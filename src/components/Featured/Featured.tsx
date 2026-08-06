@@ -27,7 +27,7 @@ const Featured = () => {
   ];
 
   return (
-    <div className="w-full min-h-[70vh] flex justify-center items-center bg-brand-navy bg-[image:linear-gradient(to_top,rgba(0,0,0,0.9),rgba(0,0,0,0.1)),url('/heroImg.jpg')] bg-cover bg-center text-white py-20 px-5">
+    <div className="w-full min-h-[60vh] flex justify-center items-center bg-brand-navy bg-[image:linear-gradient(to_top,rgba(0,0,0,0.9),rgba(0,0,0,0.1)),url('/heroImg.jpg')] bg-cover bg-center text-white py-20 px-5">
       <div className="w-full container mx-auto flex flex-col items-center px-4 md:px-6">
 
         <div className="w-full flex flex-col items-center text-center gap-10">
@@ -37,7 +37,7 @@ const Featured = () => {
             </h1>
 
             <div className="flex flex-col md:flex-row items-center bg-transparent md:bg-white rounded-xl w-full max-w-[850px] md:h-[70px] p-0 md:p-2 shadow-none md:shadow-2xl gap-3 md:gap-0">
-              
+
               <div className="flex-1 flex items-center h-[55px] md:h-full px-5 gap-3 w-full md:w-auto bg-white rounded-lg md:rounded-none">
                 <Search className="text-gray-400 min-w-[24px]" size={24} strokeWidth={1.5} />
                 <input

@@ -23,7 +23,7 @@ const Home = () => {
       <TopRatedSellers />
       <TrustProtection />
       <TwoWays />
-      <FAQ />
+      {/* <FAQ /> */}
       <CTA />
     </div>
   )

@@ -1,0 +1,198 @@
+.profile {
+  display: flex;
+  justify-content: center;
+  background-color: #f8fafc;
+  padding: 40px 0;
+  min-height: 80vh;
+
+  .container {
+    width: 90%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .profile-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+
+    .card-header {
+      padding: 24px 30px;
+      border-bottom: 1px solid #e2e8f0;
+
+      h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 6px;
+      }
+
+      p {
+        font-size: 14px;
+        color: #64748b;
+      }
+    }
+  }
+
+  .profile-form {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .avatar-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+
+      .avatar-preview {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--green-color);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      }
+
+      .file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+
+        .upload-btn {
+          background-color: #f1f5f9;
+          border: 1px solid #cbd5e1;
+          color: #334155;
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-size: 13.5px;
+          font-weight: 600;
+          cursor: pointer;
+          &:hover {
+            background-color: #e2e8f0;
+          }
+        }
+
+        input[type="file"] {
+          font-size: 100px;
+          position: absolute;
+          left: 0;
+          top: 0;
+          opacity: 0;
+          cursor: pointer;
+        }
+      }
+
+      .file-hint {
+        font-size: 12px;
+        color: #94a3b8;
+      }
+    }
+
+    hr {
+      border: 0;
+      border-bottom: 1px solid #e2e8f0;
+      margin: 10px 0;
+    }
+
+    .form-fields {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+
+      @media screen and (max-width: 600px) {
+        grid-template-columns: 1fr;
+      }
+
+      .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        &.full-width {
+          grid-column: span 2;
+          @media screen and (max-width: 600px) {
+            grid-column: span 1;
+          }
+        }
+
+        label {
+          font-size: 13.5px;
+          font-weight: 700;
+          color: #334155;
+        }
+
+        input {
+          padding: 10px 12px;
+          border: 1px solid #cbd5e1;
+          border-radius: 6px;
+          outline: none;
+          font-size: 14px;
+          color: #1e293b;
+          background-color: #fff;
+          &:focus {
+            border-color: var(--green-color);
+          }
+        }
+
+        textarea {
+          padding: 12px;
+          border: 1px solid #cbd5e1;
+          border-radius: 6px;
+          outline: none;
+          font-size: 14px;
+          color: #1e293b;
+          resize: none;
+          &:focus {
+            border-color: var(--green-color);
+          }
+        }
+
+        .disabled-input {
+          background-color: #f8fafc;
+          color: #64748b;
+          border-color: #cbd5e1;
+          cursor: not-allowed;
+        }
+
+        .input-hint {
+          font-size: 11.5px;
+          color: #94a3b8;
+        }
+      }
+    }
+
+    .form-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 15px;
+
+      .save-btn {
+        background-color: var(--green-color);
+        color: #fff;
+        font-weight: 700;
+        font-size: 14.5px;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          filter: brightness(0.95);
+        }
+
+        &:disabled {
+          background-color: #94a3b8;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}

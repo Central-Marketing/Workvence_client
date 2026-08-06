@@ -1,0 +1,146 @@
+.two-ways {
+  width: 100%;
+  background-color: #f5f5f5;
+  padding: 80px 20px;
+  display: flex;
+  justify-content: center;
+
+  &__inner {
+    max-width: 1100px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__header {
+    text-align: center;
+    max-width: 700px;
+    margin-bottom: 48px;
+
+    h2 {
+      font-size: 36px;
+      font-weight: 600;
+      color: #1a1a1a;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+
+      .brand {
+        color: #1dbf73;
+      }
+    }
+
+    p {
+      font-size: 15px;
+      color: #6b7280;
+      line-height: 1.7;
+    }
+  }
+
+  &__cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    width: 100%;
+  }
+}
+
+.way-card {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.05);
+  }
+
+  &__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #f5f5f5;
+    border: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+
+    img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.65;
+    margin-bottom: 28px;
+    flex-grow: 1;
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 46px;
+    padding: 0 40px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    width: 100%;
+
+    &--primary {
+      background-color: #1dbf73;
+      color: #ffffff;
+      border: none;
+
+      &:hover {
+        background-color: #19a463;
+      }
+    }
+
+    &--outline {
+      background-color: #ffffff;
+      color: #555;
+      border: 1px solid #ddd;
+
+      &:hover {
+        border-color: #bbb;
+        color: #333;
+      }
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .two-ways {
+    padding: 60px 16px;
+
+    &__header h2 {
+      font-size: 28px;
+    }
+
+    &__cards {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+}

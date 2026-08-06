@@ -1,0 +1,177 @@
+.home {
+
+    .features {
+        background-color: #f1fdf7;
+        display: flex;
+        justify-content: center;
+        padding: 100px 0;
+        
+        &.dark {
+            background-color: #0D084D;
+    
+            h1, h2, p, h6 {
+                color: #fff !important;
+                font-weight: 400 !important;
+            }
+    
+            h1, h2 {
+                font-weight: 500 !important;
+            }
+
+            h1 > span {
+                font-family: 'Noto Serif Display', serif;
+                font-weight: 600;
+            }
+
+            .item > img {
+                width: 100% !important;
+            }
+
+            button {
+                background-color: var(--green-color);
+                color: #fff;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-size: 16px;
+                cursor: pointer;
+                margin-top: 20px;
+                border: none;
+                width: max-content;
+            }
+        }
+
+        .container {
+            display: flex;
+            width: 90%;
+            align-items: center;
+            gap: 50px;
+
+            @media screen and (max-width: 900px) {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+
+        .item {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+
+            h1 {
+                font-weight: 700;
+                margin-bottom: 10px;
+                font-size: 38px;
+                color: #404145;
+            }
+
+            p {
+                font-size: 18px;
+                font-weight: 500;
+                color: #62646A;
+                line-height: 26px;
+            }
+
+            .title {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+
+                img {
+                    width: 24px;
+                    height: 24px;
+                }
+                
+                h6 {
+                    color: #404145;
+                    font-weight: 700;
+                    font-size: 18px;
+                }
+            }
+
+            video {
+                width: 720px;
+
+                @media screen and (max-width: 900px) {
+                    width: 100%;
+                }
+            }
+        }
+    }
+}
+
+    .trust-protection {
+        padding: 80px 0;
+        background: #fff;
+
+        .container {
+            width: 90%;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #222427;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #2f4b5a;
+            max-width: 900px;
+            margin: 0 auto 40px auto;
+            line-height: 1.6;
+            text-decoration: underline;
+            text-underline-offset: 8px;
+            text-decoration-thickness: 2px;
+            text-decoration-color: rgba(13,8,77,0.08);
+        }
+
+        .trust-cards {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+
+            @media screen and (max-width: 900px) {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .trust-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(13,8,77,0.06);
+            padding: 36px 28px;
+            width: 340px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            align-items: center;
+            text-align: center;
+
+            .icon {
+                background: #fff;
+                border-radius: 8px;
+                padding: 12px;
+                box-shadow: 0 6px 20px rgba(13,8,77,0.04);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 6px;
+            }
+
+            h3 {
+                font-size: 20px;
+                color: #0D084D;
+                margin: 8px 0;
+                font-weight: 700;
+            }
+
+            p {
+                color: #8f9398;
+                line-height: 1.6;
+                font-size: 15px;
+            }
+        }
+    }

@@ -1,0 +1,148 @@
+.myGigs {
+  display: flex;
+  justify-content: center;
+  background-color: #f8fafc;
+  padding: 40px 0;
+  min-height: 80vh;
+
+  .loader {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 0;
+  }
+
+  .container {
+    width: 90%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+
+    .card-header {
+      padding: 24px 30px;
+      border-bottom: 1px solid #e2e8f0;
+      background-color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 6px;
+      }
+
+      p {
+        font-size: 14px;
+        color: #64748b;
+      }
+
+      .add-btn {
+        background-color: var(--green-color);
+        color: #fff;
+        font-weight: 600;
+        font-size: 14px;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          filter: brightness(0.95);
+        }
+      }
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+
+    th {
+      padding: 16px 20px;
+      color: #64748b;
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      border-bottom: 1px solid #f1f5f9;
+      background-color: #f8fafc;
+    }
+
+    td {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      font-size: 14px;
+    }
+
+    .clickable-row {
+      cursor: pointer;
+      transition: background-color 0.2s;
+      &:hover {
+        background-color: #f8fafc;
+      }
+    }
+
+    .cover-img {
+      width: 70px;
+      height: 50px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid #e2e8f0;
+    }
+
+    .title-cell {
+      font-weight: 500;
+      color: #334155;
+      max-width: 350px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .price-cell {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .sales-cell {
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .delete-btn {
+      background-color: #fef2f2;
+      color: #ef4444;
+      font-weight: 600;
+      font-size: 13px;
+      border: 1px solid #fee2e2;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background-color: #ef4444;
+        border-color: #ef4444;
+        color: #fff;
+      }
+    }
+  }
+}

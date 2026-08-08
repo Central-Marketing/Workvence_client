@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useRef, useEffect, Suspense } from 'react';
-import { GigCard, Loader } from '@/components';
+import { PackageCard, Loader } from '@/components';
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
@@ -20,14 +20,14 @@ const categories = [
   "Social Media",
 ];
 
-const mockRecommendedGigs = [
+const mockRecommendedPackages = [
   {
     _id: "rec-1",
     title: "I will create a professional and user-friendly website design for your ...",
     price: 75,
     starNumber: 482,
     totalStars: 2361.8,
-    cover: "/GigImages.png",
+    cover: "/PackageImages.png",
     userID: { username: "Leslie", image: "/media/noavatar.png" }
   },
   {
@@ -36,7 +36,7 @@ const mockRecommendedGigs = [
     price: 75,
     starNumber: 482,
     totalStars: 2361.8,
-    cover: "/gigImg.jpg",
+    cover: "/packageImg.jpg",
     userID: { username: "Leslie", image: "/media/noavatar.png" }
   },
   {
@@ -45,7 +45,7 @@ const mockRecommendedGigs = [
     price: 75,
     starNumber: 482,
     totalStars: 2361.8,
-    cover: "/GigImages.png",
+    cover: "/PackageImages.png",
     userID: { username: "Leslie", image: "/media/noavatar.png" }
   },
   {
@@ -54,12 +54,12 @@ const mockRecommendedGigs = [
     price: 75,
     starNumber: 482,
     totalStars: 2361.8,
-    cover: "/gigImg.jpg",
+    cover: "/packageImg.jpg",
     userID: { username: "Leslie", image: "/media/noavatar.png" }
   }
 ];
 
-const Gigs = () => {
+const Packages = () => {
   const searchParams = useSearchParams();
   const search = searchParams?.toString() || "";
   const navigate = useRouter();
@@ -104,7 +104,7 @@ const Gigs = () => {
   // Reactive React Query key ensuring automatic re-fetching whenever any filter state changes
   const { isLoading, error, data, refetch } = useQuery({
     queryKey: [
-      'gigs',
+      'packages',
       searchVal,
       activeCategory,
       filterCategory,
@@ -138,8 +138,8 @@ const Gigs = () => {
     }
   });
 
-  const { data: recommendedGigs } = useQuery({
-    queryKey: ['recommendedGigs'],
+  const { data: recommendedPackages } = useQuery({
+    queryKey: ['recommendedPackages'],
     queryFn: () => axiosFetch.get('/gigs?limit=4').then(({ data }) => data || []).catch(() => []),
   });
 
@@ -156,7 +156,7 @@ const Gigs = () => {
     if (currentMin) params.set('min', currentMin);
     if (currentMax) params.set('max', currentMax);
     
-    navigate.push(`/gigs?${params.toString()}`, { scroll: false });
+    navigate.push(`/packages?${params.toString()}`, { scroll: false });
   };
 
   const handleApplyFilter = () => {
@@ -185,7 +185,7 @@ const Gigs = () => {
     setExperience({ entry: false, intermediate: false, expert: false });
     setEnglishLevel('');
     setClientLocation('');
-    navigate.push('/gigs', { scroll: false });
+    navigate.push('/packages', { scroll: false });
   };
 
   const toggleExperience = (key: string) => {
@@ -574,14 +574,14 @@ const Gigs = () => {
               <img 
                 src="/404.png" 
                 onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/404Img.png"; }}
-                alt="Gig Not Found" 
+                alt="Package Not Found" 
                 className="w-full max-w-[420px] h-auto object-contain mb-8" 
               />
               <h2 className="text-[28px] sm:text-[34px] font-bold text-gray-900 mb-3 tracking-tight">
-                Oops! This <span className="text-[#1dbf73]">Gig</span> Doesn&apos;t Exist.
+                Oops! This <span className="text-[#1dbf73]">Package</span> Doesn&apos;t Exist.
               </h2>
               <p className="text-[15px] sm:text-base text-gray-500 max-w-[450px] leading-relaxed">
-                The gig you&apos;re looking for may have been removed, changed, or is temporarily unavailable.
+                The package you&apos;re looking for may have been removed, changed, or is temporarily unavailable.
               </p>
             </div>
 
@@ -591,15 +591,17 @@ const Gigs = () => {
                 You may also like:
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-                {(recommendedGigs && recommendedGigs.length > 0 ? recommendedGigs.slice(0, 4) : mockRecommendedGigs).map((gig: any) => (
-                  <GigCard key={gig._id || gig.id} data={gig} />
+                {recommendedPackages && recommendedPackages.length > 0 ? recommendedPackages.slice(0, 4).map((pkg: any) => (
+                  <PackageCard key={pkg._id || pkg.id} data={pkg} />
+                )) : mockRecommendedPackages.map((pkg: any) => (
+                  <PackageCard key={pkg._id || pkg.id} data={pkg} />
                 ))}
               </div>
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-            {data?.map((gig: any) => <GigCard key={gig._id} data={gig} />)}
+            {data?.map((pkg: any) => <PackageCard key={pkg._id} data={pkg} />)}
           </div>
         )}
       </div>
@@ -607,10 +609,10 @@ const Gigs = () => {
   );
 };
 
-export default function GigsPage() {
+export default function PackagesPage() {
   return (
     <Suspense fallback={<div className="flex justify-center items-center h-64"><Loader size={45} /></div>}>
-      <Gigs />
+      <Packages />
     </Suspense>
   );
 }

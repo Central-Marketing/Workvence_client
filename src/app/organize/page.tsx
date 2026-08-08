@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useEffect, useReducer, useState } from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useRouter } from "next/navigation";
-import { gigReducer, initialState } from '@/reducers/gigReducer';
+import { packageReducer, initialState } from '@/reducers/packageReducer';
 import { cards } from '@/data';
 import { axiosFetch, generateImageURL } from '@/utils';
 
@@ -15,9 +15,9 @@ import './Add.scss';
 
 const Add = () => {
   const user = useUserStore((state: any) => state.user);
-  const [state, dispatch] = useReducer(gigReducer, initialState);
+  const [state, dispatch] = useReducer(packageReducer, initialState);
   const [coverImage, setCoverImage] = useState(null);
-  const [gigImages, setGigImages] = useState([]);
+  const [packageImages, setPackageImages] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const navigate = useRouter();
@@ -28,8 +28,8 @@ const Add = () => {
   }, [])
 
   const mutation = useMutation({
-    mutationFn: (gig: any) =>
-      axiosFetch.post('/gigs', gig)
+    mutationFn: (pkg: any) =>
+      axiosFetch.post('/gigs', pkg)
       .then(({data}) => {
         return data;
       })
@@ -38,7 +38,7 @@ const Add = () => {
       })
     ,
     onSuccess: () => 
-      queryClient.invalidateQueries({ queryKey: ['my-gigs'] })
+      queryClient.invalidateQueries({ queryKey: ['my-packages'] })
   })
 
   const handleFormCange = (event: any) => {
@@ -63,7 +63,7 @@ const Add = () => {
       setUploading(true);
       const cover = await generateImageURL(coverImage);
       const images = await Promise.all(
-        [...gigImages].map(async (img) => await generateImageURL(img))
+        [...packageImages].map(async (img) => await generateImageURL(img))
       )
       dispatch({
         type: 'ADD_IMAGES',
@@ -90,14 +90,14 @@ const Add = () => {
     toast.success("Congratulations! You're on the market!")
     mutation.mutate(form);
     setTimeout(() => {
-      navigate.push('/my-gigs');
+      navigate.push('/my-packages');
     }, 2000);
   }
 
   return (
     <div className='add'>
       <div className="container">
-        <h1>Add New Gig</h1>
+        <h1>Add New Package</h1>
         <div className="sections">
           <div className="left">
             <label htmlFor="">Title</label>
@@ -119,7 +119,7 @@ const Add = () => {
                 <input type="file" accept='image/*' onChange={(event: any) => setCoverImage(event.target.files[0])} />
                 <br />
                 <label htmlFor="">Upload Images</label>
-                <input type="file" accept='image/*' multiple onChange={(event: any) => setGigImages(event.target.files)} />
+                <input type="file" accept='image/*' multiple onChange={(event: any) => setPackageImages(event.target.files)} />
               </div>
               <button disabled={!!disabled} onClick={handleImageUploads}>{uploading ? 'uploading' : disabled ? 'Uploaded' : 'upload'}</button>
             </div>

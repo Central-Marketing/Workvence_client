@@ -35,6 +35,7 @@ const footerColumns = [
       "Workvence Guides",
       "Post a Project",
       "Browse Services",
+      "Recommended Sellers",
     ],
   },
   {
@@ -120,7 +121,14 @@ const Footer = () => {
               {col.links.map((link) => (
                 <Link
                   key={link}
-                  href={link === "Privacy Policy" ? "/privacy" : link === "Terms of Service" ? "/terms" : "#"}
+                  href={
+                    link === "Privacy Policy" ? "/privacy" : 
+                    link === "Terms of Service" ? "/terms" : 
+                    link === "Trust & Safety" ? "/trust-safety" : 
+                    link === "Help Center" ? "/help-center" : 
+                    link === "Recommended Sellers" ? "/recommended-sellers" :
+                    "#"
+                  }
                   className="text-[13px] text-gray-500 hover:text-gray-900 transition-colors"
                 >
                   {link}

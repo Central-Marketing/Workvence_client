@@ -65,7 +65,7 @@ const ExploreCategories = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {categories.map((category, index) => (
             <Link
-              href={`/gigs?category=${category.path}`}
+              href={`/packages?category=${category.path}`}
               key={index}
               className="flex flex-col p-6 bg-white border border-gray-100 rounded-[1.5rem] shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.1)] transition-all duration-300 group"
             >

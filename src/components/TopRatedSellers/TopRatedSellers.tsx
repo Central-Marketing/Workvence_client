@@ -51,7 +51,7 @@ const TopRatedSellers = () => {
             </p>
           </div>
           <Link
-            href="/gigs"
+            href="/packages"
             className="px-8 py-3 bg-brand-green text-white rounded-[8px] font-semibold hover:bg-[#389115] transition-colors whitespace-nowrap mb-2 shadow-sm hover:shadow-md"
           >
             View all
@@ -60,7 +60,7 @@ const TopRatedSellers = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sellers.map((seller) => (
-            <div key={seller.id} className="flex flex-col bg-[#fafafa] rounded-2xl overflow-hidden border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 group cursor-pointer">
+            <Link href={`/package/${seller.id}`} key={seller.id} className="flex flex-col bg-[#fafafa] rounded-2xl overflow-hidden border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 group cursor-pointer">
               <div className="w-full h-56 overflow-hidden rounded-t-2xl m-1.5 mb-0 w-[calc(100%-12px)]">
                 <img
                   src={seller.image}
@@ -97,7 +97,7 @@ const TopRatedSellers = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

@@ -20,10 +20,10 @@ const TwoWays = () => {
             </div>
             <h3>Buy a Fixed-Price Service</h3>
             <p>
-              Browse curated gig packages with clear scopes and set timelines. Perfect for defined tasks like logos, articles, or bug fixes.
+              Browse curated package packages with clear scopes and set timelines. Perfect for defined tasks like logos, articles, or bug fixes.
             </p>
-            <Link href="/gigs" className="way-card__btn way-card__btn--primary">
-              Browse gigs
+            <Link href="/packages" className="way-card__btn way-card__btn--primary">
+              Browse packages
             </Link>
           </div>
 
@@ -35,7 +35,7 @@ const TwoWays = () => {
             <p>
               Submit your custom requirements and let our vetted experts pitch their best solutions. Best for long-term or complex initiatives.
             </p>
-            <Link href="/gigs" className="way-card__btn way-card__btn--outline">
+            <Link href="/packages" className="way-card__btn way-card__btn--outline">
               Post project
             </Link>
           </div>

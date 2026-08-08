@@ -1,14 +1,13 @@
 import axios from "axios";
 
 const getBaseURL = () => {
-  const envUrl = process.env.NEXT_PUBLIC_SERVER_API_URL;
-  if (envUrl && !envUrl.includes("localhost")) {
-    return envUrl;
+  if (typeof window === "undefined") {
+    // Server-side rendering (SSR) needs absolute URL
+    return process.env.NEXT_PUBLIC_SERVER_API_URL || "http://localhost:8080/api";
   }
-  const hostname = typeof window !== "undefined" && window.location.hostname
-    ? window.location.hostname
-    : "localhost";
-  return `http://${hostname}:8080/api`;
+  // Client-side requests should always go to the relative /api proxy
+  // This completely fixes CORS and cross-origin cookie issues with cloudflare tunnels!
+  return "/api";
 };
 
 const axiosFetch = axios.create({

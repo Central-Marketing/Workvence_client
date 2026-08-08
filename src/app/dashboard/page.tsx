@@ -82,7 +82,7 @@ const Dashboard = () => {
             </h2>
             <p className="subtext">
               {user.isSeller 
-                ? `Cleared earnings from ${completedOrders.length} gigs` 
+                ? `Cleared earnings from ${completedOrders.length} packages` 
                 : `Across all ${totalOrdersCount} placed orders`}
             </p>
           </div>
@@ -96,7 +96,7 @@ const Dashboard = () => {
           <div className="stat-card">
             <span className="label">Completed Orders</span>
             <h2 className="value">{completedOrders.length}</h2>
-            <p className="subtext">Gigs successfully closed</p>
+            <p className="subtext">Packages successfully closed</p>
           </div>
 
           <div className="stat-card">
@@ -165,7 +165,7 @@ const Dashboard = () => {
           <div className="card actions-card">
             <h2>Quick Actions</h2>
             <div className="actions-list">
-              <Link href="/gigs" className="action-button primary">
+              <Link href="/packages" className="action-button primary">
                 Browse Services
               </Link>
               <Link href="/messages" className="action-button secondary">
@@ -174,16 +174,24 @@ const Dashboard = () => {
               {user.isSeller ? (
                 <>
                   <Link href="/organize" className="action-button secondary">
-                    Publish a new Gig
+                    Publish a new Package
+                  </Link>
+                  <Link href="/briefs" className="action-button secondary">
+                    Browse Job Briefs
                   </Link>
                   <Link href="/earnings" className="action-button secondary">
                     View Earnings Statement
                   </Link>
                 </>
               ) : (
-                <Link href="/register?seller=true" className="action-button secondary">
-                  Become a Seller
-                </Link>
+                <>
+                  <Link href="/briefs/create" className="action-button secondary">
+                    Post a Job Brief
+                  </Link>
+                  <Link href="/register?seller=true" className="action-button secondary">
+                    Become a Seller
+                  </Link>
+                </>
               )}
             </div>
           </div>

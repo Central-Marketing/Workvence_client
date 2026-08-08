@@ -9,12 +9,13 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
   const isMessagePage = pathname === "/messages" || pathname.startsWith("/message/");
   const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/reset-password";
+  const isAdminPage = pathname.startsWith("/admin");
 
   return (
     <>
-      {!isAuthPage && <Navbar />}
+      {!isAuthPage && !isAdminPage && <Navbar />}
       {children}
-      {!isMessagePage && !isAuthPage && <Footer />}
+      {!isMessagePage && !isAuthPage && !isAdminPage && <Footer />}
     </>
   );
 }

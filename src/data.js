@@ -137,7 +137,7 @@ export const projects = [
   },
 ];
 
-export const gigs = [
+export const packages = [
   {
     id: 1,
     img: "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=800",

@@ -17,7 +17,7 @@ const Message = () => {
   const messagesEndRef = useRef(null);
 
   const [showOfferModal, setShowOfferModal] = useState(false);
-  const [selectedGigId, setSelectedGigId] = useState("");
+  const [selectedPackageId, setSelectedPackageId] = useState("");
   const [offerDesc, setOfferDesc] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
   const [offerDelivery, setOfferDelivery] = useState("");
@@ -114,8 +114,8 @@ const Message = () => {
     refetchInterval: 5000
   });
 
-  const { data: sellerGigs = [] } = useQuery({
-    queryKey: ['seller-gigs', user?._id],
+  const { data: sellerPackages = [] } = useQuery({
+    queryKey: ['seller-packages', user?._id],
     queryFn: () => axiosFetch.get(`/gigs?userID=${user._id}`).then(({ data }) => data),
     enabled: !!user?.isSeller
   });
@@ -175,18 +175,18 @@ const Message = () => {
 
   const handleOfferSubmit = (e) => {
     e.preventDefault();
-    if (!selectedGigId) { toast.error("Select a gig first."); return; }
+    if (!selectedPackageId) { toast.error("Select a package first."); return; }
     if (!offerDesc || !offerPrice || !offerDelivery) { toast.error("Fill all fields."); return; }
 
     const payload = {
-      gigID: selectedGigId,
+      packageID: selectedPackageId,
       price: Number(offerPrice),
       desc: offerDesc,
       delivery: Number(offerDelivery),
       sellerID: user._id
     };
     mutation.mutate({ conversationID, description: `[CUSTOM_OFFER]${JSON.stringify(payload)}` });
-    setSelectedGigId(""); setOfferDesc(""); setOfferPrice(""); setOfferDelivery("");
+    setSelectedPackageId(""); setOfferDesc(""); setOfferPrice(""); setOfferDelivery("");
     setShowOfferModal(false);
     toast.success("Custom offer sent!");
   };
@@ -194,7 +194,7 @@ const Message = () => {
   const handleAcceptOffer = async (offer) => {
     try {
       const { data } = await axiosFetch.post('/orders/create-payment-intent/custom', {
-        gigID: offer.gigID,
+        packageID: offer.packageID,
         customPrice: offer.price,
         customTitle: offer.desc,
         sellerID: offer.sellerID,

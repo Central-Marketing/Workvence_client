@@ -76,7 +76,7 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
             {categories.map((cat) => (
               <Link
                 key={cat}
-                href={`/gigs?category=${cat === 'All services' ? '' : encodeURIComponent(cat)}`}
+                href={`/packages?category=${cat === 'All services' ? '' : encodeURIComponent(cat)}`}
                 className="flex-shrink-0 px-4 py-4 text-[13.5px] font-semibold text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap border-b-2 border-transparent hover:border-gray-300"
               >
                 {cat}
@@ -208,7 +208,7 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
               
               <div className="flex flex-wrap items-center justify-center gap-4 w-full">
                 <Link
-                  href="/gigs?category=Digital%20Marketing"
+                  href="/packages?category=Digital%20Marketing"
                   className="px-7 py-3.5 bg-[#1dbf73] hover:bg-[#19a463] text-white font-semibold rounded-xl transition-all shadow-sm text-sm"
                 >
                   Browse other sellers
@@ -234,7 +234,7 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
               Recommended sellers
             </h3>
             <Link
-              href="/gigs?category=Digital%20Marketing"
+              href="/packages?category=Digital%20Marketing"
               className="text-sm font-semibold text-[#1dbf73] hover:underline transition-colors"
             >
               View all experts

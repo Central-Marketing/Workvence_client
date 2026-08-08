@@ -1,9 +1,10 @@
 // @ts-nocheck
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Reviews } from '@/components';
+import { axiosFetch } from '@/utils';
 
 const categories = [
   "All services",
@@ -17,71 +18,46 @@ const categories = [
   "Social Media",
 ];
 
-const portfolioProjects = [
-  {
-    title: "Email Marketing Automation",
-    date: "From April 2026",
-    desc: "My online course client needed automated email sequences to nurture leads and increase enrollment rates.",
-    tags: ["Email Marketing", "3+"],
-    cost: "$200-$400",
-    duration: "7-10 days",
-    thumb: "https://images.pexels.com/photos/5699456/pexels-photo-5699456.jpeg?auto=compress&cs=tinysrgb&w=600",
-    mainImage: "https://images.pexels.com/photos/5699456/pexels-photo-5699456.jpeg?auto=compress&cs=tinysrgb&w=1200",
-  },
-  {
-    title: "YouTube SEO & Video Growth",
-    date: "From March 2026",
-    desc: "Optimized video metadata, high-CTR thumbnails, and keyword ranking strategy for a SaaS tech channel.",
-    tags: ["YouTube SEO", "Video Ads"],
-    cost: "$300-$600",
-    duration: "10-14 days",
-    thumb: "https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=600",
-    mainImage: "https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=1200",
-  },
-  {
-    title: "Facebook & Instagram Lead Ads",
-    date: "From February 2026",
-    desc: "Built targeted conversion campaigns with custom audience retargeting, resulting in a 4.2x ROAS within two weeks.",
-    tags: ["Meta Ads", "Lead Generation"],
-    cost: "$450-$800",
-    duration: "2 Weeks",
-    thumb: "https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600",
-    mainImage: "https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1200",
-  },
-  {
-    title: "Google Ads Search Campaign",
-    date: "From January 2026",
-    desc: "Comprehensive keyword research, landing page optimization, and smart bidding strategy for an e-commerce brand.",
-    tags: ["Google Ads", "SEM"],
-    cost: "$500-$900",
-    duration: "3 Weeks",
-    thumb: "https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=600",
-    mainImage: "https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=1200",
-  },
-  {
-    title: "Full Stack Social Growth Strategy",
-    date: "From December 2025",
-    desc: "End-to-end multi-channel branding, viral hook frameworks, and community engagement for a personal branding coach.",
-    tags: ["Social Media", "Growth"],
-    cost: "$700-$1200",
-    duration: "1 Month",
-    thumb: "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=600",
-    mainImage: "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=1200",
-  }
-];
+
 
 const SellerPublicProfile = ({ username }: { username?: string }) => {
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [sellerData, setSellerData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const displayUsername = username && username !== "undefined" && username !== "null"
+  useEffect(() => {
+    const fetchSellerData = async () => {
+      try {
+        if (!username || username === "undefined" || username === "null") {
+          setIsLoading(false);
+          return;
+        }
+        const { data } = await axiosFetch.get(`/users/${username}`);
+        if (!data.error) {
+          setSellerData(data.user || data);
+        }
+      } catch (error) {
+        console.error("Error fetching seller data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSellerData();
+  }, [username]);
+
+  const displayUsername = sellerData?.username || (username && username !== "undefined" && username !== "null"
     ? decodeURIComponent(username)
-    : "Alex Mercer";
+    : "Alex Mercer");
 
   const cleanHandle = displayUsername.toLowerCase().replace(/\s+/g, "").slice(0, 10);
   const handleName = `@${cleanHandle}03`;
 
-  const activeProject = portfolioProjects[selectedIdx] || portfolioProjects[0];
+  const activeProject = sellerData?.portfolio?.[selectedIdx] || null;
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-12 h-12 border-4 border-gray-200 border-t-[#1dbf73] rounded-full animate-spin"></div></div>;
+  }
 
   return (
     <div className="min-h-screen bg-white text-gray-800 pb-28">
@@ -92,7 +68,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
             {categories.map((cat) => (
               <Link
                 key={cat}
-                href={`/gigs?category=${cat === 'All services' ? '' : encodeURIComponent(cat)}`}
+                href={`/packages?category=${cat === 'All services' ? '' : encodeURIComponent(cat)}`}
                 className="flex-shrink-0 px-4 py-4 text-[13.5px] font-semibold text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap border-b-2 border-transparent hover:border-gray-300"
               >
                 {cat}
@@ -113,7 +89,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
             <div className="flex flex-col items-center border-b border-gray-100 pb-6 mb-6">
               <div className="w-24 h-24 rounded-full bg-gray-100 relative mb-3.5 p-1 border border-gray-200 shadow-2xs flex-shrink-0">
                 <img
-                  src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  src={sellerData?.image || "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=800"}
                   alt={displayUsername}
                   className="w-full h-full rounded-full object-cover"
                 />
@@ -125,7 +101,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                 {displayUsername}
               </h1>
               <p className="text-sm sm:text-[15px] text-gray-500 text-center mt-1 font-normal">
-                Digital marketer
+                {sellerData?.shortTitle || "Digital marketer"}
               </p>
 
               {/* Badges */}
@@ -164,7 +140,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                   </svg>
                   <span>From</span>
                 </span>
-                <span className="font-semibold text-gray-900">United States</span>
+                <span className="font-semibold text-gray-900">{sellerData?.country || "United States"}</span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -174,7 +150,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                   </svg>
                   <span>Member since</span>
                 </span>
-                <span className="font-semibold text-gray-900">2021</span>
+                <span className="font-semibold text-gray-900">{sellerData?.createdAt ? new Date(sellerData.createdAt).getFullYear() : "2021"}</span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -184,7 +160,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                   </svg>
                   <span>Languages</span>
                 </span>
-                <span className="font-semibold text-gray-900">English</span>
+                <span className="font-semibold text-gray-900">{sellerData?.languages ? sellerData.languages.map((l:any)=>l.language).join(", ") : "English"}</span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -214,7 +190,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                 SKILLS
               </h2>
               <div className="flex flex-wrap gap-2">
-                {["Google Ads", "Content Marketing", "Email Marketing", "Lead Generation"].map((skill) => (
+                {(sellerData?.skills || ["Google Ads", "Content Marketing", "Email Marketing", "Lead Generation"]).map((skill: string) => (
                   <span key={skill} className="bg-[#eaf8f0] text-[#169c5e] hover:bg-[#d5f1e1] px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-default">
                     {skill}
                   </span>
@@ -252,11 +228,11 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
             {/* Stats Summary */}
             <div className="grid grid-cols-2 gap-4 py-6 border-b border-gray-100 text-center">
               <div>
-                <p className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">4.9</p>
-                <p className="text-xs text-gray-400 font-medium mt-0.5">248 Reviews</p>
+                <p className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">{sellerData?.starRating || 4.9}</p>
+                <p className="text-xs text-gray-400 font-medium mt-0.5">{sellerData?.totalReviews || 248} Reviews</p>
               </div>
               <div>
-                <p className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">320</p>
+                <p className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">{sellerData?.completedOrdersCount || 320}</p>
                 <p className="text-xs text-gray-400 font-medium mt-0.5">Orders Completed</p>
               </div>
             </div>
@@ -297,122 +273,103 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
               <div className="text-gray-600 text-[14.5px] sm:text-[15px] leading-relaxed font-normal space-y-4">
                 <p>Hello!</p>
                 <p>
-                  I&apos;m Samuel Morgan, a Professional Digital Marketer specializing in YouTube SEO, Facebook Ads Manager, Google Ads Campaigns, and Social Media Management.
+                  {sellerData?.description || "I am a Professional Digital Marketer specializing in YouTube SEO, Facebook Ads Manager, Google Ads Campaigns, and Social Media Management."}
                 </p>
-                <p>
-                  I partner with startups, personal brands, and businesses to boost online visibility, drive meaningful engagement, and maximize conversions through data-driven marketing strategies.
-                </p>
-                <div>
-                  <p className="font-semibold text-gray-800 mb-1.5">My Expertise:</p>
-                  <ul className="space-y-1 pl-1">
-                    <li>• YouTube video ranking &amp; SEO optimization</li>
-                    <li>• Facebook &amp; Instagram ad campaigns (lead generation &amp; sales)</li>
-                    <li>• Google Ads (Search, Display, YouTube advertising)</li>
-                    <li>• End-to-end social media management &amp; growth strategies</li>
-                  </ul>
-                </div>
+                {sellerData?.experience && sellerData.experience.length > 0 && (
+                  <div>
+                    <p className="font-semibold text-gray-800 mb-1.5">My Experience:</p>
+                    <ul className="space-y-2 pl-1">
+                      {sellerData.experience.map((exp: any, idx: number) => (
+                        <li key={idx}>
+                          <span className="font-semibold text-gray-900">• {exp.title}</span> at {exp.company}
+                          <br />
+                          <span className="text-sm text-gray-500 pl-3">{exp.description}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* SECTION 2: Seller Portfolio */}
-            <div className="bg-white border border-gray-200/90 rounded-3xl p-7 sm:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.025)]">
-              
-              {/* Portfolio Header */}
-              <div className="flex items-center justify-between gap-4 mb-5">
-                <h2 className="text-xl sm:text-[24px] font-semibold text-gray-900 tracking-tight">
-                  Seller Portfolio
-                </h2>
-                <button type="button" className="text-gray-400 hover:text-gray-900 transition-colors p-1" title="View all projects">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Thumbnails Row (5 images + +15 Projects box) */}
-              <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 mb-8">
-                {portfolioProjects.map((proj, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setSelectedIdx(idx)}
-                    className={`aspect-square rounded-2xl p-1 overflow-hidden transition-all relative group cursor-pointer ${
-                      selectedIdx === idx
-                        ? "border-2 border-[#1dbf73] ring-2 ring-[#1dbf73]/10 bg-[#eaf8f0]/30 shadow-xs"
-                        : "border border-gray-200 hover:border-gray-300 bg-gray-50"
-                    }`}
-                  >
-                    <img src={proj.thumb} alt={proj.title} className="w-full h-full object-cover rounded-xl transition-transform group-hover:scale-105" />
+            {sellerData?.portfolio && sellerData.portfolio.length > 0 && (
+              <div className="bg-white border border-gray-200/90 rounded-3xl p-7 sm:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.025)]">
+                
+                {/* Portfolio Header */}
+                <div className="flex items-center justify-between gap-4 mb-5">
+                  <h2 className="text-xl sm:text-[24px] font-semibold text-gray-900 tracking-tight">
+                    Seller Portfolio
+                  </h2>
+                  <button type="button" className="text-gray-400 hover:text-gray-900 transition-colors p-1" title="View all projects">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
                   </button>
-                ))}
-                
-                {/* +15 Projects Card */}
-                <Link
-                  href={`/gigs?search=${displayUsername}`}
-                  className="aspect-square bg-white border border-gray-200 hover:border-gray-300 rounded-2xl flex flex-col items-center justify-center text-center p-2 shadow-2xs hover:bg-gray-50 transition-all group"
-                >
-                  <span className="text-base sm:text-lg font-semibold text-gray-800 group-hover:text-[#1dbf73] transition-colors">+15</span>
-                  <span className="text-[11px] sm:text-xs text-gray-400 font-medium mt-0.5">Projects</span>
-                </Link>
-              </div>
-
-              {/* Featured Project Case Study Card */}
-              <div className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-7 shadow-[0_2px_15px_rgba(0,0,0,0.025)] grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
-                
-                {/* Left details */}
-                <div className="lg:col-span-6 flex flex-col justify-between h-full">
-                  <div>
-                    <span className="text-xs font-semibold text-gray-400 block mb-1.5">
-                      {activeProject.date}
-                    </span>
-                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2.5 tracking-tight">
-                      {activeProject.title}
-                    </h3>
-                    <p className="text-[14px] sm:text-[14.5px] text-gray-500 leading-relaxed font-normal mb-5">
-                      {activeProject.desc}
-                    </p>
-
-                    {/* Pill Tags */}
-                    <div className="flex flex-wrap items-center gap-2 mb-6">
-                      {activeProject.tags.map((tag) => (
-                        <span key={tag} className="px-3.5 py-1.5 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-600 shadow-2xs">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Cost & Duration footer */}
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
-                    <div>
-                      <p className="text-xs font-semibold text-gray-400 mb-1">Project Cost</p>
-                      <p className="text-base font-semibold text-gray-900">{activeProject.cost}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold text-gray-400 mb-1">Project duration</p>
-                      <p className="text-base font-semibold text-gray-900">{activeProject.duration}</p>
-                    </div>
-                  </div>
                 </div>
 
-                {/* Right image screen */}
-                <div className="lg:col-span-6">
-                  <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden bg-gray-900 border border-gray-200/80 shadow-xs relative group">
-                    <img
-                      src={activeProject.mainImage}
-                      alt={activeProject.title}
-                      className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
-                    />
-                  </div>
+                {/* Thumbnails Row */}
+                <div className="flex flex-wrap gap-3 mb-8">
+                  {sellerData.portfolio.map((proj: any, idx: number) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedIdx(idx)}
+                      className={`h-20 w-24 sm:w-28 rounded-2xl p-1 overflow-hidden transition-all relative group cursor-pointer ${
+                        selectedIdx === idx
+                          ? "border-2 border-[#1dbf73] ring-2 ring-[#1dbf73]/10 bg-[#eaf8f0]/30 shadow-xs"
+                          : "border border-gray-200 hover:border-gray-300 bg-gray-50"
+                      }`}
+                    >
+                      <img src={proj.image || "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg"} alt={proj.title} className="w-full h-full object-cover rounded-xl transition-transform group-hover:scale-105" />
+                    </button>
+                  ))}
                 </div>
 
-              </div>
+                {/* Featured Project Case Study Card */}
+                {activeProject && (
+                  <div className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-7 shadow-[0_2px_15px_rgba(0,0,0,0.025)] grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
+                    
+                    {/* Left details */}
+                    <div className="lg:col-span-6 flex flex-col justify-center h-full">
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 tracking-tight">
+                          {activeProject.title}
+                        </h3>
+                        <p className="text-[14px] sm:text-[14.5px] text-gray-500 leading-relaxed font-normal mb-5">
+                          {activeProject.description}
+                        </p>
 
-            </div>
+                        {activeProject.link && (
+                          <a href={activeProject.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[#1dbf73] font-semibold text-[14px] hover:text-[#19a463] transition-colors">
+                            View Live Project
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Right image screen */}
+                    <div className="lg:col-span-6">
+                      <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden bg-gray-900 border border-gray-200/80 shadow-xs relative group">
+                        <img
+                          src={activeProject.image || "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg"}
+                          alt={activeProject.title}
+                          className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
+                        />
+                      </div>
+                    </div>
+
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* SECTION 3: Reviews */}
             <div className="bg-white border border-gray-200/90 rounded-3xl p-7 sm:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.025)]">
-              <Reviews gigID={username || "66bb31018991206112f45511"} />
+              <Reviews packageID={username || "66bb31018991206112f45511"} />
             </div>
 
           </div>

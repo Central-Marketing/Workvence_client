@@ -52,7 +52,7 @@ const PopularServices = () => {
         >
           {cards.map((card) => (
             <SwiperSlide key={card.id}>
-              <Link href={`/gigs?category=${card.slug}`}>
+              <Link href={`/packages?category=${card.slug}`}>
                 <div className="flex flex-col bg-[#f9fafb] rounded-[1.25rem] overflow-hidden group cursor-pointer border border-transparent hover:border-gray-100 transition-all duration-300">
                   <div className="h-[260px] overflow-hidden m-2 rounded-[1rem]">
                     <img 

@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
+import Swal from 'sweetalert2';
 import moment from "moment";
 import "./OrderDetail.scss";
 
@@ -127,13 +128,87 @@ const OrderDetail = () => {
     }
   };
 
+  const handleRequestRevision = async () => {
+    const { value: text } = await Swal.fire({
+      title: 'Request Revision',
+      input: 'textarea',
+      inputLabel: 'What needs to be changed?',
+      inputPlaceholder: 'Please describe the revisions needed clearly...',
+      showCancelButton: true,
+      confirmButtonColor: '#1dbf73',
+      inputValidator: (value) => {
+        if (!value) return 'You need to write a reason!';
+      }
+    });
+
+    if (text) {
+      setSubmitting(true);
+      try {
+        await axiosFetch.post(`/orders/${order._id}/request-revision`, { reason: text });
+        Swal.fire('Sent!', 'Your revision request has been sent to the seller.', 'success');
+        refetch();
+      } catch (err) {
+        Swal.fire('Error', err.response?.data?.message || 'Failed to request revision', 'error');
+      } finally {
+        setSubmitting(false);
+      }
+    }
+  };
+
+  const handleRequestExtension = async () => {
+    const { value: formValues } = await Swal.fire({
+      title: 'Request Time Extension',
+      html:
+        '<input id="swal-input1" type="number" min="1" class="swal2-input" placeholder="Extra Days Needed (e.g. 2)">' +
+        '<textarea id="swal-input2" class="swal2-textarea" placeholder="Reason for extension..."></textarea>',
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonColor: '#1dbf73',
+      preConfirm: () => {
+        const days = (document.getElementById('swal-input1') as HTMLInputElement).value;
+        const reason = (document.getElementById('swal-input2') as HTMLTextAreaElement).value;
+        if (!days || !reason) {
+          Swal.showValidationMessage('Both fields are required');
+        }
+        return { extraDays: parseInt(days), reason };
+      }
+    });
+
+    if (formValues) {
+      setSubmitting(true);
+      try {
+        await axiosFetch.post(`/orders/${order._id}/request-extension`, formValues);
+        Swal.fire('Sent!', 'Your extension request has been sent to the buyer.', 'success');
+        refetch();
+      } catch (err) {
+        Swal.fire('Error', err.response?.data?.message || 'Failed to request extension', 'error');
+      } finally {
+        setSubmitting(false);
+      }
+    }
+  };
+
+  const handleRespondExtension = async (action: string) => {
+    try {
+      await axiosFetch.patch(`/orders/${order._id}/respond-extension`, { action });
+      Swal.fire('Success', `Extension request has been ${action}ed.`, 'success');
+      refetch();
+    } catch (err) {
+      toast.error("Failed to respond to extension request.");
+    }
+  };
+
   if (isLoading) return <div className="loader-container"><Loader size={50} /></div>;
   if (error || !order) return <div className="error-container">Failed to load order.</div>;
 
-  const contactUser = user?.isSeller ? order.buyerID : order.sellerID;
-  const isPaid = order.status === 'paid' || !order.status;
-  const isDelivered = order.status === 'delivered';
-  const isCompleted = order.status === 'completed';
+  const isCurrentUserSeller = (user?._id && order?.sellerID && (user._id === order.sellerID._id || user._id === order.sellerID)) || (user?.isSeller && user?.username === order?.sellerID?.username);
+  const contactUser = isCurrentUserSeller ? order.buyerID : order.sellerID;
+  const isRevision = order?.status?.toLowerCase() === 'revision' || order?.status?.toLowerCase() === 'in_revision' || order?.status?.toLowerCase() === 'in revision' || !!order?.revisionReason;
+  const isPaid = order?.status?.toLowerCase() === 'paid' || order?.status?.toLowerCase() === 'in_progress' || order?.status?.toLowerCase() === 'in progress' || isRevision || !order?.status;
+  const isDelivered = order?.status?.toLowerCase() === 'delivered';
+  const isCompleted = order?.status?.toLowerCase() === 'completed';
+  const extensionData = order?.extensionRequest || order?.extension;
+  const hasPendingExtension = extensionData?.status === 'pending';
 
   return (
     <div className="order-detail">
@@ -157,6 +232,28 @@ const OrderDetail = () => {
             </div>
           </div>
 
+          {/* Extension Request Banner for Buyer */}
+          {!isCurrentUserSeller && hasPendingExtension && (
+            <div className="card delivery-card" style={{ borderLeft: '4px solid #0095ff' }}>
+              <div className="delivery-badge-tag" style={{ background: '#e0f2fe', color: '#0284c7' }}>Time Extension Request</div>
+              <div className="delivery-content">
+                <h5>The Seller has requested more time ({extensionData.extraDays || extensionData.requestedDays} days)</h5>
+                <p className="message-text">Reason: "{extensionData.reason}"</p>
+              </div>
+              <div className="delivery-actions" style={{ display: 'flex', gap: '15px' }}>
+                <button className="approve-order-btn" onClick={() => handleRespondExtension('accept')}>
+                  Approve Extension
+                </button>
+                <button 
+                  onClick={() => handleRespondExtension('reject')}
+                  style={{ background: 'white', color: '#ff6b4a', border: '1px solid #ff6b4a', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Reject
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Countdown Clock Display Banner */}
           {countdownText && (
             <div className={`card countdown-card ${isOverdue ? 'overdue' : ''}`}>
@@ -179,13 +276,14 @@ const OrderDetail = () => {
                   <p>Funds secured in escrow. Seller began working.</p>
                 </div>
               </div>
-              <div className={`step ${isDelivered || isCompleted ? "completed" : "pending"}`}>
+              <div className={`step ${isDelivered || isCompleted || isRevision ? "completed" : "pending"}`}>
                 <div className="step-bullet">2</div>
                 <div className="step-content">
                   <h5>Work Delivered</h5>
                   <p>
                     {isDelivered || isCompleted 
                       ? "Seller submitted work files for review." 
+                      : isRevision ? "Buyer requested revisions. Seller is working on them."
                       : "Seller is currently working on your delivery."}
                   </p>
                 </div>
@@ -204,6 +302,16 @@ const OrderDetail = () => {
             </div>
           </div>
 
+          {isRevision && (
+            <div className="card delivery-card" style={{ borderLeft: '4px solid #ff9800' }}>
+              <div className="delivery-badge-tag" style={{ background: '#fff3e0', color: '#e65100' }}>In Revision</div>
+              <div className="delivery-content">
+                <h5>{!isCurrentUserSeller ? "Feedback from me:" : "Feedback from Buyer:"}</h5>
+                <p className="message-text">"{order.revisionReason || order.revisions?.[order.revisions.length - 1]?.reason || order.revisions?.[order.revisions.length - 1] || "No specific feedback provided."}"</p>
+              </div>
+            </div>
+          )}
+
           {/* Deliveries Display Details */}
           {isDelivered && (
             <div className="card delivery-card">
@@ -221,13 +329,21 @@ const OrderDetail = () => {
                 )}
               </div>
               
-              {!user.isSeller && (
-                <div className="delivery-actions">
+              {!isCurrentUserSeller && (
+                <div className="delivery-actions" style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
                   <button className="approve-order-btn" onClick={handleCompleteOrder}>
                     Approve Work & Release Funds
                   </button>
-                  <p className="action-hint">
-                    By clicking, you accept the work and authorize release of funds.
+                  <button 
+                    className="request-revision-btn" 
+                    onClick={handleRequestRevision}
+                    disabled={submitting}
+                    style={{ background: 'white', color: '#ff6b4a', border: '1px solid #ff6b4a', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    Request Revision
+                  </button>
+                  <p className="action-hint" style={{ width: '100%', marginTop: '5px' }}>
+                    By clicking Approve, you accept the work and authorize release of funds.
                   </p>
                 </div>
               )}
@@ -253,15 +369,36 @@ const OrderDetail = () => {
           )}
 
           {/* Interactive Delivery Submission Form for Seller */}
-          {user.isSeller && isPaid && (
+          {isCurrentUserSeller && isPaid && (
             <div className="card action-form-card">
               {!showDeliverForm ? (
                 <div className="delivery-teaser">
                   <h4>Ready to submit your work?</h4>
                   <p>Upload files or supply external links along with instructions to complete the order.</p>
-                  <button className="start-delivery-btn" onClick={() => setShowDeliverForm(true)}>
-                    Deliver Now
-                  </button>
+                  <div style={{ display: 'flex', gap: '15px', marginTop: '15px', justifyContent: 'center' }}>
+                    <button className="start-delivery-btn" onClick={() => setShowDeliverForm(true)}>
+                      Deliver Now
+                    </button>
+                    {!hasPendingExtension && (
+                      <button 
+                        onClick={handleRequestExtension}
+                        style={{ background: 'white', color: '#1dbf73', border: '1px solid #1dbf73', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                      >
+                        Request Time Extension
+                      </button>
+                    )}
+                  </div>
+                  {hasPendingExtension && (
+                    <div style={{ marginTop: '24px', padding: '16px 20px', background: '#f0f9ff', borderLeft: '4px solid #0ea5e9', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <div style={{ fontSize: '24px' }}>⏳</div>
+                      <div>
+                        <h4 style={{ margin: 0, color: '#0369a1', fontSize: '16px', fontWeight: 600 }}>Time Extension Requested</h4>
+                        <p style={{ margin: '4px 0 0 0', color: '#0284c7', fontSize: '14px' }}>
+                          Waiting for the buyer to review your request for an additional {extensionData.extraDays || extensionData.requestedDays} days.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <form onSubmit={handleDeliverSubmit} className="deliver-form">
@@ -305,35 +442,70 @@ const OrderDetail = () => {
           <div className="card ledger-card">
             <h3>Order Activity & Escrow Ledger</h3>
             <div className="ledger-timeline">
-              <div className="ledger-event">
-                <span className="ledger-date">
-                  {moment(order.createdAt).format("MMM DD, YYYY - hh:mm A")}
-                </span>
-                <p className="ledger-desc">
-                  💰 Escrow Payment Secured. Stripe confirmed payment of <strong>{order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}</strong>.
-                </p>
-              </div>
+              {order.history && order.history.length > 0 ? (
+                order.history.map((item: any, index: number) => {
+                  let icon = "📌";
+                  if (item.action === "ORDER_CREATED") icon = "💰";
+                  if (item.action === "EXTENSION_REQUESTED" || item.action === "EXTENSION_RESPONDED") icon = "⏳";
+                  if (item.action === "WORK_DELIVERED" || item.action === "DELIVERY_SUBMITTED") icon = "📦";
+                  if (item.action === "REVISION_REQUESTED") icon = "⚠️";
+                  if (item.action === "ORDER_COMPLETED" || item.action === "ORDER_ACCEPTED") icon = "✓";
+                  
+                  return (
+                    <div className="ledger-event" key={item._id || index}>
+                      <span className="ledger-date">
+                        {moment(item.timestamp).format("MMM DD, YYYY - hh:mm A")}
+                      </span>
+                      <p className="ledger-desc">
+                        {icon} {item.note}
+                      </p>
+                    </div>
+                  );
+                })
+              ) : (
+                <>
+                  <div className="ledger-event">
+                    <span className="ledger-date">
+                      {moment(order.createdAt).format("MMM DD, YYYY - hh:mm A")}
+                    </span>
+                    <p className="ledger-desc">
+                      💰 Escrow Payment Secured. Stripe confirmed payment of <strong>{order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}</strong>.
+                    </p>
+                  </div>
 
-              {(isDelivered || isCompleted) && (
-                <div className="ledger-event">
-                  <span className="ledger-date">
-                    {moment(order.updatedAt).format("MMM DD, YYYY - hh:mm A")}
-                  </span>
-                  <p className="ledger-desc">
-                    📦 Work Delivered. Seller submitted delivery statement and work files.
-                  </p>
-                </div>
-              )}
+                  {(isDelivered || isCompleted || isRevision) && (
+                    <div className="ledger-event">
+                      <span className="ledger-date">
+                        {moment(order.updatedAt).format("MMM DD, YYYY - hh:mm A")}
+                      </span>
+                      <p className="ledger-desc">
+                        📦 Work Delivered. Seller submitted delivery statement and work files.
+                      </p>
+                    </div>
+                  )}
 
-              {isCompleted && (
-                <div className="ledger-event">
-                  <span className="ledger-date">
-                    {moment(order.updatedAt).format("MMM DD, YYYY - hh:mm A")}
-                  </span>
-                  <p className="ledger-desc">
-                    ✓ Escrow Cleared. Buyer accepted delivery. Funds of <strong>{order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}</strong> released to seller's statement ledger.
-                  </p>
-                </div>
+                  {isRevision && (
+                    <div className="ledger-event">
+                      <span className="ledger-date">
+                        {moment(order.updatedAt).format("MMM DD, YYYY - hh:mm A")}
+                      </span>
+                      <p className="ledger-desc">
+                        ⚠️ Revision Requested. Buyer asked for changes: "{order.revisionReason}".
+                      </p>
+                    </div>
+                  )}
+
+                  {isCompleted && (
+                    <div className="ledger-event">
+                      <span className="ledger-date">
+                        {moment(order.updatedAt).format("MMM DD, YYYY - hh:mm A")}
+                      </span>
+                      <p className="ledger-desc">
+                        ✓ Escrow Cleared. Buyer accepted delivery. Funds of <strong>{order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}</strong> released to seller's statement ledger.
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -350,12 +522,12 @@ const OrderDetail = () => {
             <div className="statement-row">
               <span className="label">Order Status</span>
               <span className={`status-tag ${order.status || 'paid'}`}>
-                {isCompleted ? "Completed" : isDelivered ? "Delivered" : "In Progress"}
+                {isCompleted ? "Completed" : isDelivered ? "Delivered" : isRevision ? "In Revision" : "In Progress"}
               </span>
             </div>
             <div className="statement-row">
-              <span className="label">Payment ID</span>
-              <span className="value font-mono">{order.payment_intent}</span>
+              <span className="label">Order ID</span>
+              <span className="value font-mono">{order._id}</span>
             </div>
             <div className="statement-row">
               <span className="label">Your Role</span>

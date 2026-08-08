@@ -18,7 +18,7 @@ const faqData = [
   },
   {
     question: "Can I buy a fixed-price service and also post a project?",
-    answer: "Absolutely! You can browse and purchase ready-made gig packages for quick tasks, and also post custom projects to receive competitive bids from verified professionals."
+    answer: "Absolutely! You can browse and purchase ready-made package packages for quick tasks, and also post custom projects to receive competitive bids from verified professionals."
   },
   {
     question: "How do sellers receive payments?",

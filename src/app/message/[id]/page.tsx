@@ -163,8 +163,11 @@ const Message = () => {
     const handleReceiveMessage = (newMsg: any) => {
       // 1. Update current chat messages
       queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
-        if (oldData.some((m: any) => m._id === newMsg._id)) return oldData;
-        return [...oldData, newMsg];
+        const arr = Array.isArray(oldData) ? oldData : [];
+        if (arr.some((m: any) => m._id === newMsg._id)) return arr;
+        // Filter out temp message once real message arrives
+        const withoutTemp = arr.filter((m: any) => typeof m._id === 'string' && !m._id.startsWith('temp-'));
+        return [...withoutTemp, newMsg];
       });
 
       // 2. Instantly update conversation sidebar and header unread badge

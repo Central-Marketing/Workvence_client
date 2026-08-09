@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
-import { cards } from '@/data';
+import { useQuery } from '@tanstack/react-query';
+import { axiosFetch } from '@/utils';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -13,20 +14,27 @@ import 'swiper/css/navigation';
 const PopularServices = () => {
   const swiperRef = useRef<any>(null);
 
+  const { data: fetchedCategories = [] } = useQuery({
+    queryKey: ['admin-categories-popular'],
+    queryFn: () => axiosFetch.get('/admin/categories').then(({ data }) => data)
+  });
+
+  const categoryList = Array.isArray(fetchedCategories) ? fetchedCategories : fetchedCategories.categories || [];
+
   return (
     <section className="w-full py-16 md:py-20 bg-white">
       <div className="container mx-auto px-4 md:px-6 relative">
         <div className="flex justify-between items-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-semibold text-gray-600">Best Popular Services</h2>
-          
+          <h2 className="text-2xl md:text-4xl font-semibold text-gray-600">Best Popular Services</h2>
+
           <div className="flex gap-2">
-            <button 
+            <button
               onClick={() => swiperRef.current?.slidePrev()}
               className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 hover:text-gray-600 transition-colors bg-white shadow-sm"
             >
               <ChevronLeft size={20} strokeWidth={2} />
             </button>
-            <button 
+            <button
               onClick={() => swiperRef.current?.slideNext()}
               className="w-10 h-10 flex items-center justify-center rounded-xl bg-brand-green text-white hover:bg-[#389115] transition-colors shadow-sm"
             >
@@ -50,19 +58,19 @@ const PopularServices = () => {
           }}
           className="w-full"
         >
-          {cards.map((card) => (
-            <SwiperSlide key={card.id}>
-              <Link href={`/packages?category=${card.slug}`}>
+          {categoryList.map((card: any) => (
+            <SwiperSlide key={card._id || card.slug || card.name}>
+              <Link href={`/packages?category=${card.slug || card.name?.toLowerCase().replace(/\s+/g, '-')}`}>
                 <div className="flex flex-col bg-[#f9fafb] rounded-[1.25rem] overflow-hidden group cursor-pointer border border-transparent hover:border-gray-100 transition-all duration-300">
                   <div className="h-[260px] overflow-hidden m-2 rounded-[1rem]">
-                    <img 
-                      src={card.img} 
-                      alt={card.title} 
+                    <img
+                      src={card.image || card.img || "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600"}
+                      alt={card.name || card.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                   <div className="p-4 flex justify-between items-center">
-                    <h3 className="font-semibold text-gray-800 text-[16px]">{card.title}</h3>
+                    <h3 className="font-semibold text-gray-800 text-[16px]">{card.name || card.title}</h3>
                     <ArrowRight size={18} className="text-gray-500 group-hover:text-brand-green transition-colors" />
                   </div>
                 </div>

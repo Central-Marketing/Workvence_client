@@ -8,7 +8,6 @@ import { Loader } from "@/components";
 import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 import moment from "moment";
 import toast from "react-hot-toast";
-import "./Earnings.scss";
 
 const Earnings = () => {
   const user = useUserStore((state) => state.user);
@@ -86,17 +85,17 @@ const Earnings = () => {
   }[s] || { bg: "#f1f5f9", color: "#64748b" });
 
   return (
-    <div className="earnings">
-      <div className="container">
+    <div className="min-h-[80vh] bg-slate-50 py-10 flex justify-center font-sans">
+      <div className="w-[95%] md:w-[90%] max-w-[1100px] flex flex-col gap-7 mx-auto">
 
         {/* ── Balance Header ── */}
-        <div className="earnings-hero">
-          <div className="hero-left">
-            <h1>Seller Earnings</h1>
-            <p>Track your income, awaiting clearance, and request payouts</p>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-5 flex-wrap">
+          <div>
+            <h1 className="text-2xl md:text-[26px] font-extrabold text-slate-900 mb-1">Seller Earnings</h1>
+            <p className="text-sm text-slate-500">Track your income, awaiting clearance, and request payouts</p>
           </div>
           <button
-            className="payout-cta"
+            className="w-full md:w-auto bg-brand-green text-white py-3 px-6 rounded-lg text-[14.5px] font-bold transition-all hover:brightness-95 disabled:bg-slate-300 disabled:text-slate-400 disabled:cursor-not-allowed whitespace-nowrap"
             onClick={() => setShowPayoutModal(true)}
             disabled={availableBalance <= 0}
           >
@@ -105,52 +104,52 @@ const Earnings = () => {
         </div>
 
         {/* ── Stats Cards ── */}
-        <div className="stats-grid">
-          <div className="card stat-box">
-            <div className="stat-icon green">💰</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-6 flex items-start gap-4">
+            <div className="text-2xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0 bg-emerald-50">💰</div>
             <div>
-              <span className="stat-label">Net Income (Cleared)</span>
-              <h2>{netIncome.toLocaleString("en-US", { style: "currency", currency: "USD" })}</h2>
-              <p className="stat-sub">{completedOrders.length} completed orders</p>
+              <span className="text-[12.5px] font-bold text-slate-500 uppercase tracking-wide block mb-1.5">Net Income (Cleared)</span>
+              <h2 className="text-[28px] font-extrabold text-slate-900 m-0 mb-1">{netIncome.toLocaleString("en-US", { style: "currency", currency: "USD" })}</h2>
+              <p className="text-[12.5px] text-slate-400 m-0">{completedOrders.length} completed orders</p>
             </div>
           </div>
 
-          <div className="card stat-box">
-            <div className="stat-icon amber">⏳</div>
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-6 flex items-start gap-4">
+            <div className="text-2xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0 bg-amber-50">⏳</div>
             <div>
-              <span className="stat-label">Awaiting Clearance</span>
-              <h2>{awaitingClearance.toLocaleString("en-US", { style: "currency", currency: "USD" })}</h2>
-              <p className="stat-sub">{awaitingOrders.length} active orders in escrow</p>
+              <span className="text-[12.5px] font-bold text-slate-500 uppercase tracking-wide block mb-1.5">Awaiting Clearance</span>
+              <h2 className="text-[28px] font-extrabold text-slate-900 m-0 mb-1">{awaitingClearance.toLocaleString("en-US", { style: "currency", currency: "USD" })}</h2>
+              <p className="text-[12.5px] text-slate-400 m-0">{awaitingOrders.length} active orders in escrow</p>
             </div>
           </div>
 
-          <div className="card stat-box highlight">
-            <div className="stat-icon blue">🏦</div>
+          <div className="bg-emerald-50 rounded-2xl border border-emerald-200 shadow-sm overflow-hidden p-6 flex items-start gap-4">
+            <div className="text-2xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0 bg-blue-50">🏦</div>
             <div>
-              <span className="stat-label green-text">Available Balance</span>
-              <h2 className="balance-amount">
+              <span className="text-[12.5px] font-bold text-emerald-800 uppercase tracking-wide block mb-1.5">Available Balance</span>
+              <h2 className="text-[28px] font-extrabold text-emerald-700 m-0 mb-1">
                 {availableBalance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
               </h2>
-              <p className="stat-sub">Ready to withdraw</p>
+              <p className="text-[12.5px] text-slate-400 m-0">Ready to withdraw</p>
             </div>
           </div>
         </div>
 
         {/* ── Payout Request History ── */}
         {payouts.length > 0 && (
-          <div className="card payout-history-card">
-            <div className="card-header">
-              <h2>Payout Requests</h2>
-              <p>Your submitted withdrawal requests</p>
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="p-5 md:px-7 md:py-5 border-b border-slate-200">
+              <h2 className="text-lg font-bold text-slate-900 mb-1">Payout Requests</h2>
+              <p className="text-[13.5px] text-slate-500">Your submitted withdrawal requests</p>
             </div>
-            <div className="table-responsive">
-              <table>
+            <div className="w-full overflow-x-auto">
+              <table className="w-full border-collapse text-left min-w-[850px] whitespace-nowrap">
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>Note</th>
-                    <th>Status</th>
+                    <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Date</th>
+                    <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Amount</th>
+                    <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Note</th>
+                    <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -158,14 +157,14 @@ const Earnings = () => {
                     const sc = statusColor(p.status);
                     return (
                       <tr key={p._id}>
-                        <td className="date-cell">{moment(p.createdAt).format("MMM DD, YYYY")}</td>
-                        <td className="amount-cell">
+                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-600 whitespace-nowrap">{moment(p.createdAt).format("MMM DD, YYYY")}</td>
+                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-[15px] font-bold text-emerald-700">
                           {p.amount.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                         </td>
-                        <td className="desc-cell">{p.note || "—"}</td>
-                        <td>
+                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-800 min-w-[300px] whitespace-nowrap">{p.note || "—"}</td>
+                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm text-slate-700">
                           <span
-                            className="status-tag"
+                            className="text-[11px] font-bold py-1 px-3 rounded-full uppercase tracking-wide inline-block"
                             style={{ background: sc.bg, color: sc.color }}
                           >
                             {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
@@ -181,40 +180,40 @@ const Earnings = () => {
         )}
 
         {/* ── Financial Statement Table ── */}
-        <div className="card statement-card">
-          <div className="card-header">
-            <h2>Financial Statement History</h2>
-            <p>Complete transaction ledger for all your orders</p>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="p-5 md:px-7 md:py-5 border-b border-slate-200">
+            <h2 className="text-lg font-bold text-slate-900 mb-1">Financial Statement History</h2>
+            <p className="text-[13.5px] text-slate-500">Complete transaction ledger for all your orders</p>
           </div>
-          <div className="table-responsive">
-            <table>
+          <div className="w-full overflow-x-auto">
+            <table className="w-full border-collapse text-left min-w-[1000px]">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Order Reference</th>
-                  <th>Description</th>
-                  <th>Amount</th>
-                  <th>Status</th>
+                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Date</th>
+                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Order Reference</th>
+                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Description</th>
+                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Amount</th>
+                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {sellerOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="no-transactions">
+                    <td colSpan={5} className="text-center p-12 text-slate-400 font-medium">
                       No financial transactions recorded yet.
                     </td>
                   </tr>
                 ) : (
                   sellerOrders.map((order: any) => (
                     <tr key={order._id}>
-                      <td className="date-cell">{moment(order.createdAt).format("MMM DD, YYYY")}</td>
-                      <td className="id-cell font-mono">{order._id?.slice(-8)}</td>
-                      <td className="desc-cell">Payment for: {order.title}</td>
-                      <td className="amount-cell">
+                      <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-600 whitespace-nowrap">{moment(order.createdAt).format("MMM DD, YYYY")}</td>
+                      <td className="py-4 px-6 border-b border-slate-100 align-middle text-[11.5px] font-mono text-slate-500">{order._id?.slice(-8)}</td>
+                      <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-800 min-w-[350px] whitespace-nowrap">Payment for: {order.title}</td>
+                      <td className="py-4 px-6 border-b border-slate-100 align-middle text-[15px] font-bold text-emerald-700">
                         +{order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                       </td>
-                      <td>
-                        <span className={`status-tag ${order.status || "paid"}`}>
+                      <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm text-slate-700">
+                        <span className={`text-[11px] font-bold py-1 px-3 rounded-full uppercase tracking-wide inline-block ${order.status === "completed" ? "bg-emerald-50 text-emerald-600" : order.status === "delivered" ? "bg-blue-50 text-blue-500" : "bg-amber-50 text-amber-600"}`}>
                           {order.status === "completed" ? "Cleared" : order.status === "delivered" ? "Delivered" : "In Escrow"}
                         </span>
                       </td>
@@ -230,26 +229,27 @@ const Earnings = () => {
 
       {/* ── Payout Request Modal ── */}
       {showPayoutModal && (
-        <div className="modal-backdrop" onClick={() => setShowPayoutModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <div className="modal-head">
-              <h3>Request Payout</h3>
-              <button onClick={() => setShowPayoutModal(false)}>&times;</button>
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-[1000] p-4 animate-in fade-in duration-200" onClick={() => setShowPayoutModal(false)}>
+          <div className="bg-white w-full max-w-[440px] rounded-2xl shadow-[0_25px_60px_-12px_rgba(0,0,0,0.2)] overflow-hidden animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center py-4 px-5 border-b border-slate-200 bg-slate-50">
+              <h3 className="text-[17px] font-bold text-slate-900 m-0">Request Payout</h3>
+              <button className="text-2xl text-slate-400 hover:text-slate-900 leading-none" onClick={() => setShowPayoutModal(false)}>&times;</button>
             </div>
-            <form onSubmit={handlePayoutSubmit} className="payout-form">
-              <div className="available-info">
-                <span>Available Balance</span>
-                <strong>
+            <form onSubmit={handlePayoutSubmit} className="p-5 flex flex-col gap-4">
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg py-3 px-4 flex justify-between items-center text-sm">
+                <span className="text-emerald-800 font-semibold">Available Balance</span>
+                <strong className="text-lg font-extrabold text-emerald-700">
                   {availableBalance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                 </strong>
               </div>
 
-              <div className="field-group">
-                <label>Amount to Withdraw (USD)</label>
-                <div className="amount-input-wrap">
-                  <span className="currency-prefix">$</span>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-bold text-slate-600">Amount to Withdraw (USD)</label>
+                <div className="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:border-brand-green">
+                  <span className="px-3 bg-slate-50 text-slate-600 font-bold text-base border-r border-slate-200 flex items-center h-[42px]">$</span>
                   <input
                     type="number"
+                    className="border-none flex-1 p-2.5 text-sm text-slate-800 outline-none"
                     placeholder="0.00"
                     value={payoutAmount}
                     onChange={e => setPayoutAmount(e.target.value)}
@@ -261,25 +261,26 @@ const Earnings = () => {
                 </div>
               </div>
 
-              <div className="field-group">
-                <label>Note (Optional)</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[13px] font-bold text-slate-600">Note (Optional)</label>
                 <input
                   type="text"
+                  className="p-2.5 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green w-full"
                   placeholder="e.g. Monthly withdrawal"
                   value={payoutNote}
                   onChange={e => setPayoutNote(e.target.value)}
                 />
               </div>
 
-              <p className="payout-disclaimer">
+              <p className="text-[12.5px] text-slate-400 bg-slate-50 rounded-lg py-2.5 px-3.5 m-0 leading-relaxed">
                 ⚡ Payout requests are reviewed and processed within 2–3 business days. You will be notified when the status changes.
               </p>
 
-              <div className="payout-modal-actions">
-                <button type="submit" disabled={payoutMutation.isPending}>
+              <div className="flex gap-2.5 mt-2">
+                <button type="submit" disabled={payoutMutation.isPending} className="flex-1 py-3 px-4 bg-brand-green text-white rounded-lg text-sm font-bold transition-all hover:brightness-95 disabled:bg-slate-300 disabled:cursor-not-allowed">
                   {payoutMutation.isPending ? "Submitting..." : "Submit Request"}
                 </button>
-                <button type="button" className="cancel" onClick={() => setShowPayoutModal(false)}>
+                <button type="button" className="flex-1 py-3 px-4 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-sm font-bold transition-all hover:bg-slate-200" onClick={() => setShowPayoutModal(false)}>
                   Cancel
                 </button>
               </div>

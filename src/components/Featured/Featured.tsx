@@ -26,7 +26,7 @@ const Featured = () => {
     { name: "Data Server", icon: <Database size={28} strokeWidth={1.5} />, path: "data" },
   ];
 
-  const filteredCategories = categoryIcons.filter(cat => 
+  const filteredCategories = categoryIcons.filter(cat =>
     cat.name.toLowerCase().includes(search.trim().toLowerCase())
   );
 
@@ -40,12 +40,12 @@ const Featured = () => {
               Connect with Top <span className="text-brand-light">Freelancers</span><br />Build Outstanding Projects.
             </h1>
 
-            <div className="flex flex-col md:flex-row items-center bg-transparent md:bg-white rounded-xl w-full max-w-[850px] md:h-[70px] p-0 md:p-2 shadow-none md:shadow-2xl gap-3 md:gap-0">
+            <div className="flex flex-col md:flex-row items-center bg-transparent md:bg-white rounded-xl w-[90%] md:w-full max-w-[850px] md:h-[70px] p-0 md:p-2 shadow-none md:shadow-2xl gap-3 md:gap-0">
 
-              <div className="flex-1 flex items-center h-[55px] md:h-full px-5 gap-3 w-full md:w-auto bg-white rounded-lg md:rounded-none">
+              <div className="flex-1 flex items-center h-full px-5 gap-3 w-full md:w-auto bg-white rounded-lg md:rounded-none">
                 <Search className="text-gray-400 min-w-[24px]" size={24} strokeWidth={1.5} />
                 <input
-                  className="w-full h-full border-none outline-none text-[15px] text-gray-800 placeholder-gray-400 bg-transparent"
+                  className="w-full h-14 md:h-full border-none outline-none text-sm text-gray-800 placeholder-gray-400 bg-transparent"
                   type="text"
                   placeholder="Job title, key words or company"
                   onChange={(event: any) => setSearch(event.target.value)}

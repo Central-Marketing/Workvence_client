@@ -1,3 +1,5 @@
+"use client";
+
 import Link from 'next/link';
 import {
   MonitorCheck,
@@ -7,52 +9,35 @@ import {
   Box,
   Scissors,
   Code2,
-  Database
+  Database,
+  Briefcase
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { axiosFetch } from '@/utils';
+
+// Helper to assign a random icon based on index or category name
+const getIcon = (index: number) => {
+  const icons = [
+    <MonitorCheck className="text-gray-700" size={32} strokeWidth={1.5} />,
+    <Megaphone className="text-gray-700" size={32} strokeWidth={1.5} />,
+    <PenTool className="text-gray-700" size={32} strokeWidth={1.5} />,
+    <Clapperboard className="text-gray-700" size={32} strokeWidth={1.5} />,
+    <Box className="text-gray-700" size={32} strokeWidth={1.5} />,
+    <Scissors className="text-gray-700" size={32} strokeWidth={1.5} />,
+    <Code2 className="text-gray-700" size={32} strokeWidth={1.5} />,
+    <Database className="text-gray-700" size={32} strokeWidth={1.5} />,
+    <Briefcase className="text-gray-700" size={32} strokeWidth={1.5} />
+  ];
+  return icons[index % icons.length];
+};
 
 const ExploreCategories = () => {
-  const categories = [
-    {
-      title: "Graphic & Design",
-      icon: <MonitorCheck className="text-gray-700" size={32} strokeWidth={1.5} />,
-      path: "design"
-    },
-    {
-      title: "Digital Marketing",
-      icon: <Megaphone className="text-gray-700" size={32} strokeWidth={1.5} />,
-      path: "social"
-    },
-    {
-      title: "Writing & Translation",
-      icon: <PenTool className="text-gray-700" size={32} strokeWidth={1.5} />,
-      path: "books"
-    },
-    {
-      title: "Video & Animation",
-      icon: <Clapperboard className="text-gray-700" size={32} strokeWidth={1.5} />,
-      path: "video"
-    },
-    {
-      title: "Animation & 3D",
-      icon: <Box className="text-gray-700" size={32} strokeWidth={1.5} />,
-      path: "video"
-    },
-    {
-      title: "Video & Editing",
-      icon: <Scissors className="text-gray-700" size={32} strokeWidth={1.5} />,
-      path: "video"
-    },
-    {
-      title: "Programming & Tech",
-      icon: <Code2 className="text-gray-700" size={32} strokeWidth={1.5} />,
-      path: "wordpress"
-    },
-    {
-      title: "Data & Intelligence",
-      icon: <Database className="text-gray-700" size={32} strokeWidth={1.5} />,
-      path: "ai"
-    }
-  ];
+  const { data: fetchedCategories = [] } = useQuery({
+    queryKey: ['admin-categories-explore'],
+    queryFn: () => axiosFetch.get('/admin/categories').then(({ data }) => data)
+  });
+
+  const categoryList = Array.isArray(fetchedCategories) ? fetchedCategories : fetchedCategories.categories || [];
 
   return (
     <section className="w-full py-16 md:py-20 bg-white">
@@ -63,27 +48,32 @@ const ExploreCategories = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {categories.map((category, index) => (
-            <Link
-              href={`/packages?category=${category.path}`}
-              key={index}
-              className="flex flex-col p-6 bg-white border border-gray-100 rounded-[1.5rem] shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.1)] transition-all duration-300 group"
-            >
-              <div className="mb-8">
-                <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-gray-50 group-hover:bg-brand-green/10 transition-colors duration-300">
-                  {category.icon}
+          {categoryList.map((category: any, index: number) => {
+            const title = category.name || category.title || category.slug || "Category";
+            const path = category.slug || title.toLowerCase().replace(/\s+/g, '-');
+            
+            return (
+              <Link
+                href={`/packages?category=${path}`}
+                key={category._id || index}
+                className="flex flex-col p-4 md:p-6 bg-white border border-gray-100 rounded-[1.5rem] shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-10px_rgba(0,0,0,0.1)] transition-all duration-300 group"
+              >
+                <div className="mb-4 md:mb-8">
+                  <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl bg-gray-50 group-hover:bg-brand-green/10 transition-colors duration-300">
+                    {getIcon(index)}
+                  </div>
                 </div>
-              </div>
-              <h3 className="text-lg md:text-xl font-semibold text-gray-800 leading-tight group-hover:text-brand-green transition-colors duration-300">
-                {category.title.split(' & ').map((part, i, arr) => (
-                  <span key={i}>
-                    {part}
-                    {i !== arr.length - 1 && <>&nbsp;&<br className="hidden md:block" /></>}
-                  </span>
-                ))}
-              </h3>
-            </Link>
-          ))}
+                <h3 className="text-[15px] sm:text-lg md:text-xl font-semibold text-gray-800 leading-tight group-hover:text-brand-green transition-colors duration-300">
+                  {title.split(' & ').map((part: string, i: number, arr: any[]) => (
+                    <span key={i}>
+                      {part}
+                      {i !== arr.length - 1 && <>&nbsp;&&nbsp;<br className="hidden md:block" /></>}
+                    </span>
+                  ))}
+                </h3>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>

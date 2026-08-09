@@ -101,7 +101,7 @@ const Navbar = () => {
           </Link>
 
           <div className={`hidden lg:flex items-center overflow-hidden transition-all duration-300 ${showMenu || pathname !== '/' ? 'opacity-100 max-w-[500px]' : 'opacity-0 max-w-0 pointer-events-none'}`}>
-            <div className="flex items-center border rounded-lg px-4 py-2.5 w-[350px] xl:w-[450px] bg-gray-50 border-gray-200 focus-within:bg-white focus-within:border-brand-green focus-within:shadow-sm group">
+            <div className="flex items-center border rounded-lg px-4 py-2.5 w-[250px] xl:w-[320px] bg-gray-50 border-gray-200 focus-within:bg-white focus-within:border-brand-green focus-within:shadow-sm group">
               <RiSearchLine className="text-gray-400 text-xl mr-3 group-focus-within:text-brand-green transition-colors" />
               <input 
                 type="text" 

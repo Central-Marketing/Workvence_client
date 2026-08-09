@@ -33,3 +33,4 @@ export { default as SuspendedSeller } from './SuspendedSeller/SuspendedSeller';
 export { default as RecommendedSellers } from './RecommendedSellers/RecommendedSellers';
 export { default as SubmitProposalModal } from './SubmitProposalModal/SubmitProposalModal';
 export { default as FavoriteButton } from "./FavoriteButton/FavoriteButton";
+export { default as CustomSelect } from './CustomSelect/CustomSelect';

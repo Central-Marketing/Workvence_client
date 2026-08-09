@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { axiosFetch } from "@/utils";
 
 const socialLinks = [
   { href: "#", icon: "/all-icons/tiktok.svg", label: "TikTok" },
@@ -9,23 +13,10 @@ const socialLinks = [
   { href: "#", icon: "/all-icons/new-twitter-rectangle.svg", label: "X (Twitter)" },
 ];
 
-const footerColumns = [
+const staticFooterColumns = [
   {
     title: "Categories",
-    links: [
-      "Graphics & Design",
-      "Digital Marketing",
-      "Writing & Translation",
-      "Video & Animation",
-      "Music & Audio",
-      "Programming & Tech",
-      "AI Services",
-      "Consulting",
-      "Data",
-      "Business",
-      "Photography",
-      "Finance",
-    ],
+    links: [],
   },
   {
     title: "For Clients",
@@ -62,6 +53,23 @@ const footerColumns = [
 ];
 
 const Footer = () => {
+  const { data: fetchedCategories = [] } = useQuery({
+    queryKey: ['admin-categories-footer'],
+    queryFn: () => axiosFetch.get('/admin/categories').then(({ data }) => data)
+  });
+
+  const categoryList = Array.isArray(fetchedCategories) ? fetchedCategories : fetchedCategories.categories || [];
+
+  const footerColumns = staticFooterColumns.map(col => {
+    if (col.title === "Categories") {
+      return {
+        ...col,
+        links: categoryList.slice(0, 12).map((item: any) => item.name || (item.slug ? item.slug[0].toUpperCase() + item.slug.slice(1) : String(item)))
+      };
+    }
+    return col;
+  });
+
   return (
     <footer className="w-full bg-slate-900 text-slate-100">
       {/* Top: Brand + newsletter */}

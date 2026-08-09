@@ -3,16 +3,13 @@
 
 import toast from 'react-hot-toast';
 import { useEffect, useReducer, useState } from 'react';
-import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter } from "next/navigation";
 import { packageReducer, initialState } from '@/reducers/packageReducer';
-import { cards } from '@/data';
 import { axiosFetch, generateImageURL } from '@/utils';
 
-
 import { useUserStore } from "@/store/userStore";
-import './Add.scss';
-
+import { CustomSelect } from '@/components';
 const Add = () => {
   const user = useUserStore((state: any) => state.user);
   const [state, dispatch] = useReducer(packageReducer, initialState);
@@ -22,6 +19,13 @@ const Add = () => {
   const [disabled, setDisabled] = useState(false);
   const navigate = useRouter();
   const queryClient = useQueryClient();
+
+  const { data: fetchedCategories = [] } = useQuery({
+    queryKey: ['admin-categories'],
+    queryFn: () => axiosFetch.get('/admin/categories').then(({ data }) => data)
+  });
+
+  const categoryList = Array.isArray(fetchedCategories) ? fetchedCategories : fetchedCategories.categories || [];
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -94,72 +98,88 @@ const Add = () => {
     }, 2000);
   }
 
+  const inputClasses = "p-3.5 border border-slate-200 rounded-lg text-slate-800 bg-slate-50 transition-all duration-300 w-full placeholder:text-slate-400 focus:outline-none focus:border-brand-green focus:bg-white focus:ring-4 focus:ring-brand-green/10";
+  const labelClasses = "text-slate-700 text-sm font-semibold -mb-2";
+  const btnClasses = "px-6 py-4 rounded-lg bg-brand-green font-semibold text-base text-white transition-all duration-300 shadow-[0_4px_12px_rgba(16,185,129,0.2)] hover:bg-[#059669] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(16,185,129,0.3)] disabled:bg-slate-300 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none";
+
   return (
-    <div className='add'>
-      <div className="container">
-        <h1>Add New Package</h1>
-        <div className="sections">
-          <div className="left">
-            <label htmlFor="">Title</label>
-            <input name='title' type="text" placeholder="e.g. I will do something I'm really good at" onChange={handleFormCange} />
+    <div className='min-h-screen bg-slate-50 py-10 flex justify-center font-sans'>
+      <div className="w-[95%] md:w-[90%] max-w-[1100px] bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] p-8 md:py-12 md:px-16 mx-auto">
+        <h1 className="text-slate-900 font-bold text-2xl md:text-3xl mb-10 border-b-2 border-slate-100 pb-5">Add New Package</h1>
+        
+        <div className="flex flex-col md:flex-row justify-between gap-10 md:gap-16">
+          <div className="flex-1 flex flex-col gap-6">
+            <label className={labelClasses}>Title</label>
+            <input name='title' type="text" className={inputClasses} placeholder="e.g. I will do something I'm really good at" onChange={handleFormCange} />
 
-            <label htmlFor="">Category</label>
-            <select name="category" onChange={handleFormCange}>
-              <option value=''>Category</option>
-              {
-                cards.map((item) => (
-                  <option key={item.id} value={item.slug}>{item.slug[0].toUpperCase() + item.slug.slice(1)}</option>
-                ))
-              }
-            </select>
+            <label className={labelClasses}>Category</label>
+            <CustomSelect
+              options={categoryList.map((item: any) => ({
+                value: item.slug || item.name || item._id || String(item),
+                label: item.name || (item.slug ? item.slug[0].toUpperCase() + item.slug.slice(1) : String(item))
+              }))}
+              value={state.category || ''}
+              onChange={(val) => handleFormCange({ target: { name: 'category', value: val } })}
+              placeholder="Category"
+            />
 
-            <div className="images">
-              <div className="imagesInputs">
-                <label htmlFor="">Cover Image</label>
-                <input type="file" accept='image/*' onChange={(event: any) => setCoverImage(event.target.files[0])} />
-                <br />
-                <label htmlFor="">Upload Images</label>
-                <input type="file" accept='image/*' multiple onChange={(event: any) => setPackageImages(event.target.files)} />
+            <div className="flex flex-col gap-4 p-5 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
+              <div className="flex flex-col gap-4 w-full">
+                <label className="text-slate-700 text-sm font-semibold">Cover Image</label>
+                <input type="file" accept='image/*' className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer" onChange={(event: any) => setCoverImage(event.target.files[0])} />
+                
+                <label className="text-slate-700 text-sm font-semibold mt-2">Upload Images</label>
+                <input type="file" accept='image/*' multiple className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer" onChange={(event: any) => setPackageImages(event.target.files)} />
               </div>
-              <button disabled={!!disabled} onClick={handleImageUploads}>{uploading ? 'uploading' : disabled ? 'Uploaded' : 'upload'}</button>
+              <button className={`${btnClasses} mt-2 px-6 py-2.5 text-sm w-auto self-start`} disabled={!!disabled} onClick={handleImageUploads}>
+                {uploading ? 'Uploading...' : disabled ? 'Uploaded' : 'Upload'}
+              </button>
             </div>
 
-            <label htmlFor="">Description</label>
-            <textarea name='description' cols="30" rows="16" placeholder='Brief descriptions to introduce your service to customers' onChange={handleFormCange}></textarea>
-            <button onClick={handleFormSubmit}>Create</button>
+            <label className={labelClasses}>Description</label>
+            <textarea name='description' className={`${inputClasses} min-h-[120px] resize-y`} placeholder='Brief descriptions to introduce your service to customers' onChange={handleFormCange}></textarea>
+            
+            <button className={`${btnClasses} mt-4`} onClick={handleFormSubmit}>Create Package</button>
           </div>
 
-          <div className="right">
-            <label htmlFor="">Service Title</label>
-            <input type="text" name='shortTitle' placeholder='e.g. One-page web design' onChange={handleFormCange} />
+          <div className="flex-1 flex flex-col gap-6">
+            <label className={labelClasses}>Service Title</label>
+            <input type="text" name='shortTitle' className={inputClasses} placeholder='e.g. One-page web design' onChange={handleFormCange} />
 
-            <label htmlFor="">Short Description</label>
-            <textarea name='shortDesc' cols="30" rows="10" placeholder='Short description of your service' onChange={handleFormCange}></textarea>
+            <label className={labelClasses}>Short Description</label>
+            <textarea name='shortDesc' className={`${inputClasses} min-h-[120px] resize-y`} placeholder='Short description of your service' onChange={handleFormCange}></textarea>
 
-            <label htmlFor="">Delivery Time (e.g. 3 days)</label>
-            <input type="number" name='deliveryTime' min='1' onChange={handleFormCange} />
+            <label className={labelClasses}>Delivery Time (e.g. 3 days)</label>
+            <input type="number" name='deliveryTime' min='1' className={inputClasses} onChange={handleFormCange} />
 
-            <label htmlFor="">Revision Number</label>
-            <input type="number" name='revisionNumber' min='1' onChange={handleFormCange} />
+            <label className={labelClasses}>Revision Number</label>
+            <input type="number" name='revisionNumber' min='1' className={inputClasses} onChange={handleFormCange} />
 
-            <label htmlFor="">Add Feature</label>
-            <form className='add' onSubmit={handleFormFeature}>
-              <input type="text" placeholder='e.g. page design' onChange={handleFormCange} />
-              <button type='submit'>Add</button>
+            <label className={labelClasses}>Add Feature</label>
+            <form className='flex justify-between items-center gap-3' onSubmit={handleFormFeature}>
+              <input type="text" className={`${inputClasses} flex-1`} placeholder='e.g. page design' onChange={handleFormCange} />
+              <button type='submit' className={`${btnClasses} px-6 py-3.5 h-auto m-0 whitespace-nowrap`}>Add</button>
             </form>
-            <div className="addedFeatures">
+            
+            <div className="flex flex-wrap gap-2.5 mt-1">
               {
                 state.features?.map((feature: any) => (
-                  <div key={feature} className="item">
-                    <button onClick={() => dispatch({ type: 'REMOVE_FEATURE', payload: feature })}>{feature}
-                      <span>X</span>
+                  <div key={feature} className="group cursor-pointer">
+                    <button 
+                      type="button"
+                      className="px-3 py-1.5 text-[13px] font-medium bg-slate-100 text-slate-600 rounded-full flex items-center gap-2 border border-slate-200 transition-all duration-200 group-hover:bg-red-100 group-hover:border-red-300 group-hover:text-red-500"
+                      onClick={() => dispatch({ type: 'REMOVE_FEATURE', payload: feature })}
+                    >
+                      {feature}
+                      <span className="bg-slate-200 text-slate-500 w-4 h-4 flex items-center justify-center rounded-full text-[10px] font-bold transition-all duration-200 group-hover:bg-red-500 group-hover:text-white">X</span>
                     </button>
                   </div>
                 ))
               }
             </div>
-            <label htmlFor="">Price</label>
-            <input name='price' type="number" min='1' onChange={handleFormCange} />
+            
+            <label className={labelClasses}>Price</label>
+            <input name='price' type="number" min='1' className={inputClasses} onChange={handleFormCange} />
           </div>
         </div>
       </div>

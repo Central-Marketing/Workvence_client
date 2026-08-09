@@ -6,9 +6,8 @@ import { useEffect, useReducer, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter, useParams } from "next/navigation";
 import { packageReducer, initialState } from '@/reducers/packageReducer';
-import { cards } from '@/data';
 import { axiosFetch, generateImageURL } from '@/utils';
-import { Loader } from '@/components';
+import { Loader, CustomSelect } from '@/components';
 
 import { useUserStore } from "@/store/userStore";
 import '../Add.scss';
@@ -27,6 +26,13 @@ const EditPackage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const { data: fetchedCategories = [] } = useQuery({
+    queryKey: ['admin-categories'],
+    queryFn: () => axiosFetch.get('/admin/categories').then(({ data }) => data)
+  });
+
+  const categoryList = Array.isArray(fetchedCategories) ? fetchedCategories : fetchedCategories.categories || [];
 
   // Fetch the existing package details
   const { isLoading, error, data: packageData } = useQuery({
@@ -171,14 +177,15 @@ const EditPackage = () => {
             />
 
             <label htmlFor="category">Category</label>
-            <select name="category" value={state.category} onChange={handleFormChange}>
-              <option value=''>Category</option>
-              {
-                cards.map((item) => (
-                  <option key={item.id} value={item.slug}>{item.slug[0].toUpperCase() + item.slug.slice(1)}</option>
-                ))
-              }
-            </select>
+            <CustomSelect
+              options={categoryList.map((item: any) => ({
+                value: item.slug || item.name || item._id || String(item),
+                label: item.name || (item.slug ? item.slug[0].toUpperCase() + item.slug.slice(1) : String(item))
+              }))}
+              value={state.category}
+              onChange={(value) => handleFormChange({ target: { name: 'category', value } })}
+              placeholder="Select Category"
+            />
 
             <div className="images">
               <div className="imagesInputs">

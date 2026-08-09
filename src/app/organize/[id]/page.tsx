@@ -10,7 +10,6 @@ import { axiosFetch, generateImageURL } from '@/utils';
 import { Loader, CustomSelect } from '@/components';
 
 import { useUserStore } from "@/store/userStore";
-import '../Add.scss';
 
 const EditPackage = () => {
   const { id } = useParams();

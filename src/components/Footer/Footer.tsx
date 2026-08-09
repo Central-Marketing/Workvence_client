@@ -126,7 +126,7 @@ const Footer = () => {
           {footerColumns.map((col) => (
             <div key={col.title} className="flex flex-col gap-3">
               <h3 className="text-[14px] font-semibold text-slate-100 mb-2">{col.title}</h3>
-              {col.links.map((link) => (
+              {col.links.map((link: string) => (
                 <Link
                   key={link}
                   href={

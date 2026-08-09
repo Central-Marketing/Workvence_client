@@ -21,6 +21,8 @@ const BriefDetail = () => {
 
   const [proposalSent, setProposalSent] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showMyProposalModal, setShowMyProposalModal] = useState(false);
+  const [submittedProposalData, setSubmittedProposalData] = useState<any>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -49,24 +51,26 @@ const BriefDetail = () => {
   const isSeller = user?.isSeller;
 
   // Check if seller already submitted a proposal
-  const { data: existingProposals = [] } = useQuery({
-    queryKey: ["brief-proposals", briefId],
+  const { data: myProposals = [] } = useQuery({
+    queryKey: ["my-proposals-for-brief", briefId],
     queryFn: () =>
-      axiosFetch.get(`/briefs/${briefId}/proposals`)
+      axiosFetch.get(`/briefs/my-proposals`)
         .then(({ data }) => {
-          if (Array.isArray(data)) return data;
-          if (Array.isArray(data?.proposals)) return data.proposals;
-          if (Array.isArray(data?.data)) return data.data;
-          return [];
+          let props = [];
+          if (Array.isArray(data)) props = data;
+          else if (Array.isArray(data?.proposals)) props = data.proposals;
+          else if (Array.isArray(data?.data)) props = data.data;
+          
+          return props.filter((p: any) => p.briefID === briefId || p.briefID?._id === briefId);
         })
         .catch(() => []),
     enabled: !!briefId && !!user && isSeller && !isOwner,
   });
 
-  const hasAlreadyProposed = existingProposals.some(
-    (p: any) => p.sellerID?._id === user?._id || p.sellerID === user?._id
-  );
+  const myProposal = myProposals[0];
+  const hasAlreadyProposed = !!myProposal;
 
+  const activeProposal = submittedProposalData || myProposal;
   const showSubmittedUI = proposalSent || hasAlreadyProposed;
 
   // Close brief mutation (buyer)
@@ -84,6 +88,7 @@ const BriefDetail = () => {
 
   const handleProposalSuccess = (data?: any, isAlreadySubmitted?: boolean) => {
     setProposalSent(true);
+    setSubmittedProposalData(data);
     if (typeof window !== "undefined") {
       localStorage.setItem(`proposed_${briefId}`, "true");
     }
@@ -230,12 +235,12 @@ const BriefDetail = () => {
                 <p className="text-slate-500">
                   You have already submitted a proposal for this brief. The buyer will review your proposal and may initiate a conversation.
                 </p>
-                <Link
-                  href={`/briefs/my-briefs`}
+                <button
+                  onClick={() => setShowMyProposalModal(true)}
                   className="mt-4 px-6 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition-colors inline-block"
                 >
-                  View My Proposals
-                </Link>
+                  View My Proposal
+                </button>
               </div>
             ) : (
               <div className="py-10 px-5 text-center flex flex-col items-center">
@@ -265,6 +270,38 @@ const BriefDetail = () => {
           </div>
         )}
       </div>
+
+      {showMyProposalModal && activeProposal && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden relative">
+            <div className="flex justify-between items-center p-6 border-b border-slate-100">
+              <h2 className="text-xl font-bold text-slate-900">Your Proposal</h2>
+              <button
+                onClick={() => setShowMyProposalModal(false)}
+                className="text-slate-400 hover:text-slate-600 text-3xl leading-none"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="p-6 flex flex-col gap-4">
+              <div className="flex justify-between border-b border-slate-100 pb-4">
+                <div>
+                  <div className="text-sm font-semibold text-slate-400 uppercase tracking-wide">Your Offer</div>
+                  <div className="text-lg font-bold text-emerald-500">${activeProposal.price}</div>
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-slate-400 uppercase tracking-wide">Delivery</div>
+                  <div className="text-lg font-bold text-slate-900">{activeProposal.deliveryTime} Days</div>
+                </div>
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-2">Cover Letter</div>
+                <div className="text-[15px] text-slate-700 whitespace-pre-wrap leading-relaxed">{activeProposal.coverLetter}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showModal && (
         <SubmitProposalModal

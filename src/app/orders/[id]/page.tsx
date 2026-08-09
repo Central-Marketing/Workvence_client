@@ -30,6 +30,11 @@ const OrderDetail = () => {
   const [countdownText, setCountdownText] = useState("");
   const [isOverdue, setIsOverdue] = useState(false);
 
+  // Review states
+  const [reviewStar, setReviewStar] = useState(5);
+  const [reviewDescription, setReviewDescription] = useState("");
+  const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -43,6 +48,17 @@ const OrderDetail = () => {
         .catch(({ response }) => {
           toast.error(response?.data?.message || "Failed to load order");
         }),
+  });
+
+  const { data: reviews = [] } = useQuery({
+    queryKey: ["reviews"],
+    queryFn: () =>
+      axiosFetch.get("/reviews").then(({ data }) => {
+        if (Array.isArray(data)) return data;
+        if (Array.isArray(data?.reviews)) return data.reviews;
+        if (Array.isArray(data?.data)) return data.data;
+        return [];
+      }).catch(() => []),
   });
 
   // Real-time order updates without page reload
@@ -216,6 +232,29 @@ const OrderDetail = () => {
     }
   };
 
+  const handleReviewSubmit = async (e: any) => {
+    e.preventDefault();
+    if (!reviewDescription) {
+      toast.error("Please enter a review description.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await axiosFetch.post(`/reviews`, {
+        orderID: order._id,
+        star: reviewStar,
+        description: reviewDescription,
+      });
+      toast.success("Review submitted successfully!");
+      setHasSubmittedReview(true);
+      refetch();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to submit review");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (isLoading) return <div className="loader-container"><Loader size={50} /></div>;
   if (error || !order) return <div className="error-container">Failed to load order.</div>;
 
@@ -385,6 +424,70 @@ const OrderDetail = () => {
               </div>
             </div>
           )}
+
+          {/* Review Form for Buyer */}
+          {isCompleted && !isCurrentUserSeller && !hasSubmittedReview && !order.isReviewed && (
+            <div className="card action-form-card" style={{ marginTop: '24px' }}>
+              <div className="delivery-teaser">
+                <h4>Leave a Review</h4>
+                <p>Share your experience with this seller to help others.</p>
+              </div>
+              <form onSubmit={handleReviewSubmit} style={{ marginTop: '20px' }}>
+                <div style={{ marginBottom: '15px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155' }}>Rating (1-5)</label>
+                  <select 
+                    value={reviewStar} 
+                    onChange={(e) => setReviewStar(Number(e.target.value))}
+                    style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '15px' }}
+                  >
+                    {[5, 4, 3, 2, 1].map(num => (
+                      <option key={num} value={num}>{num} Star{num !== 1 ? 's' : ''}</option>
+                    ))}
+                  </select>
+                </div>
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155' }}>Review Description</label>
+                  <textarea 
+                    rows={4}
+                    value={reviewDescription}
+                    onChange={(e) => setReviewDescription(e.target.value)}
+                    placeholder="Outstanding work! Code is clean, well-tested, and delivered ahead of schedule."
+                    style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '15px', resize: 'vertical' }}
+                    required
+                  ></textarea>
+                </div>
+                <button 
+                  type="submit" 
+                  disabled={submitting}
+                  style={{ width: '100%', padding: '14px', background: '#6ad724', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer' }}
+                >
+                  {submitting ? 'Submitting...' : 'Submit Review'}
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* Review Display for Seller */}
+          {isCompleted && (() => {
+            const currentReview = reviews.find((r: any) => 
+              r.orderID === order._id || r.orderID?._id === order._id || order.reviewID === r._id
+            ) || order.review;
+
+            if (currentReview) {
+              return (
+                <div className="card delivery-card" style={{ marginTop: '24px', borderLeft: '4px solid #f59e0b' }}>
+                  <div className="delivery-badge-tag" style={{ background: '#fef3c7', color: '#b45309' }}>Review from Buyer</div>
+                  <div className="delivery-content">
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#f59e0b', marginRight: '8px' }}>{currentReview.star} ★</span>
+                    </div>
+                    <p className="message-text" style={{ fontStyle: 'italic' }}>"{currentReview.description}"</p>
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
 
           {/* Interactive Delivery Submission Form for Seller */}
           {isCurrentUserSeller && isPaid && (

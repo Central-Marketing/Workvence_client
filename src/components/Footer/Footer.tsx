@@ -70,9 +70,9 @@ const Footer = () => {
           <div className="max-w-xs">
             <Link href="/">
               <img
-                src="/Workvence-logo-Horizontal 1.png"
-                alt="Workvence"
-                className="h-7 object-contain cursor-pointer mb-5 bg-white/10 rounded px-2 py-1"
+                src="/whiteLogo.png"
+                alt="Workvence Logo"
+                className="h-7 object-contain cursor-pointer mb-5"
               />
             </Link>
             <p className="text-[13.5px] text-slate-400 leading-relaxed">
@@ -122,12 +122,12 @@ const Footer = () => {
                 <Link
                   key={link}
                   href={
-                    link === "Privacy Policy" ? "/privacy" : 
-                    link === "Terms of Service" ? "/terms" : 
-                    link === "Trust & Safety" ? "/trust-safety" : 
-                    link === "Help Center" ? "/help-center" : 
-                    link === "Recommended Sellers" ? "/recommended-sellers" :
-                    "#"
+                    link === "Privacy Policy" ? "/privacy" :
+                      link === "Terms of Service" ? "/terms" :
+                        link === "Trust & Safety" ? "/trust-safety" :
+                          link === "Help Center" ? "/help-center" :
+                            link === "Recommended Sellers" ? "/recommended-sellers" :
+                              "#"
                   }
                   className="text-[13px] text-slate-400 hover:text-white transition-colors"
                 >

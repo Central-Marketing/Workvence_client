@@ -90,6 +90,14 @@ const BriefsFeed = () => {
                 My Briefs
               </Link>
             )}
+            {user && user.isSeller && (
+              <Link
+                href="/briefs/my-briefs"
+                className="btn-my-briefs"
+              >
+                My All Proposal
+              </Link>
+            )}
           </div>
         </div>
 
@@ -187,7 +195,7 @@ const BriefsFeed = () => {
                     />
                     <span>{brief.userID?.username || "Anonymous"}</span>
                   </div>
-                  <button 
+                  <button
                     onClick={(e) => {
                       e.stopPropagation();
                       router.push(`/briefs/${brief._id}`);

@@ -234,11 +234,121 @@ const MyBriefs = () => {
     </div>
   );
 };
+const MyProposals = () => {
+  const router = useRouter();
+  const { isLoading, data: proposals = [] } = useQuery({
+    queryKey: ["my-proposals"],
+    queryFn: () =>
+      axiosFetch
+        .get("/briefs/my-proposals")
+        .then(({ data }) => {
+          if (Array.isArray(data)) return data;
+          if (Array.isArray(data?.proposals)) return data.proposals;
+          if (Array.isArray(data?.data)) return data.data;
+          return [];
+        })
+        .catch(() => []),
+  });
+
+  return (
+    <div className="my-briefs">
+      <div className="container">
+        {/* Banner */}
+        <div className="page-banner">
+          <div className="banner-text">
+            <h1>My Proposals</h1>
+            <p>Track your submitted proposals for job briefs</p>
+          </div>
+          <div className="banner-actions">
+            <Link href="/briefs" className="btn-browse">
+              Browse Open Briefs
+            </Link>
+          </div>
+        </div>
+
+        {/* Content */}
+        {isLoading ? (
+          <div className="loader">
+            <Loader size={45} />
+          </div>
+        ) : proposals.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-icon">📝</div>
+            <h3>No proposals submitted</h3>
+            <p>You haven't submitted any proposals yet. Browse open briefs and start pitching!</p>
+            <Link href="/briefs" className="btn-cta">
+              Browse Briefs
+            </Link>
+          </div>
+        ) : (
+          <div className="briefs-list">
+            {proposals.map((proposal: any) => {
+              const briefId = proposal.briefID?._id || proposal.briefID;
+              return (
+                <div
+                  key={proposal._id}
+                  className="brief-row"
+                  onClick={() => router.push(`/briefs/${briefId}`)}
+                >
+                  <div className="brief-info">
+                    <h3 className="brief-title">
+                      {proposal.briefID?.title || "Unknown Brief"}
+                    </h3>
+                    <div className="brief-meta">
+                      {proposal.price && (
+                        <span>
+                          Your Offer:{" "}
+                          <span className="meta-value">${proposal.price}</span>
+                        </span>
+                      )}
+                      {proposal.deliveryTime && (
+                        <span>
+                          Delivery:{" "}
+                          <span className="meta-value">{proposal.deliveryTime} Days</span>
+                        </span>
+                      )}
+                      <span>
+                        Submitted:{" "}
+                        <span className="meta-value">
+                          {moment(proposal.createdAt).fromNow()}
+                        </span>
+                      </span>
+                    </div>
+                    {proposal.coverLetter && (
+                      <div style={{ marginTop: '14px', fontSize: '14px', color: '#475569', lineHeight: '1.6' }}>
+                        <strong style={{ color: '#1e293b' }}>Cover Letter:</strong>
+                        <div style={{ marginTop: '6px', whiteSpace: 'pre-wrap' }}>{proposal.coverLetter}</div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div
+                    className="brief-actions"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Link
+                      href={`/briefs/${briefId}`}
+                      className="btn-view"
+                    >
+                      View Details
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default function MyBriefsPage() {
+  const user = useUserStore((state) => state.user);
+
   return (
     <PrivateRoute>
-      <MyBriefs />
+      {user?.isSeller ? <MyProposals /> : <MyBriefs />}
     </PrivateRoute>
   );
 }

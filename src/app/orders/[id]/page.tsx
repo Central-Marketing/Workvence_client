@@ -147,7 +147,7 @@ const OrderDetail = () => {
         await axiosFetch.post(`/orders/${order._id}/request-revision`, { reason: text });
         Swal.fire('Sent!', 'Your revision request has been sent to the seller.', 'success');
         refetch();
-      } catch (err) {
+      } catch (err: any) {
         Swal.fire('Error', err.response?.data?.message || 'Failed to request revision', 'error');
       } finally {
         setSubmitting(false);
@@ -180,7 +180,7 @@ const OrderDetail = () => {
         await axiosFetch.post(`/orders/${order._id}/request-extension`, formValues);
         Swal.fire('Sent!', 'Your extension request has been sent to the buyer.', 'success');
         refetch();
-      } catch (err) {
+      } catch (err: any) {
         Swal.fire('Error', err.response?.data?.message || 'Failed to request extension', 'error');
       } finally {
         setSubmitting(false);

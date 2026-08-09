@@ -281,7 +281,7 @@ const HelpCenter = () => {
           <div className="lg:col-span-3 space-y-6">
             <h3 className="text-[12px] font-bold text-gray-500 uppercase tracking-widest pl-2">Need More Help?</h3>
 
-            <Link href="#" className="block bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
+            <Link href="/support/new" className="block bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
               <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
@@ -289,17 +289,17 @@ const HelpCenter = () => {
                 </svg>
               </div>
               <h4 className="font-bold text-gray-900 text-[15px] mb-1">Contact Support</h4>
-              <p className="text-gray-500 text-[13px]">Email our expert team</p>
+              <p className="text-gray-500 text-[13px]">Submit a support ticket</p>
             </Link>
 
-            <Link href="#" className="block bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
+            <Link href="/support" className="block bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
               <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
               </div>
-              <h4 className="font-bold text-gray-900 text-[15px] mb-1">Live Chat</h4>
-              <p className="text-gray-500 text-[13px]">Instant 1-on-1 support</p>
+              <h4 className="font-bold text-gray-900 text-[15px] mb-1">Support Dashboard & Live Chat</h4>
+              <p className="text-gray-500 text-[13px]">Instant 1-on-1 support stream</p>
             </Link>
           </div>
 

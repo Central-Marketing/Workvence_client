@@ -16,7 +16,8 @@ const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser }) => {
     queryKey: ['conversations'],
     queryFn: () => axiosFetch.get('/conversations').then(({ data }) => Array.isArray(data) ? data : (data?.conversations || data?.data || [])).catch(() => []),
     enabled: !!currentUser?._id,
-    refetchInterval: 15000
+    staleTime: 60000,
+    refetchInterval: false,
   });
 
   // Compute total unread conversations count

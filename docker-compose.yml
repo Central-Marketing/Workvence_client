@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   workvence-client:
     image: ghcr.io/central-marketing/workvence_client:latest
@@ -9,10 +7,9 @@ services:
     container_name: workvence_client
     restart: always
     ports:
-      - "3000:3000"
+      - "3500:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
-    # Uncomment if using an env file on server
-    # env_file:
-    #   - .env
+    env_file:
+      - .env

@@ -141,13 +141,22 @@ const Message = () => {
     };
   }, [user?._id, queryClient]);
 
-  // Fetch messages for active conversation
+  // Fetch messages history for active conversation (1-time initial fetch, 0 polling)
   const { isLoading: msgsLoading, data: messages = [] } = useQuery({
     queryKey: ['messages', conversationID],
     queryFn: () =>
-      axiosFetch.get(`/messages/${conversationID}`)
-        .then(({ data }) => Array.isArray(data) ? data : (data?.messages || []))
-        .catch(() => []),
+      axiosFetch.get(`/messages/history/${conversationID}`)
+        .then(({ data }) => {
+          if (Array.isArray(data)) return data;
+          if (data?.data?.messages) return data.data.messages;
+          if (data?.messages) return data.messages;
+          return [];
+        })
+        .catch(() =>
+          axiosFetch.get(`/messages/${conversationID}`)
+            .then(({ data }) => Array.isArray(data) ? data : (data?.messages || []))
+            .catch(() => [])
+        ),
     enabled: !!conversationID,
     staleTime: 60000,
     refetchInterval: false
@@ -157,7 +166,20 @@ const Message = () => {
   useEffect(() => {
     if (!conversationID) return;
 
-    socket.emit('join_conversation', conversationID);
+    const joinRoom = () => {
+      socket.emit('join_conversation', conversationID);
+      socket.emit('join_room', conversationID);
+      socket.emit('join', conversationID);
+      if (user?._id) socket.emit('user_connected', user._id);
+    };
+
+    if (socket.connected) {
+      joinRoom();
+    } else {
+      socket.connect();
+      socket.once('connect', joinRoom);
+    }
+
     setIsRecipientTyping(false);
 
     const handleReceiveMessage = (newMsg: any) => {
@@ -320,20 +342,24 @@ const Message = () => {
     clearTimeout(typingTimeoutRef.current);
     stopTypingIndicator();
 
-    const msgPayload = {
-      conversationID,
-      description: messageText,
-      userID: user?._id,
-      isSeller: Boolean(user?.isSeller)
-    };
+    const currentText = messageText;
+    setMessageText("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
 
-    // Optimistically render sending user's message immediately
+    // 1. Optimistically append temporary message to local UI (0ms latency, right side!)
+    const tempId = `temp-${Date.now()}`;
     const tempMessage = {
-      _id: `temp-${Date.now()}`,
+      _id: tempId,
       conversationID,
-      userID: { _id: user?._id, username: user?.username, image: user?.image },
-      description: messageText,
-      createdAt: new Date().toISOString(),
+      userID: {
+        _id: user?._id || user?.id,
+        username: user?.username || 'User',
+        image: user?.image || '/media/noavatar.png'
+      },
+      description: currentText,
+      createdAt: new Date().toISOString()
     };
 
     queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
@@ -341,15 +367,17 @@ const Message = () => {
       return [...arr, tempMessage];
     });
 
+    const msgPayload = {
+      conversationID,
+      description: currentText,
+      userID: user?._id || user?.id,
+      isSeller: Boolean(user?.isSeller)
+    };
+
+    // 2. Perform DB save via authenticated HTTP mutation & emit Socket event
+    mutation.mutate(msgPayload);
     if (socket && socket.connected) {
       socket.emit("send_message", msgPayload);
-    } else {
-      mutation.mutate(msgPayload);
-    }
-
-    setMessageText("");
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
     }
   };
 
@@ -573,7 +601,9 @@ const Message = () => {
                 ) : filteredMessages.length === 0 ? (
                   <div className="scroll-empty">{msgSearchQuery ? "No messages found" : "Send the first message!"}</div>
                 ) : filteredMessages.map((msg: any, index: number) => {
-                  const isOwner = user?._id && ((msg.userID?._id || msg.userID) === user._id);
+                  const senderIdStr = String(msg.userID?._id || msg.userID?.id || msg.userID || '');
+                  const currentUserIdStr = String(user?._id || user?.id || '');
+                  const isOwner = currentUserIdStr !== '' && senderIdStr === currentUserIdStr;
                   const offer = parseOffer(msg.description);
                   const msgDate = moment(msg.createdAt).format('MMM DD');
                   const prevMsgDate = index > 0 ? moment(filteredMessages[index - 1].createdAt).format('MMM DD') : null;

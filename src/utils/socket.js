@@ -1,8 +1,11 @@
 import { io } from 'socket.io-client';
 
 const getSocketURL = () => {
+    if (process.env.NEXT_PUBLIC_SOCKET_URL) {
+        return process.env.NEXT_PUBLIC_SOCKET_URL.replace(/\/api\/?$/, '');
+    }
     const envUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL;
-    if (envUrl && !envUrl.includes("localhost")) {
+    if (envUrl) {
         return envUrl.replace(/\/api\/?$/, '');
     }
     const hostname = typeof window !== 'undefined' && window.location.hostname
@@ -49,6 +52,10 @@ const socket = {
     on(event, cb) {
         const s = getSocket();
         s?.on(event, cb);
+    },
+    once(event, cb) {
+        const s = getSocket();
+        s?.once(event, cb);
     },
     off(event, cb) {
         if (realSocket) {

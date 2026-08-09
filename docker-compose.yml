@@ -4,6 +4,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SERVER_API_URL: https://devadmin.workvence.com/api
+        NEXT_PUBLIC_API_URL: https://devadmin.workvence.com/api
+        NEXT_PUBLIC_SOCKET_URL: https://devadmin.workvence.com
+        NEXT_PUBLIC_ADMIN_API_URL: https://devadmin.workvence.com/api/admin
+        NEXT_PUBLIC_ADMIN_BACKEND_URL: https://devadmin.workvence.com
     container_name: workvence_client
     restart: always
     ports:
@@ -11,5 +17,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - NEXT_PUBLIC_SERVER_API_URL=https://devadmin.workvence.com/api
+      - NEXT_PUBLIC_ADMIN_API_URL=https://devadmin.workvence.com/api/admin
     env_file:
       - .env

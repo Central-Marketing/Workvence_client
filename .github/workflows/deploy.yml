@@ -36,6 +36,11 @@ jobs:
         run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
+          NEXT_PUBLIC_SERVER_API_URL: https://devadmin.workvence.com/api
+          NEXT_PUBLIC_API_URL: https://devadmin.workvence.com/api
+          NEXT_PUBLIC_SOCKET_URL: https://devadmin.workvence.com
+          NEXT_PUBLIC_ADMIN_API_URL: https://devadmin.workvence.com/api/admin
+          NEXT_PUBLIC_ADMIN_BACKEND_URL: https://devadmin.workvence.com
 
   build-and-deploy:
     name: Build Docker & Deploy to VPS
@@ -76,6 +81,12 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            NEXT_PUBLIC_SERVER_API_URL=https://devadmin.workvence.com/api
+            NEXT_PUBLIC_API_URL=https://devadmin.workvence.com/api
+            NEXT_PUBLIC_SOCKET_URL=https://devadmin.workvence.com
+            NEXT_PUBLIC_ADMIN_API_URL=https://devadmin.workvence.com/api/admin
+            NEXT_PUBLIC_ADMIN_BACKEND_URL=https://devadmin.workvence.com
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -97,7 +108,7 @@ jobs:
             echo "Pulling latest Docker image..."
             docker pull ghcr.io/${{ env.IMAGE_NAME }}:latest
             
-            echo "Restarting container..."
+            echo "Restarting container on port 3500..."
             docker stop workvence_client || true
             docker rm workvence_client || true
             
@@ -110,7 +121,7 @@ jobs:
             docker run -d \
               --name workvence_client \
               --restart always \
-              -p 3000:3000 \
+              -p 3500:3000 \
               $ENV_FLAG \
               ghcr.io/${{ env.IMAGE_NAME }}:latest
             

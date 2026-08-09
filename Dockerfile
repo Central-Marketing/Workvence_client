@@ -14,6 +14,18 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Build Arguments for Next.js NEXT_PUBLIC_ Environment Variables
+ARG NEXT_PUBLIC_SERVER_API_URL=https://devadmin.workvence.com/api
+ARG NEXT_PUBLIC_API_URL=https://devadmin.workvence.com/api
+ARG NEXT_PUBLIC_SOCKET_URL=https://devadmin.workvence.com
+ARG NEXT_PUBLIC_ADMIN_API_URL=https://devadmin.workvence.com/api/admin
+ARG NEXT_PUBLIC_ADMIN_BACKEND_URL=https://devadmin.workvence.com
+
+ENV NEXT_PUBLIC_SERVER_API_URL=${NEXT_PUBLIC_SERVER_API_URL}
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV NEXT_PUBLIC_SOCKET_URL=${NEXT_PUBLIC_SOCKET_URL}
+ENV NEXT_PUBLIC_ADMIN_API_URL=${NEXT_PUBLIC_ADMIN_API_URL}
+ENV NEXT_PUBLIC_ADMIN_BACKEND_URL=${NEXT_PUBLIC_ADMIN_BACKEND_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build

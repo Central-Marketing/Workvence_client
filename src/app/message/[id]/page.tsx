@@ -149,7 +149,8 @@ const Message = () => {
         .then(({ data }) => Array.isArray(data) ? data : (data?.messages || []))
         .catch(() => []),
     enabled: !!conversationID,
-    refetchInterval: 3000
+    staleTime: 60000,
+    refetchInterval: false
   });
 
   // Manage room subscription & realtime events for active conversation
@@ -162,8 +163,11 @@ const Message = () => {
     const handleReceiveMessage = (newMsg: any) => {
       // 1. Update current chat messages
       queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
-        if (oldData.some((m: any) => m._id === newMsg._id)) return oldData;
-        return [...oldData, newMsg];
+        const arr = Array.isArray(oldData) ? oldData : [];
+        if (arr.some((m: any) => m._id === newMsg._id)) return arr;
+        // Filter out temp message once real message arrives
+        const withoutTemp = arr.filter((m: any) => typeof m._id === 'string' && !m._id.startsWith('temp-'));
+        return [...withoutTemp, newMsg];
       });
 
       // 2. Instantly update conversation sidebar and header unread badge
@@ -316,7 +320,33 @@ const Message = () => {
     clearTimeout(typingTimeoutRef.current);
     stopTypingIndicator();
 
-    mutation.mutate({ conversationID, description: messageText });
+    const msgPayload = {
+      conversationID,
+      description: messageText,
+      userID: user?._id,
+      isSeller: Boolean(user?.isSeller)
+    };
+
+    // Optimistically render sending user's message immediately
+    const tempMessage = {
+      _id: `temp-${Date.now()}`,
+      conversationID,
+      userID: { _id: user?._id, username: user?.username, image: user?.image },
+      description: messageText,
+      createdAt: new Date().toISOString(),
+    };
+
+    queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
+      const arr = Array.isArray(oldData) ? oldData : [];
+      return [...arr, tempMessage];
+    });
+
+    if (socket && socket.connected) {
+      socket.emit("send_message", msgPayload);
+    } else {
+      mutation.mutate(msgPayload);
+    }
+
     setMessageText("");
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';

@@ -111,7 +111,8 @@ const Message = () => {
         .then(({ data }) => data)
         .catch(() => []),
     enabled: !!conversationID,
-    refetchInterval: 5000
+    staleTime: 60000,
+    refetchInterval: false
   });
 
   const { data: sellerPackages = [] } = useQuery({

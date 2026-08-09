@@ -19,7 +19,11 @@ const PopularServices = () => {
     queryFn: () => axiosFetch.get('/admin/categories').then(({ data }) => data)
   });
 
-  const categoryList = Array.isArray(fetchedCategories) ? fetchedCategories : fetchedCategories.categories || [];
+  const categoryList = Array.isArray(fetchedCategories)
+    ? fetchedCategories
+    : Array.isArray(fetchedCategories?.data)
+    ? fetchedCategories.data
+    : fetchedCategories?.categories || [];
 
   return (
     <section className="w-full py-16 md:py-20 bg-white">
@@ -59,18 +63,18 @@ const PopularServices = () => {
           className="w-full"
         >
           {categoryList.map((card: any) => (
-            <SwiperSlide key={card._id || card.slug || card.name}>
+            <SwiperSlide key={card._id || card.id || card.slug || card.name}>
               <Link href={`/packages?category=${card.slug || card.name?.toLowerCase().replace(/\s+/g, '-')}`}>
                 <div className="flex flex-col bg-[#f9fafb] rounded-[1.25rem] overflow-hidden group cursor-pointer border border-transparent hover:border-gray-100 transition-all duration-300">
-                  <div className="h-[260px] overflow-hidden m-2 rounded-[1rem]">
+                  <div className="h-[260px] overflow-hidden m-2 rounded-[1rem] bg-gray-100 flex items-center justify-center">
                     <img
-                      src={card.image || card.img || "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600"}
+                      src={card.image || card.img || card.icon || "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600"}
                       alt={card.name || card.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                   <div className="p-4 flex justify-between items-center">
-                    <h3 className="font-semibold text-gray-800 text-[16px]">{card.name || card.title}</h3>
+                    <h3 className="font-semibold text-gray-800 text-[16px] capitalize">{card.name || card.title}</h3>
                     <ArrowRight size={18} className="text-gray-500 group-hover:text-brand-green transition-colors" />
                   </div>
                 </div>

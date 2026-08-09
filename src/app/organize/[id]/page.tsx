@@ -31,7 +31,11 @@ const EditPackage = () => {
     queryFn: () => axiosFetch.get('/admin/categories').then(({ data }) => data)
   });
 
-  const categoryList = Array.isArray(fetchedCategories) ? fetchedCategories : fetchedCategories.categories || [];
+  const categoryList = Array.isArray(fetchedCategories)
+    ? fetchedCategories
+    : Array.isArray(fetchedCategories?.data)
+    ? fetchedCategories.data
+    : fetchedCategories?.categories || [];
 
   // Fetch the existing package details
   const { isLoading, error, data: packageData } = useQuery({

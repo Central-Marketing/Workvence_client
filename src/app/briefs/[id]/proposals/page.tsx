@@ -59,13 +59,27 @@ const Proposals = () => {
 
   // Initiate chat from proposal
   const chatMutation = useMutation({
-    mutationFn: async ({ proposalId }: { proposalId: string }) => {
-      const { data } = await axiosFetch.post(`/briefs/proposals/${proposalId}/chat`);
-      return data;
+    mutationFn: async ({ proposalId, sellerId }: { proposalId: string; sellerId: string }) => {
+      const buyerId = user?._id;
+      if (!buyerId) throw new Error("User not found");
+      
+      try {
+        const res = await axiosFetch.get(`/conversations/single/${sellerId}/${buyerId}`);
+        if (res.data?.conversationID || res.data?.id) {
+          return { conversationID: res.data.conversationID || res.data.id };
+        }
+      } catch (err) {
+        // Conversation not found, proceed to create
+      }
+      
+      const newConv = await axiosFetch.post("/conversations", {
+        to: sellerId,
+        from: buyerId,
+      });
+      return newConv.data;
     },
     onSuccess: (data) => {
-      toast.success("Chat initiated!");
-      const convId = data?.conversation?.id || data?.conversationID || data?.conversationId || data?.conversation?.conversationID || data?.id || data?._id;
+      const convId = data?.conversationID || data?.conversationId || data?.id || data?._id;
       if (convId) {
         router.push(`/message/${convId}`);
       } else {
@@ -73,7 +87,7 @@ const Proposals = () => {
       }
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || "Failed to initiate chat");
+      toast.error(err?.response?.data?.message || err?.message || "Failed to initiate chat");
     },
   });
 

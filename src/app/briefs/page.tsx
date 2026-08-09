@@ -10,7 +10,7 @@ import { RiSearchLine } from "react-icons/ri";
 
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader, SubmitProposalModal } from "@/components";
+import { Loader } from "@/components";
 import "./Briefs.scss";
 
 const CATEGORIES = [
@@ -31,7 +31,6 @@ const BriefsFeed = () => {
   const user = useUserStore((state) => state.user);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
-  const [selectedBrief, setSelectedBrief] = useState<any>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -188,41 +187,29 @@ const BriefsFeed = () => {
                     />
                     <span>{brief.userID?.username || "Anonymous"}</span>
                   </div>
-                  {user?.isSeller && brief.userID?._id !== user?._id && brief.status !== "closed" && (
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedBrief(brief);
-                      }}
-                      style={{
-                        padding: '6px 12px',
-                        background: '#6ad724',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '14px'
-                      }}
-                    >
-                      Submit Proposal
-                    </button>
-                  )}
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/briefs/${brief._id}`);
+                    }}
+                    style={{
+                      padding: '6px 12px',
+                      background: '#6ad724',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '14px'
+                    }}
+                  >
+                    View Brief
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
-
-      {selectedBrief && (
-        <SubmitProposalModal 
-          brief={selectedBrief} 
-          onClose={() => setSelectedBrief(null)}
-          onSuccess={() => {
-            toast.success("Proposal submitted successfully!");
-          }}
-        />
-      )}
     </div>
   );
 };

@@ -110,6 +110,7 @@ const Orders = () => {
                     <th>Image</th>
                     <th>{user?.isSeller ? "Buyer" : "Seller"}</th>
                     <th>Title</th>
+                    <th>Order ID</th>
                     <th>Price</th>
                     <th>Status Pill</th>
                     <th>Contact</th>
@@ -118,7 +119,7 @@ const Orders = () => {
                 <tbody>
                   {filteredOrders.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="no-orders-msg">
+                      <td colSpan={7} className="no-orders-msg">
                         No orders found in this category.
                       </td>
                     </tr>
@@ -134,6 +135,9 @@ const Orders = () => {
                             : order.sellerID?.username}
                         </td>
                         <td className="title-cell">{order.title}</td>
+                        <td className="order-id-cell" style={{ fontSize: '12px', color: '#64748b', fontFamily: 'monospace' }}>
+                          {order._id}
+                        </td>
                         <td className="price-cell">
                           {order.price.toLocaleString("en-US", {
                             style: "currency",

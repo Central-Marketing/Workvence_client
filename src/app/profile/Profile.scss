@@ -101,6 +101,37 @@
       margin: 10px 0;
     }
 
+    .tabs-container {
+      display: flex;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0 30px;
+      gap: 24px;
+      background: #f8fafc;
+      overflow-x: auto;
+
+      .tab-btn {
+        padding: 16px 4px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #64748b;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+
+        &:hover {
+          color: #334155;
+        }
+
+        &.active {
+          color: var(--green-color);
+          border-bottom-color: var(--green-color);
+        }
+      }
+    }
+
     .form-fields {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -167,11 +198,90 @@
         }
       }
     }
+    
+    .dynamic-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 10px;
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h3 {
+          font-size: 16px;
+          font-weight: 700;
+          color: #1e293b;
+        }
+
+        .add-btn {
+          background: transparent;
+          color: var(--green-color);
+          border: 1px solid var(--green-color);
+          padding: 6px 12px;
+          border-radius: 6px;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &:hover {
+            background: var(--green-color);
+            color: #fff;
+          }
+        }
+      }
+
+      .dynamic-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 20px;
+        position: relative;
+
+        .remove-btn {
+          position: absolute;
+          top: 15px;
+          right: 15px;
+          background: transparent;
+          border: none;
+          color: #ef4444;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+
+        .card-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 15px;
+          margin-top: 5px;
+
+          @media screen and (max-width: 600px) {
+            grid-template-columns: 1fr;
+          }
+          
+          .full-width {
+            grid-column: span 2;
+            @media screen and (max-width: 600px) {
+              grid-column: span 1;
+            }
+          }
+        }
+      }
+    }
 
     .form-footer {
       display: flex;
       justify-content: flex-end;
-      margin-top: 15px;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
 
       .save-btn {
         background-color: var(--green-color);

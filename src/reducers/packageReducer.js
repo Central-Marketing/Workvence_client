@@ -13,7 +13,7 @@ export const initialState = {
     price: 0,
 }
 
-export const gigReducer = (state, { type, payload }) => {
+export const packageReducer = (state, { type, payload }) => {
     switch(type) {
         case 'CHANGE_INPUT':
             return {
@@ -39,6 +39,9 @@ export const gigReducer = (state, { type, payload }) => {
                 ...state,
                 features: state.features.filter((feature) => feature !== payload)
             }
+            
+        case 'INITIALIZE_STATE':
+            return payload;
 
         default:
             return state;

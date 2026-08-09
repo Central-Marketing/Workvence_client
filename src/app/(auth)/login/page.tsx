@@ -8,11 +8,12 @@ import { axiosFetch } from '@/utils';
 import { useUserStore } from '@/store/userStore';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import './Login.scss';
+import Swal from 'sweetalert2';
 
 const Login = () => {
   const [formInput, setFormInput] = useState({
-    username: 'buyer2',
-    password: 'password123'
+    username: '',
+    password: ''
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -126,7 +127,26 @@ const Login = () => {
       }
 
       // If neither API nor test fallback succeeded
+      const isVerified = apiErr.response?.data?.isVerified;
+      const email = apiErr.response?.data?.email;
       const message = apiErr.response?.data?.message || 'Invalid username or password';
+
+      if (isVerified === false && email) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Verification Required',
+          text: message,
+          confirmButtonText: 'Verify Now',
+          confirmButtonColor: '#1dbf73'
+        }).then(() => {
+          sessionStorage.setItem('tempLoginPassword', formInput.password);
+          sessionStorage.setItem('tempLoginUsername', formInput.username);
+          router.push(`/register?step=3&email=${encodeURIComponent(email)}`);
+        });
+        setLoading(false);
+        return;
+      }
+
       setError(message);
       toast.error(message, {
         duration: 3000,
@@ -148,31 +168,11 @@ const Login = () => {
             
             <form onSubmit={handleFormSubmit}>
               <div className="form-fields">
-                <h1>Continue with username</h1>
-                
-                <div className="demo-accounts-bar">
-                  <span className="demo-title">Quick Fill Demo Credentials:</span>
-                  <div className="demo-btns">
-                    <button 
-                      type="button" 
-                      className={`demo-btn ${formInput.username === 'buyer2' ? 'active' : ''}`}
-                      onClick={() => setFormInput({ username: 'buyer2', password: 'password123' })}
-                    >
-                      👤 Buyer (buyer2)
-                    </button>
-                    <button 
-                      type="button" 
-                      className={`demo-btn ${formInput.username === 'Anna Bell' ? 'active' : ''}`}
-                      onClick={() => setFormInput({ username: 'Anna Bell', password: 'password123' })}
-                    >
-                      ⭐ Seller (Anna Bell)
-                    </button>
-                  </div>
-                </div>
+                <h1>Continue with Email</h1>
 
                 <div className="input-group">
-                  <label>User name</label>
-                  <input name="username" type="text" placeholder="Enter your user name" value={formInput.username} onChange={handleFormInput} />
+                  <label>Email Address</label>
+                  <input name="username" type="text" placeholder="Enter your email address" value={formInput.username} onChange={handleFormInput} />
                 </div>
                 
                 <div className="input-group">
@@ -200,7 +200,10 @@ const Login = () => {
               </div>
             </form>
             
-            <div className="auth-footer-step2">
+            <div className="auth-footer-step2 mt-6 text-center">
+              <p className="mb-4 text-sm text-gray-600">
+                Don't have an account? <Link href="/register" className="text-[#1dbf73] font-semibold hover:underline">Sign up</Link>
+              </p>
               <p className="copyright">©2026 workvence All right reserved</p>
             </div>
           </div>

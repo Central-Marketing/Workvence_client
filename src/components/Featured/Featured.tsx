@@ -11,7 +11,7 @@ const Featured = () => {
 
   const handleSearch = () => {
     if (search || category) {
-      router.push(`/gigs?search=${search}&category=${category}`);
+      router.push(`/packages?search=${search}&category=${category}`);
     }
   }
 
@@ -58,17 +58,21 @@ const Featured = () => {
             </div>
           </div>
 
-          <div className="flex justify-start lg:justify-center flex-nowrap overflow-x-auto w-full max-w-7xl gap-6 md:gap-8 mt-5 pb-4 custom-scrollbar">
+          <div className="flex justify-center items-start w-full max-w-5xl mt-5 gap-1 sm:gap-4 md:gap-6 overflow-hidden mx-auto">
             {categoryIcons.map((cat, index) => (
               <div
                 key={index}
-                className="flex flex-col items-center gap-2.5 cursor-pointer transition group min-w-[100px] flex-shrink-0"
-                onClick={() => router.push(`/gigs?category=${cat.path}`)}
+                className="flex flex-col items-center gap-1 md:gap-2 cursor-pointer transition group flex-1 min-w-0 md:flex-none md:w-[110px]"
+                onClick={() => router.push(`/packages?category=${cat.path}`)}
               >
-                <div className="w-[60px] h-[60px] md:w-[72px] md:h-[72px] rounded-full border border-white/30 bg-white/10 flex justify-center items-center text-white transition-all duration-300 group-hover:bg-white/20 group-hover:border-white group-hover:shadow-lg group-hover:shadow-white/20 backdrop-blur-sm">
-                  {cat.icon}
+                <div className="w-[28px] h-[28px] sm:w-[50px] sm:h-[50px] md:w-[72px] md:h-[72px] rounded-full border border-white/30 bg-white/10 flex justify-center items-center text-white transition-all duration-300 group-hover:bg-white/20 group-hover:border-white group-hover:shadow-lg group-hover:shadow-white/20 backdrop-blur-sm shrink-0">
+                  <div className="scale-[0.35] sm:scale-75 md:scale-100 flex items-center justify-center">
+                    {cat.icon}
+                  </div>
                 </div>
-                <span className="text-[12px] md:text-[14px] font-semibold text-white/90 text-center tracking-wide whitespace-nowrap">{cat.name}</span>
+                <span className="text-[7px] sm:text-[10px] md:text-[14px] font-semibold text-white/90 text-center tracking-tight leading-tight w-full break-words md:whitespace-nowrap truncate sm:overflow-visible sm:whitespace-normal">
+                  {cat.name}
+                </span>
               </div>
             ))}
           </div>

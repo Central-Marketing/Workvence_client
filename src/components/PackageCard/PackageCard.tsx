@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const GigCard = ({ data }: { data: any }) => {
+const PackageCard = ({ data }: { data: any }) => {
   const router = useRouter();
   if (!data) return null;
 
@@ -21,7 +21,7 @@ const GigCard = ({ data }: { data: any }) => {
   const formattedPrice = typeof data.price === "number" ? `$${data.price}` : (data.price ? `$${data.price}` : "$75");
 
   // Slug or fallback ID for details URL
-  const gigUrl = `/gig/${data.slug || data._id || data.id}`;
+  const packageUrl = `/package/${data.slug || data._id || data.id}`;
 
   const handleProfileClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -37,7 +37,7 @@ const GigCard = ({ data }: { data: any }) => {
 
   return (
     <Link 
-      href={gigUrl}
+      href={packageUrl}
       className="block w-full bg-white rounded-2xl border border-gray-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.08)] transition-all duration-300 overflow-hidden h-full group"
     >
       <div className="flex flex-col h-full">
@@ -45,13 +45,13 @@ const GigCard = ({ data }: { data: any }) => {
         <div className="relative w-full aspect-[16/10] overflow-hidden bg-gray-100">
           <img
             src={coverImg}
-            alt={data.title || data.desc || "Gig Cover"}
+            alt={data.title || data.desc || "Package Cover"}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
           />
           <button
             type="button"
             className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors z-10"
-            aria-label="Bookmark gig"
+            aria-label="Bookmark package"
             onClick={handleBookmarkClick}
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -117,4 +117,4 @@ const GigCard = ({ data }: { data: any }) => {
   );
 };
 
-export default GigCard;
+export default PackageCard;

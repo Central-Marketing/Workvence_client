@@ -10,15 +10,15 @@ import { useUserStore } from "@/store/userStore";
 
 
 import { Loader } from "@/components";
-import './MyGigs.scss';
+import './MyPackages.scss';
 
-const MyGigs = () => {
+const MyPackages = () => {
   const user = useUserStore((state: any) => state.user);
   const navigate = useRouter();
 
   const queryClient = useQueryClient();
   const { isLoading, error, data = [] } = useQuery({
-    queryKey: ['my-gigs'],
+    queryKey: ['my-packages'],
     queryFn: () =>
       axiosFetch(`/gigs?userID=${user._id}`)
         .then(({ data }) => data)
@@ -32,12 +32,12 @@ const MyGigs = () => {
       axiosFetch.delete(`/gigs/${_id}`)
     ,
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['my-gigs'] })
+      queryClient.invalidateQueries({ queryKey: ['my-packages'] })
   });
 
-  const handleGigDelete = (gig: any) => {
-    mutation.mutate(gig._id);
-    toast.success(gig.title + ' deleted successfully!');
+  const handlePackageDelete = (pkg: any) => {
+    mutation.mutate(pkg._id);
+    toast.success(pkg.title + ' deleted successfully!');
   }
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const MyGigs = () => {
   }, [])
 
   return (
-    <div className='myGigs'>
+    <div className='myPackages'>
       {
         isLoading
           ? <div className='loader'> <Loader size={45} /> </div>
@@ -55,11 +55,11 @@ const MyGigs = () => {
                 <div className="card">
                   <div className="card-header">
                     <div className="header-info">
-                      <h1>My Gigs</h1>
+                      <h1>My Packages</h1>
                       <p>Manage your published service listings</p>
                     </div>
                     <Link href='/organize' className='link'>
-                      <button className="add-btn">Add New Gig</button>
+                      <button className="add-btn">Add New Package</button>
                     </Link>
                   </div>
                   
@@ -76,32 +76,43 @@ const MyGigs = () => {
                       </thead>
                       <tbody>
                         {
-                          data.map((gig: any) => (
-                            <tr key={gig._id} onClick={() => navigate.push(`/gig/${gig._id}`)} className="clickable-row">
+                          data.map((pkg: any) => (
+                            <tr key={pkg._id} onClick={() => navigate.push(`/package/${pkg._id}`)} className="clickable-row">
                               <td>
                                 <img
                                   className="cover-img"
-                                  src={gig.cover}
+                                  src={pkg.cover}
                                   alt=""
                                 />
                               </td>
-                              <td className="title-cell">{gig.title}</td>
-                              <td className="price-cell">{gig.price.toLocaleString("en-US", {
+                              <td className="title-cell">{pkg.title}</td>
+                              <td className="price-cell">{pkg.price.toLocaleString("en-US", {
                                 style: "currency",
                                 currency: "USD",
                               })}</td>
-                              <td className="sales-cell">{gig.sales}</td>
-                              <td>
-                                <button 
-                                  className='delete-btn' 
-                                  onClick={(e: any) => { 
-                                    e.stopPropagation(); 
-                                    handleGigDelete(gig); 
-                                  }}
-                                >
-                                  Delete
-                                </button>
-                              </td>
+                              <td className="sales-cell">{pkg.sales}</td>
+                                <td>
+                                  <div className="action-buttons">
+                                    <button
+                                      className='edit-btn'
+                                      onClick={(e: any) => {
+                                        e.stopPropagation();
+                                        navigate.push(`/organize/${pkg._id}`);
+                                      }}
+                                    >
+                                      Edit
+                                    </button>
+                                    <button 
+                                      className='delete-btn' 
+                                      onClick={(e: any) => { 
+                                        e.stopPropagation(); 
+                                        handlePackageDelete(pkg); 
+                                      }}
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
+                                </td>
                             </tr>
                           ))
                         }
@@ -115,4 +126,4 @@ const MyGigs = () => {
   )
 }
 
-export default MyGigs;
+export default MyPackages;

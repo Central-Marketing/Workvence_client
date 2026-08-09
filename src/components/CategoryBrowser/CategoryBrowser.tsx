@@ -127,7 +127,7 @@ const CategoryBrowser = ({ defaultCategory = "Technology & Programming" }: { def
   };
 
   const handleSubitemClick = (sub: string) => {
-    router.push(`/gigs?category=${encodeURIComponent(activeCategory)}&search=${encodeURIComponent(sub)}`);
+    router.push(`/packages?category=${encodeURIComponent(activeCategory)}&search=${encodeURIComponent(sub)}`);
   };
 
   return (
@@ -171,7 +171,7 @@ const CategoryBrowser = ({ defaultCategory = "Technology & Programming" }: { def
 
             <button
               type="button"
-              onClick={() => router.push('/gigs')}
+              onClick={() => router.push('/packages')}
               className="bg-white border border-gray-200/90 hover:border-gray-300 hover:bg-gray-50/80 rounded-xl px-5 py-3 shadow-[0_2px_12px_rgba(0,0,0,0.04)] inline-flex items-center gap-3 font-extrabold text-gray-800 text-sm transition-all cursor-pointer group"
             >
               <span className="w-7 h-7 rounded-lg bg-[#1dbf73] flex items-center justify-center text-white text-xs font-bold group-hover:bg-[#19a463] transition-colors shadow-xs">
@@ -189,7 +189,7 @@ const CategoryBrowser = ({ defaultCategory = "Technology & Programming" }: { def
           </h2>
           <button 
             type="button"
-            onClick={() => router.push(`/gigs?category=${encodeURIComponent(activeCategory)}`)}
+            onClick={() => router.push(`/packages?category=${encodeURIComponent(activeCategory)}`)}
             className="font-extrabold text-gray-800 text-sm hover:text-[#1dbf73] transition-colors border-b-2 border-gray-800 hover:border-[#1dbf73] pb-0.5 cursor-pointer"
           >
             Show All

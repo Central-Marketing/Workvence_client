@@ -31,8 +31,8 @@ const HowItWorks = () => {
 
   const freelancerSteps = [
     {
-      title: "Create a Gig",
-      desc: "Sign up, setup your gig, and offer your work to our global audience.",
+      title: "Create a Package",
+      desc: "Sign up, setup your package, and offer your work to our global audience.",
       icon: <PenTool className="text-gray-700" size={20} strokeWidth={1.5} />
     },
     {

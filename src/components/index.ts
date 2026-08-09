@@ -1,13 +1,14 @@
 export { default as Navbar } from "./Navbar/Navbar";
 export { default as Featured } from "./Featured/Featured";
+export { default as NotificationBell } from "./NotificationBell/NotificationBell";
+export { default as HeaderInboxIcon } from "./HeaderInboxIcon/HeaderInboxIcon";
 export { default as TrustedBy } from "./TrustedBy/TrustedBy";
-
 export { default as CategoryCard } from "./CategoryCard/CategoryCard";
 export { default as Slide } from "./Slide/Slide";
 export { default as PrevArrow } from "./Arrows/PrevArrow";
 export { default as NextArrow } from "./Arrows/NextArrow";
 export { default as ProjectCard } from "./ProjectCard/ProjectCard";
-export { default as GigCard } from "./GigCard/GigCard";
+export { default as PackageCard } from "./PackageCard/PackageCard";
 export { default as Reviews } from "./Reviews/Reviews";
 export { default as Review } from "./Review/Review";
 export { default as CheckoutForm } from "./CheckoutForm/CheckoutForm";
@@ -29,3 +30,5 @@ export { default as PrivacyPolicy } from './PrivacyPolicy/PrivacyPolicy';
 export { default as TermsAndConditions } from './TermsAndConditions/TermsAndConditions';
 export { default as SellerPublicProfile } from './SellerPublicProfile/SellerPublicProfile';
 export { default as SuspendedSeller } from './SuspendedSeller/SuspendedSeller';
+export { default as RecommendedSellers } from './RecommendedSellers/RecommendedSellers';
+export { default as SubmitProposalModal } from './SubmitProposalModal/SubmitProposalModal';

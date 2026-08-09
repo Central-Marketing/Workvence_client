@@ -25,14 +25,10 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      // Assuming a backend endpoint for forgot password
-      // await axiosFetch.post('/auth/forgot-password', { email });
+      await axiosFetch.post('/auth/forgot-password', { email });
       
-      // Simulate API call for now
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast.success("Password reset link sent to your email!");
-      router.push('/login');
+      toast.success("Password reset OTP sent to your email!");
+      router.push(`/reset-password?email=${encodeURIComponent(email)}`);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to send reset link");
     } finally {

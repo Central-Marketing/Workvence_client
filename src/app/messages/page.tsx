@@ -25,7 +25,7 @@ const Messages = () => {
     queryKey: ['conversations'],
     queryFn: () =>
       axiosFetch.get('/conversations')
-        .then(({ data }) => data ?? [])
+        .then(({ data }) => Array.isArray(data) ? data : (data?.conversations || data?.data || []))
         .catch((err) => {
           console.log(err?.response || err);
           return [];
@@ -91,7 +91,14 @@ const Messages = () => {
                                 className={`clickable-row ${isUnread ? "unread-row" : ""}`}
                               >
                                 <td className="user-cell">
-                                  {user?.isSeller ? conv.buyerID?.username : conv.sellerID?.username}
+                                  <div className="flex items-center gap-2">
+                                    <img
+                                      src={(user?.isSeller ? conv.buyerID?.image : conv.sellerID?.image) || "/media/noavatar.png"}
+                                      alt=""
+                                      className="w-8 h-8 rounded-full object-cover"
+                                    />
+                                    <span>{user?.isSeller ? conv.buyerID?.username : conv.sellerID?.username}</span>
+                                  </div>
                                 </td>
                                 <td className="msg-cell">
                                   <span className="last-msg">

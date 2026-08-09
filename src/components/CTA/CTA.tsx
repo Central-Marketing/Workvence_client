@@ -21,7 +21,7 @@ const CTA = () => {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                href="/gigs"
+                href="/packages"
                 className="w-full sm:w-auto bg-white text-gray-900 font-medium px-7 py-3.5 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
               >
                 Find a service <span className="text-lg leading-none mb-0.5">&rarr;</span>

@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";
 import toast from "react-hot-toast";
@@ -14,6 +15,22 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  // Handle clicking outside to close the dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
 
   // 1. Fetch initial notifications from REST API
   useEffect(() => {
@@ -52,30 +69,116 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
       // Increment unread badge count
       setUnreadCount((prev) => prev + 1);
 
-      // Show real-time Toast popup on screen
+      // Trigger subtle animation on the icon
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 2000); // 2 seconds of bounce
+
       toast.custom((t) => (
-        <div className={`toast-notification ${t.visible ? 'animate-enter' : 'animate-leave'}`}>
+        <div className={`toast-notification relative ${t.visible ? 'animate-enter' : 'animate-leave'}`}>
+          <button 
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 font-bold px-1"
+            onClick={(e) => { e.stopPropagation(); toast.dismiss(t.id); }}
+          >
+            ×
+          </button>
           <strong>🔔 {newNotif.title}</strong>
           <p>{newNotif.message}</p>
         </div>
-      ), { duration: 4000 });
+      ), { duration: 86400000 });
+      
+      // Play a short notification sound
+      try {
+        if (typeof window !== 'undefined') {
+          const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+          if (AudioContextClass) {
+            const ctx = new AudioContextClass();
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(400, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0, ctx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.2);
+          }
+        }
+      } catch (e) {
+        console.warn("Audio play blocked", e);
+      }
+    };
+
+    // Listen for real-time incoming messages (chat messages from other users)
+    const handleReceiveMessage = (newMsg: any) => {
+      // Don't notify for messages sent by the current user
+      const senderId = newMsg.userID?._id || newMsg.userID;
+      if (senderId === currentUser._id) return;
+
+      // Don't show toast if user is already viewing this conversation
+      if (typeof window !== 'undefined' && window.location.pathname.includes(`/message/${newMsg.conversationID}`)) return;
+
+      const senderName = newMsg.userID?.username || 'Someone';
+      const msgPreview = newMsg.description?.startsWith('[CUSTOM_OFFER]') 
+        ? 'sent you a custom proposal' 
+        : newMsg.description?.slice(0, 60) || 'sent a message';
+
+      // Show toast for incoming message
+      toast.custom((t) => (
+        <div 
+          className={`toast-notification relative ${t.visible ? 'animate-enter' : 'animate-leave'}`}
+          style={{ cursor: 'pointer', paddingRight: '24px' }}
+          onClick={() => {
+            toast.dismiss(t.id);
+            window.location.href = `/message/${newMsg.conversationID}`;
+          }}
+        >
+          <button 
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 font-bold px-1"
+            onClick={(e) => { e.stopPropagation(); toast.dismiss(t.id); }}
+          >
+            ×
+          </button>
+          <strong>💬 {senderName}</strong>
+          <p>{msgPreview}</p>
+        </div>
+      ), { duration: 86400000 });
+
+      // Also invalidate conversations to update the header inbox badge instantly
+      // (uses window event to signal HeaderInboxIcon to refetch)
+      window.dispatchEvent(new CustomEvent('new-message-received'));
     };
 
     socket.on("new_notification", handleNewNotification);
+    socket.on("receive_message", handleReceiveMessage);
 
     return () => {
       socket.off("new_notification", handleNewNotification);
+      socket.off("receive_message", handleReceiveMessage);
     };
   }, [currentUser]);
 
-  // 3. Mark Single Notification as Read
-  const handleMarkAsRead = async (id: string, isRead: boolean) => {
-    if (isRead) return;
+  // 3. Mark Single Notification as Read and Navigate
+  const handleNotificationClick = async (n: any) => {
+    setIsOpen(false);
+    
+    // Navigate if there's a link
+    if (n.link) {
+      router.push(n.link);
+    } else if (n.orderID) {
+      router.push(`/orders/${n.orderID}`);
+    } else if (n.proposalID) {
+      router.push(`/proposals/${n.proposalID}`);
+    }
+
+    if (n.isRead) return;
     try {
-      const res = await axiosFetch.patch(`/notifications/${id}/read`);
+      const res = await axiosFetch.patch(`/notifications/${n._id}/read`);
       if (!res.data.error) {
         setNotifications((prev) =>
-          prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
+          prev.map((notif) => (notif._id === n._id ? { ...notif, isRead: true } : notif))
         );
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
@@ -98,14 +201,14 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
   };
 
   return (
-    <div className="notification-wrapper relative flex items-center">
+    <div className="notification-wrapper relative flex items-center" ref={dropdownRef}>
       {/* Header Bell Icon with Red Badge */}
       <button 
         className="bell-btn text-gray-500 hover:text-brand-green transition-colors relative" 
         onClick={() => setIsOpen(!isOpen)}
         title="Notifications"
       >
-        <FiBell className="text-[22px]" />
+        <FiBell className={`text-[22px] transition-transform ${isAnimating ? 'animate-bounce text-brand-green' : ''}`} />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
             {unreadCount > 99 ? "99+" : unreadCount}
@@ -135,7 +238,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
                 <div
                   key={n._id}
                   className={`notif-item p-3 border-b border-gray-100 cursor-pointer transition-colors hover:bg-gray-50 ${!n.isRead ? "bg-green-50/30" : "bg-white"}`}
-                  onClick={() => handleMarkAsRead(n._id, n.isRead)}
+                  onClick={() => handleNotificationClick(n)}
                 >
                   <div className="notif-title text-sm font-bold text-gray-800 mb-1 flex items-center gap-1">
                     {!n.isRead && <span className="w-2 h-2 rounded-full bg-brand-green inline-block"></span>}

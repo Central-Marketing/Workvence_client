@@ -3,39 +3,27 @@
 import Link from 'next/link';
 import { Star, Award } from 'lucide-react';
 
+import { useQuery } from '@tanstack/react-query';
+import { axiosFetch } from '@/utils';
+import { Loader } from '@/components';
+
 const TopRatedSellers = () => {
-  const sellers = [
-    {
-      id: 1,
-      name: "Floyd Miles",
-      avatar: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100",
-      image: "/gigImg.jpg",
-      rating: 4.9,
-      reviews: 482,
-      desc: "I will create a professional and user-friendly website design for your...",
-      price: 75
-    },
-    {
-      id: 2,
-      name: "Arlene McCoy",
-      avatar: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100",
-      image: "/gigImg.jpg",
-      rating: 4.9,
-      reviews: 482,
-      desc: "I will create a professional and user-friendly website design for your...",
-      price: 75
-    },
-    {
-      id: 3,
-      name: "Ronald Richards",
-      avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100",
-      image: "/gigImg.jpg",
-      rating: 4.9,
-      reviews: 482,
-      desc: "I will create a professional and user-friendly website design for your...",
-      price: 75
-    }
-  ];
+  const { isLoading, data: sellers = [] } = useQuery({
+    queryKey: ['top-rated-packages'],
+    queryFn: () => axiosFetch.get('/gigs?sort=sales&limit=3').then(({ data }) => data || [])
+  });
+
+  if (isLoading) {
+    return (
+      <section className="w-full py-20 bg-white">
+        <div className="container mx-auto px-4 md:px-6 flex justify-center items-center h-64">
+          <Loader size={45} />
+        </div>
+      </section>
+    );
+  }
+
+  if (!sellers || sellers.length === 0) return null;
 
   return (
     <section className="w-full py-20 bg-white">
@@ -59,20 +47,20 @@ const TopRatedSellers = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sellers.map((seller) => (
-            <Link href={`/package/${seller.id}`} key={seller.id} className="flex flex-col bg-[#fafafa] rounded-2xl overflow-hidden border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 group cursor-pointer">
+          {sellers.slice(0, 3).map((seller: any) => (
+            <Link href={`/package/${seller._id}`} key={seller._id} className="flex flex-col bg-[#fafafa] rounded-2xl overflow-hidden border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 group cursor-pointer">
               <div className="w-full h-56 overflow-hidden rounded-t-2xl m-1.5 mb-0 w-[calc(100%-12px)]">
                 <img
-                  src={seller.image}
-                  alt={seller.name}
+                  src={seller.cover || seller.images?.[0] || "/PackageImages.png"}
+                  alt={seller.title}
                   className="w-full h-full object-cover rounded-t-[10px] group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-1.5 text-gray-500 text-[14px]">
-                    <span>({seller.reviews})</span>
-                    <strong className="text-gray-800 ml-1">{seller.rating}</strong>
+                    <span>({seller.starNumber || seller.reviews || 0})</span>
+                    <strong className="text-gray-800 ml-1">{seller.starNumber ? (seller.totalStars / seller.starNumber).toFixed(1) : "5.0"}</strong>
                     <Star className="text-[#ffb33e] fill-[#ffb33e]" size={16} />
                   </div>
                   <div className="flex items-center gap-0.5 bg-[#ff7a00] text-white px-2.5 py-1 rounded-md text-[12px] font-bold">
@@ -84,13 +72,13 @@ const TopRatedSellers = () => {
                 </div>
 
                 <p className="text-gray-600 text-[15px] leading-relaxed line-clamp-2 min-h-[45px]">
-                  {seller.desc}
+                  {seller.title || seller.desc}
                 </p>
 
                 <div className="flex items-center justify-between pt-5 mt-1 border-t border-gray-100 border-dashed">
                   <div className="flex items-center gap-3">
-                    <img src={seller.avatar} alt={seller.name} className="w-8 h-8 rounded-full object-cover shadow-sm" />
-                    <span className="text-gray-700 font-medium text-[15px]">{seller.name}</span>
+                    <img src={seller.userID?.image || seller.userID?.img || seller.avatar || "/media/noavatar.png"} alt={seller.userID?.username || "User"} className="w-8 h-8 rounded-full object-cover shadow-sm" />
+                    <span className="text-gray-700 font-medium text-[15px]">{seller.userID?.username || seller.name || "Freelancer"}</span>
                   </div>
                   <div className="text-gray-500 text-[14px]">
                     From <strong className="text-gray-900 text-[18px] ml-1">${seller.price}</strong>

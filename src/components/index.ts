@@ -25,10 +25,11 @@ export { default as TrustProtection } from './TrustProtection/TrustProtection';
 export { default as TwoWays } from './TwoWays/TwoWays';
 export { default as FAQ } from './FAQ/FAQ';
 export { default as CTA } from './CTA/CTA';
-export { default as CategoryBrowser } from './CategoryBrowser/CategoryBrowser';
+
 export { default as PrivacyPolicy } from './PrivacyPolicy/PrivacyPolicy';
 export { default as TermsAndConditions } from './TermsAndConditions/TermsAndConditions';
 export { default as SellerPublicProfile } from './SellerPublicProfile/SellerPublicProfile';
 export { default as SuspendedSeller } from './SuspendedSeller/SuspendedSeller';
 export { default as RecommendedSellers } from './RecommendedSellers/RecommendedSellers';
 export { default as SubmitProposalModal } from './SubmitProposalModal/SubmitProposalModal';
+export { default as FavoriteButton } from "./FavoriteButton/FavoriteButton";

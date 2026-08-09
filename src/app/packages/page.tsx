@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useRef, useEffect, Suspense } from 'react';
-import { PackageCard, Loader } from '@/components';
+import { PackageCard, Loader, TopRatedSellers } from '@/components';
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
@@ -239,7 +239,7 @@ const Packages = () => {
           </div>
           <button
             onClick={() => setShowFilter(true)}
-            className="flex items-center gap-2 bg-[#1dbf73] hover:bg-[#19a463] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
+            className="flex items-center gap-2 bg-brand-green hover:bg-brand-green text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M3 6H21M7 12H17M11 18H13" stroke="white" strokeWidth="2" strokeLinecap="round" />
@@ -409,7 +409,7 @@ const Packages = () => {
                       value={searchVal}
                       onChange={(e) => setSearchVal(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleApplyFilter()}
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#1dbf73] bg-white transition-colors"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-brand-green bg-white transition-colors"
                     />
                   </div>
                 </div>
@@ -425,7 +425,7 @@ const Packages = () => {
                       if (val && val !== 'All services') setActiveCategory(val);
                       else setActiveCategory('All services');
                     }}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-[#1dbf73] bg-white transition-colors cursor-pointer"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
                   >
                     <option value="">Select category</option>
                     {categories.map((c) => (
@@ -477,7 +477,7 @@ const Packages = () => {
 
                   {/* Min / Max Inputs */}
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 relative flex items-center border border-gray-200 rounded-xl px-3.5 py-2 bg-white focus-within:border-[#1dbf73] transition-colors">
+                    <div className="flex-1 relative flex items-center border border-gray-200 rounded-xl px-3.5 py-2 bg-white focus-within:border-brand-green transition-colors">
                       <span className="text-gray-700 font-medium text-sm mr-1.5">$</span>
                       <input 
                         type="number" 
@@ -490,7 +490,7 @@ const Packages = () => {
                       <span className="absolute right-3 text-xs text-gray-400 select-none">min</span>
                     </div>
                     <span className="text-gray-400 font-medium">-</span>
-                    <div className="flex-1 relative flex items-center border border-gray-200 rounded-xl px-3.5 py-2 bg-white focus-within:border-[#1dbf73] transition-colors">
+                    <div className="flex-1 relative flex items-center border border-gray-200 rounded-xl px-3.5 py-2 bg-white focus-within:border-brand-green transition-colors">
                       <span className="text-gray-700 font-medium text-sm mr-1.5">$</span>
                       <input 
                         type="number" 
@@ -511,7 +511,7 @@ const Packages = () => {
                   <select
                     value={englishLevel}
                     onChange={(e) => setEnglishLevel(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-[#1dbf73] bg-white transition-colors cursor-pointer"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
                   >
                     <option value="">Select english level</option>
                     <option value="basic">Basic / Conversational</option>
@@ -526,7 +526,7 @@ const Packages = () => {
                   <select
                     value={clientLocation}
                     onChange={(e) => setClientLocation(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-[#1dbf73] bg-white transition-colors cursor-pointer"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
                   >
                     <option value="">Select client location</option>
                     <option value="US">United States</option>
@@ -550,7 +550,7 @@ const Packages = () => {
                 </button>
                 <button 
                   onClick={handleApplyFilter}
-                  className="bg-[#1dbf73] hover:bg-[#19a463] text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors shadow-sm"
+                  className="bg-brand-green hover:bg-brand-green text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors shadow-sm"
                 >
                   Apply filter
                 </button>
@@ -578,7 +578,7 @@ const Packages = () => {
                 className="w-full max-w-[420px] h-auto object-contain mb-8" 
               />
               <h2 className="text-[28px] sm:text-[34px] font-bold text-gray-900 mb-3 tracking-tight">
-                Oops! This <span className="text-[#1dbf73]">Package</span> Doesn&apos;t Exist.
+                Oops! This <span className="text-brand-green">Package</span> Doesn&apos;t Exist.
               </h2>
               <p className="text-[15px] sm:text-base text-gray-500 max-w-[450px] leading-relaxed">
                 The package you&apos;re looking for may have been removed, changed, or is temporarily unavailable.
@@ -605,6 +605,8 @@ const Packages = () => {
           </div>
         )}
       </div>
+
+      <TopRatedSellers />
     </div>
   );
 };

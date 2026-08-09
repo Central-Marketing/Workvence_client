@@ -21,6 +21,13 @@ const Navbar = () => {
   const router = useRouter();
   const { user, setUser } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      router.push(`/packages?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   useEffect(() => {
     // 1. Instantly hydrate from localStorage to prevent UI flicker
@@ -96,7 +103,14 @@ const Navbar = () => {
           <div className={`hidden lg:flex items-center overflow-hidden transition-all duration-300 ${showMenu || pathname !== '/' ? 'opacity-100 max-w-[500px]' : 'opacity-0 max-w-0 pointer-events-none'}`}>
             <div className="flex items-center border rounded-lg px-4 py-2.5 w-[350px] xl:w-[450px] bg-gray-50 border-gray-200 focus-within:bg-white focus-within:border-brand-green focus-within:shadow-sm group">
               <RiSearchLine className="text-gray-400 text-xl mr-3 group-focus-within:text-brand-green transition-colors" />
-              <input type="text" placeholder="What are you looking for?" className="bg-transparent border-none outline-none w-full text-[15px] font-medium text-gray-800 placeholder-gray-400" />
+              <input 
+                type="text" 
+                placeholder="What are you looking for?" 
+                className="bg-transparent border-none outline-none w-full text-[15px] font-medium text-gray-800 placeholder-gray-400"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
+              />
             </div>
           </div>
         </div>

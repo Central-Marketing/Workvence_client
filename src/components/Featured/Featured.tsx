@@ -27,7 +27,7 @@ const Featured = () => {
   ];
 
   return (
-    <div className="w-full min-h-[60vh] flex justify-center items-center bg-brand-navy bg-[image:linear-gradient(to_top,rgba(0,0,0,0.9),rgba(0,0,0,0.1)),url('/heroImg.jpg')] bg-cover bg-center text-white py-20 px-5">
+    <div className="w-full min-h-[60vh] flex justify-center items-center bg-brand-black bg-[image:linear-gradient(to_top,rgba(0,0,0,0.9),rgba(0,0,0,0.1)),url('/heroImg.jpg')] bg-cover bg-center text-white py-20 px-5">
       <div className="w-full container mx-auto flex flex-col items-center px-4 md:px-6">
 
         <div className="w-full flex flex-col items-center text-center gap-10">

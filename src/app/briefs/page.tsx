@@ -196,7 +196,7 @@ const BriefsFeed = () => {
                       }}
                       style={{
                         padding: '6px 12px',
-                        background: '#1dbf73',
+                        background: '#6ad724',
                         color: '#fff',
                         border: 'none',
                         borderRadius: '4px',

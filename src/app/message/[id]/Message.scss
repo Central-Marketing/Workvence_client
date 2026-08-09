@@ -14,6 +14,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  position: relative;
 }
 
 /* ── LEFT: Conversation List ── */
@@ -25,13 +26,6 @@
   flex-direction: column;
   background: #fff;
   overflow: hidden;
-
-  @media screen and (max-width: 768px) {
-    width: 60px;
-    min-width: 60px;
-    .inbox-header, .conv-info, .conv-meta { display: none; }
-    .conv-item { justify-content: center; padding: 12px; }
-  }
 
   .inbox-header {
     padding: 16px;
@@ -173,6 +167,7 @@
   flex-direction: column;
   overflow: hidden;
   background: #fff;
+  min-width: 0;
 
   .chat-head {
     padding: 14px 20px;
@@ -280,6 +275,7 @@
       .offer-seller-info {
         display: flex; align-items: center; gap: 10px; min-width: 140px;
         border-right: 1px solid #f1f5f9; padding-right: 15px;
+
         img { width: 42px; height: 42px; border-radius: 50%; }
         .offer-seller-text {
           display: flex; flex-direction: column;
@@ -318,7 +314,7 @@
     .compose-form {
       display: flex; align-items: center; gap: 10px;
       border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 12px;
-      
+
       .icon-btn { background: none; border: none; font-size: 18px; cursor: pointer; color: #94a3b8; &:hover { filter: brightness(0.8); } }
       input { flex: 1; border: none; outline: none; font-size: 14px; color: #1e293b; padding: 6px; background: transparent; }
       
@@ -334,7 +330,124 @@
   }
 }
 
-.contact-sidebar { display: none; }
+/* ── RIGHT: Contact Sidebar ── */
+.contact-sidebar {
+  width: 340px;
+  min-width: 340px;
+  border-left: 1px solid #e2e8f0;
+  background: #f8fafc;
+  overflow-y: auto;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+  .sidebar-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+
+    .sidebar-section-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      h3 { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0; }
+    }
+
+    .sidebar-details {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .detail-label { font-size: 13px; color: #64748b; }
+        .detail-value { font-size: 13.5px; font-weight: 600; color: #0f172a; }
+      }
+
+      .view-profile-btn {
+        margin-top: 8px;
+        width: 100%;
+        padding: 12px;
+        background: var(--green-color);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 13.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        &:hover { filter: brightness(0.95); }
+      }
+    }
+  }
+
+  .related-services-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .section-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h3 { font-size: 14.5px; font-weight: 700; color: #0f172a; margin: 0; }
+      .see-more-btn {
+        background: none; border: none; font-size: 13px; color: var(--green-color); font-weight: 600; cursor: pointer; padding: 0;
+        &:hover { text-decoration: underline; }
+      }
+    }
+
+    .related-services-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .service-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: stretch;
+
+        &:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); transform: translateY(-2px); }
+
+        img { width: 110px; min-width: 110px; object-fit: cover; }
+
+        .service-info {
+          padding: 12px 14px;
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+
+          p { font-size: 12px; font-weight: 600; color: #1e293b; margin: 0 0 6px 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+          .service-meta {
+            margin-bottom: auto;
+            .service-author { font-size: 11px; color: #64748b; }
+          }
+
+          .service-footer {
+            display: flex; justify-content: space-between; align-items: center; margin-top: 12px;
+            .service-rating { font-size: 11px; font-weight: 700; color: #f59e0b; }
+            .service-price { font-size: 10px; color: #64748b; text-transform: uppercase; strong { font-size: 13px; color: #0f172a; margin-left: 3px; } }
+          }
+        }
+      }
+    }
+  }
+}
 
 /* ── Custom Offer Modal ── */
 .modal-backdrop {

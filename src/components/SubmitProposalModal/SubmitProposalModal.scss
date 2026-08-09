@@ -89,7 +89,7 @@
           transition: border-color 0.2s;
 
           &:focus {
-            border-color: #1dbf73;
+            border-color: #6ad724;
           }
           
           &::placeholder {
@@ -128,12 +128,12 @@
           }
 
           &.btn-submit {
-            background: #1dbf73;
+            background: #6ad724;
             color: white;
             border: none;
 
             &:hover:not(:disabled) {
-              background: #19a463;
+              background: #6ad724;
             }
 
             &:disabled {

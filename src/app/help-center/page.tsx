@@ -9,7 +9,7 @@ const freelancerTopics = [
     title: "Getting Started",
     desc: "Profile setup, identity verification, and first steps.",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ad724" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M13.5 2H19v5.5"></path>
         <path d="M19 2l-9.5 9.5"></path>
         <path d="M22 11.5V19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5"></path>
@@ -20,7 +20,7 @@ const freelancerTopics = [
     title: "Find Work",
     desc: "Searching for jobs, submitting proposals, and interviews.",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ad724" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
@@ -30,7 +30,7 @@ const freelancerTopics = [
     title: "Payments & Earnings",
     desc: "Withdrawal methods, service fees, and invoices.",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ad724" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="5" width="20" height="14" rx="2"></rect>
         <line x1="2" y1="10" x2="22" y2="10"></line>
       </svg>
@@ -40,7 +40,7 @@ const freelancerTopics = [
     title: "Account & Settings",
     desc: "Security settings, notifications, and profile visibility.",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ad724" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="3"></circle>
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
       </svg>
@@ -50,7 +50,7 @@ const freelancerTopics = [
     title: "Trust & Safety",
     desc: "Dispute resolution, site policies, and safety tips.",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ad724" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
       </svg>
     )
@@ -62,7 +62,7 @@ const clientTopics = [
     title: "Post a Project",
     desc: "Writing descriptions, setting budgets, and categories.",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ad724" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
         <line x1="12" y1="8" x2="12" y2="16"></line>
         <line x1="8" y1="12" x2="16" y2="12"></line>
@@ -73,7 +73,7 @@ const clientTopics = [
     title: "Hire Talent",
     desc: "Reviewing proposals, interviewing, and offers.",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ad724" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
         <circle cx="9" cy="7" r="4"></circle>
         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -85,7 +85,7 @@ const clientTopics = [
     title: "Manage Projects",
     desc: "Tracking milestones, work logs, and communication.",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ad724" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
       </svg>
     )
@@ -94,7 +94,7 @@ const clientTopics = [
     title: "Payments & Escrow",
     desc: "Funding projects, approving milestones, and refunds.",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ad724" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="5" width="20" height="14" rx="2"></rect>
         <line x1="2" y1="10" x2="22" y2="10"></line>
       </svg>
@@ -104,7 +104,7 @@ const clientTopics = [
     title: "Client Account",
     desc: "Team management, billing history, and preferences.",
     icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ad724" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
         <circle cx="8.5" cy="7" r="4"></circle>
         <line x1="20" y1="8" x2="20" y2="14"></line>
@@ -159,9 +159,9 @@ const HelpCenter = () => {
               <input
                 type="text"
                 placeholder="Search articles, topics, or keywords..."
-                className="w-full pl-12 pr-[100px] py-4 rounded-xl border border-gray-300 focus:outline-none focus:border-[#1dbf73] focus:ring-1 focus:ring-[#1dbf73] text-[15px] shadow-sm transition-all"
+                className="w-full pl-12 pr-[100px] py-4 rounded-xl border border-gray-300 focus:outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green text-[15px] shadow-sm transition-all"
               />
-              <button className="absolute right-2.5 top-2.5 bottom-2.5 bg-[#1dbf73] hover:bg-[#19a463] text-white px-6 rounded-lg font-semibold text-sm transition-colors shadow-sm">
+              <button className="absolute right-2.5 top-2.5 bottom-2.5 bg-brand-green hover:bg-brand-green text-white px-6 rounded-lg font-semibold text-sm transition-colors shadow-sm">
                 Search
               </button>
             </div>
@@ -193,7 +193,7 @@ const HelpCenter = () => {
                   </div>
                 </div>
                 <div className="flex gap-4 items-center">
-                  <div className="w-10 h-10 rounded-full bg-green-50 flex-shrink-0 flex items-center justify-center border border-green-100"><div className="w-4 h-4 bg-[#1dbf73] rounded-full opacity-50"></div></div>
+                  <div className="w-10 h-10 rounded-full bg-green-50 flex-shrink-0 flex items-center justify-center border border-green-100"><div className="w-4 h-4 bg-brand-green rounded-full opacity-50"></div></div>
                   <div className="space-y-2 flex-1">
                     <div className="h-2.5 w-[75%] bg-gray-200 rounded-full"></div>
                     <div className="h-2 w-[50%] bg-gray-100 rounded-full"></div>
@@ -230,7 +230,7 @@ const HelpCenter = () => {
                       <h4 className="text-[15px] font-bold text-gray-900 mb-0.5">{topic.title}</h4>
                       <p className="text-[13px] text-gray-500 line-clamp-1">{topic.desc}</p>
                     </div>
-                    <div className="text-gray-300 group-hover:text-[#1dbf73] transition-colors">
+                    <div className="text-gray-300 group-hover:text-brand-green transition-colors">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </div>
                   </Link>
@@ -261,7 +261,7 @@ const HelpCenter = () => {
                       <h4 className="text-[15px] font-bold text-gray-900 mb-0.5">{topic.title}</h4>
                       <p className="text-[13px] text-gray-500 line-clamp-1">{topic.desc}</p>
                     </div>
-                    <div className="text-gray-300 group-hover:text-[#1dbf73] transition-colors">
+                    <div className="text-gray-300 group-hover:text-brand-green transition-colors">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </div>
                   </Link>
@@ -283,7 +283,7 @@ const HelpCenter = () => {
 
             <Link href="/support/new" className="block bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
               <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ad724" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                   <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
@@ -294,7 +294,7 @@ const HelpCenter = () => {
 
             <Link href="/support" className="block bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
               <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ad724" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
               </div>
@@ -313,14 +313,14 @@ const HelpCenter = () => {
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 pb-6 border-b border-gray-100">
               <h2 className="text-2xl font-bold text-gray-900">Popular Articles</h2>
-              <Link href="#" className="text-[#1dbf73] font-semibold text-[14px] hover:underline flex items-center gap-1.5">
+              <Link href="#" className="text-brand-green font-semibold text-[14px] hover:underline flex items-center gap-1.5">
                 View All Articles <span className="text-lg leading-none">→</span>
               </Link>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-12">
               {popularArticles.map((article, i) => (
-                <Link href="#" key={i} className="text-[14.5px] text-gray-600 hover:text-[#1dbf73] font-medium transition-colors block">
+                <Link href="#" key={i} className="text-[14.5px] text-gray-600 hover:text-brand-green font-medium transition-colors block">
                   {article}
                 </Link>
               ))}

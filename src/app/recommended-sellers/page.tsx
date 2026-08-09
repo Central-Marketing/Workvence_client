@@ -49,7 +49,7 @@ const RecommendedSellers = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {sellers.map((seller) => (
               <Link
-                href={`/seller/${seller.username}`}
+                href={`/seller/${seller._id}`}
                 key={seller._id}
                 className="flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 group"
               >

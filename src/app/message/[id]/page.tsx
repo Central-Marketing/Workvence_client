@@ -149,7 +149,8 @@ const Message = () => {
         .then(({ data }) => Array.isArray(data) ? data : (data?.messages || []))
         .catch(() => []),
     enabled: !!conversationID,
-    refetchInterval: 3000
+    staleTime: 60000,
+    refetchInterval: false
   });
 
   // Manage room subscription & realtime events for active conversation
@@ -316,7 +317,33 @@ const Message = () => {
     clearTimeout(typingTimeoutRef.current);
     stopTypingIndicator();
 
-    mutation.mutate({ conversationID, description: messageText });
+    const msgPayload = {
+      conversationID,
+      description: messageText,
+      userID: user?._id,
+      isSeller: Boolean(user?.isSeller)
+    };
+
+    // Optimistically render sending user's message immediately
+    const tempMessage = {
+      _id: `temp-${Date.now()}`,
+      conversationID,
+      userID: { _id: user?._id, username: user?.username, image: user?.image },
+      description: messageText,
+      createdAt: new Date().toISOString(),
+    };
+
+    queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
+      const arr = Array.isArray(oldData) ? oldData : [];
+      return [...arr, tempMessage];
+    });
+
+    if (socket && socket.connected) {
+      socket.emit("send_message", msgPayload);
+    } else {
+      mutation.mutate(msgPayload);
+    }
+
     setMessageText("");
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';

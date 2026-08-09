@@ -3,13 +3,17 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { useUserStore } from "@/store/userStore";
+import { FavoriteButton } from "@/components";
 
 const PackageCard = ({ data }: { data: any }) => {
   const router = useRouter();
+  const { user } = useUserStore((state: any) => state);
   if (!data) return null;
 
   const userImg = data.userID?.image || data.pp || "/media/noavatar.png";
   const username = data.userID?.username || data.username || "Leslie";
+  const sellerId = data.userID?._id || data.userId?._id || data.userId || data._id;
   const coverImg = data.cover || data.img || "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80";
   
   // Rating calculation
@@ -26,7 +30,7 @@ const PackageCard = ({ data }: { data: any }) => {
   const handleProfileClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    router.push(`/profile/${username}`);
+    router.push(`/seller/${sellerId}`);
   };
 
   const handleBookmarkClick = (e: React.MouseEvent) => {
@@ -48,16 +52,17 @@ const PackageCard = ({ data }: { data: any }) => {
             alt={data.title || data.desc || "Package Cover"}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
           />
-          <button
-            type="button"
-            className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors z-10"
-            aria-label="Bookmark package"
-            onClick={handleBookmarkClick}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-            </svg>
-          </button>
+          <div className="absolute top-3 right-3 z-10 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors cursor-default">
+              <FavoriteButton 
+                gigId={data._id || data.id} 
+                initialIsFavorited={data.isFavorited} 
+                initialFavoriteCount={data.favoriteCount} 
+                currentUser={user}
+                className="w-5 h-5"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Content Body */}
@@ -101,7 +106,7 @@ const PackageCard = ({ data }: { data: any }) => {
                 alt={username}
                 className="w-7 h-7 rounded-full object-cover border border-gray-200"
               />
-              <span className="text-[14px] font-semibold text-gray-800 group-hover/user:text-[#1dbf73] transition-colors">
+              <span className="text-[14px] font-semibold text-gray-800 group-hover/user:text-brand-green transition-colors">
                 {username}
               </span>
             </div>

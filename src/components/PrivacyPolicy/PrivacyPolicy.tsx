@@ -47,7 +47,7 @@ const PrivacyPolicy = () => {
               Privacy & Data Security
             </h1>
 
-            <div className="flex items-center gap-1.5 text-sm font-semibold text-[#1dbf73] mb-4">
+            <div className="flex items-center gap-1.5 text-sm font-semibold text-brand-green mb-4">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 <polyline points="12 6 12 12 16 14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -63,9 +63,9 @@ const PrivacyPolicy = () => {
           {/* Large Shield Check SVG Icon */}
           <div className="w-28 h-28 sm:w-36 sm:h-36 flex-shrink-0 text-[#21c074] opacity-90 relative z-10 mx-auto lg:mr-6">
             <svg viewBox="0 0 120 130" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-sm">
-              <path d="M60 10L15 28.5V65C15 92.5 34.5 117.5 60 125C85.5 117.5 105 92.5 105 65V28.5L60 10Z" fill="#1dbf73" fillOpacity="0.15" stroke="#1dbf73" strokeWidth="7" strokeLinejoin="round" />
-              <path d="M60 21L24 36V65C24 87.5 40 108 60 114C80 108 96 87.5 96 65V36L60 21Z" fill="#1dbf73" fillOpacity="0.2" />
-              <path d="M43 65L55 77L79 51" stroke="#1dbf73" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M60 10L15 28.5V65C15 92.5 34.5 117.5 60 125C85.5 117.5 105 92.5 105 65V28.5L60 10Z" fill="#6ad724" fillOpacity="0.15" stroke="#6ad724" strokeWidth="7" strokeLinejoin="round" />
+              <path d="M60 21L24 36V65C24 87.5 40 108 60 114C80 108 96 87.5 96 65V36L60 21Z" fill="#6ad724" fillOpacity="0.2" />
+              <path d="M43 65L55 77L79 51" stroke="#6ad724" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
         </div>
@@ -75,7 +75,7 @@ const PrivacyPolicy = () => {
 
           {/* Card 1: What We Collect */}
           <div className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-7 shadow-[0_2px_15px_rgba(0,0,0,0.025)] hover:border-gray-300 transition-all flex flex-col justify-start">
-            <div className="w-11 h-11 rounded-xl bg-[#eaf8f0] text-[#1dbf73] flex items-center justify-center mb-5">
+            <div className="w-11 h-11 rounded-xl bg-[#eaf8f0] text-brand-green flex items-center justify-center mb-5">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
@@ -90,7 +90,7 @@ const PrivacyPolicy = () => {
 
           {/* Card 2: How We Use Data */}
           <div className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-7 shadow-[0_2px_15px_rgba(0,0,0,0.025)] hover:border-gray-300 transition-all flex flex-col justify-start">
-            <div className="w-11 h-11 rounded-xl bg-[#eaf8f0] text-[#1dbf73] flex items-center justify-center mb-5">
+            <div className="w-11 h-11 rounded-xl bg-[#eaf8f0] text-brand-green flex items-center justify-center mb-5">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
@@ -105,7 +105,7 @@ const PrivacyPolicy = () => {
 
           {/* Card 3: How We Protect You */}
           <div className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-7 shadow-[0_2px_15px_rgba(0,0,0,0.025)] hover:border-gray-300 transition-all flex flex-col justify-start">
-            <div className="w-11 h-11 rounded-xl bg-[#eaf8f0] text-[#1dbf73] flex items-center justify-center mb-5">
+            <div className="w-11 h-11 rounded-xl bg-[#eaf8f0] text-brand-green flex items-center justify-center mb-5">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>

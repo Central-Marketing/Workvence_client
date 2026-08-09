@@ -7,7 +7,8 @@ import { useQuery } from '@tanstack/react-query';
 import { axiosFetch, getCountryFlag } from '@/utils';
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { Loader, Reviews } from '@/components';
+import { Loader, Reviews, FavoriteButton } from '@/components';
+import { useUserStore } from "@/store/userStore";
 import "./Package.scss";
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
@@ -31,7 +32,7 @@ const PackageContent = () => {
 
   const [activeTab, setActiveTab] = useState("Description");
   const [packageTier, setPackageTier] = useState("basic");
-  const [saved, setSaved] = useState(false);
+  const { user } = useUserStore((state: any) => state);
   const [selectedHeroIndex, setSelectedHeroIndex] = useState(0);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [showComparisonTable, setShowComparisonTable] = useState(false);
@@ -89,7 +90,7 @@ const PackageContent = () => {
         <h2 className="text-2xl font-semibold text-gray-800 mb-2">Something went wrong!</h2>
         <p className="text-gray-500 mb-6">We could not load the requested package details.</p>
         <Link href="/packages">
-          <button className="px-6 py-2.5 bg-[#1dbf73] text-white font-bold rounded-xl shadow-sm hover:bg-[#19a463] transition-all">
+          <button className="px-6 py-2.5 bg-brand-green text-white font-bold rounded-xl shadow-sm hover:bg-brand-green transition-all">
             Back to Packages
           </button>
         </Link>
@@ -141,18 +142,17 @@ const PackageContent = () => {
             <span className="text-gray-900 font-semibold">Package Details</span>
           </p>
           <div className="flex items-center gap-2.5">
-            <button 
-              onClick={() => setSaved(!saved)} 
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors cursor-pointer ${saved ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
-              title={saved ? "Remove from saved" : "Save package"}
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-              </svg>
-            </button>
-            <span className="border border-gray-200 bg-white px-3.5 py-1 rounded-lg text-xs font-semibold text-gray-700 shadow-2xs select-none">
-              {saved ? 25 : 24}
-            </span>
+            <div className="flex items-center border border-gray-200 bg-white px-3.5 py-1.5 rounded-lg shadow-2xs select-none">
+              <FavoriteButton 
+                gigId={_id as string} 
+                initialIsFavorited={data?.isFavorited} 
+                initialFavoriteCount={data?.favoriteCount} 
+                currentUser={user}
+                className="h-5"
+                iconClassName="w-[20px] h-[20px]"
+                showCount={true}
+              />
+            </div>
           </div>
         </div>
 
@@ -164,7 +164,7 @@ const PackageContent = () => {
 
           <div className="flex flex-wrap items-center justify-between gap-4 pb-1">
             <div 
-              onClick={() => router.push(`/profile/${data?.userID?.username}`)}
+              onClick={() => router.push(`/seller/${data?.userID?._id}`)}
               className="flex items-center gap-3.5 cursor-pointer group"
             >
               <img 
@@ -173,7 +173,7 @@ const PackageContent = () => {
                 className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-xs" 
               />
               <div>
-                <h4 className="text-base font-semibold text-gray-900 group-hover:text-[#1dbf73] transition-colors">
+                <h4 className="text-base font-semibold text-gray-900 group-hover:text-brand-green transition-colors">
                   {data?.userID?.username}
                 </h4>
                 <p className="text-xs sm:text-sm text-gray-500 font-medium mt-0.5">
@@ -216,7 +216,7 @@ const PackageContent = () => {
                   onClick={() => setSelectedHeroIndex(idx)}
                   className={`relative rounded-xl overflow-hidden border-2 transition-all duration-300 cursor-pointer w-full aspect-[16/10] lg:aspect-auto h-full ${
                     selectedHeroIndex === idx 
-                      ? 'border-[#1dbf73] ring-2 ring-[#1dbf73]/20 shadow-sm scale-[0.98]' 
+                      ? 'border-brand-green ring-2 ring-brand-green/20 shadow-sm scale-[0.98]' 
                       : 'border-transparent opacity-80 hover:opacity-100 hover:border-gray-300'
                   }`}
                 >
@@ -303,7 +303,7 @@ const PackageContent = () => {
                           {basicPkg.features?.map((f: string, i: number) => (
                             <div key={i} className="flex justify-between items-center">
                               <span>{f}</span>
-                              <svg className="text-[#1dbf73]" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                              <svg className="text-brand-green" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                             </div>
                           ))}
                         </div>
@@ -316,12 +316,12 @@ const PackageContent = () => {
 
                     {/* Standard Card */}
                     {standardPkg ? (
-                      <div className="flex flex-col p-6 sm:p-8 bg-white border-[2.5px] border-[#1dbf73] rounded-[18px] relative shadow-lg z-10 md:-mx-1 md:scale-[1.02] -my-0.5">
+                      <div className="flex flex-col p-6 sm:p-8 bg-white border-[2.5px] border-brand-green rounded-[18px] relative shadow-lg z-10 md:-mx-1 md:scale-[1.02] -my-0.5">
                         <div className="absolute -top-[14px] left-8 bg-[#0095ff] text-white text-[11px] font-extrabold px-2.5 py-1 rounded-[6px] flex items-center gap-1.5 shadow-sm uppercase tracking-wider">
                           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
                           About
                         </div>
-                        <div className="inline-block bg-[#1dbf73] text-white text-[11px] font-extrabold px-4 py-1.5 rounded-full w-max mb-6 uppercase tracking-wider">STANDARD</div>
+                        <div className="inline-block bg-brand-green text-white text-[11px] font-extrabold px-4 py-1.5 rounded-full w-max mb-6 uppercase tracking-wider">STANDARD</div>
                         <div className="text-[34px] font-bold text-gray-900 mb-2">$ {standardPkg.price}</div>
                         <div className="flex items-center gap-1.5 text-gray-900 text-sm font-semibold mb-8">
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
@@ -336,7 +336,7 @@ const PackageContent = () => {
                           {standardPkg.features?.map((f: string, i: number) => (
                             <div key={i} className="flex justify-between items-center">
                               <span>{f}</span>
-                              <svg className="text-[#1dbf73]" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                              <svg className="text-brand-green" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                             </div>
                           ))}
                         </div>
@@ -365,7 +365,7 @@ const PackageContent = () => {
                           {premiumPkg.features?.map((f: string, i: number) => (
                             <div key={i} className="flex justify-between items-center">
                               <span>{f}</span>
-                              <svg className="text-[#1dbf73]" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                              <svg className="text-brand-green" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                             </div>
                           ))}
                         </div>
@@ -448,7 +448,13 @@ const PackageContent = () => {
                     </div>
                   </div>
                   <button 
-                    onClick={() => router.push(`/messages`)}
+                    onClick={() => {
+                      if (!user) {
+                        router.push('/login');
+                      } else {
+                        router.push(`/messages`);
+                      }
+                    }}
                     className="px-6 py-2.5 bg-white hover:bg-gray-100 text-gray-900 font-semibold text-sm rounded-xl border border-gray-300 transition-colors shadow-2xs cursor-pointer"
                   >
                     Contact Me
@@ -550,7 +556,7 @@ const PackageContent = () => {
                     <div className="space-y-3 mb-7">
                       {featuresList.map((feature: string, index: number) => (
                         <label key={index} className="flex items-center gap-3 text-xs sm:text-sm text-gray-800 select-none font-medium">
-                          <svg className="text-[#1dbf73]" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                          <svg className="text-brand-green" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                           <span>{feature}</span>
                         </label>
                       ))}
@@ -578,17 +584,30 @@ const PackageContent = () => {
                 </div>
 
                 {/* Primary Continue / Buy Plan Button */}
-                <Link href={`/pay/${_id}?tier=${packageTier}`} className="block w-full mt-6">
-                  <button className="w-full py-3.5 bg-[#1dbf73] hover:bg-[#19a463] text-white font-semibold text-sm sm:text-base rounded-xl transition-all shadow-sm cursor-pointer">
-                    Continue (${displayPrice})
-                  </button>
-                </Link>
+                <button 
+                  onClick={() => {
+                    if (!user) {
+                      router.push('/login');
+                    } else {
+                      router.push(`/pay/${_id}?tier=${packageTier}`);
+                    }
+                  }} 
+                  className="w-full mt-6 py-3.5 bg-brand-green hover:bg-brand-green text-white font-semibold text-sm sm:text-base rounded-xl transition-all shadow-sm cursor-pointer"
+                >
+                  Continue (${displayPrice})
+                </button>
               </div>
 
               {/* Separate Contact Me Button matching photo placement */}
               <button 
                 type="button"
-                onClick={() => router.push(`/messages`)}
+                onClick={() => {
+                  if (!user) {
+                    router.push('/login');
+                  } else {
+                    router.push(`/messages`);
+                  }
+                }}
                 className="w-full py-3.5 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-sm rounded-2xl border border-gray-200 transition-colors flex items-center justify-center gap-2 shadow-2xs cursor-pointer"
               >
                 <span>Contact me</span>

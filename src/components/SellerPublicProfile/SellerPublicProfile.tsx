@@ -33,7 +33,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
           setIsLoading(false);
           return;
         }
-        const { data } = await axiosFetch.get(`/users/${username}`);
+        const { data } = await axiosFetch.get(`/users/seller/${username}`);
         if (!data.error) {
           setSellerData(data.user || data);
         }
@@ -56,7 +56,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
   const activeProject = sellerData?.portfolio?.[selectedIdx] || null;
 
   if (isLoading) {
-    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-12 h-12 border-4 border-gray-200 border-t-[#1dbf73] rounded-full animate-spin"></div></div>;
+    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-12 h-12 border-4 border-gray-200 border-t-brand-green rounded-full animate-spin"></div></div>;
   }
 
   return (
@@ -94,7 +94,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                   className="w-full h-full rounded-full object-cover"
                 />
                 {/* Online Dot */}
-                <span className="w-4 h-4 rounded-full bg-[#1dbf73] border-2 border-white absolute bottom-1 right-1 shadow-xs" title="Online now"></span>
+                <span className="w-4 h-4 rounded-full bg-brand-green border-2 border-white absolute bottom-1 right-1 shadow-xs" title="Online now"></span>
               </div>
 
               <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 text-center tracking-tight">
@@ -208,7 +208,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
               <div className="mb-4">
                 <div className="flex justify-between items-center text-[13px] mb-1.5">
                   <span className="font-semibold text-gray-900">Job Success Rate</span>
-                  <span className="font-semibold text-[#1dbf73]">100%</span>
+                  <span className="font-semibold text-brand-green">100%</span>
                 </div>
                 <div className="h-2 w-full bg-gray-900 rounded-full"></div>
               </div>
@@ -217,7 +217,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
               <div className="mb-2">
                 <div className="flex justify-between items-center text-[13px] mb-1.5">
                   <span className="font-semibold text-gray-900">On-Time Delivery</span>
-                  <span className="font-semibold text-[#1dbf73]">98%</span>
+                  <span className="font-semibold text-brand-green">98%</span>
                 </div>
                 <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
                   <div className="w-[98%] h-full bg-gray-900 rounded-full"></div>
@@ -241,7 +241,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
             <div className="flex items-center gap-3 mt-6">
               <Link
                 href={`/message/new?user=${displayUsername}`}
-                className="flex-1 bg-[#1dbf73] hover:bg-[#19a463] text-white font-semibold py-3 px-4 rounded-xl text-sm text-center transition-all shadow-sm cursor-pointer"
+                className="flex-1 bg-brand-green hover:bg-brand-green text-white font-semibold py-3 px-4 rounded-xl text-sm text-center transition-all shadow-sm cursor-pointer"
               >
                 Contact Seller
               </Link>
@@ -317,7 +317,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                       onClick={() => setSelectedIdx(idx)}
                       className={`h-20 w-24 sm:w-28 rounded-2xl p-1 overflow-hidden transition-all relative group cursor-pointer ${
                         selectedIdx === idx
-                          ? "border-2 border-[#1dbf73] ring-2 ring-[#1dbf73]/10 bg-[#eaf8f0]/30 shadow-xs"
+                          ? "border-2 border-brand-green ring-2 ring-brand-green/10 bg-[#eaf8f0]/30 shadow-xs"
                           : "border border-gray-200 hover:border-gray-300 bg-gray-50"
                       }`}
                     >
@@ -341,7 +341,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                         </p>
 
                         {activeProject.link && (
-                          <a href={activeProject.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[#1dbf73] font-semibold text-[14px] hover:text-[#19a463] transition-colors">
+                          <a href={activeProject.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-brand-green font-semibold text-[14px] hover:text-brand-green transition-colors">
                             View Live Project
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />

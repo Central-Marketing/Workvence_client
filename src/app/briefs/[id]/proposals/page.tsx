@@ -261,10 +261,10 @@ const Proposals = () => {
                     />
                     <div className="seller-info">
                       <div
-                        className="seller-name font-semibold text-lg cursor-pointer hover:text-[#1dbf73] transition-colors"
+                        className="seller-name font-semibold text-lg cursor-pointer hover:text-brand-green transition-colors"
                         onClick={() =>
                           seller._id &&
-                          router.push(`/seller-profile/${seller._id}`)
+                          router.push(`/seller/${seller._id}`)
                         }
                       >
                         {seller.username || "Seller"}

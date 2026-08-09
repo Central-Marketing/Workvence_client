@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { 
+import {
   RiSearchLine,
   RiCheckboxCircleFill,
   RiStarFill,
@@ -18,7 +18,10 @@ import {
   RiTimeLine,
   RiRefreshLine,
   RiLineChartLine,
-  RiMoneyDollarCircleLine
+  RiMoneyDollarCircleLine,
+  RiMenuLine,
+  RiInformationLine,
+  RiCloseLine
 } from "react-icons/ri";
 
 import axios from 'axios';
@@ -47,6 +50,11 @@ const Message = () => {
   const [isRecipientTyping, setIsRecipientTyping] = useState(false);
   const [partnerUsername, setPartnerUsername] = useState("");
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [convSearchQuery, setConvSearchQuery] = useState("");
+  const [msgSearchQuery, setMsgSearchQuery] = useState("");
+  const [isMsgSearchActive, setIsMsgSearchActive] = useState(false);
+  const [isLeftSideOpen, setIsLeftSideOpen] = useState(false);
+  const [isRightSideOpen, setIsRightSideOpen] = useState(false);
   const typingTimeoutRef = useRef(null);
   const isTypingRef = useRef(false);
 
@@ -102,7 +110,7 @@ const Message = () => {
     socket.emit('user_connected', user._id);
 
     const handleOnlineUsers = (users: any) => setOnlineUsers(users);
-    
+
     // Global listener for new messages to update the sidebar/header even if in a different chat
     const handleGlobalReceiveMessage = (newMsg: any) => {
       queryClient.setQueryData(['conversations'], (oldConvs: any) => {
@@ -250,6 +258,13 @@ const Message = () => {
     ? (user?.isSeller ? conversation.buyerID : conversation.sellerID)
     : null;
 
+  // Recipient's packages
+  const { data: recipientPackages = [] } = useQuery({
+    queryKey: ['recipient-packages', recipientUser?._id],
+    queryFn: () => axiosFetch.get(`/gigs?userID=${recipientUser?._id}`).then(({ data }) => data ?? []).catch(() => []),
+    enabled: !!recipientUser?._id && !!recipientUser?.isSeller
+  });
+
   const contactOrders = allOrders.filter((o: any) => {
     const sId = o.sellerID?._id || o.sellerID;
     const bId = o.buyerID?._id || o.buyerID;
@@ -258,10 +273,27 @@ const Message = () => {
   });
 
   const mutation = useMutation({
-    mutationFn: (msg) => axiosFetch.post('/messages', msg),
+    mutationFn: (msg: any) => axiosFetch.post('/messages', msg),
+    onMutate: async (newMsg: any) => {
+      // Optimistically update the conversations list with the new lastMessage and correct read status
+      queryClient.setQueryData(['conversations'], (oldConvs: any) => {
+        if (!Array.isArray(oldConvs)) return oldConvs;
+        return oldConvs.map((c: any) => {
+          if (c.id === newMsg.conversationID || c.conversationID === newMsg.conversationID || c._id === newMsg.conversationID) {
+            return {
+              ...c,
+              lastMessage: newMsg.description,
+              updatedAt: new Date().toISOString(),
+              readBySeller: user?.isSeller ? true : false,
+              readByBuyer: user?.isSeller ? false : true
+            };
+          }
+          return c;
+        }).sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages', conversationID] });
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
     }
   });
 
@@ -278,7 +310,7 @@ const Message = () => {
   const handleSend = (e: any) => {
     e.preventDefault();
     if (!messageText.trim()) return;
-    
+
     // Immediately stop typing indicator
     clearTimeout(typingTimeoutRef.current);
     stopTypingIndicator();
@@ -297,7 +329,7 @@ const Message = () => {
   const handleInputChange = (e: any) => {
     const value = e.target.value;
     setMessageText(value);
-    
+
     if (conversationID && user?.username) {
       // Emit 'typing_start' on first keystroke
       if (!isTypingRef.current && value.length > 0) {
@@ -307,7 +339,7 @@ const Message = () => {
           username: user.username
         });
       }
-      
+
       // Reset 2-second timer on every keypress
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
@@ -370,16 +402,37 @@ const Message = () => {
   const activeConv = conversations.find((c: any) => c.conversationID === conversationID || c.id === conversationID || c._id === conversationID);
   const isReadByRecipient = user?.isSeller ? activeConv?.readByBuyer : activeConv?.readBySeller;
 
+  const filteredConversations = conversations.filter((conv: any) => {
+    if (!convSearchQuery) return true;
+    const contact = user?.isSeller ? conv.buyerID : conv.sellerID;
+    const searchLower = convSearchQuery.toLowerCase();
+    const username = (contact?.username || '').toLowerCase();
+    const lastMsg = (conv.lastMessage || '').toLowerCase();
+    return username.includes(searchLower) || lastMsg.includes(searchLower);
+  });
+
+  const filteredMessages = messages.filter((msg: any) => {
+    if (!msgSearchQuery) return true;
+    return msg.description?.toLowerCase().includes(msgSearchQuery.toLowerCase());
+  });
+
   return (
     <div className="message-page">
       <div className="inbox-layout">
 
+        <div className={`md:hidden fixed inset-0 bg-black/20 z-30 transition-opacity duration-300 ease-in-out ${isLeftSideOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsLeftSideOpen(false)}></div>
+
         {/* ── LEFT: Conversation List ── */}
-        <aside className="conversation-list">
+        <aside className={`conversation-list transform transition-transform duration-300 ease-in-out max-md:absolute max-md:z-40 max-md:w-[320px] max-md:h-full max-md:shadow-xl max-md:!flex ${isLeftSideOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'}`}>
           <div className="inbox-header">
             <div className="search-bar">
               <RiSearchLine className="search-icon" />
-              <input type="text" placeholder="What are you looking for?" />
+              <input
+                type="text"
+                placeholder="What are you looking for?"
+                value={convSearchQuery}
+                onChange={(e) => setConvSearchQuery(e.target.value)}
+              />
             </div>
             <div className="filters">
               <span className="filter-pill active">All</span>
@@ -392,9 +445,9 @@ const Message = () => {
           <div className="conv-items">
             {convsLoading ? (
               <div className="list-loader"><Loader size={28} /></div>
-            ) : conversations.length === 0 ? (
-              <div className="list-empty">No conversations yet</div>
-            ) : conversations.map((conv: any) => {
+            ) : filteredConversations.length === 0 ? (
+              <div className="list-empty">{convSearchQuery ? "No conversations found" : "No conversations yet"}</div>
+            ) : filteredConversations.map((conv: any) => {
               const isUnread = isConversationUnread(conv, user);
               const contact = user.isSeller ? conv.buyerID : conv.sellerID;
               const lastMsg = conv.lastMessage?.startsWith('[CUSTOM_OFFER]')
@@ -406,7 +459,10 @@ const Message = () => {
                 <div
                   key={conv._id}
                   className={`conv-item ${isActive ? 'active' : ''} ${isUnread ? 'unread' : ''}`}
-                  onClick={() => navigate.push(`/message/${conv.conversationID}`)}
+                  onClick={() => {
+                    navigate.push(`/message/${conv.conversationID}`);
+                    setIsLeftSideOpen(false);
+                  }}
                 >
                   <div className="conv-avatar">
                     <img src={contact?.image || '/media/noavatar.png'} alt="" />
@@ -442,10 +498,13 @@ const Message = () => {
           ) : (
             <>
               {/* Header */}
-              <div className="chat-head">
+              <div className="chat-head max-md:px-3.5 max-md:py-2.5">
+                <button className="md:hidden mr-3 text-slate-500 text-xl flex-shrink-0" onClick={() => setIsLeftSideOpen(true)}>
+                  <RiMenuLine />
+                </button>
                 {recipientUser ? (
                   <>
-                    <div className="head-user">
+                    <div className="head-user flex-1 cursor-pointer" onClick={() => setIsRightSideOpen(true)}>
                       <div className="head-avatar">
                         <img src={recipientUser.image || '/media/noavatar.png'} alt="" />
                       </div>
@@ -455,9 +514,22 @@ const Message = () => {
                       </div>
                     </div>
                     <div className="head-actions">
-                      <button className="action-icon"><RiSearchLine /></button>
-                      <button className="action-icon"><RiPhoneLine /></button>
-                      <button className="action-icon"><RiMore2Fill /></button>
+                      {isMsgSearchActive ? (
+                        <div style={{ display: 'flex', alignItems: 'center', background: '#f1f5f9', borderRadius: '20px', padding: '2px 10px' }}>
+                          <input
+                            type="text"
+                            placeholder="Search in chat..."
+                            value={msgSearchQuery}
+                            onChange={(e) => setMsgSearchQuery(e.target.value)}
+                            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '14px', padding: '4px', width: '150px' }}
+                            autoFocus
+                          />
+                          <button className="action-icon" onClick={() => { setIsMsgSearchActive(false); setMsgSearchQuery(''); }} style={{ margin: 0, padding: 0, fontSize: '18px' }}>&times;</button>
+                        </div>
+                      ) : (
+                        <button className="action-icon" onClick={() => setIsMsgSearchActive(true)}><RiSearchLine /></button>
+                      )}
+                      <button className="lg:hidden action-icon ml-1" onClick={() => setIsRightSideOpen(true)}><RiInformationLine /></button>
                     </div>
                   </>
                 ) : <h3>Conversation</h3>}
@@ -467,14 +539,15 @@ const Message = () => {
               <div className="messages-scroll">
                 {msgsLoading ? (
                   <div className="scroll-loader"><Loader size={32} /></div>
-                ) : messages.length === 0 ? (
-                  <div className="scroll-empty">Send the first message!</div>
-                ) : messages.map((msg: any, index: number) => {
+                ) : filteredMessages.length === 0 ? (
+                  <div className="scroll-empty">{msgSearchQuery ? "No messages found" : "Send the first message!"}</div>
+                ) : filteredMessages.map((msg: any, index: number) => {
                   const isOwner = user?._id && ((msg.userID?._id || msg.userID) === user._id);
                   const offer = parseOffer(msg.description);
                   const msgDate = moment(msg.createdAt).format('MMM DD');
-                  const prevMsgDate = index > 0 ? moment(messages[index - 1].createdAt).format('MMM DD') : null;
+                  const prevMsgDate = index > 0 ? moment(filteredMessages[index - 1].createdAt).format('MMM DD') : null;
                   const showDateDivider = msgDate !== prevMsgDate;
+                  const acceptedOrder = offer ? contactOrders.find((o: any) => o.title === offer.desc && Number(o.price) === Number(offer.price)) : null;
 
                   return (
                     <div key={msg._id} className="msg-wrapper">
@@ -483,50 +556,66 @@ const Message = () => {
                           <span className="date-pill">{msgDate === moment().format('MMM DD') ? 'Today' : msgDate}</span>
                         </div>
                       )}
-                      <div className={`msg-row ${isOwner ? 'msg-owner' : 'msg-other'}`}>
+                      <div className={`msg-row max-md:max-w-[85%] ${isOwner ? 'msg-owner' : 'msg-other'} ${offer ? 'has-offer !max-w-[95%] xl:!max-w-[85%]' : ''}`}>
                         {!isOwner && (
                           <img className="msg-avatar" src={msg.userID?.image || recipientUser?.image || '/media/noavatar.png'} alt="" />
                         )}
 
                         {offer ? (
-                          <div className={`offer-card ${msg.withdrawn ? 'withdrawn' : ''}`}>
+                          <div className={`offer-card max-md:p-3.5 ${msg.withdrawn ? 'withdrawn' : ''}`}>
                             {msg.withdrawn ? (
                               <p className="withdrawn-text">↩ This offer was withdrawn by the seller.</p>
                             ) : (
-                              <div className="offer-content">
-                                <div className="offer-seller-info">
-                                  <img src={msg.userID?.image || '/media/noavatar.png'} alt="" />
-                                  <div className="offer-seller-text">
-                                    <strong>{msg.userID?.username || 'Seller'} <RiCheckboxCircleFill className="verified-badge" /></strong>
-                                    <span>⭐ 5.0 (42)</span>
+                              <div className="offer-content flex flex-col w-full">
+                                <div className="flex justify-between items-start mb-2 gap-4">
+                                  <div>
+                                    <h4 className="text-base font-bold text-slate-900 leading-tight mb-1">Custom Proposal</h4>
+                                    <p className="text-sm text-slate-500 line-clamp-2">{offer.desc || 'No description provided.'}</p>
+                                  </div>
+                                  <div className="text-2xl font-black text-slate-800">${offer.price}</div>
+                                </div>
+
+                                <div className="flex items-center gap-6 py-3 border-y border-slate-100 my-2">
+                                  <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                                    <RiTimeLine className="text-slate-400 text-lg" />
+                                    <span className="font-semibold">{offer.delivery} Days</span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                                    <RiRefreshLine className="text-slate-400 text-lg" />
+                                    <span className="font-semibold">Unlimited Revisions</span>
                                   </div>
                                 </div>
-                                <div className="offer-details-grid">
-                                  <div className="offer-stat">
-                                    <span className="stat-label"><RiMoneyDollarCircleLine /> BID</span>
-                                    <span className="stat-val">${offer.price}</span>
-                                  </div>
-                                  <div className="offer-stat">
-                                    <span className="stat-label"><RiTimeLine /> DELIVERY</span>
-                                    <span className="stat-val">{offer.delivery} Days</span>
-                                  </div>
-                                  <div className="offer-stat">
-                                    <span className="stat-label"><RiRefreshLine /> REVISIONS</span>
-                                    <span className="stat-val">3</span>
-                                  </div>
-                                  <div className="offer-stat">
-                                    <span className="stat-label"><RiLineChartLine /> SUCCESS</span>
-                                    <span className="stat-val">98%</span>
-                                  </div>
-                                </div>
-                                <div className="offer-actions">
-                                  {!user?.isSeller && (
-                                    <button className="accept-btn" onClick={() => handleAcceptOffer(offer)}>Accept Proposal</button>
+
+                                <div className="flex gap-2 w-full mt-1">
+                                  {acceptedOrder ? (
+                                    <button
+                                      className="flex-1 py-2 px-3 rounded-lg font-bold text-sm bg-brand-green text-white hover:brightness-95 transition-all"
+                                      onClick={() => navigate.push(`/orders/${acceptedOrder._id}`)}
+                                    >
+                                      View Order
+                                    </button>
+                                  ) : (
+                                    <>
+                                      {!user?.isSeller && (
+                                        <button className="flex-1 py-2 px-3 rounded-lg font-bold text-sm bg-brand-green text-white hover:brightness-95 transition-all" onClick={() => handleAcceptOffer(offer)}>Accept</button>
+                                      )}
+                                      {user?.isSeller && isOwner && (
+                                        <button className="flex-1 py-2 px-3 rounded-lg font-bold text-sm bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all" onClick={() => handleWithdraw(msg._id)}>Withdraw</button>
+                                      )}
+                                    </>
                                   )}
-                                  {user?.isSeller && isOwner && (
-                                    <button className="withdraw-btn" onClick={() => handleWithdraw(msg._id)}>Withdraw Offer</button>
-                                  )}
-                                  <button className="view-btn">View Proposal</button>
+                                  <button
+                                    className="flex-1 py-2 px-3 rounded-lg font-bold text-sm border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all"
+                                    onClick={() => {
+                                      if (offer.packageID) {
+                                        navigate.push(`/package/${offer.packageID}`);
+                                      } else if (offer.briefID) {
+                                        navigate.push(`/briefs/${offer.briefID}`);
+                                      }
+                                    }}
+                                  >
+                                    View Details
+                                  </button>
                                 </div>
                               </div>
                             )}
@@ -561,16 +650,16 @@ const Message = () => {
               </div>
 
               {/* Compose Area */}
-              <div className="compose-area">
-                <form onSubmit={handleSend} className="compose-form">
+              <div className="compose-area max-md:p-3">
+                <form onSubmit={handleSend} className="compose-form max-md:px-2 max-md:py-1 max-md:gap-1.5">
                   <button type="button" className="icon-btn"><RiAddLine /></button>
                   <button type="button" className="icon-btn"><RiEmotionLine /></button>
-                  <input 
-                    type="text" 
-                    placeholder="Message" 
-                    value={messageText} 
-                    onChange={handleInputChange} 
-                    onKeyDown={handleKeyDown} 
+                  <input
+                    type="text"
+                    placeholder="Message"
+                    value={messageText}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                   />
                   {user?.isSeller && (
                     <button type="button" className="offer-btn-small" onClick={() => setShowOfferModal(true)}>
@@ -586,43 +675,105 @@ const Message = () => {
           )}
         </main>
 
+        <div className={`lg:hidden fixed inset-0 bg-black/20 z-30 transition-opacity duration-300 ease-in-out ${isRightSideOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsRightSideOpen(false)}></div>
+
         {/* ── RIGHT: About This Contact ── */}
         {recipientUser && (
-          <aside className="contact-sidebar">
-            <div className="sidebar-user">
-              <img src={recipientUser.image || '/media/noavatar.png'} alt="" />
-              <h4>{recipientUser.username}</h4>
-              <span>{recipientUser.country || 'United States'}</span>
-            </div>
-            <hr />
-            <div className="sidebar-section">
-              <h5>About</h5>
-              {recipientUser.description && (
-                <p className="contact-bio">{recipientUser.description}</p>
-              )}
-              <div className="detail-row">
-                <span>Member since</span>
-                <span>{moment(recipientUser.createdAt).format('MMM YYYY')}</span>
+          <aside className={`contact-sidebar transform transition-transform duration-300 ease-in-out max-lg:absolute max-lg:right-0 max-lg:z-40 max-lg:shadow-xl max-lg:h-full max-lg:!flex ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
+            <div className="sidebar-card relative">
+              <button className="lg:hidden absolute top-2 right-2 text-gray-500 text-2xl" onClick={() => setIsRightSideOpen(false)}><RiCloseLine /></button>
+              <div className="sidebar-section-header">
+                <h3>About {recipientUser.username}</h3>
+              </div>
+              <div className="sidebar-details">
+                <div className="detail-row">
+                  <span className="detail-label">From</span>
+                  <span className="detail-value">{recipientUser.country || 'United States'}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">On Workvence since</span>
+                  <span className="detail-value">{moment(recipientUser.createdAt).format('MMM YYYY')}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">English</span>
+                  <span className="detail-value">Native</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Response rate</span>
+                  <span className="detail-value">1 h</span>
+                </div>
+                <button className="view-profile-btn" onClick={() => navigate.push(`/seller/${recipientUser._id}`)}>
+                  View Profile
+                </button>
               </div>
             </div>
+
             {contactOrders.length > 0 && (
-              <>
-                <hr />
-                <div className="sidebar-section">
-                  <h5>Orders together <em>({contactOrders.length})</em></h5>
-                  {contactOrders.slice(0, 3).map((o: any) => (
-                    <div key={o._id} className="sidebar-order" onClick={() => navigate.push(`/orders/${o._id}`)}>
-                      <img src={o.image || '/media/noavatar.png'} alt="" />
-                      <div>
-                        <p>{o.title}</p>
-                        <span className={`mini-pill ${o.status || 'paid'}`}>
-                          {o.status === 'completed' ? 'Completed' : o.status === 'delivered' ? 'Delivered' : 'In Progress'}
-                        </span>
+              <div className="sidebar-card" style={{ marginTop: '20px' }}>
+                <div className="sidebar-section-header" style={{ marginBottom: '14px' }}>
+                  <h3>Orders ({contactOrders.length})</h3>
+                </div>
+                <div className="flex flex-col gap-2.5 px-2">
+                  {contactOrders.slice(0, 4).map((order: any) => (
+                    <div
+                      key={order._id}
+                      className="relative rounded-lg border border-slate-100 overflow-hidden cursor-pointer hover:shadow-md hover:border-slate-200 transition-all duration-200 group"
+                      onClick={() => navigate.push(`/orders/${order._id}`)}
+                    >
+                      <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${order.status === 'completed' ? 'bg-green-500' :
+                        order.status === 'delivered' ? 'bg-blue-500' : 'bg-amber-500'
+                        }`} />
+                      <div className="px-2 py-2.5">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-[2px] rounded ${order.status === 'completed' ? 'bg-green-50 text-green-600' :
+                            order.status === 'delivered' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'
+                            }`}>
+                            {order.status === 'completed' ? 'Completed' : order.status === 'delivered' ? 'Delivered' : 'In Progress'}
+                          </span>
+                          <span className="text-sm font-extrabold text-slate-800">${order.price}</span>
+                        </div>
+                        <h4 className="text-[12px] font-medium text-slate-600 line-clamp-1 group-hover:text-slate-900 transition-colors">
+                          {order.title}
+                        </h4>
                       </div>
                     </div>
                   ))}
                 </div>
-              </>
+                {contactOrders.length > 3 && (
+                  <button
+                    className="w-full mt-3 py-2 text-[12px] font-bold text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                    onClick={() => navigate.push('/orders')}
+                  >
+                    View All Orders →
+                  </button>
+                )}
+              </div>
+            )}
+
+            {recipientPackages.length > 0 && (
+              <div className="related-services-section">
+                <div className="section-title-row">
+                  <h3>Related Services</h3>
+                  <button className="see-more-btn" onClick={() => navigate.push(`/seller/${recipientUser._id}`)}>See More &gt;</button>
+                </div>
+                <div className="related-services-list">
+                  {recipientPackages.slice(0, 4).map((pkg: any) => (
+                    <div key={pkg._id} className="service-card" onClick={() => navigate.push(`/package/${pkg._id}`)}>
+                      <img src={pkg.images?.[0] || pkg.cover || '/media/noavatar.png'} alt="" />
+                      <div className="service-info">
+                        <p>{pkg.title}</p>
+                        <div className="service-meta">
+                          <span className="service-author">by {recipientUser.username}</span>
+                        </div>
+                        <div className="service-footer">
+                          <span className="service-rating">⭐ {pkg.starNumber || 5.0} ({pkg.sales || 0})</span>
+                          <span className="service-price">FROM <strong>${pkg.price}</strong></span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </aside>
         )}
@@ -631,7 +782,7 @@ const Message = () => {
       {/* Custom Offer Modal */}
       {showOfferModal && (
         <div className="modal-backdrop" onClick={() => setShowOfferModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
+          <div className="modal-box max-md:w-[96%] max-md:max-h-[95vh] max-md:overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="modal-head">
               <h3>Create Custom Offer</h3>
               <button onClick={() => setShowOfferModal(false)}>&times;</button>

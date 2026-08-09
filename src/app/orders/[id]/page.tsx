@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 
 
 import { axiosFetch } from "@/utils";
+import { socket } from "@/utils/socket";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 import Swal from 'sweetalert2';
@@ -43,6 +44,23 @@ const OrderDetail = () => {
           toast.error(response?.data?.message || "Failed to load order");
         }),
   });
+
+  // Real-time order updates without page reload
+  useEffect(() => {
+    if (id) {
+      socket.emit("join_order", id);
+    }
+    const handleOrderUpdate = (data: any) => {
+      // Re-fetch or update order state in-place without page reload!
+      if (data.orderId === id) {
+        refetch(); // Trigger react-query refetch
+      }
+    };
+    socket.on("order_updated", handleOrderUpdate);
+    return () => {
+      socket.off("order_updated", handleOrderUpdate);
+    };
+  }, [id, refetch]);
 
   // Countdown clock effect
   useEffect(() => {
@@ -111,7 +129,7 @@ const OrderDetail = () => {
       setDeliveryText("");
       setDeliveryFile("");
       refetch();
-    } catch (err) {
+    } catch (err: any) {
       toast.error("Failed to submit delivery");
     } finally {
       setSubmitting(false);
@@ -123,7 +141,7 @@ const OrderDetail = () => {
       await axiosFetch.post(`/orders/complete/${order._id}`);
       toast.success("Order accepted and marked as completed!");
       refetch();
-    } catch (err) {
+    } catch (err: any) {
       toast.error("Failed to complete order");
     }
   };
@@ -135,7 +153,7 @@ const OrderDetail = () => {
       inputLabel: 'What needs to be changed?',
       inputPlaceholder: 'Please describe the revisions needed clearly...',
       showCancelButton: true,
-      confirmButtonColor: '#1dbf73',
+      confirmButtonColor: '#6ad724',
       inputValidator: (value) => {
         if (!value) return 'You need to write a reason!';
       }
@@ -147,7 +165,7 @@ const OrderDetail = () => {
         await axiosFetch.post(`/orders/${order._id}/request-revision`, { reason: text });
         Swal.fire('Sent!', 'Your revision request has been sent to the seller.', 'success');
         refetch();
-      } catch (err) {
+      } catch (err: any) {
         Swal.fire('Error', err.response?.data?.message || 'Failed to request revision', 'error');
       } finally {
         setSubmitting(false);
@@ -163,7 +181,7 @@ const OrderDetail = () => {
         '<textarea id="swal-input2" class="swal2-textarea" placeholder="Reason for extension..."></textarea>',
       focusConfirm: false,
       showCancelButton: true,
-      confirmButtonColor: '#1dbf73',
+      confirmButtonColor: '#6ad724',
       preConfirm: () => {
         const days = (document.getElementById('swal-input1') as HTMLInputElement).value;
         const reason = (document.getElementById('swal-input2') as HTMLTextAreaElement).value;
@@ -180,7 +198,7 @@ const OrderDetail = () => {
         await axiosFetch.post(`/orders/${order._id}/request-extension`, formValues);
         Swal.fire('Sent!', 'Your extension request has been sent to the buyer.', 'success');
         refetch();
-      } catch (err) {
+      } catch (err: any) {
         Swal.fire('Error', err.response?.data?.message || 'Failed to request extension', 'error');
       } finally {
         setSubmitting(false);
@@ -193,7 +211,7 @@ const OrderDetail = () => {
       await axiosFetch.patch(`/orders/${order._id}/respond-extension`, { action });
       Swal.fire('Success', `Extension request has been ${action}ed.`, 'success');
       refetch();
-    } catch (err) {
+    } catch (err: any) {
       toast.error("Failed to respond to extension request.");
     }
   };
@@ -382,7 +400,7 @@ const OrderDetail = () => {
                     {!hasPendingExtension && (
                       <button 
                         onClick={handleRequestExtension}
-                        style={{ background: 'white', color: '#1dbf73', border: '1px solid #1dbf73', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                        style={{ background: 'white', color: '#6ad724', border: '1px solid #6ad724', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
                       >
                         Request Time Extension
                       </button>

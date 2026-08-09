@@ -137,7 +137,7 @@ const Login = () => {
           title: 'Verification Required',
           text: message,
           confirmButtonText: 'Verify Now',
-          confirmButtonColor: '#1dbf73'
+          confirmButtonColor: '#6ad724'
         }).then(() => {
           sessionStorage.setItem('tempLoginPassword', formInput.password);
           sessionStorage.setItem('tempLoginUsername', formInput.username);
@@ -202,7 +202,7 @@ const Login = () => {
             
             <div className="auth-footer-step2 mt-6 text-center">
               <p className="mb-4 text-sm text-gray-600">
-                Don't have an account? <Link href="/register" className="text-[#1dbf73] font-semibold hover:underline">Sign up</Link>
+                Don't have an account? <Link href="/register" className="text-brand-green font-semibold hover:underline">Sign up</Link>
               </p>
               <p className="copyright">©2026 workvence All right reserved</p>
             </div>

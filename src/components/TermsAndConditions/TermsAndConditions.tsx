@@ -113,7 +113,7 @@ const TermsAndConditions = () => {
               Terms & Conditions
             </h1>
             
-            <div className="flex items-center gap-1.5 text-sm font-semibold text-[#1dbf73] mb-4">
+            <div className="flex items-center gap-1.5 text-sm font-semibold text-brand-green mb-4">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 <polyline points="12 6 12 12 16 14" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -132,7 +132,7 @@ const TermsAndConditions = () => {
           
           {/* Card 1: Secure Payments */}
           <div className="bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 shadow-[0_2px_15px_rgba(0,0,0,0.025)] hover:border-gray-300 transition-all flex flex-col justify-start">
-            <div className="w-9 h-9 rounded-lg bg-[#eaf8f0] text-[#1dbf73] flex items-center justify-center mb-4">
+            <div className="w-9 h-9 rounded-lg bg-[#eaf8f0] text-brand-green flex items-center justify-center mb-4">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
@@ -147,7 +147,7 @@ const TermsAndConditions = () => {
 
           {/* Card 2: Buyer Protection */}
           <div className="bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 shadow-[0_2px_15px_rgba(0,0,0,0.025)] hover:border-gray-300 transition-all flex flex-col justify-start">
-            <div className="w-9 h-9 rounded-lg bg-[#eaf8f0] text-[#1dbf73] flex items-center justify-center mb-4">
+            <div className="w-9 h-9 rounded-lg bg-[#eaf8f0] text-brand-green flex items-center justify-center mb-4">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
@@ -162,7 +162,7 @@ const TermsAndConditions = () => {
 
           {/* Card 3: Escrow Protection */}
           <div className="bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 shadow-[0_2px_15px_rgba(0,0,0,0.025)] hover:border-gray-300 transition-all flex flex-col justify-start">
-            <div className="w-9 h-9 rounded-lg bg-[#eaf8f0] text-[#1dbf73] flex items-center justify-center mb-4">
+            <div className="w-9 h-9 rounded-lg bg-[#eaf8f0] text-brand-green flex items-center justify-center mb-4">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
               </svg>
@@ -177,7 +177,7 @@ const TermsAndConditions = () => {
 
           {/* Card 4: 24/7 Support */}
           <div className="bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 shadow-[0_2px_15px_rgba(0,0,0,0.025)] hover:border-gray-300 transition-all flex flex-col justify-start">
-            <div className="w-9 h-9 rounded-lg bg-[#eaf8f0] text-[#1dbf73] flex items-center justify-center mb-4">
+            <div className="w-9 h-9 rounded-lg bg-[#eaf8f0] text-brand-green flex items-center justify-center mb-4">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
@@ -208,7 +208,7 @@ const TermsAndConditions = () => {
                 >
                   <div className="flex items-center gap-4">
                     {/* Green circular badge icon */}
-                    <div className="w-8 h-8 rounded-full bg-[#eaf8f0] text-[#1dbf73] flex items-center justify-center flex-shrink-0 font-semibold text-xs shadow-2xs">
+                    <div className="w-8 h-8 rounded-full bg-[#eaf8f0] text-brand-green flex items-center justify-center flex-shrink-0 font-semibold text-xs shadow-2xs">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
@@ -234,7 +234,7 @@ const TermsAndConditions = () => {
                       <ul className="space-y-2 pt-2">
                         {item.bullets.map((bullet, bIdx) => (
                           <li key={bIdx} className="flex items-center gap-2.5 text-[14px] text-gray-600">
-                            <svg className="w-4 h-4 text-[#1dbf73] flex-shrink-0 fill-current" viewBox="0 0 20 20">
+                            <svg className="w-4 h-4 text-brand-green flex-shrink-0 fill-current" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
                             <span>{bullet}</span>

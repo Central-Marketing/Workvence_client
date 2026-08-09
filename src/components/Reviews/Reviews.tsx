@@ -118,7 +118,7 @@ const Reviews = (props: any) => {
                                     </span>
                                     <div className="h-2 rounded-full bg-gray-200 flex-1 mx-3 overflow-hidden">
                                         <div 
-                                            className={`h-full rounded-full transition-all duration-1000 ${hasVotes ? 'bg-[#1dbf73]' : 'bg-transparent'}`}
+                                            className={`h-full rounded-full transition-all duration-1000 ${hasVotes ? 'bg-brand-green' : 'bg-transparent'}`}
                                             style={{ width: `${percentage}%` }}
                                         ></div>
                                     </div>
@@ -165,7 +165,7 @@ const Reviews = (props: any) => {
                             placeholder="Search reviews"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-white border border-gray-200/90 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-gray-700 placeholder-gray-400 shadow-2xs focus:outline-none focus:border-[#1dbf73] transition-colors"
+                            className="w-full bg-white border border-gray-200/90 rounded-xl pl-10 pr-4 py-2.5 text-xs sm:text-sm text-gray-700 placeholder-gray-400 shadow-2xs focus:outline-none focus:border-brand-green transition-colors"
                         />
                         <svg className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -203,7 +203,7 @@ const Reviews = (props: any) => {
                     <button
                         type="button"
                         onClick={() => setShowMore(!showMore)}
-                        className="px-7 py-3 bg-[#1dbf73] hover:bg-[#19a463] text-white font-semibold rounded-xl shadow-sm transition-all text-sm cursor-pointer"
+                        className="px-7 py-3 bg-brand-green hover:bg-brand-green text-white font-semibold rounded-xl shadow-sm transition-all text-sm cursor-pointer"
                     >
                         {showMore ? "Show fewer reviews" : "Show more review"}
                     </button>
@@ -219,7 +219,7 @@ const Reviews = (props: any) => {
                             <label className="block text-xs font-bold text-gray-700 uppercase mb-2">Rating Score</label>
                             <select 
                                 name="star" 
-                                className="bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-800 focus:outline-none focus:border-[#1dbf73] shadow-2xs cursor-pointer w-48"
+                                className="bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-800 focus:outline-none focus:border-brand-green shadow-2xs cursor-pointer w-48"
                                 defaultValue={5}
                             >
                                 <option value={5}>★★★★★ (5 - Excellent)</option>
@@ -236,14 +236,14 @@ const Reviews = (props: any) => {
                                 rows={4} 
                                 placeholder="Describe your working experience with this seller..." 
                                 required
-                                className="w-full bg-white border border-gray-200 rounded-xl p-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#1dbf73] transition-colors shadow-2xs"
+                                className="w-full bg-white border border-gray-200 rounded-xl p-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-brand-green transition-colors shadow-2xs"
                             ></textarea>
                         </div>
                         <div className="flex justify-end pt-2">
                             <button 
                                 type="submit" 
                                 disabled={mutation.isPending}
-                                className="px-7 py-3 bg-[#1dbf73] hover:bg-[#19a463] text-white font-extrabold text-sm rounded-xl transition-all shadow-sm cursor-pointer disabled:opacity-50"
+                                className="px-7 py-3 bg-brand-green hover:bg-brand-green text-white font-extrabold text-sm rounded-xl transition-all shadow-sm cursor-pointer disabled:opacity-50"
                             >
                                 {mutation.isPending ? "Submitting..." : "Send Review"}
                             </button>

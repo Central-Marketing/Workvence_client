@@ -75,7 +75,7 @@ const RegisterContent = () => {
         icon: 'error',
         title: 'Oops...',
         text: err.response?.data?.message || "Registration failed",
-        confirmButtonColor: '#1dbf73'
+        confirmButtonColor: '#6ad724'
       });
       setLoading(false);
     }
@@ -117,7 +117,7 @@ const RegisterContent = () => {
           icon: 'success',
           title: 'Welcome to Workvence!',
           text: 'Your email is verified and you are now logged in.',
-          confirmButtonColor: '#1dbf73'
+          confirmButtonColor: '#6ad724'
         }).then(() => {
           router.push('/');
         });
@@ -126,7 +126,7 @@ const RegisterContent = () => {
           icon: 'success',
           title: 'Email Verified!',
           text: 'Your email has been verified successfully. Please log in.',
-          confirmButtonColor: '#1dbf73'
+          confirmButtonColor: '#6ad724'
         }).then(() => {
           router.push('/login');
         });
@@ -137,7 +137,7 @@ const RegisterContent = () => {
         icon: 'error',
         title: 'Verification Failed',
         text: err.response?.data?.message || "OTP verification failed",
-        confirmButtonColor: '#1dbf73'
+        confirmButtonColor: '#6ad724'
       });
     } finally {
       setLoading(false);
@@ -158,7 +158,7 @@ const RegisterContent = () => {
         icon: 'error',
         title: 'Request Blocked',
         text: err.response?.data?.message || "Failed to resend OTP",
-        confirmButtonColor: '#1dbf73'
+        confirmButtonColor: '#6ad724'
       });
     }
   }
@@ -251,12 +251,12 @@ const RegisterContent = () => {
                   <p className="subtext">Continue with your email and choose a unique username. This is how you'll appear to other users across the platform.</p>
 
                   <div className="account-type-toggle mb-5 mt-2 flex gap-4">
-                    <label className={`flex-1 flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${!formInput.isSeller ? 'border-[#1dbf73] bg-[#eaf8f0] text-[#169c5e]' : 'border-gray-200 hover:border-gray-300'}`}>
+                    <label className={`flex-1 flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${!formInput.isSeller ? 'border-brand-green bg-[#eaf8f0] text-[#169c5e]' : 'border-gray-200 hover:border-gray-300'}`}>
                       <input type="radio" name="isSeller" checked={!formInput.isSeller} onChange={() => setFormInput({...formInput, isSeller: false})} className="hidden" />
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                       <span className="font-semibold text-[14px]">I'm a Client</span>
                     </label>
-                    <label className={`flex-1 flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formInput.isSeller ? 'border-[#1dbf73] bg-[#eaf8f0] text-[#169c5e]' : 'border-gray-200 hover:border-gray-300'}`}>
+                    <label className={`flex-1 flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formInput.isSeller ? 'border-brand-green bg-[#eaf8f0] text-[#169c5e]' : 'border-gray-200 hover:border-gray-300'}`}>
                       <input type="radio" name="isSeller" checked={formInput.isSeller} onChange={() => setFormInput({...formInput, isSeller: true})} className="hidden" />
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
                       <span className="font-semibold text-[14px]">I'm a Freelancer</span>
@@ -324,7 +324,7 @@ const RegisterContent = () => {
                         id={`otp-${index}`}
                         type="text"
                         maxLength={1}
-                        className="otp-box w-12 h-14 text-center text-xl font-bold border rounded-lg focus:border-[#1dbf73] focus:ring-1 focus:ring-[#1dbf73]"
+                        className="otp-box w-12 h-14 text-center text-xl font-bold border rounded-lg focus:border-brand-green focus:ring-1 focus:ring-brand-green"
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}
@@ -338,13 +338,13 @@ const RegisterContent = () => {
                       type="button" 
                       onClick={handleResendOtp} 
                       disabled={resendTimer > 0}
-                      className={`font-bold transition-colors ${resendTimer > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-[#1dbf73] hover:underline cursor-pointer'}`}
+                      className={`font-bold transition-colors ${resendTimer > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-brand-green hover:underline cursor-pointer'}`}
                     >
                       {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : 'Resend OTP'}
                     </button>
                   </div>
 
-                  <button type="submit" className="submit-btn w-full bg-[#1dbf73] text-white py-3 rounded-lg font-bold hover:bg-[#19a463] transition-colors" disabled={loading}>
+                  <button type="submit" className="submit-btn w-full bg-brand-green text-white py-3 rounded-lg font-bold hover:bg-brand-green transition-colors" disabled={loading}>
                     {loading ? 'Verifying...' : 'Verify Email'}
                   </button>
                 </div>

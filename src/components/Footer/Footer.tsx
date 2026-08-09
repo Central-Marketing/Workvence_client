@@ -63,19 +63,19 @@ const footerColumns = [
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-gray-50 text-gray-900">
+    <footer className="w-full bg-slate-900 text-slate-100">
       {/* Top: Brand + newsletter */}
-      <div className="container mx-auto px-4 md:px-8 pt-16 pb-12 border-b border-gray-100">
+      <div className="container mx-auto px-4 md:px-8 pt-16 pb-12 border-b border-slate-800">
         <div className="flex flex-col lg:flex-row justify-between gap-10">
           <div className="max-w-xs">
             <Link href="/">
               <img
                 src="/Workvence-logo-Horizontal 1.png"
                 alt="Workvence"
-                className="h-7 object-contain cursor-pointer mb-5"
+                className="h-7 object-contain cursor-pointer mb-5 bg-white/10 rounded px-2 py-1"
               />
             </Link>
-            <p className="text-[13.5px] text-gray-500 leading-relaxed">
+            <p className="text-[13.5px] text-slate-400 leading-relaxed">
               The trusted marketplace connecting skilled professionals with clients around the world. Hire smarter. Deliver better.
             </p>
             <div className="flex items-center gap-3 mt-6">
@@ -84,9 +84,9 @@ const Footer = () => {
                   key={s.label}
                   href={s.href}
                   aria-label={s.label}
-                  className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                  className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center hover:bg-slate-700 transition-colors"
                 >
-                  <img src={s.icon} alt={s.label} className="w-4 h-4 opacity-60" />
+                  <img src={s.icon} alt={s.label} className="w-4 h-4 opacity-70 invert" />
                 </a>
               ))}
             </div>
@@ -94,17 +94,17 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div className="max-w-sm w-full">
-            <h4 className="text-[15px] font-semibold text-gray-900 mb-2">Stay in the loop</h4>
-            <p className="text-[13px] text-gray-500 mb-4 leading-relaxed">
+            <h4 className="text-[15px] font-semibold text-slate-100 mb-2">Stay in the loop</h4>
+            <p className="text-[13px] text-slate-400 mb-4 leading-relaxed">
               Get the latest platform updates, freelancer tips, and curated picks straight to your inbox.
             </p>
             <div className="flex gap-2">
               <input
                 type="email"
                 placeholder="Your email address"
-                className="flex-1 bg-gray-50 text-gray-900 text-[13px] placeholder-gray-400 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-gray-400 transition-colors"
+                className="flex-1 bg-slate-800 text-slate-100 text-[13px] placeholder-slate-500 border border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:border-slate-500 transition-colors"
               />
-              <button className="bg-[#1dbf73] hover:bg-[#19a463] text-white text-[13px] font-semibold px-5 py-2.5 rounded-xl transition-colors whitespace-nowrap">
+              <button className="bg-brand-green hover:bg-brand-green text-white text-[13px] font-semibold px-5 py-2.5 rounded-xl transition-colors whitespace-nowrap">
                 Subscribe
               </button>
             </div>
@@ -113,11 +113,11 @@ const Footer = () => {
       </div>
 
       {/* Middle: Nav columns */}
-      <div className="container mx-auto px-4 md:px-8 py-12 border-b border-gray-100">
+      <div className="container mx-auto px-4 md:px-8 py-12 border-b border-slate-800">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
           {footerColumns.map((col) => (
             <div key={col.title} className="flex flex-col gap-3">
-              <h3 className="text-[14px] font-semibold text-gray-900 mb-2">{col.title}</h3>
+              <h3 className="text-[14px] font-semibold text-slate-100 mb-2">{col.title}</h3>
               {col.links.map((link) => (
                 <Link
                   key={link}
@@ -129,7 +129,7 @@ const Footer = () => {
                     link === "Recommended Sellers" ? "/recommended-sellers" :
                     "#"
                   }
-                  className="text-[13px] text-gray-500 hover:text-gray-900 transition-colors"
+                  className="text-[13px] text-slate-400 hover:text-white transition-colors"
                 >
                   {link}
                 </Link>
@@ -142,20 +142,20 @@ const Footer = () => {
       {/* Bottom bar */}
       <div className="container mx-auto px-4 md:px-8 py-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-[12px] text-gray-500">
+          <p className="text-[12px] text-slate-400">
             ©Workvence International Ltd. {new Date().getFullYear()} — All rights reserved.
           </p>
-          <div className="flex items-center gap-6 text-[12px] text-gray-500">
-            <button className="flex items-center gap-1.5 hover:text-gray-900 transition-colors">
-              <img src="/all-icons/global.svg" alt="Language" className="w-3.5 h-3.5 opacity-60" />
+          <div className="flex items-center gap-6 text-[12px] text-slate-400">
+            <button className="flex items-center gap-1.5 hover:text-white transition-colors">
+              <img src="/all-icons/global.svg" alt="Language" className="w-3.5 h-3.5 opacity-60 invert" />
               <span>English</span>
             </button>
-            <button className="flex items-center gap-1 hover:text-gray-900 transition-colors">
+            <button className="flex items-center gap-1 hover:text-white transition-colors">
               <span className="font-medium">$</span>
               <span>USD</span>
             </button>
-            <Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-gray-900 transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
           </div>
         </div>
       </div>

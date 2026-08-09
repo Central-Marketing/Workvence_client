@@ -71,7 +71,7 @@ const Review = (props: any) => {
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-[#1dbf73] hover:text-[#19a463] font-bold ml-1.5 transition-colors cursor-pointer inline-block"
+              className="text-brand-green hover:text-brand-green font-bold ml-1.5 transition-colors cursor-pointer inline-block"
             >
               {isExpanded ? "See less" : "See more"}
             </button>

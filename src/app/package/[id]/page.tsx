@@ -57,6 +57,33 @@ const PackageContent = () => {
     }
   });
 
+  const handleContact = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    const sellerID = data?.userID?._id;
+    const buyerID = user._id;
+
+    if (!sellerID || !buyerID) return;
+
+    if (sellerID === buyerID) {
+      Swal.fire('Notice', 'You cannot contact yourself.', 'info');
+      return;
+    }
+
+    try {
+      const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
+      router.push(`/message/${res.data.conversationID}`);
+    } catch (err) {
+      const res = await axiosFetch.post("/conversations", {
+        to: sellerID,
+        from: buyerID,
+      });
+      router.push(`/message/${res.data.conversationID}`);
+    }
+  };
+
   const country = getCountryFlag(data?.userID?.country);
 
   useEffect(() => {
@@ -448,13 +475,7 @@ const PackageContent = () => {
                     </div>
                   </div>
                   <button 
-                    onClick={() => {
-                      if (!user) {
-                        router.push('/login');
-                      } else {
-                        router.push(`/messages`);
-                      }
-                    }}
+                    onClick={handleContact}
                     className="px-6 py-2.5 bg-white hover:bg-gray-100 text-gray-900 font-semibold text-sm rounded-xl border border-gray-300 transition-colors shadow-2xs cursor-pointer"
                   >
                     Contact Me
@@ -601,13 +622,7 @@ const PackageContent = () => {
               {/* Separate Contact Me Button matching photo placement */}
               <button 
                 type="button"
-                onClick={() => {
-                  if (!user) {
-                    router.push('/login');
-                  } else {
-                    router.push(`/messages`);
-                  }
-                }}
+                onClick={handleContact}
                 className="w-full py-3.5 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-sm rounded-2xl border border-gray-200 transition-colors flex items-center justify-center gap-2 shadow-2xs cursor-pointer"
               >
                 <span>Contact me</span>

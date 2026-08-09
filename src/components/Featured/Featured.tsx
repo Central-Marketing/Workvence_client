@@ -26,9 +26,13 @@ const Featured = () => {
     { name: "Data Server", icon: <Database size={28} strokeWidth={1.5} />, path: "data" },
   ];
 
+  const filteredCategories = categoryIcons.filter(cat => 
+    cat.name.toLowerCase().includes(search.trim().toLowerCase())
+  );
+
   return (
     <div className="w-full min-h-[60vh] flex justify-center items-center bg-brand-black bg-[image:linear-gradient(to_top,rgba(0,0,0,0.9),rgba(0,0,0,0.1)),url('/heroImg.jpg')] bg-cover bg-center text-white py-20 px-5">
-      <div className="w-full container mx-auto flex flex-col items-center px-4 md:px-6">
+      <div className="w-full container mx-auto flex flex-col items-center px-4 md:px-6 mt-32 md:mt-56">
 
         <div className="w-full flex flex-col items-center text-center gap-10">
           <div className="w-full max-w-4xl flex flex-col items-center text-center gap-10">
@@ -58,8 +62,8 @@ const Featured = () => {
             </div>
           </div>
 
-          <div className="flex justify-center items-start w-full max-w-5xl mt-5 gap-1 sm:gap-4 md:gap-6 overflow-hidden mx-auto">
-            {categoryIcons.map((cat, index) => (
+          <div className="flex justify-center items-start w-full max-w-5xl mt-5 gap-1 sm:gap-4 md:gap-6 overflow-hidden mx-auto h-[100px]">
+            {search.trim().length > 0 && filteredCategories.map((cat, index) => (
               <div
                 key={index}
                 className="flex flex-col items-center gap-1 md:gap-2 cursor-pointer transition group flex-1 min-w-0 md:flex-none md:w-[110px]"

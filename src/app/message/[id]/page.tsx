@@ -57,6 +57,7 @@ const Message = () => {
   const [isRightSideOpen, setIsRightSideOpen] = useState(false);
   const typingTimeoutRef = useRef(null);
   const isTypingRef = useRef(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -317,18 +318,25 @@ const Message = () => {
 
     mutation.mutate({ conversationID, description: messageText });
     setMessageText("");
-  };
-
-  const handleKeyDown = (e: any) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend(e);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
     }
   };
+
 
   const handleInputChange = (e: any) => {
     const value = e.target.value;
     setMessageText(value);
+
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
+      if (textareaRef.current.scrollHeight > 150) {
+        textareaRef.current.style.overflowY = 'auto';
+      } else {
+        textareaRef.current.style.overflowY = 'hidden';
+      }
+    }
 
     if (conversationID && user?.username) {
       // Emit 'typing_start' on first keystroke
@@ -433,13 +441,6 @@ const Message = () => {
                 value={convSearchQuery}
                 onChange={(e) => setConvSearchQuery(e.target.value)}
               />
-            </div>
-            <div className="filters">
-              <span className="filter-pill active">All</span>
-              <span className="filter-pill">Gig inbox</span>
-              <span className="filter-pill">Bid inbox</span>
-              <span className="filter-pill">Unread</span>
-              <span className="filter-pill">Favorites</span>
             </div>
           </div>
           <div className="conv-items">
@@ -654,12 +655,12 @@ const Message = () => {
                 <form onSubmit={handleSend} className="compose-form max-md:px-2 max-md:py-1 max-md:gap-1.5">
                   <button type="button" className="icon-btn"><RiAddLine /></button>
                   <button type="button" className="icon-btn"><RiEmotionLine /></button>
-                  <input
-                    type="text"
+                  <textarea
+                    ref={textareaRef}
                     placeholder="Message"
                     value={messageText}
                     onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
+                    rows={1}
                   />
                   {user?.isSeller && (
                     <button type="button" className="offer-btn-small" onClick={() => setShowOfferModal(true)}>

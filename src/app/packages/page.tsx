@@ -71,10 +71,14 @@ const Packages = () => {
   const initialMin = initialParams.get('min') || '';
   const initialMax = initialParams.get('max') || '';
 
-  const [sortBy, setSortBy] = useState('sales');
+  const initialSort = initialParams.get('sort') || 'createdAt';
+  const initialPage = parseInt(initialParams.get('page') || '1', 10);
+
+  const [sortBy, setSortBy] = useState(initialSort);
   const [searchVal, setSearchVal] = useState(initialSearch);
   const [activeCategory, setActiveCategory] = useState(initialCat);
   const [showFilter, setShowFilter] = useState(false);
+  const [page, setPage] = useState(initialPage);
 
   // Additional sidebar & tag filter states
   const [filterCategory, setFilterCategory] = useState(initialCat !== 'All services' && initialCat !== 'Results' ? initialCat : '');
@@ -99,6 +103,8 @@ const Packages = () => {
     setSearchVal(params.get('search') || '');
     setMinPrice(params.get('min') || '');
     setMaxPrice(params.get('max') || '');
+    setSortBy(params.get('sort') || 'createdAt');
+    setPage(parseInt(params.get('page') || '1', 10));
   }, [search]);
 
   // Reactive React Query key ensuring automatic re-fetching whenever any filter state changes
@@ -111,6 +117,7 @@ const Packages = () => {
       minPrice,
       maxPrice,
       sortBy,
+      page,
       JSON.stringify(experience),
       englishLevel,
       clientLocation
@@ -131,6 +138,8 @@ const Packages = () => {
       if (minPrice) queryParams.set('min', minPrice);
       if (maxPrice) queryParams.set('max', maxPrice);
       if (sortBy) queryParams.set('sort', sortBy);
+      queryParams.set('limit', '20');
+      queryParams.set('page', page.toString());
 
       return axiosFetch.get(`/gigs?${queryParams.toString()}`)
         .then(({ data }) => data || [])
@@ -150,11 +159,15 @@ const Packages = () => {
     const currentCat = overrides.category !== undefined ? overrides.category : (filterCategory || (activeCategory !== 'All services' ? activeCategory : ''));
     const currentMin = overrides.minPrice !== undefined ? overrides.minPrice : minPrice;
     const currentMax = overrides.maxPrice !== undefined ? overrides.maxPrice : maxPrice;
+    const currentSort = overrides.sortBy !== undefined ? overrides.sortBy : sortBy;
+    const currentPage = overrides.page !== undefined ? overrides.page : (overrides.resetPage ? 1 : page);
 
     if (currentSearch && currentSearch.trim()) params.set('search', currentSearch.trim());
     if (currentCat && currentCat !== 'All services' && currentCat !== 'Results') params.set('category', currentCat);
     if (currentMin) params.set('min', currentMin);
     if (currentMax) params.set('max', currentMax);
+    if (currentSort && currentSort !== 'createdAt') params.set('sort', currentSort);
+    if (currentPage > 1) params.set('page', currentPage.toString());
     
     navigate.push(`/packages?${params.toString()}`, { scroll: false });
   };
@@ -602,6 +615,33 @@ const Packages = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
             {data?.map((pkg: any) => <PackageCard key={pkg._id} data={pkg} />)}
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {data && data.length > 0 && (
+          <div className="flex justify-center items-center gap-4 mt-12 mb-4">
+            <button 
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                syncUrlWithFilters({ page: page - 1 });
+              }}
+              disabled={page === 1}
+              className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+            >
+              Previous
+            </button>
+            <span className="font-semibold text-gray-800 bg-gray-100 px-4 py-2 rounded-lg">Page {page}</span>
+            <button 
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                syncUrlWithFilters({ page: page + 1 });
+              }}
+              disabled={data.length < 20}
+              className="px-6 py-2.5 bg-brand-green text-white font-semibold rounded-xl hover:bg-[#3ea917] disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+            >
+              Next
+            </button>
           </div>
         )}
       </div>

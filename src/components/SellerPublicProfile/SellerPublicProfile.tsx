@@ -3,8 +3,11 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Reviews } from '@/components';
 import { axiosFetch } from '@/utils';
+import { useUserStore } from '@/store/userStore';
+import Swal from 'sweetalert2';
 
 const categories = [
   "All services",
@@ -25,6 +28,35 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [sellerData, setSellerData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const { user } = useUserStore((state: any) => state);
+
+  const handleContact = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    const sellerID = sellerData?._id;
+    const buyerID = user._id;
+
+    if (!sellerID || !buyerID) return;
+
+    if (sellerID === buyerID) {
+      Swal.fire('Notice', 'You cannot contact yourself.', 'info');
+      return;
+    }
+
+    try {
+      const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
+      router.push(`/message/${res.data.conversationID}`);
+    } catch (err) {
+      const res = await axiosFetch.post("/conversations", {
+        to: sellerID,
+        from: buyerID,
+      });
+      router.push(`/message/${res.data.conversationID}`);
+    }
+  };
 
   useEffect(() => {
     const fetchSellerData = async () => {
@@ -239,12 +271,12 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
 
             {/* Action Buttons */}
             <div className="flex items-center gap-3 mt-6">
-              <Link
-                href={`/message/new?user=${displayUsername}`}
-                className="flex-1 bg-brand-green hover:bg-brand-green text-white font-semibold py-3 px-4 rounded-xl text-sm text-center transition-all shadow-sm cursor-pointer"
+              <button
+                onClick={handleContact}
+                className="flex-1 bg-brand-green hover:bg-brand-green text-white font-semibold py-3 px-4 rounded-xl text-sm text-center transition-all shadow-sm cursor-pointer border-none"
               >
                 Contact Seller
-              </Link>
+              </button>
               
               <button
                 type="button"

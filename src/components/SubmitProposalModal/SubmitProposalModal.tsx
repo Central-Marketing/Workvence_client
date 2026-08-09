@@ -37,7 +37,15 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
         onClose();
       }
     } catch (err: any) {
-      setErrorMsg(err.response?.data?.message || "Proposal submission failed.");
+      const msg = err.response?.data?.message || "Proposal submission failed.";
+      setErrorMsg(msg);
+      
+      if (msg.toLowerCase().includes("already submitted")) {
+        setTimeout(() => {
+          onSuccess(null, true);
+          onClose();
+        }, 2000);
+      }
     } finally {
       setLoading(false);
     }

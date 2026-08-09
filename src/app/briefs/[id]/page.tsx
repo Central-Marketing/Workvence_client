@@ -11,7 +11,6 @@ import toast from "react-hot-toast";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader, SubmitProposalModal } from "@/components";
-import "./BriefDetail.scss";
 
 const BriefDetail = () => {
   const router = useRouter();
@@ -25,7 +24,10 @@ const BriefDetail = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    if (typeof window !== "undefined" && localStorage.getItem(`proposed_${briefId}`)) {
+      setProposalSent(true);
+    }
+  }, [briefId]);
 
   // Fetch brief details
   const {
@@ -38,6 +40,34 @@ const BriefDetail = () => {
       axiosFetch.get(`/briefs/${briefId}`).then(({ data }) => data?.brief || data?.data || data),
     enabled: !!briefId,
   });
+
+  const isClosed = brief?.isClosed || brief?.status === "closed";
+  const isOwner =
+    brief &&
+    user &&
+    (brief.userID?._id === user._id || brief.userID === user._id);
+  const isSeller = user?.isSeller;
+
+  // Check if seller already submitted a proposal
+  const { data: existingProposals = [] } = useQuery({
+    queryKey: ["brief-proposals", briefId],
+    queryFn: () =>
+      axiosFetch.get(`/briefs/${briefId}/proposals`)
+        .then(({ data }) => {
+          if (Array.isArray(data)) return data;
+          if (Array.isArray(data?.proposals)) return data.proposals;
+          if (Array.isArray(data?.data)) return data.data;
+          return [];
+        })
+        .catch(() => []),
+    enabled: !!briefId && !!user && isSeller && !isOwner,
+  });
+
+  const hasAlreadyProposed = existingProposals.some(
+    (p: any) => p.sellerID?._id === user?._id || p.sellerID === user?._id
+  );
+
+  const showSubmittedUI = proposalSent || hasAlreadyProposed;
 
   // Close brief mutation (buyer)
   const closeMutation = useMutation({
@@ -52,25 +82,21 @@ const BriefDetail = () => {
     },
   });
 
-  const handleProposalSuccess = () => {
+  const handleProposalSuccess = (data?: any, isAlreadySubmitted?: boolean) => {
     setProposalSent(true);
-    toast.success("Proposal submitted successfully!");
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`proposed_${briefId}`, "true");
+    }
+    if (!isAlreadySubmitted) {
+      toast.success("Proposal submitted successfully!");
+    }
   };
-
-  const isClosed = brief?.isClosed || brief?.status === "closed";
-  const isOwner =
-    brief &&
-    user &&
-    (brief.userID?._id === user._id || brief.userID === user._id);
-  const isSeller = user?.isSeller;
 
   if (isLoading) {
     return (
-      <div className="brief-detail">
-        <div className="container">
-          <div className="loader">
-            <Loader size={45} />
-          </div>
+      <div className="flex justify-center bg-slate-50 py-10 min-h-[80vh]">
+        <div className="w-[90%] max-w-[900px] flex justify-center mt-10">
+          <Loader size={45} />
         </div>
       </div>
     );
@@ -78,33 +104,31 @@ const BriefDetail = () => {
 
   if (error || !brief) {
     return (
-      <div className="brief-detail">
-        <div className="container">
-          <div className="error-state">
-            <h3>Brief not found</h3>
-            <p>This brief may have been removed or the link is invalid.</p>
-          </div>
+      <div className="flex justify-center bg-slate-50 py-10 min-h-[80vh]">
+        <div className="w-[90%] max-w-[900px] flex flex-col items-center justify-center text-center mt-10">
+          <h3 className="text-xl font-bold text-slate-900 mb-2">Brief not found</h3>
+          <p className="text-slate-500">This brief may have been removed or the link is invalid.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="brief-detail">
-      <div className="container">
+    <div className="flex justify-center bg-slate-50 py-10 min-h-[80vh]">
+      <div className="w-[90%] max-w-[900px] flex flex-col gap-6">
         {/* Back */}
-        <Link href="/briefs" className="back-link">
+        <Link href="/briefs" className="inline-flex items-center gap-1.5 text-slate-500 text-sm font-semibold hover:text-emerald-500 w-fit transition-colors">
           ← Back to Briefs
         </Link>
 
         {/* Main Detail Card */}
-        <div className="detail-card">
-          <div className="detail-header">
-            <div className="header-left">
-              <h1>{brief.title}</h1>
-              <div className="header-meta">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="p-5 sm:p-7 sm:px-8 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start gap-4">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl font-bold text-slate-900 mb-2 leading-tight">{brief.title}</h1>
+              <div className="flex flex-wrap gap-4 text-[13px] text-slate-500 items-center">
                 {brief.category && (
-                  <span className="category-tag">{brief.category}</span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-500 capitalize">{brief.category}</span>
                 )}
                 <span>Posted {moment(brief.createdAt).fromNow()}</span>
                 {brief.deadline && (
@@ -114,69 +138,70 @@ const BriefDetail = () => {
                 )}
               </div>
             </div>
-            <span className={`status-badge ${isClosed ? "closed" : "open"}`}>
+            <span className={`px-4 py-1.5 rounded-full text-[13px] font-semibold capitalize shrink-0 ${isClosed ? "bg-red-50 text-red-500" : "bg-emerald-50 text-emerald-500"}`}>
               {isClosed ? "Closed" : "Open"}
             </span>
           </div>
 
-          <div className="detail-body">
+          <div className="p-5 sm:p-7 sm:px-8 flex flex-col gap-6">
             {/* Description */}
             <div>
-              <h3 className="section-title">Description</h3>
-              <p className="description-text">{brief.description}</p>
+              <h3 className="text-[15px] font-bold text-slate-900 uppercase tracking-wide mb-4">Description</h3>
+              <p className="text-[15px] text-slate-700 leading-relaxed whitespace-pre-wrap">{brief.description}</p>
             </div>
 
             {/* Info Grid */}
-            <div className="info-grid">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {brief.budget && (
-                <div className="info-item">
-                  <div className="info-label">Budget</div>
-                  <div className="info-value green">${brief.budget}</div>
+                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Budget</div>
+                  <div className="text-lg font-bold text-emerald-500">${brief.budget}</div>
                 </div>
               )}
               {brief.deadline && (
-                <div className="info-item">
-                  <div className="info-label">Deadline</div>
-                  <div className="info-value">
+                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Deadline</div>
+                  <div className="text-lg font-bold text-slate-900">
                     {moment(brief.deadline).format("MMM D, YYYY")}
                   </div>
                 </div>
               )}
               {brief.proposalCount !== undefined && (
-                <div className="info-item">
-                  <div className="info-label">Proposals</div>
-                  <div className="info-value">{brief.proposalCount}</div>
+                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Proposals</div>
+                  <div className="text-lg font-bold text-slate-900">{brief.proposalCount}</div>
                 </div>
               )}
             </div>
 
             {/* Buyer Info */}
-            <div className="buyer-section">
+            <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg border border-slate-100">
               <img
                 src={brief.userID?.image || "/media/noavatar.png"}
                 alt=""
+                className="w-10 h-10 rounded-full object-cover"
               />
               <div>
-                <div className="buyer-name">
+                <div className="text-[15px] font-semibold text-slate-900">
                   {brief.userID?.username || "Anonymous"}
                 </div>
-                <div className="buyer-label">Brief Owner</div>
+                <div className="text-xs text-slate-400">Brief Owner</div>
               </div>
             </div>
           </div>
 
           {/* Footer Actions */}
-          <div className="detail-footer">
+          <div className="px-8 py-5 border-t border-slate-100 flex gap-3">
             {isOwner && !isClosed && (
               <>
                 <Link
                   href={`/briefs/${briefId}/proposals`}
-                  className="btn-primary"
+                  className="px-6 py-2.5 bg-emerald-500 text-white font-semibold rounded-lg hover:bg-emerald-600 transition-colors"
                 >
                   View Proposals
                 </Link>
                 <button
-                  className="btn-danger"
+                  className="px-6 py-2.5 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors"
                   onClick={() => closeMutation.mutate()}
                   disabled={closeMutation.isPending}
                 >
@@ -187,7 +212,7 @@ const BriefDetail = () => {
             {isOwner && isClosed && (
               <Link
                 href={`/briefs/${briefId}/proposals`}
-                className="btn-secondary"
+                className="px-6 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition-colors"
               >
                 View Past Proposals
               </Link>
@@ -197,26 +222,30 @@ const BriefDetail = () => {
 
         {/* Proposal Action — Sellers only, open briefs only */}
         {isSeller && !isOwner && !isClosed && (
-          <div className="proposal-form-card">
-            {proposalSent ? (
-              <div className="proposal-submitted">
-                <div className="check-icon">✅</div>
-                <h3>Proposal Submitted!</h3>
-                <p>
-                  The buyer will review your proposal and may initiate a
-                  conversation.
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden p-8 text-center">
+            {showSubmittedUI ? (
+              <div className="flex flex-col items-center justify-center gap-3">
+                <div className="text-4xl">✅</div>
+                <h3 className="text-xl font-bold text-slate-900">Proposal Submitted!</h3>
+                <p className="text-slate-500">
+                  You have already submitted a proposal for this brief. The buyer will review your proposal and may initiate a conversation.
                 </p>
+                <Link
+                  href={`/briefs/my-briefs`}
+                  className="mt-4 px-6 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition-colors inline-block"
+                >
+                  View My Proposals
+                </Link>
               </div>
             ) : (
-              <div className="submit-action-area" style={{ textAlign: 'center', padding: '40px 20px' }}>
-                <h2>Ready to submit?</h2>
-                <p className="subtitle" style={{ marginBottom: '20px' }}>
+              <div className="py-10 px-5 text-center flex flex-col items-center">
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">Ready to submit?</h2>
+                <p className="text-slate-500 mb-6">
                   Convince the buyer why you are the best fit for this project
                 </p>
-                <button 
-                  className="btn-primary" 
+                <button
+                  className="px-8 py-3 bg-emerald-500 text-white font-semibold rounded-lg hover:bg-emerald-600 transition-colors text-lg"
                   onClick={() => setShowModal(true)}
-                  style={{ padding: '12px 32px', fontSize: '1.1rem' }}
                 >
                   Submit Proposal
                 </button>
@@ -227,19 +256,19 @@ const BriefDetail = () => {
 
         {/* Closed notice for sellers */}
         {isSeller && !isOwner && isClosed && (
-          <div className="proposal-form-card">
-            <div className="proposal-submitted">
-              <div className="check-icon">🔒</div>
-              <h3>This Brief is Closed</h3>
-              <p>The buyer is no longer accepting proposals for this project.</p>
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden p-8 text-center">
+            <div className="flex flex-col items-center justify-center gap-3">
+              <div className="text-4xl">🔒</div>
+              <h3 className="text-xl font-bold text-slate-900">This Brief is Closed</h3>
+              <p className="text-slate-500">The buyer is no longer accepting proposals for this project.</p>
             </div>
           </div>
         )}
       </div>
-      
+
       {showModal && (
-        <SubmitProposalModal 
-          brief={brief} 
+        <SubmitProposalModal
+          brief={brief}
           onClose={() => setShowModal(false)}
           onSuccess={handleProposalSuccess}
         />

@@ -184,12 +184,18 @@ const Message = () => {
     setIsRecipientTyping(false);
 
     const handleReceiveMessage = (newMsg: any) => {
-      // 1. Update current chat messages
+      // 1. Update current chat messages with strict deduplication
       queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
         const arr = Array.isArray(oldData) ? oldData : [];
-        if (arr.some((m: any) => m._id === newMsg._id)) return arr;
-        // Filter out temp message once real message arrives
-        const withoutTemp = arr.filter((m: any) => typeof m._id === 'string' && !m._id.startsWith('temp-'));
+        if (arr.some((m: any) => String(m._id) === String(newMsg._id))) return arr;
+
+        // Replace matching temp message or remove temp- messages
+        const withoutTemp = arr.filter((m: any) => {
+          if (typeof m._id === 'string' && m._id.startsWith('temp-')) {
+            return m.description !== newMsg.description;
+          }
+          return true;
+        });
         return [...withoutTemp, newMsg];
       });
 
@@ -383,7 +389,7 @@ const Message = () => {
       isSeller: Boolean(user?.isSeller)
     };
 
-    // 2. Perform DB save & automatic WebSocket broadcast via HTTP mutation
+    // 2. Perform DB save & single automatic WebSocket broadcast via HTTP mutation
     mutation.mutate(msgPayload);
   };
 

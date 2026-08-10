@@ -121,15 +121,17 @@ export const supportService = {
   /**
    * Get a time-limited signed URL for viewing/downloading private Cloudinary attachments
    */
-  async getSignedAssetUrl(public_id: string, ticketId?: string, thread: string = 'creator'): Promise<string> {
+  async getSignedAssetUrl(public_id: string, ticketId?: string, thread?: string, orderId?: string): Promise<string> {
     if (!public_id) return '';
     try {
       const params: Record<string, string> = { public_id };
       if (ticketId) params.ticketId = ticketId;
       if (thread) params.thread = thread;
+      if (orderId) params.orderId = orderId;
 
       const res = await adminAxiosFetch.get('/storage/signed-url', { params }).catch(() => axiosFetch.get('/storage/signed-url', { params }));
-      return res.data?.url || res.data?.signedUrl || '';
+      const data = res.data?.data || res.data;
+      return data?.url || data?.signedUrl || '';
     } catch (err) {
       console.warn('Failed to fetch signed asset URL:', err);
       return '';

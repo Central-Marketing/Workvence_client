@@ -182,6 +182,33 @@ const OrderDetail = () => {
     }
   };
 
+  const handleSecureFileAccess = async (fileUrl: string, action: 'preview' | 'download' = 'download') => {
+    if (!fileUrl) return;
+    if (!fileUrl.includes('cloudinary') && (fileUrl.startsWith('http://') || fileUrl.startsWith('https://'))) {
+      if (action === 'preview' && /\.(png|jpe?g|gif|webp|svg)/i.test(fileUrl)) {
+        setLightboxImage(fileUrl);
+      } else {
+        window.open(fileUrl, '_blank', 'noopener,noreferrer');
+      }
+      return;
+    }
+
+    try {
+      toast.loading("Generating time-limited link...", { id: "sec-file" });
+      const signedUrl = await supportService.getSignedAssetUrl(fileUrl, undefined, undefined, order?._id);
+      const targetUrl = signedUrl || fileUrl;
+      toast.dismiss("sec-file");
+
+      if (action === 'preview') {
+        setLightboxImage(targetUrl);
+      } else {
+        window.open(targetUrl, '_blank', 'noopener,noreferrer');
+      }
+    } catch (err) {
+      toast.error("Access denied or failed to generate secure link.", { id: "sec-file" });
+    }
+  };
+
   const handleDeliverSubmit = async (e: any) => {
     e.preventDefault();
     if (!deliveryText && uploadedDeliveryFiles.length === 0 && !deliveryFile) {
@@ -465,33 +492,30 @@ const OrderDetail = () => {
                                   src={fileUrl}
                                   alt={`Delivery ${index + 1}`}
                                   className="w-full h-36 object-cover cursor-pointer group-hover:scale-105 transition-transform"
-                                  onClick={() => setLightboxImage(fileUrl)}
+                                  onClick={() => handleSecureFileAccess(fileUrl, 'preview')}
                                 />
-                                <a
-                                  href={fileUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  download
-                                  className="absolute bottom-2 right-2 bg-black/70 hover:bg-black text-white text-xs px-2.5 py-1 rounded-md font-medium"
+                                <button
+                                  type="button"
+                                  onClick={() => handleSecureFileAccess(fileUrl, 'download')}
+                                  className="absolute bottom-2 right-2 bg-black/70 hover:bg-black text-white text-xs px-2.5 py-1 rounded-md font-medium cursor-pointer"
                                 >
                                   ⬇️ Download
-                                </a>
+                                </button>
                               </div>
                             );
                           }
 
                           return (
-                            <a
+                            <button
                               key={index}
-                              href={fileUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-2.5 p-3 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-lg hover:bg-slate-100 border text-xs font-medium"
+                              type="button"
+                              onClick={() => handleSecureFileAccess(fileUrl, 'download')}
+                              className="flex items-center gap-2.5 p-3 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-lg hover:bg-slate-100 border text-xs font-medium w-full text-left cursor-pointer"
                             >
                               <span className="text-lg">📄</span>
                               <span className="truncate max-w-[180px] font-semibold">{fileName}</span>
                               <span className="ml-auto text-slate-400">⬇️</span>
-                            </a>
+                            </button>
                           );
                         })}
                       </div>

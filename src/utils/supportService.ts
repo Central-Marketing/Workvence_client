@@ -1,4 +1,14 @@
+import axios from 'axios';
 import axiosFetch from './axiosFetch';
+
+const getAdminApiUrl = () => {
+  return process.env.NEXT_PUBLIC_ADMIN_API_URL || process.env.NEXT_PUBLIC_ADMIN_BACKEND_URL || "http://localhost:8082/api";
+};
+
+const adminAxiosFetch = axios.create({
+  baseURL: getAdminApiUrl(),
+  withCredentials: true
+});
 
 export interface SupportTicketItem {
   id: string;
@@ -99,8 +109,13 @@ export const supportService = {
    * Get Cloudinary upload signature from admin backend storage service
    */
   async getCloudinarySignature(folder: string = 'support_chat_attachments', type: string = 'authenticated') {
-    const res = await axiosFetch.post('/storage/cloudinary-signature', { folder, type });
-    return res.data;
+    try {
+      const res = await adminAxiosFetch.post('/storage/cloudinary-signature', { folder, type });
+      return res.data;
+    } catch {
+      const fallbackRes = await axiosFetch.post('/storage/cloudinary-signature', { folder, type });
+      return fallbackRes.data;
+    }
   },
 
   /**
@@ -113,7 +128,7 @@ export const supportService = {
       if (ticketId) params.ticketId = ticketId;
       if (thread) params.thread = thread;
 
-      const res = await axiosFetch.get('/storage/signed-url', { params });
+      const res = await adminAxiosFetch.get('/storage/signed-url', { params }).catch(() => axiosFetch.get('/storage/signed-url', { params }));
       return res.data?.url || res.data?.signedUrl || '';
     } catch (err) {
       console.warn('Failed to fetch signed asset URL:', err);
@@ -179,7 +194,7 @@ export const supportService = {
   async deleteCloudinaryFile(public_id: string) {
     if (!public_id) return;
     try {
-      const res = await axiosFetch.post('/storage/delete-file', { public_id });
+      const res = await adminAxiosFetch.post('/storage/delete-file', { public_id }).catch(() => axiosFetch.post('/storage/delete-file', { public_id }));
       return res.data;
     } catch (err) {
       console.warn('Failed to delete Cloudinary file:', err);

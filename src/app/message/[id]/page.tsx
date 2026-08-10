@@ -26,6 +26,7 @@ import {
 
 import axios from 'axios';
 import { axiosFetch, socket, getAvatarUrl } from "@/utils";
+import supportService from "@/utils/supportService";
 import { isConversationUnread } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
@@ -58,6 +59,55 @@ const Message = () => {
   const typingTimeoutRef = useRef(null);
   const isTypingRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [attachment, setAttachment] = useState<any>(null);
+  const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploadingAttachment(true);
+      toast.loading("Uploading attachment...", { id: "upload-file" });
+      const uploaded = await supportService.uploadFileToCloudinary(file, "chat_attachments");
+      toast.success("Attachment ready!", { id: "upload-file" });
+      const localPreview = file.type.startsWith('image/') || file.name.match(/\.(png|jpe?g|gif|webp|svg)$/i)
+        ? URL.createObjectURL(file)
+        : null;
+
+      setAttachment({
+        name: file.name,
+        public_id: uploaded.public_id || null,
+        url: uploaded.secure_url || uploaded.url,
+        previewUrl: localPreview || uploaded.secure_url || uploaded.url,
+        type: file.type || (file.name.match(/\.(png|jpe?g|gif|webp|svg)$/i) ? 'image' : 'file'),
+        size: file.size
+      });
+    } catch (err) {
+      console.error("Failed to upload attachment:", err);
+      toast.error("Failed to upload file. Please try again.", { id: "upload-file" });
+    } finally {
+      setIsUploadingAttachment(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemoveAttachment = async () => {
+    if (!attachment) return;
+    const targetPublicId = attachment.public_id;
+    setAttachment(null);
+    if (targetPublicId) {
+      try {
+        await supportService.deleteCloudinaryFile(targetPublicId);
+        toast.success("Attachment deleted from server", { id: "delete-file" });
+      } catch (err) {
+        console.warn("Failed to delete attachment from CDN:", err);
+      }
+    }
+  };
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -356,14 +406,17 @@ const Message = () => {
 
   const handleSend = (e: any) => {
     e.preventDefault();
-    if (!messageText.trim()) return;
+    if (!messageText.trim() && !attachment?.url) return;
 
     // Immediately stop typing indicator
     clearTimeout(typingTimeoutRef.current);
     stopTypingIndicator();
 
     const currentText = messageText;
+    const currentAttachment = attachment;
+
     setMessageText("");
+    setAttachment(null);
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
@@ -379,6 +432,8 @@ const Message = () => {
         image: getAvatarUrl(user?.image, user?.username || 'User')
       },
       description: currentText,
+      file: currentAttachment?.url || null,
+      attachments: currentAttachment?.url ? [currentAttachment.url] : [],
       createdAt: new Date().toISOString()
     };
 
@@ -390,6 +445,8 @@ const Message = () => {
     const msgPayload = {
       conversationID,
       description: currentText,
+      file: currentAttachment?.url || null,
+      attachments: currentAttachment?.url ? [currentAttachment.url] : [],
       userID: user?._id || user?.id,
       isSeller: Boolean(user?.isSeller)
     };
@@ -498,6 +555,42 @@ const Message = () => {
     if (!msgSearchQuery) return true;
     return msg.description?.toLowerCase().includes(msgSearchQuery.toLowerCase());
   });
+
+  const renderMessageAttachment = (msg: any) => {
+    const fileUrl = msg.file || (Array.isArray(msg.attachments) && msg.attachments[0]) || null;
+    if (!fileUrl) return null;
+
+    const isImage = /\.(png|jpe?g|gif|webp|svg)/i.test(fileUrl) || msg.fileType?.includes('image');
+
+    if (isImage) {
+      return (
+        <div className="my-1.5 overflow-hidden rounded-lg border border-slate-200 shadow-sm max-w-[280px]">
+          <img
+            src={fileUrl}
+            alt="Attachment"
+            className="w-full max-h-[220px] object-cover cursor-pointer hover:opacity-95 transition-opacity"
+            onClick={() => setLightboxImage(fileUrl)}
+          />
+        </div>
+      );
+    }
+
+    const fileName = fileUrl.split('/').pop()?.split('?')[0] || 'Attachment';
+
+    return (
+      <a
+        href={fileUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        download
+        className="flex items-center gap-2 px-3 py-2 my-1.5 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-lg hover:bg-slate-200 transition-colors border text-xs font-medium"
+      >
+        <span className="text-base">📄</span>
+        <span className="truncate max-w-[180px]">{fileName}</span>
+        <span className="ml-auto text-slate-400">⬇️</span>
+      </a>
+    );
+  };
 
   return (
     <div className="message-page">
@@ -610,7 +703,6 @@ const Message = () => {
                   </>
                 ) : <h3>Conversation</h3>}
               </div>
-
               {/* Messages */}
               <div className="messages-scroll">
                 {msgsLoading ? (
@@ -700,7 +792,8 @@ const Message = () => {
                           </div>
                         ) : (
                           <div className="msg-bubble">
-                            <p>{msg.description}</p>
+                            {renderMessageAttachment(msg)}
+                            {msg.description && <p>{msg.description}</p>}
                             <span className="msg-time">
                               {moment(msg.createdAt).format('HH:mm')}
                               {isOwner && <RiCheckDoubleLine className={`check-icon ${isReadByRecipient ? 'read' : ''}`} />}
@@ -728,9 +821,55 @@ const Message = () => {
               </div>
 
               {/* Compose Area */}
-              <div className="compose-area max-md:p-3">
+              <div className="compose-area max-md:p-3 relative">
+                {attachment && (
+                  <div className="flex items-center gap-3 mb-3 p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 shadow-sm max-w-sm">
+                    {attachment.type?.includes('image') || /\.(png|jpe?g|gif|webp|svg)/i.test(attachment.name) ? (
+                      <div className="relative group flex-shrink-0">
+                        <img
+                          src={attachment.previewUrl || attachment.url}
+                          alt="Preview"
+                          className="w-16 h-16 rounded-lg object-cover border border-slate-300 shadow-xs"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 rounded-lg flex items-center justify-center font-bold text-xl flex-shrink-0">
+                        📄
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">{attachment.name}</p>
+                      <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                        {attachment.size ? `${(attachment.size / 1024).toFixed(1)} KB` : 'Attachment'} • Ready to send
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveAttachment}
+                      className="text-slate-400 hover:text-red-500 font-bold p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                      title="Remove attachment from server"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+
                 <form onSubmit={handleSend} className="compose-form max-md:px-2 max-md:py-1 max-md:gap-1.5">
-                  <button type="button" className="icon-btn"><RiAddLine /></button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploadingAttachment}
+                    title="Attach file or image"
+                  >
+                    <RiAddLine />
+                  </button>
                   <button type="button" className="icon-btn"><RiEmotionLine /></button>
                   <textarea
                     ref={textareaRef}
@@ -744,7 +883,7 @@ const Message = () => {
                       Create Offer
                     </button>
                   )}
-                  <button type="submit" className="send-btn" disabled={!messageText.trim()}>
+                  <button type="submit" className="send-btn" disabled={(!messageText.trim() && !attachment?.url) || isUploadingAttachment}>
                     <RiSendPlaneFill />
                   </button>
                 </form>
@@ -905,6 +1044,24 @@ const Message = () => {
                 <button type="button" className="cancel" onClick={() => setShowOfferModal(false)}>Cancel</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox Image Modal */}
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 cursor-pointer"
+          onClick={() => setLightboxImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh]" onClick={e => e.stopPropagation()}>
+            <img src={lightboxImage} alt="Enlarged preview" className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl" />
+            <button
+              onClick={() => setLightboxImage(null)}
+              className="absolute top-2 right-2 text-white bg-black/60 hover:bg-black/90 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold"
+            >
+              ✕
+            </button>
           </div>
         </div>
       )}

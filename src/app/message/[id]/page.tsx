@@ -173,12 +173,13 @@ const Message = () => {
       if (user?._id) socket.emit('user_connected', user._id);
     };
 
-    if (socket.connected) {
+    socket.connect();
+    joinRoom();
+
+    const handleConnect = () => {
       joinRoom();
-    } else {
-      socket.connect();
-      socket.once('connect', joinRoom);
-    }
+    };
+    socket.on('connect', handleConnect);
 
     setIsRecipientTyping(false);
 
@@ -319,8 +320,16 @@ const Message = () => {
         }).sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages', conversationID] });
+    onSuccess: (res: any) => {
+      const savedMsg = res?.data?.data || res?.data;
+      if (savedMsg && savedMsg._id) {
+        queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
+          const arr = Array.isArray(oldData) ? oldData : [];
+          if (arr.some((m: any) => m._id === savedMsg._id)) return arr;
+          const withoutTemp = arr.filter((m: any) => typeof m._id === 'string' && !m._id.startsWith('temp-'));
+          return [...withoutTemp, savedMsg];
+        });
+      }
     }
   });
 
@@ -348,7 +357,7 @@ const Message = () => {
       textareaRef.current.style.height = 'auto';
     }
 
-    // 1. Optimistically append temporary message to local UI (0ms latency, right side!)
+    // 1. Optimistically append temporary message to local UI (0ms latency)
     const tempId = `temp-${Date.now()}`;
     const tempMessage = {
       _id: tempId,
@@ -374,11 +383,8 @@ const Message = () => {
       isSeller: Boolean(user?.isSeller)
     };
 
-    // 2. Perform DB save via authenticated HTTP mutation & emit Socket event
+    // 2. Perform DB save & automatic WebSocket broadcast via HTTP mutation
     mutation.mutate(msgPayload);
-    if (socket && socket.connected) {
-      socket.emit("send_message", msgPayload);
-    }
   };
 
 

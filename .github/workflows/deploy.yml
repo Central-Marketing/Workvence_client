@@ -105,25 +105,12 @@ jobs:
             echo "Logging into GitHub Container Registry..."
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
-            echo "Pulling latest Docker image..."
-            docker pull ghcr.io/${{ env.IMAGE_NAME }}:latest
+            echo "Pulling latest repository changes & Docker image..."
+            git pull origin main || true
+            docker compose pull
             
-            echo "Restarting container on port 3500..."
-            docker stop workvence_client || true
-            docker rm workvence_client || true
-            
-            ENV_FLAG=""
-            if [ -f .env ]; then
-              ENV_FLAG="--env-file .env"
-              echo "Found .env file, passing to container..."
-            fi
-
-            docker run -d \
-              --name workvence_client \
-              --restart always \
-              -p 3500:3000 \
-              $ENV_FLAG \
-              ghcr.io/${{ env.IMAGE_NAME }}:latest
+            echo "Automated restart with docker compose..."
+            docker compose up -d --remove-orphans
             
             docker image prune -f
-            echo "Deployment successful in $TARGET_DIR!"
+            echo "🎉 Automated deployment complete in $TARGET_DIR!"

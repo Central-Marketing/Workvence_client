@@ -19,6 +19,7 @@ const EditPackage = () => {
   const [packageImages, setPackageImages] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [disabled, setDisabled] = useState(false);
+  const [activeTier, setActiveTier] = useState('basic');
   const navigate = useRouter();
   const queryClient = useQueryClient();
 
@@ -47,7 +48,20 @@ const EditPackage = () => {
           dispatch({
             type: 'INITIALIZE_STATE',
             payload: {
+              ...initialState,
               ...data,
+              packages: data.packages || {
+                basic: {
+                  title: data.shortTitle || '',
+                  shortDesc: data.shortDesc || '',
+                  price: data.price || 0,
+                  deliveryTime: data.deliveryTime || '',
+                  revisionNumber: data.revisionNumber || '',
+                  features: data.features || []
+                },
+                standard: null,
+                premium: null
+              },
               features: data.features || [],
             }
           });
@@ -84,14 +98,55 @@ const EditPackage = () => {
     });
   };
 
-  const handleFormFeature = (event: any) => {
-    event.preventDefault();
-    if (event.target[0].value.trim() === '') return;
+  const handlePackageFormChange = (event: any) => {
+    const { name, value } = event.target;
     dispatch({
-      type: 'ADD_FEATURE',
-      payload: event.target[0].value
+      type: 'CHANGE_PACKAGE_INPUT',
+      payload: { tier: activeTier, name, value }
     });
+    // Sync with root fields for backward compatibility when editing 'basic'
+    if (activeTier === 'basic') {
+      dispatch({
+        type: 'CHANGE_INPUT',
+        payload: { name, value }
+      });
+    }
+  };
+
+  const handlePackageFeatureAdd = (event: any) => {
+    event.preventDefault();
+    if (!event.target[0].value) return;
+    dispatch({
+      type: 'ADD_PACKAGE_FEATURE',
+      payload: { tier: activeTier, feature: event.target[0].value }
+    });
+    if (activeTier === 'basic') {
+      dispatch({
+        type: 'ADD_FEATURE',
+        payload: event.target[0].value
+      });
+    }
     event.target.reset();
+  };
+
+  const handlePackageFeatureRemove = (feature: string) => {
+    dispatch({
+      type: 'REMOVE_PACKAGE_FEATURE',
+      payload: { tier: activeTier, feature }
+    });
+    if (activeTier === 'basic') {
+      dispatch({
+        type: 'REMOVE_FEATURE',
+        payload: feature
+      });
+    }
+  };
+
+  const toggleTier = (tier: string) => {
+    dispatch({
+      type: 'TOGGLE_PACKAGE_TIER',
+      payload: { tier }
+    });
   };
 
   const handleImageUploads = async () => {
@@ -130,13 +185,16 @@ const EditPackage = () => {
   const handleFormSubmit = (event: any) => {
     event.preventDefault();
     
-    // Validate required fields
-    const requiredKeys = ['title', 'category', 'description', 'shortTitle', 'shortDesc', 'deliveryTime', 'revisionNumber', 'price'];
-    for(let key of requiredKeys) {
-      if(state[key] === '' || state[key] === undefined || state[key] === null) {
-        toast.error('Please fill input field: ' + key);
-        return;
-      }
+    // Basic root level validation
+    if (!state.title || !state.category || !state.description) {
+      toast.error('Please fill all main gig details');
+      return;
+    }
+    
+    // Basic tier validation
+    if (!state.packages?.basic?.title || !state.packages?.basic?.shortDesc || !state.packages?.basic?.price || !state.packages?.basic?.deliveryTime) {
+      toast.error('Please fill all Basic package details');
+      return;
     }
 
     const form = { ...state };
@@ -164,128 +222,140 @@ const EditPackage = () => {
     return null;
   }
 
-  return (
-    <div className='add'>
-      <div className="container">
-        <h1>Edit Package: {packageData.title}</h1>
-        <div className="sections">
-          <div className="left">
-            <label htmlFor="title">Title</label>
-            <input 
-              name='title' 
-              type="text" 
-              placeholder="e.g. I will do something I'm really good at" 
-              value={state.title} 
-              onChange={handleFormChange} 
-            />
+  const inputClasses = "p-3.5 border border-slate-200 rounded-lg text-slate-800 bg-slate-50 transition-all duration-300 w-full placeholder:text-slate-400 focus:outline-none focus:border-brand-green focus:bg-white focus:ring-4 focus:ring-brand-green/10";
+  const labelClasses = "text-slate-700 text-sm font-semibold -mb-2";
+  const btnClasses = "px-6 py-4 rounded-lg bg-brand-green font-semibold text-base text-white transition-all duration-300 shadow-[0_4px_12px_rgba(16,185,129,0.2)] hover:bg-[#059669] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(16,185,129,0.3)] disabled:bg-slate-300 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none";
 
-            <label htmlFor="category">Category</label>
+  const activePackage = state.packages?.[activeTier];
+
+  return (
+    <div className='min-h-screen bg-slate-50 py-10 flex justify-center font-sans'>
+      <div className="w-[95%] md:w-[90%] max-w-[1100px] bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] p-8 md:py-12 md:px-16 mx-auto">
+        <h1 className="text-slate-900 font-bold text-2xl md:text-3xl mb-10 border-b-2 border-slate-100 pb-5">Edit Package: {packageData.title}</h1>
+        
+        <div className="flex flex-col md:flex-row justify-between gap-10 md:gap-16">
+          <div className="flex-1 flex flex-col gap-6">
+            <label className={labelClasses}>Gig Title</label>
+            <input name='title' type="text" className={inputClasses} placeholder="e.g. I will do something I'm really good at" onChange={handleFormChange} value={state.title || ''} />
+
+            <label className={labelClasses}>Category</label>
             <CustomSelect
               options={categoryList.map((item: any) => ({
                 value: item.slug || item.name || item._id || String(item),
                 label: item.name || (item.slug ? item.slug[0].toUpperCase() + item.slug.slice(1) : String(item))
               }))}
-              value={state.category}
-              onChange={(value) => handleFormChange({ target: { name: 'category', value } })}
+              value={state.category || ''}
+              onChange={(val) => handleFormChange({ target: { name: 'category', value: val } })}
               placeholder="Select Category"
             />
 
-            <div className="images">
-              <div className="imagesInputs">
-                <label htmlFor="">Cover Image (Leave empty to keep current)</label>
-                <input type="file" accept='image/*' onChange={(event: any) => setCoverImage(event.target.files[0])} />
+            <div className="flex flex-col gap-4 p-5 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
+              <div className="flex flex-col gap-4 w-full">
+                <label className="text-slate-700 text-sm font-semibold">Cover Image (Leave empty to keep current)</label>
+                <input type="file" accept='image/*' className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer" onChange={(event: any) => setCoverImage(event.target.files[0])} />
                 {state.cover && !coverImage && <img src={state.cover} alt="Current Cover" style={{width: 80, height: 50, objectFit: 'cover', marginTop: 10, borderRadius: 4}} />}
-                <br />
-                <label htmlFor="">Upload Images (Leave empty to keep current)</label>
-                <input type="file" accept='image/*' multiple onChange={(event: any) => setPackageImages(event.target.files)} />
+                
+                <label className="text-slate-700 text-sm font-semibold mt-2">Upload Images (Leave empty to keep current)</label>
+                <input type="file" accept='image/*' multiple className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer" onChange={(event: any) => setPackageImages(event.target.files)} />
                 {state.images && state.images.length > 0 && packageImages.length === 0 && (
                   <div style={{display: 'flex', gap: 10, marginTop: 10}}>
-                    {state.images.map((img, i) => (
+                    {state.images.map((img: string, i: number) => (
                       <img key={i} src={img} alt="Current" style={{width: 50, height: 50, objectFit: 'cover', borderRadius: 4}} />
                     ))}
                   </div>
                 )}
               </div>
-              <button disabled={!!disabled} onClick={handleImageUploads}>{uploading ? 'Uploading...' : disabled ? 'Uploaded' : 'Update Images'}</button>
+              <button className={`${btnClasses} mt-2 px-6 py-2.5 text-sm w-auto self-start`} disabled={!!disabled || mutation.isPending} onClick={handleImageUploads}>
+                {uploading ? 'Uploading...' : disabled ? 'Uploaded' : 'Update Images'}
+              </button>
             </div>
 
-            <label htmlFor="description">Description</label>
-            <textarea 
-              name='description' 
-              cols={30} 
-              rows={16} 
-              placeholder='Brief descriptions to introduce your service to customers' 
-              value={state.description} 
-              onChange={handleFormChange}
-            ></textarea>
+            <label className={labelClasses}>Description</label>
+            <textarea name='description' className={`${inputClasses} min-h-[120px] resize-y`} placeholder='Brief descriptions to introduce your service to customers' onChange={handleFormChange} value={state.description || ''}></textarea>
             
-            <button onClick={handleFormSubmit} disabled={mutation.isPending}>
+            <button className={`${btnClasses} mt-4`} onClick={handleFormSubmit} disabled={mutation.isPending}>
               {mutation.isPending ? 'Updating...' : 'Update Package'}
             </button>
           </div>
 
-          <div className="right">
-            <label htmlFor="shortTitle">Service Title</label>
-            <input 
-              type="text" 
-              name='shortTitle' 
-              placeholder='e.g. One-page web design' 
-              value={state.shortTitle} 
-              onChange={handleFormChange} 
-            />
-
-            <label htmlFor="shortDesc">Short Description</label>
-            <textarea 
-              name='shortDesc' 
-              cols={30} 
-              rows={10} 
-              placeholder='Short description of your service' 
-              value={state.shortDesc} 
-              onChange={handleFormChange}
-            ></textarea>
-
-            <label htmlFor="deliveryTime">Delivery Time (e.g. 3 days)</label>
-            <input 
-              type="number" 
-              name='deliveryTime' 
-              min='1' 
-              value={state.deliveryTime} 
-              onChange={handleFormChange} 
-            />
-
-            <label htmlFor="revisionNumber">Revision Number</label>
-            <input 
-              type="number" 
-              name='revisionNumber' 
-              min='1' 
-              value={state.revisionNumber} 
-              onChange={handleFormChange} 
-            />
-
-            <label htmlFor="">Add Feature</label>
-            <form className='add' onSubmit={handleFormFeature}>
-              <input type="text" placeholder='e.g. page design' />
-              <button type='submit'>Add</button>
-            </form>
-            <div className="addedFeatures">
-              {
-                state.features?.map((feature: any) => (
-                  <div key={feature} className="item">
-                    <button type="button" onClick={() => dispatch({ type: 'REMOVE_FEATURE', payload: feature })}>{feature}
-                      <span>X</span>
-                    </button>
-                  </div>
-                ))
-              }
+          <div className="flex-1 flex flex-col gap-6">
+            {/* Tabs */}
+            <div className="flex border-b border-slate-200 mb-2">
+              {['basic', 'standard', 'premium'].map((tier) => (
+                <button
+                  key={tier}
+                  className={`flex-1 py-3 text-sm font-semibold text-center border-b-2 transition-colors ${
+                    activeTier === tier 
+                      ? 'border-brand-green text-brand-green' 
+                      : 'border-transparent text-slate-500 hover:text-slate-700'
+                  }`}
+                  onClick={() => setActiveTier(tier)}
+                >
+                  {tier.charAt(0).toUpperCase() + tier.slice(1)}
+                </button>
+              ))}
             </div>
-            <label htmlFor="price">Price</label>
-            <input 
-              name='price' 
-              type="number" 
-              min='1' 
-              value={state.price} 
-              onChange={handleFormChange} 
-            />
+
+            {activePackage === null ? (
+              <div className="flex flex-col items-center justify-center py-12 bg-slate-50 rounded-xl border border-slate-200 border-dashed">
+                <p className="text-slate-500 mb-4">{activeTier.charAt(0).toUpperCase() + activeTier.slice(1)} Package is not active.</p>
+                <button className={`${btnClasses} px-6 py-2 text-sm h-auto`} onClick={() => toggleTier(activeTier)}>
+                  Enable {activeTier.charAt(0).toUpperCase() + activeTier.slice(1)} Package
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between items-center -mb-2">
+                  <label className={labelClasses}>Service Title ({activeTier})</label>
+                  {activeTier !== 'basic' && (
+                    <button className="text-xs text-red-500 hover:text-red-700 font-medium" onClick={() => toggleTier(activeTier)}>
+                      Disable
+                    </button>
+                  )}
+                </div>
+                <input type="text" name={activeTier === 'basic' ? 'shortTitle' : 'title'} className={inputClasses} placeholder='e.g. One-page web design' onChange={handlePackageFormChange} value={activeTier === 'basic' ? (activePackage.shortTitle || '') : (activePackage.title || '')} />
+
+                <label className={labelClasses}>Short Description</label>
+                <textarea name='shortDesc' className={`${inputClasses} min-h-[120px] resize-y`} placeholder='Short description of your service' onChange={handlePackageFormChange} value={activePackage.shortDesc || ''}></textarea>
+
+                <div className="flex gap-4">
+                  <div className="flex-1 flex flex-col gap-6">
+                    <label className={labelClasses}>Delivery Time (Days)</label>
+                    <input type="number" name='deliveryTime' min='1' className={inputClasses} onChange={handlePackageFormChange} value={activePackage.deliveryTime || ''} />
+                  </div>
+                  <div className="flex-1 flex flex-col gap-6">
+                    <label className={labelClasses}>Revision Number</label>
+                    <input type="number" name='revisionNumber' min='1' className={inputClasses} onChange={handlePackageFormChange} value={activePackage.revisionNumber || ''} />
+                  </div>
+                </div>
+
+                <label className={labelClasses}>Add Feature</label>
+                <form className='flex justify-between items-center gap-3' onSubmit={handlePackageFeatureAdd}>
+                  <input type="text" className={`${inputClasses} flex-1`} placeholder='e.g. page design' />
+                  <button type='submit' className={`${btnClasses} px-6 py-3.5 h-auto m-0 whitespace-nowrap`}>Add</button>
+                </form>
+                
+                <div className="flex flex-wrap gap-2.5 mt-1">
+                  {
+                    activePackage.features?.map((feature: any) => (
+                      <div key={feature} className="group cursor-pointer">
+                        <button 
+                          type="button"
+                          className="px-3 py-1.5 text-[13px] font-medium bg-slate-100 text-slate-600 rounded-full flex items-center gap-2 border border-slate-200 transition-all duration-200 group-hover:bg-red-100 group-hover:border-red-300 group-hover:text-red-500"
+                          onClick={() => handlePackageFeatureRemove(feature)}
+                        >
+                          {feature}
+                          <span className="bg-slate-200 text-slate-500 w-4 h-4 flex items-center justify-center rounded-full text-[10px] font-bold transition-all duration-200 group-hover:bg-red-500 group-hover:text-white">X</span>
+                        </button>
+                      </div>
+                    ))
+                  }
+                </div>
+                
+                <label className={labelClasses}>Price ($)</label>
+                <input name='price' type="number" min='1' className={inputClasses} onChange={handlePackageFormChange} value={activePackage.price || ''} />
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -294,3 +364,4 @@ const EditPackage = () => {
 }
 
 export default EditPackage;
+

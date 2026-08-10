@@ -52,14 +52,18 @@ const PackageCard = ({ data }: { data: any }) => {
             alt={data.title || data.desc || "Package Cover"}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
           />
-          <div className="absolute top-3 right-3 z-10 flex items-center justify-center">
-            <div className="w-8 h-8 rounded-lg bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors cursor-default">
+          <div 
+            className="absolute top-3 right-3 z-10 flex items-center justify-center"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+          >
+            <div className="w-8 h-8 rounded-lg bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors cursor-pointer overflow-hidden">
               <FavoriteButton 
                 gigId={data._id || data.id} 
                 initialIsFavorited={data.isFavorited} 
                 initialFavoriteCount={data.favoriteCount} 
                 currentUser={user}
-                className="w-5 h-5"
+                className="w-full h-full flex items-center justify-center"
+                iconClassName="w-4 h-4"
               />
             </div>
           </div>

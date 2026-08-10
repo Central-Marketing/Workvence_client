@@ -11,6 +11,18 @@ export const initialState = {
     revisionNumber: '',
     features: [],
     price: 0,
+    packages: {
+        basic: {
+            title: '',
+            shortDesc: '',
+            price: 0,
+            deliveryTime: '',
+            revisionNumber: '',
+            features: []
+        },
+        standard: null,
+        premium: null
+    }
 }
 
 export const packageReducer = (state, { type, payload }) => {
@@ -40,6 +52,59 @@ export const packageReducer = (state, { type, payload }) => {
                 features: state.features.filter((feature) => feature !== payload)
             }
             
+        case 'CHANGE_PACKAGE_INPUT':
+            return {
+                ...state,
+                packages: {
+                    ...state.packages,
+                    [payload.tier]: {
+                        ...state.packages[payload.tier],
+                        [payload.name]: payload.value
+                    }
+                }
+            }
+            
+        case 'ADD_PACKAGE_FEATURE':
+            return {
+                ...state,
+                packages: {
+                    ...state.packages,
+                    [payload.tier]: {
+                        ...state.packages[payload.tier],
+                        features: [...state.packages[payload.tier].features, payload.feature]
+                    }
+                }
+            }
+
+        case 'REMOVE_PACKAGE_FEATURE':
+            return {
+                ...state,
+                packages: {
+                    ...state.packages,
+                    [payload.tier]: {
+                        ...state.packages[payload.tier],
+                        features: state.packages[payload.tier].features.filter((feature) => feature !== payload.feature)
+                    }
+                }
+            }
+
+        case 'TOGGLE_PACKAGE_TIER':
+            const isEnabled = state.packages[payload.tier] !== null;
+            return {
+                ...state,
+                packages: {
+                    ...state.packages,
+                    [payload.tier]: isEnabled ? null : {
+                        title: '',
+                        shortDesc: '',
+                        price: 0,
+                        deliveryTime: '',
+                        revisionNumber: '',
+                        features: []
+                    }
+                }
+            }
+
         case 'INITIALIZE_STATE':
             return payload;
 

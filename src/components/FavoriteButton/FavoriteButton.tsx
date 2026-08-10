@@ -27,17 +27,12 @@ const FavoriteButton = ({
   const [favoriteCount, setFavoriteCount] = useState(initialFavoriteCount);
   const [loading, setLoading] = useState(false);
 
-  // Sellers cannot favorite Gigs
-  if (currentUser?.isSeller) {
-    return null; // Or render static count badge without click handler
-  }
-
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!currentUser?._id) {
-      toast.error("Please sign in as a buyer to favorite services!");
+      toast.error("Please sign in to favorite services!");
       return;
     }
 

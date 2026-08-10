@@ -7,7 +7,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { RiSearchLine } from "react-icons/ri";
 import { FiMenu, FiX, FiMessageSquare, FiBell } from "react-icons/fi";
 
-import { axiosFetch } from '@/utils';
+import toast from 'react-hot-toast';
+import { axiosFetch, socket } from '@/utils';
 import { useUserStore } from "@/store/userStore";
 import { Loader, NotificationBell, HeaderInboxIcon } from '@/components';
 
@@ -59,6 +60,48 @@ const Navbar = () => {
     })();
   }, [setUser]);
 
+  // 3. Global Socket Listener for Real-Time Chat & Notifications across ALL pages
+  useEffect(() => {
+    if (!user?._id && !user?.id) return;
+    const userId = user._id || user.id;
+
+    if (!socket.connected) {
+      socket.connect();
+    }
+    socket.emit("user_connected", userId);
+
+    const handleGlobalMessage = (newMsg: any) => {
+      const senderId = newMsg.userID?._id || newMsg.userID?.id || newMsg.userID;
+      if (String(senderId) === String(userId)) return;
+
+      const currentChatPage = `/message/${newMsg.conversationID}`;
+      if (pathname === currentChatPage) return;
+
+      const senderName = newMsg.userID?.username || "Someone";
+      toast((t) => (
+        <div
+          onClick={() => {
+            toast.dismiss(t.id);
+            router.push(`/message/${newMsg.conversationID}`);
+          }}
+          className="cursor-pointer flex items-center space-x-3 p-1"
+        >
+
+          <div>
+            <p className="font-semibold text-sm text-gray-800">{senderName}</p>
+            <p className="text-xs text-gray-600 truncate max-w-[200px]">{newMsg.description}</p>
+          </div>
+        </div>
+      ), { duration: 5000 });
+    };
+
+    socket.on("receive_message", handleGlobalMessage);
+
+    return () => {
+      socket.off("receive_message", handleGlobalMessage);
+    };
+  }, [user, pathname, router]);
+
   const isActive = () => {
     window.scrollY > 0 ? setShowMenu(true) : setShowMenu(false);
   };
@@ -103,9 +146,9 @@ const Navbar = () => {
           <div className={`hidden lg:flex items-center overflow-hidden transition-all duration-300 ${showMenu || pathname !== '/' ? 'opacity-100 max-w-[500px]' : 'opacity-0 max-w-0 pointer-events-none'}`}>
             <div className="flex items-center border rounded-lg px-4 py-2.5 w-[250px] xl:w-[320px] bg-gray-50 border-gray-200 focus-within:bg-white focus-within:border-brand-green focus-within:shadow-sm group">
               <RiSearchLine className="text-gray-400 text-xl mr-3 group-focus-within:text-brand-green transition-colors" />
-              <input 
-                type="text" 
-                placeholder="What are you looking for?" 
+              <input
+                type="text"
+                placeholder="What are you looking for?"
                 className="bg-transparent border-none outline-none w-full text-[15px] font-medium text-gray-800 placeholder-gray-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}

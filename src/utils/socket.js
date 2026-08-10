@@ -20,7 +20,7 @@ const options = {
     reconnection: true,
     reconnectionAttempts: 10,
     reconnectionDelay: 1000,
-    transports: ['polling', 'websocket'],
+    transports: ['websocket', 'polling'],
     path: '/socket.io/'
 };
 

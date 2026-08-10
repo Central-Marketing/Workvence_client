@@ -1,7 +1,7 @@
 "use client";
 
 import toast from 'react-hot-toast';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";
+import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 import Swal from 'sweetalert2';
@@ -24,6 +25,10 @@ const OrderDetail = () => {
   const [showDeliverForm, setShowDeliverForm] = useState(false);
   const [deliveryText, setDeliveryText] = useState("");
   const [deliveryFile, setDeliveryFile] = useState("");
+  const [uploadedDeliveryFiles, setUploadedDeliveryFiles] = useState<any[]>([]);
+  const [isUploadingDeliveryFiles, setIsUploadingDeliveryFiles] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const deliveryFileInputRef = useRef<HTMLInputElement>(null);
   const [submitting, setSubmitting] = useState(false);
 
   // Countdown timer state
@@ -128,25 +133,81 @@ const OrderDetail = () => {
       });
   };
 
+  const handleDeliveryFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    try {
+      setIsUploadingDeliveryFiles(true);
+      toast.loading(`Uploading ${files.length} file(s)...`, { id: "upload-delivery" });
+      const newUploaded: any[] = [];
+
+      for (const file of files) {
+        const uploaded = await supportService.uploadFileToCloudinary(file, "order_deliveries");
+        const localPreview = file.type.startsWith('image/') || file.name.match(/\.(png|jpe?g|gif|webp|svg)$/i)
+          ? URL.createObjectURL(file)
+          : null;
+
+        newUploaded.push({
+          name: file.name,
+          public_id: uploaded.public_id || null,
+          url: uploaded.secure_url || uploaded.url,
+          previewUrl: localPreview || uploaded.secure_url || uploaded.url,
+          type: file.type || (file.name.match(/\.(png|jpe?g|gif|webp|svg)$/i) ? 'image' : 'file'),
+          size: file.size
+        });
+      }
+
+      setUploadedDeliveryFiles(prev => [...prev, ...newUploaded]);
+      toast.success(`${files.length} file(s) attached!`, { id: "upload-delivery" });
+    } catch (err) {
+      console.error("Failed to upload delivery files:", err);
+      toast.error("Failed to upload file(s). Please try again.", { id: "upload-delivery" });
+    } finally {
+      setIsUploadingDeliveryFiles(false);
+      if (deliveryFileInputRef.current) deliveryFileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemoveDeliveryFile = async (index: number) => {
+    const target = uploadedDeliveryFiles[index];
+    setUploadedDeliveryFiles(prev => prev.filter((_, i) => i !== index));
+    if (target?.public_id) {
+      try {
+        await supportService.deleteCloudinaryFile(target.public_id);
+        toast.success("File deleted from server", { id: "delete-file" });
+      } catch (err) {
+        console.warn("Failed to delete CDN file:", err);
+      }
+    }
+  };
+
   const handleDeliverSubmit = async (e: any) => {
     e.preventDefault();
-    if (!deliveryText) {
-      toast.error("Please enter delivery notes.");
+    if (!deliveryText && uploadedDeliveryFiles.length === 0 && !deliveryFile) {
+      toast.error("Please enter delivery notes or attach files/links.");
       return;
     }
     setSubmitting(true);
     try {
+      const fileUrls = [
+        ...uploadedDeliveryFiles.map(f => f.url),
+        ...(deliveryFile ? [deliveryFile] : [])
+      ].filter(Boolean);
+
       await axiosFetch.post(`/orders/deliver/${order._id}`, {
         deliveryText,
-        deliveryFile
+        deliveryFile: fileUrls[0] || "",
+        deliveryFiles: fileUrls
       });
       toast.success("Delivery submitted!");
       setShowDeliverForm(false);
       setDeliveryText("");
       setDeliveryFile("");
+      setUploadedDeliveryFiles([]);
       refetch();
     } catch (err: any) {
-      toast.error("Failed to submit delivery");
+      toast.error(err.response?.data?.message || "Failed to submit delivery");
     } finally {
       setSubmitting(false);
     }
@@ -370,20 +431,73 @@ const OrderDetail = () => {
           )}
 
           {/* Deliveries Display Details */}
-          {isDelivered && (
+          {(isDelivered || isCompleted) && (order.deliveryText || order.deliveryFile || (order.deliveryFiles && order.deliveryFiles.length > 0)) && (
             <div className="card delivery-card">
               <div className="delivery-badge-tag">Delivered Work</div>
               <div className="delivery-content">
-                <h5>Message from Seller:</h5>
-                <p className="message-text">"{order.deliveryText}"</p>
-                {order.deliveryFile && (
-                  <div className="attachment-box">
-                    <span>Attachment:</span>
-                    <a href={order.deliveryFile} target="_blank" rel="noopener noreferrer" className="download-btn">
-                      View Delivery Attachment / Link
-                    </a>
-                  </div>
+                {order.deliveryText && (
+                  <>
+                    <h5>Message from Seller:</h5>
+                    <p className="message-text">"{order.deliveryText}"</p>
+                  </>
                 )}
+                
+                {(() => {
+                  const allDeliveredFiles = [
+                    ...(Array.isArray(order.deliveryFiles) ? order.deliveryFiles : []),
+                    ...(order.deliveryFile && !order.deliveryFiles?.includes(order.deliveryFile) ? [order.deliveryFile] : [])
+                  ].filter(Boolean);
+
+                  if (allDeliveredFiles.length === 0) return null;
+
+                  return (
+                    <div className="mt-3">
+                      <h5 className="font-bold text-sm mb-2 text-slate-800 dark:text-slate-200">Delivered Attachments ({allDeliveredFiles.length}):</h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {allDeliveredFiles.map((fileUrl: string, index: number) => {
+                          const isImage = /\.(png|jpe?g|gif|webp|svg)/i.test(fileUrl);
+                          const fileName = fileUrl.split('/').pop()?.split('?')[0] || `Attachment ${index + 1}`;
+
+                          if (isImage) {
+                            return (
+                              <div key={index} className="overflow-hidden rounded-lg border border-slate-200 shadow-xs group relative">
+                                <img
+                                  src={fileUrl}
+                                  alt={`Delivery ${index + 1}`}
+                                  className="w-full h-36 object-cover cursor-pointer group-hover:scale-105 transition-transform"
+                                  onClick={() => setLightboxImage(fileUrl)}
+                                />
+                                <a
+                                  href={fileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  download
+                                  className="absolute bottom-2 right-2 bg-black/70 hover:bg-black text-white text-xs px-2.5 py-1 rounded-md font-medium"
+                                >
+                                  ⬇️ Download
+                                </a>
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <a
+                              key={index}
+                              href={fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2.5 p-3 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-lg hover:bg-slate-100 border text-xs font-medium"
+                            >
+                              <span className="text-lg">📄</span>
+                              <span className="truncate max-w-[180px] font-semibold">{fileName}</span>
+                              <span className="ml-auto text-slate-400">⬇️</span>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
               
               {!isCurrentUserSeller && (
@@ -532,22 +646,80 @@ const OrderDetail = () => {
                       value={deliveryText}
                       onChange={(e: any) => setDeliveryText(e.target.value)}
                       rows={5}
-                      required
                     />
                   </div>
 
+                  {/* CDN Upload Attachments Section */}
                   <div className="field-group">
-                    <label>Attachment URL / Download Link</label>
+                    <label className="flex justify-between items-center">
+                      <span>Delivery Attachments (Multiple Files)</span>
+                      <span className="text-xs text-slate-500 font-normal">Max file size 100MB</span>
+                    </label>
+
+                    <input
+                      type="file"
+                      ref={deliveryFileInputRef}
+                      onChange={handleDeliveryFileSelect}
+                      multiple
+                      className="hidden"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => deliveryFileInputRef.current?.click()}
+                      disabled={isUploadingDeliveryFiles}
+                      className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium border border-slate-300 transition-colors my-1 cursor-pointer"
+                    >
+                      📎 {isUploadingDeliveryFiles ? 'Uploading Files...' : 'Upload Delivery Files to CDN'}
+                    </button>
+
+                    {/* Render Uploaded Delivery Attachments List */}
+                    {uploadedDeliveryFiles.length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                        {uploadedDeliveryFiles.map((fileObj, idx) => (
+                          <div key={idx} className="flex items-center gap-2.5 p-2 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 text-xs">
+                            {fileObj.type?.includes('image') || /\.(png|jpe?g|gif|webp|svg)/i.test(fileObj.name) ? (
+                              <img
+                                src={fileObj.previewUrl || fileObj.url}
+                                alt="Delivery preview"
+                                className="w-10 h-10 rounded-md object-cover cursor-pointer border"
+                                onClick={() => setLightboxImage(fileObj.previewUrl || fileObj.url)}
+                              />
+                            ) : (
+                              <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 rounded-md flex items-center justify-center font-bold text-base flex-shrink-0">
+                                📄
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-slate-800 dark:text-slate-200 truncate">{fileObj.name}</p>
+                              <p className="text-[10px] text-slate-500">{fileObj.size ? `${(fileObj.size / 1024).toFixed(1)} KB` : 'Uploaded'}</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveDeliveryFile(idx)}
+                              className="text-slate-400 hover:text-red-500 font-bold p-1 cursor-pointer"
+                              title="Remove file from CDN"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="field-group">
+                    <label>External Link / Additional Download URL (Optional)</label>
                     <input 
                       type="text" 
-                      placeholder="e.g. https://github.com, https://drive.google.com/..."
+                      placeholder="e.g. https://github.com/myrepo, https://drive.google.com/..."
                       value={deliveryFile}
                       onChange={(e: any) => setDeliveryFile(e.target.value)}
                     />
                   </div>
 
                   <div className="form-actions">
-                    <button type="submit" className="submit-btn" disabled={submitting}>
+                    <button type="submit" className="submit-btn" disabled={submitting || isUploadingDeliveryFiles}>
                       {submitting ? "Submitting..." : "Submit Delivery"}
                     </button>
                     <button type="button" className="cancel-btn" onClick={() => setShowDeliverForm(false)}>
@@ -684,8 +856,25 @@ const OrderDetail = () => {
           )}
 
         </div>
-
       </div>
+
+      {/* Lightbox Image Modal */}
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 cursor-pointer"
+          onClick={() => setLightboxImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh]" onClick={e => e.stopPropagation()}>
+            <img src={lightboxImage} alt="Enlarged preview" className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl" />
+            <button
+              onClick={() => setLightboxImage(null)}
+              className="absolute top-2 right-2 text-white bg-black/60 hover:bg-black/90 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

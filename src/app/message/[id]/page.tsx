@@ -25,7 +25,7 @@ import {
 } from "react-icons/ri";
 
 import axios from 'axios';
-import { axiosFetch, socket } from "@/utils";
+import { axiosFetch, socket, getAvatarUrl } from "@/utils";
 import { isConversationUnread } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
@@ -371,7 +371,7 @@ const Message = () => {
       userID: {
         _id: user?._id || user?.id,
         username: user?.username || 'User',
-        image: user?.image || '/media/noavatar.png'
+        image: getAvatarUrl(user?.image, user?.username || 'User')
       },
       description: currentText,
       createdAt: new Date().toISOString()

@@ -184,6 +184,11 @@ const Message = () => {
     setIsRecipientTyping(false);
 
     const handleReceiveMessage = (newMsg: any) => {
+      // Ignore messages belonging to other conversations
+      if (newMsg?.conversationID && newMsg.conversationID !== conversationID) {
+        return;
+      }
+
       // 1. Update current chat messages with strict deduplication
       queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
         const arr = Array.isArray(oldData) ? oldData : [];

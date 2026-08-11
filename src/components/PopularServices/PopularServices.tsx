@@ -69,7 +69,7 @@ const PopularServices = () => {
                 <div className="flex flex-col bg-blue-50 rounded-xl overflow-hidden group cursor-pointer border border-transparent hover:border-blue-100 transition-all duration-300">
                   <div className="h-[160px] sm:h-[200px] md:h-[260px] overflow-hidden m-1.5 md:m-2 rounded-2xl md:rounded-[1rem] bg-blue-100/50 flex items-center justify-center">
                     <img
-                      src={card.image || card.img || card.icon || "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600"}
+                      src={card.icon || card.banner || card.image || card.img || "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600"}
                       alt={card.name || card.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

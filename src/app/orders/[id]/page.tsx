@@ -72,14 +72,17 @@ const OrderDetail = () => {
       socket.emit("join_order", id);
     }
     const handleOrderUpdate = (data: any) => {
-      // Re-fetch or update order state in-place without page reload!
-      if (data.orderId === id) {
-        refetch(); // Trigger react-query refetch
+      if (data?.orderId === id || data?.order?._id === id || data?.metadata?.orderId === id) {
+        refetch();
       }
     };
     socket.on("order_updated", handleOrderUpdate);
+    socket.on("new_notification", handleOrderUpdate);
+    socket.on("notification", handleOrderUpdate);
     return () => {
       socket.off("order_updated", handleOrderUpdate);
+      socket.off("new_notification", handleOrderUpdate);
+      socket.off("notification", handleOrderUpdate);
     };
   }, [id, refetch]);
 

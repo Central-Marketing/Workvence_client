@@ -191,10 +191,31 @@ export const supportService = {
   },
 
   /**
-   * Delete uploaded file from Cloudinary
+   * Delete uploaded file from Cloudinary (accepts public_id or full Cloudinary URL)
    */
-  async deleteCloudinaryFile(public_id: string) {
-    if (!public_id) return;
+  async deleteCloudinaryFile(urlOrPublicId: string) {
+    if (!urlOrPublicId) return;
+
+    let public_id = urlOrPublicId;
+    if (urlOrPublicId.includes('/upload/')) {
+      try {
+        const parts = urlOrPublicId.split('/upload/');
+        if (parts.length > 1) {
+          let pathAfterUpload = parts[1];
+          // Strip version tag (e.g. v170000000/)
+          pathAfterUpload = pathAfterUpload.replace(/^v\d+\//, '');
+          // Strip file extension (.png, .jpg, .pdf)
+          const lastDotIndex = pathAfterUpload.lastIndexOf('.');
+          if (lastDotIndex !== -1) {
+            pathAfterUpload = pathAfterUpload.substring(0, lastDotIndex);
+          }
+          public_id = pathAfterUpload;
+        }
+      } catch (e) {
+        console.warn('Failed to parse public_id from URL:', e);
+      }
+    }
+
     try {
       const res = await adminAxiosFetch.post('/storage/delete-file', { public_id }).catch(() => axiosFetch.post('/storage/delete-file', { public_id }));
       return res.data;

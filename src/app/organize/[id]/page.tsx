@@ -216,7 +216,17 @@ const EditPackage = () => {
   };
 
   // Remove an uploaded CDN image URL
-  const handleRemoveCdnImage = (urlToRemove: string) => {
+  const handleRemoveCdnImage = async (urlToRemove: string) => {
+    if (urlToRemove && (urlToRemove.includes('cloudinary.com') || urlToRemove.includes('/upload/'))) {
+      try {
+        toast.loading('Deleting asset from CDN...', { id: 'delete-asset' });
+        await supportService.deleteCloudinaryFile(urlToRemove);
+        toast.success('Asset deleted from CDN', { id: 'delete-asset' });
+      } catch (err) {
+        console.warn('Failed to delete asset from CDN:', err);
+        toast.dismiss('delete-asset');
+      }
+    }
     dispatch({
       type: 'ADD_IMAGES',
       payload: {
@@ -227,7 +237,8 @@ const EditPackage = () => {
   };
 
   // Remove cover image
-  const handleRemoveCover = () => {
+  const handleRemoveCover = async () => {
+    const currentCoverUrl = state.cover;
     setCoverImage(null);
     dispatch({
       type: 'ADD_IMAGES',
@@ -236,6 +247,16 @@ const EditPackage = () => {
         images: state.images || []
       }
     });
+    if (currentCoverUrl && (currentCoverUrl.includes('cloudinary.com') || currentCoverUrl.includes('/upload/'))) {
+      try {
+        toast.loading('Deleting cover image from CDN...', { id: 'delete-cover' });
+        await supportService.deleteCloudinaryFile(currentCoverUrl);
+        toast.success('Cover image deleted from CDN', { id: 'delete-cover' });
+      } catch (err) {
+        console.warn('Failed to delete cover image from CDN:', err);
+        toast.dismiss('delete-cover');
+      }
+    }
   };
 
   const uploadToCDN = async (file: File) => {

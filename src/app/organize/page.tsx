@@ -6,6 +6,7 @@ import { useEffect, useReducer, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter } from "next/navigation";
 import dynamic from 'next/dynamic';
+import { X, FileText, Upload } from 'lucide-react';
 import 'react-quill-new/dist/quill.snow.css';
 import { packageReducer, initialState } from '@/reducers/packageReducer';
 import { axiosFetch, generateImageURL } from '@/utils';
@@ -56,8 +57,8 @@ const quillFormats = [
 const Add = () => {
   const user = useUserStore((state: any) => state.user);
   const [state, dispatch] = useReducer(packageReducer, initialState);
-  const [coverImage, setCoverImage] = useState(null);
-  const [packageImages, setPackageImages] = useState([]);
+  const [coverImage, setCoverImage] = useState<File | null>(null);
+  const [packageImages, setPackageImages] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [activeTier, setActiveTier] = useState('basic');
@@ -166,6 +167,43 @@ const Add = () => {
     });
   };
 
+  // Select local attachment files
+  const handleFilesSelected = (e: any) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files) as File[];
+      setPackageImages((prev) => [...prev, ...newFiles]);
+      setDisabled(false);
+    }
+  };
+
+  // Remove a local file before upload
+  const handleRemoveLocalFile = (indexToRemove: number) => {
+    setPackageImages((prev) => prev.filter((_, index) => index !== indexToRemove));
+  };
+
+  // Remove an uploaded CDN image URL
+  const handleRemoveCdnImage = (urlToRemove: string) => {
+    dispatch({
+      type: 'ADD_IMAGES',
+      payload: {
+        cover: state.cover,
+        images: (state.images || []).filter((img: string) => img !== urlToRemove)
+      }
+    });
+  };
+
+  // Remove cover image
+  const handleRemoveCover = () => {
+    setCoverImage(null);
+    dispatch({
+      type: 'ADD_IMAGES',
+      payload: {
+        cover: '',
+        images: state.images || []
+      }
+    });
+  };
+
   // Upload image/attachment to CDN (Cloudinary) with fallback to ImgBB
   const uploadToCDN = async (file: File) => {
     if (!file) return { url: '' };
@@ -187,19 +225,21 @@ const Add = () => {
     }
     try {
       setUploading(true);
-      const cover = coverImage ? await uploadToCDN(coverImage) : { url: '' };
-      const images = await Promise.all(
-        [...packageImages].map(async (img) => await uploadToCDN(img))
+      const cover = coverImage ? await uploadToCDN(coverImage) : { url: state.cover || '' };
+      const newUploaded = await Promise.all(
+        packageImages.map(async (img) => await uploadToCDN(img))
       );
-      const uploadedImageUrls = images.map((img) => img.url).filter(Boolean);
+      const newUrls = newUploaded.map((img) => img.url).filter(Boolean);
+      const combinedImages = [...(state.images || []), ...newUrls];
 
       dispatch({
         type: 'ADD_IMAGES',
         payload: {
           cover: cover.url || state.cover || '',
-          images: uploadedImageUrls.length > 0 ? uploadedImageUrls : (state.images || [])
+          images: combinedImages
         }
       });
+      setPackageImages([]);
       setUploading(false);
       setDisabled(true);
       toast.success('Attachments uploaded to CDN successfully!');
@@ -267,15 +307,116 @@ const Add = () => {
               placeholder="Category"
             />
 
-            <div className="flex flex-col gap-4 p-5 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
-              <div className="flex flex-col gap-4 w-full">
-                <label className="text-slate-700 text-sm font-semibold">Cover Image </label>
-                <input type="file" accept='image/*,.pdf,.zip' className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer" onChange={(event: any) => setCoverImage(event.target.files[0])} />
+            {/* Media & Attachment Section */}
+            <div className="flex flex-col gap-5 p-5 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
+              {/* 1. Cover Image Upload & Remove */}
+              <div className="flex flex-col gap-2">
+                <label className="text-slate-700 text-sm font-semibold">Cover Image</label>
+                <input
+                  type="file"
+                  accept='image/*,.pdf,.zip'
+                  className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer text-sm text-slate-600"
+                  onChange={(event: any) => {
+                    if (event.target.files?.[0]) {
+                      setCoverImage(event.target.files[0]);
+                      setDisabled(false);
+                    }
+                  }}
+                />
 
-                <label className="text-slate-700 text-sm font-semibold mt-2">Upload Attachments / Images (CDN)</label>
-                <input type="file" accept='image/*,.pdf,.zip,.doc,.docx' multiple className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer" onChange={(event: any) => setPackageImages(event.target.files)} />
+                {(coverImage || state.cover) && (
+                  <div className="relative group w-24 h-16 rounded-lg overflow-hidden border border-slate-200 shadow-xs mt-2 bg-slate-100">
+                    <img
+                      src={coverImage ? URL.createObjectURL(coverImage) : state.cover}
+                      alt="Cover Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-90 hover:opacity-100 transition-opacity shadow-xs"
+                      onClick={handleRemoveCover}
+                      title="Remove Cover Image"
+                    >
+                      <X size={12} strokeWidth={2.5} />
+                    </button>
+                    <span className="absolute bottom-0 inset-x-0 bg-slate-900/70 text-white text-[9px] text-center font-bold py-0.5">
+                      COVER
+                    </span>
+                  </div>
+                )}
               </div>
-              <button type="button" className={`${btnClasses} mt-2 px-6 py-2.5 text-sm w-auto self-start`} disabled={!!disabled || uploading} onClick={handleImageUploads}>
+
+              {/* 2. Attachments / Gallery Images Upload & Remove */}
+              <div className="flex flex-col gap-2 mt-2">
+                <label className="text-slate-700 text-sm font-semibold">
+                  Upload Attachments / Images (CDN)
+                </label>
+                <input
+                  type="file"
+                  accept='image/*,.pdf,.zip,.doc,.docx'
+                  multiple
+                  className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer text-sm text-slate-600"
+                  onChange={handleFilesSelected}
+                />
+
+                {((state.images && state.images.length > 0) || packageImages.length > 0) && (
+                  <div className="flex flex-wrap gap-3 mt-3">
+                    {/* CDN Uploaded Images */}
+                    {state.images?.map((url: string, index: number) => (
+                      <div key={`cdn-${index}`} className="relative group w-20 h-20 rounded-lg overflow-hidden border border-slate-200 bg-white shadow-xs">
+                        {url.match(/\.(jpeg|jpg|gif|png|webp)/i) || url.includes('cloudinary') || url.includes('ibb.co') ? (
+                          <img src={url} alt="Attachment" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 p-1 text-slate-500">
+                            <FileText size={20} />
+                            <span className="text-[9px] font-semibold uppercase mt-1 truncate max-w-full px-1">File</span>
+                          </div>
+                        )}
+                        <button
+                          type="button"
+                          className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-90 hover:opacity-100 transition-opacity shadow-xs"
+                          onClick={() => handleRemoveCdnImage(url)}
+                          title="Remove Attachment"
+                        >
+                          <X size={12} strokeWidth={2.5} />
+                        </button>
+                      </div>
+                    ))}
+
+                    {/* Newly Selected Local Files */}
+                    {packageImages.map((file: File, index: number) => (
+                      <div key={`local-${index}`} className="relative group w-20 h-20 rounded-lg overflow-hidden border border-brand-green/40 bg-white shadow-xs">
+                        {file.type.startsWith('image/') ? (
+                          <img src={URL.createObjectURL(file)} alt={file.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 p-1 text-slate-600">
+                            <FileText size={20} />
+                            <span className="text-[9px] font-semibold truncate max-w-full px-1">{file.name}</span>
+                          </div>
+                        )}
+                        <button
+                          type="button"
+                          className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-90 hover:opacity-100 transition-opacity shadow-xs"
+                          onClick={() => handleRemoveLocalFile(index)}
+                          title="Remove File"
+                        >
+                          <X size={12} strokeWidth={2.5} />
+                        </button>
+                        <span className="absolute bottom-0 inset-x-0 bg-brand-green text-white text-[8px] text-center font-bold py-0.5">
+                          NEW
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                className={`${btnClasses} mt-2 px-6 py-2.5 text-sm w-auto self-start`}
+                disabled={!!disabled || uploading || (!coverImage && packageImages.length === 0)}
+                onClick={handleImageUploads}
+              >
                 {uploading ? 'Uploading to CDN...' : disabled ? 'Uploaded to CDN' : 'Upload Attachments to CDN'}
               </button>
             </div>
@@ -401,4 +542,4 @@ const Add = () => {
   )
 }
 
-export default Add
+export default Add;

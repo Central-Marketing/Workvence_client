@@ -287,8 +287,12 @@ const PackageContent = () => {
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 tracking-tight">
                 Description
               </h2>
-              <div className="text-gray-600 text-[15px] sm:text-base leading-relaxed whitespace-pre-line space-y-6 font-normal">
-                <p>{data?.description}</p>
+              <div className="text-gray-600 text-[15px] sm:text-base leading-relaxed quill-content-display">
+                {data?.description?.includes('<') ? (
+                  <div dangerouslySetInnerHTML={{ __html: data.description }} />
+                ) : (
+                  <p className="whitespace-pre-line">{data?.description}</p>
+                )}
               </div>
             </div>
 

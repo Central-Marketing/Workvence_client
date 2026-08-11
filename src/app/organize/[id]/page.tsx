@@ -5,11 +5,56 @@ import toast from 'react-hot-toast';
 import { useEffect, useReducer, useState } from 'react';
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter, useParams } from "next/navigation";
+import dynamic from 'next/dynamic';
+import 'react-quill-new/dist/quill.snow.css';
 import { packageReducer, initialState } from '@/reducers/packageReducer';
 import { axiosFetch, generateImageURL } from '@/utils';
+import adminAxios from '@/utils/adminAxios';
+import supportService from '@/utils/supportService';
 import { Loader, CustomSelect } from '@/components';
 
 import { useUserStore } from "@/store/userStore";
+
+// Dynamically import ReactQuill to ensure SSG/SSR compatibility
+const ReactQuill = dynamic(() => import('react-quill-new'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-44 flex flex-col items-center justify-center space-y-2 border border-slate-200 bg-slate-50 rounded-xl">
+      <span className="text-xs font-semibold text-slate-400">Loading Rich Text Editor...</span>
+    </div>
+  ),
+});
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    [{ size: ['small', false, 'large', 'huge'] }],
+    ['bold', 'italic', 'underline', 'strike'],
+
+    [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+    [{ align: [] }],
+
+
+
+  ],
+};
+
+const quillFormats = [
+  'header',
+  'size',
+  'bold',
+  'italic',
+  'underline',
+  'strike',
+  'color',
+  'background',
+  'list',
+  'indent',
+  'align',
+  'blockquote',
+  'code-block',
+  'link',
+];
 
 const EditPackage = () => {
   const { id } = useParams();
@@ -29,14 +74,14 @@ const EditPackage = () => {
 
   const { data: fetchedCategories = [] } = useQuery({
     queryKey: ['admin-categories'],
-    queryFn: () => axiosFetch.get('/admin/categories').then(({ data }) => data)
+    queryFn: () => adminAxios.get('/categories').then(({ data }) => data)
   });
 
   const categoryList = Array.isArray(fetchedCategories)
     ? fetchedCategories
     : Array.isArray(fetchedCategories?.data)
-    ? fetchedCategories.data
-    : fetchedCategories?.categories || [];
+      ? fetchedCategories.data
+      : fetchedCategories?.categories || [];
 
   // Fetch the existing package details
   const { isLoading, error, data: packageData } = useQuery({
@@ -149,22 +194,40 @@ const EditPackage = () => {
     });
   };
 
+  const uploadToCDN = async (file: File) => {
+    if (!file) return { url: '' };
+    try {
+      const uploaded = await supportService.uploadFileToCloudinary(file, 'gig_attachments');
+      if (uploaded?.secure_url || uploaded?.url) {
+        return { url: uploaded.secure_url || uploaded.url };
+      }
+    } catch (err) {
+      console.warn('Cloudinary CDN upload failed, trying fallback:', err);
+    }
+    return await generateImageURL(file);
+  };
+
   const handleImageUploads = async () => {
+    if (!coverImage && packageImages.length === 0) {
+      toast.error('Please select a cover image or package images to update');
+      return;
+    }
+
     try {
       setUploading(true);
       let newCover = state.cover;
       let newImages = state.images || [];
 
       if (coverImage) {
-        const coverRes = await generateImageURL(coverImage);
-        newCover = coverRes.url;
+        const coverRes = await uploadToCDN(coverImage);
+        newCover = coverRes.url || newCover;
       }
-      
+
       if (packageImages.length > 0) {
         const imagesRes = await Promise.all(
-          [...packageImages].map(async (img) => await generateImageURL(img))
+          [...packageImages].map(async (img) => await uploadToCDN(img))
         );
-        newImages = imagesRes.map((img) => img.url);
+        newImages = imagesRes.map((img) => img.url).filter(Boolean);
       }
 
       dispatch({
@@ -173,33 +236,40 @@ const EditPackage = () => {
       });
       setUploading(false);
       setDisabled(true);
-      toast.success('Images uploaded successfully!');
+      toast.success('Attachments uploaded to CDN successfully!');
     }
     catch (error) {
-      console.log(error);
-      toast.error('Image upload failed');
+      console.error(error);
+      toast.error('Attachment upload to CDN failed');
       setUploading(false);
     }
   };
 
   const handleFormSubmit = (event: any) => {
-    event.preventDefault();
-    
-    // Basic root level validation
-    if (!state.title || !state.category || !state.description) {
-      toast.error('Please fill all main gig details');
-      return;
+    if (event) event.preventDefault();
+
+    const form = { ...state };
+    if (form.packages?.basic) {
+      const bTitle = form.packages.basic.title || form.packages.basic.shortDesc || form.shortTitle || form.title || '';
+      form.packages.basic.title = bTitle;
+      form.packages.basic.shortDesc = form.packages.basic.shortDesc || form.shortDesc || '';
+      form.packages.basic.price = Number(form.packages.basic.price || form.price || 0);
+      form.packages.basic.deliveryTime = form.packages.basic.deliveryTime || form.deliveryTime || '';
     }
-    
-    // Basic tier validation
-    if (!state.packages?.basic?.title || !state.packages?.basic?.shortDesc || !state.packages?.basic?.price || !state.packages?.basic?.deliveryTime) {
-      toast.error('Please fill all Basic package details');
+
+    // Basic root level validation
+    if (!form.title || !form.category || !form.description || form.description === '<p><br></p>') {
+      toast.error('Please fill all main gig details (Title, Category, and Description)');
       return;
     }
 
-    const form = { ...state };
-    toast.success("Updating pkg...");
-    
+    // Basic tier validation
+    const basicTitle = form.packages?.basic?.title || form.packages?.basic?.shortDesc;
+    if (!basicTitle || !form.packages?.basic?.shortDesc || !form.packages?.basic?.price || !form.packages?.basic?.deliveryTime) {
+      toast.error('Please fill all Basic package details (Title, Short Description, Price, and Delivery Time)');
+      return;
+    }
+
     mutation.mutate(form, {
       onSuccess: () => {
         toast.success("Package updated successfully!");
@@ -232,7 +302,7 @@ const EditPackage = () => {
     <div className='min-h-screen bg-slate-50 py-10 flex justify-center font-sans'>
       <div className="w-[95%] md:w-[90%] max-w-[1100px] bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] p-8 md:py-12 md:px-16 mx-auto">
         <h1 className="text-slate-900 font-bold text-2xl md:text-3xl mb-10 border-b-2 border-slate-100 pb-5">Edit Package: {packageData.title}</h1>
-        
+
         <div className="flex flex-col md:flex-row justify-between gap-10 md:gap-16">
           <div className="flex-1 flex flex-col gap-6">
             <label className={labelClasses}>Gig Title</label>
@@ -251,28 +321,37 @@ const EditPackage = () => {
 
             <div className="flex flex-col gap-4 p-5 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
               <div className="flex flex-col gap-4 w-full">
-                <label className="text-slate-700 text-sm font-semibold">Cover Image (Leave empty to keep current)</label>
-                <input type="file" accept='image/*' className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer" onChange={(event: any) => setCoverImage(event.target.files[0])} />
-                {state.cover && !coverImage && <img src={state.cover} alt="Current Cover" style={{width: 80, height: 50, objectFit: 'cover', marginTop: 10, borderRadius: 4}} />}
-                
-                <label className="text-slate-700 text-sm font-semibold mt-2">Upload Images (Leave empty to keep current)</label>
-                <input type="file" accept='image/*' multiple className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer" onChange={(event: any) => setPackageImages(event.target.files)} />
+                <label className="text-slate-700 text-sm font-semibold">Cover Image (CDN Upload)</label>
+                <input type="file" accept='image/*,.pdf,.zip' className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer" onChange={(event: any) => setCoverImage(event.target.files[0])} />
+                {state.cover && !coverImage && <img src={state.cover} alt="Current Cover" style={{ width: 80, height: 50, objectFit: 'cover', marginTop: 10, borderRadius: 4 }} />}
+
+                <label className="text-slate-700 text-sm font-semibold mt-2">Upload Attachments / Images (CDN)</label>
+                <input type="file" accept='image/*,.pdf,.zip,.doc,.docx' multiple className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer" onChange={(event: any) => setPackageImages(event.target.files)} />
                 {state.images && state.images.length > 0 && packageImages.length === 0 && (
-                  <div style={{display: 'flex', gap: 10, marginTop: 10}}>
+                  <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
                     {state.images.map((img: string, i: number) => (
-                      <img key={i} src={img} alt="Current" style={{width: 50, height: 50, objectFit: 'cover', borderRadius: 4}} />
+                      <img key={i} src={img} alt="Current" style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }} />
                     ))}
                   </div>
                 )}
               </div>
               <button className={`${btnClasses} mt-2 px-6 py-2.5 text-sm w-auto self-start`} disabled={!!disabled || mutation.isPending} onClick={handleImageUploads}>
-                {uploading ? 'Uploading...' : disabled ? 'Uploaded' : 'Update Images'}
+                {uploading ? 'Uploading to CDN...' : disabled ? 'Uploaded to CDN' : 'Update Attachments on CDN'}
               </button>
             </div>
 
-            <label className={labelClasses}>Description</label>
-            <textarea name='description' className={`${inputClasses} min-h-[120px] resize-y`} placeholder='Brief descriptions to introduce your service to customers' onChange={handleFormChange} value={state.description || ''}></textarea>
-            
+            <label className={labelClasses}>Description (Rich Text Editor)</label>
+            <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
+              <ReactQuill
+                theme="snow"
+                value={state.description || ''}
+                onChange={(html) => dispatch({ type: 'CHANGE_INPUT', payload: { name: 'description', value: html } })}
+                modules={quillModules}
+                formats={quillFormats}
+                placeholder="Write rich descriptions to introduce your service to customers..."
+              />
+            </div>
+
             <button className={`${btnClasses} mt-4`} onClick={handleFormSubmit} disabled={mutation.isPending}>
               {mutation.isPending ? 'Updating...' : 'Update Package'}
             </button>
@@ -284,11 +363,10 @@ const EditPackage = () => {
               {['basic', 'standard', 'premium'].map((tier) => (
                 <button
                   key={tier}
-                  className={`flex-1 py-3 text-sm font-semibold text-center border-b-2 transition-colors ${
-                    activeTier === tier 
-                      ? 'border-brand-green text-brand-green' 
-                      : 'border-transparent text-slate-500 hover:text-slate-700'
-                  }`}
+                  className={`flex-1 py-3 text-sm font-semibold text-center border-b-2 transition-colors ${activeTier === tier
+                    ? 'border-brand-green text-brand-green'
+                    : 'border-transparent text-slate-500 hover:text-slate-700'
+                    }`}
                   onClick={() => setActiveTier(tier)}
                 >
                   {tier.charAt(0).toUpperCase() + tier.slice(1)}
@@ -334,12 +412,12 @@ const EditPackage = () => {
                   <input type="text" className={`${inputClasses} flex-1`} placeholder='e.g. page design' />
                   <button type='submit' className={`${btnClasses} px-6 py-3.5 h-auto m-0 whitespace-nowrap`}>Add</button>
                 </form>
-                
+
                 <div className="flex flex-wrap gap-2.5 mt-1">
                   {
                     activePackage.features?.map((feature: any) => (
                       <div key={feature} className="group cursor-pointer">
-                        <button 
+                        <button
                           type="button"
                           className="px-3 py-1.5 text-[13px] font-medium bg-slate-100 text-slate-600 rounded-full flex items-center gap-2 border border-slate-200 transition-all duration-200 group-hover:bg-red-100 group-hover:border-red-300 group-hover:text-red-500"
                           onClick={() => handlePackageFeatureRemove(feature)}
@@ -351,7 +429,7 @@ const EditPackage = () => {
                     ))
                   }
                 </div>
-                
+
                 <label className={labelClasses}>Price ($)</label>
                 <input name='price' type="number" min='1' className={inputClasses} onChange={handlePackageFormChange} value={activePackage.price || ''} />
               </>

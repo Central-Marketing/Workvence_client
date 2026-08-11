@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { axiosFetch } from '@/utils';
+import adminAxios from '@/utils/adminAxios';
 
 // Helper to assign a fallback icon based on index or category name
 const getIcon = (index: number) => {
@@ -34,7 +35,7 @@ const getIcon = (index: number) => {
 const ExploreCategories = () => {
   const { data: fetchedCategories = [] } = useQuery({
     queryKey: ['admin-categories-explore'],
-    queryFn: () => axiosFetch.get('/admin/categories').then(({ data }) => data)
+    queryFn: () => adminAxios.get('/categories').then(({ data }) => data)
   });
 
   const categoryList = Array.isArray(fetchedCategories)

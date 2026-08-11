@@ -53,7 +53,7 @@ export const supportService = {
     orderID?: string;
     attachments?: any[];
   }) {
-    const res = await axiosFetch.post('/support/tickets', payload);
+    const res = await adminAxiosFetch.post('/admin/support/tickets', payload);
     return res.data;
   },
 
@@ -61,7 +61,7 @@ export const supportService = {
    * Get all support tickets submitted by current authenticated user
    */
   async getMyTickets(): Promise<SupportTicketItem[]> {
-    const res = await axiosFetch.get('/support/tickets/my-tickets');
+    const res = await adminAxiosFetch.get('/admin/support/tickets/my-tickets');
     const data = res.data;
     if (Array.isArray(data)) return data;
     if (Array.isArray(data?.tickets)) return data.tickets;
@@ -73,7 +73,7 @@ export const supportService = {
    * Get single support ticket details & thread messages
    */
   async getTicketById(ticketId: string): Promise<SupportTicketItem> {
-    const res = await axiosFetch.get(`/support/tickets/${ticketId}`);
+    const res = await adminAxiosFetch.get(`/admin/support/tickets/${ticketId}`);
     const payload = res.data;
     return payload?.data?.ticket || payload?.ticket || payload?.data || payload;
   },
@@ -85,7 +85,7 @@ export const supportService = {
     ticketId: string,
     payload: { message: string; thread?: string; attachments?: any[] }
   ) {
-    const res = await axiosFetch.post(`/support/tickets/${ticketId}/reply`, payload);
+    const res = await adminAxiosFetch.post(`/admin/support/tickets/${ticketId}/reply`, payload);
     return res.data;
   },
 

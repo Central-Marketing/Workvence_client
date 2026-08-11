@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
+import socket from "@/utils/socket";
 import adminAxios from "@/utils/adminAxios";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
@@ -27,16 +28,16 @@ export default function AdminLayout({
     (async () => {
       try {
         const { data } = await adminAxios.get("/auth/me");
-        const u = data?.data?.user || data?.user;
-        if (!u) throw new Error("No user");
-        setUser(u);
-      } catch {
-        // Fallback: check local user store
-        const stored = localStorage.getItem("user");
-        if (!stored) {
-          toast.error("Please log in to access admin panel");
-          router.push("/login?redirect=/admin/dashboard");
-          return;
+        if (data?.user) {
+          setUser(data.user);
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
+      } catch (error: any) {
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          socket.disconnect();
+          localStorage.removeItem("user");
+          setUser(null);
+          router.push("/login");
         }
       } finally {
         setChecking(false);
@@ -48,11 +49,13 @@ export default function AdminLayout({
   const logoutMutation = useMutation({
     mutationFn: () => adminAxios.post("/auth/logout"),
     onSuccess: () => {
+      socket.disconnect();
       localStorage.removeItem("user");
       setUser(null);
       router.push("/login");
     },
     onError: () => {
+      socket.disconnect();
       localStorage.removeItem("user");
       setUser(null);
       router.push("/login");

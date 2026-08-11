@@ -294,7 +294,6 @@ const Message = () => {
     socket.on('offer_withdrawn', handleOfferWithdrawn);
 
     return () => {
-      socket.emit('leave_conversation', conversationID);
       socket.off('receive_message', handleReceiveMessage);
       socket.off('user_typing', handleUserTyping);
       socket.off('user_stopped_typing', handleUserStoppedTyping);

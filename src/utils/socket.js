@@ -42,6 +42,9 @@ const socket = {
     },
     disconnect() {
         if (realSocket) {
+            if (realSocket.connected) {
+                realSocket.emit('leave_conversation');
+            }
             realSocket.disconnect();
         }
     },

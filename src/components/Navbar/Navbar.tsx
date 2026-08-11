@@ -49,6 +49,7 @@ const Navbar = () => {
       catch (error: any) {
         // Only log out if it's explicitly an auth error (Token expired, invalid cookie, etc.)
         if (error.response?.status === 401 || error.response?.status === 403) {
+          socket.disconnect();
           localStorage.removeItem('user');
           setUser(null);
         }
@@ -84,11 +85,13 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await axiosFetch.post("/auth/logout");
+    } catch ({ response }) {
+      console.log(response?.data);
+    } finally {
+      socket.disconnect();
       localStorage.removeItem('user');
       setUser(null);
       router.push("/");
-    } catch ({ response }) {
-      console.log(response?.data);
     }
   };
 

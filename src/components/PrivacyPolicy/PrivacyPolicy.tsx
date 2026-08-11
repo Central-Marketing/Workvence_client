@@ -37,7 +37,7 @@ const defaultPrivacyPolicy = `
   <li>To enforce our terms, conditions, and policies for security and moderation purposes.</li>
 </ol>
 <blockquote>Workvence does not sell, rent, or lease customer data to third parties for marketing purposes.</blockquote>
-<h2>3. Data Security & Storage</h2>
+<h2>3. Data Security & Storage dfsg</h2>
 <p>We have implemented appropriate technical and organizational security measures designed to protect the security of any personal information we process.</p>
 `;
 

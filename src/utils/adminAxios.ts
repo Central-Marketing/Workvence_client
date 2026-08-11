@@ -1,6 +1,9 @@
 import axios from "axios";
 
 const getAdminBaseURL = () => {
+  if (typeof window !== "undefined") {
+    return "/api/admin";
+  }
   const envUrl = process.env.NEXT_PUBLIC_ADMIN_API_URL;
   if (envUrl) return envUrl;
 

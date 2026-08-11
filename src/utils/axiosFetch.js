@@ -1,6 +1,9 @@
 import axios from "axios";
 
 const getBaseURL = () => {
+  if (typeof window !== 'undefined') {
+    return "/api";
+  }
   return process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 };
 

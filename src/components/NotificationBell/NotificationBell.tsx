@@ -42,8 +42,10 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
           setNotifications(res.data.notifications || []);
           setUnreadCount(res.data.unreadCount || 0);
         }
-      } catch (err) {
-        console.error("Failed to load notifications:", err);
+      } catch (err: any) {
+        if (err.response?.status !== 401) {
+          console.error("Failed to load notifications:", err);
+        }
       }
     };
 

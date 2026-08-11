@@ -280,7 +280,23 @@ const EditPackage = () => {
 
     try {
       setUploading(true);
-      const cover = coverImage ? await uploadToCDN(coverImage) : { url: state.cover || '' };
+
+      const oldCoverUrl = state.cover;
+      let newCoverUrl = state.cover || '';
+
+      if (coverImage) {
+        if (oldCoverUrl && (oldCoverUrl.includes('cloudinary.com') || oldCoverUrl.includes('/upload/'))) {
+          try {
+            await supportService.deleteCloudinaryFile(oldCoverUrl);
+          } catch (err) {
+            console.warn('Failed deleting old cover image from CDN:', err);
+          }
+        }
+        const uploadedCover = await uploadToCDN(coverImage);
+        newCoverUrl = uploadedCover.url || '';
+        setCoverImage(null);
+      }
+
       const newUploaded = await Promise.all(
         packageImages.map(async (img) => await uploadToCDN(img))
       );
@@ -290,14 +306,14 @@ const EditPackage = () => {
       dispatch({
         type: 'ADD_IMAGES',
         payload: {
-          cover: cover.url || state.cover || '',
+          cover: newCoverUrl,
           images: combinedImages
         }
       });
       setPackageImages([]);
       setUploading(false);
       setDisabled(true);
-      toast.success('Attachments uploaded to CDN successfully!');
+      toast.success('Attachments updated and old cover replaced on CDN!');
     }
     catch (error) {
       console.error(error);

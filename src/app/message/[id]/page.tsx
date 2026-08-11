@@ -192,22 +192,34 @@ const Message = () => {
   }, [user?._id, queryClient]);
 
   // Fetch messages history for active conversation (1-time initial fetch, 0 polling)
-  const { isLoading: msgsLoading, data: messages = [] } = useQuery({
+  const { isLoading: msgsLoading, isError: msgsError, error: msgsQueryError, data: messages = [] } = useQuery({
     queryKey: ['messages', conversationID],
-    queryFn: () =>
-      axiosFetch.get(`/messages/history/${conversationID}`)
-        .then(({ data }) => {
+    queryFn: async () => {
+      try {
+        const { data } = await axiosFetch.get(`/messages/history/${conversationID}`);
+        if (Array.isArray(data)) return data;
+        if (data?.data?.messages) return data.data.messages;
+        if (data?.messages) return data.messages;
+        return [];
+      } catch (err: any) {
+        if (err?.response?.status === 403) {
+          throw new Error('Access denied! You are not a participant in this conversation.');
+        }
+        try {
+          const { data } = await axiosFetch.get(`/messages/${conversationID}`);
           if (Array.isArray(data)) return data;
-          if (data?.data?.messages) return data.data.messages;
           if (data?.messages) return data.messages;
           return [];
-        })
-        .catch(() =>
-          axiosFetch.get(`/messages/${conversationID}`)
-            .then(({ data }) => Array.isArray(data) ? data : (data?.messages || []))
-            .catch(() => [])
-        ),
+        } catch (err2: any) {
+          if (err2?.response?.status === 403) {
+            throw new Error('Access denied! You are not a participant in this conversation.');
+          }
+          throw err2;
+        }
+      }
+    },
     enabled: !!conversationID,
+    retry: false,
     staleTime: 60000,
     refetchInterval: false
   });
@@ -704,7 +716,15 @@ const Message = () => {
               </div>
               {/* Messages */}
               <div className="messages-scroll">
-                {msgsLoading ? (
+                {msgsError ? (
+                  <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-red-50/50 dark:bg-red-950/20 m-6 rounded-2xl border border-red-200 dark:border-red-900/50 shadow-sm">
+                    <div className="w-16 h-16 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center text-3xl mb-4 font-bold">🚫</div>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">Access Denied (403)</h3>
+                    <p className="text-slate-600 dark:text-slate-400 max-w-md text-sm leading-relaxed">
+                      You are not a participant in this conversation. You do not have permission to view or send messages in this chat.
+                    </p>
+                  </div>
+                ) : msgsLoading ? (
                   <div className="scroll-loader"><Loader size={32} /></div>
                 ) : filteredMessages.length === 0 ? (
                   <div className="scroll-empty">{msgSearchQuery ? "No messages found" : "Send the first message!"}</div>
@@ -853,39 +873,41 @@ const Message = () => {
                   </div>
                 )}
 
-                <form onSubmit={handleSend} className="compose-form max-md:px-2 max-md:py-1 max-md:gap-1.5">
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                  <button
-                    type="button"
-                    className="icon-btn"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploadingAttachment}
-                    title="Attach file or image"
-                  >
-                    <RiAddLine />
-                  </button>
-                  <button type="button" className="icon-btn"><RiEmotionLine /></button>
-                  <textarea
-                    ref={textareaRef}
-                    placeholder="Message"
-                    value={messageText}
-                    onChange={handleInputChange}
-                    rows={1}
-                  />
-                  {user?.isSeller && (
-                    <button type="button" className="offer-btn-small" onClick={() => setShowOfferModal(true)}>
-                      Create Offer
+                {!msgsError && (
+                  <form onSubmit={handleSend} className="compose-form max-md:px-2 max-md:py-1 max-md:gap-1.5">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      className="icon-btn"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploadingAttachment}
+                      title="Attach file or image"
+                    >
+                      <RiAddLine />
                     </button>
-                  )}
-                  <button type="submit" className="send-btn" disabled={(!messageText.trim() && !attachment?.url) || isUploadingAttachment}>
-                    <RiSendPlaneFill />
-                  </button>
-                </form>
+                    <button type="button" className="icon-btn"><RiEmotionLine /></button>
+                    <textarea
+                      ref={textareaRef}
+                      placeholder="Message"
+                      value={messageText}
+                      onChange={handleInputChange}
+                      rows={1}
+                    />
+                    {user?.isSeller && (
+                      <button type="button" className="offer-btn-small" onClick={() => setShowOfferModal(true)}>
+                        Create Offer
+                      </button>
+                    )}
+                    <button type="submit" className="send-btn" disabled={(!messageText.trim() && !attachment?.url) || isUploadingAttachment}>
+                      <RiSendPlaneFill />
+                    </button>
+                  </form>
+                )}
               </div>
             </>
           )}

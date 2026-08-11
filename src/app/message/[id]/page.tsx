@@ -58,6 +58,7 @@ const Message = () => {
   const [isRightSideOpen, setIsRightSideOpen] = useState(false);
   const typingTimeoutRef = useRef(null);
   const isTypingRef = useRef(false);
+  const isSendingRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -415,9 +416,12 @@ const Message = () => {
     }
   };
 
-  const handleSend = (e: any) => {
-    e.preventDefault();
+  const handleSend = (e?: any) => {
+    if (e) e.preventDefault();
+    if (isSendingRef.current || mutation.isPending) return;
     if (!messageText.trim() && !attachment?.url) return;
+
+    isSendingRef.current = true;
 
     // Immediately stop typing indicator
     clearTimeout(typingTimeoutRef.current);
@@ -463,7 +467,24 @@ const Message = () => {
     };
 
     // 2. Perform DB save & single automatic WebSocket broadcast via HTTP mutation
-    mutation.mutate(msgPayload);
+    mutation.mutate(msgPayload, {
+      onSettled: () => {
+        isSendingRef.current = false;
+      }
+    });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      if (e.shiftKey) {
+        // Shift + Enter -> Send message
+        e.preventDefault();
+        handleSend(e);
+      } else {
+        // Normal Enter -> Normal newline in textarea
+        e.stopPropagation();
+      }
+    }
   };
 
 
@@ -890,12 +911,13 @@ const Message = () => {
                     >
                       <RiAddLine />
                     </button>
-                    <button type="button" className="icon-btn"><RiEmotionLine /></button>
+
                     <textarea
                       ref={textareaRef}
                       placeholder="Message"
                       value={messageText}
                       onChange={handleInputChange}
+                      onKeyDown={handleKeyDown}
                       rows={1}
                     />
                     {user?.isSeller && (
@@ -903,7 +925,7 @@ const Message = () => {
                         Create Offer
                       </button>
                     )}
-                    <button type="submit" className="send-btn" disabled={(!messageText.trim() && !attachment?.url) || isUploadingAttachment}>
+                    <button type="submit" className="send-btn" disabled={(!messageText.trim() && !attachment?.url) || isUploadingAttachment || mutation.isPending}>
                       <RiSendPlaneFill />
                     </button>
                   </form>

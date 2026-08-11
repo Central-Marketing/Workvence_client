@@ -31,19 +31,19 @@ const Featured = () => {
   );
 
   return (
-    <div className="w-full h-[50vh] md:min-h-[60vh] flex justify-center items-center bg-brand-black bg-[image:linear-gradient(to_top,rgba(0,0,0,0.9),rgba(0,0,0,0.1)),url('/heroImg.jpg')] bg-cover bg-center text-white py-20 px-5">
-      <div className="w-full container mx-auto flex flex-col items-center px-4 md:px-6 mt-32 md:mt-56">
+    <div className="w-full h-[50vh] md:min-h-[70vh] flex justify-center items-end md:items-center bg-brand-black bg-[image:linear-gradient(to_top,rgba(0,0,0,0.9),rgba(0,0,0,0.1)),url('/heroImg.jpg')] bg-cover bg-center text-white pb-4 md:py-20 px-5">
+      <div className="w-full container mx-auto flex flex-col items-center px-4 md:px-6 md:mt-56">
 
         <div className="w-full flex flex-col items-center text-center gap-10">
           <div className="w-full max-w-4xl flex flex-col items-center text-center gap-10">
-            <h1 className="text-4xl md:text-5xl leading-tight font-bold m-0 text-white">
+            <h1 className="text-2xl md:text-5xl leading-tight font-bold -mb-4 md:mb-0 text-white">
               Connect with Top <span className="text-brand-light">Freelancers</span><br />Build Outstanding Projects.
             </h1>
 
             <div className="flex flex-col md:flex-row items-center bg-transparent md:bg-white rounded-xl w-[90%] md:w-full max-w-[850px] md:h-[70px] p-0 md:p-2 shadow-none md:shadow-2xl gap-3 md:gap-0">
 
               <div className="flex-1 flex items-center h-full px-5 gap-3 w-full md:w-auto bg-white rounded-lg md:rounded-none">
-                <Search className="text-gray-400 min-w-[24px]" size={24} strokeWidth={1.5} />
+                <Search className="text-gray-400 min-w-[24px] cursor-pointer hover:text-brand-green transition-colors" size={24} strokeWidth={1.5} onClick={handleSearch} />
                 <input
                   className="w-full h-14 md:h-full border-none outline-none text-sm text-gray-800 placeholder-gray-400 bg-transparent"
                   type="text"
@@ -54,7 +54,7 @@ const Featured = () => {
               </div>
 
               <button
-                className="h-[55px] md:h-full px-10 w-full md:w-auto bg-brand-green text-white border-none rounded-lg text-lg font-bold cursor-pointer transition-all duration-300 hover:bg-[#389115] flex-shrink-0 md:ml-2 shadow-md hover:shadow-lg"
+                className="hidden md:flex items-center justify-center h-[55px] md:h-full px-10 w-full md:w-auto bg-brand-green text-white border-none rounded-lg text-lg font-bold cursor-pointer transition-all duration-300 hover:bg-[#389115] flex-shrink-0 md:ml-2 shadow-md hover:shadow-lg"
                 onClick={handleSearch}
               >
                 Search
@@ -62,7 +62,7 @@ const Featured = () => {
             </div>
           </div>
 
-          <div className="flex justify-center items-start w-full max-w-5xl mt-5 gap-1 sm:gap-4 md:gap-6 overflow-hidden mx-auto h-[100px]">
+          <div className={`flex justify-center items-start w-full max-w-5xl mt-5 gap-1 sm:gap-4 md:gap-6 overflow-hidden mx-auto ${search.trim().length > 0 ? 'h-[100px]' : 'h-0'}`}>
             {search.trim().length > 0 && filteredCategories.map((cat, index) => (
               <div
                 key={index}

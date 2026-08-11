@@ -55,30 +55,28 @@ const HowItWorks = () => {
   const steps = activeTab === 'clients' ? clientSteps : freelancerSteps;
 
   return (
-    <section className="w-full py-20 bg-gray-50">
+    <section className="w-full py-10 md:py-20 bg-gray-50">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-semibold text-gray-600 mb-4">How Workvence Works</h2>
           <p className="text-gray-500 text-lg mb-8">A simple, secure experience for both clients and freelancers.</p>
-          
+
           <div className="flex bg-[#f1f3f5] p-[6px] rounded-full shadow-inner">
-            <button 
+            <button
               onClick={() => setActiveTab('clients')}
-              className={`px-8 py-2.5 rounded-full text-[15px] font-semibold transition-all duration-300 ${
-                activeTab === 'clients' 
-                  ? 'bg-white text-brand-green shadow-sm' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
+              className={`px-8 py-2.5 rounded-full text-[15px] font-semibold transition-all duration-300 ${activeTab === 'clients'
+                ? 'bg-white text-brand-green shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+                }`}
             >
               For Clients
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('freelancers')}
-              className={`px-8 py-2.5 rounded-full text-[15px] font-semibold transition-all duration-300 ${
-                activeTab === 'freelancers' 
-                  ? 'bg-white text-brand-green shadow-sm' 
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
+              className={`px-8 py-2.5 rounded-full text-[15px] font-semibold transition-all duration-300 ${activeTab === 'freelancers'
+                ? 'bg-white text-brand-green shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+                }`}
             >
               For Freelancers
             </button>

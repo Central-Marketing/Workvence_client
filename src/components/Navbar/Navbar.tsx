@@ -214,13 +214,14 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Hamburger Button */}
-        <div className="flex lg:hidden items-center gap-4">
+        <div className="flex lg:hidden items-center gap-3 md:gap-4">
           {user && !isLoading && (
-            <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => router.push('/profile')}>
-              <img src={user.image || "/media/noavatar.png"} alt="" className="w-8 h-8 rounded-full object-cover shadow-sm" />
+            <div className="flex items-center gap-4 mr-1">
+              <HeaderInboxIcon currentUser={user} />
+              <NotificationBell currentUser={user} />
             </div>
           )}
-          <button onClick={() => setIsMobileMenuOpen(true)} className="text-2xl text-gray-700 focus:outline-none hover:text-brand-green transition-colors">
+          <button onClick={() => setIsMobileMenuOpen(true)} className="text-2xl text-gray-700 focus:outline-none hover:text-brand-green transition-colors ml-1">
             <FiMenu />
           </button>
         </div>
@@ -250,6 +251,17 @@ const Navbar = () => {
             </>
           ) : (
             <>
+              <div 
+                className="flex items-center gap-4 pb-6 mb-2 border-b border-gray-100 cursor-pointer hover:opacity-80 transition-opacity" 
+                onClick={() => { setIsMobileMenuOpen(false); router.push('/profile'); }}
+              >
+                <img src={user.image || "/media/noavatar.png"} alt="" className="w-14 h-14 rounded-full object-cover shadow-sm border border-gray-200" />
+                <div className="flex flex-col overflow-hidden">
+                  <span className="text-gray-900 font-bold truncate">@{user.username || "User"}</span>
+                  <span className="text-sm text-brand-green font-medium">View Profile</span>
+                </div>
+              </div>
+              
               <Link href="/packages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Browse Packages</Link>
               <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Briefs</Link>
               <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Dashboard</Link>

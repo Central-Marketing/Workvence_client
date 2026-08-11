@@ -22,8 +22,8 @@ const PopularServices = () => {
   const categoryList = Array.isArray(fetchedCategories)
     ? fetchedCategories
     : Array.isArray(fetchedCategories?.data)
-    ? fetchedCategories.data
-    : fetchedCategories?.categories || [];
+      ? fetchedCategories.data
+      : fetchedCategories?.categories || [];
 
   return (
     <section className="w-full py-16 md:py-20 bg-white">
@@ -52,30 +52,30 @@ const PopularServices = () => {
           onBeforeInit={(swiper) => {
             swiperRef.current = swiper;
           }}
-          spaceBetween={24}
-          slidesPerView={1}
+          spaceBetween={12}
+          slidesPerView={2}
           breakpoints={{
-            480: { slidesPerView: 2 },
-            768: { slidesPerView: 3 },
-            1024: { slidesPerView: 4 },
-            1280: { slidesPerView: 4 },
+            480: { slidesPerView: 2, spaceBetween: 16 },
+            768: { slidesPerView: 3, spaceBetween: 20 },
+            1024: { slidesPerView: 4, spaceBetween: 24 },
+            1280: { slidesPerView: 4, spaceBetween: 24 },
           }}
           className="w-full"
         >
           {categoryList.map((card: any) => (
             <SwiperSlide key={card._id || card.id || card.slug || card.name}>
               <Link href={`/packages?category=${card.slug || card.name?.toLowerCase().replace(/\s+/g, '-')}`}>
-                <div className="flex flex-col bg-[#f9fafb] rounded-[1.25rem] overflow-hidden group cursor-pointer border border-transparent hover:border-gray-100 transition-all duration-300">
-                  <div className="h-[260px] overflow-hidden m-2 rounded-[1rem] bg-gray-100 flex items-center justify-center">
+                <div className="flex flex-col bg-blue-50 rounded-xl overflow-hidden group cursor-pointer border border-transparent hover:border-blue-100 transition-all duration-300">
+                  <div className="h-[160px] sm:h-[200px] md:h-[260px] overflow-hidden m-1.5 md:m-2 rounded-2xl md:rounded-[1rem] bg-blue-100/50 flex items-center justify-center">
                     <img
                       src={card.image || card.img || card.icon || "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600"}
                       alt={card.name || card.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
-                  <div className="p-4 flex justify-between items-center">
-                    <h3 className="font-semibold text-gray-800 text-[16px] capitalize">{card.name || card.title}</h3>
-                    <ArrowRight size={18} className="text-gray-500 group-hover:text-brand-green transition-colors" />
+                  <div className="p-3 md:p-4 flex justify-between items-center">
+                    <h3 className="font-semibold text-gray-800 text-md sm:text-[14px] md:text-[16px] capitalize truncate pr-2">{card.name || card.title}</h3>
+                    <ArrowRight size={16} className="text-gray-500 group-hover:text-brand-green transition-colors flex-shrink-0" />
                   </div>
                 </div>
               </Link>

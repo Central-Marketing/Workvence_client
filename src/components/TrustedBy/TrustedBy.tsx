@@ -23,7 +23,7 @@ const TrustedBy = () => {
   ];
 
   return (
-    <div className="w-full bg-gray-100 py-10 flex justify-center">
+    <div className="w-full bg-gray-100 py-10 md:flex justify-center hidden">
       <div className="w-full container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {trustFeatures.map((feature, index) => (
@@ -32,8 +32,8 @@ const TrustedBy = () => {
                 <img src={feature.icon} alt={feature.title} className="w-6 h-6 object-contain" />
               </div>
               <div className="flex flex-col">
-                <h4 className="text-[15px] font-bold text-gray-800">{feature.title}</h4>
-                <p className="text-[13px] text-gray-500 leading-tight mt-1">{feature.description}</p>
+                <h4 className="text-base font-bold text-gray-800">{feature.title}</h4>
+                <p className="text-sm text-gray-500 leading-tight mt-1">{feature.description}</p>
               </div>
             </div>
           ))}

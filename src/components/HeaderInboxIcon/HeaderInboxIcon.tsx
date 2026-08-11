@@ -52,30 +52,6 @@ const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser }) => {
       // Trigger subtle animation on the icon
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 2000); // 2 seconds of bounce
-      
-      // Play a short notification sound for messages
-      try {
-        if (typeof window !== 'undefined') {
-          const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-          if (AudioContextClass) {
-            const ctx = new AudioContextClass();
-            const osc = ctx.createOscillator();
-            const gainNode = ctx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(ctx.destination);
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(600, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0, ctx.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.05);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.3);
-          }
-        }
-      } catch (e) {
-        console.warn("Audio play blocked", e);
-      }
     };
 
     if (!socket.connected) socket.connect();

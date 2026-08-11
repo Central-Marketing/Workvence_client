@@ -5,6 +5,7 @@ import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";
 import toast from "react-hot-toast";
 import { FiBell } from "react-icons/fi";
+import { playNotificationSound } from "@/utils/soundUtil";
 import "./NotificationBell.scss";
 
 interface NotificationBellProps {
@@ -86,29 +87,8 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
         </div>
       ), { duration: 86400000 });
       
-      // Play a short notification sound
-      try {
-        if (typeof window !== 'undefined') {
-          const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-          if (AudioContextClass) {
-            const ctx = new AudioContextClass();
-            const osc = ctx.createOscillator();
-            const gainNode = ctx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(ctx.destination);
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(400, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0, ctx.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.2);
-          }
-        }
-      } catch (e) {
-        console.warn("Audio play blocked", e);
-      }
+      // Play notification sound for all non-chat notifications
+      playNotificationSound('notification');
     };
 
     // Listen for real-time incoming messages (chat messages from other users)
@@ -117,8 +97,14 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
       const senderId = newMsg.userID?._id || newMsg.userID;
       if (senderId === currentUser._id) return;
 
-      // Don't show toast if user is already viewing this conversation
-      if (typeof window !== 'undefined' && window.location.pathname.includes(`/message/${newMsg.conversationID}`)) return;
+      // Play message sound and show toast ONLY if user is NOT on the chat page
+      const isViewingCurrentChat = typeof window !== 'undefined' && window.location.pathname.includes(`/message/${newMsg.conversationID}`);
+      const isAnyChatPage = typeof window !== 'undefined' && window.location.pathname.startsWith('/message');
+
+      if (isViewingCurrentChat || isAnyChatPage) return;
+
+      // Play message notification sound
+      playNotificationSound('message');
 
       const senderName = newMsg.userID?.username || 'Someone';
       const msgPreview = newMsg.description?.startsWith('[CUSTOM_OFFER]') 

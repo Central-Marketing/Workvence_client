@@ -34,3 +34,5 @@ export { default as RecommendedSellers } from './RecommendedSellers/RecommendedS
 export { default as SubmitProposalModal } from './SubmitProposalModal/SubmitProposalModal';
 export { default as FavoriteButton } from "./FavoriteButton/FavoriteButton";
 export { default as CustomSelect } from './CustomSelect/CustomSelect';
+export { default as GlobalSocketListener } from './GlobalSocketListener/GlobalSocketListener';
+

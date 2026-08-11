@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
+import adminAxios from "@/utils/adminAxios";
 
 const socialLinks = [
   { href: "#", icon: "/all-icons/tiktok.svg", label: "TikTok" },
@@ -55,7 +56,7 @@ const staticFooterColumns = [
 const Footer = () => {
   const { data: fetchedCategories = [] } = useQuery({
     queryKey: ['admin-categories-footer'],
-    queryFn: () => axiosFetch.get('/admin/categories').then(({ data }) => data)
+    queryFn: () => adminAxios.get('/categories').then(({ data }) => data)
   });
 
   const categoryList = Array.isArray(fetchedCategories)

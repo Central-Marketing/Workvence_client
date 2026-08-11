@@ -7,6 +7,7 @@ import { Navigation } from 'swiper/modules';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { axiosFetch } from '@/utils';
+import adminAxios from '@/utils/adminAxios';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -16,7 +17,7 @@ const PopularServices = () => {
 
   const { data: fetchedCategories = [] } = useQuery({
     queryKey: ['admin-categories-popular'],
-    queryFn: () => axiosFetch.get('/admin/categories').then(({ data }) => data)
+    queryFn: () => adminAxios.get('/categories').then(({ data }) => data)
   });
 
   const categoryList = Array.isArray(fetchedCategories)

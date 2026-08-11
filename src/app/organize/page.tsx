@@ -269,7 +269,7 @@ const Add = () => {
 
             <div className="flex flex-col gap-4 p-5 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
               <div className="flex flex-col gap-4 w-full">
-                <label className="text-slate-700 text-sm font-semibold">Cover Image (CDN Upload)</label>
+                <label className="text-slate-700 text-sm font-semibold">Cover Image </label>
                 <input type="file" accept='image/*,.pdf,.zip' className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer" onChange={(event: any) => setCoverImage(event.target.files[0])} />
 
                 <label className="text-slate-700 text-sm font-semibold mt-2">Upload Attachments / Images (CDN)</label>

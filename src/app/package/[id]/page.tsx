@@ -9,7 +9,6 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Loader, Reviews, FavoriteButton } from '@/components';
 import { useUserStore } from "@/store/userStore";
-import { handleContactUser } from '@/utils/chatHelpers';
 import "./Package.scss";
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
@@ -58,14 +57,31 @@ const PackageContent = () => {
     }
   });
 
-  const handleContact = () => {
+  const handleContact = async () => {
     if (!user) {
       router.push('/login');
       return;
     }
-    const sellerID = data?.userID?._id || data?.userID;
-    if (!sellerID) return;
-    handleContactUser(sellerID, user, router);
+    const sellerID = data?.userID?._id;
+    const buyerID = user._id;
+
+    if (!sellerID || !buyerID) return;
+
+    if (sellerID === buyerID) {
+      Swal.fire('Notice', 'You cannot contact yourself.', 'info');
+      return;
+    }
+
+    try {
+      const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
+      router.push(`/message/${res.data.conversationID}`);
+    } catch (err) {
+      const res = await axiosFetch.post("/conversations", {
+        to: sellerID,
+        from: buyerID,
+      });
+      router.push(`/message/${res.data.conversationID}`);
+    }
   };
 
   const country = getCountryFlag(data?.userID?.country);
@@ -112,13 +128,13 @@ const PackageContent = () => {
   const galleryImages = Array.from(new Set([...(data.images || []), data.cover].filter(Boolean))).slice(0, 6);
   const activeHeroImg = galleryImages[selectedHeroIndex] || "/media/noavatar.png";
 
-  const selectedPackage = data?.packages && data.packages[packageTier] 
-    ? data.packages[packageTier] 
+  const selectedPackage = data?.packages && data.packages[packageTier]
+    ? data.packages[packageTier]
     : data?.packages?.basic || {};
 
   const displayPrice = selectedPackage.price || data.price || 0;
-  const featuresList = selectedPackage.features && selectedPackage.features.length > 0 
-    ? selectedPackage.features 
+  const featuresList = selectedPackage.features && selectedPackage.features.length > 0
+    ? selectedPackage.features
     : data.features || [];
 
   const basicPkg = data?.packages?.basic;
@@ -148,16 +164,16 @@ const PackageContent = () => {
         {/* Breadcrumb & Saved Favorites Pill */}
         <div className="flex items-center justify-between py-6">
           <p className="text-sm text-gray-500 flex items-center gap-1.5 flex-wrap">
-            <Link href="/" className="hover:underline">Home</Link> / 
-            <Link href="/packages" className="hover:underline">Search result</Link> / 
+            <Link href="/" className="hover:underline">Home</Link> /
+            <Link href="/packages" className="hover:underline">Search result</Link> /
             <span className="text-gray-900 font-semibold">Package Details</span>
           </p>
           <div className="flex items-center gap-2.5">
             <div className="flex items-center border border-gray-200 bg-white px-3.5 py-1.5 rounded-lg shadow-2xs select-none">
-              <FavoriteButton 
-                gigId={_id as string} 
-                initialIsFavorited={data?.isFavorited} 
-                initialFavoriteCount={data?.favoriteCount} 
+              <FavoriteButton
+                gigId={_id as string}
+                initialIsFavorited={data?.isFavorited}
+                initialFavoriteCount={data?.favoriteCount}
                 currentUser={user}
                 className="h-5"
                 iconClassName="w-[20px] h-[20px]"
@@ -174,14 +190,14 @@ const PackageContent = () => {
           </h1>
 
           <div className="flex flex-wrap items-center justify-between gap-4 pb-1">
-            <div 
+            <div
               onClick={() => router.push(`/seller/${data?.userID?._id}`)}
               className="flex items-center gap-3.5 cursor-pointer group"
             >
-              <img 
-                src={data?.userID?.image || "/media/noavatar.png"} 
-                alt="Seller Avatar" 
-                className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-xs" 
+              <img
+                src={data?.userID?.image || "/media/noavatar.png"}
+                alt="Seller Avatar"
+                className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-xs"
               />
               <div>
                 <h4 className="text-base font-semibold text-gray-900 group-hover:text-brand-green transition-colors">
@@ -212,10 +228,10 @@ const PackageContent = () => {
         {galleryImages.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-12">
             <div className="lg:col-span-8 aspect-[16/10] sm:aspect-[16/9] lg:aspect-auto lg:h-[430px] w-full rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 shadow-sm relative group">
-              <img 
-                src={activeHeroImg} 
-                alt={data?.title} 
-                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" 
+              <img
+                src={activeHeroImg}
+                alt={data?.title}
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
               />
             </div>
 
@@ -225,11 +241,10 @@ const PackageContent = () => {
                   key={idx}
                   type="button"
                   onClick={() => setSelectedHeroIndex(idx)}
-                  className={`relative rounded-xl overflow-hidden border-2 transition-all duration-300 cursor-pointer w-full aspect-[16/10] lg:aspect-auto h-full ${
-                    selectedHeroIndex === idx 
-                      ? 'border-brand-green ring-2 ring-brand-green/20 shadow-sm scale-[0.98]' 
+                  className={`relative rounded-xl overflow-hidden border-2 transition-all duration-300 cursor-pointer w-full aspect-[16/10] lg:aspect-auto h-full ${selectedHeroIndex === idx
+                      ? 'border-brand-green ring-2 ring-brand-green/20 shadow-sm scale-[0.98]'
                       : 'border-transparent opacity-80 hover:opacity-100 hover:border-gray-300'
-                  }`}
+                    }`}
                 >
                   <img src={img} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
                 </button>
@@ -240,10 +255,10 @@ const PackageContent = () => {
 
         {/* Two-Column Body Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          
+
           {/* LEFT CONTENT COLUMN */}
           <div className="lg:col-span-8 space-y-14">
-            
+
             {/* Tab Switching Pill Bar */}
             <div className="bg-gray-100 p-1.5 rounded-2xl flex items-center gap-1 overflow-x-auto scrollbar-hide border border-gray-200/60 sticky top-20 z-10 shadow-2xs">
               {[
@@ -255,11 +270,10 @@ const PackageContent = () => {
                 <button
                   key={name}
                   onClick={() => scrollToSection(id, name)}
-                  className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                    activeTab === name 
-                      ? "bg-white text-gray-900 shadow-sm" 
+                  className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${activeTab === name
+                      ? "bg-white text-gray-900 shadow-sm"
                       : "text-gray-500 hover:text-gray-900"
-                  }`}
+                    }`}
                 >
                   {name}
                 </button>
@@ -287,7 +301,7 @@ const PackageContent = () => {
                   <h2 className="text-[24px] sm:text-[28px] font-semibold text-[#1e293b] tracking-tight">
                     Compare packages
                   </h2>
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowComparisonTable(!showComparisonTable)}
                     className="border border-gray-200 hover:bg-white text-gray-500 font-medium text-[14.5px] px-5 py-2.5 rounded-[12px] transition-colors cursor-pointer bg-transparent shadow-xs"
@@ -299,7 +313,7 @@ const PackageContent = () => {
                 {/* Expandable Comparison Cards */}
                 {showComparisonTable && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-0 bg-white rounded-[20px] overflow-hidden border border-gray-200 animate-fadeIn relative">
-                    
+
                     {/* Basic Card */}
                     {basicPkg ? (
                       <div className="flex flex-col p-6 sm:p-8 bg-[#fafafa]">
@@ -313,12 +327,12 @@ const PackageContent = () => {
                           <h4 className="text-[12.5px] font-extrabold text-gray-900 uppercase tracking-wider mb-2">{basicPkg.title}</h4>
                           <p className="text-[14.5px] text-gray-500 leading-snug">{basicPkg.shortDesc}</p>
                         </div>
-                        
+
                         <div className="space-y-4 text-[13.5px] text-gray-600 font-medium flex-grow border-t border-gray-100 pt-6">
                           {basicPkg.features?.map((f: string, i: number) => (
                             <div key={i} className="flex justify-between items-center">
                               <span>{f}</span>
-                              <svg className="text-brand-green" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                              <svg className="text-brand-green" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg>
                             </div>
                           ))}
                         </div>
@@ -346,12 +360,12 @@ const PackageContent = () => {
                           <h4 className="text-[12.5px] font-extrabold text-gray-900 uppercase tracking-wider mb-2">{standardPkg.title}</h4>
                           <p className="text-[14.5px] text-gray-500 leading-snug">{standardPkg.shortDesc}</p>
                         </div>
-                        
+
                         <div className="space-y-4 text-[13.5px] text-gray-600 font-medium flex-grow border-t border-gray-100 pt-6">
                           {standardPkg.features?.map((f: string, i: number) => (
                             <div key={i} className="flex justify-between items-center">
                               <span>{f}</span>
-                              <svg className="text-brand-green" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                              <svg className="text-brand-green" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg>
                             </div>
                           ))}
                         </div>
@@ -375,12 +389,12 @@ const PackageContent = () => {
                           <h4 className="text-[12.5px] font-extrabold text-gray-900 uppercase tracking-wider mb-2">{premiumPkg.title}</h4>
                           <p className="text-[14.5px] text-gray-500 leading-snug">{premiumPkg.shortDesc}</p>
                         </div>
-                        
+
                         <div className="space-y-4 text-[13.5px] text-gray-600 font-medium flex-grow border-t border-gray-100 pt-6">
                           {premiumPkg.features?.map((f: string, i: number) => (
                             <div key={i} className="flex justify-between items-center">
                               <span>{f}</span>
-                              <svg className="text-brand-green" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                              <svg className="text-brand-green" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg>
                             </div>
                           ))}
                         </div>
@@ -462,7 +476,7 @@ const PackageContent = () => {
                       </div>
                     </div>
                   </div>
-                  <button 
+                  <button
                     onClick={handleContact}
                     className="px-6 py-2.5 bg-white hover:bg-gray-100 text-gray-900 font-semibold text-sm rounded-xl border border-gray-300 transition-colors shadow-2xs cursor-pointer"
                   >
@@ -510,10 +524,10 @@ const PackageContent = () => {
           {/* RIGHT PRICING & TIER SWITCHER SIDEBAR */}
           <div className="lg:col-span-4">
             <div className="sticky top-28 space-y-4">
-              
+
               {/* White Package Tier Card */}
               <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs transition-all">
-                
+
                 {/* Package Tier Selector */}
                 {data?.packages && (
                   <div className="grid grid-cols-3 gap-1 bg-gray-100 p-1.5 rounded-xl text-center mb-6 border border-gray-200/60">
@@ -524,13 +538,12 @@ const PackageContent = () => {
                           key={tier}
                           onClick={() => !isDisabled && setPackageTier(tier)}
                           disabled={isDisabled}
-                          className={`py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
-                            packageTier === tier 
-                              ? "bg-white text-gray-900 shadow-xs cursor-default" 
-                              : isDisabled 
+                          className={`py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${packageTier === tier
+                              ? "bg-white text-gray-900 shadow-xs cursor-default"
+                              : isDisabled
                                 ? "text-gray-300 cursor-not-allowed"
                                 : "text-gray-500 hover:text-gray-900 cursor-pointer"
-                          }`}
+                            }`}
                         >
                           {tier.charAt(0).toUpperCase() + tier.slice(1)}
                         </button>
@@ -565,7 +578,7 @@ const PackageContent = () => {
                     <div className="space-y-3 mb-7">
                       {featuresList.map((feature: string, index: number) => (
                         <label key={index} className="flex items-center gap-3 text-xs sm:text-sm text-gray-800 select-none font-medium">
-                          <svg className="text-brand-green" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                          <svg className="text-brand-green" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg>
                           <span>{feature}</span>
                         </label>
                       ))}
@@ -593,14 +606,14 @@ const PackageContent = () => {
                 </div>
 
                 {/* Primary Continue / Buy Plan Button */}
-                <button 
+                <button
                   onClick={() => {
                     if (!user) {
                       router.push('/login');
                     } else {
                       router.push(`/pay/${_id}?tier=${packageTier}`);
                     }
-                  }} 
+                  }}
                   className="w-full mt-6 py-3.5 bg-brand-green hover:bg-brand-green text-white font-semibold text-sm sm:text-base rounded-xl transition-all shadow-sm cursor-pointer"
                 >
                   Continue (${displayPrice})
@@ -608,7 +621,7 @@ const PackageContent = () => {
               </div>
 
               {/* Separate Contact Me Button matching photo placement */}
-              <button 
+              <button
                 type="button"
                 onClick={handleContact}
                 className="w-full py-3.5 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-sm rounded-2xl border border-gray-200 transition-colors flex items-center justify-center gap-2 shadow-2xs cursor-pointer"

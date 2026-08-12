@@ -6,8 +6,9 @@ import { useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { axiosFetch } from "@/utils";
-import { getOtherUser, isConversationUnread } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
+
+
 import { Loader } from "@/components";
 import './Messages.scss';
 
@@ -17,8 +18,8 @@ const Messages = () => {
   const navigate = useRouter();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    window.scrollTo(0, 0)
+  }, [])
 
   const { isLoading, error, data = [] } = useQuery({
     queryKey: ['conversations'],
@@ -29,17 +30,19 @@ const Messages = () => {
           console.log(err?.response || err);
           return [];
         })
-  });
+  })
 
   const mutation = useMutation({
-    mutationFn: (id: string) => axiosFetch.patch(`/conversations/${id}`),
+    mutationFn: (id) =>
+      axiosFetch.patch(`/conversations/${id}`)
+    ,
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ['conversations'] })
-  });
+  })
 
-  const handleMessageRead = (id: string) => {
+  const handleMessageRead = (id) => {
     mutation.mutate(id);
-  };
+  }
 
   if (!user) {
     return (
@@ -56,91 +59,92 @@ const Messages = () => {
   return (
     <div className='messages'>
       <div className="container">
-        {isLoading ? (
-          <div className='loader'> <Loader size={45} /> </div>
-        ) : error ? (
-          <div className="error-message">Something went wrong!</div>
-        ) : (
-          <div className="card">
-            <div className="card-header">
-              <h1>Conversations</h1>
-              <p>Interact with your active contacts</p>
-            </div>
+        {
+          isLoading
+            ? <div className='loader'> <Loader size={45} /> </div>
+            : error
+              ? <div className="error-message">Something went wrong!</div>
+              : <div className="card">
+                <div className="card-header">
+                  <h1>Conversations</h1>
+                  <p>Interact with your active buyers and sellers</p>
+                </div>
 
-            <div className="table-responsive">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Contact</th>
-                    <th>Last Message</th>
-                    <th>Date</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.map((conv: any) => {
-                    const isUnread = isConversationUnread(conv, user);
-                    const contact = getOtherUser(conv, user);
-                    const canonicalId = conv.conversationID || conv._id || conv.id;
-
-                    return (
-                      <tr
-                        key={conv._id || canonicalId}
-                        onClick={() => navigate.push(`/message/${canonicalId}`)}
-                        className={`clickable-row ${isUnread ? "unread-row" : ""}`}
-                      >
-                        <td className="user-cell">
-                          <div className="flex items-center gap-2">
-                            <img
-                              src={contact?.image || "/media/noavatar.png"}
-                              alt={contact?.username || 'User Avatar'}
-                              className="w-8 h-8 rounded-full object-cover"
-                            />
-                            <span>{contact?.username || 'User'}</span>
-                          </div>
-                        </td>
-                        <td className="msg-cell">
-                          <span className="last-msg">
-                            {(() => {
-                              const msg = conv?.lastMessage;
-                              if (!msg) return "No messages yet";
-                              if (msg.startsWith('[CUSTOM_OFFER]')) {
-                                try {
-                                  const offer = JSON.parse(msg.replace('[CUSTOM_OFFER]', ''));
-                                  return `✉ Custom Offer Proposal - $${offer.price}: ${offer.desc}`;
-                                } catch (err) {
-                                  return "✉ Custom Offer Proposal";
-                                }
-                              }
-                              return msg;
-                            })()}
-                          </span>
-                        </td>
-                        <td className="date-cell">{moment(conv.updatedAt).fromNow()}</td>
-                        <td>
-                          {isUnread && (
-                            <button
-                              className="read-btn"
-                              onClick={(e: any) => {
-                                e.stopPropagation();
-                                handleMessageRead(canonicalId);
-                              }}
-                            >
-                              Mark as read
-                            </button>
-                          )}
-                        </td>
+                <div className="table-responsive">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>{user?.isSeller ? 'Buyer' : 'Seller'}</th>
+                        <th>Last Message</th>
+                        <th>Date</th>
+                        <th>Action</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+                    </thead>
+                    <tbody>
+                      {
+                        data.map((conv) => {
+                          const isUnread = (user?.isSeller && !conv.readBySeller) || (!user?.isSeller && !conv.readByBuyer);
+                          return (
+                            <tr
+                              key={conv._id}
+                              onClick={() => navigate.push(`/message/${conv.conversationID}`)}
+                              className={`clickable-row ${isUnread ? "unread-row" : ""}`}
+                            >
+                              <td className="user-cell">
+                                <div className="flex items-center gap-2">
+                                  <img
+                                    src={(user?.isSeller ? conv.buyerID?.image : conv.sellerID?.image) || "/media/noavatar.png"}
+                                    alt=""
+                                    className="w-8 h-8 rounded-full object-cover"
+                                  />
+                                  <span>{user?.isSeller ? conv.buyerID?.username : conv.sellerID?.username}</span>
+                                </div>
+                              </td>
+                              <td className="msg-cell">
+                                <span className="last-msg">
+                                  {(() => {
+                                    const msg = conv?.lastMessage;
+                                    if (!msg) return "No messages yet";
+                                    if (msg.startsWith('[CUSTOM_OFFER]')) {
+                                      try {
+                                        const offer = JSON.parse(msg.replace('[CUSTOM_OFFER]', ''));
+                                        return `✉ Custom Offer Proposal - $${offer.price}: ${offer.desc}`;
+                                      } catch (err) {
+                                        return "✉ Custom Offer Proposal";
+                                      }
+                                    }
+                                    return msg;
+                                  })()}
+                                </span>
+                              </td>
+                              <td className="date-cell">{moment(conv.updatedAt).fromNow()}</td>
+                              <td>
+                                {
+                                  isUnread && (
+                                    <button
+                                      className="read-btn"
+                                      onClick={(e: any) => {
+                                        e.stopPropagation();
+                                        handleMessageRead(conv.conversationID);
+                                      }}
+                                    >
+                                      Mark as read
+                                    </button>
+                                  )
+                                }
+                              </td>
+                            </tr>
+                          );
+                        })
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+        }
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default Messages;

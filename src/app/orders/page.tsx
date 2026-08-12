@@ -5,14 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { handleContactUser } from "@/utils/chatHelpers";
 import { Loader } from '@/components';
 import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 
 const Orders = () => {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
-  
+
   // Status filter state
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -32,13 +31,26 @@ const Orders = () => {
         }),
   });
 
-  const handleContact = (order: any) => {
-    if (!order) return;
-    const sellerID = order.sellerID?._id || order.sellerID;
-    const buyerID = order.buyerID?._id || order.buyerID;
-    const currentUid = String(user?._id || user?.id || '');
-    const targetUserId = String(sellerID) === currentUid ? buyerID : sellerID;
-    handleContactUser(targetUserId, user, router);
+  const handleContact = async (order: any) => {
+    const sellerID = order.sellerID.hasOwnProperty("_id")
+      ? order.sellerID._id
+      : order.sellerID;
+    const buyerID = order.buyerID.hasOwnProperty("_id")
+      ? order.buyerID._id
+      : order.buyerID;
+
+    axiosFetch
+      .get(`/conversations/single/${sellerID}/${buyerID}`)
+      .then(({ data }) => {
+        router.push(`/message/${data.conversationID}`);
+      })
+      .catch(async () => {
+        const { data } = await axiosFetch.post("/conversations", {
+          to: user.isSeller ? buyerID : sellerID,
+          from: user.isSeller ? sellerID : buyerID,
+        });
+        router.push(`/message/${data.conversationID}`);
+      });
   };
 
   // Filter orders by selected status tab
@@ -64,32 +76,32 @@ const Orders = () => {
 
             {/* Filter Tabs Row */}
             <div className="flex gap-2 px-5 pb-5 md:px-7 md:pb-4 border-b border-slate-200 flex-wrap">
-              <button 
+              <button
                 className={`px-4 py-2 rounded-full text-[13px] font-semibold border transition-all ${statusFilter === "all" ? "bg-brand-green text-white border-brand-green" : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-200"}`}
                 onClick={() => setStatusFilter("all")}
               >
                 All Orders ({data.length})
               </button>
-              <button 
+              <button
                 className={`px-4 py-2 rounded-full text-[13px] font-semibold border transition-all ${statusFilter === "in_progress" ? "bg-brand-green text-white border-brand-green" : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-200"}`}
                 onClick={() => setStatusFilter("in_progress")}
               >
                 In Progress ({data.filter((o: any) => o.status === 'paid' || !o.status).length})
               </button>
-              <button 
+              <button
                 className={`px-4 py-2 rounded-full text-[13px] font-semibold border transition-all ${statusFilter === "delivered" ? "bg-brand-green text-white border-brand-green" : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-200"}`}
                 onClick={() => setStatusFilter("delivered")}
               >
                 Delivered ({data.filter((o: any) => o.status === 'delivered').length})
               </button>
-              <button 
+              <button
                 className={`px-4 py-2 rounded-full text-[13px] font-semibold border transition-all ${statusFilter === "completed" ? "bg-brand-green text-white border-brand-green" : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-200"}`}
                 onClick={() => setStatusFilter("completed")}
               >
                 Completed ({data.filter((o: any) => o.status === 'completed').length})
               </button>
             </div>
-            
+
             <div className="w-full overflow-x-auto">
               <table className="w-full border-collapse text-left min-w-[950px] whitespace-nowrap">
                 <thead>

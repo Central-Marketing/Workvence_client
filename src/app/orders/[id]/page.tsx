@@ -11,7 +11,6 @@ import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
-import { handleContactUser } from "@/utils/chatHelpers";
 import { Loader } from "@/components";
 import Swal from 'sweetalert2';
 import moment from "moment";
@@ -118,13 +117,23 @@ const OrderDetail = () => {
     return () => clearInterval(interval);
   }, [order]);
 
-  const handleContact = () => {
+  const handleContact = async () => {
     if (!order) return;
-    const sellerID = order.sellerID?._id || order.sellerID;
-    const buyerID = order.buyerID?._id || order.buyerID;
-    const currentUid = String(user?._id || user?.id || '');
-    const targetUserId = String(sellerID) === currentUid ? buyerID : sellerID;
-    handleContactUser(targetUserId, user, navigate);
+    const sellerID = order.sellerID.hasOwnProperty("_id") ? order.sellerID._id : order.sellerID;
+    const buyerID = order.buyerID.hasOwnProperty("_id") ? order.buyerID._id : order.buyerID;
+
+    axiosFetch
+      .get(`/conversations/single/${sellerID}/${buyerID}`)
+      .then(({ data }) => {
+        navigate.push(`/message/${data.conversationID}`);
+      })
+      .catch(async () => {
+        const { data } = await axiosFetch.post("/conversations", {
+          to: user.isSeller ? buyerID : sellerID,
+          from: user.isSeller ? sellerID : buyerID,
+        });
+        navigate.push(`/message/${data.conversationID}`);
+      });
   };
 
   const handleDeliveryFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -352,10 +361,10 @@ const OrderDetail = () => {
   return (
     <div className="order-detail">
       <div className="container">
-        
+
         {/* Left Side: Order Main Details Card */}
         <div className="main-content">
-          
+
           {/* Order Header Info */}
           <div className="card order-header-card">
             <div className="order-header-info">
@@ -383,7 +392,7 @@ const OrderDetail = () => {
                 <button className="approve-order-btn" onClick={() => handleRespondExtension('accept')}>
                   Approve Extension
                 </button>
-                <button 
+                <button
                   onClick={() => handleRespondExtension('reject')}
                   style={{ background: 'white', color: '#ff6b4a', border: '1px solid #ff6b4a', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
                 >
@@ -420,10 +429,10 @@ const OrderDetail = () => {
                 <div className="step-content">
                   <h5>Work Delivered</h5>
                   <p>
-                    {isDelivered || isCompleted 
-                      ? "Seller submitted work files for review." 
+                    {isDelivered || isCompleted
+                      ? "Seller submitted work files for review."
                       : isRevision ? "Buyer requested revisions. Seller is working on them."
-                      : "Seller is currently working on your delivery."}
+                        : "Seller is currently working on your delivery."}
                   </p>
                 </div>
               </div>
@@ -432,8 +441,8 @@ const OrderDetail = () => {
                 <div className="step-content">
                   <h5>Order Accepted & Completed</h5>
                   <p>
-                    {isCompleted 
-                      ? "Buyer approved the work. Funds released to seller." 
+                    {isCompleted
+                      ? "Buyer approved the work. Funds released to seller."
                       : "Awaiting buyer review and acceptance."}
                   </p>
                 </div>
@@ -462,7 +471,7 @@ const OrderDetail = () => {
                     <p className="message-text">"{order.deliveryText}"</p>
                   </>
                 )}
-                
+
                 {(() => {
                   const allDeliveredFiles = [
                     ...(Array.isArray(order.deliveryFiles) ? order.deliveryFiles : []),
@@ -517,14 +526,14 @@ const OrderDetail = () => {
                   );
                 })()}
               </div>
-              
+
               {!isCurrentUserSeller && (
                 <div className="delivery-actions" style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
                   <button className="approve-order-btn" onClick={handleCompleteOrder}>
                     Approve Work & Release Funds
                   </button>
-                  <button 
-                    className="request-revision-btn" 
+                  <button
+                    className="request-revision-btn"
                     onClick={handleRequestRevision}
                     disabled={submitting}
                     style={{ background: 'white', color: '#ff6b4a', border: '1px solid #ff6b4a', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
@@ -567,8 +576,8 @@ const OrderDetail = () => {
               <form onSubmit={handleReviewSubmit} style={{ marginTop: '20px' }}>
                 <div style={{ marginBottom: '15px' }}>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155' }}>Rating (1-5)</label>
-                  <select 
-                    value={reviewStar} 
+                  <select
+                    value={reviewStar}
                     onChange={(e) => setReviewStar(Number(e.target.value))}
                     style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '15px' }}
                   >
@@ -579,7 +588,7 @@ const OrderDetail = () => {
                 </div>
                 <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155' }}>Review Description</label>
-                  <textarea 
+                  <textarea
                     rows={4}
                     value={reviewDescription}
                     onChange={(e) => setReviewDescription(e.target.value)}
@@ -588,8 +597,8 @@ const OrderDetail = () => {
                     required
                   ></textarea>
                 </div>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={submitting}
                   style={{ width: '100%', padding: '14px', background: '#6ad724', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer' }}
                 >
@@ -601,7 +610,7 @@ const OrderDetail = () => {
 
           {/* Review Display for Seller */}
           {isCompleted && (() => {
-            const currentReview = reviews.find((r: any) => 
+            const currentReview = reviews.find((r: any) =>
               r.orderID === order._id || r.orderID?._id === order._id || order.reviewID === r._id
             ) || order.review;
 
@@ -633,7 +642,7 @@ const OrderDetail = () => {
                       Deliver Now
                     </button>
                     {!hasPendingExtension && (
-                      <button 
+                      <button
                         onClick={handleRequestExtension}
                         style={{ background: 'white', color: '#6ad724', border: '1px solid #6ad724', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
                       >
@@ -656,10 +665,10 @@ const OrderDetail = () => {
               ) : (
                 <form onSubmit={handleDeliverSubmit} className="deliver-form">
                   <h3>Submit Order Delivery</h3>
-                  
+
                   <div className="field-group">
                     <label>Instructions & Work Details</label>
-                    <textarea 
+                    <textarea
                       placeholder="Describe what work is included in this delivery..."
                       value={deliveryText}
                       onChange={(e: any) => setDeliveryText(e.target.value)}
@@ -728,8 +737,8 @@ const OrderDetail = () => {
 
                   <div className="field-group">
                     <label>External Link / Additional Download URL (Optional)</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="e.g. https://github.com/myrepo, https://drive.google.com/..."
                       value={deliveryFile}
                       onChange={(e: any) => setDeliveryFile(e.target.value)}
@@ -761,7 +770,7 @@ const OrderDetail = () => {
                   if (item.action === "WORK_DELIVERED" || item.action === "DELIVERY_SUBMITTED") icon = "📦";
                   if (item.action === "REVISION_REQUESTED") icon = "⚠️";
                   if (item.action === "ORDER_COMPLETED" || item.action === "ORDER_ACCEPTED") icon = "✓";
-                  
+
                   return (
                     <div className="ledger-event" key={item._id || index}>
                       <span className="ledger-date">
@@ -825,7 +834,7 @@ const OrderDetail = () => {
 
         {/* Right Side: Sidebar Info & Escrow Statement Cards */}
         <div className="sidebar-content">
-          
+
           {/* Statement Payment Details Card */}
           <div className="card statement-card">
             <h3>Statement Details</h3>

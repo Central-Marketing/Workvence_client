@@ -37,6 +37,7 @@ const Message = () => {
   const user = useUserStore((state: any) => state.user);
   const params = useParams();
   const conversationID = (params?.id || params?.conversationID) as string;
+  const isValidId = Boolean(conversationID && conversationID !== 'undefined' && conversationID !== 'null');
   const queryClient = useQueryClient();
   const navigate = useRouter();
   const messagesEndRef = useRef(null);
@@ -74,30 +75,17 @@ const Message = () => {
   const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileAttachmentChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setIsUploadingAttachment(true);
     try {
-      setIsUploadingAttachment(true);
-      toast.loading("Uploading attachment...", { id: "upload-file" });
-      const uploaded = await supportService.uploadFileToCloudinary(file, "chat_attachments");
-      toast.success("Attachment ready!", { id: "upload-file" });
-      const localPreview = file.type.startsWith('image/') || file.name.match(/\.(png|jpe?g|gif|webp|svg)$/i)
-        ? URL.createObjectURL(file)
-        : null;
-
-      setAttachment({
-        name: file.name,
-        public_id: uploaded.public_id || null,
-        url: uploaded.secure_url || uploaded.url,
-        previewUrl: localPreview || uploaded.secure_url || uploaded.url,
-        type: file.type || (file.name.match(/\.(png|jpe?g|gif|webp|svg)$/i) ? 'image' : 'file'),
-        size: file.size
-      });
-    } catch (err) {
-      console.error("Failed to upload attachment:", err);
-      toast.error("Failed to upload file. Please try again.", { id: "upload-file" });
+      const uploadedData = await supportService.uploadCloudinaryFile(file);
+      setAttachment(uploadedData);
+      toast.success("File attached successfully");
+    } catch (err: any) {
+      toast.error(err?.message || "Attachment upload failed");
     } finally {
       setIsUploadingAttachment(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -129,21 +117,24 @@ const Message = () => {
     queryFn: () => axiosFetch.get('/conversations').then(({ data }) => Array.isArray(data) ? data : (data?.conversations || data?.data || [])).catch(() => [])
   });
 
-  // Auto-navigate to first conversation if none selected
+  // Auto-navigate to first conversation if none selected or invalid ID
   useEffect(() => {
-    if (!conversationID && conversations.length > 0) {
-      navigate.push(`/message/${conversations[0].conversationID}`, { replace: true });
+    if (!isValidId && conversations.length > 0) {
+      const firstId = conversations[0].uuid || conversations[0].conversationID || conversations[0]._id;
+      if (firstId && firstId !== 'undefined') {
+        navigate.push(`/message/${firstId}`, { replace: true });
+      }
     }
-  }, [conversationID, conversations, navigate]);
+  }, [isValidId, conversations, navigate]);
 
   // Mark conversation as read when opened
   useEffect(() => {
-    if (conversationID) {
+    if (isValidId) {
       // 1. Update local cache immediately to clear unread dots instantly
       queryClient.setQueryData(['conversations'], (oldConvs: any) => {
         if (!Array.isArray(oldConvs)) return oldConvs;
         return oldConvs.map((c: any) => {
-          if (c.id === conversationID || c.conversationID === conversationID || c._id === conversationID) {
+          if (c.uuid === conversationID || c.conversationID === conversationID || c._id === conversationID) {
             return {
               ...c,
               readBySeller: true,
@@ -160,7 +151,7 @@ const Message = () => {
         .then(() => queryClient.invalidateQueries({ queryKey: ['conversations'] }))
         .catch(console.error);
     }
-  }, [conversationID, queryClient]);
+  }, [isValidId, conversationID, queryClient]);
 
   // Socket: global connection and online users
   useEffect(() => {
@@ -226,7 +217,7 @@ const Message = () => {
         }
       }
     },
-    enabled: !!conversationID,
+    enabled: isValidId,
     retry: false,
     staleTime: 60000,
     refetchInterval: false
@@ -234,7 +225,7 @@ const Message = () => {
 
   // Manage room subscription & realtime events for active conversation
   useEffect(() => {
-    if (!conversationID) return;
+    if (!isValidId) return;
 
     const joinRoom = () => {
       socket.emit('join_conversation', conversationID);
@@ -391,7 +382,7 @@ const Message = () => {
         return [];
       }
     },
-    enabled: !!conversationID
+    enabled: isValidId
   });
 
   // Shared orders
@@ -408,7 +399,7 @@ const Message = () => {
         .get(`/conversations/${conversationID}`)
         .then(({ data }) => data?.data || data)
         .catch(() => null),
-    enabled: !!conversationID,
+    enabled: isValidId,
     staleTime: 30000,
   });
 

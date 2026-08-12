@@ -34,8 +34,7 @@ const Messages = () => {
 
   const mutation = useMutation({
     mutationFn: (id) =>
-      axiosFetch.patch(`/conversations/${id}`)
-    ,
+      axiosFetch.patch(`/conversations/${id}/mark-read`).catch(() => axiosFetch.patch(`/conversations/${id}`)),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ['conversations'] })
   })
@@ -83,11 +82,16 @@ const Messages = () => {
                     <tbody>
                       {
                         data.map((conv) => {
+                          const targetId = conv.uuid || conv.conversationID || conv._id;
                           const isUnread = (user?.isSeller && !conv.readBySeller) || (!user?.isSeller && !conv.readByBuyer);
                           return (
                             <tr
-                              key={conv._id}
-                              onClick={() => navigate.push(`/message/${conv.conversationID}`)}
+                              key={conv._id || targetId}
+                              onClick={() => {
+                                if (targetId && targetId !== 'undefined') {
+                                  navigate.push(`/message/${targetId}`);
+                                }
+                              }}
                               className={`clickable-row ${isUnread ? "unread-row" : ""}`}
                             >
                               <td className="user-cell">
@@ -120,12 +124,12 @@ const Messages = () => {
                               <td className="date-cell">{moment(conv.updatedAt).fromNow()}</td>
                               <td>
                                 {
-                                  isUnread && (
+                                  isUnread && targetId && (
                                     <button
                                       className="read-btn"
                                       onClick={(e: any) => {
                                         e.stopPropagation();
-                                        handleMessageRead(conv.conversationID);
+                                        handleMessageRead(targetId);
                                       }}
                                     >
                                       Mark as read

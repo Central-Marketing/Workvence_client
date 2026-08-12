@@ -352,12 +352,14 @@ const Message = () => {
     queryFn: () => axiosFetch.get('/orders').then(({ data }) => data ?? []).catch(() => []),
   });
 
-  const conversation = conversations.find((c: any) =>
-    c.conversationID === conversationID || c.id === conversationID || c._id === conversationID
-  );
-  const recipientUser = conversation
-    ? (user?.isSeller ? conversation.buyerID : conversation.sellerID)
-    : null;
+  const conversation = conversations.find((c: any) => {
+    if (c.conversationID === conversationID || c.id === conversationID || c._id === conversationID) return true;
+    const sId = String(c.sellerID?._id || c.sellerID || '');
+    const bId = String(c.buyerID?._id || c.buyerID || '');
+    return `${sId}${bId}` === conversationID || `${bId}${sId}` === conversationID;
+  });
+
+  const recipientUser = getOtherUser(conversation, user);
 
   // Recipient's packages
   const { data: recipientPackages = [] } = useQuery({
@@ -571,12 +573,18 @@ const Message = () => {
 
   const fmt = (d) => moment(d).format('MMM DD, HH:mm');
 
-  const activeConv = conversations.find((c: any) => c.conversationID === conversationID || c.id === conversationID || c._id === conversationID);
-  const isReadByRecipient = user?.isSeller ? activeConv?.readByBuyer : activeConv?.readBySeller;
+  const activeConv = conversations.find((c: any) => {
+    if (c.conversationID === conversationID || c.id === conversationID || c._id === conversationID) return true;
+    const sId = String(c.sellerID?._id || c.sellerID || '');
+    const bId = String(c.buyerID?._id || c.buyerID || '');
+    return `${sId}${bId}` === conversationID || `${bId}${sId}` === conversationID;
+  });
+  const isUserSellerInActiveConv = String(activeConv?.sellerID?._id || activeConv?.sellerID || '') === String(user?._id || user?.id || '');
+  const isReadByRecipient = isUserSellerInActiveConv ? activeConv?.readByBuyer : activeConv?.readBySeller;
 
   const filteredConversations = conversations.filter((conv: any) => {
     if (!convSearchQuery) return true;
-    const contact = user?.isSeller ? conv.buyerID : conv.sellerID;
+    const contact = getOtherUser(conv, user);
     const searchLower = convSearchQuery.toLowerCase();
     const username = (contact?.username || '').toLowerCase();
     const lastMsg = (conv.lastMessage || '').toLowerCase();
@@ -650,7 +658,7 @@ const Message = () => {
               <div className="list-empty">{convSearchQuery ? "No conversations found" : "No conversations yet"}</div>
             ) : filteredConversations.map((conv: any) => {
               const isUnread = isConversationUnread(conv, user);
-              const contact = user.isSeller ? conv.buyerID : conv.sellerID;
+              const contact = getOtherUser(conv, user);
               const lastMsg = conv.lastMessage?.startsWith('[CUSTOM_OFFER]')
                 ? '📋 Custom Offer'
                 : conv.lastMessage || 'No messages yet';

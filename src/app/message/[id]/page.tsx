@@ -204,17 +204,9 @@ const Message = () => {
         if (data?.data?.messages) return data.data.messages;
         if (data?.messages) return data.messages;
         return [];
-      } catch (err: any) {
-        try {
-          const { data } = await axiosFetch.get(`/messages/history/${conversationID}`);
-          if (Array.isArray(data)) return data;
-          if (data?.data?.messages) return data.data.messages;
-          if (data?.messages) return data.messages;
-          return [];
-        } catch (err2: any) {
-          console.warn('Failed to fetch messages for conversation', conversationID, err2);
-          return [];
-        }
+      } catch (err) {
+        console.error("Error fetching messages:", err);
+        return [];
       }
     },
     enabled: isValidId,
@@ -444,10 +436,7 @@ const Message = () => {
   });
 
   const mutation = useMutation({
-    mutationFn: (msg: any) =>
-      axiosFetch
-        .post(`/conversations/${conversationID}/messages`, msg)
-        .catch(() => axiosFetch.post('/messages', msg)),
+    mutationFn: (msg: any) => axiosFetch.post(`/conversations/${conversationID}/messages`, msg),
     onMutate: async (newMsg: any) => {
       // Optimistically update the conversations list with the new lastMessage and correct read status
       queryClient.setQueryData(['conversations'], (oldConvs: any) => {

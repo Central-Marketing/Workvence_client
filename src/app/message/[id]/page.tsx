@@ -443,12 +443,7 @@ const Message = () => {
     activeConvRef.current = activeConversation;
   }, [activeConversation]);
 
-  // Recipient's packages
-  const { data: recipientPackages = [] } = useQuery({
-    queryKey: ['recipient-packages', recipientUser?._id],
-    queryFn: () => axiosFetch.get(`/gigs?userID=${recipientUser?._id}`).then(({ data }) => data ?? []).catch(() => []),
-    enabled: !!recipientUser?._id && !!recipientUser?.isSeller
-  });
+
 
   const contactOrders = allOrders.filter((o: any) => {
     const sId = o.sellerID?._id || o.sellerID;
@@ -1117,31 +1112,7 @@ const Message = () => {
               </div>
             )}
 
-            {recipientPackages.length > 0 && (
-              <div className="related-services-section">
-                <div className="section-title-row">
-                  <h3>Related Services</h3>
-                  <button className="see-more-btn" onClick={() => navigate.push(`/seller/${recipientUser._id}`)}>See More &gt;</button>
-                </div>
-                <div className="related-services-list">
-                  {recipientPackages.slice(0, 4).map((pkg: any) => (
-                    <div key={pkg._id} className="service-card" onClick={() => navigate.push(`/package/${pkg._id}`)}>
-                      <img src={pkg.images?.[0] || pkg.cover || '/media/noavatar.png'} alt="" />
-                      <div className="service-info">
-                        <p>{pkg.title}</p>
-                        <div className="service-meta">
-                          <span className="service-author">by {recipientUser.username}</span>
-                        </div>
-                        <div className="service-footer">
-                          <span className="service-rating">⭐ {pkg.starNumber || 5.0} ({pkg.sales || 0})</span>
-                          <span className="service-price">FROM <strong>${pkg.price}</strong></span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+
           </aside>
         )}
       </div>

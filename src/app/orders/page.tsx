@@ -42,14 +42,16 @@ const Orders = () => {
     axiosFetch
       .get(`/conversations/single/${sellerID}/${buyerID}`)
       .then(({ data }) => {
-        router.push(`/message/${data.conversationID}`);
+        const targetId = data.uuid || data.conversationID || data._id;
+        router.push(`/message/${targetId}`);
       })
       .catch(async () => {
         const { data } = await axiosFetch.post("/conversations", {
           to: user.isSeller ? buyerID : sellerID,
           from: user.isSeller ? sellerID : buyerID,
         });
-        router.push(`/message/${data.conversationID}`);
+        const targetId = data.uuid || data.conversationID || data._id;
+        router.push(`/message/${targetId}`);
       });
   };
 

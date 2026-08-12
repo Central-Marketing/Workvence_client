@@ -74,13 +74,15 @@ const PackageContent = () => {
 
     try {
       const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
-      router.push(`/message/${res.data.conversationID}`);
+      const targetId = res.data.uuid || res.data.conversationID || res.data._id;
+      router.push(`/message/${targetId}`);
     } catch (err) {
       const res = await axiosFetch.post("/conversations", {
         to: sellerID,
         from: buyerID,
       });
-      router.push(`/message/${res.data.conversationID}`);
+      const targetId = res.data.uuid || res.data.conversationID || res.data._id;
+      router.push(`/message/${targetId}`);
     }
   };
 

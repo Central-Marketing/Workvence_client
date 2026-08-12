@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useRef, useEffect, Suspense } from 'react';
-import { PackageCard, Loader, TopRatedSellers } from '@/components';
+import { PackageCard, Loader, TopRatedSellers, GigsGridSkeleton } from '@/components';
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
@@ -575,8 +575,8 @@ const Packages = () => {
 
         {/* Results Grid / Empty State */}
         {isLoading ? (
-          <div className="flex justify-center items-center py-24">
-            <Loader size={45} />
+          <div className="py-6">
+            <GigsGridSkeleton count={8} />
           </div>
         ) : error ? (
           <div className="text-center py-24 text-gray-500">Something went wrong. Please try again.</div>

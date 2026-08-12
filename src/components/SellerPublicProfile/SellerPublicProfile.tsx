@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Reviews } from '@/components';
+import { Reviews, SellerProfileSkeleton } from '@/components';
 import { axiosFetch } from '@/utils';
 import { useUserStore } from '@/store/userStore';
 import Swal from 'sweetalert2';
@@ -90,7 +90,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
   const activeProject = sellerData?.portfolio?.[selectedIdx] || null;
 
   if (isLoading) {
-    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-12 h-12 border-4 border-gray-200 border-t-brand-green rounded-full animate-spin"></div></div>;
+    return <SellerProfileSkeleton />;
   }
 
   return (

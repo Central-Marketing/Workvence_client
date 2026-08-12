@@ -12,13 +12,19 @@ import adminAxios from '@/utils/adminAxios';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
+import { CategoryCarouselSkeleton } from '@/components';
+
 const PopularServices = () => {
   const swiperRef = useRef<any>(null);
 
-  const { data: fetchedCategories = [] } = useQuery({
+  const { isLoading, data: fetchedCategories = [] } = useQuery({
     queryKey: ['admin-categories-popular'],
     queryFn: () => adminAxios.get('/categories').then(({ data }) => data)
   });
+
+  if (isLoading) {
+    return <CategoryCarouselSkeleton />;
+  }
 
   const categoryList = Array.isArray(fetchedCategories)
     ? fetchedCategories

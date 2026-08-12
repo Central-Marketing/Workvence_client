@@ -29,7 +29,7 @@ import { axiosFetch, socket, getAvatarUrl } from "@/utils";
 import supportService from "@/utils/supportService";
 import { getOtherUser, isConversationUnread } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "@/components";
+import { Loader, ChatSkeleton, Skeleton } from "@/components";
 import moment from 'moment';
 import "./Message.scss";
 
@@ -711,6 +711,10 @@ const Message = () => {
       </a>
     );
   };
+
+  if (convsLoading && conversations.length === 0) {
+    return <ChatSkeleton />;
+  }
 
   return (
     <div className="message-page">

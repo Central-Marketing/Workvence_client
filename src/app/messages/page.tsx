@@ -9,7 +9,7 @@ import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 
 
-import { Loader } from "@/components";
+import { Loader, Skeleton } from "@/components";
 import './Messages.scss';
 
 const Messages = () => {
@@ -60,7 +60,22 @@ const Messages = () => {
       <div className="container">
         {
           isLoading
-            ? <div className='loader'> <Loader size={45} /> </div>
+            ? (
+              <div className="card space-y-4 p-6">
+                <Skeleton className="w-48 h-8" />
+                <Skeleton className="w-64 h-4 mb-6" />
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="flex items-center justify-between py-3 border-b border-slate-100">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="w-10 h-10 rounded-full" />
+                      <Skeleton className="w-32 h-4" />
+                    </div>
+                    <Skeleton className="w-48 h-4 hidden md:block" />
+                    <Skeleton className="w-20 h-4" />
+                  </div>
+                ))}
+              </div>
+            )
             : error
               ? <div className="error-message">Something went wrong!</div>
               : <div className="card">

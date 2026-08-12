@@ -10,7 +10,7 @@ import 'swiper/css/navigation';
 
 import { useQuery } from '@tanstack/react-query';
 import { axiosFetch } from '@/utils';
-import { Loader } from '@/components';
+import { TopSellersSkeleton } from '@/components';
 
 const TopRatedSellers = () => {
   const swiperRef = useRef<any>(null);
@@ -21,13 +21,7 @@ const TopRatedSellers = () => {
   });
 
   if (isLoading) {
-    return (
-      <section className="w-full py-20 bg-white">
-        <div className="container mx-auto px-4 md:px-6 flex justify-center items-center h-64">
-          <Loader size={45} />
-        </div>
-      </section>
-    );
+    return <TopSellersSkeleton />;
   }
 
   if (!sellers || sellers.length === 0) return null;

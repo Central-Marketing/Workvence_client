@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { axiosFetch, getCountryFlag } from '@/utils';
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { Loader, Reviews, FavoriteButton } from '@/components';
+import { Loader, Reviews, FavoriteButton, PackageDetailSkeleton } from '@/components';
 import { useUserStore } from "@/store/userStore";
 import "./Package.scss";
 
@@ -106,11 +106,7 @@ const PackageContent = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <Loader size={45} />
-      </div>
-    );
+    return <PackageDetailSkeleton />;
   }
 
   if (error || !data) {

@@ -27,7 +27,7 @@ import {
 import axios from 'axios';
 import { axiosFetch, socket, getAvatarUrl } from "@/utils";
 import supportService from "@/utils/supportService";
-import { isConversationUnread } from '@/utils/chatHelpers';
+import { getOtherUser, isConversationUnread } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 import moment from 'moment';
@@ -352,12 +352,28 @@ const Message = () => {
     queryFn: () => axiosFetch.get('/orders').then(({ data }) => data ?? []).catch(() => []),
   });
 
-  const conversation = conversations.find((c: any) =>
-    c.conversationID === conversationID || c.id === conversationID || c._id === conversationID
-  );
-  const recipientUser = conversation
-    ? (user?.isSeller ? conversation.buyerID : conversation.sellerID)
-    : null;
+  // Fetch active conversation document directly from backend to guarantee populated seller & buyer profiles
+  const { data: activeConvData } = useQuery({
+    queryKey: ['active-conversation', conversationID],
+    queryFn: () =>
+      axiosFetch
+        .get(`/conversations/${conversationID}`)
+        .then(({ data }) => data?.data || data)
+        .catch(() => null),
+    enabled: !!conversationID,
+    staleTime: 30000,
+  });
+
+  const activeConversation =
+    activeConvData ||
+    conversations.find(
+      (c: any) =>
+        c.conversationID === conversationID ||
+        c.id === conversationID ||
+        c._id === conversationID
+    );
+
+  const recipientUser = getOtherUser(activeConversation, user);
 
   // Recipient's packages
   const { data: recipientPackages = [] } = useQuery({
@@ -650,7 +666,7 @@ const Message = () => {
               <div className="list-empty">{convSearchQuery ? "No conversations found" : "No conversations yet"}</div>
             ) : filteredConversations.map((conv: any) => {
               const isUnread = isConversationUnread(conv, user);
-              const contact = user.isSeller ? conv.buyerID : conv.sellerID;
+              const contact = getOtherUser(conv, user);
               const lastMsg = conv.lastMessage?.startsWith('[CUSTOM_OFFER]')
                 ? '📋 Custom Offer'
                 : conv.lastMessage || 'No messages yet';

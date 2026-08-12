@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
+import { handleContactUser } from "@/utils/chatHelpers";
 import { Loader } from '@/components';
 import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 
@@ -31,26 +32,13 @@ const Orders = () => {
         }),
   });
 
-  const handleContact = async (order: any) => {
-    const sellerID = order.sellerID.hasOwnProperty("_id")
-      ? order.sellerID._id
-      : order.sellerID;
-    const buyerID = order.buyerID.hasOwnProperty("_id")
-      ? order.buyerID._id
-      : order.buyerID;
-
-    axiosFetch
-      .get(`/conversations/single/${sellerID}/${buyerID}`)
-      .then(({ data }) => {
-        router.push(`/message/${data.conversationID}`);
-      })
-      .catch(async () => {
-        const { data } = await axiosFetch.post("/conversations", {
-          to: user.isSeller ? buyerID : sellerID,
-          from: user.isSeller ? sellerID : buyerID,
-        });
-        router.push(`/message/${data.conversationID}`);
-      });
+  const handleContact = (order: any) => {
+    if (!order) return;
+    const sellerID = order.sellerID?._id || order.sellerID;
+    const buyerID = order.buyerID?._id || order.buyerID;
+    const currentUid = String(user?._id || user?.id || '');
+    const targetUserId = String(sellerID) === currentUid ? buyerID : sellerID;
+    handleContactUser(targetUserId, user, router);
   };
 
   // Filter orders by selected status tab

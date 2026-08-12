@@ -37,12 +37,13 @@ const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser }) => {
         return oldConvs.map((c: any) => {
           if (c.id === newMsg.conversationID || c.conversationID === newMsg.conversationID || c._id === newMsg.conversationID) {
             const isViewing = typeof window !== 'undefined' && window.location.pathname.includes(`/message/${newMsg.conversationID}`);
+            const isSellerInConv = String(c.sellerID?._id || c.sellerID || '') === String(currentUser._id || currentUser.id || '');
             return {
               ...c,
               lastMessage: newMsg.description,
               updatedAt: new Date().toISOString(),
-              readBySeller: currentUser?.isSeller ? isViewing : c.readBySeller,
-              readByBuyer: !currentUser?.isSeller ? isViewing : c.readByBuyer
+              readBySeller: isSellerInConv ? isViewing : c.readBySeller,
+              readByBuyer: !isSellerInConv ? isViewing : c.readByBuyer
             };
           }
           return c;

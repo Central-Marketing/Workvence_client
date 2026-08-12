@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Loader, Reviews, FavoriteButton } from '@/components';
 import { useUserStore } from "@/store/userStore";
+import { handleContactUser } from '@/utils/chatHelpers';
 import "./Package.scss";
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
@@ -57,31 +58,14 @@ const PackageContent = () => {
     }
   });
 
-  const handleContact = async () => {
+  const handleContact = () => {
     if (!user) {
       router.push('/login');
       return;
     }
-    const sellerID = data?.userID?._id;
-    const buyerID = user._id;
-
-    if (!sellerID || !buyerID) return;
-
-    if (sellerID === buyerID) {
-      Swal.fire('Notice', 'You cannot contact yourself.', 'info');
-      return;
-    }
-
-    try {
-      const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
-      router.push(`/message/${res.data.conversationID}`);
-    } catch (err) {
-      const res = await axiosFetch.post("/conversations", {
-        to: sellerID,
-        from: buyerID,
-      });
-      router.push(`/message/${res.data.conversationID}`);
-    }
+    const sellerID = data?.userID?._id || data?.userID;
+    if (!sellerID) return;
+    handleContactUser(sellerID, user, router);
   };
 
   const country = getCountryFlag(data?.userID?.country);

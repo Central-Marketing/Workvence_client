@@ -36,9 +36,112 @@ const RegisterContent = () => {
     isSeller: isSellerParam,
   });
 
+  const [usernameStatus, setUsernameStatus] = useState<{
+    loading: boolean;
+    available: boolean | null;
+    valid: boolean | null;
+    message: string;
+  }>({ loading: false, available: null, valid: null, message: '' });
+
+  const [emailStatus, setEmailStatus] = useState<{
+    loading: boolean;
+    available: boolean | null;
+    valid: boolean | null;
+    message: string;
+  }>({ loading: false, available: null, valid: null, message: '' });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Debounced Username Availability Check (400ms)
+  useEffect(() => {
+    const rawUser = formInput.username.trim();
+    if (!rawUser) {
+      setUsernameStatus({ loading: false, available: null, valid: null, message: '' });
+      return;
+    }
+
+    if (rawUser.length < 3) {
+      setUsernameStatus({
+        loading: false,
+        available: false,
+        valid: false,
+        message: 'Username must be at least 3 characters long.'
+      });
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(rawUser)) {
+      setUsernameStatus({
+        loading: false,
+        available: false,
+        valid: false,
+        message: 'Only letters, numbers, and underscores allowed.'
+      });
+      return;
+    }
+
+    setUsernameStatus(prev => ({ ...prev, loading: true }));
+    const timer = setTimeout(async () => {
+      try {
+        const { data } = await axiosFetch.get(`/auth/check-availability?username=${encodeURIComponent(rawUser)}`);
+        const info = data?.data?.username;
+        if (info) {
+          setUsernameStatus({
+            loading: false,
+            available: info.available,
+            valid: info.valid,
+            message: info.message
+          });
+        }
+      } catch (err) {
+        setUsernameStatus(prev => ({ ...prev, loading: false }));
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [formInput.username]);
+
+  // Debounced Email Availability Check (400ms)
+  useEffect(() => {
+    const rawEmail = formInput.email.trim();
+    if (!rawEmail) {
+      setEmailStatus({ loading: false, available: null, valid: null, message: '' });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(rawEmail)) {
+      setEmailStatus({
+        loading: false,
+        available: false,
+        valid: false,
+        message: 'Please enter a valid email address.'
+      });
+      return;
+    }
+
+    setEmailStatus(prev => ({ ...prev, loading: true }));
+    const timer = setTimeout(async () => {
+      try {
+        const { data } = await axiosFetch.get(`/auth/check-availability?email=${encodeURIComponent(rawEmail)}`);
+        const info = data?.data?.email;
+        if (info) {
+          setEmailStatus({
+            loading: false,
+            available: info.available,
+            valid: info.valid,
+            message: info.message
+          });
+        }
+      } catch (err) {
+        setEmailStatus(prev => ({ ...prev, loading: false }));
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [formInput.email]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -59,6 +162,21 @@ const RegisterContent = () => {
         toast.error('Please fill all input field: ' + key);
         return;
       }
+    }
+
+    if (usernameStatus.available === false) {
+      toast.error(usernameStatus.message || 'Username is not available');
+      return;
+    }
+
+    if (emailStatus.available === false) {
+      toast.error(emailStatus.message || 'Email is not available');
+      return;
+    }
+
+    if (!hasMinLength || !hasUpperCase || !hasLowerCase || !hasNumber) {
+      toast.error('Password must fulfill all criteria (at least 8 characters, 1 uppercase, 1 lowercase, and 1 number).');
+      return;
     }
 
     setLoading(true);
@@ -196,6 +314,9 @@ const RegisterContent = () => {
   const hasLowerCase = /[a-z]/.test(formInput.password);
   const hasNumber = /[0-9]/.test(formInput.password);
 
+  const isPasswordValid = hasMinLength && hasUpperCase && hasLowerCase && hasNumber;
+  const isFormDisabled = loading || !isPasswordValid || usernameStatus.available === false || emailStatus.available === false || usernameStatus.loading || emailStatus.loading;
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4 md:p-10 box-border">
       <div className="flex w-full max-w-[1200px] md:h-[800px] bg-white rounded-2xl overflow-hidden">
@@ -256,14 +377,62 @@ const RegisterContent = () => {
                     </label>
                   </div>
 
+                  {/* Username Input with Debounced Live Status Indicator */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-[#333]">User name</label>
-                    <input name="username" type="text" placeholder="Enter your user name" onChange={handleChange} className="py-3 px-3 border border-gray-200 rounded-lg text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full" />
+                    <div className="relative flex items-center">
+                      <input
+                        name="username"
+                        type="text"
+                        placeholder="Enter your user name"
+                        onChange={handleChange}
+                        value={formInput.username}
+                        className={`py-3 px-3 pr-10 border rounded-lg text-sm bg-white transition-colors focus:outline-none w-full ${
+                          usernameStatus.available === true
+                            ? 'border-emerald-500 focus:border-emerald-500'
+                            : usernameStatus.available === false
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-gray-200 focus:border-emerald-500'
+                        }`}
+                      />
+                      {usernameStatus.loading && (
+                        <div className="absolute right-3 inline-block w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                      )}
+                    </div>
+                    {usernameStatus.message && !usernameStatus.loading && (
+                      <p className={`text-xs font-medium mt-0.5 ${usernameStatus.available ? 'text-emerald-600' : 'text-red-500'}`}>
+                        {usernameStatus.available ? '✓ ' : '✕ '} {usernameStatus.message}
+                      </p>
+                    )}
                   </div>
 
+                  {/* Email Input with Debounced Live Status Indicator */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-[#333]">Email Address</label>
-                    <input name="email" type="email" placeholder="Enter your email address" onChange={handleChange} className="py-3 px-3 border border-gray-200 rounded-lg text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full" />
+                    <div className="relative flex items-center">
+                      <input
+                        name="email"
+                        type="email"
+                        placeholder="Enter your email address"
+                        onChange={handleChange}
+                        value={formInput.email}
+                        className={`py-3 px-3 pr-10 border rounded-lg text-sm bg-white transition-colors focus:outline-none w-full ${
+                          emailStatus.available === true
+                            ? 'border-emerald-500 focus:border-emerald-500'
+                            : emailStatus.available === false
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-gray-200 focus:border-emerald-500'
+                        }`}
+                      />
+                      {emailStatus.loading && (
+                        <div className="absolute right-3 inline-block w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                      )}
+                    </div>
+                    {emailStatus.message && !emailStatus.loading && (
+                      <p className={`text-xs font-medium mt-0.5 ${emailStatus.available ? 'text-emerald-600' : 'text-red-500'}`}>
+                        {emailStatus.available ? '✓ ' : '✕ '} {emailStatus.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-1.5">
@@ -291,7 +460,7 @@ const RegisterContent = () => {
                     </div>
                   </div>
 
-                  <button type="submit" className="mt-2 bg-emerald-500 text-white py-4 border-none rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed" disabled={loading}>{loading ? 'Loading...' : 'Continue'}</button>
+                  <button type="submit" className="mt-2 bg-emerald-500 text-white py-4 border-none rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed" disabled={isFormDisabled}>{loading ? 'Loading...' : 'Continue'}</button>
                 </div>
               </form>
               <div className="mt-auto pt-10 text-left w-full">

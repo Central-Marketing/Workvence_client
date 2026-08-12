@@ -11,6 +11,7 @@ import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
+import { handleContactUser } from "@/utils/chatHelpers";
 import { Loader } from "@/components";
 import Swal from 'sweetalert2';
 import moment from "moment";
@@ -117,23 +118,13 @@ const OrderDetail = () => {
     return () => clearInterval(interval);
   }, [order]);
 
-  const handleContact = async () => {
+  const handleContact = () => {
     if (!order) return;
-    const sellerID = order.sellerID.hasOwnProperty("_id") ? order.sellerID._id : order.sellerID;
-    const buyerID = order.buyerID.hasOwnProperty("_id") ? order.buyerID._id : order.buyerID;
-
-    axiosFetch
-      .get(`/conversations/single/${sellerID}/${buyerID}`)
-      .then(({ data }) => {
-        navigate.push(`/message/${data.conversationID}`);
-      })
-      .catch(async () => {
-        const { data } = await axiosFetch.post("/conversations", {
-          to: user.isSeller ? buyerID : sellerID,
-          from: user.isSeller ? sellerID : buyerID,
-        });
-        navigate.push(`/message/${data.conversationID}`);
-      });
+    const sellerID = order.sellerID?._id || order.sellerID;
+    const buyerID = order.buyerID?._id || order.buyerID;
+    const currentUid = String(user?._id || user?.id || '');
+    const targetUserId = String(sellerID) === currentUid ? buyerID : sellerID;
+    handleContactUser(targetUserId, user, navigate);
   };
 
   const handleDeliveryFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {

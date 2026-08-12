@@ -960,7 +960,7 @@ const Message = () => {
                             {msg.description && <p>{msg.description}</p>}
                             <span className="msg-time">
                               {moment(msg.createdAt).format('HH:mm')}
-                              {isOwner && <RiCheckDoubleLine className={`check-icon ${isMsgReadByRecipient(msg) ? 'read' : ''}`} />}
+                              {/* {isOwner && <RiCheckDoubleLine className={`check-icon ${isMsgReadByRecipient(msg) ? 'read' : ''}`} />} */}
                             </span>
                           </div>
                         )}

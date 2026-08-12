@@ -392,7 +392,7 @@ const Message = () => {
   const activeConversation =
     activeConvData ||
     conversations.find((c: any) => {
-      if (c.conversationID === conversationID || c.id === conversationID || c._id === conversationID) return true;
+      if (c.uuid === conversationID || c.conversationID === conversationID || c.id === conversationID || c._id === conversationID) return true;
       const sId = String(c.sellerID?._id || c.sellerID || '');
       const bId = String(c.buyerID?._id || c.buyerID || '');
       return `${sId}${bId}` === conversationID || `${bId}${sId}` === conversationID;
@@ -746,9 +746,9 @@ const Message = () => {
               const lastMsg = conv.lastMessage?.startsWith('[CUSTOM_OFFER]')
                 ? '📋 Custom Offer'
                 : conv.lastMessage || 'No messages yet';
-              const canonicalId = conv.conversationID || conv._id || conv.id;
+              const canonicalId = conv.uuid || conv._id || conv.id;
               const isActive = canonicalId === conversationID || conv.conversationID === conversationID || conv.id === conversationID || conv._id === conversationID;
-
+              console.log(conv)
               return (
                 <div
                   key={conv._id || canonicalId}
@@ -847,7 +847,29 @@ const Message = () => {
                     </p>
                   </div>
                 ) : msgsLoading ? (
-                  <div className="scroll-loader"><Loader size={32} /></div>
+                  <div className="p-6 space-y-6 flex-1 overflow-hidden">
+                    <div className="flex gap-3 max-w-md">
+                      <Skeleton className="w-8 h-8 rounded-full flex-shrink-0" />
+                      <div className="space-y-2">
+                        <Skeleton className="w-48 h-12 rounded-2xl rounded-tl-none" />
+                        <Skeleton className="w-16 h-3" />
+                      </div>
+                    </div>
+                    <div className="flex gap-3 max-w-md ml-auto flex-row-reverse">
+                      <Skeleton className="w-8 h-8 rounded-full flex-shrink-0" />
+                      <div className="space-y-2 flex flex-col items-end">
+                        <Skeleton className="w-64 h-16 rounded-2xl rounded-tr-none" />
+                        <Skeleton className="w-16 h-3" />
+                      </div>
+                    </div>
+                    <div className="flex gap-3 max-w-md">
+                      <Skeleton className="w-8 h-8 rounded-full flex-shrink-0" />
+                      <div className="space-y-2">
+                        <Skeleton className="w-36 h-10 rounded-2xl rounded-tl-none" />
+                        <Skeleton className="w-16 h-3" />
+                      </div>
+                    </div>
+                  </div>
                 ) : filteredMessages.length === 0 ? (
                   <div className="scroll-empty">{msgSearchQuery ? "No messages found" : "Send the first message!"}</div>
                 ) : filteredMessages.map((msg: any, index: number) => {

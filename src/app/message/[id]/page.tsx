@@ -27,7 +27,7 @@ import {
 import axios from 'axios';
 import { axiosFetch, socket, getAvatarUrl } from "@/utils";
 import supportService from "@/utils/supportService";
-import { isConversationUnread } from '@/utils/chatHelpers';
+import { getOtherUser, isConversationUnread } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 import moment from 'moment';
@@ -61,6 +61,14 @@ const Message = () => {
   const isSendingRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const userRef = useRef(user);
+  const convIdRef = useRef(conversationID);
+  const activeConvRef = useRef<any>(null);
+  const recipientTypingTimerRef = useRef<any>(null);
+
+  useEffect(() => { userRef.current = user; }, [user]);
+  useEffect(() => { convIdRef.current = conversationID; }, [conversationID]);
 
   const [attachment, setAttachment] = useState<any>(null);
   const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
@@ -147,7 +155,8 @@ const Message = () => {
       });
 
       // 2. Patch backend
-      axiosFetch.patch(`/conversations/${conversationID}`)
+      axiosFetch.patch(`/conversations/${conversationID}/mark-read`)
+        .catch(() => axiosFetch.patch(`/conversations/${conversationID}`))
         .then(() => queryClient.invalidateQueries({ queryKey: ['conversations'] }))
         .catch(console.error);
     }
@@ -186,9 +195,11 @@ const Message = () => {
     socket.on('online_users', handleOnlineUsers);
     socket.on('receive_message', handleGlobalReceiveMessage);
 
+
     return () => {
       socket.off('online_users', handleOnlineUsers);
       socket.off('receive_message', handleGlobalReceiveMessage);
+
     };
   }, [user?._id, queryClient]);
 
@@ -197,25 +208,21 @@ const Message = () => {
     queryKey: ['messages', conversationID],
     queryFn: async () => {
       try {
-        const { data } = await axiosFetch.get(`/messages/history/${conversationID}`);
+        const { data } = await axiosFetch.get(`/conversations/${conversationID}/messages`);
         if (Array.isArray(data)) return data;
         if (data?.data?.messages) return data.data.messages;
         if (data?.messages) return data.messages;
         return [];
       } catch (err: any) {
-        if (err?.response?.status === 403) {
-          throw new Error('Access denied! You are not a participant in this conversation.');
-        }
         try {
-          const { data } = await axiosFetch.get(`/messages/${conversationID}`);
+          const { data } = await axiosFetch.get(`/messages/history/${conversationID}`);
           if (Array.isArray(data)) return data;
+          if (data?.data?.messages) return data.data.messages;
           if (data?.messages) return data.messages;
           return [];
         } catch (err2: any) {
-          if (err2?.response?.status === 403) {
-            throw new Error('Access denied! You are not a participant in this conversation.');
-          }
-          throw err2;
+          console.warn('Failed to fetch messages for conversation', conversationID, err2);
+          return [];
         }
       }
     },
@@ -286,15 +293,56 @@ const Message = () => {
       });
     };
 
-    const handleUserTyping = (data) => {
-      if (data.conversationID === conversationID) {
+    const isEventForCurrentChat = (data: any) => {
+      if (!data) return false;
+
+      const currentUser = userRef.current;
+      if (data.username && currentUser?.username && data.username.toLowerCase() === currentUser.username.toLowerCase()) {
+        return false; // Ignore typing events from self
+      }
+
+      const incomingId = String(data?.conversationUUID || data?.conversationID || data?.uuid || data?.id || '').trim();
+      if (!incomingId || incomingId === 'undefined') return false;
+
+      const currentParamId = convIdRef.current;
+      if (currentParamId && incomingId === String(currentParamId).trim()) return true;
+
+      const convDoc = activeConvRef.current;
+      if (convDoc) {
+        if (convDoc.uuid && incomingId === String(convDoc.uuid).trim()) return true;
+        if (convDoc.conversationID && incomingId === String(convDoc.conversationID).trim()) return true;
+        if (convDoc._id && incomingId === String(convDoc._id).trim()) return true;
+        if (convDoc.id && incomingId === String(convDoc.id).trim()) return true;
+
+        const sId = String(convDoc.sellerID?._id || convDoc.sellerID || '');
+        const bId = String(convDoc.buyerID?._id || convDoc.buyerID || '');
+        if (`${sId}${bId}` === incomingId || `${bId}${sId}` === incomingId) return true;
+
+        // If incoming ID does not match the active conversation doc, reject it
+        return false;
+      }
+
+      // If active conversation doc hasn't loaded yet, accept for active chat
+      return true;
+    };
+
+    const handleUserTyping = (data: any) => {
+      if (isEventForCurrentChat(data)) {
         setIsRecipientTyping(true);
-        setPartnerUsername(data.username);
+        setPartnerUsername(data.username || '');
+
+        clearTimeout(recipientTypingTimerRef.current);
+        recipientTypingTimerRef.current = setTimeout(() => {
+          setIsRecipientTyping(false);
+        }, 3500);
       }
     };
 
-    const handleUserStoppedTyping = (data) => {
-      if (data.conversationID === conversationID) setIsRecipientTyping(false);
+    const handleUserStoppedTyping = (data: any) => {
+      if (isEventForCurrentChat(data)) {
+        clearTimeout(recipientTypingTimerRef.current);
+        setIsRecipientTyping(false);
+      }
     };
 
     const handleOfferWithdrawn = () => {
@@ -352,14 +400,48 @@ const Message = () => {
     queryFn: () => axiosFetch.get('/orders').then(({ data }) => data ?? []).catch(() => []),
   });
 
-  const conversation = conversations.find((c: any) => {
-    if (c.conversationID === conversationID || c.id === conversationID || c._id === conversationID) return true;
-    const sId = String(c.sellerID?._id || c.sellerID || '');
-    const bId = String(c.buyerID?._id || c.buyerID || '');
-    return `${sId}${bId}` === conversationID || `${bId}${sId}` === conversationID;
+  // Fetch active conversation document directly from backend to guarantee populated seller & buyer profiles
+  const { data: activeConvData } = useQuery({
+    queryKey: ['active-conversation', conversationID],
+    queryFn: () =>
+      axiosFetch
+        .get(`/conversations/${conversationID}`)
+        .then(({ data }) => data?.data || data)
+        .catch(() => null),
+    enabled: !!conversationID,
+    staleTime: 30000,
   });
 
-  const recipientUser = getOtherUser(conversation, user);
+  const activeConversation =
+    activeConvData ||
+    conversations.find((c: any) => {
+      if (c.conversationID === conversationID || c.id === conversationID || c._id === conversationID) return true;
+      const sId = String(c.sellerID?._id || c.sellerID || '');
+      const bId = String(c.buyerID?._id || c.buyerID || '');
+      return `${sId}${bId}` === conversationID || `${bId}${sId}` === conversationID;
+    });
+
+  const recipientUser = getOtherUser(activeConversation, user);
+
+  // If conversation room isn't populated yet, attempt fallback recipient resolution from 48-char ID
+  const fallbackRecipientId =
+    !recipientUser && conversationID?.length === 48
+      ? conversationID.substring(0, 24) === String(user?._id || user?.id)
+        ? conversationID.substring(24)
+        : conversationID.substring(0, 24)
+      : null;
+
+  const { data: fallbackUser } = useQuery({
+    queryKey: ['user-fallback', fallbackRecipientId],
+    queryFn: () => axiosFetch.get(`/users/${fallbackRecipientId}`).then(({ data }) => data).catch(() => null),
+    enabled: !recipientUser && !!fallbackRecipientId
+  });
+
+  const finalRecipientUser = recipientUser || fallbackUser;
+
+  useEffect(() => {
+    activeConvRef.current = activeConversation;
+  }, [activeConversation]);
 
   // Recipient's packages
   const { data: recipientPackages = [] } = useQuery({
@@ -376,7 +458,10 @@ const Message = () => {
   });
 
   const mutation = useMutation({
-    mutationFn: (msg: any) => axiosFetch.post('/messages', msg),
+    mutationFn: (msg: any) =>
+      axiosFetch
+        .post(`/conversations/${conversationID}/messages`, msg)
+        .catch(() => axiosFetch.post('/messages', msg)),
     onMutate: async (newMsg: any) => {
       // Optimistically update the conversations list with the new lastMessage and correct read status
       queryClient.setQueryData(['conversations'], (oldConvs: any) => {
@@ -408,11 +493,14 @@ const Message = () => {
     }
   });
 
+  const activeRoomID = activeConversation?.uuid || activeConversation?.conversationID || activeConversation?._id || (conversationID !== 'undefined' ? conversationID : null);
+
   const stopTypingIndicator = () => {
-    if (isTypingRef.current && conversationID && user?.username) {
+    if (isTypingRef.current && activeRoomID && activeRoomID !== 'undefined' && user?.username) {
       isTypingRef.current = false;
       socket.emit("typing_stop", {
-        conversationID,
+        conversationID: activeRoomID,
+        conversationUUID: activeRoomID,
         username: user.username
       });
     }
@@ -504,12 +592,13 @@ const Message = () => {
       }
     }
 
-    if (conversationID && user?.username) {
+    if (activeRoomID && activeRoomID !== 'undefined' && user?.username) {
       // Emit 'typing_start' on first keystroke
       if (!isTypingRef.current && value.length > 0) {
         isTypingRef.current = true;
         socket.emit("typing_start", {
-          conversationID,
+          conversationID: activeRoomID,
+          conversationUUID: activeRoomID,
           username: user.username
         });
       }
@@ -662,14 +751,15 @@ const Message = () => {
               const lastMsg = conv.lastMessage?.startsWith('[CUSTOM_OFFER]')
                 ? '📋 Custom Offer'
                 : conv.lastMessage || 'No messages yet';
-              const isActive = conv.conversationID === conversationID || conv.id === conversationID || conv._id === conversationID;
+              const canonicalId = conv.conversationID || conv._id || conv.id;
+              const isActive = canonicalId === conversationID || conv.conversationID === conversationID || conv.id === conversationID || conv._id === conversationID;
 
               return (
                 <div
-                  key={conv._id}
+                  key={conv._id || canonicalId}
                   className={`conv-item ${isActive ? 'active' : ''} ${isUnread ? 'unread' : ''}`}
                   onClick={() => {
-                    navigate.push(`/message/${conv.conversationID}`);
+                    navigate.push(`/message/${canonicalId}`);
                     setIsLeftSideOpen(false);
                   }}
                 >
@@ -711,15 +801,23 @@ const Message = () => {
                 <button className="md:hidden mr-3 text-slate-500 text-xl flex-shrink-0" onClick={() => setIsLeftSideOpen(true)}>
                   <RiMenuLine />
                 </button>
-                {recipientUser ? (
+                {finalRecipientUser ? (
                   <>
                     <div className="head-user flex-1 cursor-pointer" onClick={() => setIsRightSideOpen(true)}>
                       <div className="head-avatar">
-                        <img src={recipientUser.image || '/media/noavatar.png'} alt="" />
+                        <img src={finalRecipientUser.image || '/media/noavatar.png'} alt="" />
                       </div>
                       <div className="head-info">
-                        <h3>{recipientUser.username}</h3>
-                        <span className="head-status">last seen 5 mins ago</span>
+                        <h3>{finalRecipientUser.username}</h3>
+                        <span className="head-status font-medium">
+                          {isRecipientTyping ? (
+                            <span className="text-brand-green font-semibold animate-pulse flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 bg-brand-green rounded-full"></span> typing...
+                            </span>
+                          ) : (
+                            "Active Contact"
+                          )}
+                        </span>
                       </div>
                     </div>
                     <div className="head-actions">
@@ -758,7 +856,8 @@ const Message = () => {
                 ) : filteredMessages.length === 0 ? (
                   <div className="scroll-empty">{msgSearchQuery ? "No messages found" : "Send the first message!"}</div>
                 ) : filteredMessages.map((msg: any, index: number) => {
-                  const senderIdStr = String(msg.userID?._id || msg.userID?.id || msg.userID || '');
+                  const senderObj = msg.senderID || msg.userID;
+                  const senderIdStr = String(senderObj?._id || senderObj?.id || senderObj || '');
                   const currentUserIdStr = String(user?._id || user?.id || '');
                   const isOwner = currentUserIdStr !== '' && senderIdStr === currentUserIdStr;
                   const offer = parseOffer(msg.description);
@@ -776,7 +875,7 @@ const Message = () => {
                       )}
                       <div className={`msg-row max-md:max-w-[85%] ${isOwner ? 'msg-owner' : 'msg-other'} ${offer ? 'has-offer !max-w-[95%] xl:!max-w-[85%]' : ''}`}>
                         {!isOwner && (
-                          <img className="msg-avatar" src={msg.userID?.image || recipientUser?.image || '/media/noavatar.png'} alt="" />
+                          <img className="msg-avatar" src={senderObj?.image || finalRecipientUser?.image || '/media/noavatar.png'} alt="" />
                         )}
 
                         {offer ? (
@@ -946,21 +1045,21 @@ const Message = () => {
         <div className={`lg:hidden fixed inset-0 bg-black/20 z-30 transition-opacity duration-300 ease-in-out ${isRightSideOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsRightSideOpen(false)}></div>
 
         {/* ── RIGHT: About This Contact ── */}
-        {recipientUser && (
+        {finalRecipientUser && (
           <aside className={`contact-sidebar transform transition-transform duration-300 ease-in-out max-lg:absolute max-lg:right-0 max-lg:z-40 max-lg:shadow-xl max-lg:h-full max-lg:!flex ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
             <div className="sidebar-card relative">
               <button className="lg:hidden absolute top-2 right-2 text-gray-500 text-2xl" onClick={() => setIsRightSideOpen(false)}><RiCloseLine /></button>
               <div className="sidebar-section-header">
-                <h3>About {recipientUser.username}</h3>
+                <h3>About {finalRecipientUser.username}</h3>
               </div>
               <div className="sidebar-details">
                 <div className="detail-row">
                   <span className="detail-label">From</span>
-                  <span className="detail-value">{recipientUser.country || 'United States'}</span>
+                  <span className="detail-value">{finalRecipientUser.country || 'United States'}</span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">On Workvence since</span>
-                  <span className="detail-value">{moment(recipientUser.createdAt).format('MMM YYYY')}</span>
+                  <span className="detail-value">{moment(finalRecipientUser.createdAt).format('MMM YYYY')}</span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-label">English</span>
@@ -970,7 +1069,7 @@ const Message = () => {
                   <span className="detail-label">Response rate</span>
                   <span className="detail-value">1 h</span>
                 </div>
-                <button className="view-profile-btn" onClick={() => navigate.push(`/seller/${recipientUser._id}`)}>
+                <button className="view-profile-btn" onClick={() => navigate.push(`/seller/${finalRecipientUser._id}`)}>
                   View Profile
                 </button>
               </div>

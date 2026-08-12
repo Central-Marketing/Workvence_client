@@ -663,8 +663,30 @@ const Message = () => {
     const bId = String(c.buyerID?._id || c.buyerID || '');
     return `${sId}${bId}` === conversationID || `${bId}${sId}` === conversationID;
   });
+
+  const recipientUsername = finalRecipientUser?.username || getOtherUser(activeConv || activeConversation, user)?.username;
   const isUserSellerInActiveConv = String(activeConv?.sellerID?._id || activeConv?.sellerID || '') === String(user?._id || user?.id || '');
-  const isReadByRecipient = isUserSellerInActiveConv ? activeConv?.readByBuyer : activeConv?.readBySeller;
+
+  const isReadByRecipient = (() => {
+    const targetConv = activeConv || activeConversation;
+    if (!targetConv) return false;
+
+    // 1. Username-based standard read status check
+    if (Array.isArray(targetConv.readBy) && recipientUsername) {
+      return targetConv.readBy.includes(recipientUsername);
+    }
+
+    // 2. Legacy flag fallback
+    return isUserSellerInActiveConv ? targetConv?.readByBuyer : targetConv?.readBySeller;
+  })();
+
+  const isMsgReadByRecipient = (msg: any) => {
+    if (!msg) return false;
+    if (Array.isArray(msg.readBy) && recipientUsername) {
+      return msg.readBy.includes(recipientUsername);
+    }
+    return isReadByRecipient;
+  };
 
   const filteredConversations = conversations.filter((conv: any) => {
     if (!convSearchQuery) return true;
@@ -938,7 +960,7 @@ const Message = () => {
                             {msg.description && <p>{msg.description}</p>}
                             <span className="msg-time">
                               {moment(msg.createdAt).format('HH:mm')}
-                              {isOwner && <RiCheckDoubleLine className={`check-icon ${isReadByRecipient ? 'read' : ''}`} />}
+                              {isOwner && <RiCheckDoubleLine className={`check-icon ${isMsgReadByRecipient(msg) ? 'read' : ''}`} />}
                             </span>
                           </div>
                         )}

@@ -1014,7 +1014,7 @@ const Message = () => {
                     <input
                       type="file"
                       ref={fileInputRef}
-                      onChange={handleFileSelect}
+                      onChange={handleFileAttachmentChange}
                       className="hidden"
                     />
                     <button

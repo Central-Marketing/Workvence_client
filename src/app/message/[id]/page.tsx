@@ -393,14 +393,24 @@ const Message = () => {
     staleTime: 30000,
   });
 
+  const isConversationActive = (c: any, targetId: string) => {
+    if (!c || !targetId) return false;
+    const tid = String(targetId).trim();
+    if (c.uuid && String(c.uuid).trim() === tid) return true;
+    if (c.conversationID && String(c.conversationID).trim() === tid) return true;
+    if (c._id && String(c._id).trim() === tid) return true;
+    if (c.id && String(c.id).trim() === tid) return true;
+
+    const sId = String(c.sellerID?._id || c.sellerID || '');
+    const bId = String(c.buyerID?._id || c.buyerID || '');
+    if (sId && bId && (`${sId}${bId}` === tid || `${bId}${sId}` === tid)) return true;
+
+    return false;
+  };
+
   const activeConversation =
     activeConvData ||
-    conversations.find((c: any) => {
-      if (c.uuid === conversationID || c.conversationID === conversationID || c.id === conversationID || c._id === conversationID) return true;
-      const sId = String(c.sellerID?._id || c.sellerID || '');
-      const bId = String(c.buyerID?._id || c.buyerID || '');
-      return `${sId}${bId}` === conversationID || `${bId}${sId}` === conversationID;
-    });
+    conversations.find((c: any) => isConversationActive(c, conversationID));
 
   const recipientUser = getOtherUser(activeConversation, user);
 
@@ -750,9 +760,8 @@ const Message = () => {
               const lastMsg = conv.lastMessage?.startsWith('[CUSTOM_OFFER]')
                 ? '📋 Custom Offer'
                 : conv.lastMessage || 'No messages yet';
-              const canonicalId = conv.uuid || conv._id || conv.id;
-              const isActive = canonicalId === conversationID || conv.conversationID === conversationID || conv.id === conversationID || conv._id === conversationID;
-              console.log(conv)
+              const canonicalId = conv.uuid || conv.conversationID || conv._id || conv.id;
+              const isActive = isConversationActive(conv, conversationID);
               return (
                 <div
                   key={conv._id || canonicalId}

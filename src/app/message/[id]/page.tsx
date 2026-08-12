@@ -230,59 +230,19 @@ const Message = () => {
 
     setIsRecipientTyping(false);
 
-    const handleReceiveMessage = (newMsg: any) => {
-      // Ignore messages belonging to other conversations
-      if (newMsg?.conversationID && newMsg.conversationID !== conversationID) {
-        return;
-      }
-
-      // 1. Update current chat messages with strict deduplication
-      queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
-        const arr = Array.isArray(oldData) ? oldData : [];
-        if (arr.some((m: any) => String(m._id) === String(newMsg._id))) return arr;
-
-        // Replace matching temp message or remove temp- messages
-        const withoutTemp = arr.filter((m: any) => {
-          if (typeof m._id === 'string' && m._id.startsWith('temp-')) {
-            return m.description !== newMsg.description;
-          }
-          return true;
-        });
-        return [...withoutTemp, newMsg];
-      });
-
-      // 2. Instantly update conversation sidebar and header unread badge
-      queryClient.setQueryData(['conversations'], (oldConvs: any) => {
-        if (!Array.isArray(oldConvs)) return oldConvs;
-        return oldConvs.map((c: any) => {
-          if (c.id === newMsg.conversationID || c.conversationID === newMsg.conversationID || c._id === newMsg.conversationID) {
-            const isCurrentlyViewingThisChat = conversationID === newMsg.conversationID;
-            return {
-              ...c,
-              lastMessage: newMsg.description,
-              updatedAt: new Date().toISOString(),
-              readBySeller: user?.isSeller ? isCurrentlyViewingThisChat : c.readBySeller,
-              readByBuyer: !user?.isSeller ? isCurrentlyViewingThisChat : c.readByBuyer
-            };
-          }
-          return c;
-        }).sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-      });
-    };
-
-    const isEventForCurrentChat = (data: any) => {
+    const isEventForCurrentChat = (data: any, isTypingEvent = true) => {
       if (!data) return false;
 
       const currentUser = userRef.current;
-      if (data.username && currentUser?.username && data.username.toLowerCase() === currentUser.username.toLowerCase()) {
+      if (isTypingEvent && data.username && currentUser?.username && data.username.toLowerCase() === currentUser.username.toLowerCase()) {
         return false; // Ignore typing events from self
       }
 
-      const incomingId = String(data?.conversationUUID || data?.conversationID || data?.uuid || data?.id || '').trim();
+      const incomingId = String(data?.conversationUUID || data?.conversationID || data?.uuid || data?.id || data?.conversation || '').trim();
       if (!incomingId || incomingId === 'undefined') return false;
 
-      const currentParamId = convIdRef.current;
-      if (currentParamId && incomingId === String(currentParamId).trim()) return true;
+      const currentParamId = String(convIdRef.current || '').trim();
+      if (currentParamId && incomingId === currentParamId) return true;
 
       const convDoc = activeConvRef.current;
       if (convDoc) {
@@ -293,9 +253,9 @@ const Message = () => {
 
         const sId = String(convDoc.sellerID?._id || convDoc.sellerID || '');
         const bId = String(convDoc.buyerID?._id || convDoc.buyerID || '');
-        if (`${sId}${bId}` === incomingId || `${bId}${sId}` === incomingId) return true;
+        if (sId && bId && (`${sId}${bId}` === incomingId || `${bId}${sId}` === incomingId)) return true;
 
-        // If incoming ID does not match the active conversation doc, reject it
+        // If incoming ID does not match active conversation document, reject
         return false;
       }
 
@@ -303,8 +263,52 @@ const Message = () => {
       return true;
     };
 
+    const handleReceiveMessage = (newMsg: any) => {
+      const isForCurrent = isEventForCurrentChat(newMsg, false);
+
+      // 1. Only update current chat messages if it actually belongs to the open chat
+      if (isForCurrent) {
+        queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
+          const arr = Array.isArray(oldData) ? oldData : [];
+          if (arr.some((m: any) => String(m._id) === String(newMsg._id))) return arr;
+
+          // Replace matching temp message or remove temp- messages
+          const withoutTemp = arr.filter((m: any) => {
+            if (typeof m._id === 'string' && m._id.startsWith('temp-')) {
+              return m.description !== newMsg.description;
+            }
+            return true;
+          });
+          return [...withoutTemp, newMsg];
+        });
+      }
+
+      // 2. Instantly update conversation sidebar and header unread badge
+      queryClient.setQueryData(['conversations'], (oldConvs: any) => {
+        if (!Array.isArray(oldConvs)) return oldConvs;
+        const incomingCid = String(newMsg?.conversationUUID || newMsg?.conversationID || newMsg?.uuid || newMsg?.id || '').trim();
+        return oldConvs.map((c: any) => {
+          const cUuid = String(c.uuid || c.conversationID || c._id || c.id || '').trim();
+          const sId = String(c.sellerID?._id || c.sellerID || '');
+          const bId = String(c.buyerID?._id || c.buyerID || '');
+
+          const isTargetConv = cUuid === incomingCid || (sId && bId && (`${sId}${bId}` === incomingCid || `${bId}${sId}` === incomingCid));
+          if (isTargetConv) {
+            return {
+              ...c,
+              lastMessage: newMsg.description,
+              updatedAt: new Date().toISOString(),
+              readBySeller: user?.isSeller ? isForCurrent : c.readBySeller,
+              readByBuyer: !user?.isSeller ? isForCurrent : c.readByBuyer
+            };
+          }
+          return c;
+        }).sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      });
+    };
+
     const handleUserTyping = (data: any) => {
-      if (isEventForCurrentChat(data)) {
+      if (isEventForCurrentChat(data, true)) {
         setIsRecipientTyping(true);
         setPartnerUsername(data.username || '');
 
@@ -316,7 +320,7 @@ const Message = () => {
     };
 
     const handleUserStoppedTyping = (data: any) => {
-      if (isEventForCurrentChat(data)) {
+      if (isEventForCurrentChat(data, true)) {
         clearTimeout(recipientTypingTimerRef.current);
         setIsRecipientTyping(false);
       }

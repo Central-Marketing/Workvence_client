@@ -147,7 +147,6 @@ const Message = () => {
 
       // 2. Patch backend
       axiosFetch.patch(`/conversations/${conversationID}/mark-read`)
-        .catch(() => axiosFetch.patch(`/conversations/${conversationID}`))
         .then(() => queryClient.invalidateQueries({ queryKey: ['conversations'] }))
         .catch(console.error);
     }
@@ -198,24 +197,11 @@ const Message = () => {
   const { isLoading: msgsLoading, isError: msgsError, error: msgsQueryError, data: messages = [] } = useQuery({
     queryKey: ['messages', conversationID],
     queryFn: async () => {
-      try {
-        const { data } = await axiosFetch.get(`/conversations/${conversationID}/messages`);
-        if (Array.isArray(data)) return data;
-        if (data?.data?.messages) return data.data.messages;
-        if (data?.messages) return data.messages;
-        return [];
-      } catch (err) {
-        try {
-          const { data } = await axiosFetch.get(`/messages/history/${conversationID}`);
-          if (Array.isArray(data)) return data;
-          if (data?.data?.messages) return data.data.messages;
-          if (data?.messages) return data.messages;
-          return [];
-        } catch (err2) {
-          console.warn("Failed to fetch messages for conversation", conversationID, err2);
-          return [];
-        }
-      }
+      const { data } = await axiosFetch.get(`/conversations/${conversationID}/messages`);
+      if (Array.isArray(data)) return data;
+      if (data?.data?.messages) return data.data.messages;
+      if (data?.messages) return data.messages;
+      return [];
     },
     enabled: isValidId,
     retry: false,
@@ -444,9 +430,7 @@ const Message = () => {
   });
 
   const mutation = useMutation({
-    mutationFn: (msg: any) =>
-      axiosFetch.post(`/conversations/${conversationID}/messages`, msg)
-        .catch(() => axiosFetch.post('/messages', msg)),
+    mutationFn: (msg: any) => axiosFetch.post(`/conversations/${conversationID}/messages`, msg),
     onMutate: async (newMsg: any) => {
       // Optimistically update the conversations list with the new lastMessage and correct read status
       queryClient.setQueryData(['conversations'], (oldConvs: any) => {

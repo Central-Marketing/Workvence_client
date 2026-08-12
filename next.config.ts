@@ -3,17 +3,23 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   async rewrites() {
-    const mainApiUrl = (
+    let rawMainUrl = (
       process.env.NEXT_PUBLIC_SERVER_API_URL ||
       process.env.NEXT_PUBLIC_API_URL ||
       'http://localhost:8080/api'
-    ).replace(/\/$/, '');
+    ).trim().replace(/\/$/, '');
 
-    const adminApiUrl = (
+    // Ensure mainApiUrl always ends with /api
+    const mainApiUrl = rawMainUrl.endsWith('/api') ? rawMainUrl : `${rawMainUrl}/api`;
+
+    let rawAdminUrl = (
       process.env.NEXT_PUBLIC_ADMIN_API_URL ||
       process.env.NEXT_PUBLIC_ADMIN_BACKEND_URL ||
       'http://localhost:8082/api'
-    ).replace(/\/$/, '');
+    ).trim().replace(/\/$/, '');
+
+    // Ensure adminApiUrl always ends with /api
+    const adminApiUrl = rawAdminUrl.endsWith('/api') ? rawAdminUrl : `${rawAdminUrl}/api`;
 
     return [
       {

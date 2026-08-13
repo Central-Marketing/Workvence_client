@@ -1032,23 +1032,41 @@ const Message = () => {
                 )}
 
                 {!msgsError && (
-                  <form onSubmit={handleSend} className="compose-form max-md:px-2 max-md:py-1 max-md:gap-1.5">
+                  <form
+                    onSubmit={handleSend}
+                    className="compose-form relative flex items-end gap-2 p-2 bg-white border border-gray-200 rounded-2xl shadow-sm max-md:px-2 max-md:py-1.5 max-md:gap-1.5"
+                  >
                     <input
                       type="file"
                       ref={fileInputRef}
                       onChange={handleFileAttachmentChange}
                       className="hidden"
                     />
+
+                    {/* Plus / Attach Button */}
                     <button
                       type="button"
-                      className="icon-btn"
+                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors flex-shrink-0 mb-0.5"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploadingAttachment}
                       title="Attach file or image"
+                      aria-label="Attach file or image"
                     >
-                      <RiAddLine />
+                      <RiAddLine className="w-5 h-5" />
                     </button>
 
+                    {/* Optional Seller Offer Button */}
+                    {user?.isSeller && (
+                      <button
+                        type="button"
+                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap flex-shrink-0 mb-0.5"
+                        onClick={() => setShowOfferModal(true)}
+                      >
+                        Create Offer
+                      </button>
+                    )}
+
+                    {/* Message Textarea */}
                     <textarea
                       ref={textareaRef}
                       placeholder="Message"
@@ -1056,14 +1074,17 @@ const Message = () => {
                       onChange={handleInputChange}
                       onKeyDown={handleKeyDown}
                       rows={1}
+                      className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 resize-none text-gray-800 placeholder-gray-400 text-sm py-1.5 px-1 min-h-[36px] max-h-32 overflow-y-auto scrollbar-hide scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                     />
-                    {user?.isSeller && (
-                      <button type="button" className="offer-btn-small" onClick={() => setShowOfferModal(true)}>
-                        Create Offer
-                      </button>
-                    )}
-                    <button type="submit" className="send-btn" disabled={(!messageText.trim() && !attachment?.url) || isUploadingAttachment || mutation.isPending}>
-                      <RiSendPlaneFill />
+
+                    {/* Send Button */}
+                    <button
+                      type="submit"
+                      className="p-2 text-gray-500 hover:text-blue-600 disabled:opacity-30 disabled:hover:text-gray-500 transition-colors flex-shrink-0 mb-0.5"
+                      disabled={(!messageText.trim() && !attachment?.url) || isUploadingAttachment || mutation.isPending}
+                      aria-label="Send message"
+                    >
+                      <RiSendPlaneFill className="w-5 h-5" />
                     </button>
                   </form>
                 )}

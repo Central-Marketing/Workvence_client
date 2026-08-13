@@ -119,21 +119,41 @@ const OrderDetail = () => {
 
   const handleContact = async () => {
     if (!order) return;
-    const sellerID = order.sellerID.hasOwnProperty("_id") ? order.sellerID._id : order.sellerID;
-    const buyerID = order.buyerID.hasOwnProperty("_id") ? order.buyerID._id : order.buyerID;
+    const sellerID = typeof order.sellerID === "object" && order.sellerID !== null ? (order.sellerID._id || order.sellerID.id) : order.sellerID;
+    const buyerID = typeof order.buyerID === "object" && order.buyerID !== null ? (order.buyerID._id || order.buyerID.id) : order.buyerID;
 
-    axiosFetch
-      .get(`/conversations/single/${sellerID}/${buyerID}`)
-      .then(({ data }) => {
-        navigate.push(`/message/${data.conversationID}`);
-      })
-      .catch(async () => {
-        const { data } = await axiosFetch.post("/conversations", {
-          to: user.isSeller ? buyerID : sellerID,
-          from: user.isSeller ? sellerID : buyerID,
-        });
-        navigate.push(`/message/${data.conversationID}`);
+    const sellerUsername = typeof order.sellerID === "object" ? order.sellerID.username : null;
+    const buyerUsername = typeof order.buyerID === "object" ? order.buyerID.username : null;
+
+    try {
+      const { data } = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
+      const targetId = data?.uuid || data?.conversationID || data?._id || data?.id || data?.data?.uuid || data?.data?.conversationID || data?.data?._id;
+      if (targetId) {
+        navigate.push(`/message/${targetId}`);
+        return;
+      }
+    } catch {
+      // Fetch failed, proceed to create/fetch conversation via POST
+    }
+
+    try {
+      const { data } = await axiosFetch.post("/conversations", {
+        sellerID,
+        buyerID,
+        to: user?.isSeller ? buyerID : sellerID,
+        from: user?.isSeller ? sellerID : buyerID,
+        seller_username: sellerUsername,
+        buyer_username: buyerUsername
       });
+      const targetId = data?.uuid || data?.conversationID || data?._id || data?.id || data?.data?.uuid || data?.data?.conversationID || data?.data?._id;
+      if (targetId) {
+        navigate.push(`/message/${targetId}`);
+      } else {
+        toast.error("Could not resolve conversation ID");
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to open conversation");
+    }
   };
 
   const handleDeliveryFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {

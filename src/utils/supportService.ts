@@ -141,9 +141,13 @@ export const supportService = {
   /**
    * Upload a File object directly to Cloudinary using signed authentication parameters
    */
-  async uploadFileToCloudinary(file: File, folder: string = 'support_chat_attachments') {
+  async uploadCloudinaryFile(file: File, folder: string = 'chat_attachments') {
+    return this.uploadFileToCloudinary(file, folder);
+  },
+
+  async uploadFileToCloudinary(file: File, folder: string = 'chat_attachments') {
     try {
-      const sigData = await this.getCloudinarySignature(folder, 'authenticated');
+      const sigData = await this.getCloudinarySignature(folder, 'authenticated').catch(() => null);
       const sigObj = sigData?.data || sigData;
 
       if (sigObj && sigObj.signature && sigObj.apiKey && sigObj.cloudName) {
@@ -153,7 +157,6 @@ export const supportService = {
         formData.append('timestamp', String(sigObj.timestamp));
         formData.append('signature', sigObj.signature);
         formData.append('folder', sigObj.folder || folder);
-        formData.append('type', 'authenticated');
 
         const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/${sigObj.cloudName}/auto/upload`, {
           method: 'POST',
@@ -170,24 +173,42 @@ export const supportService = {
             bytes: uploaded.bytes || file.size,
             type: file.type || (file.name.match(/\.(png|jpe?g|gif|webp|svg)$/i) ? 'image' : 'file'),
           };
-        } else {
-          const errJson = await cloudRes.json().catch(() => null);
-          console.warn('Cloudinary upload error response:', errJson || cloudRes.statusText);
         }
       }
     } catch (err) {
       console.warn('Cloudinary signed upload failed:', err);
     }
 
-    // Return structured asset representation fallback
-    return {
-      name: file.name,
-      public_id: `support_chat_attachments/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9_-]/g, '_')}`,
-      url: '',
-      secure_url: '',
-      bytes: file.size,
-      type: file.type,
-    };
+    // Try ImgBB fallback for image files
+    if (file.type?.startsWith('image/')) {
+      try {
+        const formData = new FormData();
+        formData.append('image', file);
+        const apiKey = process.env.NEXT_PUBLIC_IMGBB_KEY || "6857715a54c637cd1d21c558202e7c9c";
+        const imgRes = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+          method: 'POST',
+          body: formData
+        });
+        if (imgRes.ok) {
+          const imgData = await imgRes.json();
+          const url = imgData?.data?.url;
+          if (url) {
+            return {
+              name: file.name,
+              public_id: `imgbb_${Date.now()}`,
+              url,
+              secure_url: url,
+              bytes: file.size,
+              type: file.type
+            };
+          }
+        }
+      } catch (err) {
+        console.warn('ImgBB CDN upload fallback failed:', err);
+      }
+    }
+
+    throw new Error('CDN upload failed. Please try again.');
   },
 
   /**

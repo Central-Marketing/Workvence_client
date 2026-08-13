@@ -658,7 +658,11 @@ const Message = () => {
     const fileUrl = msg.file || (Array.isArray(msg.attachments) && msg.attachments[0]) || null;
     if (!fileUrl) return null;
 
-    const isImage = /\.(png|jpe?g|gif|webp|svg)/i.test(fileUrl) || msg.fileType?.includes('image');
+    const isImage =
+      /\.(png|jpe?g|gif|webp|svg|bmp|avif)/i.test(fileUrl) ||
+      fileUrl.includes('/image/upload/') ||
+      (fileUrl.includes('cloudinary.com') && fileUrl.includes('/image/')) ||
+      msg.fileType?.includes('image');
 
     if (isImage) {
       return (
@@ -932,9 +936,9 @@ const Message = () => {
                             )}
                           </div>
                         ) : (
-                          <div className="msg-bubble">
+                          <div className="msg-bubble break-words [overflow-wrap:anywhere] [word-break:break-word]">
                             {renderMessageAttachment(msg)}
-                            {msg.description && <p>{msg.description}</p>}
+                            {msg.description && <p className="break-words [overflow-wrap:anywhere] [word-break:break-word]">{msg.description}</p>}
                             <span className="msg-time">
                               {moment(msg.createdAt).format('HH:mm')}
                               {/* {isOwner && <RiCheckDoubleLine className={`check-icon ${isMsgReadByRecipient(msg) ? 'read' : ''}`} />} */}
@@ -1010,13 +1014,17 @@ const Message = () => {
                     {/* Plus / Attach Button */}
                     <button
                       type="button"
-                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors flex-shrink-0 mb-0.5"
+                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors flex-shrink-0 mb-0.5 cursor-pointer disabled:opacity-50"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploadingAttachment}
-                      title="Attach file or image"
-                      aria-label="Attach file or image"
+                      title="Attach file or image to CDN"
+                      aria-label="Attach file or image to CDN"
                     >
-                      <RiAddLine className="w-5 h-5" />
+                      {isUploadingAttachment ? (
+                        <Loader size={18} />
+                      ) : (
+                        <RiAddLine className="w-5 h-5" />
+                      )}
                     </button>
 
                     {/* Optional Seller Offer Button */}

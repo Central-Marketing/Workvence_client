@@ -72,3 +72,25 @@ export const handleStartChat = async (targetUsername: string, currentUser: any, 
     });
   }
 };
+
+export const isTargetConversation = (conversation: any, targetId: string) => {
+  if (!conversation || !targetId) return false;
+  const tid = String(targetId).trim();
+  if (!tid) return false;
+
+  const cUuid = conversation.uuid ? String(conversation.uuid).trim() : '';
+  const cConvId = conversation.conversationID ? String(conversation.conversationID).trim() : '';
+  const cId = conversation._id ? String(conversation._id).trim() : '';
+  const cGenId = conversation.id ? String(conversation.id).trim() : '';
+
+  if (cUuid && cUuid === tid) return true;
+  if (cConvId && cConvId === tid) return true;
+  if (cId && cId === tid) return true;
+  if (cGenId && cGenId === tid) return true;
+
+  const sId = String(conversation.sellerID?._id || conversation.sellerID || '');
+  const bId = String(conversation.buyerID?._id || conversation.buyerID || '');
+  if (sId && bId && (`${sId}${bId}` === tid || `${bId}${sId}` === tid)) return true;
+
+  return false;
+};

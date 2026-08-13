@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FiMessageSquare } from "react-icons/fi";
 import { axiosFetch, socket } from "@/utils";
-import { isConversationUnread } from "@/utils/chatHelpers";
+import { isConversationUnread, isTargetConversation } from "@/utils/chatHelpers";
 
 interface HeaderInboxIconProps {
   currentUser: any;
@@ -29,14 +29,17 @@ const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser }) => {
 
     // Listen for socket receive_message to update conversations cache
     const handleReceiveMessage = (newMsg: any) => {
-      const senderId = newMsg.userID?._id || newMsg.userID;
-      if (senderId === currentUser._id) return;
+      const senderId = newMsg.userID?._id || newMsg.userID?.id || newMsg.userID;
+      if (String(senderId) === String(currentUser._id || currentUser.id)) return;
+
+      const incomingCid = String(newMsg?.conversationUUID || newMsg?.conversationID || newMsg?.uuid || newMsg?.id || '').trim();
+      if (!incomingCid) return;
 
       queryClient.setQueryData(['conversations'], (oldConvs: any) => {
         if (!Array.isArray(oldConvs)) return oldConvs;
         return oldConvs.map((c: any) => {
-          if (c.id === newMsg.conversationID || c.conversationID === newMsg.conversationID || c._id === newMsg.conversationID) {
-            const isViewing = typeof window !== 'undefined' && window.location.pathname.includes(`/message/${newMsg.conversationID}`);
+          if (isTargetConversation(c, incomingCid)) {
+            const isViewing = typeof window !== 'undefined' && window.location.pathname.includes(`/message/${incomingCid}`);
             return {
               ...c,
               lastMessage: newMsg.description,

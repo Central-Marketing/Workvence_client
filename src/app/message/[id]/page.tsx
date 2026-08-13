@@ -27,7 +27,7 @@ import {
 import axios from 'axios';
 import { axiosFetch, socket, getAvatarUrl } from "@/utils";
 import supportService from "@/utils/supportService";
-import { getOtherUser, isConversationUnread } from '@/utils/chatHelpers';
+import { getOtherUser, isConversationUnread, isTargetConversation } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
 import { Loader, ChatSkeleton, Skeleton } from "@/components";
 import moment from 'moment';
@@ -52,7 +52,7 @@ const Message = () => {
   const [isRecipientTyping, setIsRecipientTyping] = useState(false);
   const [partnerUsername, setPartnerUsername] = useState("");
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [convSearchQuery, setConvSearchQuery] = useState("");
+  const [convSearchQuery, setSearchTerm] = useState("");
   const [msgSearchQuery, setMsgSearchQuery] = useState("");
   const [isMsgSearchActive, setIsMsgSearchActive] = useState(false);
   const [isLeftSideOpen, setIsLeftSideOpen] = useState(false);
@@ -134,7 +134,7 @@ const Message = () => {
       queryClient.setQueryData(['conversations'], (oldConvs: any) => {
         if (!Array.isArray(oldConvs)) return oldConvs;
         return oldConvs.map((c: any) => {
-          if (c.uuid === conversationID || c.conversationID === conversationID || c._id === conversationID) {
+          if (isTargetConversation(c, conversationID)) {
             return {
               ...c,
               readBySeller: true,
@@ -164,11 +164,14 @@ const Message = () => {
 
     // Global listener for new messages to update the sidebar/header even if in a different chat
     const handleGlobalReceiveMessage = (newMsg: any) => {
+      const incomingCid = String(newMsg?.conversationUUID || newMsg?.conversationID || newMsg?.uuid || newMsg?.id || '').trim();
+      if (!incomingCid) return;
+
       queryClient.setQueryData(['conversations'], (oldConvs: any) => {
         if (!Array.isArray(oldConvs)) return oldConvs;
         return oldConvs.map((c: any) => {
-          if (c.id === newMsg.conversationID || c.conversationID === newMsg.conversationID || c._id === newMsg.conversationID) {
-            const isCurrentlyViewingThisChat = window.location.pathname.includes(`/message/${newMsg.conversationID}`);
+          if (isTargetConversation(c, incomingCid)) {
+            const isCurrentlyViewingThisChat = window.location.pathname.includes(`/message/${incomingCid}`);
             return {
               ...c,
               lastMessage: newMsg.description,
@@ -249,24 +252,14 @@ const Message = () => {
         if (convDoc.uuid && incomingId === String(convDoc.uuid).trim()) return true;
         if (convDoc.conversationID && incomingId === String(convDoc.conversationID).trim()) return true;
         if (convDoc._id && incomingId === String(convDoc._id).trim()) return true;
-        if (convDoc.id && incomingId === String(convDoc.id).trim()) return true;
-
-        const sId = String(convDoc.sellerID?._id || convDoc.sellerID || '');
-        const bId = String(convDoc.buyerID?._id || convDoc.buyerID || '');
-        if (sId && bId && (`${sId}${bId}` === incomingId || `${bId}${sId}` === incomingId)) return true;
-
-        // If incoming ID does not match active conversation document, reject
-        return false;
       }
-
-      // If active conversation doc hasn't loaded yet, accept for active chat
-      return true;
+      return false;
     };
 
     const handleReceiveMessage = (newMsg: any) => {
       const isForCurrent = isEventForCurrentChat(newMsg, false);
 
-      // 1. Only update current chat messages if it actually belongs to the open chat
+      // 1. If message belongs to current open chat, append to messages list
       if (isForCurrent) {
         queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
           const arr = Array.isArray(oldData) ? oldData : [];
@@ -287,13 +280,9 @@ const Message = () => {
       queryClient.setQueryData(['conversations'], (oldConvs: any) => {
         if (!Array.isArray(oldConvs)) return oldConvs;
         const incomingCid = String(newMsg?.conversationUUID || newMsg?.conversationID || newMsg?.uuid || newMsg?.id || '').trim();
+        if (!incomingCid) return oldConvs;
         return oldConvs.map((c: any) => {
-          const cUuid = String(c.uuid || c.conversationID || c._id || c.id || '').trim();
-          const sId = String(c.sellerID?._id || c.sellerID || '');
-          const bId = String(c.buyerID?._id || c.buyerID || '');
-
-          const isTargetConv = cUuid === incomingCid || (sId && bId && (`${sId}${bId}` === incomingCid || `${bId}${sId}` === incomingCid));
-          if (isTargetConv) {
+          if (isTargetConversation(c, incomingCid)) {
             return {
               ...c,
               lastMessage: newMsg.description,
@@ -310,107 +299,81 @@ const Message = () => {
     const handleUserTyping = (data: any) => {
       if (isEventForCurrentChat(data, true)) {
         setIsRecipientTyping(true);
-        setPartnerUsername(data.username || '');
-
-        clearTimeout(recipientTypingTimerRef.current);
-        recipientTypingTimerRef.current = setTimeout(() => {
-          setIsRecipientTyping(false);
-        }, 3500);
+        if (recipientTypingTimerRef.current) clearTimeout(recipientTypingTimerRef.current);
+        recipientTypingTimerRef.current = setTimeout(() => setIsRecipientTyping(false), 3000);
       }
     };
 
     const handleUserStoppedTyping = (data: any) => {
       if (isEventForCurrentChat(data, true)) {
-        clearTimeout(recipientTypingTimerRef.current);
         setIsRecipientTyping(false);
+        if (recipientTypingTimerRef.current) clearTimeout(recipientTypingTimerRef.current);
       }
-    };
-
-    const handleOfferWithdrawn = () => {
-      queryClient.invalidateQueries({ queryKey: ['messages', conversationID] });
     };
 
     socket.on('receive_message', handleReceiveMessage);
+    socket.on('typing_start', handleUserTyping);
     socket.on('user_typing', handleUserTyping);
+    socket.on('typing_stop', handleUserStoppedTyping);
     socket.on('user_stopped_typing', handleUserStoppedTyping);
-    socket.on('offer_withdrawn', handleOfferWithdrawn);
 
     return () => {
+      socket.off('connect', handleConnect);
       socket.off('receive_message', handleReceiveMessage);
+      socket.off('typing_start', handleUserTyping);
       socket.off('user_typing', handleUserTyping);
+      socket.off('typing_stop', handleUserStoppedTyping);
       socket.off('user_stopped_typing', handleUserStoppedTyping);
-      socket.off('offer_withdrawn', handleOfferWithdrawn);
+      if (recipientTypingTimerRef.current) clearTimeout(recipientTypingTimerRef.current);
     };
-  }, [conversationID, queryClient]);
+  }, [isValidId, conversationID, queryClient]);
 
-  // Seller's packages
+  // Fetch all orders to show contact's orders in sidebar
+  const { data: allOrders = [] } = useQuery({
+    queryKey: ['orders-all'],
+    queryFn: () => axiosFetch.get('/orders').then(({ data }) => Array.isArray(data) ? data : (data?.orders || data?.data || [])).catch(() => [])
+  });
+
+  // Fetch active packages created by the current contact user (to populate package selector dropdown in Custom Offer modal)
   const { data: sellerPackages = [] } = useQuery({
     queryKey: ['seller-packages', user?._id],
-    queryFn: () => axiosFetch.get(`/gigs?userID=${user._id}`).then(({ data }) => data ?? []).catch(() => []),
+    queryFn: () => axiosFetch.get(`/packages?userId=${user?._id || user?.id}`).then(({ data }) => Array.isArray(data) ? data : (data?.packages || data?.data || [])).catch(() => []),
     enabled: !!user?.isSeller
   });
 
-  // Chat-linked briefs (always fetch when chat opens)
-  const serverApiUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || 'http://localhost:8080/api';
-  const { data: chatBriefs = [] } = useQuery({
+  // Fetch active briefs created by the recipient user (if current user is seller)
+  const { data: userBriefs = [] } = useQuery({
     queryKey: ['chat-briefs', conversationID, conversations.length],
     queryFn: async () => {
-      const parseResponse = (data: any) => {
-        if (Array.isArray(data)) return data;
-        if (data?.briefs && Array.isArray(data.briefs)) return data.briefs;
-        if (data?.data && Array.isArray(data.data)) return data.data;
-        if (data?._id) return [data];
-        if (data?.brief) return [data.brief];
-        return [];
-      };
-
-      try {
-        const { data } = await axiosFetch.get(`/briefs/chat-briefs/${conversationID}`);
-        return parseResponse(data);
-      } catch (err) {
-        console.warn("Failed fetching briefs with conversationID", err);
-        return [];
-      }
+      const activeConvDoc = conversations.find((c: any) => isTargetConversation(c, conversationID));
+      const targetUser = getOtherUser(activeConvDoc, user);
+      const targetUserId = targetUser?._id || targetUser?.id;
+      if (!targetUserId) return [];
+      const res = await axiosFetch.get(`/briefs?userId=${targetUserId}`).catch(() => null);
+      const data = res?.data;
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data?.briefs)) return data.briefs;
+      if (Array.isArray(data?.data)) return data.data;
+      return [];
     },
-    enabled: isValidId
+    enabled: !!user?.isSeller && isValidId
   });
 
-  // Shared orders
-  const { data: allOrders = [] } = useQuery({
-    queryKey: ['all-orders'],
-    queryFn: () => axiosFetch.get('/orders').then(({ data }) => data ?? []).catch(() => []),
-  });
-
-  // Fetch active conversation document directly from backend to guarantee populated seller & buyer profiles
+  // Fetch single conversation details if needed
   const { data: activeConvData } = useQuery({
-    queryKey: ['active-conversation', conversationID],
+    queryKey: ['conversation-detail', conversationID],
     queryFn: () =>
       axiosFetch
         .get(`/conversations/${conversationID}`)
-        .then(({ data }) => data?.data || data)
+        .then(({ data }) => data?.conversation || data?.data || data)
         .catch(() => null),
-    enabled: isValidId,
-    staleTime: 30000,
+    enabled: isValidId && conversations.length > 0 && !conversations.some((c: any) => isTargetConversation(c, conversationID)),
+    staleTime: 30000
   });
-
-  const isConversationActive = (c: any, targetId: string) => {
-    if (!c || !targetId) return false;
-    const tid = String(targetId).trim();
-    if (c.uuid && String(c.uuid).trim() === tid) return true;
-    if (c.conversationID && String(c.conversationID).trim() === tid) return true;
-    if (c._id && String(c._id).trim() === tid) return true;
-    if (c.id && String(c.id).trim() === tid) return true;
-
-    const sId = String(c.sellerID?._id || c.sellerID || '');
-    const bId = String(c.buyerID?._id || c.buyerID || '');
-    if (sId && bId && (`${sId}${bId}` === tid || `${bId}${sId}` === tid)) return true;
-
-    return false;
-  };
 
   const activeConversation =
     activeConvData ||
-    conversations.find((c: any) => isConversationActive(c, conversationID));
+    conversations.find((c: any) => isTargetConversation(c, conversationID));
 
   const recipientUser = getOtherUser(activeConversation, user);
 
@@ -449,8 +412,9 @@ const Message = () => {
       // Optimistically update the conversations list with the new lastMessage and correct read status
       queryClient.setQueryData(['conversations'], (oldConvs: any) => {
         if (!Array.isArray(oldConvs)) return oldConvs;
+        const incomingCid = String(newMsg?.conversationUUID || newMsg?.conversationID || newMsg?.uuid || newMsg?.id || conversationID || '').trim();
         return oldConvs.map((c: any) => {
-          if (c.id === newMsg.conversationID || c.conversationID === newMsg.conversationID || c._id === newMsg.conversationID) {
+          if (isTargetConversation(c, incomingCid)) {
             return {
               ...c,
               lastMessage: newMsg.description,
@@ -761,7 +725,7 @@ const Message = () => {
                 ? '📋 Custom Offer'
                 : conv.lastMessage || 'No messages yet';
               const canonicalId = conv.uuid || conv.conversationID || conv._id || conv.id;
-              const isActive = isConversationActive(conv, conversationID);
+              const isActive = isTargetConversation(conv, conversationID);
               return (
                 <div
                   key={conv._id || canonicalId}

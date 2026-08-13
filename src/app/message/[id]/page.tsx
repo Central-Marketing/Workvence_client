@@ -955,9 +955,9 @@ const Message = () => {
                             )}
                           </div>
                         ) : (
-                          <div className="msg-bubble break-words [overflow-wrap:anywhere] [word-break:break-word]">
+                          <div className="msg-bubble [overflow-wrap:anywhere] [word-break:break-word]">
                             {renderMessageAttachment(msg)}
-                            {msg.description && <p className="break-words [overflow-wrap:anywhere] [word-break:break-word]">{renderMessageTextWithLinks(msg.description)}</p>}
+                            {msg.description && <p className="[overflow-wrap:anywhere] [word-break:break-word]">{renderMessageTextWithLinks(msg.description)}</p>}
                             <span className="msg-time">
                               {moment(msg.createdAt).format('HH:mm')}
                               {/* {isOwner && <RiCheckDoubleLine className={`check-icon ${isMsgReadByRecipient(msg) ? 'read' : ''}`} />} */}

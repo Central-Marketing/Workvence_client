@@ -234,16 +234,13 @@ const OrderDetail = () => {
 
   const handleDeliverSubmit = async (e: any) => {
     e.preventDefault();
-    if (!deliveryText && uploadedDeliveryFiles.length === 0 && !deliveryFile) {
-      toast.error("Please enter delivery notes or attach files/links.");
+    if (!deliveryText && uploadedDeliveryFiles.length === 0) {
+      toast.error("Please enter delivery notes or attach files.");
       return;
     }
     setSubmitting(true);
     try {
-      const fileUrls = [
-        ...uploadedDeliveryFiles.map(f => f.url),
-        ...(deliveryFile ? [deliveryFile] : [])
-      ].filter(Boolean);
+      const fileUrls = uploadedDeliveryFiles.map(f => f.url).filter(Boolean);
 
       await axiosFetch.post(`/orders/deliver/${order._id}`, {
         deliveryText,
@@ -501,44 +498,93 @@ const OrderDetail = () => {
                   if (allDeliveredFiles.length === 0) return null;
 
                   return (
-                    <div className="mt-3">
-                      <h5 className="font-bold text-sm mb-2 text-slate-800 dark:text-slate-200">Delivered Attachments ({allDeliveredFiles.length}):</h5>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                      <h5 className="font-bold text-sm mb-3 text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                        <span>📦 Delivered Attachments ({allDeliveredFiles.length}):</span>
+                      </h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {allDeliveredFiles.map((fileUrl: string, index: number) => {
-                          const isImage = /\.(png|jpe?g|gif|webp|svg)/i.test(fileUrl);
+                          const isImage = /\.(png|jpe?g|gif|webp|svg|bmp|avif)/i.test(fileUrl) || fileUrl.includes('/image/upload/');
+                          const isVideo = /\.(mp4|webm|ogg|mov|mkv|avi|m4v|3gp)/i.test(fileUrl) || fileUrl.includes('/video/upload/');
+                          const isZip = /\.(zip|rar|7z|tar|gz)/i.test(fileUrl);
+                          const isPdf = /\.(pdf)/i.test(fileUrl);
                           const fileName = fileUrl.split('/').pop()?.split('?')[0] || `Attachment ${index + 1}`;
 
                           if (isImage) {
                             return (
-                              <div key={index} className="overflow-hidden rounded-lg border border-slate-200 shadow-xs group relative">
+                              <div key={index} className="overflow-hidden rounded-xl border border-emerald-200 dark:border-emerald-800/80 shadow-xs group relative bg-emerald-50/60 dark:bg-emerald-950/30">
                                 <img
                                   src={fileUrl}
                                   alt={`Delivery ${index + 1}`}
-                                  className="w-full h-36 object-cover cursor-pointer group-hover:scale-105 transition-transform"
+                                  className="w-full h-40 object-cover cursor-pointer group-hover:scale-105 transition-transform"
                                   onClick={() => handleSecureFileAccess(fileUrl, 'preview')}
                                 />
+                                <div className="absolute top-2 left-2 bg-emerald-600 text-white font-bold text-[10px] px-2.5 py-0.5 rounded-md shadow-xs">
+                                  Image
+                                </div>
                                 <button
                                   type="button"
                                   onClick={() => handleSecureFileAccess(fileUrl, 'download')}
-                                  className="absolute bottom-2 right-2 bg-black/70 hover:bg-black text-white text-xs px-2.5 py-1 rounded-md font-medium cursor-pointer"
+                                  className="absolute bottom-2 right-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow-xs transition-all flex items-center gap-1 cursor-pointer"
                                 >
-                                  ⬇️ Download
+                                  Download
                                 </button>
                               </div>
                             );
                           }
 
+                          if (isVideo) {
+                            return (
+                              <div key={index} className="overflow-hidden rounded-xl border border-emerald-200 dark:border-emerald-800/80 shadow-xs bg-emerald-50/60 dark:bg-emerald-950/40 p-2 flex flex-col gap-2">
+                                <div className="relative rounded-lg overflow-hidden bg-emerald-950 border border-emerald-300 dark:border-emerald-700">
+                                  <video
+                                    src={fileUrl}
+                                    controls
+                                    preload="metadata"
+                                    className="w-full max-h-48 object-contain rounded-lg"
+                                  />
+                                  <div className="absolute top-2 left-2 bg-emerald-600 text-white font-bold text-[10px] px-2.5 py-0.5 rounded-md shadow-xs">
+                                    Video Delivery
+                                  </div>
+                                </div>
+                                <div className="flex justify-between items-center px-1">
+                                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[180px]">{fileName}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSecureFileAccess(fileUrl, 'download')}
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1 cursor-pointer"
+                                  >
+                                    Download
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          }
+
                           return (
-                            <button
+                            <div
                               key={index}
-                              type="button"
-                              onClick={() => handleSecureFileAccess(fileUrl, 'download')}
-                              className="flex items-center gap-2.5 p-3 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-lg hover:bg-slate-100 border text-xs font-medium w-full text-left cursor-pointer"
+                              className="flex items-center justify-between p-3.5 bg-emerald-50/60 dark:bg-emerald-950/30 rounded-xl border border-emerald-200 dark:border-emerald-800/80 text-xs font-medium hover:border-emerald-300 transition-colors"
                             >
-                              <span className="text-lg">📄</span>
-                              <span className="truncate max-w-[180px] font-semibold">{fileName}</span>
-                              <span className="ml-auto text-slate-400">⬇️</span>
-                            </button>
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg flex-shrink-0 bg-emerald-600 text-white shadow-xs">
+                                  {isZip ? '📦' : isPdf ? '📑' : '📄'}
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="font-semibold text-slate-800 dark:text-slate-100 truncate max-w-[160px] sm:max-w-[200px]">{fileName}</p>
+                                  <p className="text-[10px] text-slate-500 font-medium">
+                                    {isZip ? 'Zip Archive' : isPdf ? 'PDF Document' : 'Delivery Asset'}
+                                  </p>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleSecureFileAccess(fileUrl, 'download')}
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex-shrink-0 shadow-xs"
+                              >
+                                Download
+                              </button>
+                            </div>
                           );
                         })}
                       </div>
@@ -547,7 +593,7 @@ const OrderDetail = () => {
                 })()}
               </div>
 
-              {!isCurrentUserSeller && (
+              {!isCurrentUserSeller && isDelivered && !isCompleted && (
                 <div className="delivery-actions" style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
                   <button className="approve-order-btn" onClick={handleCompleteOrder}>
                     Approve Work & Release Funds
@@ -698,10 +744,10 @@ const OrderDetail = () => {
 
                   {/* CDN Upload Attachments Section */}
                   <div className="field-group">
-                    <label className="flex justify-between items-center">
-                      <span>Delivery Attachments (Multiple Files)</span>
-                      <span className="text-xs text-slate-500 font-normal">Max file size 100MB</span>
-                    </label>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="font-bold text-slate-800 dark:text-slate-100 text-sm">Delivery Attachments (Images, Videos, Zip Archives)</label>
+                      <span className="text-xs text-slate-500 font-medium">Max file size 100MB</span>
+                    </div>
 
                     <input
                       type="file"
@@ -711,58 +757,95 @@ const OrderDetail = () => {
                       className="hidden"
                     />
 
-                    <button
-                      type="button"
-                      onClick={() => deliveryFileInputRef.current?.click()}
-                      disabled={isUploadingDeliveryFiles}
-                      className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium border border-slate-300 transition-colors my-1 cursor-pointer"
+                    {/* Drag & Drop Upload Zone */}
+                    <div
+                      onClick={() => !isUploadingDeliveryFiles && deliveryFileInputRef.current?.click()}
+                      className={`group border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-400 bg-slate-50/50 hover:bg-emerald-50/40 rounded-2xl p-6 text-center transition-all cursor-pointer ${isUploadingDeliveryFiles ? 'opacity-60 pointer-events-none' : ''}`}
                     >
-                      📎 {isUploadingDeliveryFiles ? 'Uploading Files...' : 'Upload Delivery Files to CDN'}
-                    </button>
+                      <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3 text-2xl group-hover:scale-110 transition-transform">
+                        ☁️
+                      </div>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 mb-1">
+                        {isUploadingDeliveryFiles ? 'Uploading Files to CDN...' : 'Click or Drag & Drop Delivery Files Here'}
+                      </p>
+                      <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+                        Upload high-res images (PNG, JPG, WEBP), videos (MP4, MOV, WEBM), source code, or ZIP archives directly to Cloudinary CDN.
+                      </p>
+                    </div>
 
-                    {/* Render Uploaded Delivery Attachments List */}
+                    {/* Render Uploaded Delivery Attachments Grid */}
                     {uploadedDeliveryFiles.length > 0 && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                        {uploadedDeliveryFiles.map((fileObj, idx) => (
-                          <div key={idx} className="flex items-center gap-2.5 p-2 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 text-xs">
-                            {fileObj.type?.includes('image') || /\.(png|jpe?g|gif|webp|svg)/i.test(fileObj.name) ? (
-                              <img
-                                src={fileObj.previewUrl || fileObj.url}
-                                alt="Delivery preview"
-                                className="w-10 h-10 rounded-md object-cover cursor-pointer border"
-                                onClick={() => setLightboxImage(fileObj.previewUrl || fileObj.url)}
-                              />
-                            ) : (
-                              <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 rounded-md flex items-center justify-center font-bold text-base flex-shrink-0">
-                                📄
+                      <div className="mt-4">
+                        <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-1.5">
+                          <span>Uploaded Delivery Assets ({uploadedDeliveryFiles.length}):</span>
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {uploadedDeliveryFiles.map((fileObj, idx) => {
+                            const isImg = fileObj.type?.includes('image') || /\.(png|jpe?g|gif|webp|svg|bmp|avif)/i.test(fileObj.name) || fileObj.url?.includes('/image/upload/');
+                            const isVid = fileObj.type?.includes('video') || /\.(mp4|webm|ogg|mov|mkv|avi)/i.test(fileObj.name) || fileObj.url?.includes('/video/upload/');
+                            const isZip = fileObj.type?.includes('zip') || /\.(zip|rar|7z|tar|gz)/i.test(fileObj.name);
+                            const isPdf = fileObj.type?.includes('pdf') || /\.(pdf)/i.test(fileObj.name);
+
+                            return (
+                              <div
+                                key={idx}
+                                className="relative flex items-center gap-3 p-3 bg-emerald-50/50 dark:bg-emerald-950/30 rounded-xl border border-emerald-200 dark:border-emerald-800/80 shadow-xs group hover:border-emerald-300 transition-all"
+                              >
+                                {isImg ? (
+                                  <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-emerald-300 dark:border-emerald-700 flex-shrink-0 bg-emerald-100 dark:bg-emerald-950">
+                                    <img
+                                      src={fileObj.previewUrl || fileObj.url}
+                                      alt="Delivery preview"
+                                      className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
+                                      onClick={() => setLightboxImage(fileObj.previewUrl || fileObj.url)}
+                                    />
+                                    <span className="absolute bottom-0 inset-x-0 bg-emerald-600 text-white text-[9px] font-bold text-center py-0.2">
+                                      IMAGE
+                                    </span>
+                                  </div>
+                                ) : isVid ? (
+                                  <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-emerald-300 dark:border-emerald-700 flex-shrink-0 bg-emerald-950 flex items-center justify-center">
+                                    <video src={fileObj.previewUrl || fileObj.url} className="w-full h-full object-cover" />
+                                    <span className="absolute inset-0 bg-emerald-600/60 flex items-center justify-center text-white text-xs font-bold">
+                                      ▶
+                                    </span>
+                                    <span className="absolute bottom-0 inset-x-0 bg-emerald-600 text-white text-[9px] font-bold text-center py-0.2">
+                                      VIDEO
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="w-14 h-14 rounded-lg bg-emerald-600 text-white border border-emerald-700 flex flex-col items-center justify-center font-bold text-xl flex-shrink-0 shadow-xs">
+                                    <span>{isZip ? '📦' : isPdf ? '📑' : '📄'}</span>
+                                    <span className="text-[9px] font-extrabold uppercase mt-0.5 text-emerald-100">
+                                      {isZip ? 'ZIP' : isPdf ? 'PDF' : 'FILE'}
+                                    </span>
+                                  </div>
+                                )}
+
+                                <div className="flex-1 min-w-0 pr-6">
+                                  <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">{fileObj.name}</p>
+                                  <p className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">
+                                    {fileObj.size ? `${(fileObj.size / 1024).toFixed(1)} KB` : 'Uploaded to CDN'}
+                                  </p>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRemoveDeliveryFile(idx);
+                                  }}
+                                  className="absolute top-2 right-2 w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-700 hover:bg-red-500 hover:text-white flex items-center justify-center font-bold text-xs transition-colors cursor-pointer shadow-xs"
+                                  title="Remove file from CDN"
+                                >
+                                  ✕
+                                </button>
                               </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-slate-800 dark:text-slate-200 truncate">{fileObj.name}</p>
-                              <p className="text-[10px] text-slate-500">{fileObj.size ? `${(fileObj.size / 1024).toFixed(1)} KB` : 'Uploaded'}</p>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveDeliveryFile(idx)}
-                              className="text-slate-400 hover:text-red-500 font-bold p-1 cursor-pointer"
-                              title="Remove file from CDN"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ))}
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
-                  </div>
-
-                  <div className="field-group">
-                    <label>External Link / Additional Download URL (Optional)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. https://github.com/myrepo, https://drive.google.com/..."
-                      value={deliveryFile}
-                      onChange={(e: any) => setDeliveryFile(e.target.value)}
-                    />
                   </div>
 
                   <div className="form-actions">

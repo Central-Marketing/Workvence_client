@@ -157,6 +157,7 @@ export const supportService = {
         formData.append('timestamp', String(sigObj.timestamp));
         formData.append('signature', sigObj.signature);
         formData.append('folder', sigObj.folder || folder);
+        formData.append('type', sigObj.type || 'authenticated');
 
         const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/${sigObj.cloudName}/auto/upload`, {
           method: 'POST',
@@ -173,6 +174,9 @@ export const supportService = {
             bytes: uploaded.bytes || file.size,
             type: file.type || (file.name.match(/\.(png|jpe?g|gif|webp|svg)$/i) ? 'image' : 'file'),
           };
+        } else {
+          const errJson = await cloudRes.json().catch(() => null);
+          console.warn('Cloudinary signed upload response error:', errJson);
         }
       }
     } catch (err) {

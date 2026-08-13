@@ -677,6 +677,25 @@ const Message = () => {
       );
     }
 
+    const isVideo =
+      /\.(mp4|webm|ogg|mov|mkv|avi|m4v|3gp)/i.test(fileUrl) ||
+      fileUrl.includes('/video/upload/') ||
+      (fileUrl.includes('cloudinary.com') && fileUrl.includes('/video/')) ||
+      msg.fileType?.includes('video');
+
+    if (isVideo) {
+      return (
+        <div className="my-1.5 overflow-hidden rounded-xl border border-slate-200 shadow-sm max-w-[340px] bg-black">
+          <video
+            src={fileUrl}
+            controls
+            preload="metadata"
+            className="w-full max-h-[280px] rounded-xl object-contain"
+          />
+        </div>
+      );
+    }
+
     const fileName = fileUrl.split('/').pop()?.split('?')[0] || 'Attachment';
 
     return (
@@ -969,13 +988,18 @@ const Message = () => {
               <div className="compose-area max-md:p-3 relative">
                 {attachment && (
                   <div className="flex items-center gap-3 mb-3 p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 shadow-sm max-w-sm">
-                    {attachment.type?.includes('image') || /\.(png|jpe?g|gif|webp|svg)/i.test(attachment.name) ? (
+                    {attachment.type?.includes('image') || /\.(png|jpe?g|gif|webp|svg)/i.test(attachment.name) || attachment.url?.includes('/image/upload/') ? (
                       <div className="relative group flex-shrink-0">
                         <img
                           src={attachment.previewUrl || attachment.url}
                           alt="Preview"
                           className="w-16 h-16 rounded-lg object-cover border border-slate-300 shadow-xs"
                         />
+                      </div>
+                    ) : attachment.type?.includes('video') || /\.(mp4|webm|ogg|mov|mkv|avi)/i.test(attachment.name) || attachment.url?.includes('/video/upload/') ? (
+                      <div className="w-16 h-16 bg-black rounded-lg overflow-hidden relative flex-shrink-0 flex items-center justify-center border border-slate-300 shadow-xs">
+                        <video src={attachment.previewUrl || attachment.url} className="w-full h-full object-cover" />
+                        <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-xs font-bold">▶</span>
                       </div>
                     ) : (
                       <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 rounded-lg flex items-center justify-center font-bold text-xl flex-shrink-0">

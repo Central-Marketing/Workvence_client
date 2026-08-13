@@ -11,7 +11,7 @@ import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "@/components";
+import { Loader, OrderSkeleton } from "@/components";
 import Swal from 'sweetalert2';
 import moment from "moment";
 import "./OrderDetail.scss";
@@ -363,7 +363,7 @@ const OrderDetail = () => {
     }
   };
 
-  if (isLoading) return <div className="loader-container"><Loader size={50} /></div>;
+  if (isLoading) return <OrderSkeleton />;
   if (error || !order) return <div className="error-container">Failed to load order.</div>;
 
   const isCurrentUserSeller = (user?._id && order?.sellerID && (user._id === order.sellerID._id || user._id === order.sellerID)) || (user?.isSeller && user?.username === order?.sellerID?.username);
@@ -760,26 +760,51 @@ const OrderDetail = () => {
                     {/* Drag & Drop Upload Zone */}
                     <div
                       onClick={() => !isUploadingDeliveryFiles && deliveryFileInputRef.current?.click()}
-                      className={`group border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-400 bg-slate-50/50 hover:bg-emerald-50/40 rounded-2xl p-6 text-center transition-all cursor-pointer ${isUploadingDeliveryFiles ? 'opacity-60 pointer-events-none' : ''}`}
+                      className={`group border-2 border-dashed border-emerald-300 dark:border-emerald-700 hover:border-emerald-500 dark:hover:border-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20 hover:bg-emerald-50/70 rounded-2xl p-6 text-center transition-all cursor-pointer ${isUploadingDeliveryFiles ? 'opacity-80 pointer-events-none' : ''}`}
                     >
-                      <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3 text-2xl group-hover:scale-110 transition-transform">
-                        ☁️
-                      </div>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 mb-1">
-                        {isUploadingDeliveryFiles ? 'Uploading Files to CDN...' : 'Click or Drag & Drop Delivery Files Here'}
-                      </p>
-                      <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
-                        Upload high-res images (PNG, JPG, WEBP), videos (MP4, MOV, WEBM), source code, or ZIP archives directly to Cloudinary CDN.
-                      </p>
+                      {isUploadingDeliveryFiles ? (
+                        <div className="flex flex-col items-center justify-center py-2">
+                          <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3">
+                            <Loader size={26} />
+                          </div>
+                          <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mb-1">
+                            Uploading Attachment(s) to Cloudinary CDN...
+                          </p>
+                          <p className="text-xs text-slate-500 font-medium">Please wait while your files are processed and secured.</p>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3 text-2xl group-hover:scale-110 transition-transform">
+                            ☁️
+                          </div>
+                          <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 mb-1">
+                            Click or Drag & Drop Delivery Files Here
+                          </p>
+                          <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+                            Upload high-res images (PNG, JPG, WEBP), videos (MP4, MOV, WEBM), source code, or ZIP archives directly to Cloudinary CDN.
+                          </p>
+                        </>
+                      )}
                     </div>
 
                     {/* Render Uploaded Delivery Attachments Grid */}
-                    {uploadedDeliveryFiles.length > 0 && (
+                    {(uploadedDeliveryFiles.length > 0 || isUploadingDeliveryFiles) && (
                       <div className="mt-4">
                         <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-1.5">
                           <span>Uploaded Delivery Assets ({uploadedDeliveryFiles.length}):</span>
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {isUploadingDeliveryFiles && (
+                            <div className="flex items-center gap-3 p-3 bg-emerald-50/80 dark:bg-emerald-950/40 rounded-xl border border-emerald-300 dark:border-emerald-700 animate-pulse">
+                              <div className="w-14 h-14 rounded-lg bg-emerald-200 dark:bg-emerald-900 flex items-center justify-center text-emerald-700 dark:text-emerald-300">
+                                <Loader size={20} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-bold text-emerald-800 dark:text-emerald-200">Uploading file...</p>
+                                <p className="text-[11px] text-emerald-600 font-medium">Securing on Cloudinary CDN</p>
+                              </div>
+                            </div>
+                          )}
                           {uploadedDeliveryFiles.map((fileObj, idx) => {
                             const isImg = fileObj.type?.includes('image') || /\.(png|jpe?g|gif|webp|svg|bmp|avif)/i.test(fileObj.name) || fileObj.url?.includes('/image/upload/');
                             const isVid = fileObj.type?.includes('video') || /\.(mp4|webm|ogg|mov|mkv|avi)/i.test(fileObj.name) || fileObj.url?.includes('/video/upload/');

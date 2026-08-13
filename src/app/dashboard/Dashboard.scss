@@ -81,6 +81,10 @@
         box-shadow: var(--hover-shadow);
       }
 
+      &.clickable-card {
+        cursor: pointer;
+      }
+
       .label {
         font-size: 14px;
         font-weight: 600;

@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Reviews, SellerProfileSkeleton } from '@/components';
+import { Reviews, SellerProfileSkeleton, FavoriteSellerButton } from '@/components';
 import { axiosFetch } from '@/utils';
 import { useUserStore } from '@/store/userStore';
 import Swal from 'sweetalert2';
@@ -280,17 +280,12 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                 Contact Seller
               </button>
 
-              <button
-                type="button"
-                onClick={() => setIsFavorited(!isFavorited)}
-                className={`w-11 h-11 rounded-xl border border-gray-200 hover:border-gray-300 flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer shadow-2xs ${isFavorited ? "text-red-500 bg-red-50/50 border-red-200" : "text-gray-400 bg-white hover:bg-gray-50"
-                  }`}
-                title={isFavorited ? "Saved" : "Save seller"}
-              >
-                <svg className={`w-5 h-5 ${isFavorited ? "fill-current" : "fill-none stroke-current"}`} strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </button>
+              {sellerData?._id && (
+                <FavoriteSellerButton
+                  sellerId={sellerData._id}
+                  className="w-11 h-11 !rounded-xl !p-0 border border-gray-200"
+                />
+              )}
             </div>
 
           </div>
@@ -349,8 +344,8 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                       type="button"
                       onClick={() => setSelectedIdx(idx)}
                       className={`h-20 w-24 sm:w-28 rounded-2xl p-1 overflow-hidden transition-all relative group cursor-pointer ${selectedIdx === idx
-                          ? "border-2 border-brand-green ring-2 ring-brand-green/10 bg-[#eaf8f0]/30 shadow-xs"
-                          : "border border-gray-200 hover:border-gray-300 bg-gray-50"
+                        ? "border-2 border-brand-green ring-2 ring-brand-green/10 bg-[#eaf8f0]/30 shadow-xs"
+                        : "border border-gray-200 hover:border-gray-300 bg-gray-50"
                         }`}
                     >
                       <img src={proj.image || "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg"} alt={proj.title} className="w-full h-full object-cover rounded-xl transition-transform group-hover:scale-105" />

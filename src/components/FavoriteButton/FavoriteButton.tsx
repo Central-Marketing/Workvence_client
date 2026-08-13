@@ -14,10 +14,10 @@ interface FavoriteButtonProps {
   showCount?: boolean;
 }
 
-const FavoriteButton = ({ 
-  gigId, 
-  initialIsFavorited = false, 
-  initialFavoriteCount = 0, 
+const FavoriteButton = ({
+  gigId,
+  initialIsFavorited = false,
+  initialFavoriteCount = 0,
   currentUser,
   className = "",
   iconClassName = "",
@@ -68,9 +68,8 @@ const FavoriteButton = ({
       type="button"
       onClick={handleToggleFavorite}
       disabled={loading}
-      className={`flex items-center justify-center transition-colors outline-none cursor-pointer ${className} ${
-        isFavorited ? "text-red-500" : "text-white hover:text-red-500"
-      }`}
+      className={`flex items-center justify-center transition-colors outline-none text-red-500 cursor-pointer ${className} ${isFavorited ? "text-red-500" : " hover:text-red-500"
+        }`}
       title={isFavorited ? "Remove from Favorites" : "Add to Favorites"}
     >
       <svg

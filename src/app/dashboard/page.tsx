@@ -49,15 +49,30 @@ const Dashboard = () => {
   const totalFinancialAmount = user.isSeller
     ? completedOrders.reduce((sum: number, order: any) => sum + order.price, 0)
     : orders.reduce((sum: number, order: any) => sum + order.price, 0);
-  
+
   const unreadMessagesCount = conversations.filter((c: any) => {
     return user.isSeller ? !c.readBySeller : !c.readByBuyer;
   }).length;
 
+  // Fetch favorite gigs & favorite sellers for buyers
+  const { data: favoriteGigs = [] } = useQuery({
+    queryKey: ["dashboard-favorite-gigs"],
+    queryFn: () => axiosFetch.get("/gigs/favorites").then(({ data }) => data?.favorites || []).catch(() => []),
+    enabled: !!user && !user.isSeller
+  });
+
+  const { data: favoriteSellers = [] } = useQuery({
+    queryKey: ["dashboard-favorite-sellers"],
+    queryFn: () => axiosFetch.get("/users/favorite-sellers").then(({ data }) => data?.sellers || []).catch(() => []),
+    enabled: !!user && !user.isSeller
+  });
+
+  const totalFavoritesCount = favoriteGigs.length + favoriteSellers.length;
+
   return (
     <div className="dashboard">
       <div className="container">
-        
+
         {/* Welcome Section */}
         <div className="welcome-banner">
           <div className="text-sec">
@@ -81,8 +96,8 @@ const Dashboard = () => {
               })}
             </h2>
             <p className="subtext">
-              {user.isSeller 
-                ? `Cleared earnings from ${completedOrders.length} packages` 
+              {user.isSeller
+                ? `Cleared earnings from ${completedOrders.length} packages`
                 : `Across all ${totalOrdersCount} placed orders`}
             </p>
           </div>
@@ -99,16 +114,26 @@ const Dashboard = () => {
             <p className="subtext">Packages successfully closed</p>
           </div>
 
-          <div className="stat-card">
-            <span className="label">Unread Messages</span>
-            <h2 className="value highlight">{unreadMessagesCount}</h2>
-            <p className="subtext">Awaiting your response</p>
-          </div>
+          {!user.isSeller ? (
+            <div className="stat-card clickable-card" onClick={() => router.push("/favorites")}>
+              <span className="label">My Favorites</span>
+              <h2 className="value highlight text-red-500 flex items-center gap-2">
+                {totalFavoritesCount}
+              </h2>
+              <p className="subtext">{favoriteGigs.length} Gigs & {favoriteSellers.length} Sellers saved</p>
+            </div>
+          ) : (
+            <div className="stat-card">
+              <span className="label">Unread Messages</span>
+              <h2 className="value highlight">{unreadMessagesCount}</h2>
+              <p className="subtext">Awaiting your response</p>
+            </div>
+          )}
         </div>
 
         {/* Two Column Layout: Recent Orders & Quick Actions */}
         <div className="layout-columns">
-          
+
           {/* Recent Orders Card */}
           <div className="card orders-card">
             <div className="card-header">
@@ -185,6 +210,9 @@ const Dashboard = () => {
                 </>
               ) : (
                 <>
+                  <Link href="/favorites" className="action-button secondary ">
+                    My Favorites ({totalFavoritesCount})
+                  </Link>
                   <Link href="/briefs/create" className="action-button secondary">
                     Post a Job Brief
                   </Link>

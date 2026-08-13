@@ -27,7 +27,7 @@ import {
 import axios from 'axios';
 import { axiosFetch, socket, getAvatarUrl } from "@/utils";
 import supportService from "@/utils/supportService";
-import { getOtherUser, isConversationUnread, isTargetConversation } from '@/utils/chatHelpers';
+import { getOtherUser, isConversationUnread, isTargetConversation, renderMessageTextWithLinks } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
 import { Loader, ChatSkeleton, Skeleton } from "@/components";
 import moment from 'moment';
@@ -885,7 +885,7 @@ const Message = () => {
                                 <div className="flex justify-between items-start mb-2 gap-4">
                                   <div>
                                     <h4 className="text-base font-bold text-slate-900 leading-tight mb-1">Custom Proposal</h4>
-                                    <p className="text-sm text-slate-500 line-clamp-2">{offer.desc || 'No description provided.'}</p>
+                                    <p className="text-sm text-slate-500 line-clamp-2">{renderMessageTextWithLinks(offer.desc || 'No description provided.')}</p>
                                   </div>
                                   <div className="text-2xl font-black text-slate-800">${offer.price}</div>
                                 </div>
@@ -938,7 +938,7 @@ const Message = () => {
                         ) : (
                           <div className="msg-bubble break-words [overflow-wrap:anywhere] [word-break:break-word]">
                             {renderMessageAttachment(msg)}
-                            {msg.description && <p className="break-words [overflow-wrap:anywhere] [word-break:break-word]">{msg.description}</p>}
+                            {msg.description && <p className="break-words [overflow-wrap:anywhere] [word-break:break-word]">{renderMessageTextWithLinks(msg.description)}</p>}
                             <span className="msg-time">
                               {moment(msg.createdAt).format('HH:mm')}
                               {/* {isOwner && <RiCheckDoubleLine className={`check-icon ${isMsgReadByRecipient(msg) ? 'read' : ''}`} />} */}

@@ -1,3 +1,4 @@
+import React from 'react';
 import axiosFetch from './axiosFetch';
 import Swal from 'sweetalert2';
 
@@ -93,4 +94,30 @@ export const isTargetConversation = (conversation: any, targetId: string) => {
   if (sId && bId && (`${sId}${bId}` === tid || `${bId}${sId}` === tid)) return true;
 
   return false;
+};
+
+const URL_REGEX = /(https?:\/\/[^\s]+)/g;
+
+export const renderMessageTextWithLinks = (text: string) => {
+  if (!text) return null;
+
+  const parts = text.split(URL_REGEX);
+
+  return parts.map((part, index) => {
+    if (part.match(/^https?:\/\//i)) {
+      return React.createElement(
+        'a',
+        {
+          key: index,
+          href: part,
+          target: '_blank',
+          rel: 'noopener noreferrer',
+          className: 'text-emerald-600 underline font-medium hover:text-emerald-700 break-all transition-colors cursor-pointer',
+          onClick: (e: any) => e.stopPropagation()
+        },
+        part
+      );
+    }
+    return part;
+  });
 };

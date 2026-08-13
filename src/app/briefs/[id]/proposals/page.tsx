@@ -59,31 +59,37 @@ const Proposals = () => {
 
   // Initiate chat from proposal
   const chatMutation = useMutation({
-    mutationFn: async ({ proposalId, sellerId }: { proposalId: string; sellerId: string }) => {
-      const buyerId = user?._id;
-      if (!buyerId) throw new Error("User not found");
-      
+    mutationFn: async ({ proposalId, sellerId, sellerUsername }: { proposalId: string; sellerId: string; sellerUsername?: string }) => {
+      const buyerId = user?._id || user?.id;
+      if (!buyerId) throw new Error("User session not found");
+      if (!sellerId) throw new Error("Seller information missing");
+
       try {
         const res = await axiosFetch.get(`/conversations/single/${sellerId}/${buyerId}`);
-        if (res.data?.conversationID || res.data?.id) {
-          return { conversationID: res.data.conversationID || res.data.id };
+        const targetId = res.data?.uuid || res.data?.conversationID || res.data?._id || res.data?.id || res.data?.data?.uuid || res.data?.data?.conversationID || res.data?.data?._id;
+        if (targetId) {
+          return { conversationID: targetId };
         }
       } catch (err) {
         // Conversation not found, proceed to create
       }
-      
+
       const newConv = await axiosFetch.post("/conversations", {
         to: sellerId,
         from: buyerId,
+        sellerID: sellerId,
+        buyerID: buyerId,
+        seller_username: sellerUsername || null,
+        buyer_username: user?.username || null
       });
       return newConv.data;
     },
     onSuccess: (data) => {
-      const convId = data?.conversationID || data?.conversationId || data?.id || data?._id;
+      const convId = data?.uuid || data?.conversationID || data?.conversationId || data?._id || data?.id || data?.data?.uuid || data?.data?.conversationID || data?.data?._id;
       if (convId) {
         router.push(`/message/${convId}`);
       } else {
-        toast.error("Conversation ID not returned from server.");
+        toast.error("Could not resolve conversation ID");
       }
     },
     onError: (err: any) => {
@@ -162,7 +168,12 @@ const Proposals = () => {
                 : aiResult.top3Recommendations || aiResult.topProposals || aiResult.recommendations || aiResult.data || []
               ).map((item, index) => {
                   const proposal = item.proposal || item;
-                  const seller = proposal.sellerID || proposal.sellerId || proposal.seller || {};
+                  const seller = typeof proposal.sellerID === 'object' && proposal.sellerID !== null 
+                    ? proposal.sellerID 
+                    : (typeof proposal.sellerId === 'object' && proposal.sellerId !== null 
+                        ? proposal.sellerId 
+                        : (typeof proposal.seller === 'object' && proposal.seller !== null ? proposal.seller : {}));
+                  const targetSellerId = seller._id || seller.id || (typeof proposal.sellerID === 'string' ? proposal.sellerID : (typeof proposal.sellerId === 'string' ? proposal.sellerId : (typeof proposal.seller === 'string' ? proposal.seller : '')));
                   return (
                     <div
                       key={proposal._id || index}
@@ -215,7 +226,7 @@ const Proposals = () => {
                       <button
                         className="btn-chat-sm"
                         onClick={() =>
-                          chatMutation.mutate({ proposalId: proposal._id, sellerId: seller._id })
+                          chatMutation.mutate({ proposalId: proposal._id, sellerId: targetSellerId, sellerUsername: seller.username })
                         }
                         disabled={chatMutation.isPending}
                       >
@@ -246,7 +257,12 @@ const Proposals = () => {
         ) : (
           <div className="proposals-list">
             {proposals.map((proposal) => {
-              const seller = proposal.sellerID || proposal.sellerId || proposal.seller || {};
+              const seller = typeof proposal.sellerID === 'object' && proposal.sellerID !== null 
+                ? proposal.sellerID 
+                : (typeof proposal.sellerId === 'object' && proposal.sellerId !== null 
+                    ? proposal.sellerId 
+                    : (typeof proposal.seller === 'object' && proposal.seller !== null ? proposal.seller : {}));
+              const targetSellerId = seller._id || seller.id || (typeof proposal.sellerID === 'string' ? proposal.sellerID : (typeof proposal.sellerId === 'string' ? proposal.sellerId : (typeof proposal.seller === 'string' ? proposal.seller : '')));
               
               // Check if AI recommended
               const aiList = Array.isArray(aiResult) ? aiResult : (aiResult?.top3Recommendations || aiResult?.topProposals || aiResult?.recommendations || aiResult?.data || []);
@@ -277,8 +293,8 @@ const Proposals = () => {
                       <div
                         className="seller-name font-semibold text-lg cursor-pointer hover:text-brand-green transition-colors"
                         onClick={() =>
-                          seller._id &&
-                          router.push(`/seller/${seller._id}`)
+                          targetSellerId &&
+                          router.push(`/seller/${targetSellerId}`)
                         }
                       >
                         {seller.username || "Seller"}
@@ -327,7 +343,7 @@ const Proposals = () => {
                     </div>
                     <button
                       className="btn-initiate-chat"
-                      onClick={() => chatMutation.mutate({ proposalId: proposal._id, sellerId: seller._id })}
+                      onClick={() => chatMutation.mutate({ proposalId: proposal._id, sellerId: targetSellerId, sellerUsername: seller.username })}
                       disabled={chatMutation.isPending}
                     >
                       {chatMutation.isPending

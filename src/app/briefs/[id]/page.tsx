@@ -272,31 +272,37 @@ const BriefDetail = () => {
       </div>
 
       {showMyProposalModal && activeProposal && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden relative">
-            <div className="flex justify-between items-center p-6 border-b border-slate-100">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4" onClick={() => setShowMyProposalModal(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden relative" onClick={e => e.stopPropagation()}>
+            {/* Header (Always Fixed at Top) */}
+            <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-white shrink-0">
               <h2 className="text-xl font-bold text-slate-900">Your Proposal</h2>
               <button
                 onClick={() => setShowMyProposalModal(false)}
-                className="text-slate-400 hover:text-slate-600 text-3xl leading-none"
+                className="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 &times;
               </button>
             </div>
-            <div className="p-6 flex flex-col gap-4">
-              <div className="flex justify-between border-b border-slate-100 pb-4">
+
+            {/* Scrollable Body Content */}
+            <div className="p-6 flex flex-col gap-5 overflow-y-auto">
+              <div className="flex justify-between border-b border-slate-100 pb-4 bg-slate-50 p-4 rounded-xl">
                 <div>
-                  <div className="text-sm font-semibold text-slate-400 uppercase tracking-wide">Your Offer</div>
-                  <div className="text-lg font-bold text-emerald-500">${activeProposal.price}</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Price</div>
+                  <div className="text-xl font-extrabold text-emerald-600">${activeProposal.price}</div>
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-slate-400 uppercase tracking-wide">Delivery</div>
-                  <div className="text-lg font-bold text-slate-900">{activeProposal.deliveryTime} Days</div>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Delivery Time</div>
+                  <div className="text-xl font-extrabold text-slate-900">{activeProposal.deliveryTime} Days</div>
                 </div>
               </div>
+
               <div>
-                <div className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-2">Cover Letter</div>
-                <div className="text-[15px] text-slate-700 whitespace-pre-wrap leading-relaxed">{activeProposal.coverLetter}</div>
+                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Cover Letter</div>
+                <div className="text-[15px] text-slate-800 whitespace-pre-wrap leading-relaxed bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+                  {activeProposal.coverLetter}
+                </div>
               </div>
             </div>
           </div>

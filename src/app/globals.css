@@ -182,3 +182,18 @@ body {
   font-family: monospace !important;
   font-size: 0.875em !important;
 }
+
+/* Universal Modal Container & Header-Pinning Safety */
+.modal-backdrop,
+.proposal-modal-overlay {
+  padding: 1rem;
+}
+
+.modal-box,
+.proposal-modal-card,
+.modal-card,
+.modal-container {
+  max-height: calc(100vh - 2.5rem);
+  display: flex;
+  flex-direction: column;
+}

@@ -230,7 +230,7 @@ const Earnings = () => {
       {/* ── Payout Request Modal ── */}
       {showPayoutModal && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-[1000] p-4 animate-in fade-in duration-200" onClick={() => setShowPayoutModal(false)}>
-          <div className="bg-white w-full max-w-[440px] rounded-2xl shadow-[0_25px_60px_-12px_rgba(0,0,0,0.2)] overflow-hidden animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+          <div className="bg-white w-full max-w-[440px] max-h-[90vh] overflow-y-auto rounded-2xl shadow-[0_25px_60px_-12px_rgba(0,0,0,0.2)] animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center py-4 px-5 border-b border-slate-200 bg-slate-50">
               <h3 className="text-[17px] font-bold text-slate-900 m-0">Request Payout</h3>
               <button className="text-2xl text-slate-400 hover:text-slate-900 leading-none" onClick={() => setShowPayoutModal(false)}>&times;</button>

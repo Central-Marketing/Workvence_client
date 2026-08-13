@@ -2,69 +2,30 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from "next/navigation";
-import { Review, Loader } from '..';
-import { axiosFetch } from "@/utils";
-import toast from 'react-hot-toast';
+import { Review } from '..';
 
 const Reviews = (props: any) => {
-    const { packageID, reviews } = props;
-    const navigation = useRouter();
-    const queryClient = useQueryClient();
-    
+    const { reviews } = props;
+
     const [searchTerm, setSearchTerm] = useState("");
     const [showMore, setShowMore] = useState(false);
-    const [showAddForm, setShowAddForm] = useState(false);
-
-    const mutation = useMutation({
-        mutationFn: (review: any) =>
-            axiosFetch.post('/reviews', review)
-            .then(({data}) => data)
-            .catch(({ response: { data } }) => {
-                if (data?.message === 'jwt expired') {
-                    navigation.push('/login');
-                }
-                toast.error(data?.message || "Error submitting review");
-                throw new Error(data?.message || "Error submitting review");
-            }),
-        onSuccess: () => {
-            toast.success("Review submitted successfully!");
-            // Invalidate the parent gig query so it fetches the new review!
-            queryClient.invalidateQueries({ queryKey: ['gig', packageID] });
-            setShowAddForm(false);
-        }
-    });
-
-    const handleReviewSubmit = (event: any) => {
-        event.preventDefault();
-        const description = event.target.description.value;
-        const star = Number(event.target.star.value);
-
-        if (star && description) {
-            mutation.mutate({ packageID, description, star });
-            event.target.reset();
-        } else {
-            toast.error("Please enter both rating and review text");
-        }
-    };
 
     const allReviews = Array.isArray(reviews) ? reviews : [];
 
     const filteredReviews = allReviews.filter((item: any) => {
-      if (!searchTerm.trim()) return true;
-      const text = `${item?.description || ""} ${item?.userID?.username || ""} ${item?.userID?.country || ""}`.toLowerCase();
-      return text.includes(searchTerm.trim().toLowerCase());
+        if (!searchTerm.trim()) return true;
+        const text = `${item?.description || ""} ${item?.userID?.username || ""} ${item?.userID?.country || ""}`.toLowerCase();
+        return text.includes(searchTerm.trim().toLowerCase());
     });
 
     const displayedReviews = showMore ? filteredReviews : filteredReviews.slice(0, 4);
-    
+
     // Calculate accurate aggregate stats
     const totalReviewsCount = allReviews.length;
     let averageRating = 0;
-    
+
     const starCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    
+
     if (totalReviewsCount > 0) {
         let totalScore = 0;
         allReviews.forEach((r: any) => {
@@ -117,7 +78,7 @@ const Reviews = (props: any) => {
                                         {starLvl} Stars
                                     </span>
                                     <div className="h-2 rounded-full bg-gray-200 flex-1 mx-3 overflow-hidden">
-                                        <div 
+                                        <div
                                             className={`h-full rounded-full transition-all duration-1000 ${hasVotes ? 'bg-brand-green' : 'bg-transparent'}`}
                                             style={{ width: `${percentage}%` }}
                                         ></div>
@@ -137,9 +98,9 @@ const Reviews = (props: any) => {
                         </h3>
                         <div className="space-y-3.5">
                             {[
-                            { label: "Seller communication level", score: averageRating > 0 ? averageRating.toFixed(1) : "0.0" },
-                            { label: "Quality of delivery", score: averageRating > 0 ? averageRating.toFixed(1) : "0.0" },
-                            { label: "Value of delivery", score: averageRating > 0 ? averageRating.toFixed(1) : "0.0" }
+                                { label: "Seller communication level", score: averageRating > 0 ? averageRating.toFixed(1) : "0.0" },
+                                { label: "Quality of delivery", score: averageRating > 0 ? averageRating.toFixed(1) : "0.0" },
+                                { label: "Value of delivery", score: averageRating > 0 ? averageRating.toFixed(1) : "0.0" }
                             ].map((criteria, i) => (
                                 <div key={i} className="flex items-center justify-between text-xs sm:text-sm">
                                     <span className="text-gray-500 font-normal">{criteria.label}</span>
@@ -177,8 +138,8 @@ const Reviews = (props: any) => {
             {/* Review Cards Grid (2 columns) */}
             {displayedReviews.length === 0 ? (
                 <div className="text-center py-10 bg-gray-50 rounded-2xl border border-gray-100 text-gray-400 font-medium">
-                    {totalReviewsCount === 0 
-                        ? "There are no reviews yet for this package." 
+                    {totalReviewsCount === 0
+                        ? "There are no reviews yet for this package."
                         : `No reviews matching "${searchTerm}" found.`}
                 </div>
             ) : (
@@ -189,17 +150,9 @@ const Reviews = (props: any) => {
                 </div>
             )}
 
-            {/* Action Buttons: Show More Reviews & Add Review Toggle */}
-            <div className="flex flex-wrap items-center justify-end gap-4 mt-6 pt-2">
-                <button
-                    type="button"
-                    onClick={() => setShowAddForm(!showAddForm)}
-                    className="px-6 py-3 bg-gray-100 hover:bg-gray-200/80 text-gray-800 font-semibold rounded-xl transition-colors text-sm cursor-pointer"
-                >
-                    {showAddForm ? "Cancel Writing" : "+ Write a Review"}
-                </button>
-
-                {filteredReviews.length > 4 && (
+            {/* Action Buttons: Show More Reviews */}
+            {filteredReviews.length > 4 && (
+                <div className="flex flex-wrap items-center justify-end gap-4 mt-6 pt-2">
                     <button
                         type="button"
                         onClick={() => setShowMore(!showMore)}
@@ -207,48 +160,6 @@ const Reviews = (props: any) => {
                     >
                         {showMore ? "Show fewer reviews" : "Show more review"}
                     </button>
-                )}
-            </div>
-
-            {/* Collapsible Write Review Form */}
-            {showAddForm && (
-                <div className="mt-8 bg-gray-50 border border-gray-200/80 rounded-2xl p-6 sm:p-8 shadow-xs animate-fadeIn">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Leave Your Feedback</h3>
-                    <form className="space-y-4" onSubmit={handleReviewSubmit}>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase mb-2">Rating Score</label>
-                            <select 
-                                name="star" 
-                                className="bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-800 focus:outline-none focus:border-brand-green shadow-2xs cursor-pointer w-48"
-                                defaultValue={5}
-                            >
-                                <option value={5}>★★★★★ (5 - Excellent)</option>
-                                <option value={4}>★★★★☆ (4 - Good)</option>
-                                <option value={3}>★★★☆☆ (3 - Average)</option>
-                                <option value={2}>★★☆☆☆ (2 - Fair)</option>
-                                <option value={1}>★☆☆☆☆ (1 - Poor)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase mb-2">Your Review</label>
-                            <textarea 
-                                name="description" 
-                                rows={4} 
-                                placeholder="Describe your working experience with this seller..." 
-                                required
-                                className="w-full bg-white border border-gray-200 rounded-xl p-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-brand-green transition-colors shadow-2xs"
-                            ></textarea>
-                        </div>
-                        <div className="flex justify-end pt-2">
-                            <button 
-                                type="submit" 
-                                disabled={mutation.isPending}
-                                className="px-7 py-3 bg-brand-green hover:bg-brand-green text-white font-extrabold text-sm rounded-xl transition-all shadow-sm cursor-pointer disabled:opacity-50"
-                            >
-                                {mutation.isPending ? "Submitting..." : "Send Review"}
-                            </button>
-                        </div>
-                    </form>
                 </div>
             )}
         </div>

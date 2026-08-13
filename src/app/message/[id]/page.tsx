@@ -342,7 +342,7 @@ const Message = () => {
   });
 
   // Fetch active briefs created by the recipient user (if current user is seller)
-  const { data: userBriefs = [] } = useQuery({
+  const { data: chatBriefs = [] } = useQuery({
     queryKey: ['chat-briefs', conversationID, conversations.length],
     queryFn: async () => {
       const activeConvDoc = conversations.find((c: any) => isTargetConversation(c, conversationID));

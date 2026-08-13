@@ -25,8 +25,10 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [sellerData, setSellerData] = useState<any>(null);
   const [sellerGigs, setSellerGigs] = useState<any[]>([]);
+  const [sellerPortfolio, setSellerPortfolio] = useState<any[]>([]);
   const [isProfileLoading, setIsProfileLoading] = useState(true);
   const [isGigsLoading, setIsGigsLoading] = useState(true);
+  const [isPortfolioLoading, setIsPortfolioLoading] = useState(true);
   const router = useRouter();
   const { user } = useUserStore((state: any) => state);
 
@@ -63,6 +65,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
     if (!username || username === "undefined" || username === "null") {
       setIsProfileLoading(false);
       setIsGigsLoading(false);
+      setIsPortfolioLoading(false);
       return;
     }
 
@@ -106,6 +109,19 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
         if (isMounted) setIsProfileLoading(false);
       });
 
+    // 2. Fetch Seller Portfolio (runs in parallel)
+    axiosFetch
+      .get(`/users/seller/${username}/portfolio`)
+      .then(({ data }) => {
+        if (isMounted && !data.error) {
+          setSellerPortfolio(data.portfolio || []);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (isMounted) setIsPortfolioLoading(false);
+      });
+
     return () => {
       isMounted = false;
     };
@@ -118,7 +134,8 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
   const cleanHandle = displayUsername.toLowerCase().replace(/\s+/g, "").slice(0, 10);
   const handleName = `@${cleanHandle}`;
 
-  const activeProject = sellerData?.portfolio?.[selectedIdx] || null;
+  const portfolioList = sellerPortfolio.length > 0 ? sellerPortfolio : (sellerData?.portfolio || []);
+  const activeProject = portfolioList[selectedIdx] || null;
 
   return (
     <div className="min-h-screen bg-white text-gray-800 pb-28">
@@ -333,10 +350,10 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
           {/* RIGHT COLUMN: Main Content Sections */}
           <div className="lg:col-span-8 space-y-10">
 
-            {/* SECTION 1: About me */}
+            {/* SECTION 1: About Me */}
             <div className="bg-white border border-gray-200/90 rounded-3xl p-7 sm:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.025)]">
               <h2 className="text-xl sm:text-[24px] font-semibold text-gray-900 mb-4 tracking-tight">
-                About me
+                About Me
               </h2>
               <div className="text-gray-600 text-[14.5px] sm:text-[15px] leading-relaxed font-normal space-y-4">
                 <p>Hello!</p>
@@ -361,74 +378,70 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
             </div>
 
             {/* SECTION 2: Seller Portfolio */}
-            {sellerData?.portfolio && sellerData.portfolio.length > 0 && (
+            {(isPortfolioLoading || portfolioList.length > 0) && (
               <div className="bg-white border border-gray-200/90 rounded-3xl p-7 sm:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.025)]">
 
                 {/* Portfolio Header */}
-                <div className="flex items-center justify-between gap-4 mb-5">
-                  <h2 className="text-xl sm:text-[24px] font-semibold text-gray-900 tracking-tight">
-                    Seller Portfolio
+                <div className="flex items-center justify-between gap-4 mb-6">
+                  <h2 className="text-xl sm:text-[24px] font-semibold text-gray-900 tracking-tight flex items-center gap-2.5">
+                    <span>Seller Portfolio</span>
+                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                      {portfolioList.length} {portfolioList.length === 1 ? 'Project' : 'Projects'}
+                    </span>
                   </h2>
-                  <button type="button" className="text-gray-400 hover:text-gray-900 transition-colors p-1" title="View all projects">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </button>
                 </div>
 
-                {/* Thumbnails Row */}
-                <div className="flex flex-wrap gap-3 mb-8">
-                  {sellerData.portfolio.map((proj: any, idx: number) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setSelectedIdx(idx)}
-                      className={`h-20 w-24 sm:w-28 rounded-2xl p-1 overflow-hidden transition-all relative group cursor-pointer ${selectedIdx === idx
-                        ? "border-2 border-brand-green ring-2 ring-brand-green/10 bg-[#eaf8f0]/30 shadow-xs"
-                        : "border border-gray-200 hover:border-gray-300 bg-gray-50"
-                        }`}
-                    >
-                      <img src={proj.image || "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg"} alt={proj.title} className="w-full h-full object-cover rounded-xl transition-transform group-hover:scale-105" />
-                    </button>
-                  ))}
-                </div>
+                {isPortfolioLoading ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <Skeleton className="h-64 w-full rounded-2xl" />
+                    <Skeleton className="h-64 w-full rounded-2xl" />
+                  </div>
+                ) : (
+                  /* Portfolio Projects Grid */
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {portfolioList.map((proj: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="group bg-white border border-gray-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-lg hover:border-emerald-300 transition-all duration-300 flex flex-col justify-between"
+                      >
+                        {/* Project Image Header */}
+                        <div className="relative h-48 sm:h-52 w-full bg-gray-100 overflow-hidden border-b border-gray-100">
+                          <img
+                            src={proj.image || "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg"}
+                            alt={proj.title || "Portfolio Project"}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
 
-                {/* Featured Project Case Study Card */}
-                {activeProject && (
-                  <div className="bg-white border border-gray-200/90 rounded-2xl p-6 sm:p-7 shadow-[0_2px_15px_rgba(0,0,0,0.025)] grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
+                        {/* Project Details Body */}
+                        <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                          <div>
+                            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1.5 tracking-tight group-hover:text-emerald-600 transition-colors line-clamp-1">
+                              {proj.title}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-gray-500 leading-relaxed font-normal line-clamp-3">
+                              {proj.description || 'No project description provided.'}
+                            </p>
+                          </div>
 
-                    {/* Left details */}
-                    <div className="lg:col-span-6 flex flex-col justify-center h-full">
-                      <div>
-                        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 tracking-tight">
-                          {activeProject.title}
-                        </h3>
-                        <p className="text-[14px] sm:text-[14.5px] text-gray-500 leading-relaxed font-normal mb-5">
-                          {activeProject.description}
-                        </p>
-
-                        {activeProject.link && (
-                          <a href={activeProject.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-brand-green font-semibold text-[14px] hover:text-brand-green transition-colors">
-                            View Live Project
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                          </a>
-                        )}
+                          {proj.link && (
+                            <div className="pt-3 border-t border-gray-100">
+                              <a
+                                href={proj.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 text-emerald-600 hover:text-emerald-700 font-bold text-xs transition-colors"
+                              >
+                                <span>View Live Project</span>
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                              </a>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Right image screen */}
-                    <div className="lg:col-span-6">
-                      <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden bg-gray-900 border border-gray-200/80 shadow-xs relative group">
-                        <img
-                          src={activeProject.image || "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg"}
-                          alt={activeProject.title}
-                          className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
-                        />
-                      </div>
-                    </div>
-
+                    ))}
                   </div>
                 )}
               </div>

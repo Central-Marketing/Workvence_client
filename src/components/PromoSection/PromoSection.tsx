@@ -22,9 +22,10 @@ const PromoSection = () => {
             muted
             loop
             playsInline
-            src="./media/video.mp4"
+            src="https://res.cloudinary.com/cqtrqtyu/video/upload/v1786602492/WhatsApp_Video_2026-08-13_at_12.22.47_PM_odf8xi.mp4"
           />
         </div>
+
       </div>
     </section>
   );

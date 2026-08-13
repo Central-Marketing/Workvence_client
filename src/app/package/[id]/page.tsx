@@ -62,27 +62,51 @@ const PackageContent = () => {
       router.push('/login');
       return;
     }
-    const sellerID = data?.userID?._id;
-    const buyerID = user._id;
 
-    if (!sellerID || !buyerID) return;
+    const sellerObj = typeof data?.userID === 'object' ? data.userID : null;
+    const sellerID = sellerObj?._id || sellerObj?.id || (typeof data?.userID === 'string' ? data.userID : null);
+    const sellerUsername = sellerObj?.username;
 
-    if (sellerID === buyerID) {
+    const buyerID = user?._id || user?.id;
+    const buyerUsername = user?.username;
+
+
+    console.log(sellerObj, sellerID, sellerUsername, buyerID, buyerUsername)
+
+    if (!sellerID || !buyerID) {
+      Swal.fire('Error', 'User information missing to start conversation.', 'error');
+      return;
+    }
+
+    if (sellerID === buyerID || (sellerUsername && buyerUsername && sellerUsername.toLowerCase() === buyerUsername.toLowerCase())) {
       Swal.fire('Notice', 'You cannot contact yourself.', 'info');
       return;
     }
 
     try {
-      const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
-      const targetId = res.data.uuid || res.data.conversationID || res.data._id;
-      router.push(`/message/${targetId}`);
-    } catch (err) {
-      const res = await axiosFetch.post("/conversations", {
+      const { data: convData } = await axiosFetch.post('/conversations', {
+        sellerID,
+        buyerID,
         to: sellerID,
         from: buyerID,
+        seller_username: sellerUsername,
+        buyer_username: buyerUsername
       });
-      const targetId = res.data.uuid || res.data.conversationID || res.data._id;
-      router.push(`/message/${targetId}`);
+
+      const targetId = convData?.uuid || convData?.conversationID || convData?._id;
+      if (targetId) {
+        router.push(`/message/${targetId}`);
+      }
+    } catch (err: any) {
+      try {
+        const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
+        const targetId = res.data?.uuid || res.data?.conversationID || res.data?._id;
+        if (targetId) {
+          router.push(`/message/${targetId}`);
+        }
+      } catch (fallbackErr: any) {
+        Swal.fire('Error', err?.response?.data?.message || 'Could not start conversation', 'error');
+      }
     }
   };
 
@@ -240,8 +264,8 @@ const PackageContent = () => {
                   type="button"
                   onClick={() => setSelectedHeroIndex(idx)}
                   className={`relative rounded-xl overflow-hidden border-2 transition-all duration-300 cursor-pointer w-full aspect-[16/10] lg:aspect-auto h-full ${selectedHeroIndex === idx
-                      ? 'border-brand-green ring-2 ring-brand-green/20 shadow-sm scale-[0.98]'
-                      : 'border-transparent opacity-80 hover:opacity-100 hover:border-gray-300'
+                    ? 'border-brand-green ring-2 ring-brand-green/20 shadow-sm scale-[0.98]'
+                    : 'border-transparent opacity-80 hover:opacity-100 hover:border-gray-300'
                     }`}
                 >
                   <img src={img} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
@@ -269,8 +293,8 @@ const PackageContent = () => {
                   key={name}
                   onClick={() => scrollToSection(id, name)}
                   className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${activeTab === name
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-900"
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-500 hover:text-gray-900"
                     }`}
                 >
                   {name}
@@ -537,10 +561,10 @@ const PackageContent = () => {
                           onClick={() => !isDisabled && setPackageTier(tier)}
                           disabled={isDisabled}
                           className={`py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${packageTier === tier
-                              ? "bg-white text-gray-900 shadow-xs cursor-default"
-                              : isDisabled
-                                ? "text-gray-300 cursor-not-allowed"
-                                : "text-gray-500 hover:text-gray-900 cursor-pointer"
+                            ? "bg-white text-gray-900 shadow-xs cursor-default"
+                            : isDisabled
+                              ? "text-gray-300 cursor-not-allowed"
+                              : "text-gray-500 hover:text-gray-900 cursor-pointer"
                             }`}
                         >
                           {tier.charAt(0).toUpperCase() + tier.slice(1)}

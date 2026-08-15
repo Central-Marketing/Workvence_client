@@ -5,7 +5,7 @@ const getAdminApiUrl = () => {
   if (typeof window !== "undefined") {
     return "/api";
   }
-  return process.env.NEXT_PUBLIC_ADMIN_API_URL || process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_ADMIN_BACKEND_URL || "http://localhost:8082/api";
+  return process.env.NEXT_PUBLIC_ADMIN_API_URL || process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_ADMIN_BACKEND_URL || "https://devadmin.workvence.com/api";
 };
 
 const adminAxiosFetch = axios.create({

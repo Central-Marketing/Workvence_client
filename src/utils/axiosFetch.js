@@ -9,7 +9,7 @@ const getBaseURL = () => {
     let cleaned = envUrl.trim().replace(/\/$/, '');
     return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
   }
-  return "http://localhost:8080/api";
+  return "https://devadmin.workvence.com/api";
 };
 
 const axiosFetch = axios.create({

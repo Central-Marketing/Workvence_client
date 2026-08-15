@@ -31,7 +31,7 @@ const PackageCard = ({ data }: { data: any }) => {
   const handleProfileClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    router.push(`/seller/${sellerId}`);
+    router.push(`/seller/${username}`);
   };
 
   const handleBookmarkClick = (e: React.MouseEvent) => {

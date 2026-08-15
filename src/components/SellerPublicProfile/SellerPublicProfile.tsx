@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -8,6 +7,22 @@ import { useRouter } from 'next/navigation';
 import { Reviews, FavoriteSellerButton, PackageCard, Skeleton, CardSkeleton } from '@/components';
 import { axiosFetch } from '@/utils';
 import { useUserStore } from '@/store/userStore';
+import moment from 'moment';
+import {
+  Globe,
+  Clock,
+  Award,
+  Star,
+  CheckCircle,
+  Briefcase,
+  GraduationCap,
+  FolderGit2,
+  Package,
+  MessageSquare,
+  AlertCircle,
+  UserX,
+  ExternalLink
+} from 'lucide-react';
 
 const categories = [
   "All services",
@@ -37,27 +52,37 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
       router.push('/login');
       return;
     }
-    const sellerID = sellerData?._id;
-    const buyerID = user._id;
+    const sellerID = sellerData?._id || sellerData?.id;
+    const buyerID = user._id || user.id;
 
     if (!sellerID || !buyerID) return;
 
-    if (sellerID === buyerID) {
+    if (String(sellerID) === String(buyerID)) {
       toast.error('You cannot contact yourself.');
       return;
     }
 
     try {
       const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
-      const targetId = res.data.uuid || res.data.conversationID || res.data._id;
-      router.push(`/message/${targetId}`);
+      const targetId = res.data?.uuid || res.data?.conversationID || res.data?._id;
+      if (targetId) {
+        router.push(`/message/${targetId}`);
+      }
     } catch (err) {
-      const res = await axiosFetch.post("/conversations", {
-        to: sellerID,
-        from: buyerID,
-      });
-      const targetId = res.data.uuid || res.data.conversationID;
-      router.push(`/message/${targetId}`);
+      try {
+        const res = await axiosFetch.post("/conversations", {
+          to: sellerID,
+          from: buyerID,
+          sellerID,
+          buyerID
+        });
+        const targetId = res.data?.uuid || res.data?.conversationID || res.data?._id;
+        if (targetId) {
+          router.push(`/message/${targetId}`);
+        }
+      } catch (postErr: any) {
+        toast.error(postErr?.response?.data?.message || 'Failed to start conversation.');
+      }
     }
   };
 
@@ -71,15 +96,15 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
 
     let isMounted = true;
 
-    // 1. Fetch Seller Profile (runs in parallel)
+    // 1. Fetch Seller Profile
     axiosFetch
       .get(`/users/seller/${username}`)
       .then(({ data }) => {
-        if (isMounted && !data.error) {
+        if (isMounted && data) {
           const userObj = data.user || data;
           setSellerData(userObj);
 
-          // Trigger gigs fetch using resolved ID
+          // Fetch seller gigs using resolved ID or username
           const sellerId = userObj._id || userObj.id;
           if (sellerId) {
             axiosFetch
@@ -104,16 +129,19 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
           }
         }
       })
-      .catch((err) => console.error("Error fetching seller profile:", err))
+      .catch((err) => {
+        console.error("Error fetching seller profile:", err);
+        if (isMounted) setSellerData(null);
+      })
       .finally(() => {
         if (isMounted) setIsProfileLoading(false);
       });
 
-    // 2. Fetch Seller Portfolio (runs in parallel)
+    // 2. Fetch Seller Portfolio
     axiosFetch
       .get(`/users/seller/${username}/portfolio`)
       .then(({ data }) => {
-        if (isMounted && !data.error) {
+        if (isMounted && data && !data.error) {
           setSellerPortfolio(data.portfolio || []);
         }
       })
@@ -127,15 +155,77 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
     };
   }, [username]);
 
+  // Normalized Profile Data
   const displayUsername = sellerData?.username || (username && username !== "undefined" && username !== "null"
     ? decodeURIComponent(username)
     : "Seller");
 
-  const cleanHandle = displayUsername.toLowerCase().replace(/\s+/g, "").slice(0, 10);
-  const handleName = `@${cleanHandle}`;
+  const avatarUrl = sellerData?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayUsername)}&background=0D9488&color=fff&bold=true&length=2`;
+  const handleName = `@${sellerData?.username || displayUsername}`;
+  const shortTitle = sellerData?.shortTitle?.trim() || "Freelancer";
+  const sellerLevel = sellerData?.sellerLevel || "Level 1 Seller";
+  const responseTime = sellerData?.responseTimeHours
+    ? `${sellerData.responseTimeHours}h Response`
+    : "1h Response";
+
+  const country = sellerData?.country?.trim() || "Not specified";
+  const memberSince = sellerData?.createdAt ? new Date(sellerData.createdAt).getFullYear() : "N/A";
+
+  const languagesList = Array.isArray(sellerData?.languages) && sellerData.languages.length > 0
+    ? sellerData.languages.map((l: any) => (typeof l === 'string' ? l : l.language || l.name || String(l))).filter(Boolean)
+    : [];
+
+  const lastDeliveryText = sellerData?.lastDeliveryDate
+    ? moment(sellerData.lastDeliveryDate).fromNow()
+    : "No deliveries yet";
+
+  const hourlyRateText = sellerData?.hourlyRate
+    ? `$${sellerData.hourlyRate}/hr`
+    : "N/A";
+
+  const skillsList = Array.isArray(sellerData?.skills) && sellerData.skills.length > 0
+    ? sellerData.skills
+    : [];
+
+  const jobSuccess = typeof sellerData?.jobSuccessRate === 'number' && sellerData.jobSuccessRate > 0
+    ? sellerData.jobSuccessRate
+    : null;
+
+  const onTimeDelivery = typeof sellerData?.onTimeDeliveryRate === 'number' && sellerData.onTimeDeliveryRate > 0
+    ? sellerData.onTimeDeliveryRate
+    : null;
+
+  const starRatingDisplay = typeof sellerData?.starRating === 'number' && sellerData.starRating > 0
+    ? sellerData.starRating.toFixed(1)
+    : "0.0";
+
+  const totalReviewsCount = sellerData?.totalReviews || (sellerData?.reviews ? sellerData.reviews.length : 0);
+  const completedOrdersCount = sellerData?.completedOrdersCount || 0;
 
   const portfolioList = sellerPortfolio.length > 0 ? sellerPortfolio : (sellerData?.portfolio || []);
-  const activeProject = portfolioList[selectedIdx] || null;
+
+  // Error / Not Found State
+  if (!isProfileLoading && !sellerData) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center p-6 bg-slate-50">
+        <div className="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-8 text-center shadow-lg flex flex-col items-center">
+          <div className="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mb-4 border border-slate-200">
+            <UserX size={32} />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Seller Not Found</h2>
+          <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+            The seller profile <span className="font-semibold text-slate-700">@{displayUsername}</span> could not be found or is currently unavailable.
+          </p>
+          <Link
+            href="/packages"
+            className="w-full py-3.5 px-6 rounded-xl bg-brand-green text-white font-semibold text-sm hover:bg-[#059669] transition-all shadow-md shadow-emerald-500/20 text-center"
+          >
+            Explore Marketplace Services
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white text-gray-800 pb-28">
@@ -182,7 +272,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                 <div className="flex flex-col items-center border-b border-gray-100 pb-6 mb-6">
                   <div className="w-24 h-24 rounded-full bg-gray-100 relative mb-3.5 p-1 border border-gray-200 shadow-2xs flex-shrink-0">
                     <img
-                      src={sellerData?.image || "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=800"}
+                      src={avatarUrl}
                       alt={displayUsername}
                       className="w-full h-full rounded-full object-cover"
                     />
@@ -193,23 +283,19 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                     {displayUsername}
                   </h1>
                   <p className="text-sm sm:text-[15px] text-gray-500 text-center mt-1 font-normal">
-                    {sellerData?.shortTitle || "Digital marketer"}
+                    {shortTitle}
                   </p>
 
                   {/* Badges */}
                   <div className="flex items-center justify-center gap-2.5 mt-3.5 flex-wrap">
                     <span className="bg-gray-100 text-gray-700 font-semibold px-3.5 py-1 rounded-full text-[12px] flex items-center gap-1.5 shadow-2xs">
-                      <svg className="w-3.5 h-3.5 text-gray-600 fill-current" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317-4.66-1.647-8-6.092-8-11.317 0-.68.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span>Level 2 Seller</span>
+                      <Award className="w-3.5 h-3.5 text-gray-600" />
+                      <span>{sellerLevel}</span>
                     </span>
 
                     <span className="bg-gray-100 text-gray-700 font-semibold px-3.5 py-1 rounded-full text-[12px] flex items-center gap-1.5 shadow-2xs">
-                      <svg className="w-3.5 h-3.5 text-gray-600 fill-current" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
-                      </svg>
-                      <span>1h Response</span>
+                      <Clock className="w-3.5 h-3.5 text-gray-600" />
+                      <span>{responseTime}</span>
                     </span>
                   </div>
                 </div>
@@ -219,20 +305,17 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-2.5 text-gray-500">
                       <span className="text-base font-semibold">@</span>
-                      <span>User name</span>
+                      <span>Username</span>
                     </span>
                     <span className="font-semibold text-gray-900">{handleName}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-2.5 text-gray-500">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
+                      <Globe className="w-4 h-4 text-gray-400" />
                       <span>From</span>
                     </span>
-                    <span className="font-semibold text-gray-900">{sellerData?.country || "United States"}</span>
+                    <span className="font-semibold text-gray-900">{country}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -242,7 +325,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                       </svg>
                       <span>Member since</span>
                     </span>
-                    <span className="font-semibold text-gray-900">{sellerData?.createdAt ? new Date(sellerData.createdAt).getFullYear() : "2021"}</span>
+                    <span className="font-semibold text-gray-900">{memberSince}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -252,7 +335,9 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                       </svg>
                       <span>Languages</span>
                     </span>
-                    <span className="font-semibold text-gray-900">{sellerData?.languages ? sellerData.languages.map((l: any) => l.language).join(", ") : "English"}</span>
+                    <span className="font-semibold text-gray-900">
+                      {languagesList.length > 0 ? languagesList.join(", ") : "Not specified"}
+                    </span>
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -262,7 +347,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                       </svg>
                       <span>Last delivery</span>
                     </span>
-                    <span className="font-semibold text-gray-900">2 Days ago</span>
+                    <span className="font-semibold text-gray-900">{lastDeliveryText}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -272,57 +357,79 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                       </svg>
                       <span>Price</span>
                     </span>
-                    <span className="font-semibold text-gray-900">$25/hr</span>
+                    <span className="font-semibold text-gray-900">{hourlyRateText}</span>
                   </div>
                 </div>
 
                 {/* SKILLS */}
                 <div className="py-5 border-b border-gray-100">
-                  <h2 className="text-[13px] font-semibold tracking-wider text-gray-900 uppercase mb-3">
-                    SKILLS
+                  <h2 className="text-[13px] font-bold tracking-wider text-gray-900 uppercase mb-3 flex items-center justify-between">
+                    <span>Skills</span>
+                    {skillsList.length > 0 && (
+                      <span className="text-xs font-semibold text-gray-400">{skillsList.length}</span>
+                    )}
                   </h2>
-                  <div className="flex flex-wrap gap-2">
-                    {(sellerData?.skills || ["Google Ads", "Content Marketing", "Email Marketing", "Lead Generation"]).map((skill: string) => (
-                      <span key={skill} className="bg-[#eaf8f0] text-[#169c5e] hover:bg-[#d5f1e1] px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-default">
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
+                  {skillsList.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {skillsList.map((skill: string, idx: number) => (
+                        <span key={idx} className="bg-[#eaf8f0] text-[#169c5e] hover:bg-[#d5f1e1] px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-default">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-400 italic">No skills listed</p>
+                  )}
                 </div>
 
                 {/* SELLER PERFORMANCE */}
                 <div className="py-5 border-b border-gray-100">
-                  <h2 className="text-[13px] font-semibold tracking-wider text-gray-900 uppercase mb-4">
-                    SELLER PERFORMANCE
+                  <h2 className="text-[13px] font-bold tracking-wider text-gray-900 uppercase mb-4">
+                    Seller Performance
                   </h2>
 
-                  <div className="mb-4">
-                    <div className="flex justify-between items-center text-[13px] mb-1.5">
-                      <span className="font-semibold text-gray-900">Job Success Rate</span>
-                      <span className="font-semibold text-brand-green">100%</span>
-                    </div>
-                    <div className="h-2 w-full bg-gray-900 rounded-full"></div>
-                  </div>
+                  {jobSuccess || onTimeDelivery ? (
+                    <div className="space-y-4">
+                      {jobSuccess && (
+                        <div>
+                          <div className="flex justify-between items-center text-[13px] mb-1.5 font-semibold">
+                            <span className="text-gray-900">Job Success Rate</span>
+                            <span className="text-brand-green">{jobSuccess}%</span>
+                          </div>
+                          <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-gray-900 rounded-full transition-all duration-500" style={{ width: `${jobSuccess}%` }}></div>
+                          </div>
+                        </div>
+                      )}
 
-                  <div className="mb-2">
-                    <div className="flex justify-between items-center text-[13px] mb-1.5">
-                      <span className="font-semibold text-gray-900">On-Time Delivery</span>
-                      <span className="font-semibold text-brand-green">98%</span>
+                      {onTimeDelivery && (
+                        <div>
+                          <div className="flex justify-between items-center text-[13px] mb-1.5 font-semibold">
+                            <span className="text-gray-900">On-Time Delivery</span>
+                            <span className="text-brand-green">{onTimeDelivery}%</span>
+                          </div>
+                          <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-gray-900 rounded-full transition-all duration-500" style={{ width: `${onTimeDelivery}%` }}></div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                      <div className="w-[98%] h-full bg-gray-900 rounded-full"></div>
+                  ) : (
+                    <div className="bg-gray-50 border border-gray-200/60 rounded-xl p-3 text-center">
+                      <p className="text-xs text-gray-600 font-semibold">New Seller</p>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Performance statistics will appear after order completion.</p>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Stats Summary */}
                 <div className="grid grid-cols-2 gap-4 py-6 border-b border-gray-100 text-center">
                   <div>
-                    <p className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">{sellerData?.starRating || 4.9}</p>
-                    <p className="text-xs text-gray-400 font-medium mt-0.5">{sellerData?.totalReviews || 248} Reviews</p>
+                    <p className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">{starRatingDisplay}</p>
+                    <p className="text-xs text-gray-400 font-medium mt-0.5">{totalReviewsCount} {totalReviewsCount === 1 ? 'Review' : 'Reviews'}</p>
                   </div>
                   <div>
-                    <p className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">{sellerData?.completedOrdersCount || 320}</p>
+                    <p className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">{completedOrdersCount}</p>
                     <p className="text-xs text-gray-400 font-medium mt-0.5">Orders Completed</p>
                   </div>
                 </div>
@@ -331,14 +438,15 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                 <div className="flex items-center gap-3 mt-6">
                   <button
                     onClick={handleContact}
-                    className="flex-1 bg-brand-green hover:bg-brand-green text-white font-semibold py-3 px-4 rounded-xl text-sm text-center transition-all shadow-sm cursor-pointer border-none"
+                    className="flex-1 bg-brand-green hover:bg-brand-green text-white font-semibold py-3 px-4 rounded-xl text-sm text-center transition-all shadow-sm cursor-pointer border-none flex items-center justify-center gap-2"
                   >
-                    Contact Seller
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Contact Seller</span>
                   </button>
 
-                  {sellerData?._id && (
+                  {(sellerData?._id || sellerData?.id) && (
                     <FavoriteSellerButton
-                      sellerId={sellerData._id}
+                      sellerId={sellerData._id || sellerData.id}
                       className="w-11 h-11 !rounded-xl !p-0 border border-gray-200"
                     />
                   )}
@@ -355,99 +463,129 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
               <h2 className="text-xl sm:text-[24px] font-semibold text-gray-900 mb-4 tracking-tight">
                 About Me
               </h2>
-              <div className="text-gray-600 text-[14.5px] sm:text-[15px] leading-relaxed font-normal space-y-4">
-                <p>Hello!</p>
-                <p>
-                  {sellerData?.description || "I am a Professional Digital Marketer specializing in YouTube SEO, Facebook Ads Manager, Google Ads Campaigns, and Social Media Management."}
+              {sellerData?.description ? (
+                <p className="text-gray-600 text-[14.5px] sm:text-[15px] leading-relaxed font-normal whitespace-pre-line">
+                  {sellerData.description}
                 </p>
-                {sellerData?.experience && sellerData.experience.length > 0 && (
-                  <div>
-                    <p className="font-semibold text-gray-800 mb-1.5">My Experience:</p>
-                    <ul className="space-y-2 pl-1">
-                      {sellerData.experience.map((exp: any, idx: number) => (
-                        <li key={idx}>
-                          <span className="font-semibold text-gray-900">• {exp.title}</span> at {exp.company}
-                          <br />
-                          <span className="text-sm text-gray-500 pl-3">{exp.description}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* SECTION 2: Seller Portfolio */}
-            {(isPortfolioLoading || portfolioList.length > 0) && (
-              <div className="bg-white border border-gray-200/90 rounded-3xl p-7 sm:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.025)]">
-
-                {/* Portfolio Header */}
-                <div className="flex items-center justify-between gap-4 mb-6">
-                  <h2 className="text-xl sm:text-[24px] font-semibold text-gray-900 tracking-tight flex items-center gap-2.5">
-                    <span>Seller Portfolio</span>
-                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                      {portfolioList.length} {portfolioList.length === 1 ? 'Project' : 'Projects'}
-                    </span>
-                  </h2>
+              ) : (
+                <div className="p-6 bg-gray-50 border border-gray-200/80 rounded-2xl text-center">
+                  <AlertCircle className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm font-semibold text-gray-700">No Description Added</p>
+                  <p className="text-xs text-gray-500 mt-1">This seller has not provided a profile description yet.</p>
                 </div>
+              )}
 
-                {isPortfolioLoading ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <Skeleton className="h-64 w-full rounded-2xl" />
-                    <Skeleton className="h-64 w-full rounded-2xl" />
-                  </div>
-                ) : (
-                  /* Portfolio Projects Grid */
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {portfolioList.map((proj: any, idx: number) => (
-                      <div
-                        key={idx}
-                        className="group bg-white border border-gray-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-lg hover:border-emerald-300 transition-all duration-300 flex flex-col justify-between"
-                      >
-                        {/* Project Image Header */}
-                        <div className="relative h-48 sm:h-52 w-full bg-gray-100 overflow-hidden border-b border-gray-100">
-                          <img
-                            src={proj.image || "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg"}
-                            alt={proj.title || "Portfolio Project"}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
+              {/* Work Experience Sub-section */}
+              {Array.isArray(sellerData?.experience) && sellerData.experience.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-gray-100">
+                  <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <Briefcase className="w-4 h-4 text-brand-green" />
+                    <span>Work Experience</span>
+                  </h3>
+                  <div className="space-y-3">
+                    {sellerData.experience.map((exp: any, idx: number) => (
+                      <div key={idx} className="bg-gray-50 p-4 rounded-xl border border-gray-200/70">
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-semibold text-gray-900 text-sm">{exp.title || exp.role}</h4>
+                          {exp.company && <span className="text-xs font-semibold text-brand-green bg-emerald-50 px-2.5 py-0.5 rounded-full">{exp.company}</span>}
                         </div>
-
-                        {/* Project Details Body */}
-                        <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                          <div>
-                            <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1.5 tracking-tight group-hover:text-emerald-600 transition-colors line-clamp-1">
-                              {proj.title}
-                            </h3>
-                            <p className="text-xs sm:text-sm text-gray-500 leading-relaxed font-normal line-clamp-3">
-                              {proj.description || 'No project description provided.'}
-                            </p>
-                          </div>
-
-                          {proj.link && (
-                            <div className="pt-3 border-t border-gray-100">
-                              <a
-                                href={proj.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 text-emerald-600 hover:text-emerald-700 font-bold text-xs transition-colors"
-                              >
-                                <span>View Live Project</span>
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                </svg>
-                              </a>
-                            </div>
-                          )}
-                        </div>
+                        {exp.description && (
+                          <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">{exp.description}</p>
+                        )}
                       </div>
                     ))}
                   </div>
-                )}
+                </div>
+              )}
+            </div>
+
+            {/* SECTION 2: Education (Fiverr/Upwork style) */}
+            {Array.isArray(sellerData?.education) && sellerData.education.length > 0 && (
+              <div className="bg-white border border-gray-200/90 rounded-3xl p-7 sm:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.025)]">
+                <h2 className="text-xl sm:text-[24px] font-semibold text-gray-900 mb-4 tracking-tight flex items-center gap-2.5">
+                  <GraduationCap className="w-6 h-6 text-brand-green" />
+                  <span>Education</span>
+                </h2>
+                <div className="space-y-4">
+                  {sellerData.education.map((edu: any, idx: number) => (
+                    <div key={idx} className="border-l-2 border-brand-green pl-4 py-1">
+                      <h4 className="text-base font-bold text-gray-900">{edu.title || edu.degree}</h4>
+                      <p className="text-sm font-medium text-gray-600">{edu.institution || edu.school}</p>
+                      {edu.year && <p className="text-xs text-gray-400 mt-0.5">{edu.year}</p>}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
-            {/* SECTION 3: Seller Gigs / Services */}
+            {/* SECTION 3: Seller Portfolio */}
+            <div className="bg-white border border-gray-200/90 rounded-3xl p-7 sm:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.025)]">
+              <div className="flex items-center justify-between gap-4 mb-6">
+                <h2 className="text-xl sm:text-[24px] font-semibold text-gray-900 tracking-tight flex items-center gap-2.5">
+                  <span>Seller Portfolio</span>
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                    {portfolioList.length} {portfolioList.length === 1 ? 'Project' : 'Projects'}
+                  </span>
+                </h2>
+              </div>
+
+              {isPortfolioLoading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <Skeleton className="h-64 w-full rounded-2xl" />
+                  <Skeleton className="h-64 w-full rounded-2xl" />
+                </div>
+              ) : portfolioList.length === 0 ? (
+                <div className="text-center py-10 bg-gray-50 rounded-2xl border border-gray-100 text-gray-400 font-medium text-sm flex flex-col items-center">
+                  <FolderGit2 className="w-8 h-8 text-gray-300 mb-2" />
+                  <p className="font-semibold text-gray-600">No Portfolio Projects</p>
+                  <p className="text-xs text-gray-400 mt-1">This seller has not uploaded any portfolio projects yet.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {portfolioList.map((proj: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className="group bg-white border border-gray-200/90 rounded-2xl overflow-hidden shadow-xs hover:shadow-lg hover:border-emerald-300 transition-all duration-300 flex flex-col justify-between"
+                    >
+                      <div className="relative h-48 sm:h-52 w-full bg-gray-100 overflow-hidden border-b border-gray-100">
+                        <img
+                          src={proj.image || "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg"}
+                          alt={proj.title || "Portfolio Project"}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+
+                      <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                          <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1.5 tracking-tight group-hover:text-emerald-600 transition-colors line-clamp-1">
+                            {proj.title}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-gray-500 leading-relaxed font-normal line-clamp-3">
+                            {proj.description || 'No project description provided.'}
+                          </p>
+                        </div>
+
+                        {proj.link && (
+                          <div className="pt-3 border-t border-gray-100">
+                            <a
+                              href={proj.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-emerald-600 hover:text-emerald-700 font-bold text-xs transition-colors"
+                            >
+                              <span>View Live Project</span>
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* SECTION 4: Seller Gigs / Services */}
             <div className="bg-white border border-gray-200/90 rounded-3xl p-7 sm:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.025)]">
               <div className="flex items-center justify-between gap-4 mb-6">
                 <h2 className="text-xl sm:text-[24px] font-semibold text-gray-900 tracking-tight flex items-center gap-2">
@@ -464,8 +602,10 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                   <CardSkeleton />
                 </div>
               ) : sellerGigs.length === 0 ? (
-                <div className="text-center py-10 bg-gray-50 rounded-2xl border border-gray-100 text-gray-400 font-medium text-sm">
-                  This seller has no published packages at the moment.
+                <div className="text-center py-10 bg-gray-50 rounded-2xl border border-gray-100 text-gray-400 font-medium text-sm flex flex-col items-center">
+                  <Package className="w-8 h-8 text-gray-300 mb-2" />
+                  <p className="font-semibold text-gray-600">No Active Gigs</p>
+                  <p className="text-xs text-gray-400 mt-1">This seller currently has no active gigs or published services.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -476,9 +616,9 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
               )}
             </div>
 
-            {/* SECTION 4: Reviews */}
+            {/* SECTION 5: Reviews */}
             <div className="bg-white border border-gray-200/90 rounded-3xl p-7 sm:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.025)]">
-              <Reviews packageID={username || "66bb31018991206112f45511"} />
+              <Reviews reviews={sellerData?.reviews || []} />
             </div>
 
           </div>

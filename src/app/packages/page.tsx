@@ -88,6 +88,15 @@ const Packages = () => {
   const [englishLevel, setEnglishLevel] = useState('');
   const [clientLocation, setClientLocation] = useState('');
 
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollCategories = (direction: 'left' | 'right') => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = direction === 'left' ? -280 : 280;
+      categoryScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
   // Sync state when URL params externally change
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -221,14 +230,31 @@ const Packages = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Category Tabs Bar */}
-      <div className="w-full bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-0">
+      <div className="w-full bg-gray-100 border-b border-gray-200 sticky top-0 z-10 select-none">
+        <div className="container mx-auto px-2 sm:px-4 md:px-6 relative flex items-center group">
+          {/* Scroll Left Button */}
+          <button
+            type="button"
+            onClick={() => scrollCategories('left')}
+            className="flex items-center justify-center absolute left-1 z-20 w-7 h-7 rounded-full bg-white/90 shadow-md text-gray-700 hover:bg-white transition-all cursor-pointer opacity-80 hover:opacity-100 xl:hidden"
+            aria-label="Scroll left"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          {/* Scrollable Container */}
+          <div
+            ref={categoryScrollRef}
+            className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-0 w-full scroll-smooth touch-pan-x overscroll-x-contain px-2 xl:px-0"
+          >
             {categories.map((cat) => (
               <button
                 key={cat}
+                type="button"
                 onClick={() => handleCategoryClick(cat)}
-                className={`flex-shrink-0 px-4 py-4 text-[13.5px] font-medium transition-colors whitespace-nowrap border-b-2 ${
+                className={`flex-shrink-0 px-4 py-4 text-[13.5px] font-medium transition-colors whitespace-nowrap border-b-2 cursor-pointer ${
                   activeCategory === cat || filterCategory === cat
                     ? 'border-gray-900 text-gray-900 font-semibold'
                     : 'border-transparent text-gray-500 hover:text-gray-900'
@@ -238,6 +264,18 @@ const Packages = () => {
               </button>
             ))}
           </div>
+
+          {/* Scroll Right Button */}
+          <button
+            type="button"
+            onClick={() => scrollCategories('right')}
+            className="flex items-center justify-center absolute right-1 z-20 w-7 h-7 rounded-full bg-white/90 shadow-md text-gray-700 hover:bg-white transition-all cursor-pointer opacity-80 hover:opacity-100 xl:hidden"
+            aria-label="Scroll right"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
       </div>
 

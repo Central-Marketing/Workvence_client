@@ -10,6 +10,7 @@ export const initialState = {
     deliveryTime: '',
     revisionNumber: '',
     features: [],
+    faqs: [],
     price: 0,
     packages: {
         basic: {
@@ -50,6 +51,18 @@ export const packageReducer = (state, { type, payload }) => {
             return {
                 ...state,
                 features: state.features.filter((feature) => feature !== payload)
+            }
+
+        case 'ADD_FAQ':
+            return {
+                ...state,
+                faqs: [...(state.faqs || []), payload]
+            }
+
+        case 'REMOVE_FAQ':
+            return {
+                ...state,
+                faqs: (state.faqs || []).filter((_, index) => index !== payload)
             }
             
         case 'CHANGE_PACKAGE_INPUT':

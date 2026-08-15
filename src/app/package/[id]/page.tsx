@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
 import Swal from 'sweetalert2';
 import { useQuery } from '@tanstack/react-query';
 import { axiosFetch, getCountryFlag } from '@/utils';
@@ -37,6 +37,15 @@ const PackageContent = () => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [showComparisonTable, setShowComparisonTable] = useState(false);
+
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollCategories = (direction: 'left' | 'right') => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = direction === 'left' ? -280 : 280;
+      categoryScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   const { isLoading, error, data } = useQuery({
     queryKey: ['package', _id],
@@ -183,9 +192,25 @@ const PackageContent = () => {
   return (
     <div className="min-h-screen bg-white text-gray-800 pb-24">
       {/* Category Navigation Bar */}
-      <div className="w-full bg-gray-100 border-b border-gray-200 sticky top-0 z-20">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-0">
+      <div className="w-full bg-gray-100 border-b border-gray-200 sticky top-0 z-20 select-none">
+        <div className="container mx-auto px-2 sm:px-4 md:px-6 relative flex items-center group">
+          {/* Scroll Left Button */}
+          <button
+            type="button"
+            onClick={() => scrollCategories('left')}
+            className="flex items-center justify-center absolute left-1 z-20 w-7 h-7 rounded-full bg-white/90 shadow-md text-gray-700 hover:bg-white transition-all cursor-pointer opacity-80 hover:opacity-100 xl:hidden"
+            aria-label="Scroll left"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          {/* Scrollable Container */}
+          <div
+            ref={categoryScrollRef}
+            className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-0 w-full scroll-smooth touch-pan-x overscroll-x-contain px-2 xl:px-0"
+          >
             {categories.map((cat) => (
               <Link
                 key={cat}
@@ -196,6 +221,18 @@ const PackageContent = () => {
               </Link>
             ))}
           </div>
+
+          {/* Scroll Right Button */}
+          <button
+            type="button"
+            onClick={() => scrollCategories('right')}
+            className="flex items-center justify-center absolute right-1 z-20 w-7 h-7 rounded-full bg-white/90 shadow-md text-gray-700 hover:bg-white transition-all cursor-pointer opacity-80 hover:opacity-100 xl:hidden"
+            aria-label="Scroll right"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
       </div>
 

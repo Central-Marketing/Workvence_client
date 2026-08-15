@@ -63,6 +63,8 @@ const EditPackage = () => {
   const [uploading, setUploading] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [activeTier, setActiveTier] = useState('basic');
+  const [faqQuestion, setFaqQuestion] = useState('');
+  const [faqAnswer, setFaqAnswer] = useState('');
   const navigate = useRouter();
   const queryClient = useQueryClient();
 
@@ -93,6 +95,7 @@ const EditPackage = () => {
             payload: {
               ...initialState,
               ...data,
+              faqs: data.faqs || [],
               packages: data.packages || {
                 basic: {
                   title: data.shortTitle || '',
@@ -198,6 +201,27 @@ const EditPackage = () => {
         payload: feature
       });
     }
+  };
+
+  const handleAddFaq = (e: any) => {
+    if (e) e.preventDefault();
+    if (!faqQuestion.trim() || !faqAnswer.trim()) {
+      toast.error('Please enter both Question and Answer for FAQ');
+      return;
+    }
+    dispatch({
+      type: 'ADD_FAQ',
+      payload: { question: faqQuestion.trim(), answer: faqAnswer.trim() }
+    });
+    setFaqQuestion('');
+    setFaqAnswer('');
+  };
+
+  const handleRemoveFaq = (index: number) => {
+    dispatch({
+      type: 'REMOVE_FAQ',
+      payload: index
+    });
   };
 
   const toggleTier = (tier: string) => {
@@ -331,7 +355,10 @@ const EditPackage = () => {
   const handleFormSubmit = (event: any) => {
     if (event) event.preventDefault();
 
-    const form = { ...state };
+    const form = {
+      ...state,
+      faqs: state.faqs || []
+    };
     if (form.packages?.basic) {
       const bTitle = form.packages.basic.title || form.packages.basic.shortDesc || form.shortTitle || form.title || '';
       form.packages.basic.title = bTitle;
@@ -539,6 +566,59 @@ const EditPackage = () => {
                 formats={quillFormats}
                 placeholder="Write rich descriptions to introduce your service to customers..."
               />
+            </div>
+
+            {/* Frequently Asked Questions (FAQ) Section */}
+            <div className="flex flex-col gap-4 p-5 bg-slate-50 border border-slate-200 rounded-xl mt-2">
+              <div className="flex items-center justify-between">
+                <label className="text-slate-700 text-sm font-semibold">Frequently Asked Questions (FAQs)</label>
+                <span className="text-xs text-slate-500 font-medium">Optional</span>
+              </div>
+
+              <div className="flex flex-col gap-3 bg-white p-4 rounded-lg border border-slate-200">
+                <input
+                  type="text"
+                  className={inputClasses}
+                  placeholder="Question (e.g. Do you provide source code?)"
+                  value={faqQuestion}
+                  onChange={(e) => setFaqQuestion(e.target.value)}
+                />
+                <textarea
+                  className={`${inputClasses} min-h-[80px] resize-y`}
+                  placeholder="Answer (e.g. Yes, full repository access and clean source code is included.)"
+                  value={faqAnswer}
+                  onChange={(e) => setFaqAnswer(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className={`${btnClasses} px-5 py-2 text-sm self-end h-auto m-0`}
+                  onClick={handleAddFaq}
+                >
+                  Add FAQ
+                </button>
+              </div>
+
+              {/* Displayed FAQs List */}
+              {state.faqs && state.faqs.length > 0 && (
+                <div className="space-y-3 mt-1">
+                  {state.faqs.map((faq: { question: string; answer: string }, idx: number) => (
+                    <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3.5 flex justify-between items-start gap-3 shadow-2xs">
+                      <div className="space-y-1">
+                        <h5 className="text-xs sm:text-sm font-bold text-slate-800">Q: {faq.question}</h5>
+                        <p className="text-xs sm:text-sm text-slate-600 font-normal">A: {faq.answer}</p>
+                      </div>
+                      <button
+                        type="button"
+                        className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-full transition-colors shrink-0 cursor-pointer"
+                        onClick={() => handleRemoveFaq(idx)}
+                        title="Remove FAQ"
+                      >
+                        <X size={14} strokeWidth={2.5} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <button

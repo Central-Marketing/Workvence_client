@@ -8,7 +8,6 @@ import { axiosFetch } from '@/utils';
 import { useUserStore } from '@/store/userStore';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import './Login.scss';
-import Swal from 'sweetalert2';
 
 const Login = () => {
   const [formInput, setFormInput] = useState({
@@ -132,17 +131,10 @@ const Login = () => {
       const message = apiErr.response?.data?.message || 'Invalid username or password';
 
       if (isVerified === false && email) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Verification Required',
-          text: message,
-          confirmButtonText: 'Verify Now',
-          confirmButtonColor: '#6ad724'
-        }).then(() => {
-          sessionStorage.setItem('tempLoginPassword', formInput.password);
-          sessionStorage.setItem('tempLoginUsername', formInput.username);
-          router.push(`/register?step=3&email=${encodeURIComponent(email)}`);
-        });
+        toast.error(message || 'Email verification required. Redirecting to OTP step...');
+        sessionStorage.setItem('tempLoginPassword', formInput.password);
+        sessionStorage.setItem('tempLoginUsername', formInput.username);
+        router.push(`/register?step=3&email=${encodeURIComponent(email)}`);
         setLoading(false);
         return;
       }

@@ -11,8 +11,7 @@ import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
-import { Loader, OrderSkeleton } from "@/components";
-import Swal from 'sweetalert2';
+import { Loader, OrderSkeleton, RevisionModal, ExtensionModal } from "@/components";
 import moment from "moment";
 import "./OrderDetail.scss";
 
@@ -20,6 +19,10 @@ const OrderDetail = () => {
   const { id } = useParams();
   const navigate = useRouter();
   const user = useUserStore((state: any) => state.user);
+
+  // Modal states
+  const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
+  const [isExtensionModalOpen, setIsExtensionModalOpen] = useState(false);
 
   // Delivery states
   const [showDeliverForm, setShowDeliverForm] = useState(false);
@@ -270,70 +273,38 @@ const OrderDetail = () => {
     }
   };
 
-  const handleRequestRevision = async () => {
-    const { value: text } = await Swal.fire({
-      title: 'Request Revision',
-      input: 'textarea',
-      inputLabel: 'What needs to be changed?',
-      inputPlaceholder: 'Please describe the revisions needed clearly...',
-      showCancelButton: true,
-      confirmButtonColor: '#6ad724',
-      inputValidator: (value) => {
-        if (!value) return 'You need to write a reason!';
-      }
-    });
-
-    if (text) {
-      setSubmitting(true);
-      try {
-        await axiosFetch.post(`/orders/${order._id}/request-revision`, { reason: text });
-        Swal.fire('Sent!', 'Your revision request has been sent to the seller.', 'success');
-        refetch();
-      } catch (err: any) {
-        Swal.fire('Error', err.response?.data?.message || 'Failed to request revision', 'error');
-      } finally {
-        setSubmitting(false);
-      }
+  const handleRequestRevisionSubmit = async (reason: string) => {
+    setSubmitting(true);
+    try {
+      await axiosFetch.post(`/orders/${order._id}/request-revision`, { reason });
+      toast.success('Your revision request has been sent to the seller.');
+      setIsRevisionModalOpen(false);
+      refetch();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to request revision');
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handleRequestExtension = async () => {
-    const { value: formValues } = await Swal.fire({
-      title: 'Request Time Extension',
-      html:
-        '<input id="swal-input1" type="number" min="1" class="swal2-input" placeholder="Extra Days Needed (e.g. 2)">' +
-        '<textarea id="swal-input2" class="swal2-textarea" placeholder="Reason for extension..."></textarea>',
-      focusConfirm: false,
-      showCancelButton: true,
-      confirmButtonColor: '#6ad724',
-      preConfirm: () => {
-        const days = (document.getElementById('swal-input1') as HTMLInputElement).value;
-        const reason = (document.getElementById('swal-input2') as HTMLTextAreaElement).value;
-        if (!days || !reason) {
-          Swal.showValidationMessage('Both fields are required');
-        }
-        return { extraDays: parseInt(days), reason };
-      }
-    });
-
-    if (formValues) {
-      setSubmitting(true);
-      try {
-        await axiosFetch.post(`/orders/${order._id}/request-extension`, formValues);
-        Swal.fire('Sent!', 'Your extension request has been sent to the buyer.', 'success');
-        refetch();
-      } catch (err: any) {
-        Swal.fire('Error', err.response?.data?.message || 'Failed to request extension', 'error');
-      } finally {
-        setSubmitting(false);
-      }
+  const handleRequestExtensionSubmit = async (extraDays: number, reason: string) => {
+    setSubmitting(true);
+    try {
+      await axiosFetch.post(`/orders/${order._id}/request-extension`, { extraDays, reason });
+      toast.success('Your extension request has been sent to the buyer.');
+      setIsExtensionModalOpen(false);
+      refetch();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to request extension');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleRespondExtension = async (action: string) => {
     try {
       await axiosFetch.patch(`/orders/${order._id}/respond-extension`, { action });
-      Swal.fire('Success', `Extension request has been ${action}ed.`, 'success');
+      toast.success(`Extension request has been ${action}ed.`);
       refetch();
     } catch (err: any) {
       toast.error("Failed to respond to extension request.");
@@ -600,7 +571,7 @@ const OrderDetail = () => {
                   </button>
                   <button
                     className="request-revision-btn"
-                    onClick={handleRequestRevision}
+                    onClick={() => setIsRevisionModalOpen(true)}
                     disabled={submitting}
                     style={{ background: 'white', color: '#ff6b4a', border: '1px solid #ff6b4a', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
                   >
@@ -709,7 +680,7 @@ const OrderDetail = () => {
                     </button>
                     {!hasPendingExtension && (
                       <button
-                        onClick={handleRequestExtension}
+                        onClick={() => setIsExtensionModalOpen(true)}
                         style={{ background: 'white', color: '#6ad724', border: '1px solid #6ad724', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
                       >
                         Request Time Extension
@@ -1030,6 +1001,22 @@ const OrderDetail = () => {
           </div>
         </div>
       )}
+
+      {/* Revision Modal */}
+      <RevisionModal
+        isOpen={isRevisionModalOpen}
+        isLoading={submitting}
+        onSubmit={handleRequestRevisionSubmit}
+        onClose={() => setIsRevisionModalOpen(false)}
+      />
+
+      {/* Extension Modal */}
+      <ExtensionModal
+        isOpen={isExtensionModalOpen}
+        isLoading={submitting}
+        onSubmit={handleRequestExtensionSubmit}
+        onClose={() => setIsExtensionModalOpen(false)}
+      />
     </div>
   );
 };

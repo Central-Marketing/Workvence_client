@@ -2,12 +2,12 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Reviews, FavoriteSellerButton, PackageCard, Skeleton, CardSkeleton } from '@/components';
 import { axiosFetch } from '@/utils';
 import { useUserStore } from '@/store/userStore';
-import Swal from 'sweetalert2';
 
 const categories = [
   "All services",
@@ -43,7 +43,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
     if (!sellerID || !buyerID) return;
 
     if (sellerID === buyerID) {
-      Swal.fire('Notice', 'You cannot contact yourself.', 'info');
+      toast.error('You cannot contact yourself.');
       return;
     }
 

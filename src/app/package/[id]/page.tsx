@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef, Suspense } from 'react';
-import Swal from 'sweetalert2';
+import toast from 'react-hot-toast';
 import { useQuery } from '@tanstack/react-query';
 import { axiosFetch, getCountryFlag } from '@/utils';
 import Link from "next/link";
@@ -61,7 +61,7 @@ const PackageContent = () => {
         })
         .catch((err) => {
           const msg = err?.response?.data?.message || "Package not found";
-          Swal.fire('Error', msg, 'error');
+          toast.error(msg);
           throw new Error(msg);
         });
     }
@@ -86,12 +86,12 @@ const PackageContent = () => {
     console.log(sellerObj, sellerID, sellerUsername, buyerID, buyerUsername)
 
     if (!sellerID || !buyerID) {
-      Swal.fire('Error', 'User information missing to start conversation.', 'error');
+      toast.error('User information missing to start conversation.');
       return;
     }
 
     if (sellerID === buyerID || (sellerUsername && buyerUsername && sellerUsername.toLowerCase() === buyerUsername.toLowerCase())) {
-      Swal.fire('Notice', 'You cannot contact yourself.', 'info');
+      toast.error('You cannot contact yourself.');
       return;
     }
 
@@ -117,7 +117,7 @@ const PackageContent = () => {
           router.push(`/message/${targetId}`);
         }
       } catch (fallbackErr: any) {
-        Swal.fire('Error', err?.response?.data?.message || 'Could not start conversation', 'error');
+        toast.error(err?.response?.data?.message || 'Could not start conversation');
       }
     }
   };
@@ -885,10 +885,21 @@ const PackageContent = () => {
 
                     <div className="space-y-3 mb-7">
                       {featuresList.map((feature: string, index: number) => (
-                        <label key={index} className="flex items-center gap-3 text-xs sm:text-sm text-gray-800 select-none font-medium">
-                          <svg className="text-brand-green" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" /></svg>
+                        <div
+                          key={index}
+                          className="flex items-center gap-3 text-xs sm:text-sm text-gray-800 select-none font-medium"
+                        >
+                          <svg
+                            className="w-4 h-4 shrink-0 text-brand-green"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            aria-hidden="true"
+                          >
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                          </svg>
+
                           <span>{feature}</span>
-                        </label>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -918,9 +929,19 @@ const PackageContent = () => {
                   onClick={() => {
                     if (!user) {
                       router.push('/login');
-                    } else {
-                      router.push(`/pay/${_id}?tier=${packageTier}`);
+                      return;
                     }
+
+                    const sellerObj = typeof data?.userID === 'object' ? data.userID : null;
+                    const sellerID = sellerObj?._id || sellerObj?.id || (typeof data?.userID === 'string' ? data.userID : null);
+                    const buyerID = user?._id || user?.id;
+
+                    if (sellerID && buyerID && String(sellerID) === String(buyerID)) {
+                      toast.error("You cannot purchase your own package.");
+                      return;
+                    }
+
+                    router.push(`/pay/${_id}?tier=${packageTier}`);
                   }}
                   className="w-full mt-6 py-3.5 bg-brand-green hover:bg-brand-green text-white font-semibold text-sm sm:text-base rounded-xl transition-all shadow-sm cursor-pointer"
                 >

@@ -1,6 +1,6 @@
 import React from 'react';
 import axiosFetch from './axiosFetch';
-import Swal from 'sweetalert2';
+import toast from 'react-hot-toast';
 
 export const getOtherUser = (conversation: any, currentUser: any) => {
   if (!conversation || !currentUser) return null;
@@ -44,12 +44,7 @@ export const handleStartChat = async (targetUsername: string, currentUser: any, 
 
   const currentUsername = currentUser.username;
   if (currentUsername && currentUsername.toLowerCase() === targetUsername.toLowerCase()) {
-    Swal.fire({
-      icon: 'info',
-      title: 'Action Blocked',
-      text: 'Users cannot start a conversation with themselves!',
-      confirmButtonColor: '#6ad724'
-    });
+    toast.error('Users cannot start a conversation with themselves!');
     return;
   }
 
@@ -65,12 +60,7 @@ export const handleStartChat = async (targetUsername: string, currentUser: any, 
       navigate.push(`/message/${convUUID}`);
     }
   } catch (err: any) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Chat Failed',
-      text: err.response?.data?.message || 'Could not start conversation',
-      confirmButtonColor: '#6ad724'
-    });
+    toast.error(err.response?.data?.message || 'Could not start conversation');
   }
 };
 

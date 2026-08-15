@@ -2,12 +2,14 @@
 "use client";
 
 import React, { useEffect, Suspense } from 'react';
+import toast from 'react-hot-toast';
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
-import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
-import Swal from 'sweetalert2';
 import './Pay.scss';
+
+// Module-level deduplication set to persist across React 18/19 Suspense remounts
+const activePaymentIntents = new Set<string>();
 
 const PayContent = () => {
   const { id } = useParams();
@@ -16,19 +18,32 @@ const PayContent = () => {
   const navigate = useRouter();
 
   useEffect(() => {
+    if (!id) return;
+    const requestKey = `${id}-${packageType}`;
+    
+    // Prevent duplicate concurrent requests across Suspense hydration & StrictMode
+    if (activePaymentIntents.has(requestKey)) return;
+    activePaymentIntents.add(requestKey);
+
     (async () => {
       try {
         const { data } = await axiosFetch.post(`/orders/create-payment-intent/${id}`, { packageType });
         if (data?.url) {
           window.location.href = data.url;
         } else if (data?.error) {
-          Swal.fire('Error', data.message || 'Payment creation failed.', 'error');
-          setTimeout(() => navigate.push('/packages'), 2000);
+          toast.error(data.message || 'Payment creation failed.');
+          setTimeout(() => {
+            activePaymentIntents.delete(requestKey);
+            navigate.push('/packages');
+          }, 2000);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Redirect to checkout failed:', error);
-        Swal.fire('Error', error.response?.data?.message || 'Package not found or payment failed.', 'error');
-        setTimeout(() => navigate.push('/packages'), 2000);
+        toast.error(error.response?.data?.message || 'Package not found or payment failed.');
+        setTimeout(() => {
+          activePaymentIntents.delete(requestKey);
+          navigate.push('/packages');
+        }, 2000);
       }
     })();
     window.scrollTo(0, 0);

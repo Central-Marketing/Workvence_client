@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
+import { Toaster } from "react-hot-toast";
 import { GlobalSocketListener } from "@/components";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -19,6 +20,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <Toaster position="bottom-right" reverseOrder={false} toastOptions={{ duration: 4000 }} />
       <GlobalSocketListener />
       {children}
     </QueryClientProvider>

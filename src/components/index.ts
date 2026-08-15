@@ -37,5 +37,9 @@ export { default as FavoriteSellerButton } from "./FavoriteSellerButton/Favorite
 export { default as CustomSelect } from './CustomSelect/CustomSelect';
 export { default as GlobalSocketListener } from './GlobalSocketListener/GlobalSocketListener';
 
+export { default as ConfirmModal } from './ConfirmModal/ConfirmModal';
+export { default as OTPModal } from './OTPModal/OTPModal';
+export { RevisionModal, ExtensionModal } from './OrderActionModals/OrderActionModals';
+
 export * from './Skeletons';
 

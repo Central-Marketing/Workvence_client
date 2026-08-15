@@ -11,8 +11,6 @@ import { FaApple, FaFacebook } from 'react-icons/fa';
 import { AiOutlineEye, AiOutlineEyeInvisible, AiOutlineCheckCircle } from 'react-icons/ai';
 import { useUserStore } from '@/store/userStore';
 
-import Swal from 'sweetalert2';
-
 const RegisterContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -188,12 +186,7 @@ const RegisterContent = () => {
       setStep(3); // Go to OTP confirmation step
     }
     catch (err: any) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: err.response?.data?.message || "Registration failed",
-        confirmButtonColor: '#6ad724'
-      });
+      toast.error(err.response?.data?.message || "Registration failed");
       setLoading(false);
     }
   }
@@ -230,32 +223,15 @@ const RegisterContent = () => {
         sessionStorage.removeItem('tempLoginUsername');
         sessionStorage.removeItem('tempLoginPassword');
 
-        Swal.fire({
-          icon: 'success',
-          title: 'Welcome to Workvence!',
-          text: 'Your email is verified and you are now logged in.',
-          confirmButtonColor: '#6ad724'
-        }).then(() => {
-          router.push('/');
-        });
+        toast.success('Welcome to Workvence! Email verified.');
+        router.push('/');
       } else {
-        Swal.fire({
-          icon: 'success',
-          title: 'Email Verified!',
-          text: 'Your email has been verified successfully. Please log in.',
-          confirmButtonColor: '#6ad724'
-        }).then(() => {
-          router.push('/login');
-        });
+        toast.success('Email verified successfully! Please log in.');
+        router.push('/login');
       }
 
     } catch (err: any) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Verification Failed',
-        text: err.response?.data?.message || "OTP verification failed",
-        confirmButtonColor: '#6ad724'
-      });
+      toast.error(err.response?.data?.message || "OTP verification failed");
     } finally {
       setLoading(false);
     }
@@ -271,12 +247,7 @@ const RegisterContent = () => {
       setResendTimer(60);
       toast.success('A new OTP has been sent to your email.');
     } catch (err: any) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Request Blocked',
-        text: err.response?.data?.message || "Failed to resend OTP",
-        confirmButtonColor: '#6ad724'
-      });
+      toast.error(err.response?.data?.message || "Failed to resend OTP");
     }
   }
 

@@ -10,6 +10,7 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [error, setError] = useState('');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -30,6 +31,7 @@ const ForgotPassword = () => {
       toast.success("Password reset OTP sent to your email!");
       router.push(`/reset-password?email=${encodeURIComponent(email)}`);
     } catch (error: any) {
+      setError(error.response?.data?.message || "Failed to send reset link");
       toast.error(error.response?.data?.message || "Failed to send reset link");
     } finally {
       setLoading(false);
@@ -67,6 +69,9 @@ const ForgotPassword = () => {
                     className="py-3 px-3 border border-gray-200 rounded-lg text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full"
                   />
                 </div>
+                {
+                  error && <p className="text-sm text-red-500">{error}</p>
+                }
 
                 <button type="submit" className="mt-2 bg-emerald-500 text-white py-4 border-none rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed w-full" disabled={loading}>
                   {loading ? 'Loading...' : 'Continue'}

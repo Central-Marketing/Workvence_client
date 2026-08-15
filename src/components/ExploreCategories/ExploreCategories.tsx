@@ -52,24 +52,42 @@ const ExploreCategories = () => {
           <p className="text-gray-500 text-sm md:text-md">Explore a wide range of services organized by category</p>
         </div>
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-y-6 gap-x-2 md:gap-6">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-x-2 gap-y-6 md:gap-6">
           {categoryList.map((category: any, index: number) => {
-            const title = category.name || category.title || category.slug || "Category";
-            const path = category.slug || title.toLowerCase().replace(/\s+/g, '-');
+            const title =
+              category.name ||
+              category.title ||
+              category.slug ||
+              "Category";
+
+            const path =
+              category.slug ||
+              title.toLowerCase().replace(/\s+/g, '-');
 
             return (
               <Link
                 href={`/packages?category=${path}`}
                 key={category._id || category.id || index}
-                className="flex flex-col items-center group"
+                className="flex w-full max-w-[140px] flex-col items-center group"
               >
                 <div className="w-[110px] h-[110px] sm:w-[110px] sm:h-[110px] md:w-[140px] md:h-[140px] flex items-center justify-center bg-white bg-gradient-to-t from-gray-50 to-transparent border border-gray-100 md:border-gray-200 rounded-[1.25rem] md:rounded-[1.5rem] shadow-[0_2px_10px_rgba(0,0,0,0.02)] md:shadow-sm mb-3 group-hover:border-gray-300 group-hover:shadow-[0_4px_15px_rgba(0,0,0,0.05)] transition-all duration-300 p-4">
-                  {category.icon && typeof category.icon === 'string' && (category.icon.startsWith('http') || category.icon.startsWith('/')) ? (
-                    <img src={category.icon} alt={title} className="w-12 h-12 md:w-16 md:h-16 object-contain" />
+                  {category.icon &&
+                    typeof category.icon === 'string' &&
+                    (category.icon.startsWith('http') ||
+                      category.icon.startsWith('/')) ? (
+                    <img
+                      src={category.icon}
+                      alt={title}
+                      className="w-12 h-12 md:w-16 md:h-16 object-contain"
+                    />
                   ) : (
-                    getIcon(index, "text-gray-700 w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14")
+                    getIcon(
+                      index,
+                      "text-gray-700 w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14"
+                    )
                   )}
                 </div>
+
                 <h3 className="text-[14px] sm:text-[15px] md:text-[16px] font-semibold text-gray-800 text-center leading-[1.2] group-hover:text-brand-green transition-colors duration-300 max-w-[100px] sm:max-w-[110px] md:max-w-full">
                   {title}
                 </h3>

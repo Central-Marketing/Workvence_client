@@ -2,7 +2,10 @@ import axios from 'axios';
 import axiosFetch from './axiosFetch';
 
 const getAdminApiUrl = () => {
-  return process.env.NEXT_PUBLIC_ADMIN_API_URL || process.env.NEXT_PUBLIC_ADMIN_BACKEND_URL || "http://localhost:8082/api";
+  if (typeof window !== "undefined") {
+    return "/api";
+  }
+  return process.env.NEXT_PUBLIC_ADMIN_API_URL || process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_ADMIN_BACKEND_URL || "http://localhost:8082/api";
 };
 
 const adminAxiosFetch = axios.create({

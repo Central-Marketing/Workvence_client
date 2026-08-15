@@ -27,7 +27,7 @@ const CTA = () => {
                 Find a service <span className="text-lg leading-none mb-0.5">&rarr;</span>
               </Link>
               <Link
-                href="/become-seller"
+                href="/register?seller=true"
                 className="w-full sm:w-auto bg-[#0a0a0a] text-white font-medium px-7 py-3.5 rounded-xl hover:bg-black transition-colors flex items-center justify-center gap-2"
               >
                 Become a seller <span className="text-lg leading-none mb-0.5">&rarr;</span>

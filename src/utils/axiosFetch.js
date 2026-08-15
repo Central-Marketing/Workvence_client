@@ -1,6 +1,9 @@
 import axios from "axios";
 
 const getBaseURL = () => {
+  if (typeof window !== "undefined") {
+    return "/api";
+  }
   const envUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL;
   if (envUrl) {
     let cleaned = envUrl.trim().replace(/\/$/, '');

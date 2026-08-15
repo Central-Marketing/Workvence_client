@@ -69,7 +69,7 @@ const Orders = () => {
       ) : error ? (
         <div className="text-center py-20 text-red-500 font-semibold">Something went wrong!</div>
       ) : (
-        <div className="w-[95%] max-w-[1200px] flex flex-col mx-auto">
+        <div className="container mx-auto px-4 md:px-6 flex flex-col ">
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-5 py-6 md:px-7 md:pb-4 md:pt-6 bg-white">
               <h1 className="text-2xl font-extrabold text-slate-900 mb-1">Manage Orders</h1>

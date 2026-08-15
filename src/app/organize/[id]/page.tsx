@@ -143,6 +143,12 @@ const EditPackage = () => {
 
   const handlePackageFormChange = (event: any) => {
     const { name, value } = event.target;
+    if (name === 'price') {
+      if (value !== '' && Number(value) <= 0) {
+        toast.error('Price must be a positive number greater than $0', { id: 'price-error' });
+        return;
+      }
+    }
     dispatch({
       type: 'CHANGE_PACKAGE_INPUT',
       payload: { tier: activeTier, name, value }
@@ -345,6 +351,19 @@ const EditPackage = () => {
     if (!basicTitle || !form.packages?.basic?.shortDesc || !form.packages?.basic?.price || !form.packages?.basic?.deliveryTime) {
       toast.error('Please fill all Basic package details (Title, Short Description, Price, and Delivery Time)');
       return;
+    }
+
+    // Validate that prices for all enabled package tiers are positive (> 0)
+    const tiers = ['basic', 'standard', 'premium'];
+    for (const tier of tiers) {
+      const pkg = form.packages?.[tier];
+      if (pkg) {
+        const pkgPrice = Number(pkg.price);
+        if (isNaN(pkgPrice) || pkgPrice <= 0) {
+          toast.error(`Price for ${tier.charAt(0).toUpperCase() + tier.slice(1)} package must be a positive number greater than $0`);
+          return;
+        }
+      }
     }
 
     mutation.mutate(form, {
@@ -621,7 +640,21 @@ const EditPackage = () => {
                 </div>
 
                 <label className={labelClasses}>Price ($)</label>
-                <input name='price' type="number" min='1' className={inputClasses} onChange={handlePackageFormChange} value={activePackage.price || ''} />
+                <input
+                  name='price'
+                  type="number"
+                  min='1'
+                  step='any'
+                  className={inputClasses}
+                  placeholder="e.g. 50"
+                  onKeyDown={(e) => {
+                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                      e.preventDefault();
+                    }
+                  }}
+                  onChange={handlePackageFormChange}
+                  value={activePackage.price || ''}
+                />
               </>
             )}
           </div>

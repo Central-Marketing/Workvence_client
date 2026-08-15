@@ -15,20 +15,27 @@ const nextConfig: NextConfig = {
     let rawAdminUrl = (
       process.env.NEXT_PUBLIC_ADMIN_API_URL ||
       process.env.NEXT_PUBLIC_ADMIN_BACKEND_URL ||
-      'http://localhost:8082/api'
+      'http://localhost:8082/api/admin'
     ).trim().replace(/\/$/, '');
 
-    // Ensure adminApiUrl always ends with /api
-    const adminApiUrl = rawAdminUrl.endsWith('/api') ? rawAdminUrl : `${rawAdminUrl}/api`;
+    // Ensure adminApiUrl always ends with /api/admin
+    let adminApiUrl = rawAdminUrl;
+    if (!adminApiUrl.endsWith('/admin')) {
+      adminApiUrl = adminApiUrl.endsWith('/api') ? `${adminApiUrl}/admin` : `${adminApiUrl}/api/admin`;
+    }
 
     return [
       {
         source: '/api/support/:path*',
-        destination: `${adminApiUrl}/support/:path*`,
+        destination: `${mainApiUrl}/support/:path*`,
       },
       {
         source: '/api/storage/:path*',
-        destination: `${adminApiUrl}/storage/:path*`,
+        destination: `${mainApiUrl}/storage/:path*`,
+      },
+      {
+        source: '/api/admin/:path*',
+        destination: `${adminApiUrl}/:path*`,
       },
       {
         source: '/api/:path*',

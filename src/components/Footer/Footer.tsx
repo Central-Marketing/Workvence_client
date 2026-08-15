@@ -6,15 +6,25 @@ import { axiosFetch } from "@/utils";
 import adminAxios from "@/utils/adminAxios";
 
 const socialLinks = [
-  { href: "#", icon: "/all-icons/tiktok.svg", label: "TikTok" },
-  { href: "#", icon: "/all-icons/instagram.svg", label: "Instagram" },
-  { href: "#", icon: "/all-icons/linkedin-01.svg", label: "LinkedIn" },
-  { href: "#", icon: "/all-icons/facebook-01.svg", label: "Facebook" },
-  { href: "#", icon: "/all-icons/pinterest.svg", label: "Pinterest" },
-  { href: "#", icon: "/all-icons/new-twitter-rectangle.svg", label: "X (Twitter)" },
+  { href: "https://www.tiktok.com/@workvence", icon: "/all-icons/tiktok.svg", label: "TikTok" },
+  { href: "https://www.instagram.com/workvence", icon: "/all-icons/instagram.svg", label: "Instagram" },
+  { href: "https://www.linkedin.com/company/workvence", icon: "/all-icons/linkedin-01.svg", label: "LinkedIn" },
+  { href: "https://www.facebook.com/workvence", icon: "/all-icons/facebook-01.svg", label: "Facebook" },
+  { href: "https://www.pinterest.com/workvence", icon: "/all-icons/pinterest.svg", label: "Pinterest" },
+  { href: "https://www.x.com/workvence", icon: "/all-icons/new-twitter-rectangle.svg", label: "X (Twitter)" },
 ];
 
-const staticFooterColumns = [
+interface FooterLink {
+  name: string;
+  href: string;
+}
+
+interface FooterColumn {
+  title: string;
+  links: FooterLink[];
+}
+
+const staticFooterColumns: FooterColumn[] = [
   {
     title: "Categories",
     links: [],
@@ -22,33 +32,33 @@ const staticFooterColumns = [
   {
     title: "For Clients",
     links: [
-      "How workvence works",
-      "Customer Success Stories",
-      "Workvence Guides",
-      "Post a Project",
-      "Browse Services",
-      "Recommended Sellers",
+      { name: "How workvence works", href: "/help-center" },
+      { name: "Customer Success Stories", href: "/recommended-sellers" },
+      { name: "Workvence Guides", href: "/help-center" },
+      { name: "Post a Project", href: "/briefs" },
+      { name: "Browse Services", href: "/packages" },
+      { name: "Recommended Sellers", href: "/recommended-sellers" },
     ],
   },
   {
     title: "For Freelancers",
     links: [
-      "Become a Freelancer",
-      "Community Hub",
-      "Seller Resources",
-      "Blogs",
-      "Success Stories",
+      { name: "Become a Freelancer", href: "/register?seller=true" },
+      { name: "Community Hub", href: "/help-center" },
+      { name: "Seller Resources", href: "/help-center" },
+      // { name: "Blogs", href: "/help-center" },
+      { name: "Success Stories", href: "/recommended-sellers" },
     ],
   },
   {
     title: "Company",
     links: [
-      "About Workvence",
-      "Help Center",
-      "Trust & Safety",
-      "Terms of Service",
-      "Privacy Policy",
-      "Press & News",
+      { name: "About Workvence", href: "/trust-safety" },
+      { name: "Help Center", href: "/help-center" },
+      { name: "Trust & Safety", href: "/trust-safety" },
+      { name: "Terms of Service", href: "/terms" },
+      { name: "Privacy Policy", href: "/privacy" },
+      // { name: "Press & News", href: "/help-center" },
     ],
   },
 ];
@@ -62,14 +72,21 @@ const Footer = () => {
   const categoryList = Array.isArray(fetchedCategories)
     ? fetchedCategories
     : Array.isArray(fetchedCategories?.data)
-    ? fetchedCategories.data
-    : fetchedCategories?.categories || [];
+      ? fetchedCategories.data
+      : fetchedCategories?.categories || [];
 
-  const footerColumns = staticFooterColumns.map(col => {
+  const footerColumns: FooterColumn[] = staticFooterColumns.map(col => {
     if (col.title === "Categories") {
       return {
         ...col,
-        links: categoryList.slice(0, 12).map((item: any) => item.name || (item.slug ? item.slug[0].toUpperCase() + item.slug.slice(1) : String(item)))
+        links: categoryList.slice(0, 12).map((item: any): FooterLink => {
+          const name = item.name || (item.slug ? item.slug[0].toUpperCase() + item.slug.slice(1) : String(item));
+          const slug = item.slug || name.toLowerCase().replace(/\s+/g, '-');
+          return {
+            name,
+            href: `/packages?category=${encodeURIComponent(slug)}`
+          };
+        })
       };
     }
     return col;
@@ -96,6 +113,8 @@ const Footer = () => {
                 <a
                   key={s.label}
                   href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={s.label}
                   className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center hover:bg-slate-700 transition-colors"
                 >
@@ -131,20 +150,13 @@ const Footer = () => {
           {footerColumns.map((col) => (
             <div key={col.title} className="flex flex-col gap-3">
               <h3 className="text-[14px] font-semibold text-slate-100 mb-2">{col.title}</h3>
-              {col.links.map((link: string) => (
+              {col.links.map((link: FooterLink) => (
                 <Link
-                  key={link}
-                  href={
-                    link === "Privacy Policy" ? "/privacy" :
-                      link === "Terms of Service" ? "/terms" :
-                        link === "Trust & Safety" ? "/trust-safety" :
-                          link === "Help Center" ? "/help-center" :
-                            link === "Recommended Sellers" ? "/recommended-sellers" :
-                              "#"
-                  }
+                  key={link.name}
+                  href={link.href}
                   className="text-[13px] text-slate-400 hover:text-white transition-colors"
                 >
-                  {link}
+                  {link.name}
                 </Link>
               ))}
             </div>

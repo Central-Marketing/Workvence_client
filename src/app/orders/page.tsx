@@ -129,7 +129,7 @@ const Orders = () => {
                     </th>
 
                     <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50 whitespace-nowrap">
-                      Status Pill
+                      Status
                     </th>
 
                     <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50 whitespace-nowrap">
@@ -198,10 +198,10 @@ const Orders = () => {
                         <td className="py-4 px-5 border-b border-slate-100 align-middle whitespace-nowrap">
                           <span
                             className={`text-[11px] font-bold py-1 px-2.5 rounded-full uppercase tracking-wide inline-block ${order.status === "completed"
-                                ? "bg-emerald-50 text-emerald-500"
-                                : order.status === "delivered"
-                                  ? "bg-blue-50 text-blue-500"
-                                  : "bg-amber-50 text-amber-600"
+                              ? "bg-emerald-50 text-emerald-500"
+                              : order.status === "delivered"
+                                ? "bg-blue-50 text-blue-500"
+                                : "bg-amber-50 text-amber-600"
                               }`}
                           >
                             {order.status === "completed"

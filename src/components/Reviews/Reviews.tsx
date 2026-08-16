@@ -2,15 +2,34 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { axiosFetch } from '@/utils';
 import { Review } from '..';
 
 const Reviews = (props: any) => {
-    const { reviews } = props;
+    const { reviews: initialReviews, sellerId, packageID } = props;
 
     const [searchTerm, setSearchTerm] = useState("");
     const [showMore, setShowMore] = useState(false);
 
-    const allReviews = Array.isArray(reviews) ? reviews : [];
+    // Fetch seller reviews from backend API if sellerId is provided
+    const { data: fetchedSellerReviews } = useQuery({
+        queryKey: ['seller-reviews', sellerId],
+        queryFn: () => axiosFetch.get(`/reviews/seller/${sellerId}`).then(({ data }: any) => data).catch(() => []),
+        enabled: Boolean(sellerId),
+    });
+
+    const fetchedList = Array.isArray(fetchedSellerReviews)
+        ? fetchedSellerReviews
+        : Array.isArray(fetchedSellerReviews?.data)
+        ? fetchedSellerReviews.data
+        : Array.isArray(fetchedSellerReviews?.reviews)
+        ? fetchedSellerReviews.reviews
+        : [];
+
+    const allReviews = fetchedList.length > 0
+        ? fetchedList
+        : (Array.isArray(initialReviews) ? initialReviews : []);
 
     const filteredReviews = allReviews.filter((item: any) => {
         if (!searchTerm.trim()) return true;

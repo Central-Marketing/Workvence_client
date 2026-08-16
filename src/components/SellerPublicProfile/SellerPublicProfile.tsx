@@ -708,7 +708,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
 
             {/* SECTION 5: Reviews */}
             <div className="bg-white border border-gray-200/90 rounded-3xl p-7 sm:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.025)]">
-              <Reviews reviews={sellerData?.reviews || []} />
+              <Reviews sellerId={sellerData?._id || sellerData?.id} reviews={sellerData?.reviews || []} />
             </div>
 
           </div>

@@ -12,6 +12,8 @@ interface NotificationBellProps {
   currentUser: any;
 }
 
+const processedNotifMessageIds = new Set<string>();
+
 const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -76,6 +78,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 2000); // 2 seconds of bounce
 
+      const notifId = newNotif._id || newNotif.id || `${newNotif.title}-${newNotif.createdAt || Date.now()}`;
       toast.custom((t) => (
         <div className={`toast-notification relative ${t.visible ? 'animate-enter' : 'animate-leave'}`}>
           <button 
@@ -87,7 +90,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
           <strong>🔔 {newNotif.title}</strong>
           <p>{newNotif.message}</p>
         </div>
-      ), { duration: 86400000 });
+      ), { id: `sys-notif-${notifId}`, duration: 5000 });
       
       // Play notification sound for all non-chat notifications
       playNotificationSound('notification');
@@ -95,15 +98,26 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
 
     // Listen for real-time incoming messages (chat messages from other users)
     const handleReceiveMessage = (newMsg: any) => {
-      // Don't notify for messages sent by the current user
-      const senderId = newMsg.userID?._id || newMsg.userID;
-      if (senderId === currentUser._id) return;
+      if (!newMsg) return;
+
+      // Robust check: Don't notify for messages sent by the current user
+      const senderId = String(newMsg.userID?._id || newMsg.userID?.id || (typeof newMsg.userID === 'string' ? newMsg.userID : '') || '');
+      const currentUserId = String(currentUser?._id || currentUser?.id || '');
+
+      if (senderId && currentUserId && senderId === currentUserId) return;
 
       // Play message sound and show toast ONLY if user is NOT on the chat page
       const isViewingCurrentChat = typeof window !== 'undefined' && window.location.pathname.includes(`/message/${newMsg.conversationID}`);
       const isAnyChatPage = typeof window !== 'undefined' && window.location.pathname.startsWith('/message');
 
       if (isViewingCurrentChat || isAnyChatPage) return;
+
+      const msgId = newMsg._id || newMsg.id || newMsg.uuid;
+      const msgKey = msgId ? String(msgId) : `${senderId}-${newMsg.description || ''}`;
+
+      if (processedNotifMessageIds.has(msgKey)) return;
+      processedNotifMessageIds.add(msgKey);
+      setTimeout(() => processedNotifMessageIds.delete(msgKey), 10000);
 
       // Play message notification sound
       playNotificationSound('message');
@@ -113,7 +127,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
         ? 'sent you a custom proposal' 
         : newMsg.description?.slice(0, 60) || 'sent a message';
 
-      // Show toast for incoming message
+      // Show toast for incoming message with 5s duration and unique ID
       toast.custom((t) => (
         <div 
           className={`toast-notification relative ${t.visible ? 'animate-enter' : 'animate-leave'}`}
@@ -132,10 +146,9 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
           <strong>💬 {senderName}</strong>
           <p>{msgPreview}</p>
         </div>
-      ), { duration: 86400000 });
+      ), { id: `chat-toast-${msgKey}`, duration: 5000 });
 
       // Also invalidate conversations to update the header inbox badge instantly
-      // (uses window event to signal HeaderInboxIcon to refetch)
       window.dispatchEvent(new CustomEvent('new-message-received'));
     };
 

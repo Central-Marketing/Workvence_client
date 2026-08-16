@@ -349,7 +349,7 @@ const Message = () => {
       const targetUser = getOtherUser(activeConvDoc, user);
       const targetUserId = targetUser?._id || targetUser?.id;
       if (!targetUserId) return [];
-      const res = await axiosFetch.get(`/briefs?userId=${targetUserId}`).catch(() => null);
+      const res = await axiosFetch.get(`/briefs/user/${targetUserId}`).catch(() => axiosFetch.get(`/briefs?userId=${targetUserId}`)).catch(() => null);
       const data = res?.data;
       if (Array.isArray(data)) return data;
       if (Array.isArray(data?.briefs)) return data.briefs;
@@ -514,12 +514,12 @@ const Message = () => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter') {
       if (e.shiftKey) {
-        // Shift + Enter -> Send message
+        // Shift + Enter -> Insert newline in textarea
+        return;
+      } else {
+        // Pressing Enter alone -> Send message
         e.preventDefault();
         handleSend(e);
-      } else {
-        // Normal Enter -> Normal newline in textarea
-        e.stopPropagation();
       }
     }
   };

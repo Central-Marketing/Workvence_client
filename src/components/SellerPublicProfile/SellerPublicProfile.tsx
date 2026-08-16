@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import { Reviews, FavoriteSellerButton, PackageCard, Skeleton, CardSkeleton } from '@/components';
 import { axiosFetch } from '@/utils';
+import adminAxios from '@/utils/adminAxios';
 import { useUserStore } from '@/store/userStore';
 import moment from 'moment';
 import {
@@ -24,7 +26,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 
-const categories = [
+const DEFAULT_CATEGORIES = [
   "All services",
   "Technology & Programming",
   "Writing & Translation",
@@ -46,6 +48,31 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
   const [isPortfolioLoading, setIsPortfolioLoading] = useState(true);
   const router = useRouter();
   const { user } = useUserStore((state: any) => state);
+
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollCategories = (direction: 'left' | 'right') => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = direction === 'left' ? -280 : 280;
+      categoryScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  // Fetch categories from backend
+  const { data: fetchedCategories = [] } = useQuery({
+    queryKey: ['admin-categories-seller-profile'],
+    queryFn: () => adminAxios.get('/categories').then(({ data }: any) => data).catch(() => [])
+  });
+
+  const categoryList = Array.isArray(fetchedCategories)
+    ? fetchedCategories
+    : Array.isArray(fetchedCategories?.data)
+      ? fetchedCategories.data
+      : fetchedCategories?.categories || [];
+
+  const categories = categoryList.length > 0
+    ? ["All services", ...categoryList.map((cat: any) => typeof cat === 'string' ? cat : cat.name || cat.slug || String(cat)).filter(Boolean)]
+    : DEFAULT_CATEGORIES;
 
   const handleContact = async () => {
     if (!user) {
@@ -230,9 +257,25 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
   return (
     <div className="min-h-screen bg-white text-gray-800 pb-28">
       {/* Sticky Category Bar */}
-      <div className="w-full bg-gray-100 border-b border-gray-200 sticky top-0 z-20 shadow-2xs">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-0">
+      <div className="w-full bg-gray-100 border-b border-gray-200 sticky top-0 z-20 shadow-2xs select-none">
+        <div className="container mx-auto px-2 sm:px-4 md:px-6 relative flex items-center group">
+          {/* Scroll Left Button */}
+          <button
+            type="button"
+            onClick={() => scrollCategories('left')}
+            className="flex items-center justify-center absolute left-1 z-20 w-7 h-7 rounded-full bg-white/90 shadow-md text-gray-700 hover:bg-white transition-all cursor-pointer opacity-80 hover:opacity-100 xl:hidden"
+            aria-label="Scroll left"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          {/* Scrollable Container */}
+          <div
+            ref={categoryScrollRef}
+            className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-0 w-full scroll-smooth touch-pan-x overscroll-x-contain px-2 xl:px-0"
+          >
             {categories.map((cat) => (
               <Link
                 key={cat}
@@ -243,6 +286,18 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
               </Link>
             ))}
           </div>
+
+          {/* Scroll Right Button */}
+          <button
+            type="button"
+            onClick={() => scrollCategories('right')}
+            className="flex items-center justify-center absolute right-1 z-20 w-7 h-7 rounded-full bg-white/90 shadow-md text-gray-700 hover:bg-white transition-all cursor-pointer opacity-80 hover:opacity-100 xl:hidden"
+            aria-label="Scroll right"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
       </div>
 

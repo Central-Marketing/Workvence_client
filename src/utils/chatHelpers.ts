@@ -20,23 +20,19 @@ export const getOtherUser = (conversation: any, currentUser: any) => {
 
 export const isConversationUnread = (conversation: any, currentUser: any) => {
   if (!conversation || !currentUser) return false;
-  const username = currentUser.username;
-
-  if (Array.isArray(conversation.readBy) && username) {
-    return !conversation.readBy.includes(username);
-  }
 
   const currentUid = String(currentUser._id || currentUser.id || '');
-  const sellerId = String(conversation.sellerID?._id || conversation.sellerID || '');
-  const buyerId = String(conversation.buyerID?._id || conversation.buyerID || '');
+  const sellerId = String(conversation.sellerID?._id || conversation.sellerID?.id || conversation.sellerID || '');
+  const buyerId = String(conversation.buyerID?._id || conversation.buyerID?.id || conversation.buyerID || '');
 
   if (sellerId === currentUid) {
-    return !conversation.readBySeller;
+    return conversation.readBySeller === false;
   }
   if (buyerId === currentUid) {
-    return !conversation.readByBuyer;
+    return conversation.readByBuyer === false;
   }
-  return currentUser.isSeller ? !conversation.readBySeller : !conversation.readByBuyer;
+
+  return currentUser.isSeller ? conversation.readBySeller === false : conversation.readByBuyer === false;
 };
 
 export const handleStartChat = async (targetUsername: string, currentUser: any, navigate: any) => {

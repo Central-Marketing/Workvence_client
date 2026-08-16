@@ -7,8 +7,9 @@ import { PackageCard, Loader, TopRatedSellers, GigsGridSkeleton } from '@/compon
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
+import adminAxios from "@/utils/adminAxios";
 
-const categories = [
+const DEFAULT_CATEGORIES = [
   "All services",
   "Technology & Programming",
   "Writing & Translation",
@@ -96,6 +97,22 @@ const Packages = () => {
       categoryScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
+
+  // Fetch categories from backend
+  const { data: fetchedCategories = [] } = useQuery({
+    queryKey: ['admin-categories-packages-page'],
+    queryFn: () => adminAxios.get('/categories').then(({ data }: any) => data).catch(() => [])
+  });
+
+  const categoryList = Array.isArray(fetchedCategories)
+    ? fetchedCategories
+    : Array.isArray(fetchedCategories?.data)
+      ? fetchedCategories.data
+      : fetchedCategories?.categories || [];
+
+  const categories = categoryList.length > 0
+    ? ["All services", ...categoryList.map((cat: any) => typeof cat === 'string' ? cat : cat.name || cat.slug || String(cat)).filter(Boolean)]
+    : DEFAULT_CATEGORIES;
 
   // Sync state when URL params externally change
   useEffect(() => {

@@ -343,6 +343,8 @@ const OrderDetail = () => {
   const isPaid = order?.status?.toLowerCase() === 'paid' || order?.status?.toLowerCase() === 'in_progress' || order?.status?.toLowerCase() === 'in progress' || isRevision || !order?.status;
   const isDelivered = order?.status?.toLowerCase() === 'delivered';
   const isCompleted = order?.status?.toLowerCase() === 'completed';
+  const isDisputed = order?.status?.toLowerCase() === 'disputed' || order?.status?.toLowerCase() === 'escalated_to_dispute';
+  const isCancelled = order?.status?.toLowerCase() === 'cancelled' || order?.status?.toLowerCase() === 'canceled';
   const extensionData = order?.extensionRequest || order?.extension;
   const hasPendingExtension = extensionData?.status === 'pending';
 
@@ -367,6 +369,110 @@ const OrderDetail = () => {
               <h2>{order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}</h2>
             </div>
           </div>
+
+          {/* Dispute Notice Card */}
+          {isDisputed && (
+            <div className="card delivery-card" style={{ borderLeft: '4px solid #f59e0b' }}>
+              <div className="delivery-badge-tag" style={{ background: '#fef3c7', color: '#b45309' }}>🛡️ Order Under Dispute</div>
+              <div className="delivery-content">
+                <h5 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+                  Workvence Support is handling your issue
+                </h5>
+                <p className="message-text" style={{ fontStyle: 'normal', color: '#475569', fontSize: '14px', lineHeight: '22px', backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', margin: '8px 0 16px 0' }}>
+                  Our Support & Administration team is actively investigating and taking care of this dispute. All payment releases and work deliveries are temporarily paused while administrators review the details. Both parties will be contacted via support tickets.
+                </p>
+                <div className="delivery-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '12px', paddingTop: '0' }}>
+                  <Link
+                    href="/support"
+                    style={{
+                      background: '#6ad724',
+                      color: '#ffffff',
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      fontWeight: 600,
+                      fontSize: '14px',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    🎧 Go to Support Desk
+                  </Link>
+                  <a
+                    href="mailto:support@workvence.com"
+                    style={{
+                      background: '#f1f5f9',
+                      color: '#334155',
+                      border: '1px solid #cbd5e1',
+                      padding: '10px 18px',
+                      borderRadius: '8px',
+                      fontWeight: 600,
+                      fontSize: '14px',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    ✉️ Email: support@workvence.com
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Cancelled Notice Card */}
+          {isCancelled && (
+            <div className="card delivery-card" style={{ borderLeft: '4px solid #ef4444' }}>
+              <div className="delivery-badge-tag" style={{ background: '#fee2e2', color: '#b91c1c' }}>❌ Order Cancelled</div>
+              <div className="delivery-content">
+                <h5 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+                  This order has been cancelled
+                </h5>
+                <p className="message-text" style={{ fontStyle: 'normal', color: '#475569', fontSize: '14px', lineHeight: '22px', backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', margin: '8px 0 16px 0' }}>
+                  This order was marked as cancelled. If you believe this cancellation was an issue, need assistance with refund details, or wish to appeal, please contact Workvence Support.
+                </p>
+                <div className="delivery-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '12px', paddingTop: '0' }}>
+                  <Link
+                    href="/support/new"
+                    style={{
+                      background: '#0f172a',
+                      color: '#ffffff',
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      fontWeight: 600,
+                      fontSize: '14px',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    🎧 Contact Support
+                  </Link>
+                  <a
+                    href="mailto:support@workvence.com"
+                    style={{
+                      background: '#f1f5f9',
+                      color: '#334155',
+                      border: '1px solid #cbd5e1',
+                      padding: '10px 18px',
+                      borderRadius: '8px',
+                      fontWeight: 600,
+                      fontSize: '14px',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    ✉️ Email: support@workvence.com
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Extension Request Banner for Buyer */}
           {!isCurrentUserSeller && hasPendingExtension && (
@@ -941,7 +1047,7 @@ const OrderDetail = () => {
             <div className="statement-row">
               <span className="label">Order Status</span>
               <span className={`status-tag ${order.status || 'paid'}`}>
-                {isCompleted ? "Completed" : isDelivered ? "Delivered" : isRevision ? "In Revision" : "In Progress"}
+                {isDisputed ? "Disputed" : isCancelled ? "Cancelled" : isCompleted ? "Completed" : isDelivered ? "Delivered" : isRevision ? "In Revision" : "In Progress"}
               </span>
             </div>
             <div className="statement-row">

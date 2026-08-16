@@ -15,6 +15,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { axiosFetch } from '@/utils';
 import adminAxios from '@/utils/adminAxios';
+import { CategoryIcon } from '../CategoryIcon/CategoryIcon';
 
 // Helper to assign a fallback icon based on index or category name
 const getIcon = (index: number, className: string = "text-gray-700 w-10 h-10 md:w-12 md:h-12") => {
@@ -71,21 +72,17 @@ const ExploreCategories = () => {
                 className="flex w-full max-w-[140px] flex-col items-center group"
               >
                 <div className="w-[110px] h-[110px] sm:w-[110px] sm:h-[110px] md:w-[140px] md:h-[140px] flex items-center justify-center bg-white bg-gradient-to-t from-gray-50 to-transparent border border-gray-100 md:border-gray-200 rounded-[1.25rem] md:rounded-[1.5rem] shadow-[0_2px_10px_rgba(0,0,0,0.02)] md:shadow-sm mb-3 group-hover:border-gray-300 group-hover:shadow-[0_4px_15px_rgba(0,0,0,0.05)] transition-all duration-300 p-4">
-                  {category.icon &&
-                    typeof category.icon === 'string' &&
-                    (category.icon.startsWith('http') ||
-                      category.icon.startsWith('/')) ? (
-                    <img
-                      src={category.icon}
-                      alt={title}
-                      className="w-12 h-12 md:w-16 md:h-16 object-contain"
-                    />
-                  ) : (
-                    getIcon(
+                  <CategoryIcon
+                    iconName={category.icon}
+                    iconType={category.iconType}
+                    iconUrl={category.icon}
+                    className="text-gray-700 w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14"
+                    alt={title}
+                    fallbackIcon={getIcon(
                       index,
                       "text-gray-700 w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14"
-                    )
-                  )}
+                    )}
+                  />
                 </div>
 
                 <h3 className="text-[14px] sm:text-[15px] md:text-[16px] font-semibold text-gray-800 text-center leading-[1.2] group-hover:text-brand-green transition-colors duration-300 max-w-[100px] sm:max-w-[110px] md:max-w-full">

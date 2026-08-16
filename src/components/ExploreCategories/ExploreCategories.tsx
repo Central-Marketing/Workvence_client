@@ -63,7 +63,7 @@ const ExploreCategories = () => {
 
             const path =
               category.slug ||
-              title.toLowerCase().replace(/\s+/g, '-');
+              title.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-');
 
             return (
               <Link

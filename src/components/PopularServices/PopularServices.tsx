@@ -69,9 +69,11 @@ const PopularServices = () => {
           }}
           className="w-full"
         >
-          {categoryList.map((card: any) => (
-            <SwiperSlide key={card._id || card.id || card.slug || card.name}>
-              <Link href={`/packages?category=${card.slug || card.name?.toLowerCase().replace(/\s+/g, '-')}`}>
+          {categoryList.map((card: any) => {
+            const cardSlug = card.slug || (card.name || card.title || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-');
+            return (
+              <SwiperSlide key={card._id || card.id || card.slug || card.name}>
+                <Link href={`/packages?category=${cardSlug}`}>
                 <div className="flex flex-col bg-blue-50 rounded-xl overflow-hidden group cursor-pointer border border-transparent hover:border-blue-100 transition-all duration-300">
                   <div className="h-[160px] sm:h-[200px] md:h-[260px] overflow-hidden m-1.5 md:m-2 rounded-2xl md:rounded-[1rem] bg-blue-100/50 flex items-center justify-center">
                     <img
@@ -87,7 +89,8 @@ const PopularServices = () => {
                 </div>
               </Link>
             </SwiperSlide>
-          ))}
+            );
+          })}
         </Swiper>
       </div>
     </section>

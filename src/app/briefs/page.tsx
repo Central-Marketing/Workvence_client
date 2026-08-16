@@ -15,16 +15,17 @@ import { Loader } from "@/components";
 import "./Briefs.scss";
 
 const DEFAULT_CATEGORIES = [
-  "All",
-  "AI",
-  "Web Development",
-  "Mobile Development",
-  "Design",
-  "Writing",
-  "Marketing",
-  "Video & Animation",
-  "Data",
-  "Other",
+  { name: "All Categories", slug: "All" },
+  { name: "AI Services", slug: "ai-services" },
+  { name: "Programming & Tech", slug: "programming-and-tech" },
+  { name: "Graphics & Design", slug: "graphics-and-design" },
+  { name: "Writing & Translation", slug: "writing-and-translation" },
+  { name: "Digital Marketing", slug: "digital-marketing" },
+  { name: "Video & Animation", slug: "video-and-animation" },
+  { name: "Data & Analytics", slug: "data-and-analytics" },
+  { name: "E-Commerce", slug: "e-commerce" },
+  { name: "Business & Consulting", slug: "business-and-consulting" },
+  { name: "Other & General", slug: "other-and-general" },
 ];
 
 const BriefsFeed = () => {
@@ -43,17 +44,29 @@ const BriefsFeed = () => {
     queryFn: () => adminAxios.get('/categories').then(({ data }: any) => data).catch(() => []),
   });
 
-  const categoryList = Array.isArray(fetchedCategories)
-    ? fetchedCategories
-    : Array.isArray(fetchedCategories?.data)
-      ? fetchedCategories.data
-      : fetchedCategories?.categories || [];
+  const categories = useMemo(() => {
+    const categoryList = Array.isArray(fetchedCategories)
+      ? fetchedCategories
+      : Array.isArray(fetchedCategories?.data)
+        ? fetchedCategories.data
+        : fetchedCategories?.categories || [];
 
-  const categories = categoryList.length > 0
-    ? ['All', ...categoryList.map((c: any) => (typeof c === 'string' ? c : c.name || c.title || String(c))).filter(Boolean)]
-    : DEFAULT_CATEGORIES;
+    if (categoryList.length === 0) return DEFAULT_CATEGORIES;
 
-  const categoryQuery = category !== "All" ? category.toLowerCase() : "";
+    const formatted = categoryList.map((c: any) => {
+      if (typeof c === 'string') {
+        const slug = c.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        return { name: c, slug };
+      }
+      const name = c.name || c.title || String(c);
+      const slug = c.slug || name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      return { name, slug };
+    }).filter((c: any) => Boolean(c.name));
+
+    return [{ name: "All Categories", slug: "All" }, ...formatted];
+  }, [fetchedCategories]);
+
+  const categoryQuery = category && category !== "All" ? category : "";
 
   const { isLoading, data: briefs = [] } = useQuery({
     queryKey: ["briefs-feed", categoryQuery],
@@ -135,8 +148,8 @@ const BriefsFeed = () => {
             onChange={(e) => setCategory(e.target.value)}
           >
             {categories.map((c) => (
-              <option key={c} value={c}>
-                {c === "All" ? "All Categories" : c}
+              <option key={c.slug} value={c.slug}>
+                {c.name}
               </option>
             ))}
           </select>

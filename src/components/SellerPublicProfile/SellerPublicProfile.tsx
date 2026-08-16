@@ -276,15 +276,20 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
             ref={categoryScrollRef}
             className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-0 w-full scroll-smooth touch-pan-x overscroll-x-contain px-2 xl:px-0"
           >
-            {categories.map((cat) => (
-              <Link
-                key={cat}
-                href={`/packages?category=${cat === 'All services' ? '' : encodeURIComponent(cat)}`}
-                className="flex-shrink-0 px-4 py-4 text-[13.5px] font-semibold text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap border-b-2 border-transparent hover:border-gray-300"
-              >
-                {cat}
-              </Link>
-            ))}
+            {categories.map((cat) => {
+              const name = typeof cat === 'string' ? cat : cat.name;
+              const rawSlug = typeof cat === 'string' ? cat : cat.slug;
+              const slug = rawSlug === 'All services' || name === 'All services' ? '' : rawSlug.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+              return (
+                <Link
+                  key={name}
+                  href={`/packages${slug ? `?category=${encodeURIComponent(slug)}` : ''}`}
+                  className="flex-shrink-0 px-4 py-4 text-[13.5px] font-semibold text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap border-b-2 border-transparent hover:border-gray-300"
+                >
+                  {name}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Scroll Right Button */}

@@ -2,7 +2,7 @@
 "use client";
 export const dynamic = 'force-dynamic';
 
-import { useState, useRef, useEffect, Suspense } from 'react';
+import { useState, useRef, useEffect, useMemo, Suspense } from 'react';
 import { PackageCard, Loader, TopRatedSellers, GigsGridSkeleton } from '@/components';
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -110,9 +110,35 @@ const Packages = () => {
       ? fetchedCategories.data
       : fetchedCategories?.categories || [];
 
-  const categories = categoryList.length > 0
-    ? ["All services", ...categoryList.map((cat: any) => typeof cat === 'string' ? cat : cat.name || cat.slug || String(cat)).filter(Boolean)]
-    : DEFAULT_CATEGORIES;
+  const categories = useMemo(() => {
+    if (categoryList.length === 0) {
+      return DEFAULT_CATEGORIES.map((c: string) => ({
+        name: c,
+        slug: c === "All services" ? "All services" : c.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+      }));
+    }
+    const formatted = categoryList.map((cat: any) => {
+      if (typeof cat === 'string') {
+        const slug = cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        return { name: cat, slug };
+      }
+      const name = cat.name || cat.title || String(cat);
+      const slug = cat.slug || name.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      return { name, slug };
+    }).filter((c: any) => Boolean(c.name));
+
+    return [{ name: "All services", slug: "All services" }, ...formatted];
+  }, [categoryList]);
+
+  const getSlugFromCat = (catInput: string) => {
+    if (!catInput || catInput === 'All services' || catInput === 'Results') return '';
+    const match = categories.find((c: any) =>
+      c.slug?.toLowerCase() === catInput.toLowerCase() ||
+      c.name?.toLowerCase() === catInput.toLowerCase()
+    );
+    if (match && match.slug && match.slug !== 'All services') return match.slug;
+    return catInput.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  };
 
   // Sync state when URL params externally change
   useEffect(() => {
@@ -120,8 +146,9 @@ const Packages = () => {
     const params = new URLSearchParams(search);
     const cat = params.get('category') || params.get('cat');
     if (cat && cat !== 'All services' && cat !== 'Results') {
-      setActiveCategory(cat);
-      setFilterCategory(cat);
+      const slug = getSlugFromCat(cat);
+      setActiveCategory(slug);
+      setFilterCategory(slug);
     } else {
       setActiveCategory('All services');
       setFilterCategory('');
@@ -131,7 +158,7 @@ const Packages = () => {
     setMaxPrice(params.get('max') || '');
     setSortBy(params.get('sort') || 'createdAt');
     setPage(parseInt(params.get('page') || '1', 10));
-  }, [search]);
+  }, [search, categories]);
 
   // Reactive React Query key ensuring automatic re-fetching whenever any filter state changes
   const { isLoading, error, data, refetch } = useQuery({
@@ -156,9 +183,9 @@ const Packages = () => {
       }
       
       const selectedCat = filterCategory || (activeCategory !== 'All services' ? activeCategory : '');
-      if (selectedCat && selectedCat !== 'Results' && selectedCat !== 'All services') {
-        queryParams.set('category', selectedCat.toLowerCase());
-        queryParams.set('cat', selectedCat);
+      const catSlug = getSlugFromCat(selectedCat);
+      if (catSlug) {
+        queryParams.set('category', catSlug);
       }
 
       if (minPrice) queryParams.set('min', minPrice);
@@ -179,17 +206,18 @@ const Packages = () => {
   });
 
   // Utility to update URL query params cleanly without full page reloads
-  const syncUrlWithFilters = (overrides = {}) => {
+  const syncUrlWithFilters = (overrides: any = {}) => {
     const params = new URLSearchParams();
     const currentSearch = overrides.searchVal !== undefined ? overrides.searchVal : searchVal;
-    const currentCat = overrides.category !== undefined ? overrides.category : (filterCategory || (activeCategory !== 'All services' ? activeCategory : ''));
+    const rawCat = overrides.category !== undefined ? overrides.category : (filterCategory || (activeCategory !== 'All services' ? activeCategory : ''));
+    const currentCatSlug = getSlugFromCat(rawCat);
     const currentMin = overrides.minPrice !== undefined ? overrides.minPrice : minPrice;
     const currentMax = overrides.maxPrice !== undefined ? overrides.maxPrice : maxPrice;
     const currentSort = overrides.sortBy !== undefined ? overrides.sortBy : sortBy;
     const currentPage = overrides.page !== undefined ? overrides.page : (overrides.resetPage ? 1 : page);
 
     if (currentSearch && currentSearch.trim()) params.set('search', currentSearch.trim());
-    if (currentCat && currentCat !== 'All services' && currentCat !== 'Results') params.set('category', currentCat);
+    if (currentCatSlug) params.set('category', currentCatSlug);
     if (currentMin) params.set('min', currentMin);
     if (currentMax) params.set('max', currentMax);
     if (currentSort && currentSort !== 'createdAt') params.set('sort', currentSort);
@@ -204,14 +232,18 @@ const Packages = () => {
     setShowFilter(false);
   };
 
-  const handleCategoryClick = (cat: string) => {
-    setActiveCategory(cat);
-    if (cat === 'All services') {
+  const handleCategoryClick = (cat: any) => {
+    const slug = typeof cat === 'string' ? cat : cat.slug;
+    const name = typeof cat === 'string' ? cat : cat.name;
+
+    if (slug === 'All services' || name === 'All services') {
+      setActiveCategory('All services');
       setFilterCategory('');
       syncUrlWithFilters({ category: '' });
     } else {
-      setFilterCategory(cat);
-      syncUrlWithFilters({ category: cat });
+      setActiveCategory(slug);
+      setFilterCategory(slug);
+      syncUrlWithFilters({ category: slug });
     }
   };
 
@@ -266,20 +298,25 @@ const Packages = () => {
             ref={categoryScrollRef}
             className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-0 w-full scroll-smooth touch-pan-x overscroll-x-contain px-2 xl:px-0"
           >
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => handleCategoryClick(cat)}
-                className={`flex-shrink-0 px-4 py-4 text-[13.5px] font-medium transition-colors whitespace-nowrap border-b-2 cursor-pointer ${
-                  activeCategory === cat || filterCategory === cat
-                    ? 'border-gray-900 text-gray-900 font-semibold'
-                    : 'border-transparent text-gray-500 hover:text-gray-900'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+            {categories.map((cat: any) => {
+              const name = typeof cat === 'string' ? cat : cat.name;
+              const slug = typeof cat === 'string' ? cat : cat.slug;
+              const isActive = activeCategory === slug || activeCategory === name || filterCategory === slug || filterCategory === name;
+              return (
+                <button
+                  key={slug}
+                  type="button"
+                  onClick={() => handleCategoryClick(cat)}
+                  className={`flex-shrink-0 px-4 py-4 text-[13.5px] font-medium transition-colors whitespace-nowrap border-b-2 cursor-pointer ${
+                    isActive
+                      ? 'border-gray-900 text-gray-900 font-semibold'
+                      : 'border-transparent text-gray-500 hover:text-gray-900'
+                  }`}
+                >
+                  {name}
+                </button>
+              );
+            })}
           </div>
 
           {/* Scroll Right Button */}

@@ -8,9 +8,28 @@ const getAdminApiUrl = () => {
   return process.env.NEXT_PUBLIC_ADMIN_API_URL || process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_ADMIN_BACKEND_URL || "https://devadmin.workvence.com/api";
 };
 
+const getAuthToken = () => {
+  if (typeof window === "undefined") return "";
+  try {
+    const match = document.cookie.match(/(?:^|; )\s*(?:accessToken|token|jwt|auth_token)\s*=\s*([^;]+)/i);
+    if (match) return decodeURIComponent(match[1]);
+    return localStorage.getItem("accessToken") || localStorage.getItem("token") || "";
+  } catch (e) {
+    return "";
+  }
+};
+
 const adminAxiosFetch = axios.create({
   baseURL: getAdminApiUrl(),
   withCredentials: true
+});
+
+adminAxiosFetch.interceptors.request.use((config) => {
+  const token = getAuthToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export interface SupportTicketItem {

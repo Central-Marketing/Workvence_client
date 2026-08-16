@@ -166,14 +166,32 @@ export default function TicketDetailsPage() {
       const ticketObj = (data as any)?.ticket || (data as any)?.data?.ticket || data;
       setTicket(ticketObj);
 
-      const rawMessages =
-        ticketObj?.threads?.creator ||
-        ticketObj?.messages ||
-        (data as any)?.threads?.creator ||
-        (data as any)?.messages ||
-        [];
+      const threadsObj = ticketObj?.threads || (data as any)?.threads;
+      let allSupportMessages: any[] = [];
 
-      setMessages(rawMessages);
+      if (threadsObj) {
+        const creatorMsgs = Array.isArray(threadsObj.creator) ? threadsObj.creator : [];
+        const buyerMsgs = Array.isArray(threadsObj.buyer) ? threadsObj.buyer : [];
+        const sellerMsgs = Array.isArray(threadsObj.seller) ? threadsObj.seller : [];
+        allSupportMessages = [...creatorMsgs, ...buyerMsgs, ...sellerMsgs];
+      } else if (Array.isArray(ticketObj?.messages)) {
+        allSupportMessages = ticketObj.messages;
+      }
+
+      // Deduplicate and sort chronologically by createdAt
+      const uniqueMap = new Map();
+      allSupportMessages.forEach((m: any) => {
+        const key = m.id || `${m.sender}-${m.createdAt}-${m.message || m.content}`;
+        if (!uniqueMap.has(key)) {
+          uniqueMap.set(key, m);
+        }
+      });
+
+      const sortedMessages = Array.from(uniqueMap.values()).sort(
+        (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
+
+      setMessages(sortedMessages);
     } catch (err: any) {
       console.error("Failed to load ticket details:", err);
       setError(err?.response?.data?.message || err.message || "Failed to load support ticket details.");
@@ -226,33 +244,20 @@ export default function TicketDetailsPage() {
     setSending(true);
 
     try {
+      // 1. Post reply to backend HTTP API
+      await supportService.replyTicket(ticketId, {
+        message: messageContent,
+        thread: "creator",
+        attachments: currentAttachments,
+      });
+
+      // 2. Emit real-time message via socket if connected
       if (isConnected) {
         sendSupportMessage(messageContent, currentAttachments);
-        const localMsg = {
-          id: `msg-${Date.now()}`,
-          ticketId,
-          thread: "creator",
-          sender: user?.username || user?.name || user?.email || "You",
-          senderName: user?.username || user?.name || user?.email || "You",
-          role: "creator",
-          message: messageContent,
-          attachments: currentAttachments,
-          createdAt: new Date().toISOString(),
-        };
-        setMessages((prev) => {
-          if (prev.some((m) => m.message === messageContent && m.role === "creator" && Math.abs(new Date(m.createdAt).getTime() - Date.now()) < 2000)) {
-            return prev;
-          }
-          return [...prev, localMsg];
-        });
-      } else {
-        await supportService.replyTicket(ticketId, {
-          message: messageContent,
-          thread: "creator",
-          attachments: currentAttachments,
-        });
-        await fetchTicketDetails();
       }
+
+      // 3. Refresh ticket details and message history from backend
+      await fetchTicketDetails();
     } catch (err: any) {
       console.error("Failed to send reply:", err);
       setError(err?.response?.data?.message || "Failed to send message reply.");

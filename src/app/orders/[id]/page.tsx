@@ -342,11 +342,20 @@ const OrderDetail = () => {
   const isRevision = order?.status?.toLowerCase() === 'revision' || order?.status?.toLowerCase() === 'in_revision' || order?.status?.toLowerCase() === 'in revision' || !!order?.revisionReason;
   const isPaid = order?.status?.toLowerCase() === 'paid' || order?.status?.toLowerCase() === 'in_progress' || order?.status?.toLowerCase() === 'in progress' || isRevision || !order?.status;
   const isDelivered = order?.status?.toLowerCase() === 'delivered';
-  const isCompleted = order?.status?.toLowerCase() === 'completed';
+  const isCompleted = order?.status?.toLowerCase() === 'completed' || order?.status?.toLowerCase() === 'complete';
   const isDisputed = order?.status?.toLowerCase() === 'disputed' || order?.status?.toLowerCase() === 'escalated_to_dispute';
   const isCancelled = order?.status?.toLowerCase() === 'cancelled' || order?.status?.toLowerCase() === 'canceled';
   const extensionData = order?.extensionRequest || order?.extension;
   const hasPendingExtension = extensionData?.status === 'pending';
+
+  const hasAlreadyReviewed =
+    hasSubmittedReview ||
+    !!order?.hasReviewed ||
+    !!order?.isReviewed ||
+    !!order?.hasReview ||
+    !!order?.isReviewedByBuyer ||
+    !!order?.review ||
+    !!order?.reviewID;
 
   return (
     <div className="order-detail">
@@ -710,7 +719,7 @@ const OrderDetail = () => {
           )}
 
           {/* Review Form for Buyer */}
-          {isCompleted && !isCurrentUserSeller && !hasSubmittedReview && !order.isReviewed && (
+          {isCompleted && !isCurrentUserSeller && !hasAlreadyReviewed && (
             <div className="card action-form-card" style={{ marginTop: '24px' }}>
               <div className="delivery-teaser">
                 <h4>Leave a Review</h4>

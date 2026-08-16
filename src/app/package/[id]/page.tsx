@@ -308,7 +308,7 @@ const PackageContent = () => {
 
           <div className="flex flex-wrap items-center justify-between gap-4 pb-1">
             <div
-              onClick={() => router.push(`/seller/${data?.userID?._id}`)}
+              onClick={() => router.push(`/seller/${data?.userID?.username}`)}
               className="flex items-center gap-3.5 cursor-pointer group"
             >
               <img

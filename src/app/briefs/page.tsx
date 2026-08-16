@@ -9,11 +9,12 @@ import moment from "moment";
 import { RiSearchLine } from "react-icons/ri";
 
 import { axiosFetch } from "@/utils";
+import adminAxios from "@/utils/adminAxios";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 import "./Briefs.scss";
 
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   "All",
   "AI",
   "Web Development",
@@ -35,6 +36,22 @@ const BriefsFeed = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Fetch categories dynamically from backend
+  const { data: fetchedCategories } = useQuery({
+    queryKey: ['admin-categories-briefs-page'],
+    queryFn: () => adminAxios.get('/categories').then(({ data }: any) => data).catch(() => []),
+  });
+
+  const categoryList = Array.isArray(fetchedCategories)
+    ? fetchedCategories
+    : Array.isArray(fetchedCategories?.data)
+      ? fetchedCategories.data
+      : fetchedCategories?.categories || [];
+
+  const categories = categoryList.length > 0
+    ? ['All', ...categoryList.map((c: any) => (typeof c === 'string' ? c : c.name || c.title || String(c))).filter(Boolean)]
+    : DEFAULT_CATEGORIES;
 
   const categoryQuery = category !== "All" ? category.toLowerCase() : "";
 
@@ -117,7 +134,7 @@ const BriefsFeed = () => {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
-            {CATEGORIES.map((c) => (
+            {categories.map((c) => (
               <option key={c} value={c}>
                 {c === "All" ? "All Categories" : c}
               </option>

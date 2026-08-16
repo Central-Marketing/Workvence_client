@@ -113,7 +113,7 @@ export default function TicketDetailsPage() {
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [replyText, setReplyText] = useState("");
   const [sending, setSending] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
@@ -338,7 +338,7 @@ export default function TicketDetailsPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-6">
-        
+
         {/* Top Navigation */}
         <div className="flex items-center justify-between">
           <Link
@@ -402,7 +402,7 @@ export default function TicketDetailsPage() {
 
         {/* Conversation Stream */}
         <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-xs overflow-hidden flex flex-col min-h-[500px]">
-          
+
           {/* Chat Header */}
           <div className="px-6 py-4 border-b border-[#e2e8f0] bg-[#f8fafc] flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -447,11 +447,10 @@ export default function TicketDetailsPage() {
                       </div>
 
                       <div
-                        className={`p-4 rounded-2xl text-xs leading-relaxed ${
-                          isAdmin
+                        className={`p-4 rounded-2xl text-xs leading-relaxed ${isAdmin
                             ? "bg-white text-[#0f172a] rounded-tl-none border border-[#e2e8f0] shadow-2xs"
                             : "bg-[#1dbf73] text-white rounded-tr-none shadow-2xs"
-                        }`}
+                          }`}
                       >
                         <p className="whitespace-pre-wrap">{msg.message}</p>
 
@@ -490,7 +489,7 @@ export default function TicketDetailsPage() {
 
           {/* Reply Form */}
           <div className="p-4 md:p-6 border-t border-[#e2e8f0] bg-white space-y-3">
-            
+
             {/* Attachment preview */}
             {attachments.length > 0 && (
               <div className="flex flex-wrap gap-2">
@@ -534,7 +533,7 @@ export default function TicketDetailsPage() {
                     onChange={handleFileSelect}
                     className="hidden"
                   />
-                  
+
                   <button
                     type="button"
                     disabled={uploadingFile}

@@ -22,10 +22,10 @@ const Reviews = (props: any) => {
     const fetchedList = Array.isArray(fetchedSellerReviews)
         ? fetchedSellerReviews
         : Array.isArray(fetchedSellerReviews?.data)
-        ? fetchedSellerReviews.data
-        : Array.isArray(fetchedSellerReviews?.reviews)
-        ? fetchedSellerReviews.reviews
-        : [];
+            ? fetchedSellerReviews.data
+            : Array.isArray(fetchedSellerReviews?.reviews)
+                ? fetchedSellerReviews.reviews
+                : [];
 
     const allReviews = fetchedList.length > 0
         ? fetchedList

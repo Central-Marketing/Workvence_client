@@ -32,31 +32,31 @@ const Review = (props: any) => {
   const duration = review?.duration || null;
 
   return (
-    <div className="bg-white border border-gray-200/90 rounded-2xl p-6 shadow-2xs hover:border-gray-300 transition-all flex flex-col justify-between h-full">
+    <div className="bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 shadow-2xs hover:border-gray-300 transition-all flex flex-col justify-between h-full w-full overflow-hidden">
       <div>
         {/* User profile and stars header */}
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <div className="flex items-center gap-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-1">
+          <div className="flex items-center gap-3.5 min-w-0 flex-1">
             <img
               src={avatar}
               alt={username}
-              className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-2xs flex-shrink-0"
+              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full object-cover border border-gray-200 shadow-2xs shrink-0"
             />
-            <div>
-              <h4 className="text-[16px] font-extrabold text-gray-900 leading-tight">
+            <div className="min-w-0 flex-1">
+              <h4 className="text-sm sm:text-[15px] font-extrabold text-gray-900 leading-tight truncate">
                 {username}
               </h4>
-              <div className="flex items-center gap-1.5 text-xs font-medium text-gray-400 mt-1">
+              <div className="flex flex-wrap items-center gap-1.5 text-xs font-medium text-gray-400 mt-1">
                 {country?.normal ? (
-                  <img src={country.normal} alt="" className="w-3.5 h-2.5 rounded-2xs object-cover" />
+                  <img src={country.normal} alt="" className="w-3.5 h-2.5 rounded-2xs object-cover shrink-0" />
                 ) : (
-                  <span className="text-[13px]">{countryName.slice(0, 2).toUpperCase()}</span>
+                  <span className="text-[12px]">{countryName.slice(0, 2).toUpperCase()}</span>
                 )}
-                <span>{countryName}</span>
+                <span className="truncate max-w-[110px] sm:max-w-none">{countryName}</span>
                 {formattedDate && (
                   <>
                     <span className="text-gray-300">•</span>
-                    <span className="text-gray-400">{formattedDate}</span>
+                    <span className="text-gray-400 whitespace-nowrap">{formattedDate}</span>
                   </>
                 )}
               </div>
@@ -64,15 +64,15 @@ const Review = (props: any) => {
           </div>
 
           {rating > 0 && (
-            <div className="flex items-center gap-1.5 font-bold text-gray-900 text-sm flex-shrink-0">
+            <div className="flex items-center gap-1.5 font-bold text-gray-900 text-xs sm:text-sm shrink-0 self-start sm:self-auto pt-0.5 sm:pt-0">
               <div className="flex items-center text-amber-400 gap-0.5">
                 {new Array(5).fill(0).map((_, i) => (
-                  <svg key={`star-${i}`} className={`w-4 h-4 fill-current ${i < rating ? 'text-amber-400' : 'text-gray-200'}`} viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <svg key={`star-${i}`} className={`w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current ${i < rating ? 'text-amber-400' : 'text-gray-200'}`} viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                 ))}
               </div>
-              <span className="ml-0.5 text-[15px] font-extrabold">{rating.toFixed(1)}</span>
+              <span className="ml-0.5 text-xs sm:text-sm font-extrabold">{rating.toFixed(1)}</span>
             </div>
           )}
         </div>

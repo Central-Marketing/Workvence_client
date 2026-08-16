@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Reviews, FavoriteSellerButton, PackageCard, Skeleton, CardSkeleton } from '@/components';
 import { axiosFetch } from '@/utils';
@@ -23,7 +23,9 @@ import {
   MessageSquare,
   AlertCircle,
   UserX,
-  ExternalLink
+  ExternalLink,
+  Eye,
+  Pencil
 } from 'lucide-react';
 
 const DEFAULT_CATEGORIES = [
@@ -47,6 +49,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
   const [isGigsLoading, setIsGigsLoading] = useState(true);
   const [isPortfolioLoading, setIsPortfolioLoading] = useState(true);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useUserStore((state: any) => state);
 
   const categoryScrollRef = useRef<HTMLDivElement>(null);
@@ -172,7 +175,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
           setSellerPortfolio(data.portfolio || []);
         }
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => {
         if (isMounted) setIsPortfolioLoading(false);
       });
@@ -256,6 +259,22 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
 
   return (
     <div className="min-h-screen bg-white text-gray-800 pb-28">
+      {/* Public Mode Preview Top Banner */}
+      {(searchParams?.get('preview') === 'true' || (user && sellerData && String(user._id || user.id) === String(sellerData._id || sellerData.id))) && (
+        <div className="w-full bg-[#eaf8f0] border-b border-[#bbf0d2] py-2.5 px-4 text-center text-xs sm:text-sm font-semibold text-[#169c5e] flex items-center justify-center gap-2 sm:gap-3 shadow-2xs z-30 relative">
+          <span className="flex items-center gap-1.5">
+            <Eye size={16} strokeWidth={2.2} />
+            <span>Public Mode Preview — This is how buyers view your seller profile.</span>
+          </span>
+          <button
+            onClick={() => router.push('/profile')}
+            className="underline hover:text-[#0f7645] font-bold transition-colors cursor-pointer shrink-0"
+          >
+            Edit Profile ✏️
+          </button>
+        </div>
+      )}
+
       {/* Sticky Category Bar */}
       <div className="w-full bg-gray-100 border-b border-gray-200 sticky top-0 z-20 shadow-2xs select-none">
         <div className="container mx-auto px-2 sm:px-4 md:px-6 relative flex items-center group">
@@ -358,6 +377,17 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                       <span>{responseTime}</span>
                     </span>
                   </div>
+
+                  {user && sellerData && String(user._id || user.id) === String(sellerData._id || sellerData.id) && (
+                    <button
+                      type="button"
+                      onClick={() => router.push('/profile')}
+                      className="mt-3.5 inline-flex items-center gap-1.5 text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer border border-gray-200 shadow-2xs"
+                    >
+                      <Pencil size={13} />
+                      <span>Edit Profile</span>
+                    </button>
+                  )}
                 </div>
 
                 {/* Seller Metadata */}
@@ -410,7 +440,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                     <span className="font-semibold text-gray-900">{lastDeliveryText}</span>
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  {/* <div className="flex items-center justify-between">
                     <span className="flex items-center gap-2.5 text-gray-500">
                       <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -418,7 +448,7 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
                       <span>Price</span>
                     </span>
                     <span className="font-semibold text-gray-900">{hourlyRateText}</span>
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* SKILLS */}

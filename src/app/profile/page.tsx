@@ -2,14 +2,16 @@
 
 import toast from 'react-hot-toast';
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
 import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
-import { User, Briefcase, GraduationCap, FolderDot, Camera, Trash2, Plus, Pencil, ExternalLink, Image as ImageIcon, UploadCloud, Folder, ArrowLeft } from "lucide-react";
+import { User, Briefcase, GraduationCap, FolderDot, Camera, Trash2, Plus, Pencil, ExternalLink, Image as ImageIcon, UploadCloud, Folder, ArrowLeft, Eye } from "lucide-react";
 import supportService from "@/utils/supportService";
 import { Loader } from "@/components";
 
 const Profile = () => {
+  const router = useRouter();
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
 
@@ -221,9 +223,27 @@ const Profile = () => {
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 
-          <div className="px-6 py-8 md:px-10 border-b border-gray-100">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Edit Profile Settings</h1>
-            <p className="text-gray-500 text-sm">Update your personal information, professional details, and portfolio.</p>
+          <div className="px-6 py-8 md:px-10 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-1">Edit Profile Settings</h1>
+              <p className="text-gray-500 text-sm">Update your personal information, professional details, and portfolio.</p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                const publicId = user?.username || user?._id || user?.id;
+                if (publicId) {
+                  router.push(`/seller/${encodeURIComponent(publicId)}?preview=true`);
+                } else {
+                  toast.error("Profile username or ID unavailable");
+                }
+              }}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#eaf8f0] text-[#169c5e] hover:bg-[#d5f1e1] border border-[#bbf0d2] text-sm font-semibold rounded-xl transition-all shadow-2xs hover:shadow-sm cursor-pointer shrink-0"
+            >
+              <Eye size={17} strokeWidth={2.2} />
+              <span>Preview Public Mode</span>
+            </button>
           </div>
 
           <div className="flex overflow-x-auto border-b border-gray-100 bg-gray-50/50 scrollbar-hide px-6 md:px-10">

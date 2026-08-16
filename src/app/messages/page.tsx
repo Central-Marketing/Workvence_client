@@ -91,7 +91,7 @@ const Messages = () => {
                         <th>{user?.isSeller ? 'Buyer' : 'Seller'}</th>
                         <th>Last Message</th>
                         <th>Date</th>
-                        <th>Action</th>
+                        {/* <th>Action</th> */}
                       </tr>
                     </thead>
                     <tbody>
@@ -137,7 +137,7 @@ const Messages = () => {
                                 </span>
                               </td>
                               <td className="date-cell">{moment(conv.updatedAt).fromNow()}</td>
-                              <td>
+                              {/* <td>
                                 {
                                   isUnread && targetId && (
                                     <button
@@ -151,7 +151,7 @@ const Messages = () => {
                                     </button>
                                   )
                                 }
-                              </td>
+                              </td> */}
                             </tr>
                           );
                         })

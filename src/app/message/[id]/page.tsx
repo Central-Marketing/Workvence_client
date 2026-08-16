@@ -1159,13 +1159,26 @@ const Message = () => {
                   <span className="detail-label">On Workvence since</span>
                   <span className="detail-value">{moment(finalRecipientUser.createdAt).format('MMM YYYY')}</span>
                 </div>
-                <div className="detail-row">
-                  <span className="detail-label">English</span>
-                  <span className="detail-value">Native</span>
-                </div>
+                {Array.isArray(finalRecipientUser?.languages) && finalRecipientUser.languages.length > 0 ? (
+                  finalRecipientUser.languages.map((item: any, index: number) => {
+                    const label = typeof item === 'string' ? item : item?.language || item?.lang || item?.name || 'English';
+                    const value = typeof item === 'string' ? 'Fluent' : item?.level || 'Fluent';
+                    return (
+                      <div className="detail-row" key={index}>
+                        <span className="detail-label">{label}</span>
+                        <span className="detail-value">{value}</span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="detail-row">
+                    <span className="detail-label">Languages</span>
+                    <span className="detail-value">English</span>
+                  </div>
+                )}
                 <div className="detail-row">
                   <span className="detail-label">Response rate</span>
-                  <span className="detail-value">1 h</span>
+                  <span className="detail-value">{finalRecipientUser.responseTimeHours} h</span>
                 </div>
                 <button className="view-profile-btn" onClick={() => navigate.push(`/seller/${finalRecipientUser._id}`)}>
                   View Profile

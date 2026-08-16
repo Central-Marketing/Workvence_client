@@ -105,55 +105,118 @@ const Orders = () => {
             </div>
 
             <div className="w-full overflow-x-auto">
-              <table className="w-full border-collapse text-left min-w-[950px] whitespace-nowrap">
+              <table className="w-full min-w-[950px] border-collapse text-left">
                 <thead>
                   <tr>
-                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Image</th>
-                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">{user?.isSeller ? "Buyer" : "Seller"}</th>
-                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Title</th>
-                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Order ID</th>
-                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Price</th>
-                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Status Pill</th>
-                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Contact</th>
+                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">
+                      Image
+                    </th>
+
+                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50 whitespace-nowrap">
+                      {user?.isSeller ? "Buyer" : "Seller"}
+                    </th>
+
+                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50 w-[280px]">
+                      Title
+                    </th>
+
+                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50 whitespace-nowrap">
+                      Order ID
+                    </th>
+
+                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50 whitespace-nowrap">
+                      Price
+                    </th>
+
+                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50 whitespace-nowrap">
+                      Status Pill
+                    </th>
+
+                    <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50 whitespace-nowrap">
+                      Contact
+                    </th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {filteredOrders.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="text-center p-12 text-slate-400 font-medium">
+                      <td
+                        colSpan={7}
+                        className="text-center p-12 text-slate-400 font-medium"
+                      >
                         No orders found in this category.
                       </td>
                     </tr>
                   ) : (
                     filteredOrders.map((order: any) => (
-                      <tr key={order._id} onClick={() => router.push(`/orders/${order._id}`)} className="cursor-pointer transition-colors hover:bg-slate-50">
+                      <tr
+                        key={order._id}
+                        onClick={() => router.push(`/orders/${order._id}`)}
+                        className="cursor-pointer transition-colors hover:bg-slate-50"
+                      >
+                        {/* Image */}
                         <td className="py-4 px-5 border-b border-slate-100 align-middle">
-                          <img className="w-[70px] h-[48px] rounded-md object-cover border border-slate-200" src={order.image || "/media/noavatar.png"} alt="" />
+                          <img
+                            className="w-[70px] h-[48px] rounded-md object-cover border border-slate-200"
+                            src={order.image || "/media/noavatar.png"}
+                            alt=""
+                          />
                         </td>
-                        <td className="py-4 px-5 border-b border-slate-100 align-middle text-sm font-semibold text-slate-800">
+
+                        {/* Buyer / Seller */}
+                        <td className="py-4 px-5 border-b border-slate-100 align-middle text-sm font-semibold text-slate-800 whitespace-nowrap">
                           {user?.isSeller
                             ? order.buyerID?.username
                             : order.sellerID?.username}
                         </td>
-                        <td className="py-4 px-5 border-b border-slate-100 align-middle text-sm font-medium text-slate-700 min-w-[300px] whitespace-nowrap">{order.title}</td>
-                        <td className="py-4 px-5 border-b border-slate-100 align-middle text-[12px] font-mono text-slate-500">
+
+                        {/* Title */}
+                        <td className="py-4 px-5 border-b border-slate-100 align-middle w-[280px] max-w-[280px]">
+                          <div
+                            className="line-clamp-2 text-sm font-medium text-slate-700 leading-5"
+                            title={order.title}
+                          >
+                            {order.title}
+                          </div>
+                        </td>
+
+                        {/* Order ID */}
+                        <td className="py-4 px-5 border-b border-slate-100 align-middle text-[12px] font-mono text-slate-500 whitespace-nowrap">
                           {order._id}
                         </td>
-                        <td className="py-4 px-5 border-b border-slate-100 align-middle text-[14px] font-bold text-slate-900">
+
+                        {/* Price */}
+                        <td className="py-4 px-5 border-b border-slate-100 align-middle text-[14px] font-bold text-slate-900 whitespace-nowrap">
                           {order.price.toLocaleString("en-US", {
                             style: "currency",
                             currency: "USD",
                           })}
                         </td>
-                        <td className="py-4 px-5 border-b border-slate-100 align-middle">
-                          <span className={`text-[11px] font-bold py-1 px-2.5 rounded-full uppercase tracking-wide inline-block ${order.status === 'completed' ? 'bg-emerald-50 text-emerald-500' : order.status === 'delivered' ? 'bg-blue-50 text-blue-500' : 'bg-amber-50 text-amber-600'}`}>
-                            {order.status === 'completed' ? 'Completed' : order.status === 'delivered' ? 'Delivered' : 'In Progress'}
+
+                        {/* Status */}
+                        <td className="py-4 px-5 border-b border-slate-100 align-middle whitespace-nowrap">
+                          <span
+                            className={`text-[11px] font-bold py-1 px-2.5 rounded-full uppercase tracking-wide inline-block ${order.status === "completed"
+                                ? "bg-emerald-50 text-emerald-500"
+                                : order.status === "delivered"
+                                  ? "bg-blue-50 text-blue-500"
+                                  : "bg-amber-50 text-amber-600"
+                              }`}
+                          >
+                            {order.status === "completed"
+                              ? "Completed"
+                              : order.status === "delivered"
+                                ? "Delivered"
+                                : "In Progress"}
                           </span>
                         </td>
-                        <td className="py-4 px-5 border-b border-slate-100 align-middle">
+
+                        {/* Contact */}
+                        <td className="py-4 px-5 border-b border-slate-100 align-middle whitespace-nowrap">
                           <button
                             className="bg-slate-100 text-slate-700 font-semibold text-[13px] border border-slate-300 py-1.5 px-3.5 rounded-md transition-all hover:bg-brand-green hover:border-brand-green hover:text-white"
-                            onClick={(e: any) => {
+                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                               e.stopPropagation();
                               handleContact(order);
                             }}

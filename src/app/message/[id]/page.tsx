@@ -74,6 +74,15 @@ const Message = () => {
   const [attachment, setAttachment] = useState<any>(null);
   const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [viewingOfferDetails, setViewingOfferDetails] = useState<any>(null);
+  const [expandedProposalIds, setExpandedProposalIds] = useState<Record<string, boolean>>({});
+
+  const toggleProposalExpand = (msgId: string) => {
+    setExpandedProposalIds(prev => ({
+      ...prev,
+      [msgId]: !prev[msgId]
+    }));
+  };
 
   const handleFileAttachmentChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -336,8 +345,8 @@ const Message = () => {
 
   // Fetch active packages created by the current contact user (to populate package selector dropdown in Custom Offer modal)
   const { data: sellerPackages = [] } = useQuery({
-    queryKey: ['seller-packages', user?._id],
-    queryFn: () => axiosFetch.get(`/packages?userId=${user?._id || user?.id}`).then(({ data }) => Array.isArray(data) ? data : (data?.packages || data?.data || [])).catch(() => []),
+    queryKey: ['seller-packages', user?._id || user?.id || user?.username],
+    queryFn: () => axiosFetch.get(`/gigs/seller/${user?.username || user?.id}`).then(({ data }) => Array.isArray(data) ? data : (data?.gigs || data?.packages || data?.data || [])).catch(() => []),
     enabled: !!user?.isSeller
   });
 
@@ -877,14 +886,19 @@ const Message = () => {
                   const senderIdStr = String(senderObj?._id || senderObj?.id || senderObj || '');
                   const currentUserIdStr = String(user?._id || user?.id || '');
                   const isOwner = currentUserIdStr !== '' && senderIdStr === currentUserIdStr;
-                  const offer = parseOffer(msg.description);
+                  const offer = msg.isCustomOffer || msg.description?.startsWith('[CUSTOM_OFFER]') ? parseOffer(msg.description) : null;
+                  const isOfferAccepted = Boolean(msg.isOfferAccepted || msg.offerStatus === 'accepted');
+                  const isWithdrawn = Boolean(msg.withdrawn || msg.offerStatus === 'withdrawn');
+                  const acceptedOrder = offer ? contactOrders.find((o: any) => (msg.orderID && (o._id === msg.orderID || o.id === msg.orderID)) || (o.title === offer.desc && Number(o.price) === Number(offer.price))) : null;
+                  const targetOrderId = msg.orderID || acceptedOrder?._id || acceptedOrder?.id;
+                  const isAccepted = isOfferAccepted || Boolean(acceptedOrder);
+
                   const msgDate = moment(msg.createdAt).format('MMM DD');
                   const prevMsgDate = index > 0 ? moment(filteredMessages[index - 1].createdAt).format('MMM DD') : null;
                   const showDateDivider = msgDate !== prevMsgDate;
-                  const acceptedOrder = offer ? contactOrders.find((o: any) => o.title === offer.desc && Number(o.price) === Number(offer.price)) : null;
 
                   return (
-                    <div key={msg._id} className="msg-wrapper">
+                    <div key={msg._id || msg.id} className="msg-wrapper">
                       {showDateDivider && (
                         <div className="date-separator">
                           <span className="date-pill">{msgDate === moment().format('MMM DD') ? 'Today' : msgDate}</span>
@@ -896,55 +910,92 @@ const Message = () => {
                         )}
 
                         {offer ? (
-                          <div className={`offer-card max-md:p-3.5 ${msg.withdrawn ? 'withdrawn' : ''}`}>
-                            {msg.withdrawn ? (
+                          <div className={`offer-card max-md:p-3.5 ${isWithdrawn ? 'withdrawn' : ''}`}>
+                            {isWithdrawn ? (
                               <p className="withdrawn-text">↩ This offer was withdrawn by the seller.</p>
                             ) : (
                               <div className="offer-content flex flex-col w-full">
-                                <div className="flex justify-between items-start mb-2 gap-4">
-                                  <div>
-                                    <h4 className="text-base font-bold text-slate-900 leading-tight mb-1">Custom Proposal</h4>
-                                    <p className="text-sm text-slate-500 line-clamp-2">{renderMessageTextWithLinks(offer.desc || 'No description provided.')}</p>
+                                {isAccepted && (
+                                  <div className="flex items-center justify-between gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200/80 rounded-xl px-3.5 py-1.5 text-xs font-bold mb-2.5">
+                                    <span>✓ Custom Proposal Accepted</span>
+                                    {targetOrderId && (
+                                      <span className="text-[11px] font-mono text-emerald-700">Order #{String(targetOrderId).slice(-6)}</span>
+                                    )}
                                   </div>
-                                  <div className="text-2xl font-black text-slate-800">${offer.price}</div>
+                                )}
+
+                                <div className="flex justify-between items-start mb-2 gap-4">
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-base font-bold text-slate-900 leading-tight mb-1.5">Custom Proposal</h4>
+                                    {(() => {
+                                      const isExpanded = Boolean(expandedProposalIds[msg._id || msg.id]);
+                                      const descText = offer.desc || 'No description provided.';
+                                      const isLongDesc = descText.length > 80;
+
+                                      return (
+                                        <div className="text-sm text-slate-700">
+                                          <p className={isExpanded ? "whitespace-pre-wrap leading-relaxed text-slate-800" : "line-clamp-2 text-slate-600"}>
+                                            {renderMessageTextWithLinks(descText)}
+                                          </p>
+                                          {isLongDesc && (
+                                            <button
+                                              type="button"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleProposalExpand(msg._id || msg.id);
+                                              }}
+                                              className="text-xs font-bold text-brand-green hover:underline mt-1 cursor-pointer inline-flex items-center gap-1"
+                                            >
+                                              {isExpanded ? "See less ▲" : "... See more ▼"}
+                                            </button>
+                                          )}
+                                        </div>
+                                      );
+                                    })()}
+                                  </div>
+                                  <div className="text-xl sm:text-2xl font-black text-slate-900 shrink-0 whitespace-nowrap flex-shrink-0">${offer.price}</div>
                                 </div>
 
-                                <div className="flex items-center gap-6 py-3 border-y border-slate-100 my-2">
+                                <div className="flex items-center gap-5 py-3 border-y border-slate-100 my-2 flex-wrap">
                                   <div className="flex items-center gap-1.5 text-sm text-slate-600">
                                     <RiTimeLine className="text-slate-400 text-lg" />
-                                    <span className="font-semibold">{offer.delivery} Days</span>
-                                  </div>
-                                  <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                                    <RiRefreshLine className="text-slate-400 text-lg" />
-                                    <span className="font-semibold">Unlimited Revisions</span>
+                                    <span className="font-semibold">{offer.delivery} Days Delivery</span>
                                   </div>
                                 </div>
 
                                 <div className="flex gap-2 w-full mt-1">
-                                  {acceptedOrder ? (
+                                  {isAccepted ? (
                                     <button
-                                      className="flex-1 py-2 px-3 rounded-lg font-bold text-sm bg-brand-green text-white hover:brightness-95 transition-all"
-                                      onClick={() => navigate.push(`/orders/${acceptedOrder._id}`)}
+                                      className="flex-1 py-2 px-3 rounded-lg font-bold text-sm bg-brand-green text-white hover:brightness-95 transition-all text-center"
+                                      onClick={() => {
+                                        if (targetOrderId) navigate.push(`/orders/${targetOrderId}`);
+                                        else navigate.push('/orders');
+                                      }}
                                     >
                                       View Order
                                     </button>
                                   ) : (
                                     <>
-                                      {!user?.isSeller && (
+                                      {!isOwner && (
                                         <button className="flex-1 py-2 px-3 rounded-lg font-bold text-sm bg-brand-green text-white hover:brightness-95 transition-all" onClick={() => handleAcceptOffer(offer)}>Accept</button>
                                       )}
-                                      {user?.isSeller && isOwner && (
-                                        <button className="flex-1 py-2 px-3 rounded-lg font-bold text-sm bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all" onClick={() => handleWithdraw(msg._id)}>Withdraw</button>
+                                      {isOwner && (
+                                        <button className="flex-1 py-2 px-3 rounded-lg font-bold text-sm bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all" onClick={() => handleWithdraw(msg._id || msg.id)}>Withdraw</button>
                                       )}
                                     </>
                                   )}
                                   <button
-                                    className="flex-1 py-2 px-3 rounded-lg font-bold text-sm border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all"
+                                    className="flex-1 py-2 px-3 rounded-lg font-bold text-sm border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all cursor-pointer"
                                     onClick={() => {
-                                      if (offer.packageID) {
-                                        navigate.push(`/package/${offer.packageID}`);
-                                      } else if (offer.briefID) {
-                                        navigate.push(`/briefs/${offer.briefID}`);
+                                      const gigId = offer?.packageID || offer?.gigID || msg?.gigID || (msg?.gig ? (msg.gig._id || msg.gig.id) : null);
+                                      const briefId = offer?.briefID || msg?.briefID || (msg?.brief ? (msg.brief._id || msg.brief.id) : null);
+
+                                      if (gigId) {
+                                        navigate.push(`/package/${gigId}`);
+                                      } else if (briefId) {
+                                        navigate.push(`/briefs/${briefId}`);
+                                      } else {
+                                        setViewingOfferDetails({ offer, msgId: msg._id || msg.id, acceptedOrder: isAccepted ? (targetOrderId || true) : null, isOwner });
                                       }
                                     }}
                                   >
@@ -1182,7 +1233,7 @@ const Message = () => {
                 <label>Package Reference <span className="text-xs text-gray-400">(optional)</span></label>
                 <select value={selectedPackageId} onChange={e => setSelectedPackageId(e.target.value)}>
                   <option value="">-- Select one of your Packages --</option>
-                  {sellerPackages.map((g: any) => <option key={g._id} value={g._id}>{g.title}</option>)}
+                  {sellerPackages.map((g: any) => <option key={g._id || g.id} value={g._id || g.id}>{g.title}</option>)}
                 </select>
               </div>
               <div className="fg">
@@ -1202,7 +1253,7 @@ const Message = () => {
                 <label>Offer Description</label>
                 <textarea placeholder="Describe the service…" value={offerDesc} onChange={e => setOfferDesc(e.target.value)} rows={3} required />
               </div>
-              <div className="fg-row">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-1">
                 <div className="fg">
                   <label>Price (USD)</label>
                   <input type="number" placeholder="150" value={offerPrice} onChange={e => setOfferPrice(e.target.value)} required min="1" />
@@ -1217,6 +1268,97 @@ const Message = () => {
                 <button type="button" className="cancel" onClick={() => setShowOfferModal(false)}>Cancel</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Full Proposal Details Modal */}
+      {viewingOfferDetails && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+          onClick={() => setViewingOfferDetails(null)}
+        >
+          <div
+            className="bg-white rounded-3xl border border-slate-200 max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 animate-fadeIn"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+              <h3 className="text-xl font-bold text-slate-900">Custom Proposal Details</h3>
+              <button
+                onClick={() => setViewingOfferDetails(null)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-lg transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex justify-between items-center bg-emerald-50/70 border border-emerald-200/60 rounded-2xl p-4">
+              <div>
+                <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Price</span>
+                <span className="text-2xl font-black text-emerald-700">${viewingOfferDetails.offer?.price}</span>
+              </div>
+              <div className="text-right">
+                <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Delivery Time</span>
+                <span className="text-base font-bold text-slate-800">{viewingOfferDetails.offer?.delivery} Days</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Full Description</h4>
+              <div className="bg-slate-50 border border-slate-200/70 rounded-2xl p-4 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto">
+                {renderMessageTextWithLinks(viewingOfferDetails.offer?.desc || 'No description provided.')}
+              </div>
+            </div>
+
+            <div className="pt-2 flex gap-3">
+              {viewingOfferDetails.acceptedOrder ? (
+                <button
+                  className="flex-1 py-3 rounded-xl font-bold text-sm bg-brand-green text-white hover:brightness-95 transition-all text-center shadow-sm"
+                  onClick={() => {
+                    const orderId = typeof viewingOfferDetails.acceptedOrder === 'string' ? viewingOfferDetails.acceptedOrder : viewingOfferDetails.acceptedOrder?._id;
+                    setViewingOfferDetails(null);
+                    if (orderId && orderId !== true) navigate.push(`/orders/${orderId}`);
+                    else navigate.push('/orders');
+                  }}
+                >
+                  View Order
+                </button>
+              ) : (
+                <>
+                  {!viewingOfferDetails.isOwner && (
+                    <button
+                      className="flex-1 py-3 rounded-xl font-bold text-sm bg-brand-green text-white hover:brightness-95 transition-all text-center shadow-sm"
+                      onClick={() => {
+                        const offer = viewingOfferDetails.offer;
+                        setViewingOfferDetails(null);
+                        handleAcceptOffer(offer);
+                      }}
+                    >
+                      Accept & Proceed to Checkout
+                    </button>
+                  )}
+                  {viewingOfferDetails.isOwner && (
+                    <button
+                      className="flex-1 py-3 rounded-xl font-bold text-sm bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all text-center"
+                      onClick={() => {
+                        const msgId = viewingOfferDetails.msgId;
+                        setViewingOfferDetails(null);
+                        handleWithdraw(msgId);
+                      }}
+                    >
+                      Withdraw Proposal
+                    </button>
+                  )}
+                </>
+              )}
+              <button
+                type="button"
+                className="py-3 px-5 rounded-xl font-semibold text-sm border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all"
+                onClick={() => setViewingOfferDetails(null)}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

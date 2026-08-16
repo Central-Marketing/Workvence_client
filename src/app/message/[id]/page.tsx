@@ -675,7 +675,7 @@ const Message = () => {
 
     if (isImage) {
       return (
-        <div className="my-1.5 overflow-hidden rounded-lg border border-slate-200 shadow-sm max-w-[280px]">
+        <div className={`mt-1 overflow-hidden rounded-lg border border-slate-200 shadow-sm max-w-[280px] ${!msg.description ? 'mb-5' : 'mb-1.5'}`}>
           <img
             src={fileUrl}
             alt="Attachment"
@@ -694,7 +694,7 @@ const Message = () => {
 
     if (isVideo) {
       return (
-        <div className="my-1.5 overflow-hidden rounded-xl border border-slate-200 shadow-sm max-w-[340px] bg-black">
+        <div className={`mt-1 overflow-hidden rounded-xl border border-slate-200 shadow-sm max-w-[340px] bg-black ${!msg.description ? 'mb-5' : 'mb-1.5'}`}>
           <video
             src={fileUrl}
             controls
@@ -713,7 +713,7 @@ const Message = () => {
         target="_blank"
         rel="noopener noreferrer"
         download
-        className="flex items-center gap-2 px-3 py-2 my-1.5 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-lg hover:bg-slate-200 transition-colors border text-xs font-medium"
+        className={`flex items-center gap-2 px-3 py-2 mt-1 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-lg hover:bg-slate-200 transition-colors border text-xs font-medium ${!msg.description ? 'mb-5' : 'mb-1.5'}`}
       >
         <span className="text-base">📄</span>
         <span className="truncate max-w-[180px]">{fileName}</span>

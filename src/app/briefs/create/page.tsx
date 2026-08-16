@@ -51,9 +51,14 @@ const CreateBrief = () => {
     ? fetchedCategories.data
     : fetchedCategories?.categories || [];
 
-  const categories = categoryList.length > 0
+  const rawFormatted = categoryList.length > 0
     ? categoryList.map((cat: any) => typeof cat === 'string' ? { name: cat, slug: cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') } : { name: cat.name || cat.title || String(cat), slug: cat.slug || (cat.name || cat.title || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') })
     : CATEGORIES.map((c) => ({ name: c, slug: c.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') }));
+
+  const categories = [
+    ...rawFormatted.filter((c: any) => c.slug !== 'other-and-general' && c.slug !== 'other' && !c.name.toLowerCase().includes('other')),
+    ...rawFormatted.filter((c: any) => c.slug === 'other-and-general' || c.slug === 'other' || c.name.toLowerCase().includes('other'))
+  ];
 
   useEffect(() => {
     window.scrollTo(0, 0);

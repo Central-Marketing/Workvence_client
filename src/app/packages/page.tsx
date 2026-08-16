@@ -127,7 +127,19 @@ const Packages = () => {
       return { name, slug };
     }).filter((c: any) => Boolean(c.name));
 
-    return [{ name: "All services", slug: "All services" }, ...formatted];
+    // Separate "Other & General" to ensure it is always placed last
+    const regularCats = formatted.filter((c: any) =>
+      c.slug !== 'other-and-general' &&
+      c.slug !== 'other' &&
+      !c.name.toLowerCase().includes('other')
+    );
+    const otherCats = formatted.filter((c: any) =>
+      c.slug === 'other-and-general' ||
+      c.slug === 'other' ||
+      c.name.toLowerCase().includes('other')
+    );
+
+    return [{ name: "All services", slug: "All services" }, ...regularCats, ...otherCats];
   }, [categoryList]);
 
   const getSlugFromCat = (catInput: string) => {

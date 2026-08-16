@@ -55,15 +55,26 @@ const BriefsFeed = () => {
 
     const formatted = categoryList.map((c: any) => {
       if (typeof c === 'string') {
-        const slug = c.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        const slug = c.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
         return { name: c, slug };
       }
       const name = c.name || c.title || String(c);
-      const slug = c.slug || name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      const slug = c.slug || name.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       return { name, slug };
     }).filter((c: any) => Boolean(c.name));
 
-    return [{ name: "All Categories", slug: "All" }, ...formatted];
+    const regularCats = formatted.filter((c: any) =>
+      c.slug !== 'other-and-general' &&
+      c.slug !== 'other' &&
+      !c.name.toLowerCase().includes('other')
+    );
+    const otherCats = formatted.filter((c: any) =>
+      c.slug === 'other-and-general' ||
+      c.slug === 'other' ||
+      c.name.toLowerCase().includes('other')
+    );
+
+    return [{ name: "All Categories", slug: "All" }, ...regularCats, ...otherCats];
   }, [fetchedCategories]);
 
   const categoryQuery = category && category !== "All" ? category : "";

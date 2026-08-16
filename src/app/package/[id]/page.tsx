@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import React, { useEffect, useState, useRef, Suspense } from 'react';
+import React, { useEffect, useState, useRef, useMemo, Suspense } from 'react';
 import toast from 'react-hot-toast';
 import { useQuery } from '@tanstack/react-query';
 import { axiosFetch, getCountryFlag } from '@/utils';
@@ -156,6 +156,44 @@ const PackageContent = () => {
     }
   };
 
+  const packagesObj = useMemo(() => {
+    let parsed: any = {};
+    if (!data) return parsed;
+
+    if (typeof data.packages === 'string') {
+      try {
+        parsed = JSON.parse(data.packages);
+      } catch {
+        parsed = {};
+      }
+    } else if (data.packages && typeof data.packages === 'object') {
+      parsed = data.packages;
+    }
+
+    if (Array.isArray(parsed)) {
+      const map: any = {};
+      parsed.forEach((p: any) => {
+        const key = (p.tier || p.name || p.type || '').toLowerCase();
+        if (key) map[key] = p;
+      });
+      parsed = map;
+    }
+
+    // Fallback for basic package from top-level fields
+    if (!parsed.basic && (data.price || data.features)) {
+      parsed.basic = {
+        price: data.price,
+        title: data.shortTitle || data.title,
+        shortDesc: data.shortDesc,
+        deliveryTime: data.deliveryTime,
+        revisionNumber: data.revisionNumber,
+        features: data.features || []
+      };
+    }
+
+    return parsed;
+  }, [data]);
+
   if (isLoading) {
     return <PackageDetailSkeleton />;
   }
@@ -176,18 +214,16 @@ const PackageContent = () => {
 
   const activeHeroImg = galleryImages[selectedHeroIndex] || "/media/noavatar.png";
 
-  const selectedPackage = data?.packages && data.packages[packageTier]
-    ? data.packages[packageTier]
-    : data?.packages?.basic || {};
+  const basicPkg = packagesObj?.basic;
+  const standardPkg = packagesObj?.standard;
+  const premiumPkg = packagesObj?.premium;
 
-  const displayPrice = selectedPackage.price || data.price || 0;
-  const featuresList = selectedPackage.features && selectedPackage.features.length > 0
-    ? selectedPackage.features
-    : data.features || [];
+  const selectedPackage = packagesObj[packageTier] || basicPkg || standardPkg || premiumPkg || {};
 
-  const basicPkg = data?.packages?.basic;
-  const standardPkg = data?.packages?.standard;
-  const premiumPkg = data?.packages?.premium;
+  const displayPrice = selectedPackage.price || data?.price || 0;
+  const featuresList = Array.isArray(selectedPackage?.features) && selectedPackage.features.length > 0
+    ? selectedPackage.features.filter(Boolean)
+    : [];
 
   return (
     <div className="min-h-screen bg-white text-gray-800 pb-24">
@@ -700,6 +736,49 @@ const PackageContent = () => {
                           <div className="bg-gray-50" />
                         )}
                       </div>
+
+                      {/* Select Package Action Row */}
+                      <div className="grid grid-cols-3 border-t border-gray-200 p-4 sm:p-5 bg-gray-50/50">
+                        <div className="px-2">
+                          {basicPkg && (
+                            <button
+                              onClick={() => {
+                                setPackageTier('basic');
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="w-full py-2.5 px-3 bg-white border border-gray-300 hover:border-gray-900 text-gray-800 font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer text-center"
+                            >
+                              Select Basic (${basicPkg.price})
+                            </button>
+                          )}
+                        </div>
+                        <div className="px-2">
+                          {standardPkg && (
+                            <button
+                              onClick={() => {
+                                setPackageTier('standard');
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="w-full py-2.5 px-3 bg-brand-green text-white font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer shadow-xs text-center"
+                            >
+                              Select Standard (${standardPkg.price})
+                            </button>
+                          )}
+                        </div>
+                        <div className="px-2">
+                          {premiumPkg && (
+                            <button
+                              onClick={() => {
+                                setPackageTier('premium');
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="w-full py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer text-center"
+                            >
+                              Select Premium (${premiumPkg.price})
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -837,23 +916,27 @@ const PackageContent = () => {
               <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs transition-all">
 
                 {/* Package Tier Selector */}
-                {data?.packages && (
+                {(basicPkg || standardPkg || premiumPkg) && (
                   <div className="grid grid-cols-3 gap-1 bg-gray-100 p-1.5 rounded-xl text-center mb-6 border border-gray-200/60">
-                    {["basic", "standard", "premium"].map((tier) => {
-                      const isDisabled = !data.packages[tier];
+                    {[
+                      { key: "basic", label: "Basic", pkg: basicPkg },
+                      { key: "standard", label: "Standard", pkg: standardPkg },
+                      { key: "premium", label: "Premium", pkg: premiumPkg },
+                    ].map(({ key, label, pkg }) => {
+                      const isDisabled = !pkg;
                       return (
                         <button
-                          key={tier}
-                          onClick={() => !isDisabled && setPackageTier(tier)}
+                          key={key}
+                          onClick={() => !isDisabled && setPackageTier(key)}
                           disabled={isDisabled}
-                          className={`py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${packageTier === tier
+                          className={`py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${packageTier === key
                             ? "bg-white text-gray-900 shadow-xs cursor-default"
                             : isDisabled
                               ? "text-gray-300 cursor-not-allowed"
                               : "text-gray-500 hover:text-gray-900 cursor-pointer"
                             }`}
                         >
-                          {tier.charAt(0).toUpperCase() + tier.slice(1)}
+                          {label}
                         </button>
                       );
                     })}

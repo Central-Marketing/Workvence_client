@@ -130,7 +130,7 @@ const Navbar = () => {
                     Browse Packages
                   </Link>
                   <Link href="/briefs" className={`hidden md:block hover:text-brand-green transition-colors ${showMenu || pathname !== "/" ? "" : "hover:text-gray-800"}`}>
-                    Briefs
+                    Projects
                   </Link>
                   <Link href="/register?seller=true" className={`hidden md:block hover:text-brand-green transition-colors ${showMenu || pathname !== "/" ? "" : "hover:text-gray-800"}`}>
                     Become a seller
@@ -149,7 +149,7 @@ const Navbar = () => {
               {user && (
                 <>
                   <Link href="/packages" className="hover:text-brand-green transition-colors">Browse Packages</Link>
-                  <Link href="/briefs" className="hover:text-brand-green transition-colors">Briefs</Link>
+                  <Link href="/briefs" className="hover:text-brand-green transition-colors">Projects</Link>
                   {!user?.isSeller && (
                     <Link href="/register?seller=true" className="hover:text-brand-green transition-colors">
                       Become a Seller
@@ -183,7 +183,7 @@ const Navbar = () => {
                         </Link>
                         {!user?.isSeller && (
                           <Link href="/briefs/my-briefs" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
-                            My Briefs
+                            My Projects
                           </Link>
                         )}
                         {user?.isSeller && (
@@ -263,7 +263,7 @@ const Navbar = () => {
               </div>
               
               <Link href="/packages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Browse Packages</Link>
-              <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Briefs</Link>
+              <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
               <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Dashboard</Link>
               {user.isSeller ? (
                 <>
@@ -276,7 +276,7 @@ const Navbar = () => {
               )}
               <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Orders</Link>
               {!user.isSeller && (
-                <Link href="/briefs/my-briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Briefs</Link>
+                <Link href="/briefs/my-briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Projects</Link>
               )}
               <Link href="/messages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Messages</Link>
               <hr className="my-2 border-gray-100" />

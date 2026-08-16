@@ -69,7 +69,7 @@ const BriefsFeed = () => {
         {/* Banner */}
         <div className="page-banner">
           <div className="banner-text">
-            <h1>Job Briefs</h1>
+            <h1>Job Projects</h1>
             <p>
               {user?.isSeller
                 ? "Browse open projects and submit your proposals"
@@ -79,7 +79,7 @@ const BriefsFeed = () => {
           <div className="banner-actions">
             {user && !user.isSeller && (
               <Link href="/briefs/create" className="btn-create">
-                + Post a Brief
+                + Post a Project
               </Link>
             )}
             {user && !user.isSeller && (
@@ -87,7 +87,7 @@ const BriefsFeed = () => {
                 href="/briefs/my-briefs"
                 className="btn-my-briefs"
               >
-                My Briefs
+                My Projects
               </Link>
             )}
             {user && user.isSeller && (
@@ -107,7 +107,7 @@ const BriefsFeed = () => {
             <RiSearchLine className="search-icon" />
             <input
               type="text"
-              placeholder="Search briefs by keyword..."
+              placeholder="Search projects by keyword..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -133,11 +133,11 @@ const BriefsFeed = () => {
         ) : filtered.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">📋</div>
-            <h3>No briefs found</h3>
+            <h3>No projects found</h3>
             <p>
               {search
                 ? "Try adjusting your search or category filter"
-                : "No open briefs at the moment. Check back soon!"}
+                : "No open projects at the moment. Check back soon!"}
             </p>
           </div>
         ) : (
@@ -210,7 +210,7 @@ const BriefsFeed = () => {
                       fontSize: '14px'
                     }}
                   >
-                    View Brief
+                    View Project
                   </button>
                 </div>
               </div>

@@ -43,10 +43,10 @@ const MyBriefs = () => {
       axiosFetch.patch(`/briefs/${briefId}/close`).then(({ data }) => data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-briefs"] });
-      toast.success("Brief closed successfully");
+      toast.success("Project closed successfully");
     },
     onError: (err) => {
-      toast.error(err?.response?.data?.message || "Failed to close brief");
+      toast.error(err?.response?.data?.message || "Failed to close project");
     },
   });
 
@@ -82,16 +82,16 @@ const MyBriefs = () => {
         {/* Banner */}
         <div className="page-banner">
           <div className="banner-text">
-            <h1>My Briefs</h1>
-            <p>Manage your posted job briefs and review proposals</p>
+            <h1>My Projects</h1>
+            <p>Manage your posted job projects and review proposals</p>
           </div>
           <div className="banner-actions">
             <Link href="/briefs" className="btn-browse">
-              Browse All Briefs
+              Browse All Projects
             </Link>
             {!user?.isSeller && (
               <Link href="/briefs/create" className="btn-create">
-                + New Brief
+                + New Project
               </Link>
             )}
           </div>
@@ -129,21 +129,21 @@ const MyBriefs = () => {
             <div className="empty-icon">📝</div>
             <h3>
               {filter === "all"
-                ? "No briefs yet"
-                : `No ${filter} briefs`}
+                ? "No projects yet"
+                : `No ${filter} projects`}
             </h3>
             <p>
               {filter === "all"
-                ? "Post your first job brief and start receiving proposals from sellers"
-                : "No briefs match this filter"}
+                ? "Post your first job project and start receiving proposals from sellers"
+                : "No projects match this filter"}
             </p>
             {filter === "all" && !user?.isSeller ? (
               <Link href="/briefs/create" className="btn-cta">
-                Post Your First Brief
+                Post Your First Project
               </Link>
             ) : filter !== "all" ? (
               <button className="btn-cta" onClick={() => setFilter("all")} style={{ cursor: 'pointer', border: 'none' }}>
-                Show All Briefs
+                Show All Projects
               </button>
             ) : null}
           </div>
@@ -257,11 +257,11 @@ const MyProposals = () => {
         <div className="page-banner">
           <div className="banner-text">
             <h1>My Proposals</h1>
-            <p>Track your submitted proposals for job briefs</p>
+            <p>Track your submitted proposals for job projects</p>
           </div>
           <div className="banner-actions">
             <Link href="/briefs" className="btn-browse">
-              Browse Open Briefs
+              Browse Open Projects
             </Link>
           </div>
         </div>
@@ -275,9 +275,9 @@ const MyProposals = () => {
           <div className="empty-state">
             <div className="empty-icon">📝</div>
             <h3>No proposals submitted</h3>
-            <p>You haven't submitted any proposals yet. Browse open briefs and start pitching!</p>
+            <p>You haven't submitted any proposals yet. Browse open projects and start pitching!</p>
             <Link href="/briefs" className="btn-cta">
-              Browse Briefs
+              Browse Projects
             </Link>
           </div>
         ) : (
@@ -292,7 +292,7 @@ const MyProposals = () => {
                 >
                   <div className="brief-info">
                     <h3 className="brief-title">
-                      {proposal.briefID?.title || "Unknown Brief"}
+                      {proposal.briefID?.title || "Unknown Project"}
                     </h3>
                     <div className="brief-meta">
                       {proposal.price && (

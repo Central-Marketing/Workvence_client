@@ -72,10 +72,10 @@ const CreateBrief = () => {
       axiosFetch.post("/briefs", briefData).then(({ data }) => data),
     onSuccess: () => {
       setStep(3);
-      toast.success("Brief posted successfully!");
+      toast.success("Project posted successfully!");
     },
     onError: (err) => {
-      toast.error(err?.response?.data?.message || "Failed to post brief");
+      toast.error(err?.response?.data?.message || "Failed to post project");
     },
   });
 
@@ -120,7 +120,7 @@ const CreateBrief = () => {
       <div className="container">
         {/* Header */}
         <div className="page-header">
-          <h1>Post a Job Brief</h1>
+          <h1>Post a Job Project</h1>
           <p>Describe what you need — AI can help structure it for you</p>
         </div>
 
@@ -177,7 +177,7 @@ const CreateBrief = () => {
         {step === 1 && aiGenerate.isPending && (
           <div className="form-card ai-loading">
             <div className="sparkle">✨</div>
-            <h3>Workvence AI is crafting your brief...</h3>
+            <h3>Workvence AI is crafting your project...</h3>
             <p>This usually takes a few seconds</p>
             <div className="ai-dots">
               <span />
@@ -191,7 +191,7 @@ const CreateBrief = () => {
         {step === 2 && (
           <div className="form-card review-step">
             <div>
-              <h2>Review & Edit Your Brief</h2>
+              <h2>Review & Edit Your Project</h2>
               <p className="subtitle">
                 Fine-tune the details below before publishing
               </p>
@@ -201,7 +201,7 @@ const CreateBrief = () => {
               <label>Title</label>
               <input
                 type="text"
-                placeholder="Give your brief a clear title"
+                placeholder="Give your project a clear title"
                 value={form.title}
                 onChange={(e) => updateField("title", e.target.value)}
               />
@@ -265,7 +265,7 @@ const CreateBrief = () => {
                 onClick={handleSubmit}
                 disabled={postBrief.isPending}
               >
-                {postBrief.isPending ? "Publishing..." : "Publish Brief"}
+                {postBrief.isPending ? "Publishing..." : "Publish Project"}
               </button>
             </div>
           </div>
@@ -275,17 +275,17 @@ const CreateBrief = () => {
         {step === 3 && (
           <div className="form-card confirm-step">
             <div className="success-icon">🎉</div>
-            <h2>Brief Published Successfully!</h2>
+            <h2>Project Published Successfully!</h2>
             <p>
-              Your brief is now live. Sellers can start submitting proposals
+              Your project is now live. Sellers can start submitting proposals
               right away.
             </p>
             <div className="nav-links">
               <Link href="/briefs/my-briefs" className="btn-primary">
-                View My Briefs
+                View My Projects
               </Link>
               <Link href="/briefs" className="btn-secondary">
-                Browse All Briefs
+                Browse All Projects
               </Link>
             </div>
           </div>

@@ -79,10 +79,10 @@ const BriefDetail = () => {
       axiosFetch.patch(`/briefs/${briefId}/close`).then(({ data }) => data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["brief", briefId] });
-      toast.success("Brief closed");
+      toast.success("Project closed");
     },
     onError: (err) => {
-      toast.error(err?.response?.data?.message || "Failed to close brief");
+      toast.error(err?.response?.data?.message || "Failed to close project");
     },
   });
 
@@ -111,8 +111,8 @@ const BriefDetail = () => {
     return (
       <div className="flex justify-center bg-slate-50 py-10 min-h-[80vh]">
         <div className="w-[90%] max-w-[900px] flex flex-col items-center justify-center text-center mt-10">
-          <h3 className="text-xl font-bold text-slate-900 mb-2">Brief not found</h3>
-          <p className="text-slate-500">This brief may have been removed or the link is invalid.</p>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">Project not found</h3>
+          <p className="text-slate-500">This project may have been removed or the link is invalid.</p>
         </div>
       </div>
     );
@@ -123,7 +123,7 @@ const BriefDetail = () => {
       <div className="w-[90%] max-w-[900px] flex flex-col gap-6">
         {/* Back */}
         <Link href="/briefs" className="inline-flex items-center gap-1.5 text-slate-500 text-sm font-semibold hover:text-emerald-500 w-fit transition-colors">
-          ← Back to Briefs
+          ← Back to Projects
         </Link>
 
         {/* Main Detail Card */}
@@ -190,7 +190,7 @@ const BriefDetail = () => {
                 <div className="text-[15px] font-semibold text-slate-900">
                   {brief.userID?.username || "Anonymous"}
                 </div>
-                <div className="text-xs text-slate-400">Brief Owner</div>
+                <div className="text-xs text-slate-400">Project Owner</div>
               </div>
             </div>
           </div>
@@ -210,7 +210,7 @@ const BriefDetail = () => {
                   onClick={() => closeMutation.mutate()}
                   disabled={closeMutation.isPending}
                 >
-                  {closeMutation.isPending ? "Closing..." : "Close Brief"}
+                  {closeMutation.isPending ? "Closing..." : "Close Project"}
                 </button>
               </>
             )}
@@ -233,7 +233,7 @@ const BriefDetail = () => {
                 <div className="text-4xl">✅</div>
                 <h3 className="text-xl font-bold text-slate-900">Proposal Submitted!</h3>
                 <p className="text-slate-500">
-                  You have already submitted a proposal for this brief. The buyer will review your proposal and may initiate a conversation.
+                  You have already submitted a proposal for this project. The buyer will review your proposal and may initiate a conversation.
                 </p>
                 <button
                   onClick={() => setShowMyProposalModal(true)}
@@ -264,7 +264,7 @@ const BriefDetail = () => {
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden p-8 text-center">
             <div className="flex flex-col items-center justify-center gap-3">
               <div className="text-4xl">🔒</div>
-              <h3 className="text-xl font-bold text-slate-900">This Brief is Closed</h3>
+              <h3 className="text-xl font-bold text-slate-900">This Project is Closed</h3>
               <p className="text-slate-500">The buyer is no longer accepting proposals for this project.</p>
             </div>
           </div>

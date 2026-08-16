@@ -569,7 +569,7 @@ const Message = () => {
 
   const handleOfferSubmit = (e: any) => {
     e.preventDefault();
-    if (!selectedPackageId && !selectedBriefId) { toast.error("Select at least a Package or a Brief."); return; }
+    if (!selectedPackageId && !selectedBriefId) { toast.error("Select at least a Package or a Project."); return; }
     if (!offerDesc || !offerPrice || !offerDelivery) { toast.error("Fill all fields."); return; }
 
     const payload: any = {
@@ -1237,17 +1237,17 @@ const Message = () => {
                 </select>
               </div>
               <div className="fg">
-                <label>Brief Reference <span className="text-xs text-gray-400">(optional)</span></label>
+                <label>Project Reference <span className="text-xs text-gray-400">(optional)</span></label>
                 <select value={selectedBriefId} onChange={e => setSelectedBriefId(e.target.value)}>
-                  <option value="">-- Select a Brief --</option>
+                  <option value="">-- Select a Project --</option>
                   {chatBriefs.length === 0
-                    ? <option disabled>No briefs available for this chat</option>
+                    ? <option disabled>No projects available for this chat</option>
                     : chatBriefs.map((b: any) => <option key={b._id} value={b._id}>{b.title} — ${b.budget}</option>)
                   }
                 </select>
               </div>
               {!selectedPackageId && !selectedBriefId && (
-                <p className="text-amber-600 text-xs mt-1">⚠ Please select at least a Package or a Brief</p>
+                <p className="text-amber-600 text-xs mt-1">⚠ Please select at least a Package or a Project</p>
               )}
               <div className="fg">
                 <label>Offer Description</label>

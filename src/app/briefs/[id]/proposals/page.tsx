@@ -109,7 +109,7 @@ const Proposals = () => {
       <div className="container">
         {/* Back */}
         <Link href={`/briefs/${briefId}`} className="back-link">
-          ← Back to Brief
+          ← Back to Project
         </Link>
 
         {/* Header */}
@@ -250,7 +250,7 @@ const Proposals = () => {
             <div className="empty-icon">📭</div>
             <h3>No proposals yet</h3>
             <p>
-              Sellers have not submitted proposals yet. Share your brief to
+              Sellers have not submitted proposals yet. Share your project to
               attract more sellers.
             </p>
           </div>

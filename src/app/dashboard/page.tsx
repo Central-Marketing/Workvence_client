@@ -202,7 +202,7 @@ const Dashboard = () => {
                     Publish a new Package
                   </Link>
                   <Link href="/briefs" className="action-button secondary">
-                    Browse Job Briefs
+                    Browse Job Projects
                   </Link>
                   <Link href="/earnings" className="action-button secondary">
                     View Earnings Statement
@@ -214,7 +214,7 @@ const Dashboard = () => {
                     My Favorites ({totalFavoritesCount})
                   </Link>
                   <Link href="/briefs/create" className="action-button secondary">
-                    Post a Job Brief
+                    Post a Job Project
                   </Link>
                   <Link href="/register?seller=true" className="action-button secondary">
                     Become a Seller

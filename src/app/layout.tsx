@@ -3,8 +3,8 @@ import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import Providers from "./Providers";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Workvence | Complete Solution for Freelancing",

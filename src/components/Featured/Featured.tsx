@@ -4,20 +4,20 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import adminAxios from '@/utils/adminAxios';
-import { 
-  Search, 
-  Palette, 
-  Code, 
-  Megaphone, 
-  Film, 
-  Cpu, 
-  FileText, 
-  Briefcase, 
-  Music, 
-  BarChart2, 
-  ShoppingCart, 
-  Star, 
-  Layers 
+import {
+  Search,
+  Palette,
+  Code,
+  Megaphone,
+  Film,
+  Cpu,
+  FileText,
+  Briefcase,
+  Music,
+  BarChart2,
+  ShoppingCart,
+  Star,
+  Layers
 } from 'lucide-react';
 
 const Featured = () => {
@@ -158,32 +158,7 @@ const Featured = () => {
           </button>
         </div>
 
-        {/* MOBILE BOTTOM AMBIENT STRIP (< 1024px) - 2 ROWS (ROW 1: 3, ROW 2: 2) */}
-        <div className="lg:hidden flex flex-col items-center gap-2 mt-8 w-full opacity-50 mix-blend-multiply overflow-hidden px-2 pointer-events-none">
-          {/* Row 1 (3 images) */}
-          <div className="flex items-center justify-center gap-2 sm:gap-3">
-            <div className="w-16 h-14 sm:w-20 sm:h-16 rounded-xl overflow-hidden shadow-2xs border border-slate-200/40 shrink-0">
-              <img src="/media/hero_images/img1.jpeg" alt="Artwork" className="w-full h-full object-cover" />
-            </div>
-            <div className="w-20 h-16 sm:w-24 sm:h-20 rounded-2xl overflow-hidden shadow-xs border border-slate-200/50 shrink-0">
-              <img src="/media/hero_images/img3.jpeg" alt="Artwork" className="w-full h-full object-cover" />
-            </div>
-            <div className="w-16 h-14 sm:w-20 sm:h-16 rounded-xl overflow-hidden shadow-2xs border border-slate-200/40 shrink-0">
-              <img src="/media/hero_images/img7.jpeg" alt="Artwork" className="w-full h-full object-cover" />
-            </div>
-          </div>
-          {/* Row 2 (2 images) */}
-          <div className="flex items-center justify-center gap-2 sm:gap-3">
-            <div className="w-16 h-14 sm:w-20 sm:h-16 rounded-xl overflow-hidden shadow-2xs border border-slate-200/40 shrink-0">
-              <img src="/media/hero_images/img2.jpeg" alt="Artwork" className="w-full h-full object-cover" />
-            </div>
-            <div className="w-16 h-14 sm:w-20 sm:h-16 rounded-xl overflow-hidden shadow-2xs border border-slate-200/40 shrink-0">
-              <img src="/media/hero_images/img4.jpeg" alt="Artwork" className="w-full h-full object-cover" />
-            </div>
-          </div>
-        </div>
-
-        {/* REAL BACKEND CATEGORY MATCHES IN GRAYSCALE */}
+        {/* REAL BACKEND CATEGORY MATCHES IN GRAYSCALE (DIRECTLY BELOW SEARCH BAR) */}
         <div className={`flex justify-center items-start flex-wrap w-full max-w-3xl mt-6 gap-2 sm:gap-4 overflow-hidden transition-all duration-300 ${search.trim().length > 0 ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
           {search.trim().length > 0 && filteredCategories.slice(0, 8).map((cat: any, index: number) => {
             const name = cat.name || cat.title || String(cat);
@@ -205,6 +180,31 @@ const Featured = () => {
               </div>
             );
           })}
+        </div>
+
+        {/* MOBILE BOTTOM AMBIENT STRIP (< 1024px) - AT VERY BOTTOM */}
+        <div className="lg:hidden flex flex-col items-center gap-3 mt-8 w-full opacity-65 mix-blend-multiply overflow-hidden px-2 pointer-events-none">
+          {/* Row 1 (3 images) */}
+          <div className="flex items-center justify-center gap-2.5 sm:gap-4">
+            <div className="w-28 h-24 sm:w-32 sm:h-24 rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 shrink-0">
+              <img src="/media/hero_images/img6.jpeg" alt="Artwork" className="w-full h-full object-cover" />
+            </div>
+            <div className="w-28 h-24 sm:w-36 sm:h-30 rounded-3xl overflow-hidden shadow-xs border border-slate-200/60 shrink-0">
+              <img src="/media/hero_images/img3.jpeg" alt="Artwork" className="w-full h-full object-cover" />
+            </div>
+            <div className="w-28 h-24 sm:w-32 sm:h-24 rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 shrink-0">
+              <img src="/media/hero_images/img7.jpeg" alt="Artwork" className="w-full h-full object-cover" />
+            </div>
+          </div>
+          {/* Row 2 (2 images) */}
+          <div className="flex items-center justify-center gap-2.5 sm:gap-4">
+            <div className="w-28 h-24 sm:w-32 sm:h-24 rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 shrink-0">
+              <img src="/media/hero_images/img5.jpeg" alt="Artwork" className="w-full h-full object-cover" />
+            </div>
+            <div className="w-28 h-24 sm:w-32 sm:h-24 rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 shrink-0">
+              <img src="/media/hero_images/img4.jpeg" alt="Artwork" className="w-full h-full object-cover" />
+            </div>
+          </div>
         </div>
 
       </div>

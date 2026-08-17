@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  images: {
+    qualities: [75, 85],
+  },
   async rewrites() {
     let rawMainUrl = (
       process.env.NEXT_PUBLIC_SERVER_API_URL ||

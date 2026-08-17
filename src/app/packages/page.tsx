@@ -718,7 +718,7 @@ const Packages = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-            {data?.map((pkg: any) => <PackageCard key={pkg._id} data={pkg} />)}
+            {data?.map((pkg: any, idx: number) => <PackageCard key={pkg._id} data={pkg} priority={idx < 2} />)}
           </div>
         )}
 

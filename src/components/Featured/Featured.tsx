@@ -39,7 +39,6 @@ const Featured = () => {
         alt="Workvence Freelance Marketplace Hero"
         fill
         priority
-        quality={85}
         className="object-cover object-center pointer-events-none"
       />
       {/* Overlay Gradient */}

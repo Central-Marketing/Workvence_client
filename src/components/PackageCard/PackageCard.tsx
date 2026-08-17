@@ -56,6 +56,7 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority={priority}
+            loading={priority ? "eager" : undefined}
             className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
             unoptimized
           />

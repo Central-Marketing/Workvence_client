@@ -17,7 +17,7 @@ const TopRatedSellers = () => {
 
   const { isLoading, data: sellers = [] } = useQuery({
     queryKey: ['top-rated-packages'],
-    queryFn: () => axiosFetch.get('/gigs?sort=sales&limit=3').then(({ data }) => data || [])
+    queryFn: () => axiosFetch.get('/gigs?sort=sales&limit=6').then(({ data }) => data || [])
   });
 
   if (isLoading) {
@@ -64,7 +64,7 @@ const TopRatedSellers = () => {
             }}
             className="w-full"
           >
-            {sellers.slice(0, 3).map((seller: any) => (
+            {sellers.slice(0, 6).map((seller: any) => (
               <SwiperSlide key={seller._id} className="pb-4">
                 <Link href={`/package/${seller._id}`} className="flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 group cursor-pointer h-full">
                   <div className="w-full h-52 md:h-56 overflow-hidden flex-shrink-0">
@@ -77,8 +77,8 @@ const TopRatedSellers = () => {
                   <div className="p-5 md:p-6 flex flex-col gap-4 flex-1">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-1.5 text-gray-500 text-[14px]">
-                        <span>({seller.starNumber || seller.reviews || 0})</span>
-                        <strong className="text-gray-800 ml-1">{seller.starNumber ? (seller.totalStars / seller.starNumber).toFixed(1) : "5.0"}</strong>
+                        <span>({seller.sales || seller.reviews || 0})</span>
+                        <strong className="text-gray-800 ml-1">{seller.gigRating ? seller.gigRating : "0.0"}</strong>
                         <Star className="text-[#ffb33e] fill-[#ffb33e]" size={16} />
                       </div>
                       <div className="flex items-center gap-0.5 bg-[#ff7a00] text-white px-2.5 py-1 rounded-md text-[12px] font-bold">
@@ -95,8 +95,8 @@ const TopRatedSellers = () => {
 
                     <div className="flex items-center justify-between pt-5 mt-auto border-t border-gray-100 border-dashed">
                       <div className="flex items-center gap-3">
-                        <img src={seller.userID?.image || seller.userID?.img || seller.avatar || "/media/noavatar.png"} alt={seller.userID?.username || "User"} className="w-8 h-8 rounded-full object-cover shadow-sm" />
-                        <span className="text-gray-700 font-medium text-[15px] truncate max-w-[100px]">{seller.userID?.username || seller.name || "Freelancer"}</span>
+                        <img src={seller.user?.image || seller.userID?.img || seller.avatar || "/media/noavatar.png"} alt={seller.userID?.username || "User"} className="w-8 h-8 rounded-full object-cover shadow-sm" />
+                        <span className="text-gray-700 font-medium text-[15px] truncate max-w-[100px]">{seller.user?.username || seller.name || "Freelancer"}</span>
                       </div>
                       <div className="text-gray-500 text-[14px]">
                         From <strong className="text-gray-900 text-[18px] ml-1">${seller.price}</strong>
@@ -114,7 +114,7 @@ const TopRatedSellers = () => {
           >
             <ChevronLeft size={22} strokeWidth={2} />
           </button>
-          
+
           <button
             onClick={(e) => { e.preventDefault(); swiperRef.current?.slideNext(); }}
             className="absolute right-0 md:-right-5 top-[45%] -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-[0_4px_15px_rgba(0,0,0,0.15)] hover:bg-gray-50 transition-all focus:outline-none"

@@ -545,10 +545,13 @@ const Packages = () => {
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
                   >
                     <option value="">Select category</option>
-                    {categories.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                    <option value="Packaging Design">Packaging Design</option>
+                    {categories.map((c: any) => {
+                      const name = typeof c === 'string' ? c : c.name;
+                      const slug = typeof c === 'string' ? c : c.slug;
+                      return (
+                        <option key={slug} value={slug}>{name}</option>
+                      );
+                    })}
                   </select>
                 </div>
 

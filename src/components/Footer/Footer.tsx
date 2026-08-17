@@ -126,7 +126,7 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div className="max-w-sm w-full">
-            <h4 className="text-[15px] font-semibold text-slate-100 mb-2">Stay in the loop</h4>
+            <h3 className="text-[15px] font-semibold text-slate-100 mb-2">Stay in the loop</h3>
             <p className="text-[13px] text-slate-400 mb-4 leading-relaxed">
               Get the latest platform updates, freelancer tips, and curated picks straight to your inbox.
             </p>

@@ -32,7 +32,7 @@ const TrustedBy = () => {
                 <img src={feature.icon} alt={feature.title} className="w-6 h-6 object-contain" />
               </div>
               <div className="flex flex-col">
-                <h4 className="text-base font-bold text-gray-800">{feature.title}</h4>
+                <p className="text-base font-bold text-gray-800">{feature.title}</p>
                 <p className="text-sm text-gray-500 leading-tight mt-1">{feature.description}</p>
               </div>
             </div>

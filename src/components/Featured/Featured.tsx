@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Search, PenTool, Megaphone, PenLine, Film, Camera, Box, Code, Database } from 'lucide-react';
 
@@ -31,8 +32,20 @@ const Featured = () => {
   );
 
   return (
-    <div className="w-full h-[50vh] md:min-h-[70vh] flex justify-center items-end md:items-center bg-brand-black bg-[image:linear-gradient(to_top,rgba(0,0,0,0.9),rgba(0,0,0,0.1)),url('/heroImg.jpg')] bg-cover bg-center text-white pb-4 md:py-20 px-5">
-      <div className="w-full container mx-auto flex flex-col items-center px-4 md:px-6 md:mt-56">
+    <div className="relative w-full h-[50vh] md:min-h-[70vh] flex justify-center items-end md:items-center bg-brand-black text-white pb-4 md:py-20 px-5 overflow-hidden">
+      {/* LCP Pre-loaded Background Image */}
+      <Image
+        src="/heroImg.jpg"
+        alt="Workvence Freelance Marketplace Hero"
+        fill
+        priority
+        quality={85}
+        className="object-cover object-center pointer-events-none"
+      />
+      {/* Overlay Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 z-10 pointer-events-none" />
+
+      <div className="relative z-20 w-full container mx-auto flex flex-col items-center px-4 md:px-6 md:mt-56">
 
         <div className="w-full flex flex-col items-center text-center gap-10">
           <div className="w-full max-w-4xl flex flex-col items-center text-center gap-10">

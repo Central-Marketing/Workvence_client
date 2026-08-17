@@ -203,7 +203,7 @@ const OrderDetail = () => {
         await supportService.deleteCloudinaryFile(target.public_id);
         toast.success("File deleted from server", { id: "delete-file" });
       } catch (err) {
-        console.warn("Failed to delete CDN file:", err);
+        console.warn("Failed to delete ", err);
       }
     }
   };
@@ -854,7 +854,7 @@ const OrderDetail = () => {
                             <Loader size={26} />
                           </div>
                           <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mb-1">
-                            Uploading Attachment(s) to Cloudinary CDN...
+                            Uploading Attachment(s)...
                           </p>
                           <p className="text-xs text-slate-500 font-medium">Please wait while your files are processed and secured.</p>
                         </div>
@@ -867,7 +867,7 @@ const OrderDetail = () => {
                             Click or Drag & Drop Delivery Files Here
                           </p>
                           <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
-                            Upload high-res images (PNG, JPG, WEBP), videos (MP4, MOV, WEBM), source code, or ZIP archives directly to Cloudinary CDN.
+                            Upload high-res images (PNG, JPG, WEBP), videos (MP4, MOV, WEBM), source code, or ZIP archives.
                           </p>
                         </>
                       )}
@@ -887,7 +887,7 @@ const OrderDetail = () => {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-bold text-emerald-800 dark:text-emerald-200">Uploading file...</p>
-                                <p className="text-[11px] text-emerald-600 font-medium">Securing on Cloudinary CDN</p>
+                                {/* <p className="text-[11px] text-emerald-600 font-medium">Securing on Cloudinary CDN</p> */}
                               </div>
                             </div>
                           )}
@@ -936,7 +936,7 @@ const OrderDetail = () => {
                                 <div className="flex-1 min-w-0 pr-6">
                                   <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">{fileObj.name}</p>
                                   <p className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">
-                                    {fileObj.size ? `${(fileObj.size / 1024).toFixed(1)} KB` : 'Uploaded to CDN'}
+                                    {fileObj.size ? `${(fileObj.size / 1024).toFixed(1)} KB` : 'Uploaded'}
                                   </p>
                                 </div>
 
@@ -947,7 +947,7 @@ const OrderDetail = () => {
                                     handleRemoveDeliveryFile(idx);
                                   }}
                                   className="absolute top-2 right-2 w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-700 hover:bg-red-500 hover:text-white flex items-center justify-center font-bold text-xs transition-colors cursor-pointer shadow-xs"
-                                  title="Remove file from CDN"
+                                  title="Remove file"
                                 >
                                   ✕
                                 </button>

@@ -214,11 +214,11 @@ const Add = () => {
   const handleRemoveCdnImage = async (urlToRemove: string) => {
     if (urlToRemove && (urlToRemove.includes('cloudinary.com') || urlToRemove.includes('/upload/'))) {
       try {
-        toast.loading('Deleting asset from CDN...', { id: 'delete-asset' });
+        toast.loading('Deleting asset ...', { id: 'delete-asset' });
         await supportService.deleteCloudinaryFile(urlToRemove);
-        toast.success('Asset deleted from CDN', { id: 'delete-asset' });
+        toast.success('Asset deleted', { id: 'delete-asset' });
       } catch (err) {
-        console.warn('Failed to delete asset from CDN:', err);
+        console.warn('Failed to delete asset:', err);
         toast.dismiss('delete-asset');
       }
     }
@@ -244,11 +244,11 @@ const Add = () => {
     });
     if (currentCoverUrl && (currentCoverUrl.includes('cloudinary.com') || currentCoverUrl.includes('/upload/'))) {
       try {
-        toast.loading('Deleting cover image from CDN...', { id: 'delete-cover' });
+        toast.loading('Deleting cover image ...', { id: 'delete-cover' });
         await supportService.deleteCloudinaryFile(currentCoverUrl);
-        toast.success('Cover image deleted from CDN', { id: 'delete-cover' });
+        toast.success('Cover image deleted', { id: 'delete-cover' });
       } catch (err) {
-        console.warn('Failed to delete cover image from CDN:', err);
+        console.warn('Failed to delete cover image:', err);
         toast.dismiss('delete-cover');
       }
     }
@@ -263,7 +263,7 @@ const Add = () => {
         return { url: uploaded.secure_url || uploaded.url };
       }
     } catch (err) {
-      console.warn('Cloudinary CDN upload failed, trying fallback:', err);
+      console.warn(' upload failed, trying fallback:', err);
     }
     return await generateImageURL(file);
   };
@@ -284,7 +284,7 @@ const Add = () => {
           try {
             await supportService.deleteCloudinaryFile(oldCoverUrl);
           } catch (err) {
-            console.warn('Failed deleting old cover image from CDN:', err);
+            console.warn('Failed deleting old cover image:', err);
           }
         }
         const uploadedCover = await uploadToCDN(coverImage);
@@ -308,12 +308,12 @@ const Add = () => {
       setPackageImages([]);
       setUploading(false);
       setDisabled(true);
-      toast.success('Attachments uploaded and old cover replaced on CDN!');
+      toast.success('Attachments uploaded and old cover replaced!');
     }
     catch (error) {
       console.error(error);
       setUploading(false);
-      toast.error('Failed uploading attachments to CDN');
+      toast.error('Failed uploading attachments');
     }
   };
 
@@ -432,7 +432,7 @@ const Add = () => {
               {/* 2. Attachments / Gallery Images Upload & Remove */}
               <div className="flex flex-col gap-2 mt-2">
                 <label className="text-slate-700 text-sm font-semibold">
-                  Upload Attachments / Images (CDN)
+                  Upload Attachments / Images
                 </label>
                 <input
                   type="file"
@@ -500,7 +500,7 @@ const Add = () => {
                 disabled={!!disabled || uploading || (!coverImage && packageImages.length === 0)}
                 onClick={handleImageUploads}
               >
-                {uploading ? 'Uploading to CDN...' : disabled ? 'Uploaded to CDN' : 'Upload Attachments to CDN'}
+                {uploading ? 'Uploading...' : disabled ? 'Uploaded' : 'Upload Attachments'}
               </button>
             </div>
 

@@ -132,14 +132,14 @@ const Profile = () => {
 
     setUploadingPortfolioIdx(index);
     try {
-      toast.loading("Uploading portfolio image to CDN...", { id: `port-up-${index}` });
+      toast.loading("Uploading portfolio image...", { id: `port-up-${index}` });
       const uploaded = await supportService.uploadFileToCloudinary(file, "portfolio_images");
       const cdnUrl = uploaded.secure_url || uploaded.url;
       if (cdnUrl) {
         handleUpdatePortfolio(index, "image", cdnUrl);
-        toast.success("Portfolio image uploaded to CDN!", { id: `port-up-${index}` });
+        toast.success("Portfolio image uploaded!", { id: `port-up-${index}` });
       } else {
-        throw new Error("Upload succeeded but no CDN URL returned");
+        throw new Error("Upload succeeded but no URL returned");
       }
     } catch (err: any) {
       toast.error(err?.message || "Portfolio image upload failed", { id: `port-up-${index}` });
@@ -554,11 +554,10 @@ const Profile = () => {
                               type="button"
                               disabled={!isProjectFormValid}
                               onClick={() => handleSaveProject(editingProjectIdx)}
-                              className={`px-5 py-2.5 text-xs font-bold rounded-xl transition-all shadow-xs ${
-                                isProjectFormValid
-                                  ? "bg-brand-green text-white hover:bg-[#389115] cursor-pointer"
-                                  : "bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300"
-                              }`}
+                              className={`px-5 py-2.5 text-xs font-bold rounded-xl transition-all shadow-xs ${isProjectFormValid
+                                ? "bg-brand-green text-white hover:bg-[#389115] cursor-pointer"
+                                : "bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300"
+                                }`}
                             >
                               Save Project
                             </button>

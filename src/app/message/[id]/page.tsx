@@ -110,7 +110,7 @@ const Message = () => {
         await supportService.deleteCloudinaryFile(targetPublicId);
         toast.success("Attachment deleted from server", { id: "delete-file" });
       } catch (err) {
-        console.warn("Failed to delete attachment from CDN:", err);
+        console.warn("Failed to delete attachment:", err);
       }
     }
   };
@@ -1092,8 +1092,8 @@ const Message = () => {
                       className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors flex-shrink-0 mb-0.5 cursor-pointer disabled:opacity-50"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploadingAttachment}
-                      title="Attach file or image to CDN"
-                      aria-label="Attach file or image to CDN"
+                      title="Attach file or image "
+                      aria-label="Attach file or image"
                     >
                       {isUploadingAttachment ? (
                         <Loader size={18} />

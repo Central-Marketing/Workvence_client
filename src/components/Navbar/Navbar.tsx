@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { RiSearchLine } from "react-icons/ri";
 import { FiMenu, FiX, FiMessageSquare, FiBell } from "react-icons/fi";
@@ -101,7 +102,7 @@ const Navbar = () => {
 
         <div className="flex items-center gap-10">
           <Link href="/" className="flex items-center">
-            <img src="/Workvence-logo-Horizontal 1.png" alt="Workvence" className="h-8 md:h-10 object-contain" />
+            <Image src="/Workvence-logo-Horizontal 1.png" width={160} height={40} alt="Workvence" className="h-8 md:h-10 w-auto object-contain" priority />
           </Link>
 
           <div className={`hidden lg:flex items-center overflow-hidden transition-all duration-300 ${showMenu || pathname !== '/' ? 'opacity-100 max-w-[500px]' : 'opacity-0 max-w-0 pointer-events-none'}`}>
@@ -163,7 +164,7 @@ const Navbar = () => {
 
                   <div className="relative profile-dropdown-container">
                     <div className="flex items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}>
-                      <img src={user.image || "/media/noavatar.png"} alt="" className="w-9 h-9 rounded-full object-cover border border-gray-200" />
+                      <Image src={user.image || "/media/noavatar.png"} width={36} height={36} alt="Profile" className="w-9 h-9 rounded-full object-cover border border-gray-200" unoptimized />
                     </div>
 
                     {isProfileDropdownOpen && (
@@ -213,16 +214,16 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile Hamburger Button */}
-        <div className="flex lg:hidden items-center gap-3 md:gap-4">
+        {/* Mobile Hamburger Button & Pre-reserved Icons Container */}
+        <div className="flex lg:hidden items-center gap-3 md:gap-4 shrink-0 min-h-[32px]">
           {user && !isLoading && (
-            <div className="flex items-center gap-4 mr-1">
+            <div className="flex items-center gap-4 mr-1 shrink-0 min-w-[64px] min-h-[24px]">
               <HeaderInboxIcon currentUser={user} />
               <NotificationBell currentUser={user} />
             </div>
           )}
-          <button onClick={() => setIsMobileMenuOpen(true)} className="text-2xl text-gray-700 focus:outline-none hover:text-brand-green transition-colors ml-1">
-            <FiMenu />
+          <button onClick={() => setIsMobileMenuOpen(true)} className="text-2xl text-gray-700 focus:outline-none hover:text-brand-green transition-colors ml-1 p-1 rounded-lg shrink-0" aria-label="Open menu">
+            <FiMenu width={24} height={24} />
           </button>
         </div>
       </div>
@@ -233,7 +234,7 @@ const Navbar = () => {
       {/* Mobile Menu Sidebar */}
       <div className={`fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] shadow-2xl transform transition-transform duration-300 ease-in-out lg:hidden flex flex-col ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <img src="/Workvence-logo-Horizontal 1.png" alt="Workvence" className="h-8 object-contain" />
+          <Image src="/Workvence-logo-Horizontal 1.png" width={140} height={32} alt="Workvence" className="h-8 w-auto object-contain" />
           <button onClick={() => setIsMobileMenuOpen(false)} className="text-2xl text-gray-600 focus:outline-none hover:text-red-500 transition-colors">
             <FiX />
           </button>

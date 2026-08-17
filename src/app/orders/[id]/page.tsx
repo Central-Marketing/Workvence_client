@@ -210,7 +210,7 @@ const OrderDetail = () => {
 
   const handleSecureFileAccess = async (fileUrl: string, action: 'preview' | 'download' = 'download') => {
     if (!fileUrl) return;
-    if (!fileUrl.includes('cloudinary') && (fileUrl.startsWith('http://') || fileUrl.startsWith('https://'))) {
+    if (fileUrl.includes('signature=') || fileUrl.includes('/download?') || (!fileUrl.includes('cloudinary') && (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')))) {
       if (action === 'preview' && /\.(png|jpe?g|gif|webp|svg)/i.test(fileUrl)) {
         setLightboxImage(fileUrl);
       } else {

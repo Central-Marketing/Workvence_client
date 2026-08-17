@@ -141,12 +141,23 @@ export const supportService = {
   },
 
   /**
+   * Helper to extract clean public_id from full Cloudinary URL
+   */
+  extractPublicId(url: string): string {
+    if (!url) return '';
+    if (!url.includes('cloudinary.com')) return url;
+    const match = url.match(/(?:upload|authenticated)\/(?:s--[^/]+--\/)?(?:v\d+\/)?(.+)$/);
+    return match ? match[1] : url;
+  },
+
+  /**
    * Get a time-limited signed URL for viewing/downloading private Cloudinary attachments
    */
   async getSignedAssetUrl(public_id: string, ticketId?: string, thread?: string, orderId?: string): Promise<string> {
     if (!public_id) return '';
     try {
-      const params: Record<string, string> = { public_id };
+      const cleanPublicId = this.extractPublicId(public_id);
+      const params: Record<string, string> = { public_id: cleanPublicId };
       if (ticketId) params.ticketId = ticketId;
       if (thread) params.thread = thread;
       if (orderId) params.orderId = orderId;

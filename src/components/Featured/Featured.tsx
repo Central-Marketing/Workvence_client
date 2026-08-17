@@ -2,7 +2,23 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, PenTool, Megaphone, PenLine, Film, Camera, Box, Code, Database } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import adminAxios from '@/utils/adminAxios';
+import { 
+  Search, 
+  Palette, 
+  Code, 
+  Megaphone, 
+  Film, 
+  Cpu, 
+  FileText, 
+  Briefcase, 
+  Music, 
+  BarChart2, 
+  ShoppingCart, 
+  Star, 
+  Layers 
+} from 'lucide-react';
 
 const Featured = () => {
   const [search, setSearch] = useState('');
@@ -15,20 +31,41 @@ const Featured = () => {
     }
   };
 
-  const categoryIcons = [
-    { name: "Graphic & Design", icon: <PenTool size={22} strokeWidth={1.5} />, path: "design" },
-    { name: "Digital Marketing", icon: <Megaphone size={22} strokeWidth={1.5} />, path: "social" },
-    { name: "Writing & Content", icon: <PenLine size={22} strokeWidth={1.5} />, path: "books" },
-    { name: "Videos & Editing", icon: <Film size={22} strokeWidth={1.5} />, path: "video" },
-    { name: "Photography", icon: <Camera size={22} strokeWidth={1.5} />, path: "photography" },
-    { name: "Animation & 3D", icon: <Box size={22} strokeWidth={1.5} />, path: "animation" },
-    { name: "Programming", icon: <Code size={22} strokeWidth={1.5} />, path: "wordpress" },
-    { name: "Data Server", icon: <Database size={22} strokeWidth={1.5} />, path: "data" },
-  ];
+  // Fetch real categories from backend database
+  const { data: fetchedCategories = [] } = useQuery({
+    queryKey: ['admin-categories-featured'],
+    queryFn: () => adminAxios.get('/categories').then(({ data }) => data).catch(() => [])
+  });
 
-  const filteredCategories = categoryIcons.filter(cat =>
-    cat.name.toLowerCase().includes(search.trim().toLowerCase())
-  );
+  const categoryList = Array.isArray(fetchedCategories)
+    ? fetchedCategories
+    : Array.isArray(fetchedCategories?.data)
+      ? fetchedCategories.data
+      : fetchedCategories?.categories || [];
+
+  const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
+    const iconKey = (iconStr || '').toLowerCase().replace(/[-_]/g, '');
+    const nameKey = (nameStr || '').toLowerCase();
+
+    if (iconKey === 'palette' || nameKey.includes('design') || nameKey.includes('graphic')) return <Palette size={20} strokeWidth={1.5} />;
+    if (iconKey === 'code' || nameKey.includes('program') || nameKey.includes('tech') || nameKey.includes('code')) return <Code size={20} strokeWidth={1.5} />;
+    if (iconKey === 'bullhorn' || nameKey.includes('market') || nameKey.includes('digital')) return <Megaphone size={20} strokeWidth={1.5} />;
+    if (iconKey === 'video' || nameKey.includes('video') || nameKey.includes('animation')) return <Film size={20} strokeWidth={1.5} />;
+    if (iconKey === 'cpu' || nameKey.includes('ai')) return <Cpu size={20} strokeWidth={1.5} />;
+    if (iconKey === 'filetext' || nameKey.includes('write') || nameKey.includes('translation')) return <FileText size={20} strokeWidth={1.5} />;
+    if (iconKey === 'briefcase' || nameKey.includes('business') || nameKey.includes('consulting')) return <Briefcase size={20} strokeWidth={1.5} />;
+    if (iconKey === 'music' || nameKey.includes('music') || nameKey.includes('audio')) return <Music size={20} strokeWidth={1.5} />;
+    if (iconKey === 'barchart' || iconKey === 'chart' || nameKey.includes('data') || nameKey.includes('analytics')) return <BarChart2 size={20} strokeWidth={1.5} />;
+    if (iconKey === 'shoppingcart' || nameKey.includes('e-commerce') || nameKey.includes('commerce')) return <ShoppingCart size={20} strokeWidth={1.5} />;
+    if (iconKey === 'star' || nameKey.includes('other') || nameKey.includes('general')) return <Star size={20} strokeWidth={1.5} />;
+
+    return <Layers size={20} strokeWidth={1.5} />;
+  };
+
+  const filteredCategories = categoryList.filter((cat: any) => {
+    const name = cat.name || cat.title || String(cat);
+    return name.toLowerCase().includes(search.trim().toLowerCase());
+  });
 
   return (
     <section className="relative w-full min-h-[85vh] lg:min-h-[calc(100vh-80px)] bg-[#FAFAFC] overflow-hidden flex items-center justify-center py-12 lg:py-16 border-b border-slate-100">
@@ -121,22 +158,28 @@ const Featured = () => {
           </button>
         </div>
 
-        {/* CATEGORY FILTER MATCHES */}
-        <div className={`flex justify-center items-start w-full max-w-3xl mt-6 gap-2 sm:gap-4 overflow-hidden transition-all duration-300 ${search.trim().length > 0 ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
-          {search.trim().length > 0 && filteredCategories.map((cat, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center gap-2 cursor-pointer transition group p-2 rounded-xl hover:bg-white hover:shadow-sm"
-              onClick={() => router.push(`/packages?category=${cat.path}`)}
-            >
-              <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-brand-green group-hover:bg-brand-green group-hover:text-white transition-colors">
-                {cat.icon}
+        {/* REAL BACKEND CATEGORY MATCHES IN GRAYSCALE */}
+        <div className={`flex justify-center items-start flex-wrap w-full max-w-3xl mt-6 gap-2 sm:gap-4 overflow-hidden transition-all duration-300 ${search.trim().length > 0 ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
+          {search.trim().length > 0 && filteredCategories.slice(0, 8).map((cat: any, index: number) => {
+            const name = cat.name || cat.title || String(cat);
+            const slug = cat.slug || name.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            const iconStr = cat.icon || '';
+
+            return (
+              <div
+                key={slug || index}
+                className="flex flex-col items-center gap-2 cursor-pointer transition group p-2 rounded-xl hover:bg-white hover:shadow-sm"
+                onClick={() => router.push(`/packages?category=${encodeURIComponent(slug)}`)}
+              >
+                <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-500 filter grayscale opacity-75 group-hover:grayscale-0 group-hover:opacity-100 group-hover:bg-brand-green group-hover:text-white group-hover:border-brand-green transition-all">
+                  {getCategoryIcon(iconStr, name)}
+                </div>
+                <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition-colors text-center max-w-[100px] truncate">
+                  {name}
+                </span>
               </div>
-              <span className="text-xs font-semibold text-slate-700 text-center">
-                {cat.name}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
       </div>

@@ -110,6 +110,8 @@ const TopRatedSellers = () => {
 
           <button
             onClick={(e) => { e.preventDefault(); swiperRef.current?.slidePrev(); }}
+            aria-label="Previous seller slide"
+            title="Previous seller"
             className="absolute left-0 md:-left-5 top-[45%] -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-[0_4px_15px_rgba(0,0,0,0.15)] hover:bg-gray-50 transition-all focus:outline-none"
           >
             <ChevronLeft size={22} strokeWidth={2} />
@@ -117,6 +119,8 @@ const TopRatedSellers = () => {
 
           <button
             onClick={(e) => { e.preventDefault(); swiperRef.current?.slideNext(); }}
+            aria-label="Next seller slide"
+            title="Next seller"
             className="absolute right-0 md:-right-5 top-[45%] -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-[0_4px_15px_rgba(0,0,0,0.15)] hover:bg-gray-50 transition-all focus:outline-none"
           >
             <ChevronRight size={22} strokeWidth={2} />

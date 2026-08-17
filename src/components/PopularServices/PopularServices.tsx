@@ -54,12 +54,16 @@ const PopularServices = () => {
           <div className="flex gap-2">
             <button
               onClick={() => swiperRef.current?.slidePrev()}
+              aria-label="Previous service slide"
+              title="Previous slide"
               className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 hover:text-gray-600 transition-colors bg-white shadow-sm"
             >
               <ChevronLeft size={20} strokeWidth={2} />
             </button>
             <button
               onClick={() => swiperRef.current?.slideNext()}
+              aria-label="Next service slide"
+              title="Next slide"
               className="w-10 h-10 flex items-center justify-center rounded-xl bg-brand-green text-white hover:bg-[#389115] transition-colors shadow-sm"
             >
               <ChevronRight size={20} strokeWidth={2} />

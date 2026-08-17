@@ -90,7 +90,7 @@ const ExploreCategories = () => {
                     iconType={category.iconType}
                     iconUrl={category.icon}
                     className="text-gray-700 w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14"
-                    alt={title}
+                    alt=""
                     fallbackIcon={getIcon(
                       index,
                       "text-gray-700 w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14"

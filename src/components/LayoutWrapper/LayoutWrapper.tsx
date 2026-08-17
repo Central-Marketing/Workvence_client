@@ -12,10 +12,12 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const isAdminPage = pathname.startsWith("/admin");
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       {!isAuthPage && !isAdminPage && <Navbar />}
-      {children}
+      <main id="main-content" className="flex-1">
+        {children}
+      </main>
       {!isMessagePage && !isAuthPage && !isAdminPage && <Footer />}
-    </>
+    </div>
   );
 }

@@ -136,9 +136,6 @@ const Navbar = () => {
                   <Link href="/register?seller=true" className={`hidden md:block hover:text-brand-green transition-colors ${showMenu || pathname !== "/" ? "" : "hover:text-gray-800"}`}>
                     Become a seller
                   </Link>
-                  <Link href="/contact" className={`hidden md:block hover:text-brand-green transition-colors ${showMenu || pathname !== "/" ? "" : "hover:text-gray-800"}`}>
-                    Contact us
-                  </Link>
                   <Link href="/login" className={`hover:text-brand-green transition-colors ${showMenu || pathname !== "/" ? "" : "hover:text-gray-800"}`}>
                     Sign in
                   </Link>
@@ -245,7 +242,6 @@ const Navbar = () => {
             <>
               <Link href="/packages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Browse Packages</Link>
               <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a seller</Link>
-              <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Contact us</Link>
               <hr className="my-2 border-gray-100" />
               <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Sign in</Link>
               <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="text-brand-green hover:opacity-80 transition-opacity">Join Now</Link>

@@ -39,11 +39,24 @@ const ExploreCategories = () => {
     queryFn: () => adminAxios.get('/categories').then(({ data }) => data)
   });
 
-  const categoryList = Array.isArray(fetchedCategories)
+  const rawList = Array.isArray(fetchedCategories)
     ? fetchedCategories
     : Array.isArray(fetchedCategories?.data)
       ? fetchedCategories.data
       : fetchedCategories?.categories || [];
+
+  const regularCats = rawList.filter((c: any) =>
+    c.slug !== 'other-and-general' &&
+    c.slug !== 'other' &&
+    !(c.name || c.title || '').toLowerCase().includes('other')
+  );
+  const otherCats = rawList.filter((c: any) =>
+    c.slug === 'other-and-general' ||
+    c.slug === 'other' ||
+    (c.name || c.title || '').toLowerCase().includes('other')
+  );
+
+  const categoryList = [...regularCats, ...otherCats];
 
   return (
     <section className="w-full py-10 md:py-20 bg-white">

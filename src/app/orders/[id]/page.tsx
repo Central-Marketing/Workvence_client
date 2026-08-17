@@ -863,7 +863,7 @@ const OrderDetail = () => {
                           <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3 text-2xl group-hover:scale-110 transition-transform">
                             ☁️
                           </div>
-                          <p className="text-sm font-semibold text-slate-900 dark:text-slate-200 mb-1">
+                          <p className="text-sm font-semibold text-slate-900 mb-1">
                             Click or Drag & Drop Delivery Files Here
                           </p>
                           <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
@@ -1088,7 +1088,7 @@ const OrderDetail = () => {
                 </div>
               </div>
               <p className="bio-desc">
-                {contactUser.description || "No bio description provided."}
+                {contactUser.description.slice(0, 100) + "..." || "No bio description provided."}
               </p>
               <button className="chat-btn" onClick={handleContact}>
                 Send Message / Chat

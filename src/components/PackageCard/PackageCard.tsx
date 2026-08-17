@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useUserStore } from "@/store/userStore";
 import { FavoriteButton } from "@/components";
 
-const PackageCard = ({ data }: { data: any }) => {
+const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean }) => {
   const router = useRouter();
   const { user } = useUserStore((state: any) => state);
   if (!data) return null;
@@ -49,10 +50,14 @@ const PackageCard = ({ data }: { data: any }) => {
       <div className="flex flex-col h-full">
         {/* Thumbnail + Bookmark Badge */}
         <div className="relative w-full aspect-[16/10] overflow-hidden bg-gray-100">
-          <img
+          <Image
             src={coverImg}
             alt={data.title || data.desc || "Package Cover"}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={priority}
+            className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+            unoptimized
           />
           <div
             className="absolute top-3 right-3 z-10 flex items-center justify-center"
@@ -107,10 +112,13 @@ const PackageCard = ({ data }: { data: any }) => {
               onClick={handleProfileClick}
               className="flex items-center gap-2.5 cursor-pointer group/user"
             >
-              <img
+              <Image
                 src={userImg}
+                width={28}
+                height={28}
                 alt={username}
                 className="w-7 h-7 rounded-full object-cover border border-gray-200"
+                unoptimized
               />
               <span className="text-[14px] font-semibold text-gray-800 group-hover/user:text-brand-green transition-colors">
                 {username}

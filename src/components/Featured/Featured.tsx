@@ -70,7 +70,7 @@ const Featured = () => {
   return (
     <section className="relative w-full min-h-[85vh] lg:min-h-[calc(100vh-80px)] bg-[#FAFAFC] overflow-hidden flex items-center justify-center py-12 lg:py-16 border-b border-slate-100">
 
-      {/* LEFT SIDE BEHANCE-EXACT SCALED UP FLOATING CLUSTER */}
+      {/* DESKTOP LEFT SIDE FLOATING CLUSTER (lg:block) */}
       <div className="hidden lg:block absolute left-0 xl:left-2 2xl:left-8 top-1/2 -translate-y-1/2 w-[320px] xl:w-[360px] h-[520px] pointer-events-none z-0 opacity-40 xl:opacity-60 hover:opacity-100 transition-all duration-500 scale-[0.60] xl:scale-80 2xl:scale-100 origin-left">
         {/* L1: Far Top Left Small */}
         <div className="absolute top-4 left-0 w-[115px] h-[105px] rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 mix-blend-multiply">
@@ -98,7 +98,7 @@ const Featured = () => {
         </div>
       </div>
 
-      {/* RIGHT SIDE BEHANCE-EXACT SCALED UP FLOATING CLUSTER */}
+      {/* DESKTOP RIGHT SIDE FLOATING CLUSTER (lg:block) */}
       <div className="hidden lg:block absolute right-0 xl:right-2 2xl:right-8 top-1/2 -translate-y-1/2 w-[320px] xl:w-[360px] h-[520px] pointer-events-none z-0 opacity-40 xl:opacity-60 hover:opacity-100 transition-all duration-500 scale-[0.60] xl:scale-80 2xl:scale-100 origin-right">
         {/* R1: Far Top Right Large Feature Card */}
         <div className="absolute top-0 right-0 w-[175px] h-[175px] rounded-3xl overflow-hidden shadow-sm border border-slate-200/60 mix-blend-multiply">
@@ -126,14 +126,14 @@ const Featured = () => {
       <div className="relative z-30 container mx-auto px-4 sm:px-6 flex flex-col items-center text-center max-w-4xl my-auto">
 
         {/* MAIN HEADLINE SPLIT INTO EXACT 3 LINES */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-[76px] font-bold text-black mb-6 flex flex-col items-center">
+        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[84px] font-bold text-black mb-6 flex flex-col items-center leading-[1.05]">
           <span>The World’s</span>
           <span className="text-brand-green">Best Creators</span>
           <span>Are on Workvence.</span>
         </h1>
 
         {/* SUBHEADING PARAGRAPH */}
-        <p className="text-slate-600 text-base sm:text-lg md:text-xl font-normal max-w-3xl leading-relaxed mb-10">
+        <p className="text-slate-600 text-lg sm:text-xl md:text-2xl font-normal max-w-3xl leading-relaxed mb-10">
           Workvence helps you discover skilled freelancers across design, development, marketing, writing, video, and more. Compare services, review portfolios, and hire with confidence.
         </p>
 
@@ -156,6 +156,31 @@ const Featured = () => {
           >
             <span>Search</span>
           </button>
+        </div>
+
+        {/* MOBILE BOTTOM AMBIENT STRIP (< 1024px) - 2 ROWS (ROW 1: 3, ROW 2: 2) */}
+        <div className="lg:hidden flex flex-col items-center gap-2 mt-8 w-full opacity-50 mix-blend-multiply overflow-hidden px-2 pointer-events-none">
+          {/* Row 1 (3 images) */}
+          <div className="flex items-center justify-center gap-2 sm:gap-3">
+            <div className="w-16 h-14 sm:w-20 sm:h-16 rounded-xl overflow-hidden shadow-2xs border border-slate-200/40 shrink-0">
+              <img src="/media/hero_images/img1.jpeg" alt="Artwork" className="w-full h-full object-cover" />
+            </div>
+            <div className="w-20 h-16 sm:w-24 sm:h-20 rounded-2xl overflow-hidden shadow-xs border border-slate-200/50 shrink-0">
+              <img src="/media/hero_images/img3.jpeg" alt="Artwork" className="w-full h-full object-cover" />
+            </div>
+            <div className="w-16 h-14 sm:w-20 sm:h-16 rounded-xl overflow-hidden shadow-2xs border border-slate-200/40 shrink-0">
+              <img src="/media/hero_images/img7.jpeg" alt="Artwork" className="w-full h-full object-cover" />
+            </div>
+          </div>
+          {/* Row 2 (2 images) */}
+          <div className="flex items-center justify-center gap-2 sm:gap-3">
+            <div className="w-16 h-14 sm:w-20 sm:h-16 rounded-xl overflow-hidden shadow-2xs border border-slate-200/40 shrink-0">
+              <img src="/media/hero_images/img2.jpeg" alt="Artwork" className="w-full h-full object-cover" />
+            </div>
+            <div className="w-16 h-14 sm:w-20 sm:h-16 rounded-xl overflow-hidden shadow-2xs border border-slate-200/40 shrink-0">
+              <img src="/media/hero_images/img4.jpeg" alt="Artwork" className="w-full h-full object-cover" />
+            </div>
+          </div>
         </div>
 
         {/* REAL BACKEND CATEGORY MATCHES IN GRAYSCALE */}

@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import adminAxios from "@/utils/adminAxios";
+import toast from "react-hot-toast";
 
 const socialLinks = [
   { href: "https://www.tiktok.com/@workvence", icon: "/all-icons/tiktok.svg", label: "TikTok" },
@@ -64,6 +66,46 @@ const staticFooterColumns: FooterColumn[] = [
 ];
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  const [subscribedMsg, setSubscribedMsg] = useState<{ type: 'success' | 'info' | 'error'; text: string } | null>(null);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubscribedMsg(null);
+
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      toast.error("Email address is required.");
+      setSubscribedMsg({ type: 'error', text: "Email address is required." });
+      return;
+    }
+
+    try {
+      setIsSubscribing(true);
+      const res = await axiosFetch.post('/newsletter/subscribe', { email: trimmedEmail });
+      const resData = res.data || {};
+
+      if (resData.alreadySubscribed) {
+        const msg = resData.message || "This email is already subscribed to our newsletter.";
+        toast.error(msg);
+        setSubscribedMsg({ type: 'info', text: msg });
+      } else {
+        const msg = resData.message || "Thank you for subscribing to our newsletter!";
+        toast.success(msg);
+        setSubscribedMsg({ type: 'success', text: msg });
+        setEmail("");
+      }
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || "Please provide a valid email address.";
+      toast.error(errMsg);
+      setSubscribedMsg({ type: 'error', text: errMsg });
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
+
   const { data: fetchedCategories = [] } = useQuery({
     queryKey: ['admin-categories-footer'],
     queryFn: () => adminAxios.get('/categories').then(({ data }) => data)
@@ -130,16 +172,34 @@ const Footer = () => {
             <p className="text-[13px] text-slate-400 mb-4 leading-relaxed">
               Get the latest platform updates, freelancer tips, and curated picks straight to your inbox.
             </p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="flex-1 bg-slate-800 text-slate-100 text-[13px] placeholder-slate-500 border border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:border-slate-500 transition-colors"
-              />
-              <button className="bg-brand-green hover:bg-brand-green text-white text-[13px] font-semibold px-5 py-2.5 rounded-xl transition-colors whitespace-nowrap">
-                Subscribe
-              </button>
-            </div>
+            <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Your email address"
+                  disabled={isSubscribing}
+                  className="flex-1 bg-slate-800 text-slate-100 text-[13px] placeholder-slate-500 border border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:border-slate-500 transition-colors disabled:opacity-60"
+                />
+                <button
+                  type="submit"
+                  disabled={isSubscribing}
+                  className="bg-brand-green hover:bg-[#389115] disabled:opacity-50 text-white text-[13px] font-semibold px-5 py-2.5 rounded-xl transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center min-w-[95px]"
+                >
+                  {isSubscribing ? "Subscribing..." : "Subscribe"}
+                </button>
+              </div>
+
+              {subscribedMsg && (
+                <p className={`text-xs mt-1 font-medium ${
+                  subscribedMsg.type === 'success' ? 'text-emerald-400' :
+                  subscribedMsg.type === 'info' ? 'text-blue-400' : 'text-rose-400'
+                }`}>
+                  {subscribedMsg.text}
+                </p>
+              )}
+            </form>
           </div>
         </div>
       </div>

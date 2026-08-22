@@ -35,7 +35,7 @@ const TwoWays = () => {
             <p>
               Submit your custom requirements and let our vetted experts pitch their best solutions. Best for long-term or complex initiatives.
             </p>
-            <Link href="/packages" className="way-card__btn way-card__btn--outline">
+            <Link href="/briefs/create" className="way-card__btn way-card__btn--outline">
               Post project
             </Link>
           </div>

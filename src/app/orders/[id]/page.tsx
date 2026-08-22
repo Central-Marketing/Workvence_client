@@ -1079,7 +1079,7 @@ const OrderDetail = () => {
           {isCurrentUserSeller && (
             <div className="card statement-card" style={{ borderColor: isCompleted ? '#a7f3d0' : '#e2e8f0', background: isCompleted ? '#f0fdf4' : '#ffffff' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0px' }}>
                   <span>💰</span> Seller Earnings Breakdown
                 </h3>
                 {order.isCleared ? (

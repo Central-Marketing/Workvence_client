@@ -158,7 +158,7 @@ const Earnings = () => {
 
   return (
     <div className="min-h-[80vh] bg-slate-50 py-10 flex justify-center font-sans">
-      <div className="w-[95%] md:w-[90%] max-w-[1100px] flex flex-col gap-7 mx-auto">
+      <div className="w-[95%] md:w-[90%] max-w-[1280px] flex flex-col gap-7 mx-auto">
 
         {/* ── Balance Header ── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-5 flex-wrap">
@@ -293,28 +293,26 @@ const Earnings = () => {
           <div className="p-5 md:px-7 md:py-5 border-b border-slate-200 flex justify-between items-center flex-wrap gap-2">
             <div>
               <h2 className="text-lg font-bold text-slate-900 mb-1">Financial Statement History</h2>
-              <p className="text-[13.5px] text-slate-500">Complete transaction ledger, order status, and clearance schedule for all your orders</p>
+              <p className="text-[13.5px] text-slate-500">Complete transaction ledger and clearance schedule for all your orders</p>
             </div>
           </div>
           <div className="w-full overflow-x-auto">
-            <table className="w-full border-collapse text-left min-w-[1150px]">
+            <table className="w-full border-collapse text-left min-w-[950px]">
               <thead>
                 <tr>
                   <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Date</th>
                   <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Order Reference</th>
                   <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Description</th>
-                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Order Status</th>
                   <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Gross Price</th>
                   <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Net Earnings</th>
-                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Clears At</th>
-                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Cleared At</th>
+                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Clearance Date</th>
                   <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Clearance Status</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="text-center p-12 text-slate-400 font-medium">
+                    <td colSpan={7} className="text-center p-12 text-slate-400 font-medium">
                       No financial transactions recorded yet.
                     </td>
                   </tr>
@@ -328,20 +326,6 @@ const Earnings = () => {
                     );
                     const orderRef = order.orderNumber || (order._id || order.id ? `#${(order._id || order.id).slice(-8)}` : "—");
 
-                    const statusBadge = (s: string) => {
-                      const st = s?.toLowerCase();
-                      if (st === "completed") {
-                        return <span className="text-[11px] font-bold py-1 px-2.5 rounded-md uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">Completed</span>;
-                      }
-                      if (st === "delivered") {
-                        return <span className="text-[11px] font-bold py-1 px-2.5 rounded-md uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">Delivered</span>;
-                      }
-                      if (st === "paid" || st === "in_progress" || st === "in progress") {
-                        return <span className="text-[11px] font-bold py-1 px-2.5 rounded-md uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">Paid</span>;
-                      }
-                      return <span className="text-[11px] font-bold py-1 px-2.5 rounded-md uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">{s || "—"}</span>;
-                    };
-
                     return (
                       <tr key={order._id || order.id} className="hover:bg-slate-50/70 transition-colors">
                         <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-600 whitespace-nowrap">
@@ -353,9 +337,6 @@ const Earnings = () => {
                         <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-800 min-w-[260px]">
                           {order.title}
                         </td>
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm whitespace-nowrap">
-                          {statusBadge(order.status)}
-                        </td>
                         <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-semibold text-slate-700 whitespace-nowrap">
                           {gross.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                         </td>
@@ -363,15 +344,14 @@ const Earnings = () => {
                           +{net.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                         </td>
                         <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm text-slate-600 whitespace-nowrap">
-                          {order.clearsAt ? (
-                            <span className="font-medium text-slate-700">{moment(order.clearsAt).format("MMM DD, YYYY")}</span>
-                          ) : (
-                            <span className="text-slate-400 font-normal">—</span>
-                          )}
-                        </td>
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm text-slate-600 whitespace-nowrap">
                           {order.clearedAt ? (
-                            <span className="font-medium text-emerald-700">{moment(order.clearedAt).format("MMM DD, YYYY")}</span>
+                            <span className="font-medium text-emerald-700" title="Date cleared into wallet">
+                              {moment(order.clearedAt).format("MMM DD, YYYY")}
+                            </span>
+                          ) : order.clearsAt ? (
+                            <span className="font-medium text-slate-700" title="Scheduled clearance date">
+                              {moment(order.clearsAt).format("MMM DD, YYYY")}
+                            </span>
                           ) : (
                             <span className="text-slate-400 font-normal">—</span>
                           )}

@@ -20,13 +20,19 @@ const Earnings = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const { isLoading, error, data: orders = [] } = useQuery({
-    queryKey: ["seller-earnings-orders"],
+  const { isLoading, error, data: statementData } = useQuery({
+    queryKey: ["seller-earnings-statement"],
     queryFn: () =>
-      axiosFetch.get("/orders").then(({ data }) => data).catch(() => []),
+      axiosFetch.get("/earnings/statement").then(({ data }) => data).catch(() => ({ orders: [], summary: {} })),
   });
 
-  const { data: payouts = [] } = useQuery({
+  const { data: clearanceStatus } = useQuery({
+    queryKey: ["earnings-clearance-status"],
+    queryFn: () =>
+      axiosFetch.get("/earnings/clearance-status").then(({ data }) => data).catch(() => null),
+  });
+
+  const { data: payoutsData = [] } = useQuery({
     queryKey: ["my-payouts"],
     queryFn: () =>
       axiosFetch.get("/payouts").then(({ data }) => data).catch(() => []),
@@ -40,29 +46,95 @@ const Earnings = () => {
       setPayoutAmount("");
       setPayoutNote("");
       queryClient.invalidateQueries({ queryKey: ["my-payouts"] });
+      queryClient.invalidateQueries({ queryKey: ["seller-earnings-statement"] });
+      queryClient.invalidateQueries({ queryKey: ["earnings-clearance-status"] });
     },
-    onError: () => toast.error("Failed to submit payout request."),
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to submit payout request.");
+    },
+  });
+
+  const syncClearanceMutation = useMutation({
+    mutationFn: () => axiosFetch.post("/earnings/sync-clearance"),
+    onSuccess: ({ data }) => {
+      const msg =
+        data?.message ||
+        (data?.clearedAmount
+          ? `Successfully cleared $${Number(data.clearedAmount).toFixed(2)} across ${data?.clearedCount ?? 1} order(s)!`
+          : "Successfully synced cleared funds!");
+      toast.success(msg);
+      queryClient.invalidateQueries({ queryKey: ["seller-earnings-statement"] });
+      queryClient.invalidateQueries({ queryKey: ["earnings-clearance-status"] });
+      queryClient.invalidateQueries({ queryKey: ["my-payouts"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-orders"] });
+    },
+    onError: (err: any) => {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "You can sync once every 60 minutes. Please try again later.";
+      toast.error(msg);
+    },
   });
 
   if (isLoading) return <div className="loader-container"><Loader size={50} /></div>;
   if (error) return <div className="error-container">Something went wrong!</div>;
 
-  // Filter only orders where logged-in user is the seller
-  const sellerOrders = orders.filter(
-    (order: any) => (order.sellerID?._id || order.sellerID) === user?._id
-  );
+  // Extract orders and summary from statement response
+  const orders: any[] = Array.isArray(statementData)
+    ? statementData
+    : (statementData?.orders || []);
 
-  const completedOrders = sellerOrders.filter((o: any) => o.status === "completed");
-  const netIncome = completedOrders.reduce((acc: number, curr: any) => acc + curr.price, 0);
+  const summary = statementData?.summary || {};
 
-  const awaitingOrders = sellerOrders.filter((o: any) => o.status === "paid" || o.status === "delivered");
-  const awaitingClearance = awaitingOrders.reduce((acc: number, curr: any) => acc + curr.price, 0);
+  const payouts: any[] = (statementData?.payouts && statementData.payouts.length > 0)
+    ? statementData.payouts
+    : (Array.isArray(payoutsData) ? payoutsData : (payoutsData?.payouts || []));
 
-  // Subtract already-requested payouts from available balance
+  const completedOrders = orders.filter((o: any) => o.status === "completed" || o.isCompleted);
+  const clearedOrders = orders.filter((o: any) => o.isCleared === true);
+  const unclearedOrders = orders.filter((o: any) => !o.isCleared);
+
+  // Net Income: From summary.lifetimeTotalIncome (or summary.clearedIncome or calculated)
+  const netIncome = summary.lifetimeTotalIncome !== undefined
+    ? Number(summary.lifetimeTotalIncome)
+    : (summary.clearedIncome !== undefined
+      ? Number(summary.clearedIncome)
+      : (clearanceStatus?.totalClearedIncome !== undefined
+        ? Number(clearanceStatus.totalClearedIncome)
+        : completedOrders.reduce((acc: number, curr: any) => {
+          const net = curr.netEarnings !== undefined
+            ? curr.netEarnings
+            : (curr.grossPrice ? curr.grossPrice - (curr.platformFee || 0) : curr.price || 0);
+          return acc + (Number(net) || 0);
+        }, 0)));
+
+  // Awaiting Clearance: From summary.awaitingClearance or calculated
+  const awaitingClearance = summary.awaitingClearance !== undefined
+    ? Number(summary.awaitingClearance)
+    : (clearanceStatus?.pendingClearanceAmount !== undefined
+      ? Number(clearanceStatus.pendingClearanceAmount)
+      : unclearedOrders.reduce((acc: number, curr: any) => {
+        const net = curr.netEarnings !== undefined
+          ? curr.netEarnings
+          : (curr.grossPrice ? curr.grossPrice - (curr.platformFee || 0) : curr.price || 0);
+        return acc + (Number(net) || 0);
+      }, 0));
+
+  // Available Balance: From summary.availableBalance, clearanceStatus, user store, or computed
   const totalRequested = payouts
     .filter((p: any) => p.status === "pending" || p.status === "approved")
     .reduce((acc: number, curr: any) => acc + curr.amount, 0);
-  const availableBalance = Math.max(netIncome - totalRequested, 0);
+
+  const availableBalance = summary.availableBalance !== undefined
+    ? Number(summary.availableBalance)
+    : (clearanceStatus?.availableBalance !== undefined
+      ? Number(clearanceStatus.availableBalance)
+      : (user?.earningsBalance !== undefined
+        ? Number(user.earningsBalance)
+        : Math.max(netIncome - totalRequested, 0)));
+
+  const readyToSync = clearanceStatus?.readyToSyncAmount ? Number(clearanceStatus.readyToSyncAmount) : 0;
 
   const handlePayoutSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,13 +166,38 @@ const Earnings = () => {
             <h1 className="text-2xl md:text-[26px] font-extrabold text-slate-900 mb-1">Seller Earnings</h1>
             <p className="text-sm text-slate-500">Track your income, awaiting clearance, and request payouts</p>
           </div>
-          <button
-            className="w-full md:w-auto bg-brand-green text-white py-3 px-6 rounded-lg text-[14.5px] font-bold transition-all hover:brightness-95 disabled:bg-slate-300 disabled:text-slate-400 disabled:cursor-not-allowed whitespace-nowrap"
-            onClick={() => setShowPayoutModal(true)}
-            disabled={availableBalance <= 0}
-          >
-            Request Payout
-          </button>
+          <div className="flex items-center gap-3 w-full md:w-auto flex-wrap sm:flex-nowrap">
+            <button
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white py-3 px-5 rounded-lg text-[14.5px] font-bold transition-all disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed whitespace-nowrap shadow-sm active:scale-[0.98]"
+              onClick={() => syncClearanceMutation.mutate()}
+              disabled={syncClearanceMutation.isPending}
+              title="Sync all mature completed orders into your available balance"
+            >
+              {syncClearanceMutation.isPending ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
+                  <span>Syncing...</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-base leading-none">🔄</span>
+                  <span>Sync Cleared Funds</span>
+                  {readyToSync > 0 && (
+                    <span className="ml-1 bg-emerald-500 text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full shadow-xs animate-pulse">
+                      ${readyToSync.toFixed(2)} ready
+                    </span>
+                  )}
+                </>
+              )}
+            </button>
+            <button
+              className="flex-1 md:flex-none bg-brand-green text-white py-3 px-6 rounded-lg text-[14.5px] font-bold transition-all hover:brightness-95 disabled:bg-slate-300 disabled:text-slate-400 disabled:cursor-not-allowed whitespace-nowrap shadow-sm active:scale-[0.98]"
+              onClick={() => setShowPayoutModal(true)}
+              disabled={availableBalance <= 0}
+            >
+              Request Payout
+            </button>
+          </div>
         </div>
 
         {/* ── Stats Cards ── */}
@@ -108,9 +205,13 @@ const Earnings = () => {
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-6 flex items-start gap-4">
             <div className="text-2xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0 bg-emerald-50">💰</div>
             <div>
-              <span className="text-[12.5px] font-bold text-slate-500 uppercase tracking-wide block mb-1.5">Net Income (Cleared)</span>
-              <h2 className="text-[28px] font-extrabold text-slate-900 m-0 mb-1">{netIncome.toLocaleString("en-US", { style: "currency", currency: "USD" })}</h2>
-              <p className="text-[12.5px] text-slate-400 m-0">{completedOrders.length} completed orders</p>
+              <span className="text-[12.5px] font-bold text-slate-500 uppercase tracking-wide block mb-1.5">Net Income</span>
+              <h2 className="text-[28px] font-extrabold text-slate-900 m-0 mb-1">
+                {netIncome.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+              </h2>
+              <p className="text-[12.5px] text-slate-400 m-0">
+                {summary.completedOrdersCount !== undefined ? `${summary.completedOrdersCount} completed orders` : `${completedOrders.length} completed orders`}
+              </p>
             </div>
           </div>
 
@@ -118,8 +219,13 @@ const Earnings = () => {
             <div className="text-2xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0 bg-amber-50">⏳</div>
             <div>
               <span className="text-[12.5px] font-bold text-slate-500 uppercase tracking-wide block mb-1.5">Awaiting Clearance</span>
-              <h2 className="text-[28px] font-extrabold text-slate-900 m-0 mb-1">{awaitingClearance.toLocaleString("en-US", { style: "currency", currency: "USD" })}</h2>
-              <p className="text-[12.5px] text-slate-400 m-0">{awaitingOrders.length} active orders in escrow</p>
+              <h2 className="text-[28px] font-extrabold text-slate-900 m-0 mb-1">
+                {awaitingClearance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+              </h2>
+              <p className="text-[12.5px] text-slate-400 m-0">
+                {summary.unclearedOrdersCount !== undefined ? `${summary.unclearedOrdersCount} order(s) pending clearance` : `${unclearedOrders.length} order(s) pending clearance`}
+                {clearanceStatus?.nextClearanceDate && ` • Next: ${moment(clearanceStatus.nextClearanceDate).format("MMM DD")}`}
+              </p>
             </div>
           </div>
 
@@ -130,7 +236,10 @@ const Earnings = () => {
               <h2 className="text-[28px] font-extrabold text-emerald-700 m-0 mb-1">
                 {availableBalance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
               </h2>
-              <p className="text-[12.5px] text-slate-400 m-0">Ready to withdraw</p>
+              <p className="text-[12.5px] text-slate-500 m-0">
+                Ready to withdraw
+                {readyToSync > 0 && ` • $${readyToSync.toFixed(2)} ready to sync`}
+              </p>
             </div>
           </div>
         </div>
@@ -156,7 +265,7 @@ const Earnings = () => {
                   {payouts.map((p: any) => {
                     const sc = statusColor(p.status);
                     return (
-                      <tr key={p._id}>
+                      <tr key={p._id || p.id}>
                         <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-600 whitespace-nowrap">{moment(p.createdAt).format("MMM DD, YYYY")}</td>
                         <td className="py-4 px-6 border-b border-slate-100 align-middle text-[15px] font-bold text-emerald-700">
                           {p.amount.toLocaleString("en-US", { style: "currency", currency: "USD" })}
@@ -181,44 +290,108 @@ const Earnings = () => {
 
         {/* ── Financial Statement Table ── */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-5 md:px-7 md:py-5 border-b border-slate-200">
-            <h2 className="text-lg font-bold text-slate-900 mb-1">Financial Statement History</h2>
-            <p className="text-[13.5px] text-slate-500">Complete transaction ledger for all your orders</p>
+          <div className="p-5 md:px-7 md:py-5 border-b border-slate-200 flex justify-between items-center flex-wrap gap-2">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 mb-1">Financial Statement History</h2>
+              <p className="text-[13.5px] text-slate-500">Complete transaction ledger, order status, and clearance schedule for all your orders</p>
+            </div>
           </div>
           <div className="w-full overflow-x-auto">
-            <table className="w-full border-collapse text-left min-w-[1000px]">
+            <table className="w-full border-collapse text-left min-w-[1150px]">
               <thead>
                 <tr>
                   <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Date</th>
                   <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Order Reference</th>
                   <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Description</th>
-                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Amount</th>
-                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Status</th>
+                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Order Status</th>
+                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Gross Price</th>
+                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Net Earnings</th>
+                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Clears At</th>
+                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Cleared At</th>
+                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Clearance Status</th>
                 </tr>
               </thead>
               <tbody>
-                {sellerOrders.length === 0 ? (
+                {orders.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center p-12 text-slate-400 font-medium">
+                    <td colSpan={9} className="text-center p-12 text-slate-400 font-medium">
                       No financial transactions recorded yet.
                     </td>
                   </tr>
                 ) : (
-                  sellerOrders.map((order: any) => (
-                    <tr key={order._id}>
-                      <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-600 whitespace-nowrap">{moment(order.createdAt).format("MMM DD, YYYY")}</td>
-                      <td className="py-4 px-6 border-b border-slate-100 align-middle text-[11.5px] font-mono text-slate-500">{order._id?.slice(-8)}</td>
-                      <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-800 min-w-[350px] whitespace-nowrap">Payment for: {order.title}</td>
-                      <td className="py-4 px-6 border-b border-slate-100 align-middle text-[15px] font-bold text-emerald-700">
-                        +{order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                      </td>
-                      <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm text-slate-700">
-                        <span className={`text-[11px] font-bold py-1 px-3 rounded-full uppercase tracking-wide inline-block ${order.status === "completed" ? "bg-emerald-50 text-emerald-600" : order.status === "delivered" ? "bg-blue-50 text-blue-500" : "bg-amber-50 text-amber-600"}`}>
-                          {order.status === "completed" ? "Cleared" : order.status === "delivered" ? "Delivered" : "In Escrow"}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
+                  orders.map((order: any) => {
+                    const gross = Number(order.grossPrice ?? order.price ?? 0);
+                    const net = Number(
+                      order.netEarnings !== undefined
+                        ? order.netEarnings
+                        : (order.grossPrice ? order.grossPrice - (order.platformFee || 0) : order.price || 0)
+                    );
+                    const orderRef = order.orderNumber || (order._id || order.id ? `#${(order._id || order.id).slice(-8)}` : "—");
+
+                    const statusBadge = (s: string) => {
+                      const st = s?.toLowerCase();
+                      if (st === "completed") {
+                        return <span className="text-[11px] font-bold py-1 px-2.5 rounded-md uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">Completed</span>;
+                      }
+                      if (st === "delivered") {
+                        return <span className="text-[11px] font-bold py-1 px-2.5 rounded-md uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">Delivered</span>;
+                      }
+                      if (st === "paid" || st === "in_progress" || st === "in progress") {
+                        return <span className="text-[11px] font-bold py-1 px-2.5 rounded-md uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">Paid</span>;
+                      }
+                      return <span className="text-[11px] font-bold py-1 px-2.5 rounded-md uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">{s || "—"}</span>;
+                    };
+
+                    return (
+                      <tr key={order._id || order.id} className="hover:bg-slate-50/70 transition-colors">
+                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-600 whitespace-nowrap">
+                          {moment(order.createdAt).format("MMM DD, YYYY")}
+                        </td>
+                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-[12px] font-mono font-semibold text-slate-700 whitespace-nowrap">
+                          {orderRef}
+                        </td>
+                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-800 min-w-[260px]">
+                          {order.title}
+                        </td>
+                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm whitespace-nowrap">
+                          {statusBadge(order.status)}
+                        </td>
+                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-semibold text-slate-700 whitespace-nowrap">
+                          {gross.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                        </td>
+                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-[15px] font-bold text-emerald-700 whitespace-nowrap">
+                          +{net.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                        </td>
+                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm text-slate-600 whitespace-nowrap">
+                          {order.clearsAt ? (
+                            <span className="font-medium text-slate-700">{moment(order.clearsAt).format("MMM DD, YYYY")}</span>
+                          ) : (
+                            <span className="text-slate-400 font-normal">—</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm text-slate-600 whitespace-nowrap">
+                          {order.clearedAt ? (
+                            <span className="font-medium text-emerald-700">{moment(order.clearedAt).format("MMM DD, YYYY")}</span>
+                          ) : (
+                            <span className="text-slate-400 font-normal">—</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm whitespace-nowrap">
+                          {order.isCleared ? (
+                            <span className="text-[11px] font-bold py-1 px-3 rounded-full uppercase tracking-wide inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                              Cleared
+                            </span>
+                          ) : (
+                            <span className="text-[11px] font-bold py-1 px-3 rounded-full uppercase tracking-wide inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                              Pending
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -299,3 +472,5 @@ export default function EarningsPage() {
     </PrivateRoute>
   );
 }
+
+

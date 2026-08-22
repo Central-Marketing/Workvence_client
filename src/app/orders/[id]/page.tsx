@@ -1065,7 +1065,7 @@ const OrderDetail = () => {
             </div>
             <div className="statement-row">
               <span className="label">Your Role</span>
-              <span className="value">{user.isSeller ? "Seller" : "Buyer"}</span>
+              <span className="value">{user?.isSeller ? "Seller" : "Buyer"}</span>
             </div>
             {order.deadline && (
               <div className="statement-row">
@@ -1074,6 +1074,87 @@ const OrderDetail = () => {
               </div>
             )}
           </div>
+
+          {/* Seller Financial Breakdown Card */}
+          {isCurrentUserSeller && (
+            <div className="card statement-card" style={{ borderColor: isCompleted ? '#a7f3d0' : '#e2e8f0', background: isCompleted ? '#f0fdf4' : '#ffffff' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>💰</span> Seller Earnings Breakdown
+                </h3>
+                {order.isCleared ? (
+                  <span style={{ fontSize: '11px', fontWeight: 700, background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '12px', border: '1px solid #bbf7d0' }}>
+                    Cleared
+                  </span>
+                ) : isCompleted ? (
+                  <span style={{ fontSize: '11px', fontWeight: 700, background: '#fef3c7', color: '#b45309', padding: '2px 8px', borderRadius: '12px', border: '1px solid #fde68a' }}>
+                    Holding Period
+                  </span>
+                ) : (
+                  <span style={{ fontSize: '11px', fontWeight: 700, background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '12px', border: '1px solid #bae6fd' }}>
+                    In Escrow
+                  </span>
+                )}
+              </div>
+              <hr />
+
+              <div className="statement-row">
+                <span className="label">Gross Price</span>
+                <span className="value">{order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}</span>
+              </div>
+
+              {(() => {
+                const commissionRate = order.commissionRate !== undefined ? Number(order.commissionRate) : 15;
+                const platformFee = order.platformFee !== undefined
+                  ? Number(order.platformFee)
+                  : (order.price * (commissionRate / 100));
+                const netEarnings = order.netEarnings !== undefined
+                  ? Number(order.netEarnings)
+                  : (order.price - platformFee);
+
+                return (
+                  <>
+                    <div className="statement-row">
+                      <span className="label">Platform Fee ({commissionRate}%)</span>
+                      <span className="value" style={{ color: '#e11d48', fontWeight: 600 }}>
+                        -${platformFee.toFixed(2)}
+                      </span>
+                    </div>
+
+                    <div className="statement-row" style={{ marginTop: '6px', paddingTop: '8px', borderTop: '1px dashed #cbd5e1' }}>
+                      <span className="label" style={{ fontWeight: 700, color: '#0f172a' }}>Net Seller Payout</span>
+                      <span className="value" style={{ fontSize: '16px', fontWeight: 800, color: '#15803d' }}>
+                        +${netEarnings.toFixed(2)}
+                      </span>
+                    </div>
+
+                    <div className="statement-row" style={{ marginTop: '4px' }}>
+                      <span className="label">Clearance Schedule</span>
+                      <span className="value" style={{ fontSize: '12px', textAlign: 'right', maxWidth: '60%' }}>
+                        {order.isCleared ? (
+                          <span style={{ color: '#15803d', fontWeight: 700 }}>
+                            ✓ Cleared {order.clearedAt ? `(${moment(order.clearedAt).format('MMM DD, YYYY')})` : ''}
+                          </span>
+                        ) : order.clearsAt ? (
+                          <span style={{ color: '#b45309', fontWeight: 600 }}>
+                            {moment(order.clearsAt).format('MMM DD, YYYY')}
+                            <span style={{ display: 'block', fontSize: '10.5px', color: '#78716c' }}>
+                              ({moment(order.clearsAt).fromNow()})
+                            </span>
+                          </span>
+                        ) : isCompleted ? (
+                          <span style={{ color: '#64748b' }}>Pending clearance</span>
+                        ) : (
+                          <span style={{ color: '#64748b' }}>Holding period applies on completion</span>
+                        )}
+                      </span>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          )}
+
 
           {/* Contact User Profile Card */}
           {contactUser && (

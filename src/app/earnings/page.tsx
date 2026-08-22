@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
@@ -11,6 +12,8 @@ import toast from "react-hot-toast";
 
 const Earnings = () => {
   const user = useUserStore((state) => state.user);
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const [showPayoutModal, setShowPayoutModal] = useState(false);
   const [payoutAmount, setPayoutAmount] = useState("");
@@ -30,6 +33,50 @@ const Earnings = () => {
     queryKey: ["my-payouts"],
     queryFn: () =>
       axiosFetch.get("/payouts").then(({ data }) => data).catch(() => []),
+  });
+
+  const { data: connectStatus } = useQuery({
+    queryKey: ["stripe-connect-status"],
+    queryFn: () =>
+      axiosFetch.get("/payouts/connect/status").then(({ data }) => data).catch(() => null),
+  });
+
+  // Handle returning redirect back from Stripe onboarding (?connect=success)
+  useEffect(() => {
+    if (searchParams?.get("connect") === "success") {
+      toast.success("Stripe account successfully connected for payouts!");
+      queryClient.invalidateQueries({ queryKey: ["stripe-connect-status"] });
+      queryClient.invalidateQueries({ queryKey: ["seller-earnings-statement"] });
+      router.replace("/earnings");
+    }
+  }, [searchParams, queryClient, router]);
+
+  const connectOnboardMutation = useMutation({
+    mutationFn: () => axiosFetch.post("/payouts/connect/onboard"),
+    onSuccess: ({ data }) => {
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error("Failed to generate Stripe onboarding link.");
+      }
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to initiate Stripe onboarding.");
+    },
+  });
+
+  const connectDashboardMutation = useMutation({
+    mutationFn: () => axiosFetch.post("/payouts/connect/dashboard-link"),
+    onSuccess: ({ data }) => {
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      } else {
+        toast.error("Failed to generate Stripe dashboard link.");
+      }
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to open Stripe dashboard.");
+    },
   });
 
   const payoutMutation = useMutation({
@@ -153,15 +200,56 @@ const Earnings = () => {
             <p className="text-sm text-slate-500">Track your income, awaiting clearance, and request payouts</p>
           </div>
           <div className="flex items-center gap-3 w-full md:w-auto flex-wrap sm:flex-nowrap">
+            {/* Stripe Connect Action Button */}
+            {!connectStatus?.payoutsEnabled ? (
+              <button
+                className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-brand-black hover:bg-slate-800 text-white py-3 px-5 rounded-xl text-[14px] font-bold transition-all disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed whitespace-nowrap shadow-sm active:scale-[0.98]"
+                onClick={() => connectOnboardMutation.mutate()}
+                disabled={connectOnboardMutation.isPending}
+                title="Connect your Stripe account to enable automated direct payouts"
+              >
+                {connectOnboardMutation.isPending ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
+                    <span>Connecting...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-base leading-none">🔗</span>
+                    <span>Connect Stripe for Payouts</span>
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 py-3 px-5 rounded-xl text-[14px] font-bold transition-all disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed whitespace-nowrap shadow-sm active:scale-[0.98]"
+                onClick={() => connectDashboardMutation.mutate()}
+                disabled={connectDashboardMutation.isPending}
+                title="View your Stripe Express account, bank details, and transfer history"
+              >
+                {connectDashboardMutation.isPending ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-slate-400 border-t-slate-700 rounded-full animate-spin inline-block" />
+                    <span>Opening Dashboard...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-base leading-none">💳</span>
+                    <span>Stripe Dashboard</span>
+                  </>
+                )}
+              </button>
+            )}
+
             <button
-              className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white py-3 px-5 rounded-lg text-[14.5px] font-bold transition-all disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed whitespace-nowrap shadow-sm active:scale-[0.98]"
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 py-3 px-5 rounded-xl text-[14px] font-bold transition-all disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed whitespace-nowrap shadow-sm active:scale-[0.98]"
               onClick={() => syncClearanceMutation.mutate()}
               disabled={syncClearanceMutation.isPending}
               title="Sync all mature completed orders into your available balance"
             >
               {syncClearanceMutation.isPending ? (
                 <>
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
+                  <span className="w-4 h-4 border-2 border-slate-400 border-t-slate-700 rounded-full animate-spin inline-block" />
                   <span>Syncing...</span>
                 </>
               ) : (
@@ -169,7 +257,7 @@ const Earnings = () => {
                   <span className="text-base leading-none">🔄</span>
                   <span>Sync Cleared Funds</span>
                   {readyToSync > 0 && (
-                    <span className="ml-1 bg-emerald-500 text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full shadow-xs animate-pulse">
+                    <span className="ml-1 bg-brand-green text-brand-black text-[11px] font-extrabold px-2 py-0.5 rounded-full shadow-xs animate-pulse">
                       ${readyToSync.toFixed(2)} ready
                     </span>
                   )}
@@ -177,7 +265,7 @@ const Earnings = () => {
               )}
             </button>
             <button
-              className="flex-1 md:flex-none bg-brand-green text-white py-3 px-6 rounded-lg text-[14.5px] font-bold transition-all hover:brightness-95 disabled:bg-slate-300 disabled:text-slate-400 disabled:cursor-not-allowed whitespace-nowrap shadow-sm active:scale-[0.98]"
+              className="flex-1 md:flex-none bg-brand-green hover:brightness-95 text-brand-black py-3 px-6 rounded-xl text-[14px] font-bold transition-all disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed whitespace-nowrap shadow-sm active:scale-[0.98]"
               onClick={() => setShowPayoutModal(true)}
               disabled={availableBalance <= 0}
             >
@@ -415,10 +503,10 @@ const Earnings = () => {
               </p>
 
               <div className="flex gap-2.5 mt-2">
-                <button type="submit" disabled={payoutMutation.isPending} className="flex-1 py-3 px-4 bg-brand-green text-white rounded-lg text-sm font-bold transition-all hover:brightness-95 disabled:bg-slate-300 disabled:cursor-not-allowed">
+                <button type="submit" disabled={payoutMutation.isPending} className="flex-1 py-3 px-4 bg-brand-green hover:brightness-95 text-brand-black rounded-xl text-sm font-bold transition-all disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed shadow-xs">
                   {payoutMutation.isPending ? "Submitting..." : "Submit Request"}
                 </button>
-                <button type="button" className="flex-1 py-3 px-4 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-sm font-bold transition-all hover:bg-slate-200" onClick={() => setShowPayoutModal(false)}>
+                <button type="button" className="flex-1 py-3 px-4 bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-sm font-bold transition-all hover:bg-slate-200 shadow-xs" onClick={() => setShowPayoutModal(false)}>
                   Cancel
                 </button>
               </div>
@@ -433,7 +521,9 @@ const Earnings = () => {
 export default function EarningsPage() {
   return (
     <PrivateRoute>
-      <Earnings />
+      <Suspense fallback={<div className="loader-container min-h-[80vh] flex items-center justify-center"><Loader size={50} /></div>}>
+        <Earnings />
+      </Suspense>
     </PrivateRoute>
   );
 }

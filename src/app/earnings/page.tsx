@@ -26,12 +26,6 @@ const Earnings = () => {
       axiosFetch.get("/earnings/statement").then(({ data }) => data).catch(() => ({ orders: [], summary: {} })),
   });
 
-  const { data: clearanceStatus } = useQuery({
-    queryKey: ["earnings-clearance-status"],
-    queryFn: () =>
-      axiosFetch.get("/earnings/clearance-status").then(({ data }) => data).catch(() => null),
-  });
-
   const { data: payoutsData = [] } = useQuery({
     queryKey: ["my-payouts"],
     queryFn: () =>
@@ -47,7 +41,6 @@ const Earnings = () => {
       setPayoutNote("");
       queryClient.invalidateQueries({ queryKey: ["my-payouts"] });
       queryClient.invalidateQueries({ queryKey: ["seller-earnings-statement"] });
-      queryClient.invalidateQueries({ queryKey: ["earnings-clearance-status"] });
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message || "Failed to submit payout request.");
@@ -64,7 +57,6 @@ const Earnings = () => {
           : "Successfully synced cleared funds!");
       toast.success(msg);
       queryClient.invalidateQueries({ queryKey: ["seller-earnings-statement"] });
-      queryClient.invalidateQueries({ queryKey: ["earnings-clearance-status"] });
       queryClient.invalidateQueries({ queryKey: ["my-payouts"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-orders"] });
     },
@@ -100,41 +92,35 @@ const Earnings = () => {
     ? Number(summary.lifetimeTotalIncome)
     : (summary.clearedIncome !== undefined
       ? Number(summary.clearedIncome)
-      : (clearanceStatus?.totalClearedIncome !== undefined
-        ? Number(clearanceStatus.totalClearedIncome)
-        : completedOrders.reduce((acc: number, curr: any) => {
-          const net = curr.netEarnings !== undefined
-            ? curr.netEarnings
-            : (curr.grossPrice ? curr.grossPrice - (curr.platformFee || 0) : curr.price || 0);
-          return acc + (Number(net) || 0);
-        }, 0)));
-
-  // Awaiting Clearance: From summary.awaitingClearance or calculated
-  const awaitingClearance = summary.awaitingClearance !== undefined
-    ? Number(summary.awaitingClearance)
-    : (clearanceStatus?.pendingClearanceAmount !== undefined
-      ? Number(clearanceStatus.pendingClearanceAmount)
-      : unclearedOrders.reduce((acc: number, curr: any) => {
+      : completedOrders.reduce((acc: number, curr: any) => {
         const net = curr.netEarnings !== undefined
           ? curr.netEarnings
           : (curr.grossPrice ? curr.grossPrice - (curr.platformFee || 0) : curr.price || 0);
         return acc + (Number(net) || 0);
       }, 0));
 
-  // Available Balance: From summary.availableBalance, clearanceStatus, user store, or computed
+  // Awaiting Clearance: From summary.awaitingClearance or calculated
+  const awaitingClearance = summary.awaitingClearance !== undefined
+    ? Number(summary.awaitingClearance)
+    : unclearedOrders.reduce((acc: number, curr: any) => {
+      const net = curr.netEarnings !== undefined
+        ? curr.netEarnings
+        : (curr.grossPrice ? curr.grossPrice - (curr.platformFee || 0) : curr.price || 0);
+      return acc + (Number(net) || 0);
+    }, 0);
+
+  // Available Balance: From summary.availableBalance, user store, or computed
   const totalRequested = payouts
     .filter((p: any) => p.status === "pending" || p.status === "approved")
     .reduce((acc: number, curr: any) => acc + curr.amount, 0);
 
   const availableBalance = summary.availableBalance !== undefined
     ? Number(summary.availableBalance)
-    : (clearanceStatus?.availableBalance !== undefined
-      ? Number(clearanceStatus.availableBalance)
-      : (user?.earningsBalance !== undefined
-        ? Number(user.earningsBalance)
-        : Math.max(netIncome - totalRequested, 0)));
+    : (user?.earningsBalance !== undefined
+      ? Number(user.earningsBalance)
+      : Math.max(netIncome - totalRequested, 0));
 
-  const readyToSync = clearanceStatus?.readyToSyncAmount ? Number(clearanceStatus.readyToSyncAmount) : 0;
+  const readyToSync = summary?.readyToSyncAmount ? Number(summary.readyToSyncAmount) : 0;
 
   const handlePayoutSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -224,7 +210,6 @@ const Earnings = () => {
               </h2>
               <p className="text-[12.5px] text-slate-400 m-0">
                 {summary.unclearedOrdersCount !== undefined ? `${summary.unclearedOrdersCount} order(s) pending clearance` : `${unclearedOrders.length} order(s) pending clearance`}
-                {clearanceStatus?.nextClearanceDate && ` • Next: ${moment(clearanceStatus.nextClearanceDate).format("MMM DD")}`}
               </p>
             </div>
           </div>

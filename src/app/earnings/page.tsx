@@ -216,7 +216,7 @@ const Earnings = () => {
                 ) : (
                   <>
                     <span className="text-base leading-none">🔗</span>
-                    <span>Connect Stripe for Payouts</span>
+                    <span>Connect Stripe Express</span>
                   </>
                 )}
               </button>
@@ -235,7 +235,7 @@ const Earnings = () => {
                 ) : (
                   <>
                     <span className="text-base leading-none">💳</span>
-                    <span>Stripe Dashboard</span>
+                    <span>Express Dashboard</span>
                   </>
                 )}
               </button>
@@ -265,11 +265,12 @@ const Earnings = () => {
               )}
             </button>
             <button
-              className="flex-1 md:flex-none bg-brand-green hover:brightness-95 text-brand-black py-3 px-6 rounded-xl text-[14px] font-bold transition-all disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed whitespace-nowrap shadow-sm active:scale-[0.98]"
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-brand-green hover:brightness-95 text-white py-3 px-6 rounded-xl text-[14px] font-bold transition-all disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed whitespace-nowrap shadow-sm active:scale-[0.98]"
               onClick={() => setShowPayoutModal(true)}
               disabled={availableBalance <= 0}
             >
-              Request Payout
+              <span className="text-base leading-none">💸</span>
+              <span>Request Payout</span>
             </button>
           </div>
         </div>
@@ -503,7 +504,7 @@ const Earnings = () => {
               </p>
 
               <div className="flex gap-2.5 mt-2">
-                <button type="submit" disabled={payoutMutation.isPending} className="flex-1 py-3 px-4 bg-brand-green hover:brightness-95 text-brand-black rounded-xl text-sm font-bold transition-all disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed shadow-xs">
+                <button type="submit" disabled={payoutMutation.isPending} className="flex-1 py-3 px-4 bg-brand-green hover:brightness-95 text-white rounded-xl text-sm font-bold transition-all disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed shadow-xs">
                   {payoutMutation.isPending ? "Submitting..." : "Submit Request"}
                 </button>
                 <button type="button" className="flex-1 py-3 px-4 bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-sm font-bold transition-all hover:bg-slate-200 shadow-xs" onClick={() => setShowPayoutModal(false)}>

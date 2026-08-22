@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:journey": "node tests/run-full-journey.js",
+    "test:dual": "node tests/comprehensive-dual-journey.js"
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^6.8.0",
@@ -39,6 +41,7 @@
     "autoprefixer": "^10.5.4",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
+    "playwright": "^1.62.1",
     "postcss": "^8.5.25",
     "tailwindcss": "^3.4.19",
     "typescript": "^5"

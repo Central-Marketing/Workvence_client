@@ -368,7 +368,7 @@ const OrderDetail = () => {
           <div className="card order-header-card">
             <div className="order-header-info">
               <span className="order-number">Order #{order._id}</span>
-              <h1>{order.title}</h1>
+              <h1 className='text-xl md:text-2xl font-semibold'>{order.title}</h1>
               <p className="order-meta">
                 Buyer: <strong>{order.buyerID?.username}</strong> | Seller: <strong>{order.sellerID?.username}</strong>
               </p>

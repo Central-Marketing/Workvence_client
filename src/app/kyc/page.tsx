@@ -2,11 +2,14 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, ShieldCheck, Lock, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Lock, CheckCircle2, UserCheck, Sparkles } from "lucide-react";
 import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 import KycVerificationForm from "@/components/KycVerificationForm/KycVerificationForm";
+import { useUserStore } from "@/store/userStore";
 
 export default function KycPage() {
+  const user = useUserStore((state) => state.user);
+
   return (
     <PrivateRoute>
       <div className="w-full min-h-screen bg-gray-50/70 py-10 md:py-16">
@@ -27,8 +30,34 @@ export default function KycPage() {
             </div>
           </div>
 
-          {/* Form container */}
-          <KycVerificationForm />
+          {/* If buyer account */}
+          {user && !user.isSeller ? (
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 text-center max-w-xl mx-auto">
+              <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-brand-green mx-auto mb-4">
+                <Sparkles size={32} />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Seller Verification</h2>
+              <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+                Identity verification (KYC) is required for sellers to receive client payouts and activate instant withdrawals.
+              </p>
+              <div className="flex justify-center gap-3">
+                <Link
+                  href="/register?seller=true"
+                  className="px-6 py-2.5 bg-brand-green hover:bg-[#389115] text-white text-sm font-bold rounded-xl transition-all shadow-sm"
+                >
+                  Become a Seller
+                </Link>
+                <Link
+                  href="/profile"
+                  className="px-5 py-2.5 border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-semibold rounded-xl transition-all"
+                >
+                  Back to Profile
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <KycVerificationForm />
+          )}
         </div>
       </div>
     </PrivateRoute>

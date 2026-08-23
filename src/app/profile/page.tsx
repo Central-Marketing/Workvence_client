@@ -251,7 +251,7 @@ const Profile = () => {
             <TabButton id="professional" label="Professional Details" icon={Briefcase} />
             <TabButton id="experience" label="Experience & Education" icon={GraduationCap} />
             {user?.isSeller && <TabButton id="portfolio" label="Portfolio" icon={FolderDot} />}
-            <TabButton id="verification" label="ID Verification" icon={ShieldCheck} />
+            {user?.isSeller && <TabButton id="verification" label="ID Verification" icon={ShieldCheck} />}
           </div>
 
           <form onSubmit={handleSubmit} className="px-6 py-8 md:px-10 md:py-10">
@@ -672,7 +672,7 @@ const Profile = () => {
               </div>
             )}
 
-            {activeTab === 'verification' && (
+            {user?.isSeller && activeTab === 'verification' && (
               <div className="animate-in fade-in duration-300">
                 <KycVerificationForm />
               </div>

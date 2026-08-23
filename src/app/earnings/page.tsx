@@ -589,7 +589,7 @@ const Earnings = () => {
           onClick={() => setShowWalletModal(false)}
         >
           <div
-            className="bg-white w-full max-w-[540px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200"
+            className="bg-white w-full max-w-[640px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center py-5 px-6 border-b border-slate-100">
@@ -679,7 +679,7 @@ const Earnings = () => {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <PayoneerLogo className="h-4.5 w-auto" />
+                      <h4 className="text-base font-bold text-slate-900">Payoneer</h4>
                       {isPayoneerReady ? (
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
                           Connected & Ready
@@ -809,13 +809,12 @@ const Earnings = () => {
                     {/* Stripe Option */}
                     <div
                       onClick={() => isStripeReady && setSelectedMethod("stripe")}
-                      className={`p-4 rounded-2xl border-2 transition-all flex items-center justify-between ${
-                        !isStripeReady
-                          ? "opacity-50 border-slate-200 bg-slate-50 cursor-not-allowed"
-                          : selectedMethod === "stripe"
+                      className={`p-4 rounded-2xl border-2 transition-all flex items-center justify-between ${!isStripeReady
+                        ? "opacity-50 border-slate-200 bg-slate-50 cursor-not-allowed"
+                        : selectedMethod === "stripe"
                           ? "border-brand-green bg-emerald-50/50 shadow-xs ring-1 ring-brand-green cursor-pointer"
                           : "border-slate-200 hover:border-slate-300 bg-white cursor-pointer"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center p-1 shadow-2xs shrink-0">
@@ -836,13 +835,12 @@ const Earnings = () => {
                     {/* Payoneer Option */}
                     <div
                       onClick={() => isPayoneerReady && setSelectedMethod("payoneer")}
-                      className={`p-4 rounded-2xl border-2 transition-all flex items-center justify-between ${
-                        !isPayoneerReady
-                          ? "opacity-50 border-slate-200 bg-slate-50 cursor-not-allowed"
-                          : selectedMethod === "payoneer"
+                      className={`p-4 rounded-2xl border-2 transition-all flex items-center justify-between ${!isPayoneerReady
+                        ? "opacity-50 border-slate-200 bg-slate-50 cursor-not-allowed"
+                        : selectedMethod === "payoneer"
                           ? "border-brand-green bg-emerald-50/50 shadow-xs ring-1 ring-brand-green cursor-pointer"
                           : "border-slate-200 hover:border-slate-300 bg-white cursor-pointer"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center p-1.5 shadow-2xs shrink-0">

@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
 import { Loader, KycRequiredModal, StripeLogo, StripeIcon, PayoneerLogo, PayoneerIcon } from "@/components";
+import { FaStripe } from "react-icons/fa";
 import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 import moment from "moment";
 import toast from "react-hot-toast";
@@ -466,9 +467,9 @@ const Earnings = () => {
                               <span>Payoneer</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-[#f4f3ff] text-[#635bff] border border-[#e0ddff]">
-                              <StripeIcon className="w-4 h-4 rounded-xs" />
-                              <span>Stripe Connect</span>
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#f4f3ff] text-[#635bff] border border-[#e0ddff]">
+                              <FaStripe size={26} className="text-[#635bff]" />
+                              <span>Connect</span>
                             </span>
                           )}
                         </td>
@@ -613,8 +614,8 @@ const Earnings = () => {
               {/* Stripe Connect Card */}
               <div className="p-5 rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-start gap-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center p-2.5 shrink-0">
-                    <StripeLogo className="h-4.5 w-auto text-[#635bff]" />
+                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center p-2 shrink-0">
+                    <FaStripe size={32} className="text-[#635bff]" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -817,8 +818,8 @@ const Earnings = () => {
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center p-1.5 shadow-2xs shrink-0">
-                          <StripeIcon className="w-5 h-5 rounded-xs" />
+                        <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center p-1 shadow-2xs shrink-0">
+                          <FaStripe size={28} className="text-[#635bff]" />
                         </div>
                         <div>
                           <p className="text-xs font-bold text-slate-900">Stripe Connect</p>

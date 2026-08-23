@@ -91,6 +91,7 @@ const Navbar = () => {
     } finally {
       socket.disconnect();
       localStorage.removeItem('user');
+      sessionStorage.removeItem("kyc_prompt_dismissed_session");
       setUser(null);
       router.push("/");
     }
@@ -193,8 +194,16 @@ const Navbar = () => {
                             <Link href="/organize" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
                               Add New Package
                             </Link>
-                            <Link href="/earnings" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
-                              Earnings
+                            <Link href="/earnings" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center justify-between">
+                              <span>Earnings</span>
+                            </Link>
+                            <Link href="/kyc" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center justify-between">
+                              <span>ID Verification</span>
+                              {!user?.isKycVerified ? (
+                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Verify</span>
+                              ) : (
+                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">🛡️ Verified</span>
+                              )}
                             </Link>
                           </>
                         )}
@@ -267,6 +276,14 @@ const Navbar = () => {
                   <Link href="/my-packages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Packages</Link>
                   <Link href="/organize" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Add New Package</Link>
                   <Link href="/earnings" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Earnings</Link>
+                  <Link href="/kyc" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors flex items-center justify-between">
+                    <span>ID Verification (KYC)</span>
+                    {!user?.isKycVerified ? (
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Unverified</span>
+                    ) : (
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">🛡️ Verified</span>
+                    )}
+                  </Link>
                 </>
               ) : (
                 <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a Seller</Link>

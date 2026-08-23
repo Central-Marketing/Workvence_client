@@ -52,6 +52,9 @@ const Login = () => {
     try {
       const { data } = await axiosFetch.post('/auth/login', payload);
       const user = data?.user || data;
+      const userKey = user.id || user._id || user.username || "default";
+      sessionStorage.removeItem(`kyc_prompt_dismissed_${userKey}`);
+      sessionStorage.removeItem("kyc_prompt_dismissed_session");
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
       toast.success(`Welcome back, ${user.username || 'user'}!`, {

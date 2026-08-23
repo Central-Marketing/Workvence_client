@@ -40,6 +40,10 @@ export { default as GlobalSocketListener } from './GlobalSocketListener/GlobalSo
 export { default as ConfirmModal } from './ConfirmModal/ConfirmModal';
 export { default as OTPModal } from './OTPModal/OTPModal';
 export { RevisionModal, ExtensionModal } from './OrderActionModals/OrderActionModals';
+export { default as KycVerificationForm } from './KycVerificationForm/KycVerificationForm';
+export { default as KycPromptModal } from './KycPromptModal/KycPromptModal';
+export { default as KycRequiredModal } from './KycRequiredModal/KycRequiredModal';
 
 export * from './Skeletons';
+
 

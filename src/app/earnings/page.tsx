@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
-import { Loader } from "@/components";
+import { Loader, KycRequiredModal } from "@/components";
 import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 import moment from "moment";
 import toast from "react-hot-toast";
@@ -16,6 +16,7 @@ const Earnings = () => {
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const [showPayoutModal, setShowPayoutModal] = useState(false);
+  const [showKycRequiredModal, setShowKycRequiredModal] = useState(false);
   const [payoutAmount, setPayoutAmount] = useState("");
   const [payoutNote, setPayoutNote] = useState("");
 
@@ -90,7 +91,20 @@ const Earnings = () => {
       queryClient.invalidateQueries({ queryKey: ["seller-earnings-statement"] });
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || "Failed to submit payout request.");
+      const status = err?.response?.status;
+      const code = err?.response?.data?.code;
+      const message = err?.response?.data?.message || "";
+      if (
+        status === 403 &&
+        (code === "KYC_REQUIRED" ||
+          message.toLowerCase().includes("kyc") ||
+          message.toLowerCase().includes("identity verification"))
+      ) {
+        setShowPayoutModal(false);
+        setShowKycRequiredModal(true);
+        return;
+      }
+      toast.error(message || "Failed to submit payout request.");
     },
   });
 
@@ -515,6 +529,14 @@ const Earnings = () => {
           </div>
         </div>
       )}
+
+      {/* ── KYC Required 403 Interceptor Modal ── */}
+      <KycRequiredModal
+        isOpen={showKycRequiredModal}
+        onClose={() => setShowKycRequiredModal(false)}
+        title="Identity Verification Required"
+        description="To withdraw your earnings, you must complete a one-time identity verification."
+      />
     </div>
   );
 };

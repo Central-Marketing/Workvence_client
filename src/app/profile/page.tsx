@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
 import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
-import { User, Briefcase, GraduationCap, FolderDot, Camera, Trash2, Plus, Pencil, ExternalLink, Image as ImageIcon, UploadCloud, Folder, ArrowLeft, Eye } from "lucide-react";
+import { User, Briefcase, GraduationCap, FolderDot, Camera, Trash2, Plus, Pencil, ExternalLink, Image as ImageIcon, UploadCloud, Folder, ArrowLeft, Eye, ShieldCheck } from "lucide-react";
 import supportService from "@/utils/supportService";
-import { Loader } from "@/components";
+import { Loader, KycVerificationForm } from "@/components";
 
 const Profile = () => {
   const router = useRouter();
@@ -251,6 +251,7 @@ const Profile = () => {
             <TabButton id="professional" label="Professional Details" icon={Briefcase} />
             <TabButton id="experience" label="Experience & Education" icon={GraduationCap} />
             {user?.isSeller && <TabButton id="portfolio" label="Portfolio" icon={FolderDot} />}
+            <TabButton id="verification" label="ID Verification" icon={ShieldCheck} />
           </div>
 
           <form onSubmit={handleSubmit} className="px-6 py-8 md:px-10 md:py-10">
@@ -671,15 +672,23 @@ const Profile = () => {
               </div>
             )}
 
-            <div className="flex justify-end mt-10 pt-6 border-t border-gray-100">
-              <button
-                type="submit"
-                disabled={isUpdating}
-                className="px-8 py-3 bg-brand-green hover:bg-[#389115] text-white font-bold rounded-xl transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isUpdating ? "Saving Settings..." : "Save All Changes"}
-              </button>
-            </div>
+            {activeTab === 'verification' && (
+              <div className="animate-in fade-in duration-300">
+                <KycVerificationForm />
+              </div>
+            )}
+
+            {activeTab !== 'verification' && (
+              <div className="flex justify-end mt-10 pt-6 border-t border-gray-100">
+                <button
+                  type="submit"
+                  disabled={isUpdating}
+                  className="px-8 py-3 bg-brand-green hover:bg-[#389115] text-white font-bold rounded-xl transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {isUpdating ? "Saving Settings..." : "Save All Changes"}
+                </button>
+              </div>
+            )}
 
           </form>
         </div>

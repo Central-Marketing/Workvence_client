@@ -194,7 +194,7 @@ const Earnings = () => {
       toast.error(`Amount exceeds available balance of $${availableBalance.toFixed(2)}.`);
       return;
     }
-    payoutMutation.mutate({ amount: amt, note: payoutNote });
+    payoutMutation.mutate({ amount: amt });
   };
 
   const statusColor = (s: string) => ({
@@ -345,7 +345,6 @@ const Earnings = () => {
                   <tr>
                     <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Date</th>
                     <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Amount</th>
-                    <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Note</th>
                     <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Status</th>
                   </tr>
                 </thead>
@@ -358,7 +357,6 @@ const Earnings = () => {
                         <td className="py-4 px-6 border-b border-slate-100 align-middle text-[15px] font-bold text-emerald-700">
                           {p.amount.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                         </td>
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-800 min-w-[300px] whitespace-nowrap">{p.note || "—"}</td>
                         <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm text-slate-700">
                           <span
                             className="text-[11px] font-bold py-1 px-3 rounded-full uppercase tracking-wide inline-block"
@@ -502,16 +500,7 @@ const Earnings = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[13px] font-bold text-slate-600">Note (Optional)</label>
-                <input
-                  type="text"
-                  className="p-2.5 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green w-full"
-                  placeholder="e.g. Monthly withdrawal"
-                  value={payoutNote}
-                  onChange={e => setPayoutNote(e.target.value)}
-                />
-              </div>
+
 
               <p className="text-[12.5px] text-slate-400 bg-slate-50 rounded-lg py-2.5 px-3.5 m-0 leading-relaxed">
                 ⚡ Payout requests are reviewed and processed within 2–3 business days. You will be notified when the status changes.

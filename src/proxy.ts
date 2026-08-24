@@ -42,6 +42,20 @@ const GENERAL_PROTECTED_ROUTES = [
   "/support",
 ];
 
+function decodeJwtPayload(token?: string): any {
+  if (!token) return null;
+  try {
+    const parts = token.split(".");
+    if (parts.length < 2) return null;
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = Buffer.from(base64, "base64").toString("utf-8");
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+}
+
 export async function proxy(req: NextRequest) {
   const { pathname, searchParams } = req.nextUrl;
 
@@ -52,6 +66,8 @@ export async function proxy(req: NextRequest) {
     req.cookies.get("jwt")?.value ||
     req.cookies.get("auth_token")?.value ||
     req.cookies.get("session")?.value;
+
+  const jwtPayload = decodeJwtPayload(authCookie);
 
   const userCookie = req.cookies.get("user")?.value;
   let parsedUser: any = null;
@@ -72,12 +88,16 @@ export async function proxy(req: NextRequest) {
     isSellerCookie === "true" ||
     roleCookie === "seller" ||
     parsedUser?.isSeller === true ||
-    parsedUser?.role === "seller"
+    parsedUser?.role === "seller" ||
+    jwtPayload?.isSeller === true ||
+    jwtPayload?.role === "seller"
   );
   const isAdmin = Boolean(
     roleCookie === "admin" ||
     parsedUser?.isAdmin === true ||
-    parsedUser?.role === "admin"
+    parsedUser?.role === "admin" ||
+    jwtPayload?.isAdmin === true ||
+    jwtPayload?.role === "admin"
   );
 
   // 2. Match Route Groups
@@ -127,8 +147,10 @@ export async function proxy(req: NextRequest) {
   // RULE D: Protect Seller Routes (Role: Seller / Admin)
   // -------------------------------------------------------------
   if (isSellerRoute && !isSeller && !isAdmin) {
-    // If a buyer attempts to access /earnings, /my-packages, or /kyc, redirect to dashboard
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    // If explicitly verified as a non-seller buyer, redirect to dashboard
+    if (isSellerCookie === "false" || parsedUser?.isSeller === false || jwtPayload?.isSeller === false) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
   }
 
   // -------------------------------------------------------------

@@ -138,7 +138,7 @@ const Navbar = () => {
                     Become a seller
                   </Link>
                   <Link href="/login" className={`hover:text-brand-green transition-colors ${showMenu || pathname !== "/" ? "" : "hover:text-gray-800"}`}>
-                    Sign in
+                    Log in
                   </Link>
                   <Link href="/register" className={`px-5 py-2 rounded-lg transition-colors shadow-sm ${showMenu || pathname !== "/" ? "bg-brand-green text-white hover:bg-[#389115]" : "border border-gray-300 hover:bg-gray-50 hover:text-brand-green"}`}>
                     Join

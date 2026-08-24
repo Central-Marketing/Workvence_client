@@ -140,8 +140,8 @@ const Navbar = () => {
                   <Link href="/login" className={`hover:text-brand-green transition-colors ${showMenu || pathname !== "/" ? "" : "hover:text-gray-800"}`}>
                     Log in
                   </Link>
-                  <Link href="/register" className={`px-5 py-2 rounded-lg transition-colors shadow-sm ${showMenu || pathname !== "/" ? "bg-brand-green text-white hover:bg-[#389115]" : "border border-gray-300 hover:bg-gray-50 hover:text-brand-green"}`}>
-                    Join
+                  <Link href="/register" className={`px-5 py-2 rounded-lg transition-colors shadow-sm ${showMenu || pathname !== "/" ? "bg-brand-green text-white hover:bg-[#389115]" : "border border-brand-green hover:bg-gray-50 hover:text-brand-green"}`}>
+                    Sign Up
                   </Link>
                 </>
               )}
@@ -253,7 +253,7 @@ const Navbar = () => {
               <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a seller</Link>
               <hr className="my-2 border-gray-100" />
               <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Log in</Link>
-              <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="text-brand-green hover:opacity-80 transition-opacity">Join Now</Link>
+              <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="text-brand-green hover:opacity-80 transition-opacity">Sign Up</Link>
             </>
           ) : (
             <>

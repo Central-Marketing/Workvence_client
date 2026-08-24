@@ -10,6 +10,7 @@ import { MdEmail } from 'react-icons/md';
 import { FaApple, FaFacebook } from 'react-icons/fa';
 import { AiOutlineEye, AiOutlineEyeInvisible, AiOutlineCheckCircle } from 'react-icons/ai';
 import { useUserStore } from '@/store/userStore';
+import Image from 'next/image';
 
 const RegisterContent = () => {
   const router = useRouter();
@@ -358,13 +359,12 @@ const RegisterContent = () => {
                         placeholder="Enter your user name"
                         onChange={handleChange}
                         value={formInput.username}
-                        className={`py-3 px-3 pr-10 border rounded-lg text-sm bg-white transition-colors focus:outline-none w-full ${
-                          usernameStatus.available === true
+                        className={`py-3 px-3 pr-10 border rounded-lg text-sm bg-white transition-colors focus:outline-none w-full ${usernameStatus.available === true
                             ? 'border-emerald-500 focus:border-emerald-500'
                             : usernameStatus.available === false
-                            ? 'border-red-500 focus:border-red-500'
-                            : 'border-gray-200 focus:border-emerald-500'
-                        }`}
+                              ? 'border-red-500 focus:border-red-500'
+                              : 'border-gray-200 focus:border-emerald-500'
+                          }`}
                       />
                       {usernameStatus.loading && (
                         <div className="absolute right-3 inline-block w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
@@ -387,13 +387,12 @@ const RegisterContent = () => {
                         placeholder="Enter your email address"
                         onChange={handleChange}
                         value={formInput.email}
-                        className={`py-3 px-3 pr-10 border rounded-lg text-sm bg-white transition-colors focus:outline-none w-full ${
-                          emailStatus.available === true
+                        className={`py-3 px-3 pr-10 border rounded-lg text-sm bg-white transition-colors focus:outline-none w-full ${emailStatus.available === true
                             ? 'border-emerald-500 focus:border-emerald-500'
                             : emailStatus.available === false
-                            ? 'border-red-500 focus:border-red-500'
-                            : 'border-gray-200 focus:border-emerald-500'
-                        }`}
+                              ? 'border-red-500 focus:border-red-500'
+                              : 'border-gray-200 focus:border-emerald-500'
+                          }`}
                       />
                       {emailStatus.loading && (
                         <div className="absolute right-3 inline-block w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
@@ -497,7 +496,7 @@ const RegisterContent = () => {
 
         {/* Right Pane */}
         <div className="hidden md:flex flex-1 relative bg-black">
-          <img src="/loginImg.jpg" alt="Workvence user" className="w-full h-full object-cover opacity-80" />
+          <Image fill src="/loginImg.jpg" alt="Workvence user" className="w-full h-full object-cover opacity-80" />
           <div className="absolute bottom-10 left-10 right-10">
             <p className="text-white text-lg leading-relaxed font-medium drop-shadow-lg">"Workvence has revolutionized how I outsource my business tasks. It's incredibly efficient, and the talent pool is unmatched. A game-changer for my startup!"</p>
           </div>

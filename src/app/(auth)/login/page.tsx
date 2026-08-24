@@ -8,6 +8,7 @@ import { axiosFetch } from '@/utils';
 import { useUserStore } from '@/store/userStore';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import './Login.scss';
+import Image from 'next/image';
 
 const Login = () => {
   const [formInput, setFormInput] = useState({
@@ -209,7 +210,7 @@ const Login = () => {
         </div>
 
         <div className="right-pane">
-          <img src="/loginImg.jpg" alt="Workvence user" className="cover-image" />
+          <Image fill src="/loginImg.jpg" alt="Workvence user" className="cover-image" />
           <div className="testimonial-overlay">
             <p>"Workvence has revolutionized how I outsource my business tasks. It's incredibly efficient, and the talent pool is unmatched. A game-changer for my startup!"</p>
           </div>

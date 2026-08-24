@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { axiosFetch } from '@/utils';
+import Image from 'next/image';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -87,7 +88,7 @@ const ForgotPassword = () => {
 
         {/* Right Pane */}
         <div className="hidden md:flex flex-1 relative bg-black">
-          <img src="/loginImg.jpg" alt="Workvence user" className="w-full h-full object-cover opacity-80" />
+          <Image fill src="/loginImg.jpg" alt="Workvence user" className="w-full h-full object-cover opacity-80" />
           <div className="absolute bottom-10 left-10 right-10">
             <p className="text-white text-lg leading-relaxed font-medium drop-shadow-lg">"Workvence has revolutionized how I outsource my business tasks. It's incredibly efficient, and the talent pool is unmatched. A game-changer for my startup!"</p>
           </div>

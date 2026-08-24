@@ -210,7 +210,7 @@ const Login = () => {
         </div>
 
         <div className="right-pane">
-          <Image fill src="/loginImg.jpg" alt="Workvence user" className="cover-image" />
+          <Image fill priority src="/loginImg.jpg" alt="Workvence user" className="cover-image" />
           <div className="testimonial-overlay">
             <p>"Workvence has revolutionized how I outsource my business tasks. It's incredibly efficient, and the talent pool is unmatched. A game-changer for my startup!"</p>
           </div>

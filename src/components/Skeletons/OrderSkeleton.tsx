@@ -88,3 +88,44 @@ export const OrderSkeleton: React.FC = () => {
     </div>
   );
 };
+
+export const RecentOrdersSkeleton: React.FC<{ rows?: number }> = ({ rows = 4 }) => {
+  const titleWidths = ['w-3/4', 'w-1/2', 'w-2/3', 'w-4/5'];
+  const subWidths = ['w-24', 'w-32', 'w-20', 'w-28'];
+
+  return (
+    <div className="table-responsive">
+      <table className="w-full">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: rows }).map((_, index) => (
+            <tr key={index}>
+              <td style={{ width: '70px' }}>
+                <Skeleton className="w-[50px] h-[38px] rounded-md !bg-slate-200" />
+              </td>
+              <td>
+                <div className="flex flex-col gap-1.5 py-1">
+                  <Skeleton className={`h-4 ${titleWidths[index % titleWidths.length]} rounded-md !bg-slate-200`} />
+                  <Skeleton className={`h-3 ${subWidths[index % subWidths.length]} rounded-sm !bg-slate-100`} />
+                </div>
+              </td>
+              <td style={{ width: '100px' }}>
+                <Skeleton className="w-16 h-5 rounded-md !bg-slate-200" />
+              </td>
+              <td style={{ width: '110px' }}>
+                <Skeleton className="w-20 h-6 rounded-full !bg-slate-200" />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};

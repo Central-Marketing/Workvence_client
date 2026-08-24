@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "@/components";
+import { Loader, RecentOrdersSkeleton } from "@/components";
 import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 import "./Dashboard.scss";
 
@@ -141,7 +141,7 @@ const Dashboard = () => {
               <Link href="/orders" className="view-all">View All</Link>
             </div>
             {ordersLoading ? (
-              <div className="loader-container"><Loader size={35} /></div>
+              <RecentOrdersSkeleton rows={4} />
             ) : orders.length === 0 ? (
               <p className="empty-message">No orders placed yet.</p>
             ) : (

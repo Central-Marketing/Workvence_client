@@ -128,7 +128,7 @@ const Featured = () => {
         {/* MAIN HEADLINE SPLIT INTO EXACT 3 LINES */}
         <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[84px] font-bold text-black mb-6 flex flex-col items-center leading-[1.05]">
           <span>The World’s</span>
-          <span className="text-brand-green">Best Creators</span>
+          <span className="text-brand-green">Best Freelancers</span>
           <span>Are on Workvence.</span>
         </h1>
 

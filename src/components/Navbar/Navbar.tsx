@@ -252,13 +252,13 @@ const Navbar = () => {
               <Link href="/packages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Browse Packages</Link>
               <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a seller</Link>
               <hr className="my-2 border-gray-100" />
-              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Sign in</Link>
+              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Log in</Link>
               <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="text-brand-green hover:opacity-80 transition-opacity">Join Now</Link>
             </>
           ) : (
             <>
-              <div 
-                className="flex items-center gap-4 pb-6 mb-2 border-b border-gray-100 cursor-pointer hover:opacity-80 transition-opacity" 
+              <div
+                className="flex items-center gap-4 pb-6 mb-2 border-b border-gray-100 cursor-pointer hover:opacity-80 transition-opacity"
                 onClick={() => { setIsMobileMenuOpen(false); router.push('/profile'); }}
               >
                 <img src={user.image || "/media/noavatar.png"} alt="" className="w-14 h-14 rounded-full object-cover shadow-sm border border-gray-200" />
@@ -267,7 +267,7 @@ const Navbar = () => {
                   <span className="text-sm text-brand-green font-medium">View Profile</span>
                 </div>
               </div>
-              
+
               <Link href="/packages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Browse Packages</Link>
               <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
               <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Dashboard</Link>

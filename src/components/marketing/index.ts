@@ -1,0 +1,14 @@
+export { default as Featured } from './Featured/Featured';
+export { default as TrustedBy } from './TrustedBy/TrustedBy';
+export { default as ExploreCategories } from './ExploreCategories/ExploreCategories';
+export { default as PopularServices } from './PopularServices/PopularServices';
+export { default as HowItWorks } from './HowItWorks/HowItWorks';
+export { default as PromoSection } from './PromoSection/PromoSection';
+export { default as TopRatedSellers } from './TopRatedSellers/TopRatedSellers';
+export { default as RecommendedSellers } from './RecommendedSellers/RecommendedSellers';
+export { default as TrustProtection } from './TrustProtection/TrustProtection';
+export { default as TwoWays } from './TwoWays/TwoWays';
+export { default as FAQ } from './FAQ/FAQ';
+export { default as CTA } from './CTA/CTA';
+export { default as PrivacyPolicy } from './PrivacyPolicy/PrivacyPolicy';
+export { default as TermsAndConditions } from './TermsAndConditions/TermsAndConditions';

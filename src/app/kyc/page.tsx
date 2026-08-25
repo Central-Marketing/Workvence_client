@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft, Lock, Sparkles } from "lucide-react";
-import KycVerificationForm from "@/components/KycVerificationForm/KycVerificationForm";
+import { KycVerificationForm } from "@/components";
 import { useUserStore } from "@/store/userStore";
 
 export default function KycPage() {

@@ -13,9 +13,8 @@ import {
   Briefcase
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { axiosFetch } from '@/utils';
 import adminAxios from '@/utils/adminAxios';
-import { CategoryIcon } from '../CategoryIcon/CategoryIcon';
+import { CategoryIcon } from '@/components';
 
 // Helper to assign a fallback icon based on index or category name
 const getIcon = (index: number, className: string = "text-gray-700 w-10 h-10 md:w-12 md:h-12") => {
@@ -36,7 +35,7 @@ const getIcon = (index: number, className: string = "text-gray-700 w-10 h-10 md:
 const ExploreCategories = () => {
   const { data: fetchedCategories = [] } = useQuery({
     queryKey: ['admin-categories-explore'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }) => data)
+    queryFn: () => adminAxios.get('/categories').then(({ data }: any) => data)
   });
 
   const rawList = Array.isArray(fetchedCategories)

@@ -1,49 +1,52 @@
-export { default as Navbar } from "./Navbar/Navbar";
-export { default as Featured } from "./Featured/Featured";
-export { default as NotificationBell } from "./NotificationBell/NotificationBell";
-export { default as HeaderInboxIcon } from "./HeaderInboxIcon/HeaderInboxIcon";
-export { default as TrustedBy } from "./TrustedBy/TrustedBy";
-export { default as CategoryCard } from "./CategoryCard/CategoryCard";
-export { default as Slide } from "./Slide/Slide";
-export { default as PrevArrow } from "./Arrows/PrevArrow";
-export { default as NextArrow } from "./Arrows/NextArrow";
-export { default as ProjectCard } from "./ProjectCard/ProjectCard";
-export { default as PackageCard } from "./PackageCard/PackageCard";
-export { default as Reviews } from "./Reviews/Reviews";
-export { default as Review } from "./Review/Review";
-export { default as CheckoutForm } from "./CheckoutForm/CheckoutForm";
-export { default as Loader } from './Loader/Loader';
-export { default as Footer } from './Footer/Footer';
-export { default as LayoutWrapper } from './LayoutWrapper/LayoutWrapper';
-export { default as ExploreCategories } from './ExploreCategories/ExploreCategories';
-export { default as PopularServices } from './PopularServices/PopularServices';
-export { default as HowItWorks } from './HowItWorks/HowItWorks';
-export { default as PromoSection } from './PromoSection/PromoSection';
-export { default as TopRatedSellers } from './TopRatedSellers/TopRatedSellers';
-export { default as TrustProtection } from './TrustProtection/TrustProtection';
-export { default as TwoWays } from './TwoWays/TwoWays';
-export { default as FAQ } from './FAQ/FAQ';
-export { default as CTA } from './CTA/CTA';
+// Layout components
+export { default as Navbar } from "./layout/Navbar/Navbar";
+export { default as Footer } from "./layout/Footer/Footer";
+export { default as NotificationBell } from "./layout/NotificationBell/NotificationBell";
+export { default as LayoutWrapper } from "./layout/LayoutWrapper/LayoutWrapper";
+export { default as GlobalSocketListener } from "./layout/GlobalSocketListener/GlobalSocketListener";
 
-export { default as PrivacyPolicy } from './PrivacyPolicy/PrivacyPolicy';
-export { default as TermsAndConditions } from './TermsAndConditions/TermsAndConditions';
-export { default as SellerPublicProfile } from './SellerPublicProfile/SellerPublicProfile';
-export { default as SuspendedSeller } from './SuspendedSeller/SuspendedSeller';
-export { default as RecommendedSellers } from './RecommendedSellers/RecommendedSellers';
-export { default as SubmitProposalModal } from './SubmitProposalModal/SubmitProposalModal';
-export { default as FavoriteButton } from "./FavoriteButton/FavoriteButton";
-export { default as FavoriteSellerButton } from "./FavoriteSellerButton/FavoriteSellerButton";
-export { default as CustomSelect } from './CustomSelect/CustomSelect';
-export { default as GlobalSocketListener } from './GlobalSocketListener/GlobalSocketListener';
+// UI components
+export { default as Loader } from "./ui/Loader/Loader";
+export { default as CustomSelect } from "./ui/CustomSelect/CustomSelect";
+export { default as ConfirmModal } from "./ui/ConfirmModal/ConfirmModal";
+export { default as Slide } from "./ui/Slide/Slide";
+export { default as PrevArrow } from "./ui/Arrows/PrevArrow";
+export { default as NextArrow } from "./ui/Arrows/NextArrow";
+export * from "./ui/Skeletons";
 
-export { default as ConfirmModal } from './ConfirmModal/ConfirmModal';
-export { default as OTPModal } from './OTPModal/OTPModal';
-export { RevisionModal, ExtensionModal } from './OrderActionModals/OrderActionModals';
-export { default as KycVerificationForm } from './KycVerificationForm/KycVerificationForm';
-export { default as KycPromptModal } from './KycPromptModal/KycPromptModal';
-export { default as KycRequiredModal } from './KycRequiredModal/KycRequiredModal';
-export * from './PayoutLogos/PayoutLogos';
+// Marketing components
+export { default as Featured } from "./marketing/Featured/Featured";
+export { default as TrustedBy } from "./marketing/TrustedBy/TrustedBy";
+export { default as ExploreCategories } from "./marketing/ExploreCategories/ExploreCategories";
+export { default as PopularServices } from "./marketing/PopularServices/PopularServices";
+export { default as HowItWorks } from "./marketing/HowItWorks/HowItWorks";
+export { default as PromoSection } from "./marketing/PromoSection/PromoSection";
+export { default as TopRatedSellers } from "./marketing/TopRatedSellers/TopRatedSellers";
+export { default as RecommendedSellers } from "./marketing/RecommendedSellers/RecommendedSellers";
+export { default as TrustProtection } from "./marketing/TrustProtection/TrustProtection";
+export { default as TwoWays } from "./marketing/TwoWays/TwoWays";
+export { default as FAQ } from "./marketing/FAQ/FAQ";
+export { default as CTA } from "./marketing/CTA/CTA";
+export { default as PrivacyPolicy } from "./marketing/PrivacyPolicy/PrivacyPolicy";
+export { default as TermsAndConditions } from "./marketing/TermsAndConditions/TermsAndConditions";
 
-export * from './Skeletons';
-
-
+// Feature components (Re-exported from features for full backward compatibility)
+export { default as HeaderInboxIcon } from "../features/chat/HeaderInboxIcon/HeaderInboxIcon";
+export { default as CategoryCard } from "../features/gigs/CategoryCard/CategoryCard";
+export { default as ProjectCard } from "../features/gigs/ProjectCard/ProjectCard";
+export { default as PackageCard } from "../features/gigs/PackageCard/PackageCard";
+export { CategoryIcon, default as CategoryIconDefault } from "../features/gigs/CategoryIcon/CategoryIcon";
+export { default as Reviews } from "../features/gigs/Reviews/Reviews";
+export { default as Review } from "../features/gigs/Review/Review";
+export { default as CheckoutForm } from "../features/buyer/checkout/CheckoutForm/CheckoutForm";
+export { default as FavoriteButton } from "../features/buyer/favorites/FavoriteButton/FavoriteButton";
+export { default as FavoriteSellerButton } from "../features/buyer/favorites/FavoriteSellerButton/FavoriteSellerButton";
+export { default as SubmitProposalModal } from "../features/buyer/briefs/SubmitProposalModal/SubmitProposalModal";
+export { default as SellerPublicProfile } from "../features/profile/SellerPublicProfile/SellerPublicProfile";
+export { default as SuspendedSeller } from "../features/seller/suspended/SuspendedSeller/SuspendedSeller";
+export { default as OTPModal } from "../features/auth/OTPModal/OTPModal";
+export { RevisionModal, ExtensionModal } from "../features/orders/OrderActionModals/OrderActionModals";
+export { default as KycVerificationForm } from "../features/kyc/KycVerificationForm/KycVerificationForm";
+export { default as KycPromptModal } from "../features/kyc/KycPromptModal/KycPromptModal";
+export { default as KycRequiredModal } from "../features/kyc/KycRequiredModal/KycRequiredModal";
+export * from "../features/seller/earnings/PayoutLogos/PayoutLogos";

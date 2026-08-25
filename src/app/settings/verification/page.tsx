@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import KycVerificationForm from "@/components/KycVerificationForm/KycVerificationForm";
+import { KycVerificationForm } from "@/components";
 import { useUserStore } from "@/store/userStore";
 
 import { ArrowLeft, Lock, Sparkles } from "lucide-react";

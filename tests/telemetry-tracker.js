@@ -10,6 +10,8 @@ class DiagnosticTracker {
   constructor(options = {}) {
     this.outputDir = options.outputDir || path.resolve(process.cwd(), 'test-results');
     this.screenshotsDir = path.join(this.outputDir, 'screenshots');
+    this.failuresDir = path.join(this.outputDir, 'failures');
+    this.authDir = path.join(this.outputDir, 'authentication');
     this.baseUrl = options.baseUrl || 'https://dev.workvence.com';
     this.startTime = Date.now();
     this.endTime = null;
@@ -22,12 +24,11 @@ class DiagnosticTracker {
     this.errors = [];
 
     // Ensure output directories exist
-    if (!fs.existsSync(this.outputDir)) {
-      fs.mkdirSync(this.outputDir, { recursive: true });
-    }
-    if (!fs.existsSync(this.screenshotsDir)) {
-      fs.mkdirSync(this.screenshotsDir, { recursive: true });
-    }
+    [this.outputDir, this.screenshotsDir, this.failuresDir, this.authDir].forEach((dir) => {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    });
   }
 
   attachToPage(page) {

@@ -133,11 +133,11 @@
     <header>
       <div>
         <h1>Workvence Live End-to-End Diagnostic Report</h1>
-        <div class="subtitle">Environment: <strong>https://dev.workvence.com</strong> | Generated: 8/22/2026, 3:44:35 PM</div>
+        <div class="subtitle">Environment: <strong>https://dev.workvence.com</strong> | Generated: 8/25/2026, 9:22:31 AM</div>
       </div>
       <div>
-        <span class="status-badge badge-passed">
-          ✔ ALL SUITES PASSED
+        <span class="status-badge badge-failed">
+          ✖ 1 FAILURES DETECTED
         </span>
       </div>
     </header>
@@ -145,19 +145,19 @@
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label">Total Execution Time</div>
-        <div class="stat-value blue">51.74s</div>
+        <div class="stat-value blue">107.54s</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">User Journey Steps</div>
-        <div class="stat-value green">11 / 11</div>
+        <div class="stat-value red">18 / 19</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">API Endpoints Tested</div>
-        <div class="stat-value">26 calls</div>
+        <div class="stat-value">136 calls</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Avg API Latency</div>
-        <div class="stat-value">263ms</div>
+        <div class="stat-value">569ms</div>
       </div>
     </div>
 
@@ -179,101 +179,173 @@
           
             <tr>
               <td>1</td>
-              <td><code>1. Authentication</code></td>
-              <td><strong>Authenticate Seller Account (naimekattor@gmail.com)</strong></td>
+              <td><code>1. Public & Discovery</code></td>
+              <td><strong>Load Homepage & Validate Navigation Discovery</strong></td>
               <td><span class="tag tag-passed">PASSED</span></td>
-              <td>5643ms</td>
-              <td style="color: #8b949e">Seller authenticated successfully: Active Session</td>
+              <td>4678ms</td>
+              <td style="color: #8b949e">Homepage loaded with navigation header and hero elements</td>
             </tr>
           
             <tr>
               <td>2</td>
-              <td><code>1. Authentication</code></td>
-              <td><strong>Authenticate Buyer Account (naim.coder@gmail.com)</strong></td>
+              <td><code>1. Public & Discovery</code></td>
+              <td><strong>Browse Public Catalog & Search Packages</strong></td>
               <td><span class="tag tag-passed">PASSED</span></td>
-              <td>5535ms</td>
-              <td style="color: #8b949e">Buyer authenticated successfully: Active Session</td>
+              <td>1886ms</td>
+              <td style="color: #8b949e">Packages catalog rendered and searchable</td>
             </tr>
           
             <tr>
               <td>3</td>
-              <td><code>2. Seller Gig Creation</code></td>
-              <td><strong>Seller: Create New Gig / Package Listing (/organize)</strong></td>
+              <td><code>Onboarding (Seller)</code></td>
+              <td><strong>Seller: Provision Disposable Temp-Mail Inbox</strong></td>
               <td><span class="tag tag-passed">PASSED</span></td>
-              <td>9203ms</td>
-              <td style="color: #8b949e">Gig creation submitted and verified on /my-packages (E2E Full Stack Web App Development 5047)</td>
+              <td>0ms</td>
+              <td style="color: #8b949e">Generated TempMail.plus inbox: wv_seller_mt83l3qx43uz@mailto.plus</td>
             </tr>
           
             <tr>
               <td>4</td>
-              <td><code>3. Buyer Brief Creation</code></td>
-              <td><strong>Buyer: Create & Post Project Brief (/briefs/create)</strong></td>
+              <td><code>Onboarding (Seller)</code></td>
+              <td><strong>Seller: Submit Registration Form & Verify API Acceptance</strong></td>
               <td><span class="tag tag-passed">PASSED</span></td>
-              <td>5260ms</td>
-              <td style="color: #8b949e">Project brief created and verified on /briefs/my-briefs (E2E Custom SaaS Application Platform 5047)</td>
+              <td>7411ms</td>
+              <td style="color: #8b949e">Registration API accepted (HTTP 201). Form transitioned to OTP Step for user_50745s (wv_seller_mt83l3qx43uz@mailto.plus)</td>
             </tr>
           
             <tr>
               <td>5</td>
-              <td><code>4. Real-time Messaging</code></td>
-              <td><strong>Buyer: Initiate Chat with Seller</strong></td>
+              <td><code>Onboarding (Seller)</code></td>
+              <td><strong>Seller: Retrieve 6-Digit OTP from Disposable Mailbox</strong></td>
               <td><span class="tag tag-passed">PASSED</span></td>
-              <td>2681ms</td>
-              <td style="color: #8b949e">Buyer sent message to Seller: "Hi! Inquiring about project milestones. Test timestamp: 3:44:13 PM"</td>
+              <td>7860ms</td>
+              <td style="color: #8b949e">OTP Code retrieved (211605) via TempMail.plus in 7.9s (4 polls)</td>
             </tr>
           
             <tr>
               <td>6</td>
-              <td><code>4. Real-time Messaging</code></td>
-              <td><strong>Seller: Receive & Reply to Buyer Message in Real-Time</strong></td>
+              <td><code>Onboarding (Seller)</code></td>
+              <td><strong>Seller: Submit OTP & Verify Authenticated Session</strong></td>
               <td><span class="tag tag-passed">PASSED</span></td>
-              <td>3130ms</td>
-              <td style="color: #8b949e">Seller replied to Buyer: "Hello! Received your inquiry. We are ready to proceed with development! (3:44:16 PM)"</td>
+              <td>4468ms</td>
+              <td style="color: #8b949e">Session authenticated. User: user_50745s (wv_seller_mt83l3qx43uz@mailto.plus), Role: SELLER</td>
             </tr>
           
             <tr>
               <td>7</td>
-              <td><code>5. Orders Lifecycle</code></td>
-              <td><strong>Seller: Inspect Orders Center & Identify Active Orders</strong></td>
+              <td><code>3. Seller Studio</code></td>
+              <td><strong>Seller: Access Seller Dashboard & Performance Analytics</strong></td>
               <td><span class="tag tag-passed">PASSED</span></td>
-              <td>2407ms</td>
-              <td style="color: #8b949e">Seller orders rendered. Target Order ID: No active orders present</td>
+              <td>2561ms</td>
+              <td style="color: #8b949e">Seller dashboard and statistics rendered</td>
             </tr>
           
             <tr>
               <td>8</td>
-              <td><code>5. Orders Lifecycle</code></td>
-              <td><strong>Orders: Verify Buyer Order Dashboard & Filters</strong></td>
-              <td><span class="tag tag-passed">PASSED</span></td>
-              <td>2353ms</td>
-              <td style="color: #8b949e">Buyer orders dashboard and status tabs verified</td>
+              <td><code>3. Seller Studio</code></td>
+              <td><strong>Seller: Create & Publish New Service Package (/organize)</strong></td>
+              <td><span class="tag tag-failed">FAILED</span></td>
+              <td>33955ms</td>
+              <td style="color: #f85149">Package creation studio error</td>
             </tr>
           
             <tr>
               <td>9</td>
-              <td><code>6. Support & Admin Chat</code></td>
-              <td><strong>Buyer: Create Support Ticket with Category & Details (/support/new)</strong></td>
+              <td><code>3. Seller Studio</code></td>
+              <td><strong>Seller: Inspect Earnings Dashboard & Clearance Center</strong></td>
               <td><span class="tag tag-passed">PASSED</span></td>
-              <td>6273ms</td>
-              <td style="color: #8b949e">Support ticket created successfully (ID: new)</td>
+              <td>1847ms</td>
+              <td style="color: #8b949e">Earnings summary cards, clearance timeline, and withdrawal options verified</td>
             </tr>
           
             <tr>
               <td>10</td>
-              <td><code>6. Support & Admin Chat</code></td>
-              <td><strong>Buyer: Send Follow-Up Message in Support Ticket Chat</strong></td>
+              <td><code>Onboarding (Buyer)</code></td>
+              <td><strong>Buyer: Provision Disposable Temp-Mail Inbox</strong></td>
               <td><span class="tag tag-passed">PASSED</span></td>
-              <td>4665ms</td>
-              <td style="color: #8b949e">Support ticket chat communication verified</td>
+              <td>0ms</td>
+              <td style="color: #8b949e">Generated TempMail.plus inbox: wv_buyer_mt83md1v4r2y@mailto.plus</td>
             </tr>
           
             <tr>
               <td>11</td>
-              <td><code>7. Financial & Earnings</code></td>
-              <td><strong>Seller: Inspect Earnings Clearance & Payout Interface (/earnings)</strong></td>
+              <td><code>Onboarding (Buyer)</code></td>
+              <td><strong>Buyer: Submit Registration Form & Verify API Acceptance</strong></td>
               <td><span class="tag tag-passed">PASSED</span></td>
-              <td>2388ms</td>
-              <td style="color: #8b949e">Earnings balance summary and payout actions rendered (Withdraw trigger: Standby)</td>
+              <td>5987ms</td>
+              <td style="color: #8b949e">Registration API accepted (HTTP 201). Form transitioned to OTP Step for user_09459b (wv_buyer_mt83md1v4r2y@mailto.plus)</td>
+            </tr>
+          
+            <tr>
+              <td>12</td>
+              <td><code>Onboarding (Buyer)</code></td>
+              <td><strong>Buyer: Retrieve 6-Digit OTP from Disposable Mailbox</strong></td>
+              <td><span class="tag tag-passed">PASSED</span></td>
+              <td>5615ms</td>
+              <td style="color: #8b949e">OTP Code retrieved (682788) via TempMail.plus in 5.6s (3 polls)</td>
+            </tr>
+          
+            <tr>
+              <td>13</td>
+              <td><code>Onboarding (Buyer)</code></td>
+              <td><strong>Buyer: Submit OTP & Verify Authenticated Session</strong></td>
+              <td><span class="tag tag-passed">PASSED</span></td>
+              <td>4492ms</td>
+              <td style="color: #8b949e">Session authenticated. User: user_09459b (wv_buyer_mt83md1v4r2y@mailto.plus), Role: BUYER</td>
+            </tr>
+          
+            <tr>
+              <td>14</td>
+              <td><code>5. Buyer Actions</code></td>
+              <td><strong>Buyer: Browse Marketplace & Inspect Seller Service Package</strong></td>
+              <td><span class="tag tag-passed">PASSED</span></td>
+              <td>2438ms</td>
+              <td style="color: #8b949e">Buyer inspected package details with tier tabs and CTA (Rendered)</td>
+            </tr>
+          
+            <tr>
+              <td>15</td>
+              <td><code>5. Buyer Actions</code></td>
+              <td><strong>Buyer: Create & Post Client Project Brief (/briefs/create)</strong></td>
+              <td><span class="tag tag-passed">PASSED</span></td>
+              <td>8025ms</td>
+              <td style="color: #8b949e">Project brief created & verified on /briefs/my-briefs (Custom SaaS Platform with Multi-Tenant Architecture 4034)</td>
+            </tr>
+          
+            <tr>
+              <td>16</td>
+              <td><code>6. Cross-User Interaction</code></td>
+              <td><strong>Buyer: Initiate Real-Time Messaging & Chat Communication</strong></td>
+              <td><span class="tag tag-passed">PASSED</span></td>
+              <td>2419ms</td>
+              <td style="color: #8b949e">Buyer messaging interface rendered & transmitted message</td>
+            </tr>
+          
+            <tr>
+              <td>17</td>
+              <td><code>6. Cross-User Interaction</code></td>
+              <td><strong>Seller: Receive Conversation in Real-Time & Check Orders Dashboard</strong></td>
+              <td><span class="tag tag-passed">PASSED</span></td>
+              <td>4684ms</td>
+              <td style="color: #8b949e">Seller messaging inbox and orders progression dashboard verified</td>
+            </tr>
+          
+            <tr>
+              <td>18</td>
+              <td><code>7. Support & Compliance</code></td>
+              <td><strong>Buyer: Create Support Ticket with Subject & Details (/support/new)</strong></td>
+              <td><span class="tag tag-passed">PASSED</span></td>
+              <td>5210ms</td>
+              <td style="color: #8b949e">Support ticket submitted and portal interactive</td>
+            </tr>
+          
+            <tr>
+              <td>19</td>
+              <td><code>7. Support & Compliance</code></td>
+              <td><strong>Inspect Help Center, Trust & Safety, Terms of Service, Privacy Policy</strong></td>
+              <td><span class="tag tag-passed">PASSED</span></td>
+              <td>1917ms</td>
+              <td style="color: #8b949e">All legal, compliance, and support knowledge bases verified</td>
             </tr>
           
         </tbody>
@@ -296,106 +368,146 @@
         <tbody>
           
             <tr>
-              <td><strong>Seller Login Page</strong></td>
-              <td><code>https://dev.workvence.com/login</code></td>
-              <td>226ms</td>
-              <td>1651ms</td>
+              <td><strong>Homepage</strong></td>
+              <td><code>https://dev.workvence.com/</code></td>
+              <td>3016ms</td>
+              <td>4368ms</td>
               <td><strong style="color: #58a6ff">0ms</strong></td>
             </tr>
           
             <tr>
-              <td><strong>Buyer Login Page</strong></td>
-              <td><code>https://dev.workvence.com/login</code></td>
-              <td>218ms</td>
-              <td>1540ms</td>
+              <td><strong>Packages Catalog</strong></td>
+              <td><code>https://dev.workvence.com/packages</code></td>
+              <td>194ms</td>
+              <td>237ms</td>
               <td><strong style="color: #58a6ff">0ms</strong></td>
             </tr>
           
             <tr>
-              <td><strong>Organize Service Page</strong></td>
+              <td><strong>Seller Register Page</strong></td>
+              <td><code>https://dev.workvence.com/register</code></td>
+              <td>196ms</td>
+              <td>305ms</td>
+              <td><strong style="color: #58a6ff">0ms</strong></td>
+            </tr>
+          
+            <tr>
+              <td><strong>Seller Dashboard</strong></td>
+              <td><code>https://dev.workvence.com/dashboard</code></td>
+              <td>206ms</td>
+              <td>438ms</td>
+              <td><strong style="color: #58a6ff">0ms</strong></td>
+            </tr>
+          
+            <tr>
+              <td><strong>Create Service Studio</strong></td>
               <td><code>https://dev.workvence.com/organize</code></td>
-              <td>224ms</td>
-              <td>258ms</td>
+              <td>233ms</td>
+              <td>270ms</td>
               <td><strong style="color: #58a6ff">0ms</strong></td>
             </tr>
           
             <tr>
-              <td><strong>Seller My Packages</strong></td>
-              <td><code>https://dev.workvence.com/my-packages</code></td>
-              <td>217ms</td>
-              <td>500ms</td>
+              <td><strong>Earnings Dashboard</strong></td>
+              <td><code>https://dev.workvence.com/earnings</code></td>
+              <td>193ms</td>
+              <td>223ms</td>
+              <td><strong style="color: #58a6ff">0ms</strong></td>
+            </tr>
+          
+            <tr>
+              <td><strong>Buyer Register Page</strong></td>
+              <td><code>https://dev.workvence.com/register</code></td>
+              <td>202ms</td>
+              <td>1484ms</td>
+              <td><strong style="color: #58a6ff">0ms</strong></td>
+            </tr>
+          
+            <tr>
+              <td><strong>Target Package Inspection</strong></td>
+              <td><code>https://dev.workvence.com/packages</code></td>
+              <td>206ms</td>
+              <td>277ms</td>
               <td><strong style="color: #58a6ff">0ms</strong></td>
             </tr>
           
             <tr>
               <td><strong>Create Brief Page</strong></td>
               <td><code>https://dev.workvence.com/briefs/create</code></td>
-              <td>217ms</td>
-              <td>502ms</td>
+              <td>195ms</td>
+              <td>467ms</td>
               <td><strong style="color: #58a6ff">0ms</strong></td>
             </tr>
           
             <tr>
               <td><strong>Buyer My Briefs</strong></td>
               <td><code>https://dev.workvence.com/briefs/my-briefs</code></td>
-              <td>212ms</td>
-              <td>472ms</td>
+              <td>219ms</td>
+              <td>475ms</td>
               <td><strong style="color: #58a6ff">0ms</strong></td>
             </tr>
           
             <tr>
               <td><strong>Buyer Messages Inbox</strong></td>
               <td><code>https://dev.workvence.com/messages</code></td>
-              <td>218ms</td>
-              <td>478ms</td>
-              <td><strong style="color: #58a6ff">478ms</strong></td>
+              <td>216ms</td>
+              <td>243ms</td>
+              <td><strong style="color: #58a6ff">267ms</strong></td>
             </tr>
           
             <tr>
               <td><strong>Seller Messages Inbox</strong></td>
               <td><code>https://dev.workvence.com/messages</code></td>
-              <td>218ms</td>
-              <td>481ms</td>
-              <td><strong style="color: #58a6ff">482ms</strong></td>
+              <td>196ms</td>
+              <td>231ms</td>
+              <td><strong style="color: #58a6ff">258ms</strong></td>
             </tr>
           
             <tr>
-              <td><strong>Seller Orders Center</strong></td>
+              <td><strong>Seller Orders Dashboard</strong></td>
               <td><code>https://dev.workvence.com/orders</code></td>
-              <td>235ms</td>
-              <td>262ms</td>
-              <td><strong style="color: #58a6ff">0ms</strong></td>
-            </tr>
-          
-            <tr>
-              <td><strong>Buyer Orders Dashboard</strong></td>
-              <td><code>https://dev.workvence.com/orders</code></td>
-              <td>212ms</td>
-              <td>224ms</td>
+              <td>192ms</td>
+              <td>219ms</td>
               <td><strong style="color: #58a6ff">0ms</strong></td>
             </tr>
           
             <tr>
               <td><strong>Create Support Ticket</strong></td>
               <td><code>https://dev.workvence.com/support/new</code></td>
-              <td>218ms</td>
-              <td>241ms</td>
+              <td>198ms</td>
+              <td>225ms</td>
               <td><strong style="color: #58a6ff">0ms</strong></td>
             </tr>
           
             <tr>
-              <td><strong>Support Ticket Chat View</strong></td>
-              <td><code>https://dev.workvence.com/support/new</code></td>
-              <td>217ms</td>
-              <td>232ms</td>
+              <td><strong>Help Center</strong></td>
+              <td><code>https://dev.workvence.com/help-center</code></td>
+              <td>219ms</td>
+              <td>243ms</td>
               <td><strong style="color: #58a6ff">0ms</strong></td>
             </tr>
           
             <tr>
-              <td><strong>Seller Earnings Dashboard</strong></td>
-              <td><code>https://dev.workvence.com/earnings</code></td>
-              <td>217ms</td>
-              <td>240ms</td>
+              <td><strong>Trust & Safety</strong></td>
+              <td><code>https://dev.workvence.com/trust-safety</code></td>
+              <td>191ms</td>
+              <td>287ms</td>
+              <td><strong style="color: #58a6ff">0ms</strong></td>
+            </tr>
+          
+            <tr>
+              <td><strong>Terms of Service</strong></td>
+              <td><code>https://dev.workvence.com/terms</code></td>
+              <td>194ms</td>
+              <td>461ms</td>
+              <td><strong style="color: #58a6ff">0ms</strong></td>
+            </tr>
+          
+            <tr>
+              <td><strong>Privacy Policy</strong></td>
+              <td><code>https://dev.workvence.com/privacy</code></td>
+              <td>195ms</td>
+              <td>458ms</td>
               <td><strong style="color: #58a6ff">0ms</strong></td>
             </tr>
           
@@ -420,25 +532,73 @@
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><code>https://dev.workvence.com/api/auth/check-availability?username=user_50745s</code></td>
               <td><strong>200</strong></td>
-              <td>208ms</td>
+              <td>367ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/auth/check-availability?email=wv_seller_mt83l3qx43uz%40mailto.plus</code></td>
+              <td><strong>200</strong></td>
+              <td>248ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-post">POST</span></td>
+              <td><code>https://dev.workvence.com/api/auth/register</code></td>
+              <td><strong>201</strong></td>
+              <td>325ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-post">POST</span></td>
+              <td><code>https://dev.workvence.com/api/auth/verify-otp</code></td>
+              <td><strong>200</strong></td>
+              <td>235ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-post">POST</span></td>
+              <td><code>https://dev.workvence.com/api/auth/login</code></td>
+              <td><strong>202</strong></td>
+              <td>336ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=user_50745s&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>338ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>1138ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>1263ms</td>
               <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
               <td><code>https://dev.workvence.com/api/auth/me</code></td>
-              <td><strong>401</strong></td>
-              <td>213ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
-            </tr>
-          
-            <tr>
-              <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
               <td><strong>200</strong></td>
-              <td>458ms</td>
+              <td>1271ms</td>
               <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
@@ -446,21 +606,101 @@
               <td><span class="tag tag-get">GET</span></td>
               <td><code>https://dev.workvence.com/api/admin/categories</code></td>
               <td><strong>200</strong></td>
-              <td>222ms</td>
+              <td>1325ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/gigs?sort=sales&limit=6</code></td>
+              <td><strong>200</strong></td>
+              <td>1350ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>1499ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>1564ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>1730ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>1801ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>1961ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>2048ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>925ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>1165ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=user_50745s&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>0ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>209ms</td>
               <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
               <td><code>https://dev.workvence.com/api/auth/me</code></td>
-              <td><strong>401</strong></td>
-              <td>233ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
-            </tr>
-          
-            <tr>
-              <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/gigs?userID=undefined</code></td>
               <td><strong>200</strong></td>
               <td>239ms</td>
               <td><span class="tag tag-passed">OK</span></td>
@@ -468,26 +708,506 @@
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><code>https://dev.workvence.com/api/orders</code></td>
               <td><strong>200</strong></td>
-              <td>260ms</td>
+              <td>247ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>251ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>270ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>465ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>518ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>449ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>659ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=user_50745s&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>1ms</td>
               <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
               <td><code>https://dev.workvence.com/api/auth/me</code></td>
-              <td><strong>401</strong></td>
-              <td>260ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
+              <td><strong>200</strong></td>
+              <td>220ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>256ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>366ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>376ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>496ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>590ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>577ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>792ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>206ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=user_50745s&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>0ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>213ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
               <td><code>https://dev.workvence.com/api/auth/me</code></td>
-              <td><strong>401</strong></td>
-              <td>230ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
+              <td><strong>200</strong></td>
+              <td>229ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>264ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>369ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/earnings/statement</code></td>
+              <td><strong>200</strong></td>
+              <td>410ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/payouts</code></td>
+              <td><strong>200</strong></td>
+              <td>413ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/payouts/status</code></td>
+              <td><strong>200</strong></td>
+              <td>452ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>570ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>542ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>742ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/auth/check-availability?username=user_09459b</code></td>
+              <td><strong>200</strong></td>
+              <td>206ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/auth/check-availability?email=wv_buyer_mt83md1v4r2y%40mailto.plus</code></td>
+              <td><strong>200</strong></td>
+              <td>231ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-post">POST</span></td>
+              <td><code>https://dev.workvence.com/api/auth/register</code></td>
+              <td><strong>201</strong></td>
+              <td>349ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-post">POST</span></td>
+              <td><code>https://dev.workvence.com/api/auth/verify-otp</code></td>
+              <td><strong>200</strong></td>
+              <td>243ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-post">POST</span></td>
+              <td><code>https://dev.workvence.com/api/auth/login</code></td>
+              <td><strong>202</strong></td>
+              <td>338ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=user_09459b&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>347ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>1308ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>1326ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/auth/me</code></td>
+              <td><strong>200</strong></td>
+              <td>1347ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>1462ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/gigs?sort=sales&limit=6</code></td>
+              <td><strong>200</strong></td>
+              <td>1513ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>1542ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>1691ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>1746ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>1922ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>1957ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>2158ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>827ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>1034ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=user_09459b&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>0ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/auth/me</code></td>
+              <td><strong>200</strong></td>
+              <td>358ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>397ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>409ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>430ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/gigs?sort=createdAt&limit=20&page=1</code></td>
+              <td><strong>200</strong></td>
+              <td>443ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/gigs?sort=sales&limit=6</code></td>
+              <td><strong>200</strong></td>
+              <td>457ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=naimdev&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>17ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/gigs?limit=4</code></td>
+              <td><strong>200</strong></td>
+              <td>560ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>613ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>659ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=borshi&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>263ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>528ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>764ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=user_09459b&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>1ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>231ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
@@ -500,39 +1220,103 @@
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/conversations</code></td>
-              <td><strong>401</strong></td>
-              <td>206ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
-            </tr>
-          
-            <tr>
-              <td><span class="tag tag-get">GET</span></td>
               <td><code>https://dev.workvence.com/api/auth/me</code></td>
-              <td><strong>401</strong></td>
-              <td>237ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
+              <td><strong>200</strong></td>
+              <td>245ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
               <td><code>https://dev.workvence.com/api/conversations</code></td>
-              <td><strong>401</strong></td>
-              <td>210ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
+              <td><strong>200</strong></td>
+              <td>248ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/auth/me</code></td>
-              <td><strong>401</strong></td>
-              <td>210ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>484ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
               <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>490ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>451ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>656ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-post">POST</span></td>
+              <td><code>https://dev.workvence.com/api/briefs/ai-generate</code></td>
+              <td><strong>200</strong></td>
+              <td>932ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=user_09459b&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>0ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/auth/me</code></td>
+              <td><strong>200</strong></td>
+              <td>231ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>243ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>243ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>248ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/briefs/my-briefs</code></td>
               <td><strong>200</strong></td>
               <td>264ms</td>
               <td><span class="tag tag-passed">OK</span></td>
@@ -540,89 +1324,297 @@
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/auth/me</code></td>
-              <td><strong>401</strong></td>
-              <td>266ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
-            </tr>
-          
-            <tr>
-              <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/auth/me</code></td>
-              <td><strong>401</strong></td>
-              <td>243ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
-            </tr>
-          
-            <tr>
-              <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
               <td><strong>200</strong></td>
-              <td>243ms</td>
+              <td>482ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>484ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>713ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=user_09459b&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>1ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>240ms</td>
               <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
               <td><code>https://dev.workvence.com/api/auth/me</code></td>
-              <td><strong>401</strong></td>
-              <td>222ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
-            </tr>
-          
-            <tr>
-              <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
               <td><strong>200</strong></td>
-              <td>241ms</td>
+              <td>252ms</td>
               <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/orders</code></td>
-              <td><strong>401</strong></td>
-              <td>246ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>255ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>481ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>458ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>681ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>210ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=user_50745s&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>0ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>224ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
               <td><code>https://dev.workvence.com/api/auth/me</code></td>
-              <td><strong>401</strong></td>
-              <td>391ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
-            </tr>
-          
-            <tr>
-              <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
               <td><strong>200</strong></td>
-              <td>406ms</td>
+              <td>234ms</td>
               <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/orders</code></td>
-              <td><strong>401</strong></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>239ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>431ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
               <td>407ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
+              <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
-              <td><code>https://dev.workvence.com/api/auth/me</code></td>
-              <td><strong>401</strong></td>
-              <td>247ms</td>
-              <td><span class="tag tag-failed">ERROR</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>613ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=user_50745s&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>5ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
             </tr>
           
             <tr>
               <td><span class="tag tag-get">GET</span></td>
               <td><code>https://dev.workvence.com/api/admin/categories</code></td>
               <td><strong>200</strong></td>
+              <td>214ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/auth/me</code></td>
+              <td><strong>200</strong></td>
+              <td>228ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>258ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>353ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/orders</code></td>
+              <td><strong>200</strong></td>
+              <td>358ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>553ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>548ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>747ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=user_09459b&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>1ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/admin/categories</code></td>
+              <td><strong>200</strong></td>
+              <td>233ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/orders</code></td>
+              <td><strong>200</strong></td>
               <td>247ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/conversations</code></td>
+              <td><strong>200</strong></td>
+              <td>248ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>251ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>484ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/auth/me</code></td>
+              <td><strong>200</strong></td>
+              <td>685ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>216ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://dev.workvence.com/api/notifications</code></td>
+              <td><strong>200</strong></td>
+              <td>430ms</td>
+              <td><span class="tag tag-passed">OK</span></td>
+            </tr>
+          
+            <tr>
+              <td><span class="tag tag-get">GET</span></td>
+              <td><code>https://ui-avatars.com/api/?name=user_09459b&background=0D9488&color=fff&bold=true&length=2</code></td>
+              <td><strong>200</strong></td>
+              <td>0ms</td>
               <td><span class="tag tag-passed">OK</span></td>
             </tr>
           

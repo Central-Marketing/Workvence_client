@@ -252,6 +252,23 @@ const RegisterContent = () => {
     }
   }
 
+  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').trim();
+    const numbersOnly = pastedData.replace(/\D/g, '').slice(0, 6);
+    if (!numbersOnly) return;
+
+    const newOtp = [...otp];
+    for (let i = 0; i < numbersOnly.length; i++) {
+      newOtp[i] = numbersOnly[i];
+    }
+    setOtp(newOtp);
+
+    const targetFocusIndex = Math.min(numbersOnly.length, 5);
+    const targetInput = document.getElementById(`otp-${targetFocusIndex}`);
+    if (targetInput) targetInput.focus();
+  };
+
   const handleOtpChange = (index: number, value: string) => {
     if (isNaN(Number(value))) return; // only numbers allowed
     const newOtp = [...otp];
@@ -306,10 +323,10 @@ const RegisterContent = () => {
                 <h1 className="text-[28px] md:text-[32px] font-bold text-[#1a1a1a] mb-10 text-center">Create a new account</h1>
 
                 <div className="flex flex-col gap-4 w-full">
-                  <button className="flex items-center justify-center gap-3 w-full py-3.5 px-4 rounded-xl text-[15px] font-medium text-[#333] bg-white border border-gray-200 cursor-pointer transition-all hover:bg-gray-50 hover:border-gray-300">
+                  <button data-testid="continue-google-btn" className="flex items-center justify-center gap-3 w-full py-3.5 px-4 rounded-xl text-[15px] font-medium text-[#333] bg-white border border-gray-200 cursor-pointer transition-all hover:bg-gray-50 hover:border-gray-300">
                     <FcGoogle className="text-[22px]" /> Continue with Google
                   </button>
-                  <button className="flex items-center justify-center gap-3 w-full py-3.5 px-4 rounded-xl text-[15px] font-medium text-[#333] bg-white border border-gray-200 cursor-pointer transition-all hover:bg-gray-50 hover:border-gray-300" onClick={() => setStep(2)}>
+                  <button data-testid="continue-email-btn" className="flex items-center justify-center gap-3 w-full py-3.5 px-4 rounded-xl text-[15px] font-medium text-[#333] bg-white border border-gray-200 cursor-pointer transition-all hover:bg-gray-50 hover:border-gray-300" onClick={() => setStep(2)}>
                     <MdEmail className="text-[22px]" color="#ea4335" /> Continue with Email
                   </button>
                 </div>
@@ -328,7 +345,7 @@ const RegisterContent = () => {
                 </Link>
               </div>
               <div className="flex justify-center md:justify-start w-full">
-                <button className="bg-transparent border-none text-[#666] text-base cursor-pointer mb-7 flex items-center hover:text-emerald-500" onClick={() => setStep(1)}>← Back</button>
+                <button data-testid="back-to-step1-btn" className="bg-transparent border-none text-[#666] text-base cursor-pointer mb-7 flex items-center hover:text-emerald-500" onClick={() => setStep(1)}>← Back</button>
               </div>
 
               <form onSubmit={handleSubmit} className="flex flex-col items-start w-full max-w-[450px]">
@@ -337,13 +354,13 @@ const RegisterContent = () => {
                   <p className="text-sm text-[#666] leading-relaxed">Continue with your email and choose a unique username. This is how you'll appear to other users across the platform.</p>
 
                   <div className="flex gap-4 mb-3 mt-2">
-                    <label className={`flex-1 flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${!formInput.isSeller ? 'border-brand-green bg-[#eaf8f0] text-[#169c5e]' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="isSeller" checked={!formInput.isSeller} onChange={() => setFormInput({ ...formInput, isSeller: false })} className="hidden" />
+                    <label data-testid="role-client-label" className={`flex-1 flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${!formInput.isSeller ? 'border-brand-green bg-[#eaf8f0] text-[#169c5e]' : 'border-gray-200 hover:border-gray-300'}`}>
+                      <input data-testid="role-client-radio" type="radio" name="isSeller" checked={!formInput.isSeller} onChange={() => setFormInput({ ...formInput, isSeller: false })} className="hidden" />
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                       <span className="font-semibold text-[14px]">I'm a Client</span>
                     </label>
-                    <label className={`flex-1 flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formInput.isSeller ? 'border-brand-green bg-[#eaf8f0] text-[#169c5e]' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input type="radio" name="isSeller" checked={formInput.isSeller} onChange={() => setFormInput({ ...formInput, isSeller: true })} className="hidden" />
+                    <label data-testid="role-freelancer-label" className={`flex-1 flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formInput.isSeller ? 'border-brand-green bg-[#eaf8f0] text-[#169c5e]' : 'border-gray-200 hover:border-gray-300'}`}>
+                      <input data-testid="role-freelancer-radio" type="radio" name="isSeller" checked={formInput.isSeller} onChange={() => setFormInput({ ...formInput, isSeller: true })} className="hidden" />
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
                       <span className="font-semibold text-[14px]">I'm a Freelancer</span>
                     </label>
@@ -354,6 +371,7 @@ const RegisterContent = () => {
                     <label className="text-sm font-semibold text-[#333]">User name</label>
                     <div className="relative flex items-center">
                       <input
+                        data-testid="username-input"
                         name="username"
                         type="text"
                         placeholder="Enter your user name"
@@ -382,6 +400,7 @@ const RegisterContent = () => {
                     <label className="text-sm font-semibold text-[#333]">Email Address</label>
                     <div className="relative flex items-center">
                       <input
+                        data-testid="email-input"
                         name="email"
                         type="email"
                         placeholder="Enter your email address"
@@ -408,7 +427,7 @@ const RegisterContent = () => {
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-[#333]">Password</label>
                     <div className="relative flex items-center">
-                      <input name="password" type={showPassword ? "text" : "password"} placeholder="***********" onChange={handleChange} className="py-3 px-3 pr-11 border border-gray-200 rounded-lg text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full" />
+                      <input data-testid="password-input" name="password" type={showPassword ? "text" : "password"} placeholder="***********" onChange={handleChange} className="py-3 px-3 pr-11 border border-gray-200 rounded-lg text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full" />
                       <button type="button" className="absolute right-3.5 bg-transparent border-none text-[#888] text-xl cursor-pointer flex items-center justify-center p-0 hover:text-[#555]" onClick={() => setShowPassword(!showPassword)}>
                         {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                       </button>
@@ -430,7 +449,7 @@ const RegisterContent = () => {
                     </div>
                   </div>
 
-                  <button type="submit" className="mt-2 bg-emerald-500 text-white py-4 border-none rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed" disabled={isFormDisabled}>{loading ? 'Loading...' : 'Continue'}</button>
+                  <button data-testid="signup-submit-btn" type="submit" className="mt-2 bg-emerald-500 text-white py-4 border-none rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed" disabled={isFormDisabled}>{loading ? 'Loading...' : 'Continue'}</button>
                 </div>
               </form>
               <div className="mt-auto pt-10 text-left w-full">
@@ -446,19 +465,20 @@ const RegisterContent = () => {
                 </Link>
               </div>
               <div className="flex justify-center md:justify-start w-full">
-                <button className="bg-transparent border-none text-[#666] text-base cursor-pointer mb-7 flex items-center hover:text-emerald-500" onClick={() => setStep(2)}>← Back</button>
+                <button data-testid="back-to-step2-btn" className="bg-transparent border-none text-[#666] text-base cursor-pointer mb-7 flex items-center hover:text-emerald-500" onClick={() => setStep(2)}>← Back</button>
               </div>
 
-              <form onSubmit={handleOtpSubmit} className="flex flex-col items-start w-full max-w-[450px]">
+              <form data-testid="otp-form" onSubmit={handleOtpSubmit} className="flex flex-col items-start w-full max-w-[450px]">
                 <div className="w-full flex flex-col gap-4">
                   <h1 className="text-[24px] md:text-[28px] font-bold text-[#1a1a1a]">Confirm your email</h1>
-                  <p className="text-sm text-gray-500 leading-relaxed mb-2">We've sent a 6-digit code to <strong>{formInput.email}</strong>. Please enter it below.</p>
+                  <p className="text-sm text-gray-500 leading-relaxed mb-2">We've sent a 6-digit code to <strong data-testid="otp-target-email">{formInput.email}</strong>. Please enter it below.</p>
 
                   <div className="flex gap-2 sm:gap-3 justify-center w-full mb-4">
                     {otp.map((digit, index) => (
                       <input
                         key={index}
                         id={`otp-${index}`}
+                        data-testid={`otp-input-${index}`}
                         type="text"
                         inputMode="numeric"
                         maxLength={1}
@@ -466,6 +486,7 @@ const RegisterContent = () => {
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                        onPaste={handleOtpPaste}
                       />
                     ))}
                   </div>
@@ -473,6 +494,7 @@ const RegisterContent = () => {
                   <div className="text-center w-full mb-4 text-sm">
                     <span className="text-gray-500">Didn't receive the code?</span>{' '}
                     <button
+                      data-testid="resend-otp-btn"
                       type="button"
                       onClick={handleResendOtp}
                       disabled={resendTimer > 0}
@@ -482,7 +504,7 @@ const RegisterContent = () => {
                     </button>
                   </div>
 
-                  <button type="submit" className="w-full bg-emerald-500 text-white py-3.5 border-none rounded-lg text-base font-bold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed" disabled={loading}>
+                  <button data-testid="verify-email-btn" type="submit" className="w-full bg-emerald-500 text-white py-3.5 border-none rounded-lg text-base font-bold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed" disabled={loading}>
                     {loading ? 'Verifying...' : 'Verify Email'}
                   </button>
                 </div>

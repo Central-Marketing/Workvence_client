@@ -50,8 +50,8 @@
 
       &.buyer-badge {
         background-color: rgba(99, 102, 241, 0.15);
-        color: #6366f1;
-        border: 1px solid rgba(99, 102, 241, 0.3);
+        color: #ffffff;
+        border: 1px solid rgb(218, 218, 218);
       }
     }
 
@@ -149,6 +149,7 @@
           font-size: 14px;
           font-weight: 600;
           text-decoration: none;
+
           &:hover {
             text-decoration: underline;
           }
@@ -189,6 +190,7 @@
         .clickable-row {
           cursor: pointer;
           transition: background-color 0.2s;
+
           &:hover {
             background-color: #f8fafc;
           }
@@ -255,6 +257,7 @@
           &.primary {
             background-color: var(--green-color);
             color: #fff;
+
             &:hover {
               filter: brightness(0.95);
             }
@@ -264,6 +267,7 @@
             background-color: #f1f5f9;
             color: #334155;
             border: 1px solid #e2e8f0;
+
             &:hover {
               background-color: #e2e8f0;
             }
@@ -318,6 +322,7 @@
         color: #94a3b8;
         cursor: pointer;
         line-height: 1;
+
         &:hover {
           color: #0f172a;
         }
@@ -445,6 +450,7 @@
     transform: scale(0.95);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;

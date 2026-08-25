@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import adminAxios from "@/utils/adminAxios";
+import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 
 const DEFAULT_CATEGORIES = [
   "All services",
@@ -19,45 +20,6 @@ const DEFAULT_CATEGORIES = [
   "Business",
   "Music & Audio",
   "Social Media",
-];
-
-const mockRecommendedPackages = [
-  {
-    _id: "rec-1",
-    title: "I will create a professional and user-friendly website design for your ...",
-    price: 75,
-    starNumber: 482,
-    totalStars: 2361.8,
-    cover: "/PackageImages.png",
-    userID: { username: "Leslie", image: "/media/noavatar.png" }
-  },
-  {
-    _id: "rec-2",
-    title: "I will create a professional and user-friendly website design for your ...",
-    price: 75,
-    starNumber: 482,
-    totalStars: 2361.8,
-    cover: "/packageImg.jpg",
-    userID: { username: "Leslie", image: "/media/noavatar.png" }
-  },
-  {
-    _id: "rec-3",
-    title: "I will create a professional and user-friendly website design for your ...",
-    price: 75,
-    starNumber: 482,
-    totalStars: 2361.8,
-    cover: "/PackageImages.png",
-    userID: { username: "Leslie", image: "/media/noavatar.png" }
-  },
-  {
-    _id: "rec-4",
-    title: "I will create a professional and user-friendly website design for your ...",
-    price: 75,
-    starNumber: 482,
-    totalStars: 2361.8,
-    cover: "/packageImg.jpg",
-    userID: { username: "Leslie", image: "/media/noavatar.png" }
-  }
 ];
 
 const Packages = () => {
@@ -173,7 +135,7 @@ const Packages = () => {
   }, [search, categories]);
 
   // Reactive React Query key ensuring automatic re-fetching whenever any filter state changes
-  const { isLoading, error, data, refetch } = useQuery({
+  const { isLoading, isError, error, data, refetch } = useQuery({
     queryKey: [
       'packages',
       searchVal,
@@ -187,7 +149,7 @@ const Packages = () => {
       englishLevel,
       clientLocation
     ],
-    queryFn: () => {
+    queryFn: async () => {
       const queryParams = new URLSearchParams();
       
       if (searchVal && searchVal.trim()) {
@@ -206,15 +168,23 @@ const Packages = () => {
       queryParams.set('limit', '20');
       queryParams.set('page', page.toString());
 
-      return axiosFetch.get(`/gigs?${queryParams.toString()}`)
-        .then(({ data }) => data || [])
-        .catch(() => []);
-    }
+      const res = await axiosFetch.get(`/gigs?${queryParams.toString()}`);
+      return res.data || [];
+    },
+    retry: 1
   });
 
   const { data: recommendedPackages } = useQuery({
     queryKey: ['recommendedPackages'],
-    queryFn: () => axiosFetch.get('/gigs?limit=4').then(({ data }) => data || []).catch(() => []),
+    queryFn: async () => {
+      try {
+        const res = await axiosFetch.get('/gigs?limit=4');
+        return res.data || [];
+      } catch {
+        return [];
+      }
+    },
+    retry: false
   });
 
   // Utility to update URL query params cleanly without full page reloads
@@ -680,48 +650,73 @@ const Packages = () => {
           </div>
         )}
 
-        {/* Results Grid / Empty State */}
+        {/* Results Grid / Loading / Error / Empty State */}
         {isLoading ? (
           <div className="py-6">
             <GigsGridSkeleton count={8} />
           </div>
-        ) : error ? (
-          <div className="text-center py-24 text-gray-500">Something went wrong. Please try again.</div>
+        ) : isError || error ? (
+          <div className="py-16 w-full animate-fadeIn flex flex-col items-center justify-center text-center">
+            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-5 border border-red-100 shadow-sm">
+              <FiAlertCircle className="w-8 h-8" />
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 tracking-tight">
+              Unable to load services
+            </h2>
+            <p className="text-gray-500 max-w-md text-sm sm:text-base mb-6 leading-relaxed">
+              We encountered an issue connecting to our servers. Please check your connection or try again.
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-green text-white font-semibold rounded-xl hover:bg-[#3ea917] transition-all shadow-sm active:scale-[0.98] cursor-pointer"
+            >
+              <FiRefreshCw className="w-4 h-4" />
+              Try Again
+            </button>
+          </div>
         ) : (!data || data.length === 0) ? (
-          <div className="py-6 w-full animate-fadeIn">
+          <div className="py-8 w-full animate-fadeIn">
             {/* Empty State Illustration & Text */}
-            <div className="text-center flex flex-col items-center justify-center max-w-xl mx-auto mb-24">
+            <div className="text-center flex flex-col items-center justify-center max-w-xl mx-auto mb-16">
               <img 
                 src="/404.png" 
                 onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/404Img.png"; }}
-                alt="Package Not Found" 
-                className="w-full max-w-[420px] h-auto object-contain mb-8" 
+                alt="No Services Found" 
+                className="w-full max-w-[320px] sm:max-w-[380px] h-auto object-contain mb-6" 
               />
-              <h2 className="text-[28px] sm:text-[34px] font-bold text-gray-900 mb-3 tracking-tight">
-                Oops! This <span className="text-brand-green">Package</span> Doesn&apos;t Exist.
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2.5 tracking-tight">
+                No services found matching your criteria
               </h2>
-              <p className="text-[15px] sm:text-base text-gray-500 max-w-[450px] leading-relaxed">
-                The package you&apos;re looking for may have been removed, changed, or is temporarily unavailable.
+              <p className="text-sm sm:text-base text-gray-500 max-w-md leading-relaxed mb-6">
+                Try adjusting your search keywords, clearing applied filters, or exploring other categories.
               </p>
+              {hasActiveFilters && (
+                <button
+                  onClick={handleReset}
+                  className="px-6 py-2.5 bg-brand-green text-white text-sm font-semibold rounded-xl hover:bg-[#3ea917] transition-all shadow-sm active:scale-[0.98] cursor-pointer"
+                >
+                  Clear all filters
+                </button>
+              )}
             </div>
 
-            {/* You may also like Section */}
-            <div className="w-full pt-4">
-              <h3 className="text-2xl sm:text-[28px] font-bold text-gray-900 mb-6 text-left">
-                You may also like:
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-                {recommendedPackages && recommendedPackages.length > 0 ? recommendedPackages.slice(0, 4).map((pkg: any) => (
-                  <PackageCard key={pkg._id || pkg.id} data={pkg} />
-                )) : mockRecommendedPackages.map((pkg: any) => (
-                  <PackageCard key={pkg._id || pkg.id} data={pkg} />
-                ))}
+            {/* Real Recommended Section (only shown if real items exist) */}
+            {recommendedPackages && recommendedPackages.length > 0 && (
+              <div className="w-full pt-8 border-t border-gray-100">
+                <h3 className="text-2xl sm:text-[28px] font-bold text-gray-900 mb-6 text-left">
+                  Recommended for you:
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+                  {recommendedPackages.slice(0, 4).map((pkg: any) => (
+                    <PackageCard key={pkg._id || pkg.id} data={pkg} />
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-            {data?.map((pkg: any, idx: number) => <PackageCard key={pkg._id} data={pkg} priority={idx < 2} />)}
+            {data?.map((pkg: any, idx: number) => <PackageCard key={pkg._id || pkg.id} data={pkg} priority={idx < 2} />)}
           </div>
         )}
 

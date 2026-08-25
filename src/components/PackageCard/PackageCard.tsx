@@ -12,17 +12,18 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
   const { user } = useUserStore((state: any) => state);
   if (!data) return null;
 
-  const userImg = data.user?.image || data.pp || "/media/noavatar.png";
-  const username = data.user?.username || data.username || "Leslie";
-  const sellerId = data.user?._id || data.userId?._id || data.userId || data._id;
+  const userObj = data.user || data.userId || data.userID || {};
+  const userImg = userObj.image || data.pp || "/media/noavatar.png";
+  const username = userObj.username || data.username || "Seller";
+  const sellerId = userObj._id || data.userId?._id || data.userId || data._id;
   const coverImg = data.cover || data.img || "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80";
 
   // Rating calculation
-  const rawRating = data.starNumber > 0 ? (data.totalStars / data.starNumber) : (data.star || 4.9);
-  const rating = data.gigRating;
+  const rawRating = data.starNumber > 0 ? (data.totalStars / data.starNumber).toFixed(1) : (data.star || 4.9);
+  const rating = data.gigRating || rawRating;
   const sales = data.sales || 0;
   const reviewCount = data.starNumber || data.reviews || 0;
-  const level = data.user.sellerLevel;
+  const level = userObj.sellerLevel || data.user?.sellerLevel || userObj.level || "Level 1";
 
   // Price formatting
   const formattedPrice = typeof data.price === "number" ? `$${data.price}` : (data.price ? `$${data.price}` : "$75");

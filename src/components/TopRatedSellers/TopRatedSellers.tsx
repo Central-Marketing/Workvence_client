@@ -15,16 +15,28 @@ import { TopSellersSkeleton } from '@/components';
 const TopRatedSellers = () => {
   const swiperRef = useRef<any>(null);
 
-  const { isLoading, data: sellers = [] } = useQuery({
+  const { isLoading, isError, data: rawSellers } = useQuery({
     queryKey: ['top-rated-packages'],
-    queryFn: () => axiosFetch.get('/gigs?sort=sales&limit=6').then(({ data }) => data || [])
+    queryFn: () => axiosFetch.get('/gigs?sort=sales&limit=6').then(({ data }) => data || []).catch(() => [])
   });
+
+  const sellers = Array.isArray(rawSellers)
+    ? rawSellers
+    : Array.isArray(rawSellers?.gigs)
+      ? rawSellers.gigs
+      : Array.isArray(rawSellers?.packages)
+        ? rawSellers.packages
+        : Array.isArray(rawSellers?.sellers)
+          ? rawSellers.sellers
+          : Array.isArray(rawSellers?.data)
+            ? rawSellers.data
+            : [];
 
   if (isLoading) {
     return <TopSellersSkeleton />;
   }
 
-  if (!sellers || sellers.length === 0) return null;
+  if (isError || !sellers || sellers.length === 0) return null;
 
   return (
     <section className="w-full py-10 md:py-20 bg-white">

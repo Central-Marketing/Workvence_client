@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState, useEffect } from "react";
@@ -81,7 +80,7 @@ const BriefDetail = () => {
       queryClient.invalidateQueries({ queryKey: ["brief", briefId] });
       toast.success("Project closed");
     },
-    onError: (err) => {
+    onError: (err: any) => {
       toast.error(err?.response?.data?.message || "Failed to close project");
     },
   });

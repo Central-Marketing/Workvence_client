@@ -1,8 +1,9 @@
-// @ts-nocheck
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { User } from "@/types";
 
 const NAV_ITEMS = [
   {
@@ -31,7 +32,7 @@ const NAV_ITEMS = [
 interface AdminSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  user: any;
+  user: User | null;
   onLogout: () => void;
 }
 

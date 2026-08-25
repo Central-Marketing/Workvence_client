@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
@@ -12,6 +11,7 @@ import { axiosFetch } from "@/utils";
 import adminAxios from "@/utils/adminAxios";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
+import { ClientBrief } from "@/types";
 import "./Briefs.scss";
 
 const DEFAULT_CATEGORIES = [
@@ -79,7 +79,7 @@ const BriefsFeed = () => {
 
   const categoryQuery = category && category !== "All" ? category : "";
 
-  const { isLoading, data: briefs = [] } = useQuery({
+  const { isLoading, data: briefs = [] } = useQuery<ClientBrief[]>({
     queryKey: ["briefs-feed", categoryQuery],
     queryFn: () =>
       axiosFetch
@@ -231,10 +231,10 @@ const BriefsFeed = () => {
                 <div className="card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div className="buyer-info">
                     <img
-                      src={brief.userID?.image || "/media/noavatar.png"}
+                      src={((brief.userID as any)?.image || (brief.userID as any)?.img || (brief.userId as any)?.image || (brief.userId as any)?.img) || "/media/noavatar.png"}
                       alt=""
                     />
-                    <span>{brief.userID?.username || "Anonymous"}</span>
+                    <span>{(brief.userID as any)?.username || (brief.userId as any)?.username || "Anonymous"}</span>
                   </div>
                   <button
                     onClick={(e) => {

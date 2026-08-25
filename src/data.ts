@@ -1,4 +1,16 @@
-export const cards = [
+import { CardItem, ProjectItem } from '@/types';
+
+export interface DummyPackageItem {
+  id: number | string;
+  img: string;
+  pp: string;
+  desc: string;
+  price: number;
+  star: number;
+  username: string;
+}
+
+export const cards: CardItem[] = [
   {
     id: 1,
     title: "AI Artists",
@@ -78,7 +90,7 @@ export const cards = [
   },
 ];
 
-export const projects = [
+export const projects: ProjectItem[] = [
   {
     id: 1,
     img: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=800",
@@ -137,7 +149,7 @@ export const projects = [
   },
 ];
 
-export const packages = [
+export const packages: DummyPackageItem[] = [
   {
     id: 1,
     img: "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=800",

@@ -46,8 +46,8 @@ const Orders = () => {
       })
       .catch(async () => {
         const { data } = await axiosFetch.post("/conversations", {
-          to: user.isSeller ? buyerID : sellerID,
-          from: user.isSeller ? sellerID : buyerID,
+          to: user?.isSeller ? buyerID : sellerID,
+          from: user?.isSeller ? sellerID : buyerID,
         });
         const targetId = data.uuid || data.conversationID || data._id;
         router.push(`/message/${targetId}`);

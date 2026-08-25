@@ -1,6 +1,10 @@
 import axios from "axios";
 
-const generateImageURL = async (image) => {
+export interface ImageUploadResponse {
+  url: string;
+}
+
+const generateImageURL = async (image?: File | Blob | null): Promise<ImageUploadResponse> => {
   if (!image) return { url: "" };
   try {
     const file = new FormData();

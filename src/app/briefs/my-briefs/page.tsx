@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
@@ -38,13 +37,13 @@ const MyBriefs = () => {
   });
 
   const closeMutation = useMutation({
-    mutationFn: (briefId) =>
+    mutationFn: (briefId: string) =>
       axiosFetch.patch(`/briefs/${briefId}/close`).then(({ data }) => data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-briefs"] });
       toast.success("Project closed successfully");
     },
-    onError: (err) => {
+    onError: (err: any) => {
       toast.error(err?.response?.data?.message || "Failed to close project");
     },
   });

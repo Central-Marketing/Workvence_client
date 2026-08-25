@@ -1,21 +1,18 @@
-// @ts-nocheck
 "use client";
 
-import { useEffect, Suspense } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import React, { useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 
-
 import "./Success.scss";
 
-const Success = () => {
-  const searchParams = useSearchParams(); const search = searchParams.toString();;
+const Success: React.FC = () => {
+  const searchParams = useSearchParams();
   const navigate = useRouter();
-  const params = new URLSearchParams(search);
-  const payment_intent = params.get("payment_intent");
-  const user = useUserStore((state: any) => state.user);
+  const payment_intent = searchParams.get("payment_intent");
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     (async () => {
@@ -24,11 +21,11 @@ const Success = () => {
         setTimeout(() => {
           navigate.push("/orders");
         }, 5000);
-      } catch ({ response }) {
-        console.log(response.data.message);
+      } catch (err: any) {
+        console.log(err?.response?.data?.message || err?.message);
       }
     })();
-  }, []);
+  }, [navigate, payment_intent]);
 
   return (
     <div className="pay-message">

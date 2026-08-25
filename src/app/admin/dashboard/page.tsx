@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState, useEffect } from "react";
@@ -175,8 +174,8 @@ function RevenueTrendChart() {
                   fontWeight: 600,
                 }}
                 itemStyle={{ color: "#10b981" }}
-                formatter={(val) => [
-                  `$${val.toLocaleString()}`,
+                formatter={(val: any) => [
+                  `$${Number(val || 0).toLocaleString()}`,
                   "Revenue",
                 ]}
               />
@@ -245,7 +244,7 @@ function OrderBreakdownChart() {
                   dataKey="value"
                   stroke="none"
                 >
-                  {pieData.map((entry, index) => (
+                  {pieData.map((entry: any, index: number) => (
                     <Cell key={index} fill={entry.color} />
                   ))}
                 </Pie>
@@ -258,7 +257,7 @@ function OrderBreakdownChart() {
                     fontSize: 13,
                     fontWeight: 600,
                   }}
-                  formatter={(val, name) => [val.toLocaleString(), name]}
+                  formatter={(val: any, name: any) => [Number(val || 0).toLocaleString(), name]}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -269,20 +268,15 @@ function OrderBreakdownChart() {
           </div>
 
           <div className="pie-legend">
-            {pieData.map((item) => (
+            {pieData.map((item: any) => (
               <div key={item.name} className="legend-item">
                 <span
                   className="legend-dot"
                   style={{ background: item.color }}
                 />
-                <span className="legend-label">{item.name}</span>
-                <span className="legend-value">
-                  {item.value.toLocaleString()}
-                </span>
-                <span className="legend-pct">
-                  {total > 0
-                    ? `${((item.value / total) * 100).toFixed(1)}%`
-                    : "0%"}
+                <span className="legend-name">{item.name}</span>
+                <span className="legend-val">
+                  {item.value} ({item.pct}%)
                 </span>
               </div>
             ))}
@@ -357,14 +351,14 @@ function PendingActions() {
         </div>
       ) : (
         <div className="actions-grid">
-          {actions.map((action) => (
+          {actions.map((action: any) => (
             <Link
               key={action.id}
               href={action.link || "#"}
               className="action-card"
             >
               <div className={`action-icon ${action.type}`}>
-                {ACTION_ICONS[action.type] || "📋"}
+                {(ACTION_ICONS as Record<string, string>)[action.type] || "📋"}
               </div>
               <div className="action-content">
                 <div className="action-title">{action.title}</div>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useEffect, useState } from "react";
@@ -86,8 +85,8 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await axiosFetch.post("/auth/logout");
-    } catch ({ response }) {
-      console.log(response?.data);
+    } catch (error: any) {
+      console.log(error?.response?.data);
     } finally {
       socket.disconnect();
       localStorage.removeItem('user');

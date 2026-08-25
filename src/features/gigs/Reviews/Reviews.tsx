@@ -1,37 +1,40 @@
-// @ts-nocheck
 "use client";
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { axiosFetch } from '@/utils';
-import { Review } from '..';
+import Review, { ReviewItem } from '../Review/Review';
 
-const Reviews = (props: any) => {
-    const { reviews: initialReviews, sellerId, packageID } = props;
+export interface ReviewsProps {
+  reviews?: ReviewItem[];
+  sellerId?: string;
+  packageID?: string;
+}
 
+const Reviews: React.FC<ReviewsProps> = ({ reviews: initialReviews, sellerId }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showMore, setShowMore] = useState(false);
 
     // Fetch seller reviews from backend API if sellerId is provided
     const { data: fetchedSellerReviews } = useQuery({
         queryKey: ['seller-reviews', sellerId],
-        queryFn: () => axiosFetch.get(`/reviews/seller/${sellerId}`).then(({ data }: any) => data).catch(() => []),
+        queryFn: () => axiosFetch.get(`/reviews/seller/${sellerId}`).then(({ data }) => data).catch(() => []),
         enabled: Boolean(sellerId),
     });
 
     const fetchedList = Array.isArray(fetchedSellerReviews)
-        ? fetchedSellerReviews
-        : Array.isArray(fetchedSellerReviews?.data)
-            ? fetchedSellerReviews.data
-            : Array.isArray(fetchedSellerReviews?.reviews)
-                ? fetchedSellerReviews.reviews
+        ? (fetchedSellerReviews as ReviewItem[])
+        : Array.isArray((fetchedSellerReviews as any)?.data)
+            ? ((fetchedSellerReviews as any).data as ReviewItem[])
+            : Array.isArray((fetchedSellerReviews as any)?.reviews)
+                ? ((fetchedSellerReviews as any).reviews as ReviewItem[])
                 : [];
 
-    const allReviews = fetchedList.length > 0
+    const allReviews: ReviewItem[] = fetchedList.length > 0
         ? fetchedList
         : (Array.isArray(initialReviews) ? initialReviews : []);
 
-    const filteredReviews = allReviews.filter((item: any) => {
+    const filteredReviews = allReviews.filter((item) => {
         if (!searchTerm.trim()) return true;
         const text = `${item?.description || ""} ${item?.userID?.username || ""} ${item?.userID?.country || ""}`.toLowerCase();
         return text.includes(searchTerm.trim().toLowerCase());
@@ -47,7 +50,7 @@ const Reviews = (props: any) => {
 
     if (totalReviewsCount > 0) {
         let totalScore = 0;
-        allReviews.forEach((r: any) => {
+        allReviews.forEach((r) => {
             const score = typeof r.star === 'number' && r.star > 0 && r.star <= 5 ? r.star : 0;
             if (score > 0) {
                 starCounts[score as keyof typeof starCounts]++;
@@ -110,7 +113,7 @@ const Reviews = (props: any) => {
                         })}
                     </div>
 
-                    {/* Right side: Rating criteria breakdown (Currently hardcoded for UI purposes, could be mapped if API supports it later) */}
+                    {/* Right side: Rating criteria breakdown */}
                     <div className="lg:col-span-6 flex flex-col justify-center">
                         <h3 className="text-[16px] font-semibold text-gray-900 mb-4.5">
                             Rating Breakdown
@@ -163,7 +166,7 @@ const Reviews = (props: any) => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    {displayedReviews.map((review: any, idx: number) => (
+                    {displayedReviews.map((review, idx) => (
                         <Review key={review._id || idx} review={review} />
                     ))}
                 </div>

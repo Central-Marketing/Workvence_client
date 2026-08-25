@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React, { useEffect, Suspense } from 'react';
@@ -11,8 +10,9 @@ import './Pay.scss';
 // Module-level deduplication set to persist across React 18/19 Suspense remounts
 const activePaymentIntents = new Set<string>();
 
-const PayContent = () => {
-  const { id } = useParams();
+const PayContent: React.FC = () => {
+  const params = useParams();
+  const id = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : undefined;
   const searchParams = useSearchParams();
   const packageType = searchParams.get('tier') || 'basic';
   const navigate = useRouter();
@@ -59,8 +59,8 @@ const PayContent = () => {
 
 export default function Pay() {
   return (
-    <React.Suspense fallback={<div className="flex justify-center items-center h-screen"><Loader size={45} /></div>}>
+    <Suspense fallback={<div className="flex justify-center items-center h-screen"><Loader size={45} /></div>}>
       <PayContent />
-    </React.Suspense>
+    </Suspense>
   );
 }

@@ -1,17 +1,20 @@
-// @ts-nocheck
 "use client";
 
+import React from 'react';
 import SliderImport from 'react-slick';
-const Slider = typeof SliderImport === 'function' ? SliderImport : (SliderImport.default || SliderImport);
+const Slider: any = typeof SliderImport === 'function' ? SliderImport : ((SliderImport as any).default || SliderImport);
 import PrevArrow from '../Arrows/PrevArrow';
 import NextArrow from '../Arrows/NextArrow';
 
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 
-const Slide = (props: any) => {
-  const { children, slidesToShow } = props;
+export interface SlideProps {
+  children?: React.ReactNode;
+  slidesToShow: number;
+}
 
+const Slide: React.FC<SlideProps> = ({ children, slidesToShow }) => {
   const settings = {
     infinite: true,
     slidesToShow: slidesToShow,
@@ -34,7 +37,7 @@ const Slide = (props: any) => {
         </Slider>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Slide;

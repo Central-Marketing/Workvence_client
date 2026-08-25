@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import toast from 'react-hot-toast';
@@ -367,7 +366,7 @@ const Add = () => {
   const labelClasses = "text-slate-700 text-sm font-semibold -mb-2";
   const btnClasses = "px-6 py-4 rounded-lg bg-brand-green font-semibold text-base text-white transition-all duration-300 shadow-[0_4px_12px_rgba(16,185,129,0.2)] hover:bg-[#059669] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(16,185,129,0.3)] disabled:bg-slate-300 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none";
 
-  const activePackage = state.packages?.[activeTier];
+  const activePackage = (state.packages as any)?.[activeTier];
 
   return (
     <div className='min-h-screen bg-slate-50 py-10 flex justify-center font-sans'>

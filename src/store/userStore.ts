@@ -1,13 +1,14 @@
 import { create } from 'zustand';
+import { User } from '@/types';
 
-interface UserState {
-  user: any;
-  setUser: (user: any) => void;
+export interface UserState {
+  user: User | null;
+  setUser: (user: User | null) => void;
 }
 
 export const useUserStore = create<UserState>((set) => ({
   user: null,
-  setUser: (user) => {
+  setUser: (user: User | null) => {
     if (typeof window !== "undefined") {
       if (user) {
         document.cookie = `isSeller=${user.isSeller ? "true" : "false"}; path=/; max-age=2592000; SameSite=Lax`;

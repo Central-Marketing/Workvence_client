@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import toast from 'react-hot-toast';
@@ -40,7 +39,6 @@ const Message = () => {
   const isValidId = Boolean(conversationID && conversationID !== 'undefined' && conversationID !== 'null');
   const queryClient = useQueryClient();
   const navigate = useRouter();
-  const messagesEndRef = useRef(null);
 
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [selectedPackageId, setSelectedPackageId] = useState("");
@@ -51,15 +49,16 @@ const Message = () => {
   const [messageText, setMessageText] = useState("");
   const [isRecipientTyping, setIsRecipientTyping] = useState(false);
   const [partnerUsername, setPartnerUsername] = useState("");
-  const [onlineUsers, setOnlineUsers] = useState([]);
-  const [convSearchQuery, setSearchTerm] = useState("");
+  const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
+  const [convSearchQuery, setConvSearchQuery] = useState("");
   const [msgSearchQuery, setMsgSearchQuery] = useState("");
   const [isMsgSearchActive, setIsMsgSearchActive] = useState(false);
   const [isLeftSideOpen, setIsLeftSideOpen] = useState(false);
   const [isRightSideOpen, setIsRightSideOpen] = useState(false);
-  const typingTimeoutRef = useRef(null);
+  const typingTimeoutRef = useRef<any>(null);
   const isTypingRef = useRef(false);
   const isSendingRef = useRef(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -131,7 +130,7 @@ const Message = () => {
     if (!isValidId && conversations.length > 0) {
       const firstId = conversations[0].uuid || conversations[0].conversationID || conversations[0]._id;
       if (firstId && firstId !== 'undefined') {
-        navigate.push(`/message/${firstId}`, { replace: true });
+        navigate.replace(`/message/${firstId}`);
       }
     }
   }, [isValidId, conversations, navigate]);
@@ -470,7 +469,7 @@ const Message = () => {
     isSendingRef.current = true;
 
     // Immediately stop typing indicator
-    clearTimeout(typingTimeoutRef.current);
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     stopTypingIndicator();
 
     const currentText = messageText;
@@ -560,7 +559,7 @@ const Message = () => {
       }
 
       // Reset 2-second timer on every keypress
-      clearTimeout(typingTimeoutRef.current);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
         stopTypingIndicator();
       }, 2000);
@@ -587,7 +586,7 @@ const Message = () => {
     toast.success("Custom offer sent!");
   };
 
-  const handleAcceptOffer = async (offer) => {
+  const handleAcceptOffer = async (offer: any) => {
     try {
       const { data } = await axiosFetch.post('/orders/create-payment-intent/custom', {
         packageID: offer.packageID,
@@ -601,7 +600,7 @@ const Message = () => {
     } catch { toast.error("Failed to initiate payment."); }
   };
 
-  const handleWithdraw = async (msgId) => {
+  const handleWithdraw = async (msgId: string) => {
     try {
       await axiosFetch.patch(`/messages/withdraw/${msgId}`);
       toast.success("Offer withdrawn.");
@@ -609,14 +608,14 @@ const Message = () => {
     } catch { toast.error("Failed to withdraw."); }
   };
 
-  const parseOffer = (desc) => {
+  const parseOffer = (desc?: string) => {
     if (desc?.startsWith('[CUSTOM_OFFER]')) {
       try { return JSON.parse(desc.replace('[CUSTOM_OFFER]', '')); } catch { return null; }
     }
     return null;
   };
 
-  const fmt = (d) => moment(d).format('MMM DD, HH:mm');
+  const fmt = (d: any) => moment(d).format('MMM DD, HH:mm');
 
   const activeConv = conversations.find((c: any) => {
     if (c.conversationID === conversationID || c.id === conversationID || c._id === conversationID) return true;

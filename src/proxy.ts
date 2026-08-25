@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { JwtPayload, User } from "@/types";
 
 /**
  * Route Categorization
@@ -42,7 +43,7 @@ const GENERAL_PROTECTED_ROUTES = [
   "/support",
 ];
 
-function decodeJwtPayload(token?: string): any {
+function decodeJwtPayload(token?: string): JwtPayload | null {
   if (!token || typeof token !== "string") return null;
   const trimmed = token.trim();
   if (!trimmed || trimmed === "undefined" || trimmed === "null") return null;
@@ -52,7 +53,7 @@ function decodeJwtPayload(token?: string): any {
     const base64Url = parts[1];
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
     const jsonPayload = Buffer.from(base64, "base64").toString("utf-8");
-    return JSON.parse(jsonPayload);
+    return JSON.parse(jsonPayload) as JwtPayload;
   } catch {
     return null;
   }
@@ -71,10 +72,10 @@ export async function proxy(req: NextRequest) {
   );
 
   const userCookie = req.cookies.get("user")?.value;
-  let parsedUser: any = null;
+  let parsedUser: User | null = null;
   if (userCookie && userCookie !== "undefined" && userCookie !== "null") {
     try {
-      parsedUser = JSON.parse(decodeURIComponent(userCookie));
+      parsedUser = JSON.parse(decodeURIComponent(userCookie)) as User;
     } catch {
       // User cookie is not JSON formatted
     }

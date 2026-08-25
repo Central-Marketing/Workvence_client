@@ -1,17 +1,44 @@
-// @ts-nocheck
 "use client";
 
 import React, { useState } from 'react';
 import moment from 'moment';
 import { getCountryFlag } from '@/utils';
 
-const Review = (props: any) => {
-  const { review } = props;
+export interface ReviewUser {
+  _id?: string;
+  username?: string;
+  image?: string;
+  img?: string;
+  country?: string;
+}
+
+export interface ReviewGig {
+  title?: string;
+  price?: number | string;
+}
+
+export interface ReviewItem {
+  _id?: string;
+  id?: string;
+  userID?: ReviewUser;
+  star?: number;
+  description?: string;
+  createdAt?: string;
+  price?: number | string;
+  duration?: string;
+  gigID?: ReviewGig;
+}
+
+export interface ReviewProps {
+  review?: ReviewItem;
+}
+
+const Review: React.FC<ReviewProps> = ({ review }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const country = getCountryFlag(review?.userID?.country);
   const countryName = review?.userID?.country || "Unknown Country";
-  const avatar = review?.userID?.image || "/media/noavatar.png";
+  const avatar = review?.userID?.image || review?.userID?.img || "/media/noavatar.png";
   const username = review?.userID?.username || "Anonymous User";
   
   // Strict binding from API payload

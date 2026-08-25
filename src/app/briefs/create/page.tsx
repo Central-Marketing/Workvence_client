@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState, useEffect } from "react";
@@ -65,18 +64,18 @@ const CreateBrief = () => {
 
   // AI Generate mutation
   const aiGenerate = useMutation({
-    mutationFn: (prompt) =>
+    mutationFn: (prompt: string) =>
       axiosFetch
         .post("/briefs/ai-generate", { prompt })
         .then(({ data }) => data),
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       const draft = data?.draft || data;
       setForm({
-        title: draft.title || "",
-        description: draft.description || "",
-        category: draft.category || "",
-        budget: draft.budget || "",
-        deliveryTime: draft.deliveryTime || "",
+        title: draft?.title || "",
+        description: draft?.description || "",
+        category: draft?.category || "",
+        budget: draft?.budget || "",
+        deliveryTime: draft?.deliveryTime || "",
       });
       setStep(2);
       toast.success("AI draft generated!");
@@ -88,13 +87,13 @@ const CreateBrief = () => {
 
   // Post brief mutation
   const postBrief = useMutation({
-    mutationFn: (briefData) =>
+    mutationFn: (briefData: any) =>
       axiosFetch.post("/briefs", briefData).then(({ data }) => data),
     onSuccess: () => {
       setStep(3);
       toast.success("Project posted successfully!");
     },
-    onError: (err) => {
+    onError: (err: any) => {
       toast.error(err?.response?.data?.message || "Failed to post project");
     },
   });
@@ -125,11 +124,11 @@ const CreateBrief = () => {
     });
   };
 
-  const updateField = (field, value) => {
+  const updateField = (field: string, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const stepClass = (n) => {
+  const stepClass = (n: number) => {
     if (n < step) return "step done";
     if (n === step) return "step active";
     return "step";

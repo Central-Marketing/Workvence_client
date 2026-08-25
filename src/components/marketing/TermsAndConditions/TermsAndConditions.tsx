@@ -1,9 +1,9 @@
-// @ts-nocheck
 "use client";
 
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
+import adminAxios from '@/utils/adminAxios';
 import { Loader } from '@/components';
 
 const categories = [

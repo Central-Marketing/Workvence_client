@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState, useEffect } from "react";
@@ -19,14 +18,14 @@ const Proposals = () => {
   const briefId = params.id;
   const user = useUserStore((state) => state.user);
 
-  const [aiResult, setAiResult] = useState(null);
+  const [aiResult, setAiResult] = useState<any>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   // Fetch proposals
-  const { isLoading, data: proposals = [] } = useQuery({
+  const { isLoading, data: proposals = [] } = useQuery<any[]>({
     queryKey: ["brief-proposals", briefId],
     queryFn: () =>
       axiosFetch
@@ -96,7 +95,7 @@ const Proposals = () => {
     },
   });
 
-  const getRankBadgeClass = (index) => {
+  const getRankBadgeClass = (index: number) => {
     if (index === 0) return "gold";
     if (index === 1) return "silver";
     if (index === 2) return "bronze";
@@ -164,8 +163,8 @@ const Proposals = () => {
               <h4>Ranked Proposals</h4>
               {(Array.isArray(aiResult)
                 ? aiResult
-                : aiResult.top3Recommendations || aiResult.topProposals || aiResult.recommendations || aiResult.data || []
-              ).map((item, index) => {
+                : (aiResult?.top3Recommendations || aiResult?.topProposals || aiResult?.recommendations || aiResult?.data || [])
+              ).map((item: any, index: number) => {
                   const proposal = item.proposal || item;
                   const seller = typeof proposal.sellerID === 'object' && proposal.sellerID !== null 
                     ? proposal.sellerID 
@@ -255,7 +254,7 @@ const Proposals = () => {
           </div>
         ) : (
           <div className="proposals-list">
-            {proposals.map((proposal) => {
+            {proposals.map((proposal: any) => {
               const seller = typeof proposal.sellerID === 'object' && proposal.sellerID !== null 
                 ? proposal.sellerID 
                 : (typeof proposal.sellerId === 'object' && proposal.sellerId !== null 
@@ -265,7 +264,7 @@ const Proposals = () => {
               
               // Check if AI recommended
               const aiList = Array.isArray(aiResult) ? aiResult : (aiResult?.top3Recommendations || aiResult?.topProposals || aiResult?.recommendations || aiResult?.data || []);
-              const isRecommended = aiList.some((item) => {
+              const isRecommended = aiList.some((item: any) => {
                 const p = item.proposal || item;
                 return p._id === proposal._id;
               });

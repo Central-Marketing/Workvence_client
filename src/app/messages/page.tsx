@@ -1,27 +1,26 @@
-// @ts-nocheck
 "use client";
 
 import moment from 'moment';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-
+import { Conversation } from "@/types";
 
 import { Loader, Skeleton } from "@/components";
 import './Messages.scss';
 
 const Messages = () => {
-  const user = useUserStore((state: any) => state.user);
+  const user = useUserStore((state) => state.user);
   const queryClient = useQueryClient();
   const navigate = useRouter();
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+    window.scrollTo(0, 0);
+  }, []);
 
-  const { isLoading, error, data = [] } = useQuery({
+  const { isLoading, error, data = [] } = useQuery<Conversation[]>({
     queryKey: ['conversations'],
     queryFn: () =>
       axiosFetch.get('/conversations')
@@ -30,18 +29,18 @@ const Messages = () => {
           console.log(err?.response || err);
           return [];
         })
-  })
+  });
 
   const mutation = useMutation({
-    mutationFn: (id) =>
+    mutationFn: (id: string) =>
       axiosFetch.patch(`/conversations/${id}/mark-read`).catch(() => axiosFetch.patch(`/conversations/${id}`)),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ['conversations'] })
-  })
+  });
 
-  const handleMessageRead = (id) => {
+  const handleMessageRead = (id: string) => {
     mutation.mutate(id);
-  }
+  };
 
   if (!user) {
     return (
@@ -112,11 +111,11 @@ const Messages = () => {
                               <td className="user-cell">
                                 <div className="flex items-center gap-2">
                                   <img
-                                    src={(user?.isSeller ? conv.buyerID?.image : conv.sellerID?.image) || "/media/noavatar.png"}
+                                    src={((user?.isSeller ? (conv.buyerID as any)?.image : (conv.sellerID as any)?.image) || (user?.isSeller ? (conv.buyerID as any)?.img : (conv.sellerID as any)?.img)) || "/media/noavatar.png"}
                                     alt=""
                                     className="w-8 h-8 rounded-full object-cover"
                                   />
-                                  <span>{user?.isSeller ? conv.buyerID?.username : conv.sellerID?.username}</span>
+                                  <span>{user?.isSeller ? (conv.buyerID as any)?.username : (conv.sellerID as any)?.username}</span>
                                 </div>
                               </td>
                               <td className="msg-cell">

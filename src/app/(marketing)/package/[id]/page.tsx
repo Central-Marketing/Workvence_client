@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import React, { useEffect, useState, useRef, useMemo, Suspense } from 'react';
@@ -28,7 +27,8 @@ const categories = [
 const PackageContent = () => {
   const params = useParams();
   const router = useRouter();
-  const _id = params?._id || params?.id;
+  const rawId = params?.id || params?._id;
+  const _id = typeof rawId === 'string' ? rawId : Array.isArray(rawId) ? rawId[0] : undefined;
 
   const [activeTab, setActiveTab] = useState("Description");
   const [packageTier, setPackageTier] = useState("basic");
@@ -247,9 +247,9 @@ const PackageContent = () => {
             ref={categoryScrollRef}
             className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-0 w-full scroll-smooth touch-pan-x overscroll-x-contain px-2 xl:px-0"
           >
-            {categories.map((cat) => {
-              const name = typeof cat === 'string' ? cat : cat.name;
-              const rawSlug = typeof cat === 'string' ? cat : cat.slug;
+            {categories.map((cat: any) => {
+              const name = typeof cat === 'string' ? cat : (cat?.name || '');
+              const rawSlug = typeof cat === 'string' ? cat : (cat?.slug || cat?.name || '');
               const slug = rawSlug === 'All services' || name === 'All services' ? '' : rawSlug.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
               return (
                 <Link

@@ -333,7 +333,9 @@ const RegisterContent = () => {
 
                 <div className="mt-14 text-center w-full">
                   <p className="text-sm text-[#666] mb-2">Already have an account? <Link href='/login' className="text-emerald-500 font-semibold no-underline hover:underline">Sign in</Link></p>
-                  <p className="text-[13px] text-[#aaa] mt-10 md:absolute md:bottom-10 md:left-10">©2026 workvence All right reserved</p>
+                </div>
+                <div className="mt-auto pt-10 text-center w-full">
+                  <p className="text-[13px] text-[#aaa]">©2026 workvence All right reserved</p>
                 </div>
               </div>
             </div>
@@ -378,10 +380,10 @@ const RegisterContent = () => {
                         onChange={handleChange}
                         value={formInput.username}
                         className={`py-3 px-3 pr-10 border rounded-lg text-sm bg-white transition-colors focus:outline-none w-full ${usernameStatus.available === true
-                            ? 'border-emerald-500 focus:border-emerald-500'
-                            : usernameStatus.available === false
-                              ? 'border-red-500 focus:border-red-500'
-                              : 'border-gray-200 focus:border-emerald-500'
+                          ? 'border-emerald-500 focus:border-emerald-500'
+                          : usernameStatus.available === false
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-gray-200 focus:border-emerald-500'
                           }`}
                       />
                       {usernameStatus.loading && (
@@ -407,10 +409,10 @@ const RegisterContent = () => {
                         onChange={handleChange}
                         value={formInput.email}
                         className={`py-3 px-3 pr-10 border rounded-lg text-sm bg-white transition-colors focus:outline-none w-full ${emailStatus.available === true
-                            ? 'border-emerald-500 focus:border-emerald-500'
-                            : emailStatus.available === false
-                              ? 'border-red-500 focus:border-red-500'
-                              : 'border-gray-200 focus:border-emerald-500'
+                          ? 'border-emerald-500 focus:border-emerald-500'
+                          : emailStatus.available === false
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-gray-200 focus:border-emerald-500'
                           }`}
                       />
                       {emailStatus.loading && (
@@ -452,7 +454,7 @@ const RegisterContent = () => {
                   <button data-testid="signup-submit-btn" type="submit" className="mt-2 bg-emerald-500 text-white py-4 border-none rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed" disabled={isFormDisabled}>{loading ? 'Loading...' : 'Continue'}</button>
                 </div>
               </form>
-              <div className="mt-auto pt-10 text-left w-full">
+              <div className="mt-auto pt-10 pb-4 text-center w-full">
                 <p className="text-[13px] text-[#aaa]">©2026 workvence All right reserved</p>
               </div>
             </div>

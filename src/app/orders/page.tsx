@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from '@/components';
-import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 
 const Orders = () => {
   const router = useRouter();
@@ -238,9 +237,5 @@ const Orders = () => {
 };
 
 export default function OrdersPage() {
-  return (
-    <PrivateRoute>
-      <Orders />
-    </PrivateRoute>
-  );
+  return <Orders />;
 }

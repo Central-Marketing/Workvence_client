@@ -9,9 +9,7 @@ import toast from "react-hot-toast";
 
 import { axiosFetch } from "@/utils";
 import adminAxios from "@/utils/adminAxios";
-import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
-import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 import "./CreateBrief.scss";
 
 const CATEGORIES = [
@@ -317,9 +315,5 @@ const CreateBrief = () => {
 };
 
 export default function CreateBriefPage() {
-  return (
-    <PrivateRoute>
-      <CreateBrief />
-    </PrivateRoute>
-  );
+  return <CreateBrief />;
 }

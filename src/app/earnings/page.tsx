@@ -7,7 +7,6 @@ import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
 import { Loader, KycRequiredModal, StripeLogo, StripeIcon, PayoneerLogo, PayoneerIcon } from "@/components";
 import { FaStripe } from "react-icons/fa";
-import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 import moment from "moment";
 import toast from "react-hot-toast";
 import {
@@ -929,10 +928,8 @@ const Earnings = () => {
 
 export default function EarningsPage() {
   return (
-    <PrivateRoute>
-      <Suspense fallback={<div className="loader-container min-h-[80vh] flex items-center justify-center"><Loader size={50} /></div>}>
-        <Earnings />
-      </Suspense>
-    </PrivateRoute>
+    <Suspense fallback={<div className="loader-container min-h-[80vh] flex items-center justify-center"><Loader size={50} /></div>}>
+      <Earnings />
+    </Suspense>
   );
 }

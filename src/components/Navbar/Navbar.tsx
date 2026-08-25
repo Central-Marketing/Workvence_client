@@ -92,6 +92,11 @@ const Navbar = () => {
       socket.disconnect();
       localStorage.removeItem('user');
       sessionStorage.removeItem("kyc_prompt_dismissed_session");
+      document.cookie = "accessToken=; path=/; max-age=0; SameSite=Lax";
+      document.cookie = "token=; path=/; max-age=0; SameSite=Lax";
+      document.cookie = "jwt=; path=/; max-age=0; SameSite=Lax";
+      document.cookie = "auth_token=; path=/; max-age=0; SameSite=Lax";
+      document.cookie = "session=; path=/; max-age=0; SameSite=Lax";
       setUser(null);
       router.push("/");
     }

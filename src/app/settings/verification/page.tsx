@@ -2,17 +2,16 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, Lock, Sparkles } from "lucide-react";
-import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 import KycVerificationForm from "@/components/KycVerificationForm/KycVerificationForm";
 import { useUserStore } from "@/store/userStore";
+
+import { ArrowLeft, Lock, Sparkles } from "lucide-react";
 
 export default function SettingsVerificationPage() {
   const user = useUserStore((state) => state.user);
 
   return (
-    <PrivateRoute>
-      <div className="w-full min-h-screen bg-gray-50/70 py-10 md:py-16">
+    <div className="w-full min-h-screen bg-gray-50/70 py-10 md:py-16">
         <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-6 flex items-center justify-between">
             <Link
@@ -58,6 +57,5 @@ export default function SettingsVerificationPage() {
           )}
         </div>
       </div>
-    </PrivateRoute>
   );
 }

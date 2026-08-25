@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader, RecentOrdersSkeleton } from "@/components";
-import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 import "./Dashboard.scss";
 
 const Dashboard = () => {
@@ -231,9 +230,5 @@ const Dashboard = () => {
 };
 
 export default function DashboardPage() {
-  return (
-    <PrivateRoute>
-      <Dashboard />
-    </PrivateRoute>
-  );
+  return <Dashboard />;
 }

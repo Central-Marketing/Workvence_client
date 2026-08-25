@@ -43,9 +43,11 @@ const GENERAL_PROTECTED_ROUTES = [
 ];
 
 function decodeJwtPayload(token?: string): any {
-  if (!token) return null;
+  if (!token || typeof token !== "string") return null;
+  const trimmed = token.trim();
+  if (!trimmed || trimmed === "undefined" || trimmed === "null") return null;
   try {
-    const parts = token.split(".");
+    const parts = trimmed.split(".");
     if (parts.length < 2) return null;
     const base64Url = parts[1];
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
@@ -68,10 +70,14 @@ export async function proxy(req: NextRequest) {
     req.cookies.get("session")?.value;
 
   const jwtPayload = decodeJwtPayload(authCookie);
+  const isJwtValid = Boolean(
+    jwtPayload &&
+    (!jwtPayload.exp || jwtPayload.exp * 1000 > Date.now())
+  );
 
   const userCookie = req.cookies.get("user")?.value;
   let parsedUser: any = null;
-  if (userCookie) {
+  if (userCookie && userCookie !== "undefined" && userCookie !== "null") {
     try {
       parsedUser = JSON.parse(decodeURIComponent(userCookie));
     } catch {
@@ -79,11 +85,25 @@ export async function proxy(req: NextRequest) {
     }
   }
 
+  const isParsedUserValid = Boolean(
+    parsedUser &&
+    typeof parsedUser === "object" &&
+    (parsedUser._id || parsedUser.id || parsedUser.username || parsedUser.email)
+  );
+
+  // Valid authentication requires a valid, unexpired JWT or a verified user session
+  const hasAuthTokenString = Boolean(
+    authCookie &&
+    authCookie.trim() !== "" &&
+    authCookie !== "undefined" &&
+    authCookie !== "null"
+  );
+  const isAuthenticated = isJwtValid || (hasAuthTokenString && isParsedUserValid);
+
   const isSellerCookie = req.cookies.get("isSeller")?.value;
   const roleCookie = req.cookies.get("role")?.value?.toLowerCase();
 
-  // Determine user authentication and role state
-  const isAuthenticated = Boolean(authCookie || parsedUser);
+  // Determine user role state
   const isSeller = Boolean(
     isSellerCookie === "true" ||
     roleCookie === "seller" ||
@@ -110,9 +130,11 @@ export async function proxy(req: NextRequest) {
   const isSellerRoute = SELLER_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
-  const isGeneralProtectedRoute = GENERAL_PROTECTED_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
-  );
+  const isGeneralProtectedRoute =
+    GENERAL_PROTECTED_ROUTES.some(
+      (route) => pathname === route || pathname.startsWith(`${route}/`)
+    ) ||
+    (pathname.startsWith("/briefs/") && pathname.endsWith("/proposals"));
 
   const isAnyProtectedRoute = isAdminRoute || isSellerRoute || isGeneralProtectedRoute;
 
@@ -120,9 +142,16 @@ export async function proxy(req: NextRequest) {
   // RULE A: Redirect Logged-In Users away from Guest Auth Pages
   // -------------------------------------------------------------
   if (isAuthGuestRoute && isAuthenticated) {
+    const isSellerIntent = searchParams.get("seller") === "true";
+    if (pathname === "/register" && isSellerIntent && !isSeller) {
+      return NextResponse.redirect(new URL("/settings/verification", req.url));
+    }
+
     const redirectUrl = searchParams.get("redirect") || "/dashboard";
-    // Prevent open redirect loops
-    const safeTarget = redirectUrl.startsWith("/") ? redirectUrl : "/dashboard";
+    // Prevent open redirect loops to auth pages
+    const safeTarget = (redirectUrl.startsWith("/") && !redirectUrl.startsWith("/login") && !redirectUrl.startsWith("/register"))
+      ? redirectUrl
+      : "/dashboard";
     return NextResponse.redirect(new URL(safeTarget, req.url));
   }
 

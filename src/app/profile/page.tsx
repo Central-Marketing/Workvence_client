@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
-import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 import { User, Briefcase, GraduationCap, FolderDot, Camera, Trash2, Plus, Pencil, ExternalLink, Image as ImageIcon, UploadCloud, Folder, ArrowLeft, Eye, ShieldCheck } from "lucide-react";
 import supportService from "@/utils/supportService";
 import { Loader, KycVerificationForm } from "@/components";
@@ -698,9 +697,5 @@ const Profile = () => {
 };
 
 export default function ProfilePage() {
-  return (
-    <PrivateRoute>
-      <Profile />
-    </PrivateRoute>
-  );
+  return <Profile />;
 }

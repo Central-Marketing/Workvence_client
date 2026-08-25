@@ -11,7 +11,6 @@ import toast from "react-hot-toast";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
-import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 import "./MyBriefs.scss";
 
 const MyBriefs = () => {
@@ -346,9 +345,5 @@ const MyProposals = () => {
 export default function MyBriefsPage() {
   const user = useUserStore((state) => state.user);
 
-  return (
-    <PrivateRoute>
-      {user?.isSeller ? <MyProposals /> : <MyBriefs />}
-    </PrivateRoute>
-  );
+  return user?.isSeller ? <MyProposals /> : <MyBriefs />;
 }

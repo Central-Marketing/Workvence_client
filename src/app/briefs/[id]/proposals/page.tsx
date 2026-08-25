@@ -11,7 +11,6 @@ import toast from "react-hot-toast";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
-import PrivateRoute from "@/components/PrivateRoute/PrivateRoute";
 import "./Proposals.scss";
 
 const Proposals = () => {
@@ -362,9 +361,5 @@ const Proposals = () => {
 };
 
 export default function ProposalsPage() {
-  return (
-    <PrivateRoute>
-      <Proposals />
-    </PrivateRoute>
-  );
+  return <Proposals />;
 }

@@ -13,6 +13,7 @@ const Profile = () => {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
+  console.log(user);
 
   // Tabs
   const [activeTab, setActiveTab] = useState("personal");
@@ -216,6 +217,8 @@ const Profile = () => {
       {label}
     </button>
   );
+
+
 
   return (
     <div className="w-full min-h-screen bg-gray-50 py-10 md:py-16">

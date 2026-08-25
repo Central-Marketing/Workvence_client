@@ -11,10 +11,10 @@ const getAdminApiUrl = () => {
 const getAuthToken = () => {
   if (typeof window === "undefined") return "";
   try {
-    const match = document.cookie.match(/(?:^|; )\s*(?:accessToken|token|jwt|auth_token)\s*=\s*([^;]+)/i);
+    const match = document.cookie.match(/(?:^|; )\s*accessToken\s*=\s*([^;]+)/i);
     if (match) return decodeURIComponent(match[1]);
-    return localStorage.getItem("accessToken") || localStorage.getItem("token") || "";
-  } catch (e) {
+    return localStorage.getItem("accessToken") || "";
+  } catch {
     return "";
   }
 };

@@ -22,6 +22,7 @@ const Dashboard = () => {
     queryKey: ["dashboard-orders"],
     queryFn: () =>
       axiosFetch.get("/orders").then(({ data }) => data ?? []).catch(() => []),
+    enabled: !!user,
   });
 
   // Fetch conversations
@@ -29,6 +30,20 @@ const Dashboard = () => {
     queryKey: ["dashboard-convs"],
     queryFn: () =>
       axiosFetch.get("/conversations").then(({ data }) => data ?? []).catch(() => []),
+    enabled: !!user,
+  });
+
+  // Fetch favorite gigs & favorite sellers for buyers
+  const { data: favoriteGigs = [] } = useQuery({
+    queryKey: ["dashboard-favorite-gigs"],
+    queryFn: () => axiosFetch.get("/gigs/favorites").then(({ data }) => data?.favorites || []).catch(() => []),
+    enabled: !!user && !user.isSeller
+  });
+
+  const { data: favoriteSellers = [] } = useQuery({
+    queryKey: ["dashboard-favorite-sellers"],
+    queryFn: () => axiosFetch.get("/users/favorite-sellers").then(({ data }) => data?.sellers || []).catch(() => []),
+    enabled: !!user && !user.isSeller
   });
 
   if (!user) {
@@ -52,19 +67,6 @@ const Dashboard = () => {
   const unreadMessagesCount = conversations.filter((c: any) => {
     return user.isSeller ? !c.readBySeller : !c.readByBuyer;
   }).length;
-
-  // Fetch favorite gigs & favorite sellers for buyers
-  const { data: favoriteGigs = [] } = useQuery({
-    queryKey: ["dashboard-favorite-gigs"],
-    queryFn: () => axiosFetch.get("/gigs/favorites").then(({ data }) => data?.favorites || []).catch(() => []),
-    enabled: !!user && !user.isSeller
-  });
-
-  const { data: favoriteSellers = [] } = useQuery({
-    queryKey: ["dashboard-favorite-sellers"],
-    queryFn: () => axiosFetch.get("/users/favorite-sellers").then(({ data }) => data?.sellers || []).catch(() => []),
-    enabled: !!user && !user.isSeller
-  });
 
   const totalFavoritesCount = favoriteGigs.length + favoriteSellers.length;
 

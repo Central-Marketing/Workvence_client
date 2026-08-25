@@ -61,13 +61,8 @@ function decodeJwtPayload(token?: string): any {
 export async function proxy(req: NextRequest) {
   const { pathname, searchParams } = req.nextUrl;
 
-  // 1. Extract authentication tokens and session cookies
-  const authCookie =
-    req.cookies.get("accessToken")?.value ||
-    req.cookies.get("token")?.value ||
-    req.cookies.get("jwt")?.value ||
-    req.cookies.get("auth_token")?.value ||
-    req.cookies.get("session")?.value;
+  // 1. Extract authentication token from accessToken cookie
+  const authCookie = req.cookies.get("accessToken")?.value;
 
   const jwtPayload = decodeJwtPayload(authCookie);
   const isJwtValid = Boolean(

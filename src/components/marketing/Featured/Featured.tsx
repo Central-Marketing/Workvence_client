@@ -26,8 +26,8 @@ const Featured = () => {
   const router = useRouter();
 
   const handleSearch = () => {
-    if (search || category) {
-      router.push(`/packages?search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}`);
+    if (search.trim() || category) {
+      router.push(`/packages?search=${encodeURIComponent(search.trim())}&category=${encodeURIComponent(category)}`);
     }
   };
 
@@ -47,19 +47,19 @@ const Featured = () => {
     const iconKey = (iconStr || '').toLowerCase().replace(/[-_]/g, '');
     const nameKey = (nameStr || '').toLowerCase();
 
-    if (iconKey === 'palette' || nameKey.includes('design') || nameKey.includes('graphic')) return <Palette size={20} strokeWidth={1.5} />;
-    if (iconKey === 'code' || nameKey.includes('program') || nameKey.includes('tech') || nameKey.includes('code')) return <Code size={20} strokeWidth={1.5} />;
-    if (iconKey === 'bullhorn' || nameKey.includes('market') || nameKey.includes('digital')) return <Megaphone size={20} strokeWidth={1.5} />;
-    if (iconKey === 'video' || nameKey.includes('video') || nameKey.includes('animation')) return <Film size={20} strokeWidth={1.5} />;
-    if (iconKey === 'cpu' || nameKey.includes('ai')) return <Cpu size={20} strokeWidth={1.5} />;
-    if (iconKey === 'filetext' || nameKey.includes('write') || nameKey.includes('translation')) return <FileText size={20} strokeWidth={1.5} />;
-    if (iconKey === 'briefcase' || nameKey.includes('business') || nameKey.includes('consulting')) return <Briefcase size={20} strokeWidth={1.5} />;
-    if (iconKey === 'music' || nameKey.includes('music') || nameKey.includes('audio')) return <Music size={20} strokeWidth={1.5} />;
-    if (iconKey === 'barchart' || iconKey === 'chart' || nameKey.includes('data') || nameKey.includes('analytics')) return <BarChart2 size={20} strokeWidth={1.5} />;
-    if (iconKey === 'shoppingcart' || nameKey.includes('e-commerce') || nameKey.includes('commerce')) return <ShoppingCart size={20} strokeWidth={1.5} />;
-    if (iconKey === 'star' || nameKey.includes('other') || nameKey.includes('general')) return <Star size={20} strokeWidth={1.5} />;
+    if (iconKey === 'palette' || nameKey.includes('design') || nameKey.includes('graphic')) return <Palette size={18} strokeWidth={1.5} />;
+    if (iconKey === 'code' || nameKey.includes('program') || nameKey.includes('tech') || nameKey.includes('code')) return <Code size={18} strokeWidth={1.5} />;
+    if (iconKey === 'bullhorn' || nameKey.includes('market') || nameKey.includes('digital')) return <Megaphone size={18} strokeWidth={1.5} />;
+    if (iconKey === 'video' || nameKey.includes('video') || nameKey.includes('animation')) return <Film size={18} strokeWidth={1.5} />;
+    if (iconKey === 'cpu' || nameKey.includes('ai')) return <Cpu size={18} strokeWidth={1.5} />;
+    if (iconKey === 'filetext' || nameKey.includes('write') || nameKey.includes('translation')) return <FileText size={18} strokeWidth={1.5} />;
+    if (iconKey === 'briefcase' || nameKey.includes('business') || nameKey.includes('consulting')) return <Briefcase size={18} strokeWidth={1.5} />;
+    if (iconKey === 'music' || nameKey.includes('music') || nameKey.includes('audio')) return <Music size={18} strokeWidth={1.5} />;
+    if (iconKey === 'barchart' || iconKey === 'chart' || nameKey.includes('data') || nameKey.includes('analytics')) return <BarChart2 size={18} strokeWidth={1.5} />;
+    if (iconKey === 'shoppingcart' || nameKey.includes('e-commerce') || nameKey.includes('commerce')) return <ShoppingCart size={18} strokeWidth={1.5} />;
+    if (iconKey === 'star' || nameKey.includes('other') || nameKey.includes('general')) return <Star size={18} strokeWidth={1.5} />;
 
-    return <Layers size={20} strokeWidth={1.5} />;
+    return <Layers size={18} strokeWidth={1.5} />;
   };
 
   const filteredCategories = categoryList.filter((cat: any) => {
@@ -68,142 +68,146 @@ const Featured = () => {
   });
 
   return (
-    <section className="relative w-full min-h-[85vh] lg:min-h-[calc(100vh-80px)] bg-[#FAFAFC] overflow-hidden flex items-center justify-center py-12 lg:py-16 border-b border-slate-100">
+    <section className="relative w-full h-[580px] sm:h-[640px] md:h-[700px] lg:h-[740px] xl:h-[780px] bg-[#E8F5F5] overflow-hidden flex flex-col justify-between pt-8 sm:pt-12 md:pt-14 pb-0 select-none">
+      {/* Background ambient radial glow at top */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_50%_at_50%_15%,rgba(242,252,248,0.7),transparent)] pointer-events-none" />
 
-      {/* DESKTOP LEFT SIDE FLOATING CLUSTER (lg:block) */}
-      <div className="hidden lg:block absolute left-0 xl:left-2 2xl:left-8 top-1/2 -translate-y-1/2 w-[320px] xl:w-[360px] h-[520px] pointer-events-none z-0 opacity-40 xl:opacity-60 hover:opacity-100 transition-all duration-500 scale-[0.60] xl:scale-80 2xl:scale-100 origin-left">
-        {/* L1: Far Top Left Small */}
-        <div className="absolute top-4 left-0 w-[115px] h-[105px] rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 mix-blend-multiply">
-          <img src="/media/hero_images/img1.jpeg" alt="Work" className="w-full h-full object-cover" />
-        </div>
-        {/* L2: Top Right Medium */}
-        <div className="absolute top-0 left-[130px] w-[105px] h-[105px] rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 mix-blend-multiply">
-          <img src="/media/hero_images/img2.jpeg" alt="Audio" className="w-full h-full object-cover" />
-        </div>
-        {/* L3: Middle Main Large Feature Card */}
-        <div className="absolute top-[120px] left-[120px] w-[175px] h-[175px] rounded-3xl overflow-hidden shadow-sm border border-slate-200/60 mix-blend-multiply">
-          <img src="/media/hero_images/img3.jpeg" alt="3D Art" className="w-full h-full object-cover" />
-        </div>
-        {/* L4: Middle Left Small */}
-        <div className="absolute top-[160px] left-[10px] w-[95px] h-[95px] rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 mix-blend-multiply">
-          <img src="/media/hero_images/img4.jpeg" alt="Design" className="w-full h-full object-cover" />
-        </div>
-        {/* L5: Bottom Left Main Tile */}
-        <div className="absolute top-[310px] left-0 w-[145px] h-[165px] rounded-3xl overflow-hidden shadow-sm border border-slate-200/60 mix-blend-multiply">
-          <img src="/media/hero_images/img5.jpeg" alt="Development" className="w-full h-full object-cover" />
-        </div>
-        {/* L6: Bottom Right Tile */}
-        <div className="absolute top-[320px] left-[160px] w-[135px] h-[120px] rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 mix-blend-multiply">
-          <img src="/media/hero_images/img6.jpeg" alt="Creative" className="w-full h-full object-cover" />
-        </div>
-      </div>
+      {/* Bottom glowing Ellipse - top 35% rises up into the bottom of the section */}
+      <div
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[65%] w-[120%] max-w-[1600px] h-[550px] sm:h-[700px] md:h-[800px] rounded-[50%] bg-[#EBFEC5] pointer-events-none z-0"
+        style={{
+          filter: 'blur(120px)',
+          backdropFilter: 'blur(500px)',
+        }}
+      />
 
-      {/* DESKTOP RIGHT SIDE FLOATING CLUSTER (lg:block) */}
-      <div className="hidden lg:block absolute right-0 xl:right-2 2xl:right-8 top-1/2 -translate-y-1/2 w-[320px] xl:w-[360px] h-[520px] pointer-events-none z-0 opacity-40 xl:opacity-60 hover:opacity-100 transition-all duration-500 scale-[0.60] xl:scale-80 2xl:scale-100 origin-right">
-        {/* R1: Far Top Right Large Feature Card */}
-        <div className="absolute top-0 right-0 w-[175px] h-[175px] rounded-3xl overflow-hidden shadow-sm border border-slate-200/60 mix-blend-multiply">
-          <img src="/media/hero_images/img7.jpeg" alt="Analytics" className="w-full h-full object-cover" />
-        </div>
-        {/* R2: Top Left Small */}
-        <div className="absolute top-[85px] right-[190px] w-[95px] h-[95px] rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 mix-blend-multiply">
-          <img src="/media/hero_images/img8.jpeg" alt="Workspace" className="w-full h-full object-cover" />
-        </div>
-        {/* R3: Middle Left Main Large Feature Card */}
-        <div className="absolute top-[195px] right-[145px] w-[160px] h-[160px] rounded-3xl overflow-hidden shadow-sm border border-slate-200/60 mix-blend-multiply">
-          <img src="/media/hero_images/img9.jpeg" alt="Platform" className="w-full h-full object-cover" />
-        </div>
-        {/* R4: Middle Right Medium */}
-        <div className="absolute top-[190px] right-0 w-[130px] h-[130px] rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 mix-blend-multiply">
-          <img src="/media/hero_images/img10.jpeg" alt="Showcase" className="w-full h-full object-cover" />
-        </div>
-        {/* R5: Bottom Right Tile */}
-        <div className="absolute top-[335px] right-0 w-[155px] h-[155px] rounded-3xl overflow-hidden shadow-sm border border-slate-200/60 mix-blend-multiply">
-          <img src="/media/hero_images/img11.jpeg" alt="Projects" className="w-full h-full object-cover" />
-        </div>
-      </div>
-
-      {/* CENTER HERO CONTENT */}
-      <div className="relative z-30 container mx-auto px-4 sm:px-6 flex flex-col items-center text-center max-w-4xl my-auto">
-
-        {/* MAIN HEADLINE SPLIT INTO EXACT 3 LINES */}
-        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[84px] font-bold text-black mb-6 flex flex-col items-center leading-[1.05]">
-          <span>The World’s</span>
-          <span className="text-brand-green">Best Freelancers</span>
-          <span>Are on Workvence.</span>
+      {/* TOP HEADER & SEARCH CONTENT */}
+      <div className="relative z-20 container mx-auto px-4 text-center max-w-4xl flex flex-col items-center">
+        {/* Headline */}
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[64px] xl:text-[85px] font-medium text-[#1E293B] tracking-tight leading-[1.12] mb-3">
+          Find the right <span className="text-[#327C73]">freelancer</span>
+          <br />
+          and get to work in minutes.
         </h1>
 
-        {/* SUBHEADING PARAGRAPH */}
-        <p className="text-slate-600 text-lg sm:text-xl md:text-2xl font-normal max-w-3xl leading-relaxed mb-10">
-          Workvence helps you discover skilled freelancers across design, development, marketing, writing, video, and more. Compare services, review portfolios, and hire with confidence.
+        {/* Subtitle */}
+        <p className="text-slate-500 text-xs sm:text-sm md:text-base font-normal max-w-xl mx-auto mb-5 sm:mb-6 leading-relaxed">
+          Search thousands of vetted sellers, order in under a minute, and start today.
         </p>
 
-        {/* SEARCH BAR CONTAINER */}
-        <div className="w-full max-w-2xl bg-white rounded-2xl sm:rounded-full p-2 sm:p-2.5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] border border-slate-200/80 flex flex-col sm:flex-row items-center gap-2 transition-all focus-within:shadow-[0_12px_40px_rgba(64,170,21,0.15)] focus-within:border-brand-green/40">
-          <div className="flex items-center gap-3 flex-1 w-full px-4 py-2 sm:py-0">
-            <Search size={22} className="text-slate-400 shrink-0" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              placeholder="Search services, skills, or keywords..."
-              className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-slate-400 text-sm sm:text-base font-medium"
+        {/* Search Bar */}
+        <div className="w-full max-w-[460px] sm:max-w-[520px] md:max-w-[560px] bg-white rounded-lg sm:rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 border border-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center gap-2.5 sm:gap-3 transition-all focus-within:border-[#2C6E63]/70 focus-within:shadow-[0_4px_16px_rgba(44,110,99,0.12)]">
+          <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-slate-400 shrink-0" strokeWidth={2} />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            placeholder="What services are you looking for..."
+            className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-slate-400 text-xs sm:text-sm md:text-base font-normal"
+          />
+        </div>
+
+        {/* Dynamic Category Suggestions on search */}
+        {search.trim().length > 0 && (
+          <div className="flex justify-center items-start flex-wrap w-full max-w-2xl mt-4 gap-2 bg-white/95 backdrop-blur-sm p-3 rounded-2xl border border-slate-200/80 shadow-lg z-30">
+            {filteredCategories.slice(0, 6).map((cat: any, index: number) => {
+              const name = cat.name || cat.title || String(cat);
+              const slug = cat.slug || name.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+              const iconStr = cat.icon || '';
+
+              return (
+                <div
+                  key={slug || index}
+                  className="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                  onClick={() => router.push(`/packages?category=${encodeURIComponent(slug)}`)}
+                >
+                  <div className="text-slate-500">
+                    {getCategoryIcon(iconStr, name)}
+                  </div>
+                  <span className="text-xs font-medium text-slate-700">
+                    {name}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* BOTTOM IMAGE GALLERY - 5 COLUMNS CONSTRAINED TO CONTAINER */}
+      <div className="relative z-10 w-full container mx-auto px-4 md:px-6 flex items-end justify-between gap-2.5 sm:gap-3.5 md:gap-4 lg:gap-5 xl:gap-6 mt-auto pointer-events-none">
+
+        {/* COLUMN 1: LEFTMOST - 2 VERTICAL IMAGES */}
+        <div className="w-[18%] min-w-[90px] max-w-[245px] flex flex-col gap-2 sm:gap-3 md:gap-4 shrink-0">
+          {/* Top image: Blue head silhouette */}
+          <div className="w-full aspect-[3/3.75] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
+            <img
+              src="/media/hero_images/img4.png"
+              alt="Creative Art"
+              className="w-full h-full object-cover object-center"
             />
           </div>
-          <button
-            onClick={handleSearch}
-            className="w-full sm:w-auto bg-brand-green hover:bg-[#389115] text-white px-8 py-3.5 rounded-xl sm:rounded-full font-bold text-base transition-colors shadow-md shrink-0 flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <span>Search</span>
-          </button>
-        </div>
-
-        {/* REAL BACKEND CATEGORY MATCHES IN GRAYSCALE (DIRECTLY BELOW SEARCH BAR) */}
-        <div className={`flex justify-center items-start flex-wrap w-full max-w-3xl mt-6 gap-2 sm:gap-4 overflow-hidden transition-all duration-300 ${search.trim().length > 0 ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}>
-          {search.trim().length > 0 && filteredCategories.slice(0, 8).map((cat: any, index: number) => {
-            const name = cat.name || cat.title || String(cat);
-            const slug = cat.slug || name.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-            const iconStr = cat.icon || '';
-
-            return (
-              <div
-                key={slug || index}
-                className="flex flex-col items-center gap-2 cursor-pointer transition group p-2 rounded-xl hover:bg-white hover:shadow-sm"
-                onClick={() => router.push(`/packages?category=${encodeURIComponent(slug)}`)}
-              >
-                <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-500 filter grayscale opacity-75 group-hover:grayscale-0 group-hover:opacity-100 group-hover:bg-brand-green group-hover:text-white group-hover:border-brand-green transition-all">
-                  {getCategoryIcon(iconStr, name)}
-                </div>
-                <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 transition-colors text-center max-w-[100px] truncate">
-                  {name}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* MOBILE BOTTOM AMBIENT STRIP (< 1024px) - AT VERY BOTTOM */}
-        <div className="lg:hidden flex flex-col items-center gap-3 mt-8 w-full opacity-65 mix-blend-multiply overflow-hidden px-2 pointer-events-none">
-          {/* Row 1 (3 images) */}
-          <div className="flex items-center justify-center gap-2.5 sm:gap-4">
-            <div className="w-28 h-24 sm:w-32 sm:h-24 rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 shrink-0">
-              <img src="/media/hero_images/img6.jpeg" alt="Artwork" className="w-full h-full object-cover" />
-            </div>
-            <div className="w-28 h-24 sm:w-36 sm:h-30 rounded-3xl overflow-hidden shadow-xs border border-slate-200/60 shrink-0">
-              <img src="/media/hero_images/img3.jpeg" alt="Artwork" className="w-full h-full object-cover" />
-            </div>
-            <div className="w-28 h-24 sm:w-32 sm:h-24 rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 shrink-0">
-              <img src="/media/hero_images/img7.jpeg" alt="Artwork" className="w-full h-full object-cover" />
-            </div>
+          {/* Bottom image: Laptop code editor (cut off at bottom by parent overflow-hidden) */}
+          <div className="w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-slate-900">
+            <img
+              src="/media/hero_images/img7.png"
+              alt="Code Development"
+              className="w-full h-auto object-cover object-top"
+            />
           </div>
-          {/* Row 2 (2 images) */}
-          <div className="flex items-center justify-center gap-2.5 sm:gap-4">
-            <div className="w-28 h-24 sm:w-32 sm:h-24 rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 shrink-0">
-              <img src="/media/hero_images/img5.jpeg" alt="Artwork" className="w-full h-full object-cover" />
-            </div>
-            <div className="w-28 h-24 sm:w-32 sm:h-24 rounded-2xl overflow-hidden shadow-2xs border border-slate-200/50 shrink-0">
-              <img src="/media/hero_images/img4.jpeg" alt="Artwork" className="w-full h-full object-cover" />
-            </div>
+        </div>
+
+        {/* COLUMN 2: SECOND - TALL ADOBE BOUQUET CARD */}
+        <div className="w-[18%] min-w-[90px] max-w-[245px] shrink-0">
+          <div className="w-full h-[160px] sm:h-[180px] md:h-[200px] lg:h-[240px] xl:h-[255px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-white">
+            <img
+              src="/media/hero_images/img1.png"
+              alt="Design Forever"
+              className="w-full h-full object-cover object-top"
+            />
+          </div>
+        </div>
+
+        {/* COLUMN 3: CENTER - VIBE CODING PHONE (LOWER POSITION) */}
+        <div className="w-[18%] min-w-[90px] max-w-[245px] shrink-0">
+          <div className="w-full h-[110px] sm:h-[155px] md:h-[200px] lg:h-[160px] xl:h-[180px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#a81e55]">
+            <img
+              src="/media/hero_images/img3.png"
+              alt="Vibe Coding"
+              className="w-full h-full object-cover object-top"
+            />
+          </div>
+        </div>
+
+        {/* COLUMN 4: FOURTH - TALL VIOLIN POSTER */}
+        <div className="w-[18%] min-w-[90px] max-w-[245px] shrink-0">
+          <div className="w-full h-[160px] sm:h-[220px] md:h-[290px] lg:h-[340px] xl:h-[305px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#fafafa]">
+            <img
+              src="/media/hero_images/img5.png"
+              alt="Violin Night"
+              className="w-full h-full object-cover object-top"
+            />
+          </div>
+        </div>
+
+        {/* COLUMN 5: RIGHTMOST - 2 VERTICAL IMAGES */}
+        <div className="w-[18%] min-w-[90px] max-w-[245px] flex flex-col gap-2 sm:gap-3 md:gap-4 shrink-0">
+          {/* Top image: The Link (robots / clarity meets creativity) */}
+          <div className="w-full aspect-[3/3.75] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
+            <img
+              src="/media/hero_images/img6.png"
+              alt="Clarity Meets Creativity"
+              className="w-full h-full object-cover object-center"
+            />
+          </div>
+          {/* Bottom image: 3D Chrome Icon (cut off at bottom) */}
+          <div className="w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#112236]">
+            <img
+              src="/media/hero_images/img2.png"
+              alt="3D Icon"
+              className="w-full h-auto object-cover object-top"
+            />
           </div>
         </div>
 

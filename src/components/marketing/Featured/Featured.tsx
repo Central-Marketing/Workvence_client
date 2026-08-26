@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import adminAxios from '@/utils/adminAxios';
@@ -32,16 +32,30 @@ const Featured = () => {
   };
 
   // Fetch real categories from backend database
-  const { data: fetchedCategories = [] } = useQuery({
+  const { data: fetchedCategories = [], isLoading } = useQuery({
     queryKey: ['admin-categories-featured'],
     queryFn: () => adminAxios.get('/categories').then(({ data }) => data).catch(() => [])
   });
 
-  const categoryList = Array.isArray(fetchedCategories)
-    ? fetchedCategories
-    : Array.isArray(fetchedCategories?.data)
-      ? fetchedCategories.data
-      : fetchedCategories?.categories || [];
+  const categoryList = useMemo(() => {
+    const raw = Array.isArray(fetchedCategories)
+      ? fetchedCategories
+      : Array.isArray(fetchedCategories?.data)
+        ? fetchedCategories.data
+        : fetchedCategories?.categories || [];
+
+    return raw.map((cat: any) => {
+      if (typeof cat === 'string') {
+        const slug = cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        return { name: cat, slug, icon: '' };
+      }
+      return {
+        name: cat.name || cat.title || String(cat),
+        slug: cat.slug || (cat.name || cat.title || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+        icon: cat.icon || '',
+      };
+    });
+  }, [fetchedCategories]);
 
   const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
     const iconKey = (iconStr || '').toLowerCase().replace(/[-_]/g, '');
@@ -62,10 +76,15 @@ const Featured = () => {
     return <Layers size={18} strokeWidth={1.5} />;
   };
 
-  const filteredCategories = categoryList.filter((cat: any) => {
-    const name = cat.name || cat.title || String(cat);
-    return name.toLowerCase().includes(search.trim().toLowerCase());
-  });
+  const filteredCategories = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return [];
+    return categoryList.filter((cat: any) => {
+      const name = (cat.name || '').toLowerCase();
+      const slug = (cat.slug || '').toLowerCase();
+      return name.includes(q) || slug.includes(q);
+    });
+  }, [search, categoryList]);
 
   return (
     <section className="relative w-full h-[580px] sm:h-[640px] md:h-[700px] lg:h-[740px] xl:h-[780px] bg-[#E8F5F5] overflow-hidden flex flex-col justify-between pt-8 sm:pt-12 md:pt-14 pb-0 select-none">
@@ -84,55 +103,83 @@ const Featured = () => {
       {/* TOP HEADER & SEARCH CONTENT */}
       <div className="relative z-20 container mx-auto px-4 text-center max-w-4xl flex flex-col items-center">
         {/* Headline */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[64px] xl:text-[85px] font-medium text-[#1E293B] tracking-tight leading-[1.12] mb-3">
+        <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-medium text-[#1E293B] tracking-tight leading-[1.12] mb-3">
           Find the right <span className="text-[#327C73]">freelancer</span>
           <br />
           and get to work in minutes.
         </h1>
 
         {/* Subtitle */}
-        <p className="text-slate-500 text-xs sm:text-sm md:text-base font-normal max-w-xl mx-auto mb-5 sm:mb-6 leading-relaxed">
+        <p className="text-[#4A4A4A] text-xs sm:text-sm md:text-lg font-normal font-inter max-w-xl mx-auto mb-5 sm:mb-6 leading-relaxed">
           Search thousands of vetted sellers, order in under a minute, and start today.
         </p>
 
-        {/* Search Bar */}
-        <div className="w-full max-w-[460px] sm:max-w-[520px] md:max-w-[560px] bg-white rounded-lg sm:rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 border border-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center gap-2.5 sm:gap-3 transition-all focus-within:border-[#2C6E63]/70 focus-within:shadow-[0_4px_16px_rgba(44,110,99,0.12)]">
-          <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-slate-400 shrink-0" strokeWidth={2} />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="What services are you looking for..."
-            className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-slate-400 text-xs sm:text-sm md:text-base font-normal"
-          />
-        </div>
-
-        {/* Dynamic Category Suggestions on search */}
-        {search.trim().length > 0 && (
-          <div className="flex justify-center items-start flex-wrap w-full max-w-2xl mt-4 gap-2 bg-white/95 backdrop-blur-sm p-3 rounded-2xl border border-slate-200/80 shadow-lg z-30">
-            {filteredCategories.slice(0, 6).map((cat: any, index: number) => {
-              const name = cat.name || cat.title || String(cat);
-              const slug = cat.slug || name.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-              const iconStr = cat.icon || '';
-
-              return (
-                <div
-                  key={slug || index}
-                  className="flex items-center gap-2 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
-                  onClick={() => router.push(`/packages?category=${encodeURIComponent(slug)}`)}
-                >
-                  <div className="text-slate-500">
-                    {getCategoryIcon(iconStr, name)}
-                  </div>
-                  <span className="text-xs font-medium text-slate-700">
-                    {name}
-                  </span>
-                </div>
-              );
-            })}
+        {/* Search Bar Container with relative positioning for floating dropdown */}
+        <div className="relative w-full max-w-[460px] sm:max-w-[520px] md:max-w-[560px]">
+          <div className="w-full bg-white rounded-lg sm:rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 border border-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center gap-2.5 sm:gap-3 transition-all focus-within:border-[#2C6E63]/70 focus-within:shadow-[0_4px_16px_rgba(44,110,99,0.12)]">
+            <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-slate-400 shrink-0" strokeWidth={2} />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              placeholder="What services are you looking for..."
+              className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-[#868686] placeholder:text-[16px] placeholder:font-sf-pro text-xs sm:text-sm md:text-base font-normal font-sf-pro"
+            />
           </div>
-        )}
+
+          {/* Floating Dynamic Category Suggestions */}
+          {search.trim().length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white/98 backdrop-blur-md p-2 rounded-xl sm:rounded-2xl border border-slate-200 shadow-xl z-50 flex flex-col gap-1 text-left">
+              {filteredCategories.length > 0 ? (
+                <>
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-2.5 py-1">
+                    Matching Categories
+                  </div>
+                  {filteredCategories.slice(0, 5).map((cat: any, index: number) => {
+                    const name = cat.name;
+                    const slug = cat.slug;
+                    const iconStr = cat.icon || '';
+
+                    return (
+                      <div
+                        key={slug || index}
+                        className="flex items-center gap-3 cursor-pointer px-3 py-2 rounded-lg hover:bg-slate-100/90 transition-colors"
+                        onClick={() => router.push(`/packages?category=${encodeURIComponent(slug)}`)}
+                      >
+                        <div className="text-[#327C73] shrink-0">
+                          {getCategoryIcon(iconStr, name)}
+                        </div>
+                        <span className="text-sm font-medium text-slate-700">
+                          {name}
+                        </span>
+                      </div>
+                    );
+                  })}
+                  <div
+                    className="flex items-center justify-between border-t border-slate-100 mt-1 pt-2 px-3 py-1.5 cursor-pointer rounded-lg hover:bg-emerald-50 text-[#327C73] transition-colors"
+                    onClick={handleSearch}
+                  >
+                    <span className="text-xs font-semibold">
+                      Search for &quot;{search.trim()}&quot;
+                    </span>
+                    <Search className="w-3.5 h-3.5" />
+                  </div>
+                </>
+              ) : (
+                <div
+                  className="flex items-center justify-between px-3 py-2 cursor-pointer rounded-lg hover:bg-emerald-50 text-[#327C73] transition-colors"
+                  onClick={handleSearch}
+                >
+                  <span className="text-xs font-medium text-slate-600">
+                    Search all gigs for &quot;<span className="font-semibold text-slate-800">{search.trim()}</span>&quot;
+                  </span>
+                  <Search className="w-3.5 h-3.5" />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* BOTTOM IMAGE GALLERY - 5 COLUMNS CONSTRAINED TO CONTAINER */}

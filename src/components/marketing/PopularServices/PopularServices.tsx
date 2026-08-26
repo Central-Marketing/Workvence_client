@@ -91,22 +91,22 @@ const PopularServices = () => {
             return (
               <SwiperSlide key={card._id || card.id || card.slug || card.name}>
                 <Link href={`/packages?category=${cardSlug}`}>
-                <div className="flex flex-col bg-blue-50 rounded-xl overflow-hidden group cursor-pointer border border-transparent hover:border-blue-100 transition-all duration-300">
-                  <div className="h-[160px] sm:h-[200px] md:h-[260px] overflow-hidden m-1.5 md:m-2 rounded-2xl md:rounded-[1rem] bg-blue-100/50 flex items-center justify-center">
-                    <img
-                      src={card.banner || card.icon || card.image || card.img || "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600"}
-                      alt=""
-                      aria-hidden="true"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                  <div className="flex flex-col bg-blue-50 rounded-xl overflow-hidden group cursor-pointer border border-transparent hover:border-blue-100 transition-all duration-300">
+                    <div className="h-[160px] sm:h-[200px] md:h-[260px] overflow-hidden m-1.5 md:m-2 rounded-2xl md:rounded-[1rem] bg-blue-100/50 flex items-center justify-center">
+                      <img
+                        src={card.banner || card.icon || card.image || card.img || "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600"}
+                        alt=""
+                        aria-hidden="true"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="p-3 md:p-4 flex justify-between items-center">
+                      <h3 className="font-semibold text-gray-800 text-md sm:text-[14px] md:text-[16px] capitalize truncate pr-2">{card.name || card.title}</h3>
+                      <ArrowRight size={16} className="text-gray-500 group-hover:text-brand-green transition-colors flex-shrink-0" />
+                    </div>
                   </div>
-                  <div className="p-3 md:p-4 flex justify-between items-center">
-                    <h3 className="font-semibold text-gray-800 text-md sm:text-[14px] md:text-[16px] capitalize truncate pr-2">{card.name || card.title}</h3>
-                    <ArrowRight size={16} className="text-gray-500 group-hover:text-brand-green transition-colors flex-shrink-0" />
-                  </div>
-                </div>
-              </Link>
-            </SwiperSlide>
+                </Link>
+              </SwiperSlide>
             );
           })}
         </Swiper>

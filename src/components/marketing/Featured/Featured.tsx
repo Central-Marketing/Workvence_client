@@ -117,7 +117,7 @@ const Featured = () => {
         {/* Search Bar Container with relative positioning for floating dropdown */}
         <div className="relative w-full max-w-[460px] sm:max-w-[520px] md:max-w-[560px]">
           <div className="w-full bg-white rounded-lg sm:rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 border border-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center gap-2.5 sm:gap-3 transition-all focus-within:border-[#2C6E63]/70 focus-within:shadow-[0_4px_16px_rgba(44,110,99,0.12)]">
-            <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-slate-400 shrink-0" strokeWidth={2} />
+            <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#292929] shrink-0" strokeWidth={2} />
             <input
               type="text"
               value={search}

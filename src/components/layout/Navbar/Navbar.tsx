@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -13,11 +13,11 @@ import toast from 'react-hot-toast';
 import { axiosFetch, socket } from '@/utils';
 import { useUserStore } from "@/store/userStore";
 import { Loader, NotificationBell, HeaderInboxIcon } from '@/components';
-
-
+import CategoryBar from "../CategoryBar/CategoryBar";
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const [showCategoryBar, setShowCategoryBar] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
@@ -57,6 +57,15 @@ const Navbar = () => {
     }
   };
 
+  const scrollCategories = (direction: 'left' | 'right') => {
+    if (categoryScrollRef.current) {
+      categoryScrollRef.current.scrollBy({
+        left: direction === 'left' ? -250 : 250,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   useEffect(() => {
     // 1. Instantly hydrate from localStorage to prevent UI flicker
     const storedUser = localStorage.getItem('user');
@@ -89,10 +98,14 @@ const Navbar = () => {
   }, [setUser]);
 
   const isActive = () => {
-    window.scrollY > 0 ? setShowMenu(true) : setShowMenu(false);
+    const scrollPos = window.scrollY;
+    setShowMenu(scrollPos > 0);
+    // Show category bar when scrolled past featured section (~500px) on home page, or always on subpages
+    setShowCategoryBar(scrollPos > 520 || pathname !== "/");
   };
 
   useEffect(() => {
+    isActive();
     window.addEventListener("scroll", isActive);
 
     // Close dropdowns if clicked outside
@@ -110,7 +123,7 @@ const Navbar = () => {
       window.removeEventListener("scroll", isActive);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [pathname]);
 
   const handleLogout = async () => {
     try {
@@ -366,6 +379,9 @@ const Navbar = () => {
           </button>
         </div>
       </div>
+
+      {/* Sticky Bottom Category Bar (Appears when scrolled past Featured section) */}
+      <CategoryBar visible={showCategoryBar} />
 
       {/* Mobile Menu Sidebar Overlay */}
       <div className={`fixed inset-0 bg-black/50 z-[60] transition-opacity duration-300 lg:hidden ${isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`} onClick={() => setIsMobileMenuOpen(false)}></div>

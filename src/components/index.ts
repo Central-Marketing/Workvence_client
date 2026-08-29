@@ -1,5 +1,6 @@
 // Layout components
 export { default as Navbar } from "./layout/Navbar/Navbar";
+export { default as CategoryBar } from "./layout/CategoryBar/CategoryBar";
 export { default as Footer } from "./layout/Footer/Footer";
 export { default as NotificationBell } from "./layout/NotificationBell/NotificationBell";
 export { default as LayoutWrapper } from "./layout/LayoutWrapper/LayoutWrapper";

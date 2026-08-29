@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import adminAxios from '@/utils/adminAxios';
@@ -311,21 +312,25 @@ const Featured = () => {
         <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
           <div className="w-full flex flex-col gap-2 sm:gap-3 md:gap-4 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
             {/* Top image: Blue head silhouette */}
-            <div className="w-full aspect-[3/3.75] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
-              <img
+            <div className="relative w-full aspect-[3/3.75] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
+              <Image
                 src="/media/hero_images/img4.png"
                 alt="Creative Art"
-                loading="eager"
-                className="w-full h-full object-cover object-center"
+                fill
+                priority
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                className="object-cover object-center"
               />
             </div>
             {/* Bottom image: Laptop code editor */}
-            <div className="w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-slate-900">
-              <img
+            <div className="relative w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-slate-900">
+              <Image
                 src="/media/hero_images/img7.png"
                 alt="Code Development"
-                loading="eager"
-                className="w-full h-auto object-cover object-top"
+                fill
+                priority
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                className="object-cover object-top"
               />
             </div>
           </div>
@@ -334,12 +339,14 @@ const Featured = () => {
         {/* COLUMN 2: SECOND - TALL ADOBE BOUQUET CARD */}
         <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
           <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-            <div className="w-full h-[160px] sm:h-[180px] md:h-[200px] lg:h-[240px] xl:h-[255px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-white">
-              <img
+            <div className="relative w-full h-[160px] sm:h-[180px] md:h-[200px] lg:h-[240px] xl:h-[255px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-white">
+              <Image
                 src="/media/hero_images/img1.png"
                 alt="Design Forever"
-                loading="eager"
-                className="w-full h-full object-cover object-top"
+                fill
+                priority
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                className="object-cover object-top"
               />
             </div>
           </div>
@@ -348,12 +355,14 @@ const Featured = () => {
         {/* COLUMN 3: CENTER - VIBE CODING PHONE (LOWER POSITION) */}
         <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
           <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-            <div className="w-full h-[110px] sm:h-[155px] md:h-[200px] lg:h-[160px] xl:h-[180px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#a81e55]">
-              <img
+            <div className="relative w-full h-[110px] sm:h-[155px] md:h-[200px] lg:h-[160px] xl:h-[180px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#a81e55]">
+              <Image
                 src="/media/hero_images/img3.png"
                 alt="Vibe Coding"
-                loading="eager"
-                className="w-full h-full object-cover object-top"
+                fill
+                priority
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                className="object-cover object-top"
               />
             </div>
           </div>
@@ -362,12 +371,14 @@ const Featured = () => {
         {/* COLUMN 4: FOURTH - TALL VIOLIN POSTER */}
         <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
           <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-            <div className="w-full h-[160px] sm:h-[220px] md:h-[290px] lg:h-[340px] xl:h-[305px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#fafafa]">
-              <img
+            <div className="relative w-full h-[160px] sm:h-[220px] md:h-[290px] lg:h-[340px] xl:h-[305px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#fafafa]">
+              <Image
                 src="/media/hero_images/img5.png"
                 alt="Violin Night"
-                loading="eager"
-                className="w-full h-full object-cover object-top"
+                fill
+                priority
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                className="object-cover object-top"
               />
             </div>
           </div>
@@ -377,21 +388,25 @@ const Featured = () => {
         <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
           <div className="w-full flex flex-col gap-2 sm:gap-3 md:gap-4 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
             {/* Top image: The Link (robots / clarity meets creativity) */}
-            <div className="w-full aspect-[3/3.75] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
-              <img
+            <div className="relative w-full aspect-[3/3.75] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
+              <Image
                 src="/media/hero_images/img6.png"
                 alt="Clarity Meets Creativity"
-                loading="eager"
-                className="w-full h-full object-cover object-center"
+                fill
+                priority
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                className="object-cover object-center"
               />
             </div>
             {/* Bottom image: 3D Chrome Icon */}
-            <div className="w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#112236]">
-              <img
+            <div className="relative w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#112236]">
+              <Image
                 src="/media/hero_images/img2.png"
                 alt="3D Icon"
-                loading="eager"
-                className="w-full h-auto object-cover object-top"
+                fill
+                priority
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                className="object-cover object-top"
               />
             </div>
           </div>

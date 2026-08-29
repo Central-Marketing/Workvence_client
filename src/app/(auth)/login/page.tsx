@@ -96,7 +96,7 @@ const Login = () => {
           <div className="email-form">
             <div className="logo-container-step2 flex justify-center md:justify-start">
               <Link href="/">
-                <img src="/Workvence-logo-Horizontal 1.png" alt="Workvence" className="brand-logo" />
+                <img src="/Workvence-logo-Horizontal3.png" alt="Workvence" className="brand-logo" />
               </Link>
             </div>
 

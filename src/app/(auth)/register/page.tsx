@@ -315,7 +315,7 @@ const RegisterContent = () => {
             <div className="flex flex-col h-full">
               <div className="flex justify-center md:justify-start">
                 <Link href="/">
-                  <img src="/Workvence-logo-Horizontal 1.png" alt="Workvence" className="h-10 object-contain" />
+                  <img src="/Workvence-logo-Horizontal3.png" alt="Workvence" className="h-10 object-contain" />
                 </Link>
               </div>
 
@@ -343,7 +343,7 @@ const RegisterContent = () => {
             <div className="flex flex-col h-full">
               <div className="flex justify-center md:justify-start mb-7">
                 <Link href="/">
-                  <img src="/Workvence-logo-Horizontal 1.png" alt="Workvence" className="h-10 object-contain" />
+                  <img src="/Workvence-logo-Horizontal3.png" alt="Workvence" className="h-10 object-contain" />
                 </Link>
               </div>
               <div className="flex justify-center md:justify-start w-full">
@@ -463,7 +463,7 @@ const RegisterContent = () => {
             <div className="flex flex-col h-full">
               <div className="flex justify-center md:justify-start mb-7">
                 <Link href="/">
-                  <img src="/Workvence-logo-Horizontal 1.png" alt="Workvence" className="h-10 object-contain" />
+                  <img src="/Workvence-logo-Horizontal3.png" alt="Workvence" className="h-10 object-contain" />
                 </Link>
               </div>
               <div className="flex justify-center md:justify-start w-full">

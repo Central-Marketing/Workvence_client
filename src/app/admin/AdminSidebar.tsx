@@ -51,7 +51,7 @@ const AdminSidebar = ({ isOpen, onClose, user, onLogout }: AdminSidebarProps) =>
         {/* Header */}
         <div className="sidebar-header">
           <img
-            src="/Workvence-logo-Horizontal 1.png"
+            src="/Workvence-logo-Horizontal3.png"
             alt="Workvence"
             className="brand-logo"
           />

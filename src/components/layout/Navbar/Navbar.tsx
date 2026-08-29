@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -57,14 +57,6 @@ const Navbar = () => {
     }
   };
 
-  const scrollCategories = (direction: 'left' | 'right') => {
-    if (categoryScrollRef.current) {
-      categoryScrollRef.current.scrollBy({
-        left: direction === 'left' ? -250 : 250,
-        behavior: 'smooth'
-      });
-    }
-  };
 
   useEffect(() => {
     // 1. Instantly hydrate from localStorage to prevent UI flicker

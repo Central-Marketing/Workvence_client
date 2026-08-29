@@ -122,8 +122,8 @@ const HowItWorks = () => {
             <button
               onClick={() => setActiveTab('buyer')}
               className={`flex-1 h-full flex items-center justify-center px-[20px] py-[10px] rounded-[8px] font-sf-pro font-medium text-[14px] sm:text-[15px] transition-all duration-200 ${activeTab === 'buyer'
-                  ? 'bg-[#0B403F] text-white shadow-sm'
-                  : 'text-[#6E6E6E] hover:text-[#222427]'
+                ? 'bg-[#0B403F] text-white shadow-sm'
+                : 'text-[#6E6E6E] hover:text-[#222427]'
                 }`}
             >
               Buyer
@@ -131,8 +131,8 @@ const HowItWorks = () => {
             <button
               onClick={() => setActiveTab('seller')}
               className={`flex-1 h-full flex items-center justify-center px-[20px] py-[10px] rounded-[8px] font-sf-pro font-medium text-[14px] sm:text-[15px] transition-all duration-200 ${activeTab === 'seller'
-                  ? 'bg-[#0B403F] text-white shadow-sm'
-                  : 'text-[#6E6E6E] hover:text-[#222427]'
+                ? 'bg-[#0B403F] text-white shadow-sm'
+                : 'text-[#6E6E6E] hover:text-[#222427]'
                 }`}
             >
               Seller
@@ -151,10 +151,10 @@ const HowItWorks = () => {
               <div className="mb-5 sm:mb-6">
                 {step.icon}
               </div>
-              <h3 className="font-sf-pro font-semibold text-[16px] sm:text-[17px] text-[#222427] mb-2 sm:mb-2.5">
+              <h3 className="font-sf-pro font-bold text-[16px] sm:text-[17px] md:text-[24px] text-[#434343] mb-2 sm:mb-2.5">
                 {step.title}
               </h3>
-              <p className="font-sf-pro font-normal text-[13px] sm:text-[14px] text-[#6E6E6E] leading-[1.6]">
+              <p className="font-inter font-normal text-[13px] sm:text-[14px] md:text-[20px] text-[#868686] leading-6 tracking-wide">
                 {step.desc}
               </p>
             </div>

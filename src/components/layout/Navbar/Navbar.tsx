@@ -134,7 +134,7 @@ const Navbar = () => {
 
   return (
     <nav className={`w-full sticky top-0 z-50 transition-all duration-300 ${showMenu || pathname !== "/" ? "bg-white border-b border-gray-100 shadow-sm text-gray-600" : "bg-transparent text-gray-600"}`}>
-      <div className="w-full container mx-auto flex justify-between items-center px-4 md:px-6 py-4">
+      <div className="w-full container mx-auto flex justify-between items-center px-4 md:px-6 py-5">
 
         <div className="flex items-center gap-10">
           <Link href="/" className="flex items-center">
@@ -227,7 +227,7 @@ const Navbar = () => {
 
                   <Link
                     href="/register"
-                    className="px-5 py-2.5 rounded-xl bg-[#0B0F19] hover:bg-black text-white font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] transition-colors flex items-center gap-1.5 shadow-sm"
+                    className="px-6 py-3 rounded-xl bg-[#0B0F19] hover:bg-black text-white font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] transition-colors flex items-center gap-1.5 shadow-sm"
                   >
                     <span>Join Now</span>
                     <FiArrowRight className="text-sm" />

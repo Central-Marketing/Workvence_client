@@ -138,7 +138,7 @@ const Navbar = () => {
 
         <div className="flex items-center gap-10">
           <Link href="/" className="flex items-center">
-            <Image src="/Workvence-logo-Horizontal 1.png" width={160} height={40} alt="Workvence" className="h-8 md:h-10 w-auto object-contain" style={{ width: "auto", height: "auto" }} priority />
+            <Image src="/Workvence-logo-Horizontal3.png" width={160} height={40} alt="Workvence" className="h-8 md:h-10 w-auto object-contain" style={{ width: "auto", height: "auto" }} priority />
           </Link>
 
           <div className={`hidden lg:flex items-center overflow-hidden transition-all duration-300 ${showMenu || pathname !== '/' ? 'opacity-100 max-w-[500px]' : 'opacity-0 max-w-0 pointer-events-none'}`}>

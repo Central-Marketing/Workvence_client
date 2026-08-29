@@ -76,7 +76,7 @@ const Login = () => {
         toast.error(message || 'Email verification required. Redirecting to OTP step...');
         sessionStorage.setItem('tempLoginPassword', formInput.password);
         sessionStorage.setItem('tempLoginUsername', formInput.username);
-        router.push(`/register?step=3&email=${encodeURIComponent(email)}`);
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
         setLoading(false);
         return;
       }

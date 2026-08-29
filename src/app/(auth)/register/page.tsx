@@ -6,8 +6,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { axiosFetch, generateImageURL } from '@/utils';
 import { FcGoogle } from 'react-icons/fc';
-import { MdEmail } from 'react-icons/md';
-import { FaApple, FaFacebook } from 'react-icons/fa';
+import { MdOutlineEmail } from 'react-icons/md';
 import { AiOutlineEye, AiOutlineEyeInvisible, AiOutlineCheckCircle } from 'react-icons/ai';
 import { useUserStore } from '@/store/userStore';
 import Image from 'next/image';
@@ -181,7 +180,7 @@ const RegisterContent = () => {
     setLoading(true);
     try {
       const { url } = image ? await generateImageURL(image) : { url: "" };
-      const { data } = await axiosFetch.post('/auth/register', { ...formInput, image: url });
+      await axiosFetch.post('/auth/register', { ...formInput, image: url });
       toast.success('Registration successful! Please confirm your email.');
       setLoading(false);
       setStep(3); // Go to OTP confirmation step
@@ -307,235 +306,337 @@ const RegisterContent = () => {
   const isFormDisabled = loading || !isPasswordValid || usernameStatus.available === false || emailStatus.available === false || usernameStatus.loading || emailStatus.loading;
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4 md:p-10 box-border">
-      <div className="flex w-full max-w-[1200px] md:h-[800px] bg-white rounded-2xl overflow-hidden">
-        {/* Left Pane */}
-        <div className="flex-1 flex flex-col p-6 md:p-10 lg:px-20 overflow-y-auto [&::-webkit-scrollbar]:w-0">
-          {step === 1 ? (
-            <div className="flex flex-col h-full">
-              <div className="flex justify-center md:justify-start">
-                <Link href="/">
-                  <img src="/Workvence-logo-Horizontal 1.png" alt="Workvence" className="h-10 object-contain" />
-                </Link>
-              </div>
-
-              <div className="flex-1 flex flex-col justify-center items-center max-w-[450px] mx-auto w-full mt-8 md:mt-0">
-                <h1 className="text-[28px] md:text-[32px] font-bold text-[#1a1a1a] mb-10 text-center">Create a new account</h1>
-
-                <div className="flex flex-col gap-4 w-full">
-                  <button data-testid="continue-google-btn" className="flex items-center justify-center gap-3 w-full py-3.5 px-4 rounded-xl text-[15px] font-medium text-[#333] bg-white border border-gray-200 cursor-pointer transition-all hover:bg-gray-50 hover:border-gray-300">
-                    <FcGoogle className="text-[22px]" /> Continue with Google
-                  </button>
-                  <button data-testid="continue-email-btn" className="flex items-center justify-center gap-3 w-full py-3.5 px-4 rounded-xl text-[15px] font-medium text-[#333] bg-white border border-gray-200 cursor-pointer transition-all hover:bg-gray-50 hover:border-gray-300" onClick={() => setStep(2)}>
-                    <MdEmail className="text-[22px]" color="#ea4335" /> Continue with Email
-                  </button>
-                </div>
-
-                <div className="mt-14 text-center w-full">
-                  <p className="text-sm text-[#666] mb-2">Already have an account? <Link href='/login' className="text-emerald-500 font-semibold no-underline hover:underline">Sign in</Link></p>
-                </div>
-                <div className="mt-auto pt-10 text-center w-full">
-                  <p className="text-[13px] text-[#aaa]">©2026 workvence All right reserved</p>
-                </div>
-              </div>
-            </div>
-          ) : step === 2 ? (
-            <div className="flex flex-col h-full">
-              <div className="flex justify-center md:justify-start mb-7">
-                <Link href="/">
-                  <img src="/Workvence-logo-Horizontal 1.png" alt="Workvence" className="h-10 object-contain" />
-                </Link>
-              </div>
-              <div className="flex justify-center md:justify-start w-full">
-                <button data-testid="back-to-step1-btn" className="bg-transparent border-none text-[#666] text-base cursor-pointer mb-7 flex items-center hover:text-emerald-500" onClick={() => setStep(1)}>← Back</button>
-              </div>
-
-              <form onSubmit={handleSubmit} className="flex flex-col items-start w-full max-w-[450px]">
-                <div className="w-full flex flex-col gap-4">
-                  <h1 className="text-[24px] md:text-[28px] font-bold text-[#1a1a1a]">Continue with email</h1>
-                  <p className="text-sm text-[#666] leading-relaxed">Continue with your email and choose a unique username. This is how you'll appear to other users across the platform.</p>
-
-                  <div className="flex gap-4 mb-3 mt-2">
-                    <label data-testid="role-client-label" className={`flex-1 flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${!formInput.isSeller ? 'border-brand-green bg-[#eaf8f0] text-[#169c5e]' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input data-testid="role-client-radio" type="radio" name="isSeller" checked={!formInput.isSeller} onChange={() => setFormInput({ ...formInput, isSeller: false })} className="hidden" />
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                      <span className="font-semibold text-[14px]">I'm a Client</span>
-                    </label>
-                    <label data-testid="role-freelancer-label" className={`flex-1 flex items-center justify-center gap-2 p-3 border rounded-xl cursor-pointer transition-all ${formInput.isSeller ? 'border-brand-green bg-[#eaf8f0] text-[#169c5e]' : 'border-gray-200 hover:border-gray-300'}`}>
-                      <input data-testid="role-freelancer-radio" type="radio" name="isSeller" checked={formInput.isSeller} onChange={() => setFormInput({ ...formInput, isSeller: true })} className="hidden" />
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                      <span className="font-semibold text-[14px]">I'm a Freelancer</span>
-                    </label>
-                  </div>
-
-                  {/* Username Input with Debounced Live Status Indicator */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-[#333]">User name</label>
-                    <div className="relative flex items-center">
-                      <input
-                        data-testid="username-input"
-                        name="username"
-                        type="text"
-                        placeholder="Enter your user name"
-                        onChange={handleChange}
-                        value={formInput.username}
-                        className={`py-3 px-3 pr-10 border rounded-lg text-sm bg-white transition-colors focus:outline-none w-full ${usernameStatus.available === true
-                          ? 'border-emerald-500 focus:border-emerald-500'
-                          : usernameStatus.available === false
-                            ? 'border-red-500 focus:border-red-500'
-                            : 'border-gray-200 focus:border-emerald-500'
-                          }`}
-                      />
-                      {usernameStatus.loading && (
-                        <div className="absolute right-3 inline-block w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                      )}
-                    </div>
-                    {usernameStatus.message && !usernameStatus.loading && (
-                      <p className={`text-xs font-medium mt-0.5 ${usernameStatus.available ? 'text-emerald-600' : 'text-red-500'}`}>
-                        {usernameStatus.available ? '✓ ' : '✕ '} {usernameStatus.message}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Email Input with Debounced Live Status Indicator */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-[#333]">Email Address</label>
-                    <div className="relative flex items-center">
-                      <input
-                        data-testid="email-input"
-                        name="email"
-                        type="email"
-                        placeholder="Enter your email address"
-                        onChange={handleChange}
-                        value={formInput.email}
-                        className={`py-3 px-3 pr-10 border rounded-lg text-sm bg-white transition-colors focus:outline-none w-full ${emailStatus.available === true
-                          ? 'border-emerald-500 focus:border-emerald-500'
-                          : emailStatus.available === false
-                            ? 'border-red-500 focus:border-red-500'
-                            : 'border-gray-200 focus:border-emerald-500'
-                          }`}
-                      />
-                      {emailStatus.loading && (
-                        <div className="absolute right-3 inline-block w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                      )}
-                    </div>
-                    {emailStatus.message && !emailStatus.loading && (
-                      <p className={`text-xs font-medium mt-0.5 ${emailStatus.available ? 'text-emerald-600' : 'text-red-500'}`}>
-                        {emailStatus.available ? '✓ ' : '✕ '} {emailStatus.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-[#333]">Password</label>
-                    <div className="relative flex items-center">
-                      <input data-testid="password-input" name="password" type={showPassword ? "text" : "password"} placeholder="***********" onChange={handleChange} className="py-3 px-3 pr-11 border border-gray-200 rounded-lg text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full" />
-                      <button type="button" className="absolute right-3.5 bg-transparent border-none text-[#888] text-xl cursor-pointer flex items-center justify-center p-0 hover:text-[#555]" onClick={() => setShowPassword(!showPassword)}>
-                        {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1 mb-1">
-                    <div className={`flex items-center gap-1.5 text-xs ${hasMinLength ? 'text-emerald-500' : 'text-[#999]'}`}>
-                      <AiOutlineCheckCircle className="text-[15px]" /> At least 8 characters
-                    </div>
-                    <div className={`flex items-center gap-1.5 text-xs ${hasUpperCase ? 'text-emerald-500' : 'text-[#999]'}`}>
-                      <AiOutlineCheckCircle className="text-[15px]" /> At least 1 uppercase letter
-                    </div>
-                    <div className={`flex items-center gap-1.5 text-xs ${hasLowerCase ? 'text-emerald-500' : 'text-[#999]'}`}>
-                      <AiOutlineCheckCircle className="text-[15px]" /> At least 1 lowercase letter
-                    </div>
-                    <div className={`flex items-center gap-1.5 text-xs ${hasNumber ? 'text-emerald-500' : 'text-[#999]'}`}>
-                      <AiOutlineCheckCircle className="text-[15px]" /> At least 1 number
-                    </div>
-                  </div>
-
-                  <button data-testid="signup-submit-btn" type="submit" className="mt-2 bg-emerald-500 text-white py-4 border-none rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed" disabled={isFormDisabled}>{loading ? 'Loading...' : 'Continue'}</button>
-                </div>
-              </form>
-              <div className="mt-auto pt-10 pb-4 text-center w-full">
-                <p className="text-[13px] text-[#aaa]">©2026 workvence All right reserved</p>
-              </div>
-            </div>
-          ) : (
-            /* ── Step 3: OTP Verification ── */
-            <div className="flex flex-col h-full">
-              <div className="flex justify-center md:justify-start mb-7">
-                <Link href="/">
-                  <img src="/Workvence-logo-Horizontal 1.png" alt="Workvence" className="h-10 object-contain" />
-                </Link>
-              </div>
-              <div className="flex justify-center md:justify-start w-full">
-                <button data-testid="back-to-step2-btn" className="bg-transparent border-none text-[#666] text-base cursor-pointer mb-7 flex items-center hover:text-emerald-500" onClick={() => setStep(2)}>← Back</button>
-              </div>
-
-              <form data-testid="otp-form" onSubmit={handleOtpSubmit} className="flex flex-col items-start w-full max-w-[450px]">
-                <div className="w-full flex flex-col gap-4">
-                  <h1 className="text-[24px] md:text-[28px] font-bold text-[#1a1a1a]">Confirm your email</h1>
-                  <p className="text-sm text-gray-500 leading-relaxed mb-2">We've sent a 6-digit code to <strong data-testid="otp-target-email">{formInput.email}</strong>. Please enter it below.</p>
-
-                  <div className="flex gap-2 sm:gap-3 justify-center w-full mb-4">
-                    {otp.map((digit, index) => (
-                      <input
-                        key={index}
-                        id={`otp-${index}`}
-                        data-testid={`otp-input-${index}`}
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={1}
-                        className="flex-1 min-w-0 max-w-[55px] aspect-square text-center text-xl sm:text-2xl font-bold border border-gray-200 rounded-xl bg-white transition-colors focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
-                        value={digit}
-                        onChange={(e) => handleOtpChange(index, e.target.value)}
-                        onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                        onPaste={handleOtpPaste}
-                      />
-                    ))}
-                  </div>
-
-                  <div className="text-center w-full mb-4 text-sm">
-                    <span className="text-gray-500">Didn't receive the code?</span>{' '}
-                    <button
-                      data-testid="resend-otp-btn"
-                      type="button"
-                      onClick={handleResendOtp}
-                      disabled={resendTimer > 0}
-                      className={`font-bold transition-colors bg-transparent border-none ${resendTimer > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-brand-green hover:underline cursor-pointer'}`}
-                    >
-                      {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : 'Resend OTP'}
-                    </button>
-                  </div>
-
-                  <button data-testid="verify-email-btn" type="submit" className="w-full bg-emerald-500 text-white py-3.5 border-none rounded-lg text-base font-bold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed" disabled={loading}>
-                    {loading ? 'Verifying...' : 'Verify Email'}
-                  </button>
-                </div>
-              </form>
-              <div className="mt-auto pt-10 text-center w-full">
-                <p className="text-[13px] text-[#aaa]">©2026 workvence All right reserved</p>
-              </div>
-            </div>
-          )}
+    <div className="min-h-screen w-full bg-[#f4f5f6] flex flex-col lg:flex-row overflow-x-hidden">
+      {/* Left Pane */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 min-h-screen">
+        {/* Top Header Logo */}
+        <div className="w-full flex justify-start">
+          <Link href="/" className="inline-flex items-center">
+            <Image
+              src="/Workvence-logo-Horizontal 1.png"
+              alt="Workvence"
+              width={145}
+              height={36}
+              className="h-8 md:h-9 w-auto object-contain"
+              priority
+            />
+          </Link>
         </div>
 
-        {/* Right Pane */}
-        <div className="hidden md:flex flex-1 relative bg-black">
-          <Image fill src="/loginImg.jpg" alt="Workvence user" className="w-full h-full object-cover opacity-80" />
-          <div className="absolute bottom-10 left-10 right-10">
-            <p className="text-white text-lg leading-relaxed font-medium drop-shadow-lg">"Workvence has revolutionized how I outsource my business tasks. It's incredibly efficient, and the talent pool is unmatched. A game-changer for my startup!"</p>
+        {/* Center Form Content */}
+        {step === 1 ? (
+          <div className="flex flex-col items-center justify-center my-auto w-full max-w-[390px] mx-auto py-8">
+            <p className="text-[14px] text-[#6b7280] mb-2 text-center">
+              Already have an account?{' '}
+              <Link href="/login" className="text-[#008364] font-semibold hover:underline">
+                Sign in
+              </Link>
+            </p>
+
+            <h1 className="text-[28px] sm:text-[32px] font-bold text-[#111827] mb-8 text-center tracking-tight">
+              Create a new account
+            </h1>
+
+            <div className="flex flex-col gap-3.5 w-full">
+              <button
+                data-testid="continue-google-btn"
+                type="button"
+                className="flex items-center justify-center gap-3 w-full py-3.5 px-4 rounded-xl text-[14px] font-medium text-[#1f2937] bg-white border border-[#e5e7eb] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80 transition-all cursor-pointer"
+              >
+                <FcGoogle className="text-[20px]" />
+                <span>Continue with Google</span>
+              </button>
+
+              <button
+                data-testid="continue-email-btn"
+                type="button"
+                onClick={() => setStep(2)}
+                className="flex items-center justify-center gap-3 w-full py-3.5 px-4 rounded-xl text-[14px] font-medium text-[#1f2937] bg-white border border-[#e5e7eb] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80 transition-all cursor-pointer"
+              >
+                <MdOutlineEmail className="text-[20px] text-[#374151]" />
+                <span>Continue with Email</span>
+              </button>
+            </div>
           </div>
+        ) : step === 2 ? (
+          <div className="flex flex-col my-auto w-full max-w-[420px] mx-auto py-8">
+            <div className="w-full mb-4">
+              <button
+                data-testid="back-to-step1-btn"
+                type="button"
+                className="bg-transparent border-none text-[#6b7280] text-sm font-medium cursor-pointer flex items-center gap-1 hover:text-emerald-600 transition-colors"
+                onClick={() => setStep(1)}
+              >
+                ← Back
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="flex flex-col items-start w-full">
+              <div className="w-full flex flex-col gap-4">
+                <div>
+                  <h1 className="text-[24px] sm:text-[28px] font-bold text-[#111827] tracking-tight mb-1.5">
+                    Continue with email
+                  </h1>
+                  <p className="text-sm text-[#6b7280] leading-relaxed">
+                    Continue with your email and choose a unique username. This is how you'll appear to other users across the platform.
+                  </p>
+                </div>
+
+                <div className="flex gap-3 my-1">
+                  <label
+                    data-testid="role-client-label"
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-3.5 border rounded-xl cursor-pointer transition-all ${
+                      !formInput.isSeller
+                        ? 'border-emerald-500 bg-emerald-50/60 text-emerald-700 font-semibold'
+                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    <input
+                      data-testid="role-client-radio"
+                      type="radio"
+                      name="isSeller"
+                      checked={!formInput.isSeller}
+                      onChange={() => setFormInput({ ...formInput, isSeller: false })}
+                      className="hidden"
+                    />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span className="text-[13px]">I'm a Client</span>
+                  </label>
+
+                  <label
+                    data-testid="role-freelancer-label"
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-3.5 border rounded-xl cursor-pointer transition-all ${
+                      formInput.isSeller
+                        ? 'border-emerald-500 bg-emerald-50/60 text-emerald-700 font-semibold'
+                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    <input
+                      data-testid="role-freelancer-radio"
+                      type="radio"
+                      name="isSeller"
+                      checked={formInput.isSeller}
+                      onChange={() => setFormInput({ ...formInput, isSeller: true })}
+                      className="hidden"
+                    />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                    <span className="text-[13px]">I'm a Freelancer</span>
+                  </label>
+                </div>
+
+                {/* Username Input */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">User name</label>
+                  <div className="relative flex items-center">
+                    <input
+                      data-testid="username-input"
+                      name="username"
+                      type="text"
+                      placeholder="Enter your user name"
+                      onChange={handleChange}
+                      value={formInput.username}
+                      className={`w-full py-3 px-3.5 pr-10 border rounded-xl text-sm bg-white transition-colors focus:outline-none ${
+                        usernameStatus.available === true
+                          ? 'border-emerald-500 focus:border-emerald-500'
+                          : usernameStatus.available === false
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-200 focus:border-emerald-500'
+                      }`}
+                    />
+                    {usernameStatus.loading && (
+                      <div className="absolute right-3 inline-block w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                    )}
+                  </div>
+                  {usernameStatus.message && !usernameStatus.loading && (
+                    <p className={`text-xs font-medium mt-0.5 ${usernameStatus.available ? 'text-emerald-600' : 'text-red-500'}`}>
+                      {usernameStatus.available ? '✓ ' : '✕ '} {usernameStatus.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Email Input */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Email Address</label>
+                  <div className="relative flex items-center">
+                    <input
+                      data-testid="email-input"
+                      name="email"
+                      type="email"
+                      placeholder="Enter your email address"
+                      onChange={handleChange}
+                      value={formInput.email}
+                      className={`w-full py-3 px-3.5 pr-10 border rounded-xl text-sm bg-white transition-colors focus:outline-none ${
+                        emailStatus.available === true
+                          ? 'border-emerald-500 focus:border-emerald-500'
+                          : emailStatus.available === false
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-gray-200 focus:border-emerald-500'
+                      }`}
+                    />
+                    {emailStatus.loading && (
+                      <div className="absolute right-3 inline-block w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                    )}
+                  </div>
+                  {emailStatus.message && !emailStatus.loading && (
+                    <p className={`text-xs font-medium mt-0.5 ${emailStatus.available ? 'text-emerald-600' : 'text-red-500'}`}>
+                      {emailStatus.available ? '✓ ' : '✕ '} {emailStatus.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Password Input */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Password</label>
+                  <div className="relative flex items-center">
+                    <input
+                      data-testid="password-input"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="***********"
+                      onChange={handleChange}
+                      className="w-full py-3 px-3.5 pr-11 border border-gray-200 rounded-xl text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3.5 bg-transparent border-none text-[#888] text-xl cursor-pointer flex items-center justify-center p-0 hover:text-[#555]"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Criteria Checklist */}
+                <div className="grid grid-cols-2 gap-1.5 my-1">
+                  <div className={`flex items-center gap-1.5 text-xs ${hasMinLength ? 'text-emerald-600 font-medium' : 'text-gray-400'}`}>
+                    <AiOutlineCheckCircle className="text-[14px]" /> At least 8 characters
+                  </div>
+                  <div className={`flex items-center gap-1.5 text-xs ${hasUpperCase ? 'text-emerald-600 font-medium' : 'text-gray-400'}`}>
+                    <AiOutlineCheckCircle className="text-[14px]" /> 1 uppercase letter
+                  </div>
+                  <div className={`flex items-center gap-1.5 text-xs ${hasLowerCase ? 'text-emerald-600 font-medium' : 'text-gray-400'}`}>
+                    <AiOutlineCheckCircle className="text-[14px]" /> 1 lowercase letter
+                  </div>
+                  <div className={`flex items-center gap-1.5 text-xs ${hasNumber ? 'text-emerald-600 font-medium' : 'text-gray-400'}`}>
+                    <AiOutlineCheckCircle className="text-[14px]" /> 1 number
+                  </div>
+                </div>
+
+                <button
+                  data-testid="signup-submit-btn"
+                  type="submit"
+                  className="mt-2 w-full bg-emerald-600 text-white py-3.5 border-none rounded-xl text-sm font-semibold cursor-pointer transition-colors hover:bg-emerald-700 disabled:bg-emerald-300 disabled:cursor-not-allowed shadow-sm"
+                  disabled={isFormDisabled}
+                >
+                  {loading ? 'Loading...' : 'Continue'}
+                </button>
+              </div>
+            </form>
+          </div>
+        ) : (
+          /* Step 3: OTP Verification */
+          <div className="flex flex-col my-auto w-full max-w-[420px] mx-auto py-8">
+            <div className="w-full mb-4">
+              <button
+                data-testid="back-to-step2-btn"
+                type="button"
+                className="bg-transparent border-none text-[#6b7280] text-sm font-medium cursor-pointer flex items-center gap-1 hover:text-emerald-600 transition-colors"
+                onClick={() => setStep(2)}
+              >
+                ← Back
+              </button>
+            </div>
+
+            <form data-testid="otp-form" onSubmit={handleOtpSubmit} className="flex flex-col items-start w-full">
+              <div className="w-full flex flex-col gap-4">
+                <div>
+                  <h1 className="text-[24px] sm:text-[28px] font-bold text-[#111827] tracking-tight mb-1.5">
+                    Confirm your email
+                  </h1>
+                  <p className="text-sm text-[#6b7280] leading-relaxed">
+                    We've sent a 6-digit code to <strong data-testid="otp-target-email" className="text-gray-900">{formInput.email}</strong>. Please enter it below.
+                  </p>
+                </div>
+
+                <div className="flex gap-2 sm:gap-3 justify-center w-full my-3">
+                  {otp.map((digit, index) => (
+                    <input
+                      key={index}
+                      id={`otp-${index}`}
+                      data-testid={`otp-input-${index}`}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      className="flex-1 min-w-0 max-w-[52px] aspect-square text-center text-xl sm:text-2xl font-bold border border-gray-200 rounded-xl bg-white transition-colors focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                      value={digit}
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                      onPaste={handleOtpPaste}
+                    />
+                  ))}
+                </div>
+
+                <div className="text-center w-full text-sm text-[#6b7280]">
+                  <span>Didn't receive the code?</span>{' '}
+                  <button
+                    data-testid="resend-otp-btn"
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={resendTimer > 0}
+                    className={`font-semibold transition-colors bg-transparent border-none ${
+                      resendTimer > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-emerald-600 hover:underline cursor-pointer'
+                    }`}
+                  >
+                    {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : 'Resend OTP'}
+                  </button>
+                </div>
+
+                <button
+                  data-testid="verify-email-btn"
+                  type="submit"
+                  className="w-full mt-2 bg-emerald-600 text-white py-3.5 border-none rounded-xl text-sm font-semibold cursor-pointer transition-colors hover:bg-emerald-700 disabled:bg-emerald-300 disabled:cursor-not-allowed shadow-sm"
+                  disabled={loading}
+                >
+                  {loading ? 'Verifying...' : 'Verify Email'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Bottom Footer Copyright */}
+        <div className="w-full flex justify-start text-[13px] text-[#6b7280] font-normal pt-6">
+          <p>© 2026 workvence All right reserved</p>
+        </div>
+      </div>
+
+      {/* Right Pane */}
+      <div className="hidden lg:flex flex-1 p-3 sm:p-4 lg:p-5 h-screen sticky top-0">
+        <div className="relative w-full h-full rounded-2xl lg:rounded-3xl overflow-hidden bg-[#0a0f1d] shadow-sm">
+          <Image
+            src="/media/loginImage.png"
+            alt="Workvence"
+            fill
+            priority
+            className="object-cover"
+            sizes="50vw"
+          />
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const Register = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <RegisterContent />
     </Suspense>
-  )
-}
+  );
+};
 
 export default Register;

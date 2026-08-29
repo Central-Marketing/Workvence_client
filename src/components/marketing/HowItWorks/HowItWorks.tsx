@@ -118,12 +118,12 @@ const HowItWorks = () => {
           </div>
 
           {/* Toggle Tabs (Buyer / Seller) */}
-          <div className="flex bg-[#F4F4F6] p-1 rounded-[10px] sm:rounded-[12px] border border-gray-200/50 w-fit">
+          <div className="flex items-center w-[214px] h-[46px] bg-[#F4F4F6] p-[4px] rounded-[10px] border border-gray-200/50">
             <button
               onClick={() => setActiveTab('buyer')}
-              className={`px-7 py-2 rounded-[8px] font-sf-pro font-medium text-[14px] sm:text-[15px] transition-all duration-200 ${
+              className={`flex-1 h-full flex items-center justify-center px-[20px] py-[10px] rounded-[8px] font-sf-pro font-medium text-[14px] sm:text-[15px] transition-all duration-200 ${
                 activeTab === 'buyer'
-                  ? 'bg-[#0E3834] text-white shadow-sm'
+                  ? 'bg-[#0B403F] text-white shadow-sm'
                   : 'text-[#6E6E6E] hover:text-[#222427]'
               }`}
             >
@@ -131,9 +131,9 @@ const HowItWorks = () => {
             </button>
             <button
               onClick={() => setActiveTab('seller')}
-              className={`px-7 py-2 rounded-[8px] font-sf-pro font-medium text-[14px] sm:text-[15px] transition-all duration-200 ${
+              className={`flex-1 h-full flex items-center justify-center px-[20px] py-[10px] rounded-[8px] font-sf-pro font-medium text-[14px] sm:text-[15px] transition-all duration-200 ${
                 activeTab === 'seller'
-                  ? 'bg-[#0E3834] text-white shadow-sm'
+                  ? 'bg-[#0B403F] text-white shadow-sm'
                   : 'text-[#6E6E6E] hover:text-[#222427]'
               }`}
             >

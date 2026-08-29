@@ -21,9 +21,9 @@ const Home = () => {
       <PostProject />
       <HowItWorks />
       <PromoSection />
-      <TopRatedSellers />
+      {/* <TopRatedSellers /> */}
       <TrustProtection />
-      <TwoWays />
+      {/* <TwoWays /> */}
       {/* <FAQ /> */}
       <CTA />
     </div>

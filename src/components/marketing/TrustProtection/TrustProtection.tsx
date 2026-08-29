@@ -1,50 +1,64 @@
+"use client";
+
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowRight } from 'lucide-react';
+
 const TrustProtection = () => {
-  const trustFeatures = [
-    {
-      title: "Escrow Protection",
-      description: "Your funds are securely held in Workvence Vault until you authorize the release upon completion of milestones.",
-      icon: "/all-icons/ai-security-03.svg"
-    },
-    {
-      title: "Vetted Experts",
-      description: "We manually verify every professional's identity, credentials, and work history to ensure only the top 1% join our community.",
-      icon: "/all-icons/id.svg"
-    },
-    {
-      title: "Dispute Resolution",
-      description: "In the rare event of a disagreement, our neutral expert mediation team steps in to reach a fair and professional resolution.",
-      icon: "/all-icons/scale.svg"
-    }
-  ];
-
   return (
-    <section className="w-full bg-white py-10 md:py-20 flex justify-center">
-      <div className="container mx-auto px-4 md:px-6 flex flex-col items-start md:items-center">
-        <div className="text-left md:text-center max-w-3xl mb-12 w-full">
-          <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 tracking-tight mb-4">
-            Built Around Trust &amp; Protection
-          </h2>
-          <p className="text-[15px] text-gray-500 leading-relaxed md:mx-auto">
-            Every project is backed by secure escrow payments, manually vetted professionals, and transparent
-            protection policies—so you can hire and collaborate with complete confidence.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-          {trustFeatures.map((feature, index) => (
-            <div
-              key={index}
-              className="bg-white border border-gray-100 rounded-2xl p-8 md:p-9 flex flex-col items-start md:items-center text-left md:text-center transition-all duration-300 hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)] hover:-translate-y-0.5"
-            >
-              <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-6">
-                <img src={feature.icon} alt={feature.title} className="w-6 h-6 object-contain" />
-              </div>
-              <h3 className="text-[17px] font-semibold text-gray-800 mb-3">{feature.title}</h3>
-              <p className="text-[14px] text-gray-500 leading-relaxed md:max-w-[280px]">
-                {feature.description}
-              </p>
+    <section className="w-full py-12 sm:py-16 md:py-20 lg:py-24 bg-white">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center w-full">
+          
+          {/* Left Column: Escrow Image Mockup */}
+          <div className="w-full flex items-center justify-center">
+            <div className="w-full relative overflow-hidden rounded-[20px] sm:rounded-[24px] shadow-sm">
+              <Image
+                src="/media/escrow.png"
+                alt="Your Money Stays Yours Until The Work Is Right."
+                width={680}
+                height={460}
+                priority
+                className="w-full h-auto object-cover rounded-[20px] sm:rounded-[24px]"
+              />
             </div>
-          ))}
+          </div>
+
+          {/* Right Column: Typography & Escrow CTA */}
+          <div className="w-full flex flex-col justify-between self-stretch py-2 lg:py-4">
+            {/* Main Headline */}
+            <div>
+              <h2 className="font-sf-pro font-[510] text-3xl sm:text-4xl lg:text-[42px] xl:text-[46px] text-[#222427] leading-[1.2] tracking-tight">
+                Your Money Stays Yours Until
+                <br />
+                The Work Is Right.
+              </h2>
+            </div>
+
+            {/* Description & CTA */}
+            <div className="mt-8 sm:mt-10 lg:mt-14 space-y-6 sm:space-y-7">
+              <p className="font-sf-pro font-normal text-[14px] sm:text-[15px] md:text-[16px] text-[#667085] leading-[1.65] w-full">
+                When you order, your payment goes into secure escrow — the seller can&apos;t
+                touch it until you approve the delivery. If the work isn&apos;t delivered or
+                doesn&apos;t match what was agreed, you&apos;re protected by our money-back
+                guarantee and can open a dispute for a platform officer to resolve. No
+                awkward chasing, no lost payments.
+              </p>
+
+              <div>
+                <Link
+                  href="/faq"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-[8px] bg-black text-white font-sf-pro font-medium text-[14px] sm:text-[15px] hover:bg-black/90 hover:shadow-sm active:scale-[0.98] transition-all duration-200 w-fit"
+                >
+                  <span>How Escrow Works</span>
+                  <ArrowRight size={16} strokeWidth={2} />
+                </Link>
+              </div>
+            </div>
+
+          </div>
+
         </div>
       </div>
     </section>

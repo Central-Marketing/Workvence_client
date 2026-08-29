@@ -1,46 +1,94 @@
+"use client";
+
+import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowRight } from 'lucide-react';
+
+const MoneyIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <rect x="2" y="6" width="20" height="12" rx="3" stroke="currentColor" strokeWidth="2" />
+    <circle cx="12" cy="12" r="2.5" stroke="currentColor" strokeWidth="2" />
+    <path d="M6 12H6.01M18 12H18.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
 
 const CTA = () => {
   return (
-    <section className="w-full bg-white py-16 md:py-24 flex justify-center">
+    <section className="w-full py-12 sm:py-16 md:py-20 lg:py-24 bg-white">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="bg-[#2e5c0f] rounded-3xl px-8 py-16 md:py-20 text-center relative overflow-hidden flex flex-col items-center">
+        
+        {/* Main Background Frame (1760x800 with 10px Radius) */}
+        <div
+          className="relative w-full max-w-[1760px] mx-auto rounded-[10px] px-6 sm:px-10 md:px-14 lg:px-16 py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
+          style={{
+            background: '#052121',
+          }}
+        >
+          {/* Bottom Ellipse Glow (1610x997, 40% top part visible rising from bottom) */}
+          <div
+            className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[60%] w-[95%] max-w-[1610px] h-[550px] sm:h-[750px] lg:h-[997px] rounded-[50%] pointer-events-none z-0"
+            style={{
+              background: 'radial-gradient(ellipse at center, #004443 0%, #004443 45%, rgba(0, 68, 67, 0.7) 70%, transparent 90%)',
+              filter: 'blur(50px)',
+            }}
+          />
 
-          {/* Decorative Background Shapes */}
-          <div className="absolute left-[10%] bottom-[20%] w-20 h-20 bg-[#3d7a14] transform rotate-45 rounded-md hidden md:block"></div>
-          <div className="absolute right-0 top-0 w-96 h-96 bg-[#234a0a] transform rotate-45 translate-x-1/2 -translate-y-1/2 origin-top-right hidden md:block"></div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
+            
+            {/* Left Content Column */}
+            <div className="lg:col-span-7 flex flex-col items-start justify-center">
+              
+              {/* Moneyback Guarantee Badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[8px] bg-[#E8F8DE] text-[#244E18] font-sf-pro font-medium text-[12px] sm:text-[13px] mb-5 sm:mb-6 shadow-sm">
+                <MoneyIcon className="w-4 h-4 text-[#244E18]" />
+                <span>100% moneyback guarantee</span>
+              </div>
 
-          <div className="relative z-10 max-w-2xl mx-auto">
-            {/* Trust signal / eyebrow */}
-            <div className="inline-flex items-center gap-2 bg-white/10 text-white text-xs font-medium px-4 py-1.5 rounded-full mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-green"></span>
-              Trusted by 12,000+ businesses
+              {/* Main Headline */}
+              <h2 className="font-sf-pro font-[510] text-3xl sm:text-4xl lg:text-[44px] xl:text-[48px] text-white leading-[1.18] tracking-tight mb-4 sm:mb-5">
+                Are You A Freelancer?
+                <br />
+                Earn Globally.
+              </h2>
+
+              {/* Description Paragraph */}
+              <p className="font-sf-pro font-normal text-[13px] sm:text-[14px] md:text-[15px] text-[#A2B6B3] leading-[1.65] max-w-xl mb-8 sm:mb-10">
+                Reach international buyers, get paid in full with fast, secure payouts, and grow your
+                business on a platform built on trust. Applications are reviewed to keep quality high.
+              </p>
+
+              {/* CTA Button */}
+              <div>
+                <Link
+                  href="/register?seller=true"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 rounded-[10px] bg-white text-[#112131] font-sf-pro font-medium text-[14px] sm:text-[15px] hover:bg-gray-100 hover:shadow-lg active:scale-[0.98] transition-all duration-200"
+                >
+                  <span>Become A Seller</span>
+                  <ArrowRight size={16} strokeWidth={2} />
+                </Link>
+              </div>
+
             </div>
 
-            <h2 className="text-3xl md:text-6xl font-semibold text-white mb-6">
-              Hire a designer, developer,<br className="hidden md:block" /> or writer today
-            </h2>
-            <p className="text-white/90 text-[15px] leading-relaxed mb-10 max-w-[550px] mx-auto">
-              Browse vetted freelancers across every skill, or apply to join Workvence
-              as a seller and put your work in front of clients who are ready to hire.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/packages"
-                className="w-full sm:w-auto bg-brand-green text-gray-900 font-medium px-7 py-3.5 rounded-xl hover:brightness-95 transition-all flex items-center justify-center gap-2"
-              >
-                Find a service <span className="text-lg leading-none mb-0.5">&rarr;</span>
-              </Link>
-              <Link
-                href="/register?seller=true"
-                className="w-full sm:w-auto bg-white text-gray-900 font-medium px-7 py-3.5 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-              >
-                Become a seller <span className="text-lg leading-none mb-0.5">&rarr;</span>
-              </Link>
+            {/* Right 3D Graphic Column */}
+            <div className="lg:col-span-5 flex items-center justify-center lg:justify-end">
+              <div className="w-full max-w-[380px] sm:max-w-[440px] lg:max-w-[500px] flex items-center justify-center">
+                <Image
+                  src="/media/cta.png"
+                  alt="Workvence - Are You A Freelancer? Earn Globally."
+                  width={560}
+                  height={560}
+                  priority
+                  className="w-full h-auto object-contain drop-shadow-2xl"
+                />
+              </div>
             </div>
+
           </div>
+
         </div>
+
       </div>
     </section>
   );

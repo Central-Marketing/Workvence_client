@@ -62,7 +62,7 @@ const Login = () => {
       setUser(user);
       toast.success(`Welcome back, ${user.username || 'user'}!`, {
         duration: 3000,
-        icon: "😃"
+        icon: ""
       });
       router.push('/dashboard');
       setLoading(false);

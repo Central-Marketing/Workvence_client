@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { axiosFetch, generateImageURL } from '@/utils';
 import { FcGoogle } from 'react-icons/fc';
 import { MdOutlineEmail } from 'react-icons/md';
-import { AiOutlineEye, AiOutlineEyeInvisible, AiOutlineCheckCircle } from 'react-icons/ai';
+import { AiOutlineEye, AiOutlineEyeInvisible, AiOutlineCheckCircle, AiOutlineArrowRight } from 'react-icons/ai';
 import { useUserStore } from '@/store/userStore';
 import Image from 'next/image';
 
@@ -385,11 +385,10 @@ const RegisterContent = () => {
                 <div className="flex gap-3 my-1">
                   <label
                     data-testid="role-client-label"
-                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-3.5 border rounded-xl cursor-pointer transition-all ${
-                      !formInput.isSeller
-                        ? 'border-emerald-500 bg-emerald-50/60 text-emerald-700 font-semibold'
-                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
-                    }`}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-3.5 border rounded-xl cursor-pointer transition-all ${!formInput.isSeller
+                      ? 'border-emerald-500 bg-emerald-50/60 text-emerald-700 font-semibold'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                      }`}
                   >
                     <input
                       data-testid="role-client-radio"
@@ -407,11 +406,10 @@ const RegisterContent = () => {
 
                   <label
                     data-testid="role-freelancer-label"
-                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-3.5 border rounded-xl cursor-pointer transition-all ${
-                      formInput.isSeller
-                        ? 'border-emerald-500 bg-emerald-50/60 text-emerald-700 font-semibold'
-                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
-                    }`}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 px-3.5 border rounded-xl cursor-pointer transition-all ${formInput.isSeller
+                      ? 'border-emerald-500 bg-emerald-50/60 text-emerald-700 font-semibold'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                      }`}
                   >
                     <input
                       data-testid="role-freelancer-radio"
@@ -439,13 +437,12 @@ const RegisterContent = () => {
                       placeholder="Enter your user name"
                       onChange={handleChange}
                       value={formInput.username}
-                      className={`w-full py-3 px-3.5 pr-10 border rounded-xl text-sm bg-white transition-colors focus:outline-none ${
-                        usernameStatus.available === true
-                          ? 'border-emerald-500 focus:border-emerald-500'
-                          : usernameStatus.available === false
+                      className={`w-full py-3 px-3.5 pr-10 border rounded-xl text-sm bg-white transition-colors focus:outline-none ${usernameStatus.available === true
+                        ? 'border-emerald-500 focus:border-emerald-500'
+                        : usernameStatus.available === false
                           ? 'border-red-500 focus:border-red-500'
                           : 'border-gray-200 focus:border-emerald-500'
-                      }`}
+                        }`}
                     />
                     {usernameStatus.loading && (
                       <div className="absolute right-3 inline-block w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
@@ -469,13 +466,12 @@ const RegisterContent = () => {
                       placeholder="Enter your email address"
                       onChange={handleChange}
                       value={formInput.email}
-                      className={`w-full py-3 px-3.5 pr-10 border rounded-xl text-sm bg-white transition-colors focus:outline-none ${
-                        emailStatus.available === true
-                          ? 'border-emerald-500 focus:border-emerald-500'
-                          : emailStatus.available === false
+                      className={`w-full py-3 px-3.5 pr-10 border rounded-xl text-sm bg-white transition-colors focus:outline-none ${emailStatus.available === true
+                        ? 'border-emerald-500 focus:border-emerald-500'
+                        : emailStatus.available === false
                           ? 'border-red-500 focus:border-red-500'
                           : 'border-gray-200 focus:border-emerald-500'
-                      }`}
+                        }`}
                     />
                     {emailStatus.loading && (
                       <div className="absolute right-3 inline-block w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
@@ -529,10 +525,21 @@ const RegisterContent = () => {
                 <button
                   data-testid="signup-submit-btn"
                   type="submit"
-                  className="mt-2 w-full bg-emerald-600 text-white py-3.5 border-none rounded-xl text-sm font-semibold cursor-pointer transition-colors hover:bg-emerald-700 disabled:bg-emerald-300 disabled:cursor-not-allowed shadow-sm"
+                  className={`mt-2 w-full flex items-center justify-center gap-2 py-3.5 border-none rounded-xl text-sm font-semibold transition-all shadow-sm ${
+                    isFormDisabled
+                      ? 'bg-[#DADADA] text-[#6E6E6E] cursor-not-allowed'
+                      : 'bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer'
+                  }`}
                   disabled={isFormDisabled}
                 >
-                  {loading ? 'Loading...' : 'Continue'}
+                  {loading ? (
+                    'Loading...'
+                  ) : (
+                    <>
+                      <span>Get Started</span>
+                      <AiOutlineArrowRight className="text-base" />
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -587,9 +594,8 @@ const RegisterContent = () => {
                     type="button"
                     onClick={handleResendOtp}
                     disabled={resendTimer > 0}
-                    className={`font-semibold transition-colors bg-transparent border-none ${
-                      resendTimer > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-emerald-600 hover:underline cursor-pointer'
-                    }`}
+                    className={`font-semibold transition-colors bg-transparent border-none ${resendTimer > 0 ? 'text-gray-400 cursor-not-allowed' : 'text-emerald-600 hover:underline cursor-pointer'
+                      }`}
                   >
                     {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : 'Resend OTP'}
                   </button>

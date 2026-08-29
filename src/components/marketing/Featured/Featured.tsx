@@ -101,9 +101,9 @@ const Featured = () => {
       />
 
       {/* TOP HEADER & SEARCH CONTENT */}
-      <div className="relative z-20 container mx-auto px-4 text-center max-w-4xl flex flex-col items-center">
+      <div className="relative z-20 container mx-auto px-4 text-center max-w-[1100px] flex flex-col items-center">
         {/* Headline */}
-        <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-medium text-[#1E293B] tracking-tight leading-[1.12] mb-3">
+        <h1 className="font-sf-pro font-[510] text-3xl sm:text-5xl md:text-6xl lg:text-[84px] text-[#1E293B] tracking-[0px] leading-[100%] text-center mb-4 sm:mb-5">
           Find the right <span className="text-[#327C73]">freelancer</span>
           <br />
           and get to work in minutes.

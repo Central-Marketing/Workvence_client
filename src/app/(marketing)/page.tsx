@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from 'react';
-import { Featured, Slide, TrustedBy, ExploreCategories, PopularServices, HowItWorks, PromoSection, TopRatedSellers, TrustProtection, TwoWays, FAQ, CTA } from '@/components';
+import { Featured, Slide, TrustedBy, ExploreCategories, PopularServices, HowItWorks, PromoSection, TopRatedSellers, TrustProtection, TwoWays, FAQ, CTA, PostProject } from '@/components';
 import { CategoryCard, ProjectCard } from '@/components';
 import { cards, projects } from '@/data';
 
@@ -18,6 +18,7 @@ const Home = () => {
       <TrustedBy />
       <ExploreCategories />
       <PopularServices />
+      <PostProject />
       <HowItWorks />
       <PromoSection />
       <TopRatedSellers />

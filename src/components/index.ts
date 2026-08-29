@@ -27,6 +27,7 @@ export { default as TrustProtection } from "./marketing/TrustProtection/TrustPro
 export { default as TwoWays } from "./marketing/TwoWays/TwoWays";
 export { default as FAQ } from "./marketing/FAQ/FAQ";
 export { default as CTA } from "./marketing/CTA/CTA";
+export { default as PostProject } from "./marketing/PostProject/PostProject";
 export { default as PrivacyPolicy } from "./marketing/PrivacyPolicy/PrivacyPolicy";
 export { default as TermsAndConditions } from "./marketing/TermsAndConditions/TermsAndConditions";
 

@@ -10,5 +10,6 @@ export { default as TrustProtection } from './TrustProtection/TrustProtection';
 export { default as TwoWays } from './TwoWays/TwoWays';
 export { default as FAQ } from './FAQ/FAQ';
 export { default as CTA } from './CTA/CTA';
+export { default as PostProject } from './PostProject/PostProject';
 export { default as PrivacyPolicy } from './PrivacyPolicy/PrivacyPolicy';
 export { default as TermsAndConditions } from './TermsAndConditions/TermsAndConditions';

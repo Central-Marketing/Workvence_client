@@ -153,14 +153,14 @@ const ExploreCategories = () => {
   const categoryList = [...regularCats, ...otherCats];
 
   return (
-    <section className="w-full py-12 sm:py-16 md:py-24 bg-white">
+    <section className="w-full pb-12 sm:pb-16 md:pb-24 bg-[#fafafa]">
       <div className="w-full container mx-auto px-4 md:px-6">
         {/* Centered Heading and Subtitle */}
         <div className="text-center mb-12 sm:mb-16 md:mb-20">
-          <h2 className="font-sf-pro font-semibold text-[32px] sm:text-[38px] md:text-[42px] text-[#222427] leading-tight tracking-tight">
+          <h2 className="font-sf-pro font-[510] text-[32px] sm:text-[38px] md:text-[48px] text-[#292929] leading-normal tracking-normal">
             Explore Top Categories
           </h2>
-          <p className="font-sf-pro font-normal text-[14px] sm:text-[15px] text-[#868686] mt-2.5 max-w-xl mx-auto">
+          <p className="font-inter font-normal text-base sm:text-[15px] text-[#6E6E6E] mt-2.5">
             Explore a wide range of services organized by category
           </p>
         </div>
@@ -188,18 +188,14 @@ const ExploreCategories = () => {
               <Link
                 href={`/packages?category=${encodeURIComponent(path)}`}
                 key={category._id || category.id || index}
-                className={`group flex flex-col items-center justify-center text-center p-8 sm:p-10 lg:p-14 hover:bg-slate-50/50 transition-all duration-200 cursor-pointer ${
-                  isRightBorderMobile ? "border-r border-gray-100" : ""
-                } ${
-                  isRightBorderDesktop ? "md:border-r md:border-gray-100" : "md:border-r-0"
-                } ${
-                  isBottomBorderMobile ? "border-b border-gray-100" : ""
-                } ${
-                  isBottomBorderDesktop ? "md:border-b md:border-gray-100" : "md:border-b-0"
-                }`}
+                className={`group flex flex-col items-center justify-center text-center p-8 sm:p-10 lg:p-14 hover:bg-slate-50/50 transition-all duration-200 cursor-pointer ${isRightBorderMobile ? "border-r border-gray-100" : ""
+                  } ${isRightBorderDesktop ? "md:border-r md:border-gray-100" : "md:border-r-0"
+                  } ${isBottomBorderMobile ? "border-b border-gray-100" : ""
+                  } ${isBottomBorderDesktop ? "md:border-b md:border-gray-100" : "md:border-b-0"
+                  }`}
               >
                 {/* Circular Icon Bubble */}
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#F6F8F9] flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 group-hover:bg-emerald-50/80 transition-all duration-300 shrink-0">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#ffffff] flex items-center justify-center mb-4 sm:mb-5 group-hover:scale-110 group-hover:bg-emerald-50/80 transition-all duration-300 shrink-0">
                   {getMatchedIcon(category, index, "w-6 h-6 sm:w-7 sm:h-7 text-[#222427] group-hover:text-brand-green transition-colors duration-300")}
                 </div>
 

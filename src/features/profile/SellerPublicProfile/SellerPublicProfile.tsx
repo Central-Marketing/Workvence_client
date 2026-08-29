@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -40,7 +40,7 @@ const DEFAULT_CATEGORIES = [
   "Social Media",
 ];
 
-const SellerPublicProfile = ({ username }: { username?: string }) => {
+const SellerPublicProfileContent = ({ username }: { username?: string }) => {
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [sellerData, setSellerData] = useState<any>(null);
   const [sellerGigs, setSellerGigs] = useState<any[]>([]);
@@ -716,6 +716,14 @@ const SellerPublicProfile = ({ username }: { username?: string }) => {
         </div>
       </div>
     </div>
+  );
+};
+
+const SellerPublicProfile = (props: { username?: string }) => {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center min-h-[60vh] bg-white"><div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div></div>}>
+      <SellerPublicProfileContent {...props} />
+    </Suspense>
   );
 };
 

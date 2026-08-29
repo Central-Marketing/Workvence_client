@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import adminAxios from '@/utils/adminAxios';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 import {
   Search,
   Palette,
@@ -25,6 +27,110 @@ const Featured = () => {
   const [category, setCategory] = useState('');
   const router = useRouter();
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const galleryRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+      if (glowRef.current) {
+        tl.fromTo(
+          glowRef.current,
+          { opacity: 0, scale: 0.9 },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 1.1,
+            ease: 'power2.out',
+            force3D: true,
+          }
+        );
+      }
+
+      // 2. Headline entrance (smooth upward drift)
+      if (headlineRef.current) {
+        tl.fromTo(
+          headlineRef.current,
+          { y: 35, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.85,
+            ease: 'power3.out',
+            force3D: true,
+            clearProps: 'transform',
+          },
+          '-=0.85'
+        );
+      }
+
+      // 3. Subtitle & Search Bar entrance
+      if (subtitleRef.current) {
+        tl.fromTo(
+          subtitleRef.current,
+          { y: 20, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.7,
+            ease: 'power2.out',
+            force3D: true,
+            clearProps: 'transform',
+          },
+          '-=0.6'
+        );
+      }
+
+      if (searchRef.current) {
+        tl.fromTo(
+          searchRef.current,
+          { y: 20, opacity: 0, scale: 0.97 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.7,
+            ease: 'power3.out',
+            force3D: true,
+            clearProps: 'transform',
+          },
+          '-=0.55'
+        );
+      }
+
+      // 4. Bottom 5 Gallery Columns (Wave-like emergence from center with complete isolation)
+      if (galleryRef.current) {
+        const cols = galleryRef.current.querySelectorAll('.hero-gallery-col');
+        if (cols && cols.length > 0) {
+          tl.fromTo(
+            cols,
+            { y: 75, opacity: 0, scale: 0.95 },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: 0.95,
+              stagger: {
+                each: 0.07,
+                from: 'center',
+              },
+              ease: 'power3.out',
+              force3D: true,
+              clearProps: 'transform',
+            },
+            '-=0.5'
+          );
+        }
+      }
+    },
+    { scope: containerRef }
+  );
+
   const handleSearch = () => {
     if (search.trim() || category) {
       router.push(`/packages?search=${encodeURIComponent(search.trim())}&category=${encodeURIComponent(category)}`);
@@ -32,7 +138,7 @@ const Featured = () => {
   };
 
   // Fetch real categories from backend database
-  const { data: fetchedCategories = [], isLoading } = useQuery({
+  const { data: fetchedCategories = [] } = useQuery({
     queryKey: ['admin-categories-featured'],
     queryFn: () => adminAxios.get('/categories').then(({ data }) => data).catch(() => [])
   });
@@ -87,12 +193,16 @@ const Featured = () => {
   }, [search, categoryList]);
 
   return (
-    <section className="relative w-full h-[580px] sm:h-[640px] md:h-[700px] lg:h-[740px] xl:h-[780px] bg-[#E8F5F5] overflow-hidden flex flex-col justify-between pt-8 sm:pt-12 md:pt-14 pb-0 select-none">
+    <section
+      ref={containerRef}
+      className="relative w-full h-[580px] sm:h-[640px] md:h-[700px] lg:h-[740px] xl:h-[780px] bg-[#E8F5F5] overflow-hidden flex flex-col justify-between pt-8 sm:pt-12 md:pt-14 pb-0 select-none"
+    >
       {/* Background ambient radial glow at top */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_50%_at_50%_15%,rgba(242,252,248,0.7),transparent)] pointer-events-none" />
 
       {/* Bottom glowing Ellipse - top 35% rises up into the bottom of the section */}
       <div
+        ref={glowRef}
         className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[65%] w-[120%] max-w-[1600px] h-[550px] sm:h-[700px] md:h-[800px] rounded-[50%] bg-[#EBFEC5] pointer-events-none z-0"
         style={{
           filter: 'blur(120px)',
@@ -103,19 +213,28 @@ const Featured = () => {
       {/* TOP HEADER & SEARCH CONTENT */}
       <div className="relative z-20 container mx-auto px-4 text-center max-w-[1100px] flex flex-col items-center">
         {/* Headline */}
-        <h1 className="font-sf-pro font-[510] text-3xl sm:text-5xl md:text-6xl lg:text-[84px] text-[#1E293B] tracking-[0px] leading-[100%] text-center mb-4 sm:mb-5">
+        <h1
+          ref={headlineRef}
+          className="font-sf-pro font-[510] text-3xl sm:text-5xl md:text-6xl lg:text-[84px] text-[#1E293B] tracking-[0px] leading-[100%] text-center mb-4 sm:mb-5"
+        >
           Find the right <span className="text-[#327C73]">freelancer</span>
           <br />
           and get to work in minutes.
         </h1>
 
         {/* Subtitle */}
-        <p className="text-[#4A4A4A] text-xs sm:text-sm md:text-lg font-normal font-inter max-w-xl mx-auto mb-5 sm:mb-6 leading-relaxed">
+        <p
+          ref={subtitleRef}
+          className="text-[#4A4A4A] text-xs sm:text-sm md:text-lg font-normal font-inter max-w-xl mx-auto mb-5 sm:mb-6 leading-relaxed"
+        >
           Search thousands of vetted sellers, order in under a minute, and start today.
         </p>
 
         {/* Search Bar Container with relative positioning for floating dropdown */}
-        <div className="relative w-full max-w-[460px] sm:max-w-[520px] md:max-w-[560px]">
+        <div
+          ref={searchRef}
+          className="relative w-full max-w-[460px] sm:max-w-[520px] md:max-w-[560px]"
+        >
           <div className="w-full bg-white rounded-lg sm:rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 border border-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center gap-2.5 sm:gap-3 transition-all focus-within:border-[#2C6E63]/70 focus-within:shadow-[0_4px_16px_rgba(44,110,99,0.12)]">
             <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#292929] shrink-0" strokeWidth={2} />
             <input
@@ -183,78 +302,98 @@ const Featured = () => {
       </div>
 
       {/* BOTTOM IMAGE GALLERY - 5 COLUMNS CONSTRAINED TO CONTAINER */}
-      <div className="relative z-10 w-full container mx-auto px-4 md:px-6 flex items-end justify-between gap-2.5 sm:gap-3.5 md:gap-4 lg:gap-5 xl:gap-6 mt-auto pointer-events-none">
+      <div
+        ref={galleryRef}
+        className="relative z-10 w-full container mx-auto px-4 md:px-6 flex items-end justify-between gap-2.5 sm:gap-3.5 md:gap-4 lg:gap-5 xl:gap-6 mt-auto pointer-events-none"
+      >
 
         {/* COLUMN 1: LEFTMOST - 2 VERTICAL IMAGES */}
-        <div className="w-[18%] min-w-[90px] max-w-[245px] flex flex-col gap-2 sm:gap-3 md:gap-4 shrink-0">
-          {/* Top image: Blue head silhouette */}
-          <div className="w-full aspect-[3/3.75] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
-            <img
-              src="/media/hero_images/img4.png"
-              alt="Creative Art"
-              className="w-full h-full object-cover object-center"
-            />
-          </div>
-          {/* Bottom image: Laptop code editor (cut off at bottom by parent overflow-hidden) */}
-          <div className="w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-slate-900">
-            <img
-              src="/media/hero_images/img7.png"
-              alt="Code Development"
-              className="w-full h-auto object-cover object-top"
-            />
+        <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
+          <div className="w-full flex flex-col gap-2 sm:gap-3 md:gap-4 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
+            {/* Top image: Blue head silhouette */}
+            <div className="w-full aspect-[3/3.75] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
+              <img
+                src="/media/hero_images/img4.png"
+                alt="Creative Art"
+                loading="eager"
+                className="w-full h-full object-cover object-center"
+              />
+            </div>
+            {/* Bottom image: Laptop code editor */}
+            <div className="w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-slate-900">
+              <img
+                src="/media/hero_images/img7.png"
+                alt="Code Development"
+                loading="eager"
+                className="w-full h-auto object-cover object-top"
+              />
+            </div>
           </div>
         </div>
 
         {/* COLUMN 2: SECOND - TALL ADOBE BOUQUET CARD */}
-        <div className="w-[18%] min-w-[90px] max-w-[245px] shrink-0">
-          <div className="w-full h-[160px] sm:h-[180px] md:h-[200px] lg:h-[240px] xl:h-[255px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-white">
-            <img
-              src="/media/hero_images/img1.png"
-              alt="Design Forever"
-              className="w-full h-full object-cover object-top"
-            />
+        <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
+          <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
+            <div className="w-full h-[160px] sm:h-[180px] md:h-[200px] lg:h-[240px] xl:h-[255px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-white">
+              <img
+                src="/media/hero_images/img1.png"
+                alt="Design Forever"
+                loading="eager"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
           </div>
         </div>
 
         {/* COLUMN 3: CENTER - VIBE CODING PHONE (LOWER POSITION) */}
-        <div className="w-[18%] min-w-[90px] max-w-[245px] shrink-0">
-          <div className="w-full h-[110px] sm:h-[155px] md:h-[200px] lg:h-[160px] xl:h-[180px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#a81e55]">
-            <img
-              src="/media/hero_images/img3.png"
-              alt="Vibe Coding"
-              className="w-full h-full object-cover object-top"
-            />
+        <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
+          <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
+            <div className="w-full h-[110px] sm:h-[155px] md:h-[200px] lg:h-[160px] xl:h-[180px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#a81e55]">
+              <img
+                src="/media/hero_images/img3.png"
+                alt="Vibe Coding"
+                loading="eager"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
           </div>
         </div>
 
         {/* COLUMN 4: FOURTH - TALL VIOLIN POSTER */}
-        <div className="w-[18%] min-w-[90px] max-w-[245px] shrink-0">
-          <div className="w-full h-[160px] sm:h-[220px] md:h-[290px] lg:h-[340px] xl:h-[305px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#fafafa]">
-            <img
-              src="/media/hero_images/img5.png"
-              alt="Violin Night"
-              className="w-full h-full object-cover object-top"
-            />
+        <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
+          <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
+            <div className="w-full h-[160px] sm:h-[220px] md:h-[290px] lg:h-[340px] xl:h-[305px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#fafafa]">
+              <img
+                src="/media/hero_images/img5.png"
+                alt="Violin Night"
+                loading="eager"
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
           </div>
         </div>
 
         {/* COLUMN 5: RIGHTMOST - 2 VERTICAL IMAGES */}
-        <div className="w-[18%] min-w-[90px] max-w-[245px] flex flex-col gap-2 sm:gap-3 md:gap-4 shrink-0">
-          {/* Top image: The Link (robots / clarity meets creativity) */}
-          <div className="w-full aspect-[3/3.75] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
-            <img
-              src="/media/hero_images/img6.png"
-              alt="Clarity Meets Creativity"
-              className="w-full h-full object-cover object-center"
-            />
-          </div>
-          {/* Bottom image: 3D Chrome Icon (cut off at bottom) */}
-          <div className="w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#112236]">
-            <img
-              src="/media/hero_images/img2.png"
-              alt="3D Icon"
-              className="w-full h-auto object-cover object-top"
-            />
+        <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
+          <div className="w-full flex flex-col gap-2 sm:gap-3 md:gap-4 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
+            {/* Top image: The Link (robots / clarity meets creativity) */}
+            <div className="w-full aspect-[3/3.75] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
+              <img
+                src="/media/hero_images/img6.png"
+                alt="Clarity Meets Creativity"
+                loading="eager"
+                className="w-full h-full object-cover object-center"
+              />
+            </div>
+            {/* Bottom image: 3D Chrome Icon */}
+            <div className="w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#112236]">
+              <img
+                src="/media/hero_images/img2.png"
+                alt="3D Icon"
+                loading="eager"
+                className="w-full h-auto object-cover object-top"
+              />
+            </div>
           </div>
         </div>
 

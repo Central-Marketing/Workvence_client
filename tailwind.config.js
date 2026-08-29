@@ -15,7 +15,7 @@ module.exports = {
         outfit: ["var(--font-outfit)", "Outfit", "sans-serif"],
       },
       colors: {
-        "brand-green": "#6ad724",
+        "brand-green": "#327C73",
         "brand-light": "#6AD724",
         "brand-black": "#112131",
       },

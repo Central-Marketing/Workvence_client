@@ -107,12 +107,12 @@ const HowItWorks = () => {
         {/* Header Row */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16 md:mb-20">
           <div>
-            <h2 className="font-sf-pro font-[510] text-3xl sm:text-4xl lg:text-[44px] text-[#222427] leading-[1.18] tracking-tight">
+            <h2 className="font-sf-pro font-[510] text-[32px] sm:text-[38px] md:text-[48px] text-[#292929] leading-normal tracking-normal">
               From Search to Done,
               <br />
               in Four Simple Steps
             </h2>
-            <p className="font-sf-pro font-normal text-[14px] sm:text-[15px] text-[#6E6E6E] mt-2.5 sm:mt-3">
+            <p className="font-inter font-normal text-base sm:text-[15px] text-[#6E6E6E] mt-2.5">
               Every step is kept safe and transparent.
             </p>
           </div>
@@ -121,21 +121,19 @@ const HowItWorks = () => {
           <div className="flex items-center w-[214px] h-[46px] bg-[#F4F4F6] p-[4px] rounded-[10px] border border-gray-200/50">
             <button
               onClick={() => setActiveTab('buyer')}
-              className={`flex-1 h-full flex items-center justify-center px-[20px] py-[10px] rounded-[8px] font-sf-pro font-medium text-[14px] sm:text-[15px] transition-all duration-200 ${
-                activeTab === 'buyer'
+              className={`flex-1 h-full flex items-center justify-center px-[20px] py-[10px] rounded-[8px] font-sf-pro font-medium text-[14px] sm:text-[15px] transition-all duration-200 ${activeTab === 'buyer'
                   ? 'bg-[#0B403F] text-white shadow-sm'
                   : 'text-[#6E6E6E] hover:text-[#222427]'
-              }`}
+                }`}
             >
               Buyer
             </button>
             <button
               onClick={() => setActiveTab('seller')}
-              className={`flex-1 h-full flex items-center justify-center px-[20px] py-[10px] rounded-[8px] font-sf-pro font-medium text-[14px] sm:text-[15px] transition-all duration-200 ${
-                activeTab === 'seller'
+              className={`flex-1 h-full flex items-center justify-center px-[20px] py-[10px] rounded-[8px] font-sf-pro font-medium text-[14px] sm:text-[15px] transition-all duration-200 ${activeTab === 'seller'
                   ? 'bg-[#0B403F] text-white shadow-sm'
                   : 'text-[#6E6E6E] hover:text-[#222427]'
-              }`}
+                }`}
             >
               Seller
             </button>
@@ -147,9 +145,8 @@ const HowItWorks = () => {
           {steps.map((step, index) => (
             <div
               key={index}
-              className={`flex flex-col py-6 sm:py-4 ${
-                index === 0 ? 'sm:pr-6 lg:pr-8 sm:pl-0' : 'sm:px-6 lg:px-8'
-              }`}
+              className={`flex flex-col py-6 sm:py-4 ${index === 0 ? 'sm:pr-6 lg:pr-8 sm:pl-0' : 'sm:px-6 lg:px-8'
+                }`}
             >
               <div className="mb-5 sm:mb-6">
                 {step.icon}

@@ -19,18 +19,16 @@ const PromoSection = () => {
   };
 
   return (
-    <section className="w-full py-16 sm:py-20 md:py-24 bg-white">
+    <section className="w-full py-16 sm:py-20 md:py-24 bg-[#fafafa]">
       <div className="container mx-auto px-4 md:px-6">
-        
+
         {/* Header Row */}
-        <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-10 sm:mb-14">
-          <div>
-            <h2 className="font-sf-pro font-[510] text-3xl sm:text-4xl lg:text-[44px] text-[#222427] leading-[1.18] tracking-tight">
-              Build Amazing Projects
-              <br />
-              With Trusted Professionals
-            </h2>
-          </div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10 sm:mb-14">
+          <h2 className="font-sf-pro font-[510] text-[32px] sm:text-[38px] md:text-[48px] text-[#292929] leading-normal tracking-normal">
+            Build Amazing Projects
+            <br />
+            With Trusted Professionals
+          </h2>
           <p className="font-sf-pro font-normal text-[13px] sm:text-[14px] text-[#6E6E6E] max-w-[340px] leading-[1.55]">
             We bring ideas to life by connecting businesses with creative minds who build experiences that make an impact
           </p>
@@ -69,9 +67,8 @@ const PromoSection = () => {
 
             {/* Ambient Play / Pause Button Overlay on Hover/Pause */}
             <div
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 pointer-events-none ${
-                isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'
-              }`}
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 pointer-events-none ${isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'
+                }`}
             >
               <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white border border-white/20 shadow-xl transition-transform duration-200 group-hover:scale-105">
                 {isPlaying ? (

@@ -17,7 +17,7 @@ const CTA = () => {
   return (
     <section className="w-full py-12 sm:py-16 md:py-20 lg:py-24 bg-white">
       <div className="container mx-auto px-4 md:px-6">
-        
+
         {/* Main Background Frame (1760x800 with 10px Radius) */}
         <div
           className="relative w-full max-w-[1760px] mx-auto rounded-[10px] px-6 sm:px-10 md:px-14 lg:px-16 py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
@@ -35,10 +35,10 @@ const CTA = () => {
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
-            
+
             {/* Left Content Column */}
             <div className="lg:col-span-7 flex flex-col items-start justify-center">
-              
+
               {/* Moneyback Guarantee Badge */}
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[8px] bg-[#E8F8DE] text-[#244E18] font-sf-pro font-medium text-[12px] sm:text-[13px] mb-5 sm:mb-6 shadow-sm">
                 <MoneyIcon className="w-4 h-4 text-[#244E18]" />
@@ -46,14 +46,14 @@ const CTA = () => {
               </div>
 
               {/* Main Headline */}
-              <h2 className="font-sf-pro font-[510] text-3xl sm:text-4xl lg:text-[44px] xl:text-[48px] text-white leading-[1.18] tracking-tight mb-4 sm:mb-5">
+              <h2 className="font-sf-pro font-[510] text-3xl sm:text-4xl lg:text-[44px] xl:text-[48px] text-white  mb-4 sm:mb-5 leading-none">
                 Are You A Freelancer?
                 <br />
                 Earn Globally.
               </h2>
 
               {/* Description Paragraph */}
-              <p className="font-sf-pro font-normal text-[13px] sm:text-[14px] md:text-[15px] text-[#A2B6B3] leading-[1.65] max-w-xl mb-8 sm:mb-10">
+              <p className="font-inter font-normal text-base sm:text-[15px] text-[#C7C7C7] mb-3.5">
                 Reach international buyers, get paid in full with fast, secure payouts, and grow your
                 business on a platform built on trust. Applications are reviewed to keep quality high.
               </p>

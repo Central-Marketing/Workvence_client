@@ -60,10 +60,10 @@ const PopularServices = () => {
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="flex justify-between items-center mb-10">
           <div className='flex flex-col gap-3'>
-            <h2 className="font-sf-pro font-[510] text-2xl sm:text-3xl md:text-[48px] text-[#292929] leading-[100%] tracking-[0px]">
+            <h2 className="font-sf-pro font-[510] text-[32px] sm:text-[38px] md:text-[48px] text-[#292929] leading-normal tracking-normal">
               Popular Services on The Platform
             </h2>
-            <p className='text-base text-[#6E6E6E]'>Hand-picked gigs from our top-rated, verified sellers.</p>
+            <p className='font-inter font-normal text-base sm:text-[15px] text-[#6E6E6E]'>Hand-picked gigs from our top-rated, verified sellers.</p>
           </div>
 
           <div className="flex gap-2">

@@ -166,7 +166,7 @@ const ExploreCategories = () => {
         </div>
 
         {/* Categories Grid with Clean Internal Dividers */}
-        <div className="w-full max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4">
+        <div className="w-full  mx-auto grid grid-cols-2 md:grid-cols-4">
           {categoryList.map((category: any, index: number) => {
             const title =
               category.name ||
@@ -188,7 +188,7 @@ const ExploreCategories = () => {
               <Link
                 href={`/packages?category=${encodeURIComponent(path)}`}
                 key={category._id || category.id || index}
-                className={`group flex flex-col items-center justify-center text-center p-8 sm:p-10 lg:p-14 hover:bg-slate-50/50 transition-all duration-200 cursor-pointer ${isRightBorderMobile ? "border-r border-gray-100" : ""
+                className={`group flex flex-col items-center justify-center text-center p-8 sm:p-10 lg:p-14 hover:bg-white transition-all duration-200 cursor-pointer ${isRightBorderMobile ? "border-r border-gray-100" : ""
                   } ${isRightBorderDesktop ? "md:border-r md:border-gray-100" : "md:border-r-0"
                   } ${isBottomBorderMobile ? "border-b border-gray-100" : ""
                   } ${isBottomBorderDesktop ? "md:border-b md:border-gray-100" : "md:border-b-0"
@@ -200,7 +200,7 @@ const ExploreCategories = () => {
                 </div>
 
                 {/* Category Title */}
-                <h3 className="font-sf-pro font-semibold text-[16px] sm:text-[17px] md:text-[18px] text-[#222427] leading-snug group-hover:text-brand-green transition-colors duration-300 max-w-[180px]">
+                <h3 className="font-sf-pro font-bold text-[16px] sm:text-[17px] md:text-[24px] text-[#434343] leading-normal group-hover:text-brand-green  transition-colors duration-300">
                   {title}
                 </h3>
               </Link>

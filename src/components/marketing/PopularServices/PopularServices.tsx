@@ -13,6 +13,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 import { CategoryCarouselSkeleton } from '@/components';
+import Image from 'next/image';
 
 const PopularServices = () => {
   const swiperRef = useRef<any>(null);
@@ -46,17 +47,31 @@ const PopularServices = () => {
   const categoryList = [...regularCats, ...otherCats];
 
   return (
-    <section className="w-full py-16 md:py-20 bg-white">
-      <div className="container mx-auto px-4 md:px-6 relative">
+    <section className="relative w-full py-16 md:py-20 bg-white overflow-hidden">
+      {/* Centered Background Circle Glow */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] max-w-[1400px] aspect-square rounded-full pointer-events-none z-0"
+        style={{
+          background: 'radial-gradient(circle at center, #EFE6FD 0%, #EFE6FD 35%, rgba(239, 230, 253, 0.6) 60%, rgba(239, 230, 253, 0.15) 75%, transparent 85%)',
+          filter: 'blur(40px)',
+        }}
+      />
+
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="flex justify-between items-center mb-10">
-          <h2 className="text-2xl md:text-4xl font-semibold text-gray-600">Best Popular Services</h2>
+          <div className='flex flex-col gap-3'>
+            <h2 className="font-sf-pro font-[510] text-2xl sm:text-3xl md:text-[48px] text-[#292929] leading-[100%] tracking-[0px]">
+              Popular Services on The Platform
+            </h2>
+            <p className='text-base text-[#6E6E6E]'>Hand-picked gigs from our top-rated, verified sellers.</p>
+          </div>
 
           <div className="flex gap-2">
             <button
               onClick={() => swiperRef.current?.slidePrev()}
               aria-label="Previous service slide"
               title="Previous slide"
-              className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 hover:text-gray-600 transition-colors bg-white shadow-sm"
+              className="w-10 h-10 flex items-center justify-center rounded-xl border-[1px] border-[#0000001A] text-[#868686] transition-colors bg-white shadow-sm"
             >
               <ChevronLeft size={20} strokeWidth={2} />
             </button>
@@ -64,7 +79,7 @@ const PopularServices = () => {
               onClick={() => swiperRef.current?.slideNext()}
               aria-label="Next service slide"
               title="Next slide"
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-brand-green text-white hover:bg-[#389115] transition-colors shadow-sm"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-[#868686] border-[1px] border-[#0000001A]  transition-colors shadow-sm"
             >
               <ChevronRight size={20} strokeWidth={2} />
             </button>
@@ -82,7 +97,7 @@ const PopularServices = () => {
             480: { slidesPerView: 2, spaceBetween: 16 },
             768: { slidesPerView: 3, spaceBetween: 20 },
             1024: { slidesPerView: 4, spaceBetween: 24 },
-            1280: { slidesPerView: 4, spaceBetween: 24 },
+            1280: { slidesPerView: 5, spaceBetween: 24 },
           }}
           className="w-full"
         >
@@ -91,13 +106,15 @@ const PopularServices = () => {
             return (
               <SwiperSlide key={card._id || card.id || card.slug || card.name}>
                 <Link href={`/packages?category=${cardSlug}`}>
-                  <div className="flex flex-col bg-blue-50 rounded-xl overflow-hidden group cursor-pointer border border-transparent hover:border-blue-100 transition-all duration-300">
-                    <div className="h-[160px] sm:h-[200px] md:h-[260px] overflow-hidden m-1.5 md:m-2 rounded-2xl md:rounded-[1rem] bg-blue-100/50 flex items-center justify-center">
-                      <img
+                  <div className="flex flex-col bg-[#EBFEC5] rounded-[10px] overflow-hidden group cursor-pointer border border-transparent hover:border-[#DAEFAF] transition-all duration-300">
+                    <div className="h-[160px] sm:h-[200px] md:h-[260px] overflow-hidden m-1.5 md:m-2 rounded-[5px] md:rounded-5px] bg-blue-100/50 flex items-center justify-center">
+                      <Image
                         src={card.banner || card.icon || card.image || card.img || "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600"}
                         alt=""
                         aria-hidden="true"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        width={315}
+                        height={300}
+                        className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="p-3 md:p-4 flex justify-between items-center">

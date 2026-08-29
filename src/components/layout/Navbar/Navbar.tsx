@@ -92,8 +92,8 @@ const Navbar = () => {
   const isActive = () => {
     const scrollPos = window.scrollY;
     setShowMenu(scrollPos > 0);
-    // Show category bar when scrolled past featured section (~500px) on home page, or always on subpages
-    setShowCategoryBar(scrollPos > 520 || pathname !== "/");
+    // Show category bar only on the homepage when scrolled past the featured section (~520px)
+    setShowCategoryBar(pathname === "/" && scrollPos > 520);
   };
 
   useEffect(() => {

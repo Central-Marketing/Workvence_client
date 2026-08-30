@@ -1124,7 +1124,7 @@ const OrderDetail = () => {
                     <div className="statement-row" style={{ marginTop: '6px', paddingTop: '8px', borderTop: '1px dashed #cbd5e1' }}>
                       <span className="label" style={{ fontWeight: 700, color: '#0f172a' }}>Net Seller Payout</span>
                       <span className="value" style={{ fontSize: '16px', fontWeight: 800, color: '#15803d' }}>
-                        +${netEarnings.toFixed(2)}
+                        ${netEarnings.toFixed(2)}
                       </span>
                     </div>
 

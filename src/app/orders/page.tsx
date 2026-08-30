@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { axiosFetch } from "@/utils";
+import { axiosFetch, getOrderStatusInfo } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from '@/components';
 
@@ -148,68 +148,61 @@ const Orders = () => {
                       </td>
                     </tr>
                   ) : (
-                    filteredOrders.map((order: any) => (
-                      <tr
-                        key={order._id}
-                        onClick={() => router.push(`/orders/${order._id}`)}
-                        className="cursor-pointer transition-colors hover:bg-slate-50"
-                      >
-                        {/* Image */}
-                        <td className="py-4 px-5 border-b border-slate-100 align-middle">
-                          <img
-                            className="w-[70px] h-[48px] rounded-md object-cover border border-slate-200"
-                            src={order.image || "/media/noavatar.png"}
-                            alt=""
-                          />
-                        </td>
+                    filteredOrders.map((order: any) => {
+                      const statusInfo = getOrderStatusInfo(order.status);
+                      return (
+                        <tr
+                          key={order._id}
+                          onClick={() => router.push(`/orders/${order._id}`)}
+                          className="cursor-pointer transition-colors hover:bg-slate-50"
+                        >
+                          {/* Image */}
+                          <td className="py-4 px-5 border-b border-slate-100 align-middle">
+                            <img
+                              className="w-[70px] h-[48px] rounded-md object-cover border border-slate-200"
+                              src={order.image || "/media/noavatar.png"}
+                              alt=""
+                            />
+                          </td>
 
-                        {/* Buyer / Seller */}
-                        <td className="py-4 px-5 border-b border-slate-100 align-middle text-sm font-semibold text-slate-800 whitespace-nowrap">
-                          {user?.isSeller
-                            ? order.buyerID?.username
-                            : order.sellerID?.username}
-                        </td>
+                          {/* Buyer / Seller */}
+                          <td className="py-4 px-5 border-b border-slate-100 align-middle text-sm font-semibold text-slate-800 whitespace-nowrap">
+                            {user?.isSeller
+                              ? order.buyerID?.username
+                              : order.sellerID?.username}
+                          </td>
 
-                        {/* Title */}
-                        <td className="py-4 px-5 border-b border-slate-100 align-middle w-[280px] max-w-[280px]">
-                          <div
-                            className="line-clamp-2 text-sm font-medium text-slate-700 leading-5"
-                            title={order.title}
-                          >
-                            {order.title}
-                          </div>
-                        </td>
+                          {/* Title */}
+                          <td className="py-4 px-5 border-b border-slate-100 align-middle w-[280px] max-w-[280px]">
+                            <div
+                              className="line-clamp-2 text-sm font-medium text-slate-700 leading-5"
+                              title={order.title}
+                            >
+                              {order.title}
+                            </div>
+                          </td>
 
-                        {/* Order ID */}
-                        <td className="py-4 px-5 border-b border-slate-100 align-middle text-sm font-medium text-slate-700 whitespace-nowrap">
-                          {order._id}
-                        </td>
+                          {/* Order ID */}
+                          <td className="py-4 px-5 border-b border-slate-100 align-middle text-sm font-medium text-slate-700 whitespace-nowrap">
+                            {order._id}
+                          </td>
 
-                        {/* Price */}
-                        <td className="py-4 px-5 border-b border-slate-100 align-middle text-[14px] font-bold text-slate-900 whitespace-nowrap">
-                          {order.price.toLocaleString("en-US", {
-                            style: "currency",
-                            currency: "USD",
-                          })}
-                        </td>
+                          {/* Price */}
+                          <td className="py-4 px-5 border-b border-slate-100 align-middle text-[14px] font-bold text-slate-900 whitespace-nowrap">
+                            {order.price.toLocaleString("en-US", {
+                              style: "currency",
+                              currency: "USD",
+                            })}
+                          </td>
 
-                        {/* Status */}
-                        <td className="py-4 px-5 border-b border-slate-100 align-middle whitespace-nowrap">
-                          <span
-                            className={`text-[11px] font-bold py-1 px-2.5 rounded-full uppercase tracking-wide inline-block ${order.status === "completed"
-                              ? "bg-emerald-50 text-emerald-500"
-                              : order.status === "delivered"
-                                ? "bg-blue-50 text-blue-500"
-                                : "bg-amber-50 text-amber-600"
-                              }`}
-                          >
-                            {order.status === "completed"
-                              ? "Completed"
-                              : order.status === "delivered"
-                                ? "Delivered"
-                                : "In Progress"}
-                          </span>
-                        </td>
+                          {/* Status */}
+                          <td className="py-4 px-5 border-b border-slate-100 align-middle whitespace-nowrap">
+                            <span
+                              className={`text-[11px] font-bold py-1 px-2.5 rounded-full uppercase tracking-wide inline-block ${statusInfo.className}`}
+                            >
+                              {statusInfo.label}
+                            </span>
+                          </td>
 
                         {/* Contact */}
                         <td className="py-4 px-5 border-b border-slate-100 align-middle whitespace-nowrap">
@@ -224,10 +217,11 @@ const Orders = () => {
                           </button>
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
             </div>
           </div>
         </div>

@@ -12,10 +12,10 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const isAdminPage = pathname.startsWith("/admin");
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className={`flex flex-col ${isMessagePage ? 'h-screen max-h-screen overflow-hidden' : 'min-h-screen'}`}>
       {!isAuthPage && !isAdminPage && <Navbar />}
       {!isAdminPage && <KycPromptModal />}
-      <main id="main-content" className="flex-1">
+      <main id="main-content" className={`flex-1 ${isMessagePage ? 'overflow-hidden flex flex-col h-[calc(100dvh-78px)] max-h-[calc(100dvh-78px)]' : ''}`}>
         {children}
       </main>
       {!isMessagePage && !isAuthPage && !isAdminPage && <Footer />}

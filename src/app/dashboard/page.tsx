@@ -17,6 +17,15 @@ const Dashboard = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    if (!user && typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
+      if (!storedUser) {
+        router.replace("/login?redirect=/dashboard");
+      }
+    }
+  }, [user, router]);
+
   // Fetch orders
   const { isLoading: ordersLoading, data: orders = [] } = useQuery({
     queryKey: ["dashboard-orders"],
@@ -48,9 +57,9 @@ const Dashboard = () => {
 
   if (!user) {
     return (
-      <div className="dashboard-loading">
+      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-4 py-16">
         <Loader size={45} />
-        <h2>Please log in to access your dashboard.</h2>
+        <h2 className="text-lg font-semibold text-slate-700">Redirecting to login...</h2>
       </div>
     );
   }

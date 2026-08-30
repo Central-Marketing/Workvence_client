@@ -160,8 +160,9 @@ export async function proxy(req: NextRequest) {
   // -------------------------------------------------------------
   if (isAuthGuestRoute && isAuthenticated) {
     const isSellerIntent = searchParams.get("seller") === "true";
-    if (pathname === "/register" && isSellerIntent && !isSeller) {
-      return NextResponse.redirect(new URL("/settings/verification", req.url));
+    // Allow /register?seller=true to remain accessible for both authenticated and unauthenticated users
+    if (pathname === "/register" && isSellerIntent) {
+      return NextResponse.next();
     }
 
     const redirectUrl = searchParams.get("redirect") || "/dashboard";

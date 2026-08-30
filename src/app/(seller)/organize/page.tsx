@@ -503,7 +503,7 @@ const Add = () => {
               </button>
             </div>
 
-            <label className={labelClasses}>Description (Rich Text Editor)</label>
+            <label className={labelClasses}>Description</label>
             <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
               <ReactQuill
                 theme="snow"

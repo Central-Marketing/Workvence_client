@@ -392,40 +392,42 @@ const Navbar = () => {
         </div>
 
         <div className="flex flex-col flex-1 overflow-y-auto p-6 gap-5 text-[16px] font-semibold text-gray-700">
-          {/* Mobile Explore Category Accordion */}
-          <div className="flex flex-col border-b border-gray-100 pb-3">
-            <button
-              onClick={() => setIsMobileCategoryOpen(!isMobileCategoryOpen)}
-              className="flex items-center justify-between py-2 text-gray-800 hover:text-brand-green transition-colors"
-            >
-              <span>Explore Category</span>
-              <FiChevronDown className={`transition-transform duration-200 ${isMobileCategoryOpen ? "rotate-180 text-brand-green" : "text-gray-400"}`} />
-            </button>
-
-            {isMobileCategoryOpen && (
-              <div className="pl-4 pt-1 flex flex-col gap-2 max-h-48 overflow-y-auto">
-                {categoryList.length > 0 ? (
-                  categoryList.map((cat: any, index: number) => (
-                    <Link
-                      key={cat.slug || index}
-                      href={`/packages?category=${encodeURIComponent(cat.slug)}`}
-                      onClick={() => { setIsMobileCategoryOpen(false); setIsMobileMenuOpen(false); }}
-                      className="text-sm font-normal text-gray-600 hover:text-brand-green py-1"
-                    >
-                      {cat.name}
-                    </Link>
-                  ))
-                ) : (
-                  <span className="text-xs text-gray-400 py-1">No categories</span>
-                )}
-              </div>
-            )}
-          </div>
-
           {!user ? (
             <>
+              {/* Mobile Explore Category Accordion (First Item) */}
+              <div className="flex flex-col">
+                <button
+                  type="button"
+                  onClick={() => setIsMobileCategoryOpen(!isMobileCategoryOpen)}
+                  className="flex items-center justify-between text-gray-700 hover:text-brand-green transition-colors text-left"
+                >
+                  <span>Explore Category</span>
+                  <FiChevronDown className={`transition-transform duration-200 ${isMobileCategoryOpen ? "rotate-180 text-brand-green" : "text-gray-400"}`} />
+                </button>
+
+                {isMobileCategoryOpen && (
+                  <div className="pl-3 pt-2 flex flex-col gap-2 max-h-48 overflow-y-auto border-l-2 border-emerald-100 ml-1 mt-1">
+                    {categoryList.length > 0 ? (
+                      categoryList.map((cat: any, index: number) => (
+                        <Link
+                          key={cat.slug || index}
+                          href={`/packages?category=${encodeURIComponent(cat.slug)}`}
+                          onClick={() => { setIsMobileCategoryOpen(false); setIsMobileMenuOpen(false); }}
+                          className="text-sm font-normal text-gray-600 hover:text-brand-green py-0.5"
+                        >
+                          {cat.name}
+                        </Link>
+                      ))
+                    ) : (
+                      <span className="text-xs text-gray-400 py-1">No categories</span>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a Seller</Link>
               <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
+
               <hr className="my-2 border-gray-100" />
               <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Sign in</Link>
               <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="text-brand-green hover:opacity-80 transition-opacity flex items-center gap-1.5">
@@ -446,9 +448,40 @@ const Navbar = () => {
                 </div>
               </div>
 
-              <Link href="/packages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Browse Packages</Link>
+              {/* Mobile Explore Category Accordion (First Item) */}
+              <div className="flex flex-col">
+                <button
+                  type="button"
+                  onClick={() => setIsMobileCategoryOpen(!isMobileCategoryOpen)}
+                  className="flex items-center justify-between text-gray-700 hover:text-brand-green transition-colors text-left"
+                >
+                  <span>Explore Category</span>
+                  <FiChevronDown className={`transition-transform duration-200 ${isMobileCategoryOpen ? "rotate-180 text-brand-green" : "text-gray-400"}`} />
+                </button>
+
+                {isMobileCategoryOpen && (
+                  <div className="pl-3 pt-2 flex flex-col gap-2 max-h-48 overflow-y-auto border-l-2 border-emerald-100 ml-1 mt-1">
+                    {categoryList.length > 0 ? (
+                      categoryList.map((cat: any, index: number) => (
+                        <Link
+                          key={cat.slug || index}
+                          href={`/packages?category=${encodeURIComponent(cat.slug)}`}
+                          onClick={() => { setIsMobileCategoryOpen(false); setIsMobileMenuOpen(false); }}
+                          className="text-sm font-normal text-gray-600 hover:text-brand-green py-0.5"
+                        >
+                          {cat.name}
+                        </Link>
+                      ))
+                    ) : (
+                      <span className="text-xs text-gray-400 py-1">No categories</span>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
               <Link href="/dashboard" prefetch={false} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Dashboard</Link>
+
               {user.isSeller ? (
                 <>
                   <Link href="/my-packages" prefetch={false} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Packages</Link>

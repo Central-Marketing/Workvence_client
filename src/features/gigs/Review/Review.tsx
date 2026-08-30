@@ -40,11 +40,11 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
   const countryName = review?.userID?.country || "Unknown Country";
   const avatar = review?.userID?.image || review?.userID?.img || "/media/noavatar.png";
   const username = review?.userID?.username || "Anonymous User";
-  
+
   // Strict binding from API payload
   const rating = typeof review?.star === 'number' && review.star >= 0 && review.star <= 5 ? review.star : 0;
   const rawText = review?.description || "No description provided.";
-  
+
   const formattedDate = review?.createdAt
     ? moment(review.createdAt).isValid()
       ? moment(review.createdAt).fromNow()
@@ -53,7 +53,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
 
   const isLong = rawText.length > 180;
   const displayDesc = isExpanded || !isLong ? rawText : `${rawText.slice(0, 180)}...`;
-  
+
   const price = review?.gigID?.price !== undefined ? `$${review.gigID.price}` : (review?.price ? (String(review.price).startsWith('$') ? review.price : `$${review.price}`) : null);
   const gigTitle = review?.gigID?.title || null;
   const duration = review?.duration || null;
@@ -70,7 +70,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
               className="w-11 h-11 sm:w-12 sm:h-12 rounded-full object-cover border border-gray-200 shadow-2xs shrink-0"
             />
             <div className="min-w-0 flex-1">
-              <h4 className="text-sm sm:text-[15px] font-extrabold text-gray-900 leading-tight truncate">
+              <h4 className="text-sm sm:text-[15px] font-bold text-gray-900 leading-tight truncate">
                 {username}
               </h4>
               <div className="flex flex-wrap items-center gap-1.5 text-xs font-medium text-gray-400 mt-1">
@@ -99,7 +99,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
                   </svg>
                 ))}
               </div>
-              <span className="ml-0.5 text-xs sm:text-sm font-extrabold">{rating.toFixed(1)}</span>
+              <span className="ml-0.5 text-xs sm:text-sm font-bold">{rating.toFixed(1)}</span>
             </div>
           )}
         </div>

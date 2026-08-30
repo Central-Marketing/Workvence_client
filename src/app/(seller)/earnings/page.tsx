@@ -320,7 +320,7 @@ const Earnings = () => {
         {/* ── Balance Header ── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-5 flex-wrap">
           <div>
-            <h1 className="text-2xl md:text-[26px] font-extrabold text-slate-900 mb-1">Seller Earnings</h1>
+            <h1 className="text-2xl md:text-[26px] font-bold text-slate-900 mb-1">Seller Earnings</h1>
             <p className="text-sm text-slate-500">Track your income, awaiting clearance, and request multi-channel payouts</p>
           </div>
 
@@ -358,7 +358,7 @@ const Earnings = () => {
                   <RefreshCw size={15} />
                   <span>Sync Cleared Funds</span>
                   {readyToSync > 0 && (
-                    <span className="ml-1 bg-brand-green text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full shadow-xs animate-pulse">
+                    <span className="ml-1 bg-brand-green text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-xs animate-pulse">
                       ${readyToSync.toFixed(2)} ready
                     </span>
                   )}
@@ -391,7 +391,7 @@ const Earnings = () => {
             <div className="text-2xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0 bg-emerald-50">💰</div>
             <div>
               <span className="text-[12.5px] font-bold text-slate-500 uppercase tracking-wide block mb-1.5">Net Income</span>
-              <h2 className="text-[28px] font-extrabold text-slate-900 m-0 mb-1">
+              <h2 className="text-[28px] font-bold text-slate-900 m-0 mb-1">
                 {netIncome.toLocaleString("en-US", { style: "currency", currency: "USD" })}
               </h2>
               <p className="text-[12.5px] text-slate-400 m-0">
@@ -404,7 +404,7 @@ const Earnings = () => {
             <div className="text-2xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0 bg-amber-50">⏳</div>
             <div>
               <span className="text-[12.5px] font-bold text-slate-500 uppercase tracking-wide block mb-1.5">Awaiting Clearance</span>
-              <h2 className="text-[28px] font-extrabold text-slate-900 m-0 mb-1">
+              <h2 className="text-[28px] font-bold text-slate-900 m-0 mb-1">
                 {awaitingClearance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
               </h2>
               <p className="text-[12.5px] text-slate-400 m-0">
@@ -417,7 +417,7 @@ const Earnings = () => {
             <div className="text-2xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0 bg-blue-50">🏦</div>
             <div>
               <span className="text-[12.5px] font-bold text-emerald-800 uppercase tracking-wide block mb-1.5">Available Balance</span>
-              <h2 className="text-[28px] font-extrabold text-emerald-700 m-0 mb-1">
+              <h2 className="text-[28px] font-bold text-emerald-700 m-0 mb-1">
                 {availableBalance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
               </h2>
               <p className="text-[12.5px] text-slate-500 m-0">
@@ -776,7 +776,7 @@ const Earnings = () => {
                   <span className="text-xs font-bold text-emerald-800 uppercase tracking-wide block">Available Balance</span>
                   <span className="text-xs text-emerald-600">Cleared & ready for withdrawal</span>
                 </div>
-                <strong className="text-2xl font-extrabold text-emerald-700">
+                <strong className="text-2xl font-bold text-emerald-700">
                   {availableBalance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                 </strong>
               </div>

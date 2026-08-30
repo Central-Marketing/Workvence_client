@@ -59,7 +59,7 @@ const BriefDetail = () => {
           if (Array.isArray(data)) props = data;
           else if (Array.isArray(data?.proposals)) props = data.proposals;
           else if (Array.isArray(data?.data)) props = data.data;
-          
+
           return props.filter((p: any) => p.briefID === briefId || p.briefID?._id === briefId);
         })
         .catch(() => []),
@@ -289,11 +289,11 @@ const BriefDetail = () => {
               <div className="flex justify-between border-b border-slate-100 pb-4 bg-slate-50 p-4 rounded-xl">
                 <div>
                   <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Price</div>
-                  <div className="text-xl font-extrabold text-emerald-600">${activeProposal.price}</div>
+                  <div className="text-xl font-bold text-emerald-600">${activeProposal.price}</div>
                 </div>
                 <div>
                   <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Delivery Time</div>
-                  <div className="text-xl font-extrabold text-slate-900">{activeProposal.deliveryTime} Days</div>
+                  <div className="text-xl font-bold text-slate-900">{activeProposal.deliveryTime} Days</div>
                 </div>
               </div>
 

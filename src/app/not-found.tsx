@@ -14,7 +14,7 @@ const NotFound = () => {
           </h1>
           <div className="absolute inset-0 flex items-center justify-center flex-col">
             <div className="w-16 h-1 bg-brand-green rounded-full mb-6"></div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
               Page Not Found
             </h2>
           </div>
@@ -25,15 +25,15 @@ const NotFound = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-          <button 
+          <button
             onClick={() => window.history.back()}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors font-semibold text-[15px]"
           >
             <ArrowLeft className="w-4 h-4" />
             Go Back
           </button>
-          
-          <Link 
+
+          <Link
             href="/"
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-white bg-brand-green hover:bg-[#399d14] transition-all shadow-md hover:shadow-lg font-semibold text-[15px]"
           >

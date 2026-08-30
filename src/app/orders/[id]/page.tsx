@@ -927,7 +927,7 @@ const OrderDetail = () => {
                                 ) : (
                                   <div className="w-14 h-14 rounded-lg bg-emerald-600 text-white border border-emerald-700 flex flex-col items-center justify-center font-bold text-xl flex-shrink-0 shadow-xs">
                                     <span>{isZip ? '📦' : isPdf ? '📑' : '📄'}</span>
-                                    <span className="text-[9px] font-extrabold uppercase mt-0.5 text-emerald-100">
+                                    <span className="text-[9px] font-bold uppercase mt-0.5 text-emerald-100">
                                       {isZip ? 'ZIP' : isPdf ? 'PDF' : 'FILE'}
                                     </span>
                                   </div>

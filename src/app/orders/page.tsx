@@ -71,7 +71,7 @@ const Orders = () => {
         <div className="container mx-auto px-4 md:px-6 flex flex-col ">
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-5 py-6 md:px-7 md:pb-4 md:pt-6 bg-white">
-              <h1 className="text-2xl font-extrabold text-slate-900 mb-1">Manage Orders</h1>
+              <h1 className="text-2xl font-bold text-slate-900 mb-1">Manage Orders</h1>
               <p className="text-[13.5px] text-slate-500">Click on any order row to track delivery status, view ledger details, or message contacts</p>
             </div>
 

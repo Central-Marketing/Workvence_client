@@ -1207,7 +1207,7 @@ const Message = () => {
                             }`}>
                             {order.status === 'completed' ? 'Completed' : order.status === 'delivered' ? 'Delivered' : 'In Progress'}
                           </span>
-                          <span className="text-sm font-extrabold text-slate-800">${order.price}</span>
+                          <span className="text-sm font-bold text-slate-800">${order.price}</span>
                         </div>
                         <h4 className="text-[12px] font-medium text-slate-600 line-clamp-1 group-hover:text-slate-900 transition-colors">
                           {order.title}

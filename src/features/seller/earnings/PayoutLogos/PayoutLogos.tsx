@@ -44,7 +44,7 @@ export const PayoneerLogo: React.FC<{ className?: string }> = ({
         strokeWidth="6"
       />
     </svg>
-    <span className="font-extrabold tracking-tight text-slate-900 text-sm">
+    <span className="font-bold tracking-tight text-slate-900 text-sm">
       payoneer
     </span>
   </div>

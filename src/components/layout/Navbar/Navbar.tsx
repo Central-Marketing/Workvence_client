@@ -127,6 +127,10 @@ const Navbar = () => {
       localStorage.removeItem('user');
       sessionStorage.removeItem("kyc_prompt_dismissed_session");
       document.cookie = "accessToken=; path=/; max-age=0; SameSite=Lax";
+      document.cookie = "refreshToken=; path=/; max-age=0; SameSite=Lax";
+      document.cookie = "user=; path=/; max-age=0; SameSite=Lax";
+      document.cookie = "isSeller=; path=/; max-age=0; SameSite=Lax";
+      document.cookie = "role=; path=/; max-age=0; SameSite=Lax";
       setUser(null);
       router.push("/");
     }

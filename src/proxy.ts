@@ -99,13 +99,19 @@ export async function proxy(req: NextRequest) {
     (parsedUser._id || parsedUser.id || parsedUser.username || parsedUser.email)
   );
 
-  // Valid authentication requires a valid, unexpired JWT, a valid refresh token, or a verified user session with active session cookies
+  const hasValidJwtUser = Boolean(
+    jwtPayload &&
+    (!jwtPayload.exp || jwtPayload.exp * 1000 > Date.now()) &&
+    (jwtPayload.id || jwtPayload._id || jwtPayload.username || jwtPayload.email)
+  );
+
   const hasSessionToken = Boolean(
     (authCookie && authCookie.trim() !== "" && authCookie !== "undefined" && authCookie !== "null") ||
     (refreshCookie && refreshCookie.trim() !== "" && refreshCookie !== "undefined" && refreshCookie !== "null")
   );
 
-  const isAuthenticated = isJwtValid || isRefreshTokenValid || (hasSessionToken && isParsedUserValid) || isParsedUserValid;
+  // Authenticated requires either a verified unexpired JWT with user identity OR a verified user cookie paired with an active session token
+  const isAuthenticated = hasValidJwtUser || (isParsedUserValid && hasSessionToken);
 
   const isSellerCookie = req.cookies.get("isSeller")?.value;
   const roleCookie = req.cookies.get("role")?.value?.toLowerCase();

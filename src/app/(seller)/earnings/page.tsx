@@ -366,7 +366,7 @@ const Earnings = () => {
               )}
             </button>
 
-            {/* Request Payout Button */}
+            {/* request payout Button */}
             <button
               className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-brand-green hover:bg-[#389115] text-white py-3 px-6 rounded-xl text-[14px] font-bold transition-all disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed whitespace-nowrap shadow-md hover:shadow-lg active:scale-[0.98] cursor-pointer"
               onClick={() => {

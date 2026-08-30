@@ -20,7 +20,7 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
 
   // Rating calculation
   const rawRating = data.starNumber > 0 ? (data.totalStars / data.starNumber).toFixed(1) : (data.star || 4.9);
-  const rating = data.gigRating || rawRating;
+  const rating = data?.gigRating;
   const sales = data.sales || 0;
   const reviewCount = data.starNumber || data.reviews || 0;
   const level = userObj.sellerLevel || data.user?.sellerLevel || userObj.level || "Level 1";

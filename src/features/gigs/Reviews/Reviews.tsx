@@ -6,9 +6,9 @@ import { axiosFetch } from '@/utils';
 import Review, { ReviewItem } from '../Review/Review';
 
 export interface ReviewsProps {
-  reviews?: ReviewItem[];
-  sellerId?: string;
-  packageID?: string;
+    reviews?: ReviewItem[];
+    sellerId?: string;
+    packageID?: string;
 }
 
 const Reviews: React.FC<ReviewsProps> = ({ reviews: initialReviews, sellerId }) => {
@@ -70,7 +70,7 @@ const Reviews: React.FC<ReviewsProps> = ({ reviews: initialReviews, sellerId }) 
             {/* Overall Rating & Count Row */}
             <div className="flex flex-wrap items-center justify-between gap-4 pb-4 mb-8">
                 <span className="text-sm sm:text-base font-semibold text-gray-900">
-                    {totalReviewsCount} {totalReviewsCount === 1 ? 'review' : 'reviews'} for this Package
+                    {totalReviewsCount} {totalReviewsCount === 1 ? 'review' : 'reviews'}
                 </span>
 
                 {totalReviewsCount > 0 && (

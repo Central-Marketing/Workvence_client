@@ -109,7 +109,7 @@ const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser }) => {
   }, [conversations, currentUser]);
 
   return (
-    <Link href="/messages" className="text-gray-500 hover:text-brand-green transition-colors relative" title="Messages">
+    <Link href="/messages" prefetch={false} className="text-gray-500 hover:text-brand-green transition-colors relative" title="Messages">
       <FiMessageSquare className={`text-[22px] transition-transform ${isAnimating ? 'animate-bounce text-brand-green' : ''}`} />
       {unreadChatsCount > 0 && (
         <span className="absolute -top-1.5 -right-2 bg-brand-green text-white text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center shadow-sm border-2 border-white">

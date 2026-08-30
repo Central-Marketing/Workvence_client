@@ -134,11 +134,11 @@ const Navbar = () => {
 
   return (
     <nav className={`w-full sticky top-0 z-50 transition-all duration-300 ${showMenu || pathname !== "/" ? "bg-white border-b border-gray-100 shadow-sm text-gray-600" : "bg-transparent text-gray-600"}`}>
-      <div className="w-full container mx-auto flex justify-between items-center px-4 md:px-6 py-5">
+      <div className="w-full container mx-auto flex justify-between items-center px-4 md:px-6 py-4">
 
         <div className="flex items-center gap-10">
           <Link href="/" className="flex items-center">
-            <Image src="/Workvence-logo-Horizontal3.png" width={160} height={40} alt="Workvence" className="h-8 md:h-10 w-auto object-contain" style={{ width: "auto", height: "auto" }} priority />
+            <Image src="/Workvence-logo-Horizontal3.png" width={160} height={40} alt="Workvence" className="h-8 md:h-10 w-auto object-contain" style={{ width: "auto", height: "44px" }} priority />
           </Link>
 
           <div className={`hidden lg:flex items-center overflow-hidden transition-all duration-300 ${showMenu || pathname !== '/' ? 'opacity-100 max-w-[500px]' : 'opacity-0 max-w-0 pointer-events-none'}`}>
@@ -309,33 +309,33 @@ const Navbar = () => {
                           <p className="font-bold text-gray-900 truncate">@{user?.username}</p>
                           <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                         </div>
-                        <Link href="/profile" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                        <Link href="/profile" prefetch={false} onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
                           My Profile
                         </Link>
-                        <Link href="/dashboard" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                        <Link href="/dashboard" prefetch={false} onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
                           Dashboard
                         </Link>
-                        <Link href="/orders" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                        <Link href="/orders" prefetch={false} onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
                           Orders
                         </Link>
                         {!user?.isSeller && (
-                          <Link href="/briefs/my-briefs" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                          <Link href="/briefs/my-briefs" prefetch={false} onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
                             My Projects
                           </Link>
                         )}
                         {user?.isSeller && (
                           <>
                             <hr className="my-1 border-gray-100" />
-                            <Link href="/my-packages" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                            <Link href="/my-packages" prefetch={false} onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
                               My Packages
                             </Link>
-                            <Link href="/organize" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                            <Link href="/organize" prefetch={false} onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
                               Add New Package
                             </Link>
-                            <Link href="/earnings" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center justify-between">
+                            <Link href="/earnings" prefetch={false} onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center justify-between">
                               <span>Earnings</span>
                             </Link>
-                            <Link href="/kyc" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center justify-between">
+                            <Link href="/kyc" prefetch={false} onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center justify-between">
                               <span>ID Verification</span>
                               {!user?.isKycVerified ? (
                                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Verify</span>
@@ -444,13 +444,13 @@ const Navbar = () => {
 
               <Link href="/packages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Browse Packages</Link>
               <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
-              <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Dashboard</Link>
+              <Link href="/dashboard" prefetch={false} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Dashboard</Link>
               {user.isSeller ? (
                 <>
-                  <Link href="/my-packages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Packages</Link>
-                  <Link href="/organize" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Add New Package</Link>
-                  <Link href="/earnings" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Earnings</Link>
-                  <Link href="/kyc" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors flex items-center justify-between">
+                  <Link href="/my-packages" prefetch={false} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Packages</Link>
+                  <Link href="/organize" prefetch={false} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Add New Package</Link>
+                  <Link href="/earnings" prefetch={false} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Earnings</Link>
+                  <Link href="/kyc" prefetch={false} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors flex items-center justify-between">
                     <span>ID Verification (KYC)</span>
                     {!user?.isKycVerified ? (
                       <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Unverified</span>
@@ -462,11 +462,11 @@ const Navbar = () => {
               ) : (
                 <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a Seller</Link>
               )}
-              <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Orders</Link>
+              <Link href="/orders" prefetch={false} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Orders</Link>
               {!user.isSeller && (
-                <Link href="/briefs/my-briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Projects</Link>
+                <Link href="/briefs/my-briefs" prefetch={false} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Projects</Link>
               )}
-              <Link href="/messages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Messages</Link>
+              <Link href="/messages" prefetch={false} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Messages</Link>
               <hr className="my-2 border-gray-100" />
               <span className="text-red-500 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>Logout</span>
             </>

@@ -62,13 +62,21 @@ function decodeJwtPayload(token?: string): JwtPayload | null {
 export async function proxy(req: NextRequest) {
   const { pathname, searchParams } = req.nextUrl;
 
-  // 1. Extract authentication token from accessToken cookie
+  // 1. Extract authentication tokens from cookies
   const authCookie = req.cookies.get("accessToken")?.value;
+  const refreshCookie = req.cookies.get("refreshToken")?.value;
 
   const jwtPayload = decodeJwtPayload(authCookie);
+  const refreshPayload = decodeJwtPayload(refreshCookie);
+
   const isJwtValid = Boolean(
     jwtPayload &&
     (!jwtPayload.exp || jwtPayload.exp * 1000 > Date.now())
+  );
+
+  const isRefreshTokenValid = Boolean(
+    refreshPayload &&
+    (!refreshPayload.exp || refreshPayload.exp * 1000 > Date.now())
   );
 
   const userCookie = req.cookies.get("user")?.value;
@@ -77,7 +85,11 @@ export async function proxy(req: NextRequest) {
     try {
       parsedUser = JSON.parse(decodeURIComponent(userCookie)) as User;
     } catch {
-      // User cookie is not JSON formatted
+      try {
+        parsedUser = JSON.parse(userCookie) as User;
+      } catch {
+        // User cookie is not JSON formatted
+      }
     }
   }
 
@@ -87,14 +99,13 @@ export async function proxy(req: NextRequest) {
     (parsedUser._id || parsedUser.id || parsedUser.username || parsedUser.email)
   );
 
-  // Valid authentication requires a valid, unexpired JWT or a verified user session
-  const hasAuthTokenString = Boolean(
-    authCookie &&
-    authCookie.trim() !== "" &&
-    authCookie !== "undefined" &&
-    authCookie !== "null"
+  // Valid authentication requires a valid, unexpired JWT, a valid refresh token, or a verified user session with active session cookies
+  const hasSessionToken = Boolean(
+    (authCookie && authCookie.trim() !== "" && authCookie !== "undefined" && authCookie !== "null") ||
+    (refreshCookie && refreshCookie.trim() !== "" && refreshCookie !== "undefined" && refreshCookie !== "null")
   );
-  const isAuthenticated = isJwtValid || (hasAuthTokenString && isParsedUserValid);
+
+  const isAuthenticated = isJwtValid || isRefreshTokenValid || (hasSessionToken && isParsedUserValid) || isParsedUserValid;
 
   const isSellerCookie = req.cookies.get("isSeller")?.value;
   const roleCookie = req.cookies.get("role")?.value?.toLowerCase();
@@ -106,14 +117,18 @@ export async function proxy(req: NextRequest) {
     parsedUser?.isSeller === true ||
     parsedUser?.role === "seller" ||
     jwtPayload?.isSeller === true ||
-    jwtPayload?.role === "seller"
+    jwtPayload?.role === "seller" ||
+    refreshPayload?.isSeller === true ||
+    refreshPayload?.role === "seller"
   );
   const isAdmin = Boolean(
     roleCookie === "admin" ||
     parsedUser?.isAdmin === true ||
     parsedUser?.role === "admin" ||
     jwtPayload?.isAdmin === true ||
-    jwtPayload?.role === "admin"
+    jwtPayload?.role === "admin" ||
+    refreshPayload?.isAdmin === true ||
+    refreshPayload?.role === "admin"
   );
 
   // 2. Match Route Groups

@@ -1,16 +1,16 @@
 "use client";
 
 import toast from 'react-hot-toast';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { axiosFetch } from '@/utils';
 import { useUserStore } from '@/store/userStore';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import './Login.scss';
 import Image from 'next/image';
 
-const Login = () => {
+const LoginForm = () => {
   const [formInput, setFormInput] = useState({
     username: '',
     password: ''
@@ -20,6 +20,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -60,11 +61,11 @@ const Login = () => {
       sessionStorage.removeItem("kyc_prompt_dismissed_session");
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
-      toast.success(`Welcome back, ${user.username || 'user'}!`, {
-        duration: 3000,
-        icon: ""
-      });
-      router.push('/dashboard');
+      const redirectTarget = searchParams?.get('redirect');
+      const safeTarget = (redirectTarget && redirectTarget.startsWith('/') && !redirectTarget.startsWith('/login') && !redirectTarget.startsWith('/register'))
+        ? redirectTarget
+        : '/dashboard';
+      router.push(safeTarget);
       setLoading(false);
       return;
     } catch (apiErr: any) {
@@ -155,6 +156,14 @@ const Login = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const Login = () => {
+  return (
+    <Suspense fallback={<div className="login-container p-10 flex items-center justify-center min-h-[400px]">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 };
 

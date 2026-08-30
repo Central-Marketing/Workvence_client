@@ -181,7 +181,7 @@ const Orders = () => {
                         </td>
 
                         {/* Order ID */}
-                        <td className="py-4 px-5 border-b border-slate-100 align-middle text-[12px] font-mono text-slate-500 whitespace-nowrap">
+                        <td className="py-4 px-5 border-b border-slate-100 align-middle text-sm font-medium text-slate-700 whitespace-nowrap">
                           {order._id}
                         </td>
 

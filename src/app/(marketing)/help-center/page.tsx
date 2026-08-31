@@ -1,8 +1,11 @@
-"use client";
-
-import React, { useEffect } from "react";
-import Head from "next/head";
+import React from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Help Center | Workvence",
+  description: "Search our knowledge base or browse support categories to quickly find answers.",
+};
 
 const freelancerTopics = [
   {
@@ -127,15 +130,8 @@ const popularArticles = [
 ];
 
 const HelpCenter = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <div className="min-h-screen bg-[#faf9f7] font-sans">
-      <Head>
-        <title>Help Center | Workvence</title>
-      </Head>
 
       {/* 1. HERO SEARCH SECTION */}
       <section className="bg-white pt-16 pb-20 border-b border-gray-100 relative overflow-hidden">

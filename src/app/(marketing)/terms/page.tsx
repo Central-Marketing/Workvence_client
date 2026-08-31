@@ -1,7 +1,11 @@
-"use client";
-
 import React, { Suspense } from "react";
+import type { Metadata } from "next";
 import { TermsAndConditions, Loader } from "@/components";
+
+export const metadata: Metadata = {
+  title: "Terms & Conditions | Workvence",
+  description: "Terms and conditions of service for Workvence platform.",
+};
 
 export default function TermsPage() {
   return (

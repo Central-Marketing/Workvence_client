@@ -48,8 +48,8 @@ const staticFooterColumns: FooterColumn[] = [
       { name: "Careers", href: "#" },
       { name: "Press & News", href: "#" },
       { name: "Partnerships", href: "#" },
-      { name: "Privacy Policy", href: "/privacy-policy" },
-      { name: "Terms of Service", href: "/terms-and-conditions" },
+      { name: "Privacy Policy", href: "/privacy" },
+      { name: "Terms of Service", href: "/terms" },
       { name: "Intellectual Property Claims", href: "#" },
       { name: "Investor Relations", href: "#" },
     ]
@@ -58,7 +58,7 @@ const staticFooterColumns: FooterColumn[] = [
     title: "Support",
     links: [
       { name: "Help & Support", href: "/support" },
-      { name: "Trust & Safety", href: "#" },
+      { name: "Trust & Safety", href: "/trust-safety" },
       { name: "Selling on Workvence", href: "/packages" },
       { name: "Buying on Workvence", href: "/packages" },
     ]
@@ -201,7 +201,7 @@ const Footer = () => {
 
               {subscribedMsg && (
                 <p className={`text-xs mt-2 font-medium ${subscribedMsg.type === 'success' ? 'text-emerald-600' :
-                    subscribedMsg.type === 'info' ? 'text-blue-600' : 'text-rose-600'
+                  subscribedMsg.type === 'info' ? 'text-blue-600' : 'text-rose-600'
                   }`}>
                   {subscribedMsg.text}
                 </p>

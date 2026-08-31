@@ -66,7 +66,7 @@ const Dashboard = () => {
 
   // Calculate statistics using the delivery status flow
   const completedOrders = orders.filter((o: any) => o.status === 'completed');
-  const pendingOrders = orders.filter((o: any) => o.status !== 'completed' && o.status !== 'cancelled' && o.status !== 'canceled');
+  const pendingOrders = orders.filter((o: any) => o.status !== 'completed' && o.status !== 'cancelled' && o.status !== 'delivered' && o.status !== 'canceled');
   const totalOrdersCount = orders.length;
 
   const totalFinancialAmount = user.isSeller

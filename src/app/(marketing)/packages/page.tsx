@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useRef, useEffect, useMemo, Suspense } from 'react';
-import { PackageCard, Loader, TopRatedSellers, GigsGridSkeleton } from '@/components';
+import { PackageCard, TopRatedSellers, GigsGridSkeleton, Skeleton } from '@/components';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
@@ -758,9 +758,34 @@ const Packages = () => {
   );
 };
 
+const PackagesPageSkeleton = () => (
+  <div className="min-h-screen bg-white pb-20 animate-fadeIn">
+    {/* Category Bar Skeleton */}
+    <div className="w-full bg-gray-50 border-b border-gray-200/80 py-3.5 px-4 md:px-6">
+      <div className="container mx-auto flex items-center gap-3 overflow-hidden">
+        <Skeleton className="h-8 w-24 rounded-full shrink-0" />
+        <Skeleton className="h-8 w-36 rounded-full shrink-0" />
+        <Skeleton className="h-8 w-28 rounded-full shrink-0" />
+        <Skeleton className="h-8 w-32 rounded-full shrink-0" />
+        <Skeleton className="h-8 w-28 rounded-full shrink-0 hidden sm:block" />
+        <Skeleton className="h-8 w-32 rounded-full shrink-0 hidden md:block" />
+      </div>
+    </div>
+
+    {/* Main Container Skeleton */}
+    <div className="container mx-auto px-4 md:px-6 pt-6">
+      <div className="flex justify-between items-center mb-6">
+        <Skeleton className="h-5 w-36 rounded-md" />
+        <Skeleton className="h-10 w-24 rounded-xl" />
+      </div>
+      <GigsGridSkeleton count={8} />
+    </div>
+  </div>
+);
+
 export default function PackagesPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center items-center h-64"><Loader size={45} /></div>}>
+    <Suspense fallback={<PackagesPageSkeleton />}>
       <Packages />
     </Suspense>
   );

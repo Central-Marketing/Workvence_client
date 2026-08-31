@@ -9,7 +9,7 @@ const NotFound = () => {
       <div className="text-center max-w-2xl mx-auto flex flex-col items-center">
         {/* Large 404 Background Text */}
         <div className="relative mb-8">
-          <h1 className="text-[120px] md:text-[180px] font-black text-gray-50 leading-none select-none tracking-tighter">
+          <h1 className="text-[120px] md:text-[180px] font-bold text-gray-50 leading-none select-none tracking-tighter">
             404
           </h1>
           <div className="absolute inset-0 flex items-center justify-center flex-col">

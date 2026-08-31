@@ -952,7 +952,7 @@ const Message = () => {
                                       );
                                     })()}
                                   </div>
-                                  <div className="text-xl sm:text-2xl font-black text-slate-900 shrink-0 whitespace-nowrap flex-shrink-0">${offer.price}</div>
+                                  <div className="text-xl sm:text-2xl font-bold text-slate-900 shrink-0 whitespace-nowrap flex-shrink-0">${offer.price}</div>
                                 </div>
 
                                 <div className="flex items-center gap-5 py-3 border-y border-slate-100 my-2 flex-wrap">
@@ -1307,7 +1307,7 @@ const Message = () => {
             <div className="flex justify-between items-center bg-emerald-50/70 border border-emerald-200/60 rounded-2xl p-4">
               <div>
                 <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Price</span>
-                <span className="text-2xl font-black text-emerald-700">${viewingOfferDetails.offer?.price}</span>
+                <span className="text-2xl font-bold text-emerald-700">${viewingOfferDetails.offer?.price}</span>
               </div>
               <div className="text-right">
                 <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Delivery Time</span>

@@ -3,8 +3,7 @@
 import { useState, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
-import adminAxios from '@/utils/adminAxios';
+import useAdminCategories from '@/hooks/useAdminCategories';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import {
@@ -139,19 +138,10 @@ const Featured = () => {
   };
 
   // Fetch real categories from backend database
-  const { data: fetchedCategories = [] } = useQuery({
-    queryKey: ['admin-categories-featured'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }) => data).catch(() => [])
-  });
+  const { categoryList: rawCategories } = useAdminCategories();
 
   const categoryList = useMemo(() => {
-    const raw = Array.isArray(fetchedCategories)
-      ? fetchedCategories
-      : Array.isArray(fetchedCategories?.data)
-        ? fetchedCategories.data
-        : fetchedCategories?.categories || [];
-
-    return raw.map((cat: any) => {
+    return rawCategories.map((cat: any) => {
       if (typeof cat === 'string') {
         const slug = cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
         return { name: cat, slug, icon: '' };
@@ -162,7 +152,7 @@ const Featured = () => {
         icon: cat.icon || '',
       };
     });
-  }, [fetchedCategories]);
+  }, [rawCategories]);
 
   const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
     const iconKey = (iconStr || '').toLowerCase().replace(/[-_]/g, '');

@@ -3,10 +3,10 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useRef, useEffect, useMemo, Suspense } from 'react';
 import { PackageCard, Loader, TopRatedSellers, GigsGridSkeleton } from '@/components';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
-import adminAxios from "@/utils/adminAxios";
+import useAdminCategories from "@/hooks/useAdminCategories";
 import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 
 const DEFAULT_CATEGORIES = [
@@ -60,16 +60,7 @@ const Packages = () => {
   };
 
   // Fetch categories from backend
-  const { data: fetchedCategories = [] } = useQuery({
-    queryKey: ['admin-categories-packages-page'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }: any) => data).catch(() => [])
-  });
-
-  const categoryList = Array.isArray(fetchedCategories)
-    ? fetchedCategories
-    : Array.isArray(fetchedCategories?.data)
-      ? fetchedCategories.data
-      : fetchedCategories?.categories || [];
+  const { categoryList } = useAdminCategories();
 
   const categories = useMemo(() => {
     if (categoryList.length === 0) {

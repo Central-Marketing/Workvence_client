@@ -8,7 +8,7 @@ import moment from "moment";
 import { RiSearchLine } from "react-icons/ri";
 
 import { axiosFetch } from "@/utils";
-import adminAxios from "@/utils/adminAxios";
+import useAdminCategories from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 import { ClientBrief } from "@/types";
@@ -39,18 +39,9 @@ const BriefsFeed = () => {
   }, []);
 
   // Fetch categories dynamically from backend
-  const { data: fetchedCategories } = useQuery({
-    queryKey: ['admin-categories-briefs-page'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }: any) => data).catch(() => []),
-  });
+  const { categoryList } = useAdminCategories();
 
   const categories = useMemo(() => {
-    const categoryList = Array.isArray(fetchedCategories)
-      ? fetchedCategories
-      : Array.isArray(fetchedCategories?.data)
-        ? fetchedCategories.data
-        : fetchedCategories?.categories || [];
-
     if (categoryList.length === 0) return DEFAULT_CATEGORIES;
 
     const formatted = categoryList.map((c: any) => {
@@ -75,7 +66,7 @@ const BriefsFeed = () => {
     );
 
     return [{ name: "All Categories", slug: "All" }, ...regularCats, ...otherCats];
-  }, [fetchedCategories]);
+  }, [categoryList]);
 
   const categoryQuery = category && category !== "All" ? category : "";
 

@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Reviews, FavoriteSellerButton, PackageCard, Skeleton, CardSkeleton } from '@/components';
 import { axiosFetch } from '@/utils';
-import adminAxios from '@/utils/adminAxios';
+import useAdminCategories from '@/hooks/useAdminCategories';
 import { useUserStore } from '@/store/userStore';
 import moment from 'moment';
 import {
@@ -62,16 +62,7 @@ const SellerPublicProfileContent = ({ username }: { username?: string }) => {
   };
 
   // Fetch categories from backend
-  const { data: fetchedCategories = [] } = useQuery({
-    queryKey: ['admin-categories-seller-profile'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }: any) => data).catch(() => [])
-  });
-
-  const categoryList = Array.isArray(fetchedCategories)
-    ? fetchedCategories
-    : Array.isArray(fetchedCategories?.data)
-      ? fetchedCategories.data
-      : fetchedCategories?.categories || [];
+  const { categoryList } = useAdminCategories();
 
   const categories = categoryList.length > 0
     ? ["All services", ...categoryList.map((cat: any) => typeof cat === 'string' ? cat : cat.name || cat.slug || String(cat)).filter(Boolean)]

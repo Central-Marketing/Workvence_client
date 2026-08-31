@@ -2,8 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
-import adminAxios from '@/utils/adminAxios';
+import useAdminCategories from '@/hooks/useAdminCategories';
 
 // 1. Graphic & Design (Artist Palette)
 const PaletteIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
@@ -128,16 +127,7 @@ const getMatchedIcon = (category: any, index: number, iconClass: string) => {
 };
 
 const ExploreCategories = () => {
-  const { data: fetchedCategories = [] } = useQuery({
-    queryKey: ['admin-categories-explore'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }: any) => data)
-  });
-
-  const rawList = Array.isArray(fetchedCategories)
-    ? fetchedCategories
-    : Array.isArray(fetchedCategories?.data)
-      ? fetchedCategories.data
-      : fetchedCategories?.categories || [];
+  const { categoryList: rawList } = useAdminCategories();
 
   const regularCats = rawList.filter((c: any) =>
     c.slug !== 'other-and-general' &&

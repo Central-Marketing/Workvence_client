@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
 import { axiosFetch } from "@/utils";
-import adminAxios from "@/utils/adminAxios";
+import useAdminCategories from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 import "./CreateBrief.scss";
@@ -38,16 +38,7 @@ const CreateBrief = () => {
     deliveryTime: "",
   });
 
-  const { data: fetchedCategories = [] } = useQuery({
-    queryKey: ["admin-categories-brief-create"],
-    queryFn: () => adminAxios.get("/categories").then(({ data }: any) => data).catch(() => []),
-  });
-
-  const categoryList = Array.isArray(fetchedCategories)
-    ? fetchedCategories
-    : Array.isArray(fetchedCategories?.data)
-    ? fetchedCategories.data
-    : fetchedCategories?.categories || [];
+  const { categoryList } = useAdminCategories();
 
   const rawFormatted = categoryList.length > 0
     ? categoryList.map((cat: any) => typeof cat === 'string' ? { name: cat, slug: cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') } : { name: cat.name || cat.title || String(cat), slug: cat.slug || (cat.name || cat.title || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') })

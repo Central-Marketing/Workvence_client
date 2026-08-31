@@ -3,8 +3,7 @@
 import React, { useRef, useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
-import adminAxios from '@/utils/adminAxios';
+import useAdminCategories from '@/hooks/useAdminCategories';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 interface CategoryBarProps {
@@ -21,16 +20,7 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
   const [canScrollRight, setCanScrollRight] = useState(true);
 
   // Fetch categories from backend API
-  const { data: fetchedCategories = [] } = useQuery({
-    queryKey: ['admin-categories-categorybar'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }) => data).catch(() => [])
-  });
-
-  const rawCats = Array.isArray(fetchedCategories)
-    ? fetchedCategories
-    : Array.isArray(fetchedCategories?.data)
-      ? fetchedCategories.data
-      : fetchedCategories?.categories || [];
+  const { categoryList: rawCats } = useAdminCategories();
 
   const categoryList = rawCats.map((cat: any) => {
     if (typeof cat === 'string') {

@@ -131,6 +131,14 @@ const Messages = () => {
                                         return "✉ Custom Offer Proposal";
                                       }
                                     }
+                                    if (msg.startsWith('[MEETING_INVITE]')) {
+                                      try {
+                                        const meet = JSON.parse(msg.replace('[MEETING_INVITE]', ''));
+                                        return `📹 Video Meeting: ${meet.title || 'Freelancer Job Discussion'}`;
+                                      } catch (err) {
+                                        return "📹 Video Meeting Invitation";
+                                      }
+                                    }
                                     return msg;
                                   })()}
                                 </span>

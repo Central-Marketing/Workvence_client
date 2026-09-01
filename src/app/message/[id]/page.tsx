@@ -20,7 +20,11 @@ import {
   RiMoneyDollarCircleLine,
   RiMenuLine,
   RiInformationLine,
-  RiCloseLine
+  RiCloseLine,
+  RiVideoChatLine,
+  RiVidiconLine,
+  RiFileCopyLine,
+  RiExternalLinkLine
 } from "react-icons/ri";
 
 import axios from 'axios';
@@ -41,6 +45,9 @@ const Message = () => {
   const navigate = useRouter();
 
   const [showOfferModal, setShowOfferModal] = useState(false);
+  const [showMeetingModal, setShowMeetingModal] = useState(false);
+  const [meetingTitle, setMeetingTitle] = useState("");
+  const [isCreatingMeeting, setIsCreatingMeeting] = useState(false);
   const [selectedPackageId, setSelectedPackageId] = useState("");
   const [selectedBriefId, setSelectedBriefId] = useState("");
   const [offerDesc, setOfferDesc] = useState("");
@@ -615,6 +622,68 @@ const Message = () => {
     return null;
   };
 
+  const parseMeeting = (desc?: string) => {
+    if (desc?.startsWith('[MEETING_INVITE]')) {
+      try { return JSON.parse(desc.replace('[MEETING_INVITE]', '')); } catch { return null; }
+    }
+    return null;
+  };
+
+  const handleCreateMeeting = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (isCreatingMeeting) return;
+
+    const targetContactName = finalRecipientUser?.username || partnerUsername || 'Client';
+    const title = meetingTitle.trim() || `Job Discussion with @${targetContactName}`;
+
+    setIsCreatingMeeting(true);
+    const toastId = toast.loading("Generating video meeting link...");
+
+    try {
+      const { data } = await axios.post(
+        'https://helping-yeti-duly.ngrok-free.app/api/v1/external/meetings',
+        { title },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+
+      if (data && (data.roomUrl || data.meetingId)) {
+        const meetingPayload = {
+          meetingId: data.meetingId || '',
+          roomUrl: data.roomUrl || '',
+          title: data.title || title,
+          hostEmail: data.hostEmail || '',
+          isPrivate: Boolean(data.isPrivate),
+          createdAt: data.createdAt || new Date().toISOString(),
+          status: data.status || 'success'
+        };
+
+        mutation.mutate({
+          conversationID,
+          description: `[MEETING_INVITE]${JSON.stringify(meetingPayload)}`,
+          isSeller: Boolean(user?.isSeller)
+        });
+
+        toast.success("Meeting room created and sent to chat!", { id: toastId });
+        setShowMeetingModal(false);
+        setMeetingTitle("");
+      } else {
+        toast.error("Failed to generate meeting link. Please try again.", { id: toastId });
+      }
+    } catch (err: any) {
+      console.error("Meeting creation error:", err);
+      toast.error(err?.response?.data?.message || err?.message || "Failed to create meeting", { id: toastId });
+    } finally {
+      setIsCreatingMeeting(false);
+    }
+  };
+
+  const handleCopyMeetingLink = (roomUrl: string) => {
+    if (!roomUrl) return;
+    navigator.clipboard.writeText(roomUrl)
+      .then(() => toast.success("Meeting link copied to clipboard!"))
+      .catch(() => toast.error("Could not copy link"));
+  };
+
   const fmt = (d: any) => moment(d).format('MMM DD, HH:mm');
 
   const activeConv = conversations.find((c: any) => {
@@ -754,7 +823,9 @@ const Message = () => {
               const contact = getOtherUser(conv, user);
               const lastMsg = conv.lastMessage?.startsWith('[CUSTOM_OFFER]')
                 ? '📋 Custom Offer'
-                : conv.lastMessage || 'No messages yet';
+                : conv.lastMessage?.startsWith('[MEETING_INVITE]')
+                  ? '📹 Video Meeting Invitation'
+                  : conv.lastMessage || 'No messages yet';
               const canonicalId = conv.uuid || conv.conversationID || conv._id || conv.id;
               const isActive = isTargetConversation(conv, conversationID);
               return (
@@ -823,7 +894,21 @@ const Message = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="head-actions">
+                    <div className="head-actions flex items-center gap-2">
+                      {user?.isSeller && (
+                        <button
+                          type="button"
+                          className="action-icon p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600 transition-colors flex items-center justify-center cursor-pointer"
+                          onClick={() => {
+                            setMeetingTitle(`Job Discussion with @${finalRecipientUser?.username || 'Client'}`);
+                            setShowMeetingModal(true);
+                          }}
+                          title="Start Video Meeting"
+                          aria-label="Start Video Meeting"
+                        >
+                          <RiVideoChatLine className="w-5 h-5 text-brand-green" />
+                        </button>
+                      )}
                       {isMsgSearchActive ? (
                         <div style={{ display: 'flex', alignItems: 'center', background: '#f1f5f9', borderRadius: '20px', padding: '2px 10px' }}>
                           <input
@@ -886,6 +971,7 @@ const Message = () => {
                   const currentUserIdStr = String(user?._id || user?.id || '');
                   const isOwner = currentUserIdStr !== '' && senderIdStr === currentUserIdStr;
                   const offer = msg.isCustomOffer || msg.description?.startsWith('[CUSTOM_OFFER]') ? parseOffer(msg.description) : null;
+                  const meeting = msg.description?.startsWith('[MEETING_INVITE]') ? parseMeeting(msg.description) : null;
                   const isOfferAccepted = Boolean(msg.isOfferAccepted || msg.offerStatus === 'accepted');
                   const isWithdrawn = Boolean(msg.withdrawn || msg.offerStatus === 'withdrawn');
                   const acceptedOrder = offer ? contactOrders.find((o: any) => (msg.orderID && (o._id === msg.orderID || o.id === msg.orderID)) || (o.title === offer.desc && Number(o.price) === Number(offer.price))) : null;
@@ -903,7 +989,7 @@ const Message = () => {
                           <span className="date-pill">{msgDate === moment().format('MMM DD') ? 'Today' : msgDate}</span>
                         </div>
                       )}
-                      <div className={`msg-row max-md:max-w-[85%] ${isOwner ? 'msg-owner' : 'msg-other'} ${offer ? 'has-offer !max-w-[95%] xl:!max-w-[85%]' : ''}`}>
+                      <div className={`msg-row max-md:max-w-[85%] ${isOwner ? 'msg-owner' : 'msg-other'} ${offer ? 'has-offer !max-w-[95%] xl:!max-w-[85%]' : ''} ${meeting ? 'has-meeting !max-w-[95%] xl:!max-w-[85%]' : ''}`}>
                         {!isOwner && (
                           <img className="msg-avatar" src={senderObj?.image || finalRecipientUser?.image || '/media/noavatar.png'} alt="" />
                         )}
@@ -1004,6 +1090,60 @@ const Message = () => {
                               </div>
                             )}
                           </div>
+                        ) : meeting ? (
+                          <div className="meeting-card max-md:p-3.5 w-[460px] max-w-full bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs overflow-hidden">
+                            <div className="flex items-center justify-between gap-2 mb-3 pb-2.5 border-b border-slate-100">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg flex-shrink-0 border border-emerald-100/80">
+                                  <RiVideoChatLine className="w-5 h-5 text-brand-green" />
+                                </div>
+                                <div>
+                                  <h4 className="text-sm font-bold text-slate-900 leading-tight">Video Meeting Invitation</h4>
+                                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span className="text-emerald-700 font-medium">Ready to join</span>
+                                    {meeting.meetingId && (
+                                      <>
+                                        <span>•</span>
+                                        <span className="font-mono text-slate-600 font-semibold">ID: {meeting.meetingId}</span>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="mb-4">
+                              <h5 className="text-[15px] font-bold text-slate-800 leading-snug mb-1">
+                                {meeting.title || "Freelancer Job Discussion"}
+                              </h5>
+                              <p className="text-xs text-slate-500 leading-relaxed">
+                                Join the real-time video consultation room to discuss project requirements, scope, and deliverables.
+                              </p>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                              <a
+                                href={meeting.roomUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-brand-green hover:brightness-95 text-white transition-all text-center flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                                style={{ background: '#6ad724', color: '#ffffff' }}
+                              >
+                                <RiVideoChatLine className="w-4 h-4" />
+                                <span>Join Video Room</span>
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => handleCopyMeetingLink(meeting.roomUrl)}
+                                className="py-2.5 px-3.5 rounded-xl font-semibold text-xs sm:text-sm border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+                                title="Copy meeting room link"
+                              >
+                                <RiFileCopyLine className="w-4 h-4 text-slate-500" />
+                                <span>Copy Link</span>
+                              </button>
+                            </div>
+                          </div>
                         ) : (
                           <div className="msg-bubble [overflow-wrap:anywhere] [word-break:break-word]">
                             {renderMessageAttachment(msg)}
@@ -1101,8 +1241,10 @@ const Message = () => {
                       )}
                     </button>
 
-                    {/* Optional Seller Offer Button */}
+                    {/* Optional Seller Action Buttons: Video Meeting & Create Offer */}
                     {user?.isSeller && (
+
+
                       <button
                         type="button"
                         className="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap flex-shrink-0 mb-0.5"
@@ -1110,6 +1252,7 @@ const Message = () => {
                       >
                         Create Offer
                       </button>
+
                     )}
 
                     {/* Message Textarea */}
@@ -1278,6 +1421,79 @@ const Message = () => {
               <div className="modal-actions">
                 <button type="submit">Send Offer</button>
                 <button type="button" className="cancel" onClick={() => setShowOfferModal(false)}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Video Meeting Creation Modal */}
+      {showMeetingModal && (
+        <div className="modal-backdrop" onClick={() => !isCreatingMeeting && setShowMeetingModal(false)}>
+          <div className="modal-box max-md:w-[96%] max-w-md p-6 bg-white rounded-3xl shadow-2xl border border-slate-100" onClick={e => e.stopPropagation()}>
+            <div className="modal-head flex justify-between items-center pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold border border-emerald-100">
+                  <RiVideoChatLine className="w-5 h-5 text-brand-green" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900">Create Video Meeting</h3>
+              </div>
+              <button
+                type="button"
+                disabled={isCreatingMeeting}
+                onClick={() => setShowMeetingModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateMeeting} className="space-y-4 pt-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                  Meeting Topic / Title
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Freelancer Job Discussion"
+                  value={meetingTitle}
+                  onChange={(e) => setMeetingTitle(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-brand-green bg-slate-50/50"
+                  required
+                  autoFocus
+                />
+                <p className="text-[11px] text-slate-400 mt-1.5">
+                  A dedicated video room will be created and instantly sent to the buyer in this chat.
+                </p>
+              </div>
+
+              <div className="pt-2 flex gap-2">
+                <button
+                  type="submit"
+                  disabled={isCreatingMeeting}
+                  className="flex-1 py-3 rounded-xl font-bold text-sm bg-brand-green text-white hover:brightness-95 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
+                  style={{ background: '#6ad724', color: '#ffffff' }}
+                >
+                  {isCreatingMeeting ? (
+                    <>
+                      <Loader size={18} />
+                      <span>Creating Room...</span>
+                    </>
+                  ) : (
+                    <>
+                      <RiVideoChatLine className="w-4 h-4" />
+                      <span>Create & Send Link</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  disabled={isCreatingMeeting}
+                  onClick={() => setShowMeetingModal(false)}
+                  className="py-3 px-4 rounded-xl font-semibold text-sm border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>

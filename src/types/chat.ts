@@ -13,6 +13,16 @@ export interface CustomOffer {
   briefId?: string;
 }
 
+export interface MeetingInvite {
+  meetingId: string;
+  roomUrl: string;
+  title: string;
+  hostEmail?: string;
+  isPrivate?: boolean;
+  createdAt?: string;
+  status?: string;
+}
+
 export interface MessageAttachment {
   url: string;
   name?: string;

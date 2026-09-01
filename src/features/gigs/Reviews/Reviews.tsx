@@ -5,13 +5,43 @@ import { useQuery } from '@tanstack/react-query';
 import { axiosFetch } from '@/utils';
 import Review, { ReviewItem } from '../Review/Review';
 
+export interface RatingBreakdownData {
+    communication?: number;
+    qualityOfDelivery?: number;
+    valueOfDelivery?: number;
+    communicationRating?: number;
+    qualityRating?: number;
+    valueRating?: number;
+    [key: string]: any;
+}
+
+export interface StarCountsData {
+    "1"?: number;
+    "2"?: number;
+    "3"?: number;
+    "4"?: number;
+    "5"?: number;
+    [key: string]: number | undefined;
+}
+
 export interface ReviewsProps {
     reviews?: ReviewItem[];
     sellerId?: string;
     packageID?: string;
+    ratingBreakdown?: RatingBreakdownData;
+    starCounts?: StarCountsData;
+    totalReviews?: number;
+    starRating?: number;
 }
 
-const Reviews: React.FC<ReviewsProps> = ({ reviews: initialReviews, sellerId }) => {
+const Reviews: React.FC<ReviewsProps> = ({
+    reviews: initialReviews,
+    sellerId,
+    ratingBreakdown: propRatingBreakdown,
+    starCounts: propStarCounts,
+    totalReviews: propTotalReviews,
+    starRating: propStarRating,
+}) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showMore, setShowMore] = useState(false);
 
@@ -36,29 +66,89 @@ const Reviews: React.FC<ReviewsProps> = ({ reviews: initialReviews, sellerId }) 
 
     const filteredReviews = allReviews.filter((item) => {
         if (!searchTerm.trim()) return true;
-        const text = `${item?.description || ""} ${item?.userID?.username || ""} ${item?.userID?.country || ""}`.toLowerCase();
+        const text = `${item?.description || ""} ${item?.userID?.username || item?.user?.username || ""} ${item?.userID?.country || item?.user?.country || ""}`.toLowerCase();
         return text.includes(searchTerm.trim().toLowerCase());
     });
 
     const displayedReviews = showMore ? filteredReviews : filteredReviews.slice(0, 4);
 
-    // Calculate accurate aggregate stats
-    const totalReviewsCount = allReviews.length;
-    let averageRating = 0;
+    // Calculate or resolve star counts and totals
+    const computedStarCounts: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    let computedTotalScore = 0;
+    let computedValidReviewCount = 0;
 
-    const starCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    let commTotal = 0;
+    let commCount = 0;
+    let qualTotal = 0;
+    let qualCount = 0;
+    let valTotal = 0;
+    let valCount = 0;
 
-    if (totalReviewsCount > 0) {
-        let totalScore = 0;
-        allReviews.forEach((r) => {
-            const score = typeof r.star === 'number' && r.star > 0 && r.star <= 5 ? r.star : 0;
-            if (score > 0) {
-                starCounts[score as keyof typeof starCounts]++;
-                totalScore += score;
-            }
-        });
-        averageRating = totalScore / totalReviewsCount;
-    }
+    allReviews.forEach((r) => {
+        const score = typeof r.star === 'number' && r.star > 0 && r.star <= 5 ? r.star : 0;
+        if (score > 0) {
+            const rounded = Math.min(5, Math.max(1, Math.round(score)));
+            computedStarCounts[rounded] = (computedStarCounts[rounded] || 0) + 1;
+            computedTotalScore += score;
+            computedValidReviewCount++;
+        }
+
+        if (typeof r.communicationRating === 'number' && r.communicationRating > 0) {
+            commTotal += r.communicationRating;
+            commCount++;
+        }
+        if (typeof r.qualityRating === 'number' && r.qualityRating > 0) {
+            qualTotal += r.qualityRating;
+            qualCount++;
+        }
+        if (typeof r.valueRating === 'number' && r.valueRating > 0) {
+            valTotal += r.valueRating;
+            valCount++;
+        }
+    });
+
+    const hasPropStarCounts = Boolean(
+        propStarCounts && (
+            (propStarCounts["5"] ?? propStarCounts[5] ?? 0) > 0 ||
+            (propStarCounts["4"] ?? propStarCounts[4] ?? 0) > 0 ||
+            (propStarCounts["3"] ?? propStarCounts[3] ?? 0) > 0 ||
+            (propStarCounts["2"] ?? propStarCounts[2] ?? 0) > 0 ||
+            (propStarCounts["1"] ?? propStarCounts[1] ?? 0) > 0
+        )
+    );
+
+    const starCounts: Record<number, number> = hasPropStarCounts
+        ? {
+            5: Number(propStarCounts?.["5"] ?? propStarCounts?.[5] ?? 0),
+            4: Number(propStarCounts?.["4"] ?? propStarCounts?.[4] ?? 0),
+            3: Number(propStarCounts?.["3"] ?? propStarCounts?.[3] ?? 0),
+            2: Number(propStarCounts?.["2"] ?? propStarCounts?.[2] ?? 0),
+            1: Number(propStarCounts?.["1"] ?? propStarCounts?.[1] ?? 0),
+        }
+        : computedStarCounts;
+
+    const totalReviewsCount = typeof propTotalReviews === 'number' && propTotalReviews > 0
+        ? propTotalReviews
+        : (allReviews.length > 0 ? allReviews.length : (hasPropStarCounts ? Object.values(starCounts).reduce((a, b) => a + b, 0) : 0));
+
+    const averageRating = typeof propStarRating === 'number' && propStarRating > 0
+        ? propStarRating
+        : (computedValidReviewCount > 0
+            ? computedTotalScore / computedValidReviewCount
+            : (totalReviewsCount > 0 && hasPropStarCounts
+                ? (starCounts[5] * 5 + starCounts[4] * 4 + starCounts[3] * 3 + starCounts[2] * 2 + starCounts[1] * 1) / totalReviewsCount
+                : 0));
+
+    // Resolve multi-criteria ratings with backward-compatible fallbacks
+    const resolvedComm = propRatingBreakdown?.communication ?? propRatingBreakdown?.communicationRating ?? (commCount > 0 ? (commTotal / commCount) : averageRating);
+    const resolvedQual = propRatingBreakdown?.qualityOfDelivery ?? propRatingBreakdown?.qualityRating ?? (qualCount > 0 ? (qualTotal / qualCount) : averageRating);
+    const resolvedVal = propRatingBreakdown?.valueOfDelivery ?? propRatingBreakdown?.valueRating ?? (valCount > 0 ? (valTotal / valCount) : averageRating);
+
+    const criteriaBreakdown = [
+        { label: "Seller communication level", score: resolvedComm > 0 ? Number(resolvedComm).toFixed(1) : (averageRating > 0 ? averageRating.toFixed(1) : "0.0") },
+        { label: "Quality of delivery", score: resolvedQual > 0 ? Number(resolvedQual).toFixed(1) : (averageRating > 0 ? averageRating.toFixed(1) : "0.0") },
+        { label: "Value of delivery", score: resolvedVal > 0 ? Number(resolvedVal).toFixed(1) : (averageRating > 0 ? averageRating.toFixed(1) : "0.0") }
+    ];
 
     return (
         <div className="w-full pb-6">
@@ -91,7 +181,7 @@ const Reviews: React.FC<ReviewsProps> = ({ reviews: initialReviews, sellerId }) 
                     {/* Left side: Star level bars */}
                     <div className="lg:col-span-6 space-y-3.5">
                         {[5, 4, 3, 2, 1].map((starLvl) => {
-                            const count = starCounts[starLvl as keyof typeof starCounts];
+                            const count = starCounts[starLvl] || 0;
                             const percentage = totalReviewsCount > 0 ? Math.round((count / totalReviewsCount) * 100) : 0;
                             const hasVotes = count > 0;
                             return (
@@ -119,11 +209,7 @@ const Reviews: React.FC<ReviewsProps> = ({ reviews: initialReviews, sellerId }) 
                             Rating Breakdown
                         </h3>
                         <div className="space-y-3.5">
-                            {[
-                                { label: "Seller communication level", score: averageRating > 0 ? averageRating.toFixed(1) : "0.0" },
-                                { label: "Quality of delivery", score: averageRating > 0 ? averageRating.toFixed(1) : "0.0" },
-                                { label: "Value of delivery", score: averageRating > 0 ? averageRating.toFixed(1) : "0.0" }
-                            ].map((criteria, i) => (
+                            {criteriaBreakdown.map((criteria, i) => (
                                 <div key={i} className="flex items-center justify-between text-xs sm:text-sm">
                                     <span className="text-gray-500 font-normal">{criteria.label}</span>
                                     <div className="flex items-center gap-1 font-semibold text-gray-900">

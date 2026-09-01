@@ -919,7 +919,14 @@ const PackageContent = () => {
 
             {/* 5. Reviews Section */}
             <div id="section-reviews" className="pt-8 border-t border-gray-100 scroll-mt-32">
-              <Reviews packageID={_id} reviews={data?.reviews || []} />
+              <Reviews
+                packageID={_id}
+                reviews={data?.reviews || []}
+                ratingBreakdown={data?.ratingBreakdown}
+                starCounts={data?.starCounts}
+                totalReviews={data?.totalReviews || data?.starNumber}
+                starRating={data?.starRating || data?.totalStars}
+              />
             </div>
 
           </div>

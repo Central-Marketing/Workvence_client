@@ -39,7 +39,9 @@ const OrderDetail = () => {
   const [isOverdue, setIsOverdue] = useState(false);
 
   // Review states
-  const [reviewStar, setReviewStar] = useState(5);
+  const [communicationRating, setCommunicationRating] = useState(5);
+  const [qualityRating, setQualityRating] = useState(5);
+  const [valueRating, setValueRating] = useState(5);
   const [reviewDescription, setReviewDescription] = useState("");
   const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
 
@@ -313,16 +315,20 @@ const OrderDetail = () => {
 
   const handleReviewSubmit = async (e: any) => {
     e.preventDefault();
-    if (!reviewDescription) {
+    if (!reviewDescription.trim()) {
       toast.error("Please enter a review description.");
       return;
     }
     setSubmitting(true);
     try {
+      const calculatedStar = Math.round(((communicationRating + qualityRating + valueRating) / 3) * 10) / 10;
       await axiosFetch.post(`/reviews`, {
         orderID: order._id,
-        star: reviewStar,
+        communicationRating,
+        qualityRating,
+        valueRating,
         description: reviewDescription,
+        star: calculatedStar,
       });
       toast.success("Review submitted successfully!");
       setHasSubmittedReview(true);
@@ -723,21 +729,118 @@ const OrderDetail = () => {
             <div className="card action-form-card" style={{ marginTop: '24px' }}>
               <div className="delivery-teaser">
                 <h4>Leave a Review</h4>
-                <p>Share your experience with this seller to help others.</p>
+                <p>Rate your experience with this seller across the 3 key criteria below.</p>
               </div>
               <form onSubmit={handleReviewSubmit} style={{ marginTop: '20px' }}>
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155' }}>Rating (1-5)</label>
-                  <select
-                    value={reviewStar}
-                    onChange={(e) => setReviewStar(Number(e.target.value))}
-                    style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '15px' }}
-                  >
-                    {[5, 4, 3, 2, 1].map(num => (
-                      <option key={num} value={num}>{num} Star{num !== 1 ? 's' : ''}</option>
-                    ))}
-                  </select>
+                {/* 3 Criteria Star Selectors */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
+                  {[
+                    {
+                      label: 'Seller communication level',
+                      description: 'How responsive and clear was the seller throughout the order?',
+                      value: communicationRating,
+                      setValue: setCommunicationRating,
+                    },
+                    {
+                      label: 'Quality of delivery',
+                      description: 'Did the completed work meet your requirements and expectations?',
+                      value: qualityRating,
+                      setValue: setQualityRating,
+                    },
+                    {
+                      label: 'Value of delivery',
+                      description: 'How satisfied are you with the quality relative to the price paid?',
+                      value: valueRating,
+                      setValue: setValueRating,
+                    },
+                  ].map((crit, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        padding: '14px 16px',
+                        backgroundColor: '#f8fafc',
+                        borderRadius: '12px',
+                        border: '1px solid #e2e8f0',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '12px',
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '14px' }}>{crit.label}</div>
+                        <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>{crit.description}</div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          {[1, 2, 3, 4, 5].map((starNum) => (
+                            <button
+                              key={starNum}
+                              type="button"
+                              onClick={() => crit.setValue(starNum)}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '2px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                transition: 'transform 0.15s ease',
+                              }}
+                              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.2)')}
+                              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                              aria-label={`${crit.label} ${starNum} stars`}
+                            >
+                              <svg
+                                style={{
+                                  width: '22px',
+                                  height: '22px',
+                                  fill: starNum <= crit.value ? '#f59e0b' : '#cbd5e1',
+                                }}
+                                viewBox="0 0 20 20"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            </button>
+                          ))}
+                        </div>
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b', minWidth: '24px', textAlign: 'right' }}>
+                          {crit.value}.0
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
+
+                {/* Live Calculated Overall Rating Preview */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '12px 16px',
+                    backgroundColor: '#f0fdf4',
+                    border: '1px solid #bbf7d0',
+                    borderRadius: '10px',
+                    marginBottom: '20px',
+                  }}
+                >
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#166534' }}>
+                    Calculated Overall Rating:
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <svg style={{ width: '18px', height: '18px', fill: '#f59e0b' }} viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span style={{ fontSize: '15px', fontWeight: 800, color: '#166534' }}>
+                      {((communicationRating + qualityRating + valueRating) / 3).toFixed(1)} / 5.0
+                    </span>
+                  </div>
+                </div>
+
+                {/* Review Description Textarea */}
                 <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155' }}>Review Description</label>
                   <textarea
@@ -760,20 +863,48 @@ const OrderDetail = () => {
             </div>
           )}
 
-          {/* Review Display for Seller */}
+          {/* Review Display for Seller & Buyer */}
           {isCompleted && (() => {
             const currentReview = reviews.find((r: any) =>
               r.orderID === order._id || r.orderID?._id === order._id || order.reviewID === r._id
             ) || order.review;
 
             if (currentReview) {
+              const overallScore = typeof currentReview.star === 'number' && currentReview.star > 0
+                ? Number(currentReview.star).toFixed(1)
+                : '5.0';
+
               return (
                 <div className="card delivery-card" style={{ marginTop: '24px', borderLeft: '4px solid #f59e0b' }}>
                   <div className="delivery-badge-tag" style={{ background: '#fef3c7', color: '#b45309' }}>Review from Buyer</div>
                   <div className="delivery-content">
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#f59e0b', marginRight: '8px' }}>{currentReview.star} ★</span>
+                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#f59e0b', marginRight: '8px' }}>
+                        {overallScore} ★
+                      </span>
                     </div>
+
+                    {/* Breakdown Badges if available */}
+                    {(Boolean(currentReview.communicationRating) || Boolean(currentReview.qualityRating) || Boolean(currentReview.valueRating)) && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+                        {currentReview.communicationRating && (
+                          <span style={{ fontSize: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '4px 10px', borderRadius: '6px', color: '#475569' }}>
+                            Communication: <strong>{Number(currentReview.communicationRating).toFixed(1)} ★</strong>
+                          </span>
+                        )}
+                        {currentReview.qualityRating && (
+                          <span style={{ fontSize: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '4px 10px', borderRadius: '6px', color: '#475569' }}>
+                            Quality: <strong>{Number(currentReview.qualityRating).toFixed(1)} ★</strong>
+                          </span>
+                        )}
+                        {currentReview.valueRating && (
+                          <span style={{ fontSize: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '4px 10px', borderRadius: '6px', color: '#475569' }}>
+                            Value: <strong>{Number(currentReview.valueRating).toFixed(1)} ★</strong>
+                          </span>
+                        )}
+                      </div>
+                    )}
+
                     <p className="message-text" style={{ fontStyle: 'italic' }}>"{currentReview.description}"</p>
                   </div>
                 </div>

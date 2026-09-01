@@ -312,14 +312,14 @@ const RegisterContent = () => {
         {/* Left Pane */}
         <div className="flex-1 flex flex-col p-6 md:p-10 lg:px-20 overflow-y-auto [&::-webkit-scrollbar]:w-0">
           {step === 1 ? (
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full justify-between">
               <div className="flex justify-center md:justify-start">
                 <Link href="/">
                   <img src="/Workvence-logo-Horizontal3.png" alt="Workvence" className="h-10 object-contain" />
                 </Link>
               </div>
 
-              <div className="flex-1 flex flex-col justify-center items-center max-w-[450px] mx-auto w-full mt-8 md:mt-0">
+              <div className="flex-1 flex flex-col justify-center items-center max-w-[450px] mx-auto w-full my-auto py-6">
                 <h1 className="text-[28px] md:text-[32px] font-bold text-[#1a1a1a] mb-10 text-center">Create a new account</h1>
 
                 <div className="flex flex-col gap-4 w-full">
@@ -334,9 +334,10 @@ const RegisterContent = () => {
                 <div className="mt-14 text-center w-full">
                   <p className="text-sm text-[#666] mb-2">Already have an account? <Link href='/login' className="text-emerald-500 font-semibold no-underline hover:underline">Sign in</Link></p>
                 </div>
-                <div className="mt-auto pt-10 text-center w-full">
-                  <p className="text-[13px] text-[#aaa]">©2026 workvence All right reserved</p>
-                </div>
+              </div>
+
+              <div className="text-center w-full pt-4">
+                <p className="text-[13px] text-[#aaa]">©2026 workvence All right reserved</p>
               </div>
             </div>
           ) : step === 2 ? (

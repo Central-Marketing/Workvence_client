@@ -895,20 +895,20 @@ const Message = () => {
                       </div>
                     </div>
                     <div className="head-actions flex items-center gap-2">
-                      {user?.isSeller && (
-                        <button
-                          type="button"
-                          className="action-icon p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600 transition-colors flex items-center justify-center cursor-pointer"
-                          onClick={() => {
-                            setMeetingTitle(`Job Discussion with @${finalRecipientUser?.username || 'Client'}`);
-                            setShowMeetingModal(true);
-                          }}
-                          title="Start Video Meeting"
-                          aria-label="Start Video Meeting"
-                        >
-                          <RiVideoChatLine className="w-5 h-5 text-brand-green" />
-                        </button>
-                      )}
+
+                      <button
+                        type="button"
+                        className="action-icon p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600 transition-colors flex items-center justify-center cursor-pointer"
+                        onClick={() => {
+                          setMeetingTitle(`Job Discussion with @${finalRecipientUser?.username || 'Client'}`);
+                          setShowMeetingModal(true);
+                        }}
+                        title="Start Video Meeting"
+                        aria-label="Start Video Meeting"
+                      >
+                        <RiVideoChatLine className="w-5 h-5 text-brand-green" />
+                      </button>
+
                       {isMsgSearchActive ? (
                         <div style={{ display: 'flex', alignItems: 'center', background: '#f1f5f9', borderRadius: '20px', padding: '2px 10px' }}>
                           <input
@@ -1471,8 +1471,8 @@ const Message = () => {
                 <button
                   type="submit"
                   disabled={isCreatingMeeting}
-                  className="flex-1 py-3 rounded-xl font-bold text-sm bg-brand-green text-white hover:brightness-95 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
-                  style={{ background: '#6ad724', color: '#ffffff' }}
+                  className="flex-1 py-3 rounded-xl font-semibold text-sm bg-brand-green text-white hover:brightness-95 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
+                  style={{ background: '#000000', color: '#ffffff' }}
                 >
                   {isCreatingMeeting ? (
                     <>

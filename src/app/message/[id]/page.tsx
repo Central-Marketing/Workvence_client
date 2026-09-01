@@ -1128,7 +1128,7 @@ const Message = () => {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-brand-green hover:brightness-95 text-white transition-all text-center flex items-center justify-center gap-2 shadow-xs cursor-pointer"
-                                style={{ background: '#6ad724', color: '#ffffff' }}
+                                style={{ background: '#000000', color: '#ffffff' }}
                               >
                                 <RiVideoChatLine className="w-4 h-4" />
                                 <span>Join Video Room</span>

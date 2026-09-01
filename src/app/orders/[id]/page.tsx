@@ -387,48 +387,25 @@ const OrderDetail = () => {
 
           {/* Dispute Notice Card */}
           {isDisputed && (
-            <div className="card delivery-card" style={{ borderLeft: '4px solid #f59e0b' }}>
-              <div className="delivery-badge-tag" style={{ background: '#fef3c7', color: '#b45309' }}>🛡️ Order Under Dispute</div>
+            <div className="card delivery-card border-l-4 border-l-amber-500">
+              <div className="delivery-badge-tag bg-amber-100 text-amber-700">🛡️ Order Under Dispute</div>
               <div className="delivery-content">
-                <h5 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+                <h5 className="text-base font-bold text-slate-900 mb-2">
                   Workvence Support is handling your issue
                 </h5>
-                <p className="message-text" style={{ fontStyle: 'normal', color: '#475569', fontSize: '14px', lineHeight: '22px', backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', margin: '8px 0 16px 0' }}>
+                <p className="message-text not-italic text-slate-600 text-sm leading-[22px] bg-slate-50 p-4 rounded-lg border border-slate-200 my-2 mb-4">
                   Our Support & Administration team is actively investigating and taking care of this dispute. All payment releases and work deliveries are temporarily paused while administrators review the details. Both parties will be contacted via support tickets.
                 </p>
-                <div className="delivery-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '12px', paddingTop: '0' }}>
+                <div className="delivery-actions flex flex-wrap gap-3 mt-3 pt-0">
                   <Link
                     href="/support"
-                    style={{
-                      background: '#6ad724',
-                      color: '#ffffff',
-                      padding: '10px 20px',
-                      borderRadius: '8px',
-                      fontWeight: 600,
-                      fontSize: '14px',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
+                    className="inline-flex items-center gap-1.5 bg-[#6ad724] hover:brightness-95 text-white px-5 py-2.5 rounded-lg font-semibold text-sm no-underline transition-all"
                   >
                     🎧 Go to Support Desk
                   </Link>
                   <a
                     href="mailto:support@workvence.com"
-                    style={{
-                      background: '#f1f5f9',
-                      color: '#334155',
-                      border: '1px solid #cbd5e1',
-                      padding: '10px 18px',
-                      borderRadius: '8px',
-                      fontWeight: 600,
-                      fontSize: '14px',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
+                    className="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-4.5 py-2.5 rounded-lg font-semibold text-sm no-underline transition-all"
                   >
                     ✉️ Email: support@workvence.com
                   </a>
@@ -439,48 +416,25 @@ const OrderDetail = () => {
 
           {/* Cancelled Notice Card */}
           {isCancelled && (
-            <div className="card delivery-card" style={{ borderLeft: '4px solid #ef4444' }}>
-              <div className="delivery-badge-tag" style={{ background: '#fee2e2', color: '#b91c1c' }}>❌ Order Cancelled</div>
+            <div className="card delivery-card border-l-4 border-l-red-500">
+              <div className="delivery-badge-tag bg-red-100 text-red-700">❌ Order Cancelled</div>
               <div className="delivery-content">
-                <h5 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
+                <h5 className="text-base font-bold text-slate-900 mb-2">
                   This order has been cancelled
                 </h5>
-                <p className="message-text" style={{ fontStyle: 'normal', color: '#475569', fontSize: '14px', lineHeight: '22px', backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', margin: '8px 0 16px 0' }}>
+                <p className="message-text not-italic text-slate-600 text-sm leading-[22px] bg-slate-50 p-4 rounded-lg border border-slate-200 my-2 mb-4">
                   This order was marked as cancelled. If you believe this cancellation was an issue, need assistance with refund details, or wish to appeal, please contact Workvence Support.
                 </p>
-                <div className="delivery-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '12px', paddingTop: '0' }}>
+                <div className="delivery-actions flex flex-wrap gap-3 mt-3 pt-0">
                   <Link
                     href="/support/new"
-                    style={{
-                      background: '#0f172a',
-                      color: '#ffffff',
-                      padding: '10px 20px',
-                      borderRadius: '8px',
-                      fontWeight: 600,
-                      fontSize: '14px',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
+                    className="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-lg font-semibold text-sm no-underline transition-all"
                   >
                     🎧 Contact Support
                   </Link>
                   <a
                     href="mailto:support@workvence.com"
-                    style={{
-                      background: '#f1f5f9',
-                      color: '#334155',
-                      border: '1px solid #cbd5e1',
-                      padding: '10px 18px',
-                      borderRadius: '8px',
-                      fontWeight: 600,
-                      fontSize: '14px',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
+                    className="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-4.5 py-2.5 rounded-lg font-semibold text-sm no-underline transition-all"
                   >
                     ✉️ Email: support@workvence.com
                   </a>
@@ -491,19 +445,19 @@ const OrderDetail = () => {
 
           {/* Extension Request Banner for Buyer */}
           {!isCurrentUserSeller && hasPendingExtension && (
-            <div className="card delivery-card" style={{ borderLeft: '4px solid #0095ff' }}>
-              <div className="delivery-badge-tag" style={{ background: '#e0f2fe', color: '#0284c7' }}>Time Extension Request</div>
+            <div className="card delivery-card border-l-4 border-l-sky-500">
+              <div className="delivery-badge-tag bg-sky-100 text-sky-700">Time Extension Request</div>
               <div className="delivery-content">
                 <h5>The Seller has requested more time ({extensionData.extraDays || extensionData.requestedDays} days)</h5>
                 <p className="message-text">Reason: "{extensionData.reason}"</p>
               </div>
-              <div className="delivery-actions" style={{ display: 'flex', gap: '15px' }}>
+              <div className="delivery-actions flex gap-4">
                 <button className="approve-order-btn" onClick={() => handleRespondExtension('accept')}>
                   Approve Extension
                 </button>
                 <button
                   onClick={() => handleRespondExtension('reject')}
-                  style={{ background: 'white', color: '#ff6b4a', border: '1px solid #ff6b4a', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                  className="bg-white hover:bg-orange-50 text-[#ff6b4a] border border-[#ff6b4a] px-5 py-3 rounded-lg font-semibold cursor-pointer transition-colors"
                 >
                   Reject
                 </button>
@@ -560,8 +514,8 @@ const OrderDetail = () => {
           </div>
 
           {isRevision && (
-            <div className="card delivery-card" style={{ borderLeft: '4px solid #ff9800' }}>
-              <div className="delivery-badge-tag" style={{ background: '#fff3e0', color: '#e65100' }}>In Revision</div>
+            <div className="card delivery-card border-l-4 border-l-amber-500">
+              <div className="delivery-badge-tag bg-amber-100 text-amber-800">In Revision</div>
               <div className="delivery-content">
                 <h5>{!isCurrentUserSeller ? "Feedback from me:" : "Feedback from Buyer:"}</h5>
                 <p className="message-text">"{order.revisionReason || order.revisions?.[order.revisions.length - 1]?.reason || order.revisions?.[order.revisions.length - 1] || "No specific feedback provided."}"</p>
@@ -686,19 +640,18 @@ const OrderDetail = () => {
               </div>
 
               {!isCurrentUserSeller && isDelivered && !isCompleted && (
-                <div className="delivery-actions" style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div className="delivery-actions flex gap-4 items-center flex-wrap">
                   <button className="approve-order-btn" onClick={handleCompleteOrder}>
                     Approve Work & Release Funds
                   </button>
                   <button
-                    className="request-revision-btn"
+                    className="request-revision-btn bg-white hover:bg-orange-50 text-[#ff6b4a] border border-[#ff6b4a] px-5 py-3 rounded-lg font-semibold cursor-pointer transition-colors"
                     onClick={() => setIsRevisionModalOpen(true)}
                     disabled={submitting}
-                    style={{ background: 'white', color: '#ff6b4a', border: '1px solid #ff6b4a', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
                   >
                     Request Revision
                   </button>
-                  <p className="action-hint" style={{ width: '100%', marginTop: '5px' }}>
+                  <p className="action-hint w-full mt-1.5">
                     By clicking Approve, you accept the work and authorize release of funds.
                   </p>
                 </div>
@@ -726,14 +679,14 @@ const OrderDetail = () => {
 
           {/* Review Form for Buyer */}
           {isCompleted && !isCurrentUserSeller && !hasAlreadyReviewed && (
-            <div className="card action-form-card" style={{ marginTop: '24px' }}>
+            <div className="card action-form-card mt-6">
               <div className="delivery-teaser">
                 <h4>Leave a Review</h4>
                 <p>Rate your experience with this seller across the 3 key criteria below.</p>
               </div>
-              <form onSubmit={handleReviewSubmit} style={{ marginTop: '20px' }}>
+              <form onSubmit={handleReviewSubmit} className="mt-5">
                 {/* 3 Criteria Star Selectors */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
+                <div className="flex flex-col gap-3.5 mb-5">
                   {[
                     {
                       label: 'Seller communication level',
@@ -756,48 +709,24 @@ const OrderDetail = () => {
                   ].map((crit, idx) => (
                     <div
                       key={idx}
-                      style={{
-                        padding: '14px 16px',
-                        backgroundColor: '#f8fafc',
-                        borderRadius: '12px',
-                        border: '1px solid #e2e8f0',
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '12px',
-                      }}
+                      className="p-3.5 sm:px-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3"
                     >
                       <div>
-                        <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '14px' }}>{crit.label}</div>
-                        <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>{crit.description}</div>
+                        <div className="font-semibold text-slate-800 text-sm">{crit.label}</div>
+                        <div className="text-xs text-slate-500 mt-0.5">{crit.description}</div>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((starNum) => (
                             <button
                               key={starNum}
                               type="button"
                               onClick={() => crit.setValue(starNum)}
-                              style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: '2px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                transition: 'transform 0.15s ease',
-                              }}
-                              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.2)')}
-                              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                              className="p-0.5 flex items-center hover:scale-125 transition-transform duration-150 cursor-pointer bg-transparent border-0"
                               aria-label={`${crit.label} ${starNum} stars`}
                             >
                               <svg
-                                style={{
-                                  width: '22px',
-                                  height: '22px',
-                                  fill: starNum <= crit.value ? '#f59e0b' : '#cbd5e1',
-                                }}
+                                className={`w-5.5 h-5.5 ${starNum <= crit.value ? 'fill-amber-400' : 'fill-slate-300'}`}
                                 viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg"
                               >
@@ -806,7 +735,7 @@ const OrderDetail = () => {
                             </button>
                           ))}
                         </div>
-                        <span style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b', minWidth: '24px', textAlign: 'right' }}>
+                        <span className="text-[13px] font-bold text-slate-800 min-w-[24px] text-right">
                           {crit.value}.0
                         </span>
                       </div>
@@ -815,47 +744,36 @@ const OrderDetail = () => {
                 </div>
 
                 {/* Live Calculated Overall Rating Preview */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '12px 16px',
-                    backgroundColor: '#f0fdf4',
-                    border: '1px solid #bbf7d0',
-                    borderRadius: '10px',
-                    marginBottom: '20px',
-                  }}
-                >
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#166534' }}>
+                <div className="flex items-center justify-between px-4 py-3 bg-emerald-50/70 border border-emerald-200 rounded-xl mb-5">
+                  <span className="text-[13px] font-semibold text-emerald-800">
                     Calculated Overall Rating:
                   </span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <svg style={{ width: '18px', height: '18px', fill: '#f59e0b' }} viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <div className="flex items-center gap-1.5">
+                    <svg className="w-4.5 h-4.5 fill-amber-400" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
-                    <span style={{ fontSize: '15px', fontWeight: 800, color: '#166534' }}>
+                    <span className="text-[15px] font-extrabold text-emerald-800">
                       {((communicationRating + qualityRating + valueRating) / 3).toFixed(1)} / 5.0
                     </span>
                   </div>
                 </div>
 
                 {/* Review Description Textarea */}
-                <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155' }}>Review Description</label>
+                <div className="mb-5">
+                  <label className="block mb-2 font-semibold text-slate-700 text-sm">Review Description</label>
                   <textarea
                     rows={4}
                     value={reviewDescription}
                     onChange={(e) => setReviewDescription(e.target.value)}
                     placeholder="Outstanding work! Code is clean, well-tested, and delivered ahead of schedule."
-                    style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '15px', resize: 'vertical' }}
+                    className="w-full p-3 rounded-lg border border-slate-200 text-[15px] resize-y focus:outline-none focus:border-brand-green"
                     required
                   ></textarea>
                 </div>
                 <button
                   type="submit"
                   disabled={submitting}
-                  style={{ width: '100%', padding: '14px', background: '#6ad724', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer' }}
+                  className="w-full p-3.5 bg-[#6ad724] hover:brightness-95 text-white rounded-lg text-base font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-0 shadow-xs"
                 >
                   {submitting ? 'Submitting...' : 'Submit Review'}
                 </button>
@@ -875,37 +793,37 @@ const OrderDetail = () => {
                 : '5.0';
 
               return (
-                <div className="card delivery-card" style={{ marginTop: '24px', borderLeft: '4px solid #f59e0b' }}>
-                  <div className="delivery-badge-tag" style={{ background: '#fef3c7', color: '#b45309' }}>Review from Buyer</div>
+                <div className="card delivery-card mt-6 border-l-4 border-l-amber-500">
+                  <div className="delivery-badge-tag bg-amber-100 text-amber-700">Review from Buyer</div>
                   <div className="delivery-content">
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#f59e0b', marginRight: '8px' }}>
+                    <div className="flex items-center mb-2">
+                      <span className="text-lg font-bold text-amber-500 mr-2">
                         {overallScore} ★
                       </span>
                     </div>
 
                     {/* Breakdown Badges if available */}
                     {(Boolean(currentReview.communicationRating) || Boolean(currentReview.qualityRating) || Boolean(currentReview.valueRating)) && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+                      <div className="flex flex-wrap gap-2 mb-3">
                         {currentReview.communicationRating && (
-                          <span style={{ fontSize: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '4px 10px', borderRadius: '6px', color: '#475569' }}>
+                          <span className="text-xs bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md text-slate-600">
                             Communication: <strong>{Number(currentReview.communicationRating).toFixed(1)} ★</strong>
                           </span>
                         )}
                         {currentReview.qualityRating && (
-                          <span style={{ fontSize: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '4px 10px', borderRadius: '6px', color: '#475569' }}>
+                          <span className="text-xs bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md text-slate-600">
                             Quality: <strong>{Number(currentReview.qualityRating).toFixed(1)} ★</strong>
                           </span>
                         )}
                         {currentReview.valueRating && (
-                          <span style={{ fontSize: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '4px 10px', borderRadius: '6px', color: '#475569' }}>
+                          <span className="text-xs bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md text-slate-600">
                             Value: <strong>{Number(currentReview.valueRating).toFixed(1)} ★</strong>
                           </span>
                         )}
                       </div>
                     )}
 
-                    <p className="message-text" style={{ fontStyle: 'italic' }}>"{currentReview.description}"</p>
+                    <p className="message-text italic">"{currentReview.description}"</p>
                   </div>
                 </div>
               );
@@ -920,25 +838,25 @@ const OrderDetail = () => {
                 <div className="delivery-teaser">
                   <h4>Ready to submit your work?</h4>
                   <p>Upload files or supply external links along with instructions to complete the order.</p>
-                  <div style={{ display: 'flex', gap: '15px', marginTop: '15px', justifyContent: 'center' }}>
+                  <div className="flex gap-4 mt-4 justify-center flex-wrap">
                     <button className="start-delivery-btn" onClick={() => setShowDeliverForm(true)}>
                       Deliver Now
                     </button>
                     {!hasPendingExtension && (
                       <button
                         onClick={() => setIsExtensionModalOpen(true)}
-                        style={{ background: 'white', color: '#6ad724', border: '1px solid #6ad724', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                        className="bg-white hover:bg-emerald-50 text-[#6ad724] border border-[#6ad724] px-5 py-3 rounded-lg font-semibold cursor-pointer transition-colors"
                       >
                         Request Time Extension
                       </button>
                     )}
                   </div>
                   {hasPendingExtension && (
-                    <div style={{ marginTop: '24px', padding: '16px 20px', background: '#f0f9ff', borderLeft: '4px solid #0ea5e9', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <div style={{ fontSize: '24px' }}>⏳</div>
+                    <div className="mt-6 p-4 sm:p-5 bg-sky-50 border-l-4 border-l-sky-500 rounded-lg flex items-center gap-4">
+                      <div className="text-2xl flex-shrink-0">⏳</div>
                       <div>
-                        <h4 style={{ margin: 0, color: '#0369a1', fontSize: '16px', fontWeight: 600 }}>Time Extension Requested</h4>
-                        <p style={{ margin: '4px 0 0 0', color: '#0284c7', fontSize: '14px' }}>
+                        <h4 className="m-0 text-sky-900 text-base font-semibold">Time Extension Requested</h4>
+                        <p className="mt-1 text-sky-700 text-sm">
                           Waiting for the buyer to review your request for an additional {extensionData.extraDays || extensionData.requestedDays} days.
                         </p>
                       </div>
@@ -1208,21 +1126,21 @@ const OrderDetail = () => {
 
           {/* Seller Financial Breakdown Card */}
           {isCurrentUserSeller && (
-            <div className="card statement-card" style={{ borderColor: isCompleted ? '#a7f3d0' : '#e2e8f0', background: isCompleted ? '#f0fdf4' : '#ffffff' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0px' }}>
+            <div className={`card statement-card ${isCompleted ? '!border-emerald-200 !bg-emerald-50/40' : '!border-slate-200 !bg-white'}`}>
+              <div className="flex justify-between items-center mb-2 gap-2">
+                <h3 className="m-0 text-[15px] font-bold text-slate-900 flex items-center gap-1.5">
                   <span>💰</span> Seller Earnings Breakdown
                 </h3>
                 {order.isCleared ? (
-                  <span style={{ fontSize: '11px', fontWeight: 700, background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '12px', border: '1px solid #bbf7d0' }}>
+                  <span className="text-[11px] font-bold bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200 whitespace-nowrap shrink-0">
                     Cleared
                   </span>
                 ) : isCompleted ? (
-                  <span style={{ fontSize: '11px', fontWeight: 700, background: '#fef3c7', color: '#b45309', padding: '2px 8px', borderRadius: '12px', border: '1px solid #fde68a' }}>
+                  <span className="text-[11px] font-bold bg-amber-100 text-amber-700 px-2.5 py-0.5 rounded-full border border-amber-200 whitespace-nowrap shrink-0">
                     Holding Period
                   </span>
                 ) : (
-                  <span style={{ fontSize: '11px', fontWeight: 700, background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '12px', border: '1px solid #bae6fd' }}>
+                  <span className="text-[11px] font-bold bg-sky-100 text-sky-700 px-2.5 py-0.5 rounded-full border border-sky-200 whitespace-nowrap shrink-0">
                     In Escrow
                   </span>
                 )}
@@ -1247,36 +1165,36 @@ const OrderDetail = () => {
                   <>
                     <div className="statement-row">
                       <span className="label">Platform Fee ({commissionRate}%)</span>
-                      <span className="value" style={{ color: '#e11d48', fontWeight: 600 }}>
+                      <span className="value text-rose-600 font-semibold">
                         -${platformFee.toFixed(2)}
                       </span>
                     </div>
 
-                    <div className="statement-row" style={{ marginTop: '6px', paddingTop: '8px', borderTop: '1px dashed #cbd5e1' }}>
-                      <span className="label" style={{ fontWeight: 700, color: '#0f172a' }}>Net Seller Payout</span>
-                      <span className="value" style={{ fontSize: '16px', fontWeight: 800, color: '#15803d' }}>
+                    <div className="statement-row mt-1.5 pt-2 border-t border-dashed border-slate-300">
+                      <span className="label font-bold text-slate-900">Net Seller Payout</span>
+                      <span className="value text-base font-extrabold text-emerald-700">
                         ${netEarnings.toFixed(2)}
                       </span>
                     </div>
 
-                    <div className="statement-row" style={{ marginTop: '4px' }}>
+                    <div className="statement-row mt-1">
                       <span className="label">Clearance Schedule</span>
-                      <span className="value" style={{ fontSize: '12px', textAlign: 'right', maxWidth: '60%' }}>
+                      <span className="value text-xs text-right max-w-[60%]">
                         {order.isCleared ? (
-                          <span style={{ color: '#15803d', fontWeight: 700 }}>
+                          <span className="text-emerald-700 font-bold">
                             ✓ Cleared {order.clearedAt ? `(${moment(order.clearedAt).format('MMM DD, YYYY')})` : ''}
                           </span>
                         ) : order.clearsAt ? (
-                          <span style={{ color: '#b45309', fontWeight: 600 }}>
+                          <span className="text-amber-700 font-semibold">
                             {moment(order.clearsAt).format('MMM DD, YYYY')}
-                            <span style={{ display: 'block', fontSize: '10.5px', color: '#78716c' }}>
+                            <span className="block text-[10.5px] text-stone-500">
                               ({moment(order.clearsAt).fromNow()})
                             </span>
                           </span>
                         ) : isCompleted ? (
-                          <span style={{ color: '#64748b' }}>Pending clearance</span>
+                          <span className="text-slate-500">Pending clearance</span>
                         ) : (
-                          <span style={{ color: '#64748b' }}>Holding period applies on completion</span>
+                          <span className="text-slate-500">Holding period applies on completion</span>
                         )}
                       </span>
                     </div>

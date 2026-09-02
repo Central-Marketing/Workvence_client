@@ -93,13 +93,13 @@ export default function ProTalentPage() {
       <section className="bg-gradient-to-b from-[#0f172a] via-[#112131] to-[#0f172a] text-white py-20 lg:py-28">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#6ad724]/10 border border-[#6ad724]/20 text-[#6ad724] text-xs font-semibold">
-              <Crown className="w-4 h-4 text-[#6ad724]" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#6ad724]/10 border border-[#6ad724]/20 text-[#0db890] text-xs font-semibold">
+              <Crown className="w-4 h-4 text-[#0db890]" />
               <span>Workvence Pro • Top 1% Vetted Talent</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
               Exceptional Talent for <br className="hidden sm:inline" />
-              <span className="text-[#6ad724]">Mission-Critical Projects</span>
+              <span className="text-[#0db890]">Mission-Critical Projects</span>
             </h1>
             <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto font-normal">
               Hand-vetted specialists with proven enterprise track records. Zero guesswork, guaranteed delivery excellence, and VIP concierge matching.
@@ -107,7 +107,7 @@ export default function ProTalentPage() {
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <Link
                 href="/packages?pro=true"
-                className="px-8 py-4 rounded-xl bg-[#6ad724] hover:bg-[#5ec41e] text-[#0f172a] font-bold text-sm transition shadow-lg hover:shadow-xl active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-8 py-4 rounded-xl bg-brand-green hover:bg-[#022c22] text-[#ffffff] font-bold text-sm transition shadow-lg hover:shadow-xl active:scale-95 inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Browse Pro Packages</span>
                 <ArrowRight className="w-4 h-4" />

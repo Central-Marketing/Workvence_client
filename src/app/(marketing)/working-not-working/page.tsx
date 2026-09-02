@@ -38,7 +38,7 @@ const creatives: CreativeMember[] = [
     role: "Senior 3D Art Director & Motion Lead",
     location: "Berlin / Remote",
     status: "Not Working (Available)",
-    statusColor: "bg-emerald-500",
+    statusColor: "bg-[#0db890]",
     availableDate: "Immediate",
     dayRate: "$850 / day",
     specialties: ["Cinema 4D", "Brand Motion", "Figma", "Creative Direction"],
@@ -50,7 +50,7 @@ const creatives: CreativeMember[] = [
     role: "Principal Frontend Architect",
     location: "Tokyo / Remote",
     status: "Working",
-    statusColor: "bg-amber-500",
+    statusColor: "bg-[#0db890]",
     availableDate: "Booked until Oct 15",
     dayRate: "$1,100 / day",
     specialties: ["Next.js 16", "TypeScript", "WebGL", "High-Volume Scaling"],
@@ -62,7 +62,7 @@ const creatives: CreativeMember[] = [
     role: "Lead Product & UI/UX Designer",
     location: "Paris / Remote",
     status: "Not Working (Available)",
-    statusColor: "bg-emerald-500",
+    statusColor: "bg-[#0db890]",
     availableDate: "Immediate",
     dayRate: "$780 / day",
     specialties: ["Design Systems", "Fintech UX", "Mobile Apps", "User Research"],
@@ -74,7 +74,7 @@ const creatives: CreativeMember[] = [
     role: "Brand Strategist & Copy Lead",
     location: "New York / Remote",
     status: "Not Working (Available)",
-    statusColor: "bg-emerald-500",
+    statusColor: "bg-[#0db890]",
     availableDate: "Available for Q4 sprints",
     dayRate: "$900 / day",
     specialties: ["Brand Naming", "Direct Response", "Video Scripts", "B2B SaaS"],
@@ -110,13 +110,13 @@ export default function WorkingNotWorkingPage() {
       <section className="bg-gradient-to-b from-[#0f172a] via-[#112131] to-[#0f172a] text-white py-20 lg:py-28">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#6ad724]/10 border border-[#6ad724]/20 text-[#6ad724] text-xs font-semibold">
-              <Sparkles className="w-4 h-4 text-[#6ad724]" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0db890]/10 border border-[#0db890]/20 text-[#0db890] text-xs font-semibold">
+              <Sparkles className="w-4 h-4 text-[#0db890]" />
               <span>Curated Creative Roster</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
               Working Not Working <br className="hidden sm:inline" />
-              <span className="text-[#6ad724]">Creative Network</span>
+              <span className="text-[#0db890]">Creative Network</span>
             </h1>
             <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto font-normal">
               Find out who is available right now. Connect directly with vetted creative directors, animators, UI/UX architects, and copy leads.
@@ -128,11 +128,10 @@ export default function WorkingNotWorkingPage() {
                 <button
                   key={st}
                   onClick={() => setFilterStatus(st)}
-                  className={`px-5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
-                    filterStatus === st
-                      ? "bg-[#6ad724] text-[#0f172a] font-bold shadow-xs"
-                      : "bg-white/10 text-gray-300 hover:bg-white/20"
-                  }`}
+                  className={`px-5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${filterStatus === st
+                    ? "bg-[#0db890] text-[#0f172a] font-bold shadow-xs"
+                    : "bg-white/10 text-gray-300 hover:bg-white/20"
+                    }`}
                 >
                   {st === "All" ? "All Creatives" : st === "Available" ? "Available Now" : "Currently Booked"}
                 </button>

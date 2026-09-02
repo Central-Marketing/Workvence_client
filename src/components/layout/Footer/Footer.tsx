@@ -30,16 +30,16 @@ const staticFooterColumns: FooterColumn[] = [
   {
     title: "Categories",
     links: [
-      { name: "Graphics & Design", href: "/packages?category=graphics-and-design" },
-      { name: "Digital Marketing", href: "/packages?category=digital-marketing" },
-      { name: "Writing & Translation", href: "/packages?category=writing-and-translation" },
-      { name: "Video & Animation", href: "/packages?category=video-and-animation" },
-      { name: "Music & Audio", href: "/packages?category=music-and-audio" },
-      { name: "Programming & Tech", href: "/packages?category=programming-and-tech" },
+      { name: "AI Services", href: "/packages?category=ai-services" },
+      { name: "Business & Consulting", href: "/packages?category=business-and-consulting" },
       { name: "Data & Analytics", href: "/packages?category=data-and-analytics" },
-      { name: "Business", href: "/packages?category=business" },
-      { name: "Lifestyle", href: "/packages?category=lifestyle" },
-      { name: "Photography", href: "/packages?category=photography" },
+      { name: "Digital Marketing", href: "/packages?category=digital-marketing" },
+      { name: "E-Commerce", href: "/packages?category=e-commerce" },
+      { name: "Graphics & Design", href: "/packages?category=graphics-and-design" },
+      { name: "Music & Audio", href: "/packages?category=music-and-audio" },
+      { name: "Other & General", href: "/packages?category=other-and-general" },
+      { name: "Programming & Tech", href: "/packages?category=programming-and-tech" },
+      { name: "Video & Animation", href: "/packages?category=video-and-animation" },
     ]
   },
   {

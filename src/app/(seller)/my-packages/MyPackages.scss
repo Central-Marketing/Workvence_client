@@ -95,6 +95,7 @@
     .clickable-row {
       cursor: pointer;
       transition: background-color 0.2s;
+
       &:hover {
         background-color: #f8fafc;
       }
@@ -172,7 +173,7 @@
   /* Mobile Responsiveness */
   @media (max-width: 768px) {
     padding: 20px 0;
-    
+
     .container {
       width: 95%;
     }
@@ -204,7 +205,9 @@
     }
 
     table {
-      th, td {
+
+      th,
+      td {
         padding: 12px 10px;
         font-size: 13px;
       }
@@ -212,11 +215,11 @@
       .title-cell {
         max-width: 200px;
       }
-      
+
       .action-buttons {
         flex-direction: column;
         gap: 6px;
-        
+
         button {
           width: 100%;
         }

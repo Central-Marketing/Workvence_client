@@ -198,7 +198,7 @@ const Dashboard = () => {
           <div className="card actions-card">
             <h2>Quick Actions</h2>
             <div className="actions-list">
-              <Link href="/packages" className="action-button primary">
+              <Link href="/packages" className="action-button bg-brand-green text-white">
                 Browse Services
               </Link>
               <Link href="/messages" className="action-button secondary">

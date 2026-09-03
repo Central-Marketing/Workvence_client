@@ -45,7 +45,7 @@ const staticFooterColumns: FooterColumn[] = [
   {
     title: "About",
     links: [
-      { name: "Careers", href: "/careers" },
+      // { name: "Careers", href: "/careers" },
       { name: "Press & News", href: "/press" },
       { name: "Partnerships", href: "/partnerships" },
       { name: "Privacy Policy", href: "/privacy" },
@@ -73,27 +73,27 @@ const staticFooterColumns: FooterColumn[] = [
       { name: "Blog", href: "/blog" },
       { name: "Influencers", href: "/influencers" },
       { name: "Affiliates", href: "/affiliates" },
-      { name: "Podcast", href: "/podcast" },
-      { name: "Invite a Friend", href: "/invite" },
+      // { name: "Podcast", href: "/podcast" },
+      // { name: "Invite a Friend", href: "/invite" },
       { name: "Become a Seller", href: "/become-a-seller" },
-      { name: "Community Standards", href: "/community-standards" },
+      // { name: "Community Standards", href: "/community-standards" },
     ]
   },
-  {
-    title: "More From Workvence",
-    links: [
-      { name: "Workvence Business", href: "/business" },
-      { name: "Workvence Pro", href: "/pro" },
-      { name: "Workvence Logo Maker", href: "/logo-maker" },
-      { name: "Workvence Guides", href: "/guides" },
-      { name: "Get Inspired", href: "/get-inspired" },
-      { name: "Workvence Select", href: "/select" },
-      { name: "ClearVoice", href: "/clearvoice" },
-      { name: "Workvence Workspace", href: "/workspace" },
-      { name: "Learn", href: "/learn" },
-      { name: "Working Not Working", href: "/working-not-working" },
-    ]
-  }
+  // {
+  //   title: "More From Workvence",
+  //   links: [
+  //     { name: "Workvence Business", href: "/business" },
+  //     { name: "Workvence Pro", href: "/pro" },
+  //     { name: "Workvence Logo Maker", href: "/logo-maker" },
+  //     { name: "Workvence Guides", href: "/guides" },
+  //     { name: "Get Inspired", href: "/get-inspired" },
+  //     { name: "Workvence Select", href: "/select" },
+  //     { name: "ClearVoice", href: "/clearvoice" },
+  //     { name: "Workvence Workspace", href: "/workspace" },
+  //     { name: "Learn", href: "/learn" },
+  //     { name: "Working Not Working", href: "/working-not-working" },
+  //   ]
+  // }
 ];
 
 const Footer = () => {

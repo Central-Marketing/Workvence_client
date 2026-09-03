@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Loader, Reviews, FavoriteButton, PackageDetailSkeleton } from '@/components';
 import { useUserStore } from "@/store/userStore";
+import { FiClock } from 'react-icons/fi';
 import "./Package.scss";
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
@@ -448,7 +449,9 @@ const PackageContent = () => {
                 <button
                   key={name}
                   onClick={() => scrollToSection(id, name)}
-                  className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${activeTab === name
+                  className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                    id === "section-compare" ? "hidden min-[900px]:inline-block" : ""
+                  } ${activeTab === name
                     ? "bg-white text-gray-900 shadow-sm"
                     : "text-gray-500 hover:text-gray-900"
                     }`}
@@ -473,7 +476,7 @@ const PackageContent = () => {
             </div>
 
             {/* 2. Compare Packages Banner */}
-            <div id="section-compare" className="scroll-mt-32">
+            <div id="section-compare" className="hidden min-[900px]:block scroll-mt-32">
               <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
                 {/* Header */}
                 <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-7 border-b border-gray-200">
@@ -497,52 +500,42 @@ const PackageContent = () => {
 
                 {/* Comparison */}
                 {showComparisonTable && (
-                  <div className="animate-fadeIn overflow-x-auto">
-                    <div className="min-w-[900px]">
+                  <div className="animate-fadeIn w-full overflow-hidden">
+                    <div className="w-full">
                       {/* Package Headers */}
                       <div className="grid grid-cols-3 border-b border-gray-200">
 
                         {/* Basic */}
                         {basicPkg ? (
-                          <div className="px-6 py-6 sm:px-7 bg-white border-r border-gray-200">
-                            <div className="mb-4">
+                          <div className="px-4 py-5 xl:px-6 xl:py-6 bg-white border-r border-gray-200">
+                            <div className="mb-3 sm:mb-4">
                               <span className="text-[11px] font-bold uppercase tracking-wide text-gray-500">
                                 Basic
                               </span>
                             </div>
 
-                            <div className="text-[30px] font-bold text-gray-900 leading-none">
+                            <div className="text-2xl xl:text-[30px] font-bold text-gray-900 leading-none">
                               $ {basicPkg.price}
                             </div>
 
-                            <div className="flex items-center gap-1.5 mt-3 text-sm text-gray-600">
-                              <svg
-                                width="15"
-                                height="15"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                              >
-                                <circle cx="12" cy="12" r="10" />
-                                <polyline points="12 6 12 12 16 14" />
-                              </svg>
-                              {basicPkg.deliveryTime} days delivery
+                            <div className="flex items-center gap-1.5 mt-3 text-xs sm:text-sm text-gray-600">
+                              <FiClock size={15} className="shrink-0" />
+                              <span className="truncate">{basicPkg.deliveryTime} days delivery</span>
                             </div>
 
-                            <div className="mt-5">
-                              <h4 className="text-sm font-semibold text-gray-900">
+                            <div className="mt-4 sm:mt-5">
+                              <h4 className="text-xs sm:text-sm font-semibold text-gray-900 line-clamp-2">
                                 {basicPkg.title}
                               </h4>
 
-                              <p className="mt-1.5 text-sm leading-5 text-gray-500">
+                              <p className="mt-1.5 text-xs sm:text-sm leading-5 text-gray-500 line-clamp-3">
                                 {basicPkg.shortDesc}
                               </p>
                             </div>
                           </div>
                         ) : (
-                          <div className="px-6 py-8 bg-gray-50 border-r border-gray-200 text-center">
-                            <span className="text-sm text-gray-400">
+                          <div className="px-4 py-6 sm:px-6 sm:py-8 bg-gray-50 border-r border-gray-200 text-center flex items-center justify-center">
+                            <span className="text-xs sm:text-sm text-gray-400">
                               Basic package not offered
                             </span>
                           </div>
@@ -550,52 +543,42 @@ const PackageContent = () => {
 
                         {/* Standard */}
                         {standardPkg ? (
-                          <div className="relative px-6 py-6 sm:px-7 bg-[#f7fffc] border-r border-gray-200">
+                          <div className="relative px-4 py-5 xl:px-6 xl:py-6 bg-[#f7fffc] border-r border-gray-200">
                             {/* Recommended */}
                             <div className="absolute top-0 left-0 right-0 h-1 bg-brand-green" />
 
-                            <div className="flex items-center justify-between gap-3 mb-4">
+                            <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
                               <span className="text-[11px] font-bold uppercase tracking-wide text-brand-green">
                                 Standard
                               </span>
 
-                              <span className="rounded-full bg-brand-green px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+                              <span className="rounded-full bg-brand-green px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wide text-white shrink-0">
                                 Recommended
                               </span>
                             </div>
 
-                            <div className="text-[30px] font-bold text-gray-900 leading-none">
+                            <div className="text-2xl xl:text-[30px] font-bold text-gray-900 leading-none">
                               $ {standardPkg.price}
                             </div>
 
-                            <div className="flex items-center gap-1.5 mt-3 text-sm text-gray-600">
-                              <svg
-                                width="15"
-                                height="15"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                              >
-                                <circle cx="12" cy="12" r="10" />
-                                <polyline points="12 6 12 12 16 14" />
-                              </svg>
-                              {standardPkg.deliveryTime} days delivery
+                            <div className="flex items-center gap-1.5 mt-3 text-xs sm:text-sm text-gray-600">
+                              <FiClock size={15} className="shrink-0" />
+                              <span className="truncate">{standardPkg.deliveryTime} days delivery</span>
                             </div>
 
-                            <div className="mt-5">
-                              <h4 className="text-sm font-semibold text-gray-900">
+                            <div className="mt-4 sm:mt-5">
+                              <h4 className="text-xs sm:text-sm font-semibold text-gray-900 line-clamp-2">
                                 {standardPkg.title}
                               </h4>
 
-                              <p className="mt-1.5 text-sm leading-5 text-gray-500">
+                              <p className="mt-1.5 text-xs sm:text-sm leading-5 text-gray-500 line-clamp-3">
                                 {standardPkg.shortDesc}
                               </p>
                             </div>
                           </div>
                         ) : (
-                          <div className="px-6 py-8 bg-gray-50 border-r border-gray-200 text-center">
-                            <span className="text-sm text-gray-400">
+                          <div className="px-4 py-6 sm:px-6 sm:py-8 bg-gray-50 border-r border-gray-200 text-center flex items-center justify-center">
+                            <span className="text-xs sm:text-sm text-gray-400">
                               Standard package not offered
                             </span>
                           </div>
@@ -603,45 +586,35 @@ const PackageContent = () => {
 
                         {/* Premium */}
                         {premiumPkg ? (
-                          <div className="px-6 py-6 sm:px-7 bg-white">
-                            <div className="mb-4">
+                          <div className="px-4 py-5 xl:px-6 xl:py-6 bg-white">
+                            <div className="mb-3 sm:mb-4">
                               <span className="text-[11px] font-bold uppercase tracking-wide text-[#ff6b4a]">
                                 Premium
                               </span>
                             </div>
 
-                            <div className="text-[30px] font-bold text-gray-900 leading-none">
+                            <div className="text-2xl xl:text-[30px] font-bold text-gray-900 leading-none">
                               $ {premiumPkg.price}
                             </div>
 
-                            <div className="flex items-center gap-1.5 mt-3 text-sm text-gray-600">
-                              <svg
-                                width="15"
-                                height="15"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                              >
-                                <circle cx="12" cy="12" r="10" />
-                                <polyline points="12 6 12 12 16 14" />
-                              </svg>
-                              {premiumPkg.deliveryTime} days delivery
+                            <div className="flex items-center gap-1.5 mt-3 text-xs sm:text-sm text-gray-600">
+                              <FiClock size={15} className="shrink-0" />
+                              <span className="truncate">{premiumPkg.deliveryTime} days delivery</span>
                             </div>
 
-                            <div className="mt-5">
-                              <h4 className="text-sm font-semibold text-gray-900">
+                            <div className="mt-4 sm:mt-5">
+                              <h4 className="text-xs sm:text-sm font-semibold text-gray-900 line-clamp-2">
                                 {premiumPkg.title}
                               </h4>
 
-                              <p className="mt-1.5 text-sm leading-5 text-gray-500">
+                              <p className="mt-1.5 text-xs sm:text-sm leading-5 text-gray-500 line-clamp-3">
                                 {premiumPkg.shortDesc}
                               </p>
                             </div>
                           </div>
                         ) : (
-                          <div className="px-6 py-8 bg-gray-50 text-center">
-                            <span className="text-sm text-gray-400">
+                          <div className="px-4 py-6 sm:px-6 sm:py-8 bg-gray-50 text-center flex items-center justify-center">
+                            <span className="text-xs sm:text-sm text-gray-400">
                               Premium package not offered
                             </span>
                           </div>
@@ -653,21 +626,21 @@ const PackageContent = () => {
 
                         {/* Basic Features */}
                         {basicPkg ? (
-                          <div className="px-6 py-6 sm:px-7 border-r border-gray-200 bg-white">
+                          <div className="px-3.5 py-4 sm:px-5 sm:py-5 xl:px-6 xl:py-6 border-r border-gray-200 bg-white">
                             <div className="space-y-0">
                               {basicPkg.features?.map((f: string, i: number) => (
                                 <div
                                   key={i}
-                                  className="flex items-center justify-between gap-4 py-3 border-b border-gray-100 last:border-b-0"
+                                  className="flex items-center justify-between gap-2 sm:gap-4 py-2.5 sm:py-3 border-b border-gray-100 last:border-b-0"
                                 >
-                                  <span className="text-[13px] text-gray-600 leading-5">
+                                  <span className="text-xs sm:text-[13px] text-gray-600 leading-5 break-words">
                                     {f}
                                   </span>
 
                                   <svg
                                     className="shrink-0 text-brand-green"
-                                    width="17"
-                                    height="17"
+                                    width="16"
+                                    height="16"
                                     viewBox="0 0 24 24"
                                     fill="currentColor"
                                   >
@@ -683,21 +656,21 @@ const PackageContent = () => {
 
                         {/* Standard Features */}
                         {standardPkg ? (
-                          <div className="px-6 py-6 sm:px-7 border-r border-gray-200 bg-[#f7fffc]">
+                          <div className="px-3.5 py-4 sm:px-5 sm:py-5 xl:px-6 xl:py-6 border-r border-gray-200 bg-[#f7fffc]">
                             <div className="space-y-0">
                               {standardPkg.features?.map((f: string, i: number) => (
                                 <div
                                   key={i}
-                                  className="flex items-center justify-between gap-4 py-3 border-b border-gray-100 last:border-b-0"
+                                  className="flex items-center justify-between gap-2 sm:gap-4 py-2.5 sm:py-3 border-b border-gray-100 last:border-b-0"
                                 >
-                                  <span className="text-[13px] font-medium text-gray-700 leading-5">
+                                  <span className="text-xs sm:text-[13px] font-medium text-gray-700 leading-5 break-words">
                                     {f}
                                   </span>
 
                                   <svg
                                     className="shrink-0 text-brand-green"
-                                    width="17"
-                                    height="17"
+                                    width="16"
+                                    height="16"
                                     viewBox="0 0 24 24"
                                     fill="currentColor"
                                   >
@@ -713,21 +686,21 @@ const PackageContent = () => {
 
                         {/* Premium Features */}
                         {premiumPkg ? (
-                          <div className="px-6 py-6 sm:px-7 bg-white">
+                          <div className="px-3.5 py-4 sm:px-5 sm:py-5 xl:px-6 xl:py-6 bg-white">
                             <div className="space-y-0">
                               {premiumPkg.features?.map((f: string, i: number) => (
                                 <div
                                   key={i}
-                                  className="flex items-center justify-between gap-4 py-3 border-b border-gray-100 last:border-b-0"
+                                  className="flex items-center justify-between gap-2 sm:gap-4 py-2.5 sm:py-3 border-b border-gray-100 last:border-b-0"
                                 >
-                                  <span className="text-[13px] text-gray-600 leading-5">
+                                  <span className="text-xs sm:text-[13px] text-gray-600 leading-5 break-words">
                                     {f}
                                   </span>
 
                                   <svg
                                     className="shrink-0 text-brand-green"
-                                    width="17"
-                                    height="17"
+                                    width="16"
+                                    height="16"
                                     viewBox="0 0 24 24"
                                     fill="currentColor"
                                   >
@@ -743,41 +716,41 @@ const PackageContent = () => {
                       </div>
 
                       {/* Select Package Action Row */}
-                      <div className="grid grid-cols-3 border-t border-gray-200 p-4 sm:p-5 bg-gray-50/50">
-                        <div className="px-2">
+                      <div className="grid grid-cols-3 border-t border-gray-200 p-3 sm:p-4 xl:p-5 bg-gray-50/50">
+                        <div className="px-1.5 sm:px-2">
                           {basicPkg && (
                             <button
                               onClick={() => {
                                 setPackageTier('basic');
                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                               }}
-                              className="w-full py-2.5 px-3 bg-white border border-gray-300 hover:border-gray-900 text-gray-800 font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer text-center"
+                              className="w-full py-2.5 px-2 sm:px-3 bg-white border border-gray-300 hover:border-gray-900 text-gray-800 font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer text-center truncate"
                             >
                               Select Basic (${basicPkg.price})
                             </button>
                           )}
                         </div>
-                        <div className="px-2">
+                        <div className="px-1.5 sm:px-2">
                           {standardPkg && (
                             <button
                               onClick={() => {
                                 setPackageTier('standard');
                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                               }}
-                              className="w-full py-2.5 px-3 bg-brand-green text-white font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer shadow-xs text-center"
+                              className="w-full py-2.5 px-2 sm:px-3 bg-brand-green text-white font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer shadow-xs text-center truncate"
                             >
                               Select Standard (${standardPkg.price})
                             </button>
                           )}
                         </div>
-                        <div className="px-2">
+                        <div className="px-1.5 sm:px-2">
                           {premiumPkg && (
                             <button
                               onClick={() => {
                                 setPackageTier('premium');
                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                               }}
-                              className="w-full py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer text-center"
+                              className="w-full py-2.5 px-2 sm:px-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer text-center truncate"
                             >
                               Select Premium (${premiumPkg.price})
                             </button>
@@ -1014,10 +987,7 @@ const PackageContent = () => {
                 {/* Delivery Time & Revision Footer Row */}
                 <div className="flex items-center justify-between text-xs sm:text-sm font-semibold text-gray-800 pt-4 border-t border-gray-100">
                   <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10" strokeWidth="2"></circle>
-                      <polyline points="12 6 12 12 16 14" strokeWidth="2"></polyline>
-                    </svg>
+                    <FiClock className="w-4 h-4 text-gray-500" />
                     <span>
                       {selectedPackage.deliveryTime || data?.deliveryTime} Days delivery
                     </span>

@@ -368,6 +368,23 @@ const SellerPublicProfileContent = ({ username }: { username?: string }) => {
                       <span>{responseTime}</span>
                     </span>
                   </div>
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-3 mt-6">
+                    <button
+                      onClick={handleContact}
+                      className="flex-1 bg-brand-green hover:bg-brand-green text-white font-semibold py-3 px-4 rounded-xl text-sm text-center transition-all shadow-sm cursor-pointer border-none flex items-center justify-center gap-2"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      <span>Contact Seller</span>
+                    </button>
+
+                    {(sellerData?._id || sellerData?.id) && (
+                      <FavoriteSellerButton
+                        sellerId={sellerData._id || sellerData.id}
+                        className="w-11 h-11 !rounded-xl !p-0 border border-gray-200"
+                      />
+                    )}
+                  </div>
 
                   {user && sellerData && String(user._id || user.id) === String(sellerData._id || sellerData.id) && (
                     <button
@@ -515,23 +532,7 @@ const SellerPublicProfileContent = ({ username }: { username?: string }) => {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex items-center gap-3 mt-6">
-                  <button
-                    onClick={handleContact}
-                    className="flex-1 bg-brand-green hover:bg-brand-green text-white font-semibold py-3 px-4 rounded-xl text-sm text-center transition-all shadow-sm cursor-pointer border-none flex items-center justify-center gap-2"
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                    <span>Contact Seller</span>
-                  </button>
 
-                  {(sellerData?._id || sellerData?.id) && (
-                    <FavoriteSellerButton
-                      sellerId={sellerData._id || sellerData.id}
-                      className="w-11 h-11 !rounded-xl !p-0 border border-gray-200"
-                    />
-                  )}
-                </div>
               </>
             )}
           </div>

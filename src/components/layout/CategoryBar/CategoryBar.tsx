@@ -11,7 +11,7 @@ interface CategoryBarProps {
   visible: boolean;
 }
 
-const CategoryBar: React.FC<CategoryBarProps> = ({ visible }) => {
+const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentCategory = searchParams?.get('category') || '';
@@ -139,4 +139,13 @@ const CategoryBar: React.FC<CategoryBarProps> = ({ visible }) => {
   );
 };
 
+const CategoryBar: React.FC<CategoryBarProps> = (props) => {
+  return (
+    <React.Suspense fallback={null}>
+      <CategoryBarContent {...props} />
+    </React.Suspense>
+  );
+};
+
 export default CategoryBar;
+

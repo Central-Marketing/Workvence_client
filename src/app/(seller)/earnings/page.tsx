@@ -1,7 +1,8 @@
 "use client";
+export const dynamic = 'force-dynamic';
 
 import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
@@ -25,7 +26,6 @@ import {
 const Earnings = () => {
   const user = useUserStore((state) => state.user);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
   const [showPayoutModal, setShowPayoutModal] = useState(false);
@@ -117,9 +117,11 @@ const Earnings = () => {
 
   // Handle returning redirects back from Stripe or Payoneer onboarding
   useEffect(() => {
-    const connectParam = searchParams?.get("connect");
-    const stripeParam = searchParams?.get("stripe");
-    const payoneerParam = searchParams?.get("payoneer");
+    if (typeof window === "undefined") return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const connectParam = urlParams.get("connect");
+    const stripeParam = urlParams.get("stripe");
+    const payoneerParam = urlParams.get("payoneer");
 
     if (connectParam === "success" || stripeParam === "success") {
       toast.success("Stripe account successfully connected for payouts!");
@@ -132,7 +134,7 @@ const Earnings = () => {
       queryClient.invalidateQueries({ queryKey: ["seller-earnings-statement"] });
       router.replace("/earnings");
     }
-  }, [searchParams, queryClient, router]);
+  }, [queryClient, router]);
 
   // Stripe Onboarding Mutation
   const connectOnboardMutation = useMutation({

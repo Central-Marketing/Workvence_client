@@ -2,12 +2,13 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useRef, useEffect, useMemo, Suspense } from 'react';
-import { PackageCard, Loader, TopRatedSellers, GigsGridSkeleton } from '@/components';
+import { PackageCard, Loader, TopRatedSellers, GigsGridSkeleton, CategoryHeroBanner, SubcategoryCard } from '@/components';
+import { getCategoryTaxonomy } from '@/data/categoryTaxonomy';
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import adminAxios from "@/utils/adminAxios";
-import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
+import { FiAlertCircle, FiRefreshCw, FiGrid, FiArrowRight, FiArrowLeft } from "react-icons/fi";
 
 const DEFAULT_CATEGORIES = [
   "All services",
@@ -41,6 +42,7 @@ const Packages = () => {
   const [activeCategory, setActiveCategory] = useState(initialCat);
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(initialPage);
+  const [viewTab, setViewTab] = useState<'hub' | 'gigs'>((initialSearch || initialMin || initialMax) ? 'gigs' : 'hub');
 
   // Additional sidebar & tag filter states
   const [filterCategory, setFilterCategory] = useState(initialCat !== 'All services' && initialCat !== 'Results' ? initialCat : '');
@@ -113,6 +115,12 @@ const Packages = () => {
     return catInput.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   };
 
+  const currentTaxonomy = useMemo(() => {
+    const selected = filterCategory || (activeCategory !== 'All services' && activeCategory !== 'Results' ? activeCategory : '');
+    if (!selected) return null;
+    return getCategoryTaxonomy(selected, categoryList);
+  }, [filterCategory, activeCategory, categoryList]);
+
   // Sync state when URL params externally change
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -122,9 +130,15 @@ const Packages = () => {
       const slug = getSlugFromCat(cat);
       setActiveCategory(slug);
       setFilterCategory(slug);
+      if (params.get('search') || params.get('min') || params.get('max')) {
+        setViewTab('gigs');
+      } else {
+        setViewTab('hub');
+      }
     } else {
       setActiveCategory('All services');
       setFilterCategory('');
+      setViewTab('gigs');
     }
     setSearchVal(params.get('search') || '');
     setMinPrice(params.get('min') || '');
@@ -236,12 +250,21 @@ const Packages = () => {
     if (slug === 'All services' || name === 'All services') {
       setActiveCategory('All services');
       setFilterCategory('');
-      syncUrlWithFilters({ category: '' });
+      setViewTab('gigs');
+      syncUrlWithFilters({ category: '', searchVal: '' });
     } else {
       setActiveCategory(slug);
       setFilterCategory(slug);
-      syncUrlWithFilters({ category: slug });
+      setViewTab('hub');
+      syncUrlWithFilters({ category: slug, searchVal: '' });
     }
+  };
+
+  const handleSelectSubService = (serviceName: string) => {
+    setSearchVal(serviceName);
+    setViewTab('gigs');
+    syncUrlWithFilters({ searchVal: serviceName, resetPage: true });
+    window.scrollTo({ top: 350, behavior: 'smooth' });
   };
 
   const handleReset = () => {
@@ -329,25 +352,62 @@ const Packages = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 md:px-6 py-8">
-        {/* Breadcrumb + Filter Button Row */}
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <p className="text-sm text-gray-500">
-              Home / <span className="text-gray-800 font-medium">Search Result</span>
-            </p>
+      {/* Category Hero Banner - rendered when a specific category is active */}
+      {currentTaxonomy && activeCategory !== 'All services' && (
+        <CategoryHeroBanner
+          title={currentTaxonomy.heroTitle}
+          categoryName={currentTaxonomy.name}
+          subtitle={currentTaxonomy.heroSubtitle}
+          bannerImage={currentTaxonomy.defaultBanner}
+        />
+      )}
+
+      {/* Main Content Area: Either Subcategory Hub or Gigs Listing */}
+      {currentTaxonomy && activeCategory !== 'All services' && viewTab === 'hub' ? (
+        <div className="container mx-auto px-4 md:px-6 pb-16 animate-fadeIn">
+          {/* 8-Card Subcategory Grid - Pixel Perfect Match */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+            {currentTaxonomy.subcategories.map((subcat) => (
+              <SubcategoryCard
+                key={subcat.id}
+                title={subcat.title}
+                banner={subcat.banner}
+                items={subcat.items}
+                onSelectService={handleSelectSubService}
+              />
+            ))}
           </div>
-          <button
-            onClick={() => setShowFilter(true)}
-            className="flex items-center gap-2 bg-brand-green hover:bg-brand-green text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 6H21M7 12H17M11 18H13" stroke="white" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-            Filter
-          </button>
         </div>
+      ) : (
+        /* Main Content - Gigs Listing View */
+        <div className="container mx-auto px-4 md:px-6 py-8">
+          {/* Breadcrumb + Filter Button Row */}
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <p className="text-sm text-gray-500 flex items-center flex-wrap gap-2">
+                <span>Home / <span className="text-gray-800 font-medium">{currentTaxonomy?.name || 'Search Result'}</span></span>
+                {currentTaxonomy && activeCategory !== 'All services' && (
+                  <button
+                    type="button"
+                    onClick={() => { setSearchVal(''); setViewTab('hub'); syncUrlWithFilters({ searchVal: '' }); }}
+                    className="inline-flex items-center gap-1 text-xs text-brand-green hover:underline font-semibold ml-2 cursor-pointer"
+                  >
+                    <FiArrowLeft className="w-3.5 h-3.5" />
+                    <span>Explore {currentTaxonomy.name} Subcategories</span>
+                  </button>
+                )}
+              </p>
+            </div>
+            <button
+              onClick={() => setShowFilter(true)}
+              className="flex items-center gap-2 bg-brand-green hover:bg-brand-green text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 6H21M7 12H17M11 18H13" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              Filter
+            </button>
+          </div>
 
         {/* Active Filter Tags & Results Count Bar */}
         <div className="flex flex-wrap items-center gap-2.5 mb-8 pt-1">
@@ -761,6 +821,7 @@ const Packages = () => {
           </div>
         )}
       </div>
+      )}
 
       <TopRatedSellers />
     </div>

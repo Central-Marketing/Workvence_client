@@ -32,6 +32,7 @@ export { default as PostProject } from "./marketing/PostProject/PostProject";
 export { default as PrivacyPolicy } from "./marketing/PrivacyPolicy/PrivacyPolicy";
 export { default as TermsAndConditions } from "./marketing/TermsAndConditions/TermsAndConditions";
 export * from "./marketing/CategoryHub";
+export * from "./marketing/SubcategoryView";
 
 // Feature components (Re-exported from features for full backward compatibility)
 export { default as HeaderInboxIcon } from "../features/chat/HeaderInboxIcon/HeaderInboxIcon";

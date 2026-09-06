@@ -3,27 +3,43 @@
 import React from "react";
 
 interface SubcategoryCardProps {
+  id?: string;
   title: string;
   banner: string;
   items: string[];
-  onSelectService: (serviceName: string) => void;
+  onSelectService: (serviceName: string, subcatId?: string, subcatTitle?: string) => void;
+  onSelectSubcategory?: (subcatId: string, subcatTitle: string) => void;
 }
 
 const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
+  id,
   title,
   banner,
   items,
   onSelectService,
+  onSelectSubcategory,
 }) => {
+  const handleCardClick = () => {
+    if (onSelectSubcategory) {
+      onSelectSubcategory(id || title, title);
+    } else {
+      onSelectService(title, id || title, title);
+    }
+  };
+
   return (
     <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col">
       {/* Inset Rounded Banner Image with Padding */}
       <div className="p-3 pb-0">
-        <div className="relative w-full aspect-[2.04/1] bg-gray-50 rounded-xl overflow-hidden">
+        <div
+          onClick={handleCardClick}
+          className="relative w-full aspect-[2.04/1] bg-gray-50 rounded-xl overflow-hidden cursor-pointer group/banner"
+          title={title}
+        >
           <img
             src={banner}
             alt={title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover group-hover/banner:scale-105 transition-transform duration-500"
             loading="lazy"
           />
         </div>
@@ -31,7 +47,10 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
 
       {/* Card Header Title */}
       <div className="px-4 pt-3.5 pb-2">
-        <h3 className="font-bold text-[15px] sm:text-[15.5px] text-gray-900 leading-snug tracking-tight">
+        <h3
+          onClick={handleCardClick}
+          className="font-bold text-[15px] sm:text-[15.5px] text-gray-900 leading-snug tracking-tight hover:text-brand-green cursor-pointer transition-colors"
+        >
           {title}
         </h3>
       </div>
@@ -42,7 +61,7 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
           <button
             key={idx}
             type="button"
-            onClick={() => onSelectService(item)}
+            onClick={() => onSelectService(item, id || title, title)}
             className="w-full text-left px-4 py-2.5 hover:bg-gray-50/50 hover:text-brand-green transition-colors cursor-pointer group"
           >
             <span className="truncate block font-normal group-hover:font-medium">

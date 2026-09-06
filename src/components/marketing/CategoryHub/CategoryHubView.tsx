@@ -9,7 +9,8 @@ import { FiGrid, FiArrowRight } from "react-icons/fi";
 interface CategoryHubViewProps {
   taxonomy: CategoryTaxonomy;
   totalGigsCount?: number;
-  onSelectService: (serviceName: string) => void;
+  onSelectService: (serviceName: string, subcatId?: string, subcatTitle?: string) => void;
+  onSelectSubcategory?: (subcatId: string, subcatTitle: string) => void;
   onViewAllGigs: () => void;
 }
 
@@ -17,6 +18,7 @@ const CategoryHubView: React.FC<CategoryHubViewProps> = ({
   taxonomy,
   totalGigsCount = 0,
   onSelectService,
+  onSelectSubcategory,
   onViewAllGigs,
 }) => {
   return (
@@ -59,10 +61,12 @@ const CategoryHubView: React.FC<CategoryHubViewProps> = ({
             {taxonomy.subcategories.map((subcat) => (
               <SubcategoryCard
                 key={subcat.id}
+                id={subcat.id}
                 title={subcat.title}
                 banner={subcat.banner}
                 items={subcat.items}
                 onSelectService={onSelectService}
+                onSelectSubcategory={onSelectSubcategory}
               />
             ))}
           </div>

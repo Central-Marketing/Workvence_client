@@ -2,8 +2,18 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useRef, useEffect, useMemo, Suspense } from 'react';
-import { PackageCard, Loader, TopRatedSellers, GigsGridSkeleton, CategoryHeroBanner, SubcategoryCard } from '@/components';
-import { getCategoryTaxonomy } from '@/data/categoryTaxonomy';
+import {
+  PackageCard,
+  Loader,
+  TopRatedSellers,
+  GigsGridSkeleton,
+  CategoryHeroBanner,
+  SubcategoryCard,
+  SubcategoryHeader,
+  SubcategoryFilterBar,
+} from '@/components';
+import { getCategoryTaxonomy, SubcategoryItem } from '@/data/categoryTaxonomy';
+import { STATIC_SUBCATEGORY_GIGS, getStaticSubcategoryGigs } from '@/data/staticSubcategoryGigs';
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
@@ -31,6 +41,8 @@ const Packages = () => {
   const initialParams = new URLSearchParams(search);
   const initialSearch = initialParams.get('search') || '';
   const initialCat = initialParams.get('category') || initialParams.get('cat') || 'All services';
+  const initialSubcat = initialParams.get('subcat') || initialParams.get('subcategory') || '';
+  const initialTag = initialParams.get('tag') || initialParams.get('service') || '';
   const initialMin = initialParams.get('min') || '';
   const initialMax = initialParams.get('max') || '';
 
@@ -40,9 +52,13 @@ const Packages = () => {
   const [sortBy, setSortBy] = useState(initialSort);
   const [searchVal, setSearchVal] = useState(initialSearch);
   const [activeCategory, setActiveCategory] = useState(initialCat);
+  const [activeSubcatId, setActiveSubcatId] = useState(initialSubcat);
+  const [activeTag, setActiveTag] = useState(initialTag);
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(initialPage);
-  const [viewTab, setViewTab] = useState<'hub' | 'gigs'>((initialSearch || initialMin || initialMax) ? 'gigs' : 'hub');
+  const [viewTab, setViewTab] = useState<'hub' | 'gigs'>(
+    (initialSearch || initialMin || initialMax || initialSubcat || initialTag) ? 'gigs' : 'hub'
+  );
 
   // Additional sidebar & tag filter states
   const [filterCategory, setFilterCategory] = useState(initialCat !== 'All services' && initialCat !== 'Results' ? initialCat : '');
@@ -126,11 +142,16 @@ const Packages = () => {
     window.scrollTo(0, 0);
     const params = new URLSearchParams(search);
     const cat = params.get('category') || params.get('cat');
+    const subcat = params.get('subcat') || params.get('subcategory') || '';
+    const tag = params.get('tag') || params.get('service') || '';
+    setActiveSubcatId(subcat);
+    setActiveTag(tag);
+
     if (cat && cat !== 'All services' && cat !== 'Results') {
       const slug = getSlugFromCat(cat);
       setActiveCategory(slug);
       setFilterCategory(slug);
-      if (params.get('search') || params.get('min') || params.get('max')) {
+      if (params.get('search') || params.get('min') || params.get('max') || subcat || tag) {
         setViewTab('gigs');
       } else {
         setViewTab('hub');
@@ -216,12 +237,57 @@ const Packages = () => {
     return [];
   }, [recommendedPackages]);
 
+  const activeSubcategory = useMemo(() => {
+    if (!currentTaxonomy || !currentTaxonomy.subcategories || currentTaxonomy.subcategories.length === 0) {
+      return null;
+    }
+    if (activeSubcatId) {
+      const found = currentTaxonomy.subcategories.find(
+        (s) =>
+          s.id.toLowerCase() === activeSubcatId.toLowerCase() ||
+          s.title.toLowerCase() === activeSubcatId.toLowerCase()
+      );
+      if (found) return found;
+    }
+    if (activeTag) {
+      const foundByTag = currentTaxonomy.subcategories.find(
+        (s) => s.items?.some((it) => it.toLowerCase() === activeTag.toLowerCase())
+      );
+      if (foundByTag) return foundByTag;
+    }
+    if (searchVal) {
+      const foundByItem = currentTaxonomy.subcategories.find(
+        (s) =>
+          s.items?.some((it) => it.toLowerCase() === searchVal.toLowerCase()) ||
+          s.title.toLowerCase().includes(searchVal.toLowerCase())
+      );
+      if (foundByItem) return foundByItem;
+    }
+    return currentTaxonomy.subcategories[0];
+  }, [currentTaxonomy, activeSubcatId, activeTag, searchVal]);
+
+  const displayPackages = useMemo(() => {
+    if (packagesList && packagesList.length > 0) {
+      return packagesList;
+    }
+    return getStaticSubcategoryGigs(activeTag);
+  }, [packagesList, activeTag]);
+
+  const isSubcategoryMode = Boolean(
+    currentTaxonomy &&
+    activeCategory !== 'All services' &&
+    viewTab === 'gigs' &&
+    activeSubcategory
+  );
+
   // Utility to update URL query params cleanly without full page reloads
   const syncUrlWithFilters = (overrides: any = {}) => {
     const params = new URLSearchParams();
     const currentSearch = overrides.searchVal !== undefined ? overrides.searchVal : searchVal;
     const rawCat = overrides.category !== undefined ? overrides.category : (filterCategory || (activeCategory !== 'All services' ? activeCategory : ''));
     const currentCatSlug = getSlugFromCat(rawCat);
+    const currentSubcat = overrides.subcat !== undefined ? overrides.subcat : activeSubcatId;
+    const currentTag = overrides.tag !== undefined ? overrides.tag : activeTag;
     const currentMin = overrides.minPrice !== undefined ? overrides.minPrice : minPrice;
     const currentMax = overrides.maxPrice !== undefined ? overrides.maxPrice : maxPrice;
     const currentSort = overrides.sortBy !== undefined ? overrides.sortBy : sortBy;
@@ -229,6 +295,8 @@ const Packages = () => {
 
     if (currentSearch && currentSearch.trim()) params.set('search', currentSearch.trim());
     if (currentCatSlug) params.set('category', currentCatSlug);
+    if (currentSubcat) params.set('subcat', currentSubcat);
+    if (currentTag) params.set('tag', currentTag);
     if (currentMin) params.set('min', currentMin);
     if (currentMax) params.set('max', currentMax);
     if (currentSort && currentSort !== 'createdAt') params.set('sort', currentSort);
@@ -250,27 +318,46 @@ const Packages = () => {
     if (slug === 'All services' || name === 'All services') {
       setActiveCategory('All services');
       setFilterCategory('');
+      setActiveSubcatId('');
+      setActiveTag('');
       setViewTab('gigs');
-      syncUrlWithFilters({ category: '', searchVal: '' });
+      syncUrlWithFilters({ category: '', searchVal: '', subcat: '', tag: '' });
     } else {
       setActiveCategory(slug);
       setFilterCategory(slug);
+      setActiveSubcatId('');
+      setActiveTag('');
       setViewTab('hub');
-      syncUrlWithFilters({ category: slug, searchVal: '' });
+      syncUrlWithFilters({ category: slug, searchVal: '', subcat: '', tag: '' });
     }
   };
 
-  const handleSelectSubService = (serviceName: string) => {
-    setSearchVal(serviceName);
+  const handleSelectSubcategory = (subcatId: string, subcatTitle: string) => {
+    setActiveSubcatId(subcatId);
+    setActiveTag('');
+    setSearchVal('');
     setViewTab('gigs');
-    syncUrlWithFilters({ searchVal: serviceName, resetPage: true });
-    window.scrollTo({ top: 350, behavior: 'smooth' });
+    syncUrlWithFilters({ subcat: subcatId, tag: '', searchVal: '', resetPage: true });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSelectSubService = (serviceName: string, subcatId?: string, subcatTitle?: string) => {
+    if (subcatId) {
+      setActiveSubcatId(subcatId);
+    }
+    setActiveTag(serviceName);
+    setSearchVal('');
+    setViewTab('gigs');
+    syncUrlWithFilters({ subcat: subcatId || activeSubcatId, tag: serviceName, searchVal: '', resetPage: true });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleReset = () => {
     setMinPrice('');
     setMaxPrice('');
     setSearchVal('');
+    setActiveSubcatId('');
+    setActiveTag('');
     setFilterCategory('');
     setActiveCategory('All services');
     setExperience({ entry: false, intermediate: false, expert: false });
@@ -299,8 +386,210 @@ const Packages = () => {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Category Hero Banner - rendered when a specific category is active */}
-      {currentTaxonomy && activeCategory !== 'All services' && (
+      {/* Sidebar Filter Modal / Drawer (Accessible across all views) */}
+      {showFilter && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          {/* Dark Overlay */}
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity animate-fadeIn"
+            onClick={() => setShowFilter(false)}
+          />
+
+          {/* Slide-out Panel */}
+          <div className="relative w-full max-w-[420px] bg-white h-full shadow-2xl flex flex-col z-10 animate-slideLeft overflow-hidden">
+            {/* Drawer Header */}
+            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-white">
+              <div className="flex items-center gap-2.5">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-800">
+                  <line x1="4" y1="21" x2="4" y2="14"></line>
+                  <line x1="4" y1="10" x2="4" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12" y2="3"></line>
+                  <line x1="20" y1="21" x2="20" y2="16"></line>
+                  <line x1="20" y1="12" x2="20" y2="3"></line>
+                  <line x1="1" y1="14" x2="7" y2="14"></line>
+                  <line x1="9" y1="8" x2="15" y2="8"></line>
+                  <line x1="17" y1="16" x2="23" y2="16"></line>
+                </svg>
+                <h3 className="text-xl font-bold text-gray-900">Filters</h3>
+              </div>
+              <button
+                onClick={() => setShowFilter(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            {/* Drawer Scrollable Body */}
+            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-7 text-left">
+              {/* 1. Search */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Search</label>
+                <div className="relative flex items-center">
+                  <svg className="absolute left-3.5 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input
+                    type="text"
+                    placeholder="Project title, key words..."
+                    value={searchVal}
+                    onChange={(e) => setSearchVal(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleApplyFilter()}
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-brand-green bg-white transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* 2. Category */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Category</label>
+                <select
+                  value={filterCategory || activeCategory}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setFilterCategory(val);
+                    if (val && val !== 'All services') setActiveCategory(val);
+                    else setActiveCategory('All services');
+                  }}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
+                >
+                  <option value="">Select category</option>
+                  {categories.map((c: any) => {
+                    const name = typeof c === 'string' ? c : c.name;
+                    const slug = typeof c === 'string' ? c : c.slug;
+                    return (
+                      <option key={slug} value={slug}>{name}</option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              {/* 3. Experience Level */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-3">Experience level</label>
+                <div className="space-y-3">
+                  {[
+                    { key: 'entry', label: 'Entry Level' },
+                    { key: 'intermediate', label: 'Intermediate' },
+                    { key: 'expert', label: 'Expert' }
+                  ].map(({ key, label }) => (
+                    <label key={key} className="flex items-center gap-3 cursor-pointer select-none text-sm text-gray-700 hover:text-gray-900">
+                      <input
+                        type="checkbox"
+                        checked={experience[key as keyof typeof experience]}
+                        onChange={() => toggleExperience(key)}
+                        className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black cursor-pointer accent-black"
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* 4. Filter by Fixed-Price */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-4">Filter by Fixed-Price</label>
+                <div className="relative px-2 mb-6">
+                  <div className="flex justify-between text-xs font-semibold text-gray-700 mb-2">
+                    <span className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded shadow-2xs">${minPrice || '0'}</span>
+                    <span className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded shadow-2xs">${maxPrice || '2500'}</span>
+                  </div>
+                  <div className="h-1.5 bg-gray-200 rounded-full relative flex items-center">
+                    <div className="absolute left-[15%] right-[25%] h-full bg-gray-900 rounded-full"></div>
+                    <div className="absolute left-[15%] w-4 h-4 rounded-full bg-white border-2 border-gray-900 shadow -translate-x-1/2 cursor-pointer hover:scale-110 transition-transform"></div>
+                    <div className="absolute right-[25%] w-4 h-4 rounded-full bg-white border-2 border-gray-900 shadow translate-x-1/2 cursor-pointer hover:scale-110 transition-transform"></div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 relative flex items-center border border-gray-200 rounded-xl px-3.5 py-2 bg-white focus-within:border-brand-green transition-colors">
+                    <span className="text-gray-700 font-medium text-sm mr-1.5">$</span>
+                    <input
+                      type="number"
+                      placeholder="100"
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleApplyFilter()}
+                      className="w-full bg-transparent text-sm text-gray-900 outline-none pr-6"
+                    />
+                    <span className="absolute right-3 text-xs text-gray-400 select-none">min</span>
+                  </div>
+                  <span className="text-gray-400 font-medium">-</span>
+                  <div className="flex-1 relative flex items-center border border-gray-200 rounded-xl px-3.5 py-2 bg-white focus-within:border-brand-green transition-colors">
+                    <span className="text-gray-700 font-medium text-sm mr-1.5">$</span>
+                    <input
+                      type="number"
+                      placeholder="1000"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleApplyFilter()}
+                      className="w-full bg-transparent text-sm text-gray-900 outline-none pr-6"
+                    />
+                    <span className="absolute right-3 text-xs text-gray-400 select-none">max</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 5. English Level */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">English Level</label>
+                <select
+                  value={englishLevel}
+                  onChange={(e) => setEnglishLevel(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
+                >
+                  <option value="">Select english level</option>
+                  <option value="basic">Basic / Conversational</option>
+                  <option value="fluent">Fluent</option>
+                  <option value="native">Native / Bilingual</option>
+                </select>
+              </div>
+
+              {/* 6. Client Location */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Client Location</label>
+                <select
+                  value={clientLocation}
+                  onChange={(e) => setClientLocation(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
+                >
+                  <option value="">Select client location</option>
+                  <option value="US">United States</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="CA">Canada</option>
+                  <option value="EU">Europe</option>
+                  <option value="Asia">Asia</option>
+                  <option value="Global">Worldwide</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Drawer Footer Actions */}
+            <div className="p-5 border-t border-gray-100 bg-white flex items-center justify-end gap-4">
+              <button
+                onClick={handleReset}
+                className="text-sm font-medium text-gray-500 hover:text-gray-800 transition-colors px-2 py-2"
+              >
+                Clear filter
+              </button>
+              <button
+                onClick={handleApplyFilter}
+                className="bg-brand-green hover:bg-brand-green text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors shadow-sm"
+              >
+                Apply filter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Category Hero Banner - rendered ONLY on the Category Hub overview */}
+      {currentTaxonomy && activeCategory !== 'All services' && viewTab === 'hub' && (
         <CategoryHeroBanner
           title={currentTaxonomy.heroTitle}
           categoryName={currentTaxonomy.name}
@@ -309,7 +598,7 @@ const Packages = () => {
         />
       )}
 
-      {/* Main Content Area: Either Subcategory Hub or Gigs Listing */}
+      {/* Main Content Area: Subcategory Hub, Subcategory Services, or General Gigs Listing */}
       {currentTaxonomy && activeCategory !== 'All services' && viewTab === 'hub' ? (
         <div className="container mx-auto px-4 md:px-6 pb-16 animate-fadeIn">
           {/* 8-Card Subcategory Grid - Pixel Perfect Match */}
@@ -317,13 +606,92 @@ const Packages = () => {
             {currentTaxonomy.subcategories.map((subcat) => (
               <SubcategoryCard
                 key={subcat.id}
+                id={subcat.id}
                 title={subcat.title}
                 banner={subcat.banner}
                 items={subcat.items}
                 onSelectService={handleSelectSubService}
+                onSelectSubcategory={handleSelectSubcategory}
               />
             ))}
           </div>
+        </div>
+      ) : (currentTaxonomy && activeCategory !== 'All services' && viewTab === 'gigs' && activeSubcategory) ? (
+        /* Subcategory Services View - Pixel Perfect Match for Image 2 */
+        <div className="container mx-auto px-4 md:px-6 py-6 sm:py-8 animate-fadeIn">
+          {/* 1. Subcategory Header: Breadcrumbs, Title with Chevron Dropdown, Subtitle */}
+          <SubcategoryHeader
+            categoryName={currentTaxonomy.name}
+            categorySlug={currentTaxonomy.slug}
+            subcategories={currentTaxonomy.subcategories}
+            activeSubcategory={activeSubcategory}
+            onSelectCategory={() => {
+              setViewTab('hub');
+              setActiveSubcatId('');
+              setActiveTag('');
+              setSearchVal('');
+              syncUrlWithFilters({ subcat: '', tag: '', searchVal: '' });
+            }}
+            onSelectSubcategory={(subcat) => {
+              handleSelectSubcategory(subcat.id, subcat.title);
+            }}
+          />
+
+          {/* 2. Subcategory Filter Bar: Filter Toggle, Divider, Pills, View All */}
+          <SubcategoryFilterBar
+            items={activeSubcategory.items || []}
+            activeTag={activeTag}
+            onSelectTag={(tag) => {
+              setActiveTag(tag);
+              syncUrlWithFilters({ tag, resetPage: true });
+            }}
+            onClearTag={() => {
+              setActiveTag('');
+              syncUrlWithFilters({ tag: '', resetPage: true });
+            }}
+            onOpenFilter={() => setShowFilter(true)}
+          />
+
+          {/* 3. Results Count */}
+          <div className="mb-6">
+            <p className="text-[14.5px] sm:text-[15px] font-semibold text-gray-700">
+              {activeSubcategory.resultCount || "1,40,000+ Results"}
+            </p>
+          </div>
+
+          {/* 4. 4-Column Responsive Grid of Package Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+            {displayPackages.map((pkg: any, idx: number) => (
+              <PackageCard key={pkg._id || pkg.id || idx} data={pkg} priority={idx < 4} />
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          {displayPackages.length > 0 && (
+            <div className="flex justify-center items-center gap-4 mt-12 mb-4">
+              <button
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  syncUrlWithFilters({ page: page - 1 });
+                }}
+                disabled={page === 1}
+                className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+              >
+                Previous
+              </button>
+              <span className="font-semibold text-gray-800 bg-gray-100 px-4 py-2 rounded-lg">Page {page}</span>
+              <button
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  syncUrlWithFilters({ page: page + 1 });
+                }}
+                disabled={displayPackages.length < 8}
+                className="px-6 py-2.5 bg-brand-green text-white font-semibold rounded-xl hover:bg-[#3ea917] disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         /* Main Content - Gigs Listing View */
@@ -460,216 +828,6 @@ const Packages = () => {
               </>
             )}
           </div>
-
-          {/* Sidebar Filter Modal / Drawer */}
-          {showFilter && (
-            <div className="fixed inset-0 z-50 flex justify-end">
-              {/* Dark Overlay */}
-              <div
-                className="fixed inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity animate-fadeIn"
-                onClick={() => setShowFilter(false)}
-              />
-
-              {/* Slide-out Panel */}
-              <div className="relative w-full max-w-[420px] bg-white h-full shadow-2xl flex flex-col z-10 animate-slideLeft overflow-hidden">
-
-                {/* Drawer Header */}
-                <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-white">
-                  <div className="flex items-center gap-2.5">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-800">
-                      <line x1="4" y1="21" x2="4" y2="14"></line>
-                      <line x1="4" y1="10" x2="4" y2="3"></line>
-                      <line x1="12" y1="21" x2="12" y2="12"></line>
-                      <line x1="12" y1="8" x2="12" y2="3"></line>
-                      <line x1="20" y1="21" x2="20" y2="16"></line>
-                      <line x1="20" y1="12" x2="20" y2="3"></line>
-                      <line x1="1" y1="14" x2="7" y2="14"></line>
-                      <line x1="9" y1="8" x2="15" y2="8"></line>
-                      <line x1="17" y1="16" x2="23" y2="16"></line>
-                    </svg>
-                    <h3 className="text-xl font-bold text-gray-900">Filters</h3>
-                  </div>
-                  <button
-                    onClick={() => setShowFilter(false)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
-                  >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18"></line>
-                      <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                  </button>
-                </div>
-
-                {/* Drawer Scrollable Body */}
-                <div className="flex-1 overflow-y-auto px-6 py-6 space-y-7 text-left">
-
-                  {/* 1. Search */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">Search</label>
-                    <div className="relative flex items-center">
-                      <svg className="absolute left-3.5 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                      </svg>
-                      <input
-                        type="text"
-                        placeholder="Project title, key words..."
-                        value={searchVal}
-                        onChange={(e) => setSearchVal(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleApplyFilter()}
-                        className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-brand-green bg-white transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  {/* 2. Category */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">Category</label>
-                    <select
-                      value={filterCategory || activeCategory}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setFilterCategory(val);
-                        if (val && val !== 'All services') setActiveCategory(val);
-                        else setActiveCategory('All services');
-                      }}
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
-                    >
-                      <option value="">Select category</option>
-                      {categories.map((c: any) => {
-                        const name = typeof c === 'string' ? c : c.name;
-                        const slug = typeof c === 'string' ? c : c.slug;
-                        return (
-                          <option key={slug} value={slug}>{name}</option>
-                        );
-                      })}
-                    </select>
-                  </div>
-
-                  {/* 3. Experience Level */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-3">Experience level</label>
-                    <div className="space-y-3">
-                      {[
-                        { key: 'entry', label: 'Entry Level' },
-                        { key: 'intermediate', label: 'Intermediate' },
-                        { key: 'expert', label: 'Expert' }
-                      ].map(({ key, label }) => (
-                        <label key={key} className="flex items-center gap-3 cursor-pointer select-none text-sm text-gray-700 hover:text-gray-900">
-                          <input
-                            type="checkbox"
-                            checked={experience[key as keyof typeof experience]}
-                            onChange={() => toggleExperience(key)}
-                            className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black cursor-pointer accent-black"
-                          />
-                          <span>{label}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 4. Filter by Fixed-Price */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-4">Filter by Fixed-Price</label>
-
-                    {/* Visual Range Indicator with Badges */}
-                    <div className="relative px-2 mb-6">
-                      <div className="flex justify-between text-xs font-semibold text-gray-700 mb-2">
-                        <span className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded shadow-2xs">${minPrice || '0'}</span>
-                        <span className="bg-gray-100 border border-gray-200 px-2 py-0.5 rounded shadow-2xs">${maxPrice || '2500'}</span>
-                      </div>
-                      {/* Bar graphic */}
-                      <div className="h-1.5 bg-gray-200 rounded-full relative flex items-center">
-                        <div className="absolute left-[15%] right-[25%] h-full bg-gray-900 rounded-full"></div>
-                        <div className="absolute left-[15%] w-4 h-4 rounded-full bg-white border-2 border-gray-900 shadow -translate-x-1/2 cursor-pointer hover:scale-110 transition-transform"></div>
-                        <div className="absolute right-[25%] w-4 h-4 rounded-full bg-white border-2 border-gray-900 shadow translate-x-1/2 cursor-pointer hover:scale-110 transition-transform"></div>
-                      </div>
-                    </div>
-
-                    {/* Min / Max Inputs */}
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1 relative flex items-center border border-gray-200 rounded-xl px-3.5 py-2 bg-white focus-within:border-brand-green transition-colors">
-                        <span className="text-gray-700 font-medium text-sm mr-1.5">$</span>
-                        <input
-                          type="number"
-                          placeholder="100"
-                          value={minPrice}
-                          onChange={(e) => setMinPrice(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleApplyFilter()}
-                          className="w-full bg-transparent text-sm text-gray-900 outline-none pr-6"
-                        />
-                        <span className="absolute right-3 text-xs text-gray-400 select-none">min</span>
-                      </div>
-                      <span className="text-gray-400 font-medium">-</span>
-                      <div className="flex-1 relative flex items-center border border-gray-200 rounded-xl px-3.5 py-2 bg-white focus-within:border-brand-green transition-colors">
-                        <span className="text-gray-700 font-medium text-sm mr-1.5">$</span>
-                        <input
-                          type="number"
-                          placeholder="1000"
-                          value={maxPrice}
-                          onChange={(e) => setMaxPrice(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleApplyFilter()}
-                          className="w-full bg-transparent text-sm text-gray-900 outline-none pr-6"
-                        />
-                        <span className="absolute right-3 text-xs text-gray-400 select-none">max</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 5. English Level */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">English Level</label>
-                    <select
-                      value={englishLevel}
-                      onChange={(e) => setEnglishLevel(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
-                    >
-                      <option value="">Select english level</option>
-                      <option value="basic">Basic / Conversational</option>
-                      <option value="fluent">Fluent</option>
-                      <option value="native">Native / Bilingual</option>
-                    </select>
-                  </div>
-
-                  {/* 6. Client Location */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">Client Location</label>
-                    <select
-                      value={clientLocation}
-                      onChange={(e) => setClientLocation(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
-                    >
-                      <option value="">Select client location</option>
-                      <option value="US">United States</option>
-                      <option value="UK">United Kingdom</option>
-                      <option value="CA">Canada</option>
-                      <option value="EU">Europe</option>
-                      <option value="Asia">Asia</option>
-                      <option value="Global">Worldwide</option>
-                    </select>
-                  </div>
-
-                </div>
-
-                {/* Drawer Footer Actions */}
-                <div className="p-5 border-t border-gray-100 bg-white flex items-center justify-end gap-4">
-                  <button
-                    onClick={handleReset}
-                    className="text-sm font-medium text-gray-500 hover:text-gray-800 transition-colors px-2 py-2"
-                  >
-                    Clear filter
-                  </button>
-                  <button
-                    onClick={handleApplyFilter}
-                    className="bg-brand-green hover:bg-brand-green text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors shadow-sm"
-                  >
-                    Apply filter
-                  </button>
-                </div>
-
-              </div>
-            </div>
-          )}
 
           {/* Results Grid / Loading / Error / Empty State */}
           {isLoading ? (

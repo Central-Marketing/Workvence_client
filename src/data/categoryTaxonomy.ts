@@ -2,6 +2,8 @@ export interface SubcategoryItem {
   id: string;
   title: string;
   banner: string;
+  subtitle?: string;
+  resultCount?: string;
   items: string[];
 }
 
@@ -25,13 +27,19 @@ export const CATEGORY_TAXONOMIES: Record<string, CategoryTaxonomy> = {
       {
         id: "logo-brand-identity",
         title: "Logo & Brand Identity",
+        subtitle: "Stand out from the crowd with a logo that fits your brand personality.",
+        resultCount: "1,40,000+ Results",
         banner: "/images/category-hub/card-1.png",
         items: [
-          "Logo Design",
-          "Brand Style Guide",
-          "Business Card & Stationary",
-          "Fonts & Typography",
-          "Art Direction"
+          "Minimal Logo Design",
+          "Hand Drawn",
+          "Vintage",
+          "Cartoon",
+          "3D Logo",
+          "Geometric",
+          "Lettering",
+          "Signature",
+          "Water Color"
         ]
       },
       {

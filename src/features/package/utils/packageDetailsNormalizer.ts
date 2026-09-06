@@ -114,8 +114,10 @@ export const FALLBACK_IMAGES = {
     '/images/mock-package/thumb-1.png',
     '/images/mock-package/thumb-2.png',
     '/images/mock-package/thumb-3.png',
-    '/images/mock-package/thumb-4.png',
-    '/images/mock-package/thumb-5.png',
+    '/images/mock-package/thumb-1.png',
+    '/images/mock-package/thumb-2.png',
+    '/images/mock-package/thumb-2.png',
+    '/images/mock-package/thumb-2.png',
   ],
   fallbackPlaceholder: '/images/mock-package/thumb-1.png'
 };
@@ -244,7 +246,7 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
 
   const id = raw._id || raw.id || raw.slug || 'package-details';
   const title = raw.title || "I will create modern minimalist logo design for your business";
-  
+
   // Extract user / seller details
   const rawUser = raw.userID || raw.user || {};
   const sellerId = rawUser._id || rawUser.id || 'seller-1';
@@ -253,7 +255,7 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
   const sellerRating = Number(raw.starRating || raw.starNumber || rawUser.starRating || 4.8);
   const reviewCount = Number(raw.totalStars || rawUser.completedOrdersCount || rawUser.totalReviews || 226);
   const sellerBio = rawUser.description || "Hello, I'm a professional book cover designer creating eye-catching, high-converting covers for eBooks and print books. We are an end-to-end digital team with 15+ years of experience creating high-impact web solutions. Our expertise includes Figma UI/UX design, React.js, Next.js, Vue.js, Tailwind CSS, Bootstrap, Webflow, WordPress, Shopify, and Framer.";
-  
+
   const seller: SellerDetails = {
     id: sellerId,
     username: sellerUsername,
@@ -286,9 +288,9 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
   }
   if (gallery.length === 0) {
     gallery = [...FALLBACK_IMAGES.thumbs];
-  } else if (gallery.length < 5) {
+  } else if (gallery.length < FALLBACK_IMAGES.thumbs.length) {
     const fillers = FALLBACK_IMAGES.thumbs.filter(img => !gallery.includes(img));
-    gallery = [...gallery, ...fillers].slice(0, 5);
+    gallery = [...gallery, ...fillers];
   }
 
   // Parse package tiers
@@ -381,20 +383,20 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
   // Reviews
   const reviewsList = Array.isArray(raw.reviews) && raw.reviews.length > 0
     ? raw.reviews.map((r: any, idx: number) => ({
-        id: r._id || r.id || `rev-${idx}`,
-        buyerName: r.user?.username || r.reviewerName || "Zervis Solaiman",
-        buyerAvatar: r.user?.image || FALLBACK_IMAGES.reviewerAvatar,
-        country: r.user?.country || "Canada",
-        countryFlag: "🇨🇦",
-        projectStatus: "1 Project is ongoing",
-        rating: Number(r.star || r.rating || 4.8),
-        dateText: r.createdAt ? `${new Date(r.createdAt).toLocaleDateString()}` : "2 days ago",
-        reviewText: r.comment || r.desc || "It was great to work with him. Recommend to everyone.",
-        projectImage: FALLBACK_IMAGES.reviewLunar,
-        projectPrice: "$4000",
-        projectDuration: "7 Days",
-        sellerResponse: r.sellerResponse || "Thank you so much! It was an absolute pleasure working on this project with your team."
-      }))
+      id: r._id || r.id || `rev-${idx}`,
+      buyerName: r.user?.username || r.reviewerName || "Zervis Solaiman",
+      buyerAvatar: r.user?.image || FALLBACK_IMAGES.reviewerAvatar,
+      country: r.user?.country || "Canada",
+      countryFlag: "🇨🇦",
+      projectStatus: "1 Project is ongoing",
+      rating: Number(r.star || r.rating || 4.8),
+      dateText: r.createdAt ? `${new Date(r.createdAt).toLocaleDateString()}` : "2 days ago",
+      reviewText: r.comment || r.desc || "It was great to work with him. Recommend to everyone.",
+      projectImage: FALLBACK_IMAGES.reviewLunar,
+      projectPrice: "$4000",
+      projectDuration: "7 Days",
+      sellerResponse: r.sellerResponse || "Thank you so much! It was an absolute pleasure working on this project with your team."
+    }))
     : DEFAULT_REVIEWS;
 
   return {

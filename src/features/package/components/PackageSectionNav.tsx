@@ -30,18 +30,16 @@ export const PackageSectionNav: React.FC<PackageSectionNavProps> = ({
             key={sec.id}
             type="button"
             onClick={() => onNavigate(sec.id)}
-            className={`px-5 py-2 rounded-xl text-[13.5px] font-medium flex items-center gap-2 transition-all whitespace-nowrap cursor-pointer ${
-              isActive
-                ? "bg-[#0F172A] text-white shadow-xs"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-200/50"
-            }`}
+            className={`px-5 py-2 rounded-xl text-[13.5px] font-medium flex items-center gap-2 transition-all whitespace-nowrap cursor-pointer ${isActive
+              ? "bg-brand-green text-white shadow-xs"
+              : "text-gray-600 hover:text-gray-900 hover:bg-gray-200/50"
+              }`}
           >
             <span>{sec.label}</span>
             {sec.badge !== undefined && (
               <span
-                className={`text-xs px-2 py-0.5 rounded-full font-bold transition-colors ${
-                  isActive ? "bg-teal-700/80 text-teal-100" : "bg-teal-100 text-teal-800"
-                }`}
+                className={`text-xs px-2 py-0.5 rounded-full font-bold transition-colors ${isActive ? "bg-teal-700/80 text-teal-100" : "bg-teal-100 text-teal-800"
+                  }`}
               >
                 {sec.badge}
               </span>

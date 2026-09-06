@@ -55,9 +55,11 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
 
   // Range Slider boundaries
   const sliderMin = 0;
-  const sliderMax = 2500;
+  const sliderMax = 2000;
   const minPercent = Math.min(100, Math.max(0, ((currentMin - sliderMin) / (sliderMax - sliderMin)) * 100));
   const maxPercent = Math.min(100, Math.max(0, ((currentMax - sliderMin) / (sliderMax - sliderMin)) * 100));
+  const clampMinPercent = Math.max(8, Math.min(92, minPercent));
+  const clampMaxPercent = Math.max(8, Math.min(92, maxPercent));
 
   const handleMinSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value, 10);
@@ -90,7 +92,7 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
 
       {/* 2. Search Input */}
       <div>
-        <div className="relative flex items-center bg-[#F6F7F9] border border-transparent focus-within:border-gray-200 focus-within:bg-white rounded-xl px-3.5 py-2.5 transition-all group">
+        <div className="relative flex items-center bg-[#F6F7F9] border border-[#0000001A] focus-within:border-gray-200 focus-within:bg-white rounded-xl px-3.5 py-2.5 transition-all group">
           <FiSearch className="w-4 h-4 text-gray-400 mr-2 group-focus-within:text-gray-700 shrink-0" />
           <input
             type="text"
@@ -152,40 +154,45 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
       </div>
 
       {/* 5. Filter by Fixed Price (Dual Slider & Inputs) */}
-      <div>
-        <label className="block text-xs font-bold text-gray-900 mb-3">Filter by Fixed Price</label>
+      <div className="w-full">
+        <label className="block text-sm font-bold text-[#2D3139] mb-1">Filter by Fixed Price</label>
 
         {/* Floating Range Badges & Dual Track */}
-        <div className="relative px-2 pt-6 pb-2 mb-4">
+        <div className="relative w-full pt-8 pb-3 mb-4 select-none">
           {/* Min Badge Tooltip */}
           <div
-            className="absolute top-0 -translate-x-1/2 bg-gray-100 border border-gray-200 text-[10.5px] font-bold text-gray-800 px-2 py-0.5 rounded shadow-2xs select-none"
-            style={{ left: `${minPercent}%` }}
+            className="absolute top-0 -translate-x-1/2 bg-white border border-[#E5E7EB] text-[13px] font-semibold text-[#18181B] px-2.5 py-1 rounded-[6px] shadow-[0_3px_10px_rgba(0,0,0,0.08)] select-none pointer-events-none z-20 flex items-center justify-center transition-[left] duration-75"
+            style={{ left: `${clampMinPercent}%` }}
           >
-            ${currentMin}
+            <span>${currentMin}</span>
+            {/* Downward triangle arrow */}
+            <div className="absolute -bottom-[5px] left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45 border-r border-b border-[#E5E7EB]" />
           </div>
 
           {/* Max Badge Tooltip */}
           <div
-            className="absolute top-0 -translate-x-1/2 bg-gray-100 border border-gray-200 text-[10.5px] font-bold text-gray-800 px-2 py-0.5 rounded shadow-2xs select-none"
-            style={{ left: `${maxPercent}%` }}
+            className="absolute top-0 -translate-x-1/2 bg-white border border-[#E5E7EB] text-[13px] font-semibold text-[#18181B] px-2.5 py-1 rounded-[6px] shadow-[0_3px_10px_rgba(0,0,0,0.08)] select-none pointer-events-none z-20 flex items-center justify-center transition-[left] duration-75"
+            style={{ left: `${clampMaxPercent}%` }}
           >
-            ${currentMax}
+            <span>${currentMax}</span>
+            {/* Downward triangle arrow */}
+            <div className="absolute -bottom-[5px] left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45 border-r border-b border-[#E5E7EB]" />
           </div>
 
           {/* Visual Track */}
-          <div className="h-1.5 bg-gray-200 rounded-full relative">
+          <div className="h-[3.5px] bg-[#E5E7EB] rounded-full relative w-full my-2">
+            {/* Active connecting black bar */}
             <div
-              className="absolute h-full bg-gray-900 rounded-full"
+              className="absolute h-full bg-[#18181B] rounded-full"
               style={{ left: `${minPercent}%`, width: `${Math.max(0, maxPercent - minPercent)}%` }}
             />
             {/* Visual Thumbs */}
             <div
-              className="w-3.5 h-3.5 rounded-full bg-white border-2 border-gray-900 shadow absolute top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none"
+              className="w-5 h-5 rounded-full bg-white border-[2.5px] border-[#18181B] shadow-[0_1px_3px_rgba(0,0,0,0.15)] absolute top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none z-10"
               style={{ left: `${minPercent}%` }}
             />
             <div
-              className="w-3.5 h-3.5 rounded-full bg-white border-2 border-gray-900 shadow absolute top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none"
+              className="w-5 h-5 rounded-full bg-white border-[2.5px] border-[#18181B] shadow-[0_1px_3px_rgba(0,0,0,0.15)] absolute top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none z-10"
               style={{ left: `${maxPercent}%` }}
             />
           </div>
@@ -197,7 +204,7 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
             max={sliderMax}
             value={currentMin}
             onChange={handleMinSliderChange}
-            className="absolute inset-x-2 top-6 w-full opacity-0 cursor-pointer h-4 pointer-events-auto"
+            className={`absolute inset-x-0 bottom-1 w-full h-7 opacity-0 cursor-pointer pointer-events-none ${currentMin > sliderMax - 100 ? "z-30" : "z-20"} [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6`}
           />
           <input
             type="range"
@@ -205,7 +212,7 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
             max={sliderMax}
             value={currentMax}
             onChange={handleMaxSliderChange}
-            className="absolute inset-x-2 top-6 w-full opacity-0 cursor-pointer h-4 pointer-events-auto"
+            className="absolute inset-x-0 bottom-1 w-full h-7 opacity-0 cursor-pointer pointer-events-none z-20 [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:appearance-none [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:h-6"
           />
         </div>
 

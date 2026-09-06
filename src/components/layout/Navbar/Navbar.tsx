@@ -12,7 +12,7 @@ import adminAxios from "@/utils/adminAxios";
 import toast from 'react-hot-toast';
 import { axiosFetch, socket } from '@/utils';
 import { useUserStore } from "@/store/userStore";
-import { Loader, NotificationBell, HeaderInboxIcon } from '@/components';
+import { Loader, NotificationBell, HeaderInboxIcon, AiGradientButton } from '@/components';
 import CategoryBar from "../CategoryBar/CategoryBar";
 
 const Navbar = () => {
@@ -27,6 +27,7 @@ const Navbar = () => {
   const { user, setUser } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const isBuyer = Boolean(user && !user.isSeller);
 
   // Fetch real categories from backend
   const { data: fetchedCategories = [] } = useQuery({
@@ -133,21 +134,21 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`w-full sticky top-0 z-50 transition-all duration-300 ${showMenu || pathname !== "/" ? "bg-white border-b border-gray-100 shadow-sm text-gray-600" : "bg-transparent text-gray-600"}`}>
-      <div className="w-full container mx-auto flex justify-between items-center px-4 md:px-6 py-4">
+    <nav className={`w-full sticky top-0 z-50 transition-all duration-300 ${showMenu || pathname !== "/" || isBuyer ? "bg-white border-b border-gray-100 shadow-sm text-gray-600" : "bg-transparent text-gray-600"}`}>
+      <div className="w-full container mx-auto flex justify-between items-center px-4 md:px-6 py-3.5">
 
-        <div className="flex items-center gap-10">
-          <Link href="/" className="flex items-center">
-            <Image src="/Workvence-logo-Horizontal3.png" width={160} height={40} alt="Workvence" className="h-8 md:h-10 w-auto object-contain" style={{ width: "auto", height: "auto" }} priority />
+        <div className="flex items-center gap-6 lg:gap-8 flex-1">
+          <Link href="/" className="flex items-center shrink-0">
+            <Image src="/Workvence-logo-Horizontal3.png" width={160} height={40} alt="Workvence" className="h-8 md:h-9 w-auto object-contain" style={{ width: "auto", height: "auto" }} priority />
           </Link>
 
-          <div className={`hidden lg:flex items-center overflow-hidden transition-all duration-300 ${showMenu || pathname !== '/' ? 'opacity-100 max-w-[500px]' : 'opacity-0 max-w-0 pointer-events-none'}`}>
-            <div className="flex items-center border rounded-lg px-4 py-2.5 w-[250px] xl:w-[320px] bg-gray-50 border-gray-200 focus-within:bg-white focus-within:border-brand-green focus-within:shadow-sm group">
-              <RiSearchLine className="text-gray-400 text-xl mr-3 group-focus-within:text-brand-green transition-colors" />
+          <div className={`hidden lg:flex items-center overflow-hidden transition-all duration-300 ${showMenu || pathname !== '/' || isBuyer ? 'opacity-100 max-w-[540px] xl:max-w-[720px] 2xl:max-w-[800px] flex-1' : 'opacity-0 max-w-0 pointer-events-none'}`}>
+            <div className="flex items-center rounded-xl px-4 py-2.5 w-full max-w-[520px] xl:max-w-[680px] 2xl:max-w-[760px] bg-[#F4F4F6] border border-transparent focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-sm transition-all group">
+              <RiSearchLine className="text-gray-400 text-lg mr-2.5 group-focus-within:text-brand-green transition-colors shrink-0" />
               <input
                 type="text"
-                placeholder="What are you looking for?"
-                className="bg-transparent border-none outline-none w-full text-[15px] font-medium text-gray-800 placeholder-gray-400"
+                placeholder="What you are looking for"
+                className="bg-transparent border-none outline-none w-full text-[14px] font-medium text-gray-800 placeholder-gray-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleSearch}
@@ -159,211 +160,271 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center gap-7 font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B]">
           {isLoading ? (
             <Loader size={35} />
-          ) : (
+          ) : !user ? (
             <>
-              {!user && (
-                <>
-                  {/* Explore Category Dropdown without extra icons */}
-                  <div className="relative category-dropdown-container">
-                    <button
-                      onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                      className={`flex items-center gap-1.5 cursor-pointer py-1 font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] transition-colors ${isCategoryDropdownOpen ? "text-[#327C73]" : "text-[#1E293B] hover:text-[#327C73]"
-                        }`}
-                    >
-                      <span>Explore Category</span>
-                      <FiChevronDown className={`text-base text-[#327C73] transition-transform duration-200 ${isCategoryDropdownOpen ? "rotate-180" : ""}`} />
-                    </button>
+              {/* Explore Category Dropdown without extra icons */}
+              <div className="relative category-dropdown-container">
+                <button
+                  onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                  className={`flex items-center gap-1.5 cursor-pointer py-1 font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] transition-colors ${isCategoryDropdownOpen ? "text-[#327C73]" : "text-[#1E293B] hover:text-[#327C73]"
+                    }`}
+                >
+                  <span>Explore Category</span>
+                  <FiChevronDown className={`text-base text-[#327C73] transition-transform duration-200 ${isCategoryDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
 
-                    {isCategoryDropdownOpen && (
-                      <div className="absolute left-0 mt-3 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl py-2 flex flex-col z-[60] text-[14px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-                        <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-400">
-                          <span>Categories</span>
-                          <Link
-                            href="/packages"
-                            onClick={() => setIsCategoryDropdownOpen(false)}
-                            className="text-[#327C73] font-medium hover:underline lowercase tracking-normal"
-                          >
-                            view all
-                          </Link>
-                        </div>
-
-                        <div className="max-h-[320px] overflow-y-auto py-1">
-                          {categoryList.length > 0 ? (
-                            categoryList.map((cat: any, index: number) => (
-                              <Link
-                                key={cat.slug || index}
-                                href={`/packages?category=${encodeURIComponent(cat.slug)}`}
-                                onClick={() => setIsCategoryDropdownOpen(false)}
-                                className="px-4 py-2.5 hover:bg-emerald-50/70 hover:text-[#327C73] transition-colors flex items-center justify-between group"
-                              >
-                                <span className="truncate">{cat.name}</span>
-                                <span className="text-gray-300 group-hover:text-[#327C73] transition-colors text-xs">→</span>
-                              </Link>
-                            ))
-                          ) : (
-                            <div className="px-4 py-3 text-sm text-gray-400 text-center">
-                              No categories found
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <Link href="/register?seller=true" className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors">
-                    Become a Seller
-                  </Link>
-
-                  <Link href="/briefs" className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors">
-                    Projects
-                  </Link>
-
-                  <Link
-                    href="/login"
-                    className="px-5 py-2.5 rounded-xl bg-[#F1F3F5] hover:bg-[#E5E7EB] text-[#1E293B] font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] transition-colors"
-                  >
-                    Sign in
-                  </Link>
-
-                  <Link
-                    href="/register"
-                    className="px-5 py-2.5 rounded-xl bg-[#0B0F19] hover:bg-black text-white font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] transition-colors flex items-center gap-1.5 shadow-sm"
-                  >
-                    <span>Join Now</span>
-                    <FiArrowRight className="text-sm" />
-                  </Link>
-                </>
-              )}
-              {user && (
-                <>
-                  {/* Explore Category Dropdown */}
-                  <div className="relative category-dropdown-container">
-                    <button
-                      onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                      className={`flex items-center gap-1.5 cursor-pointer py-1 font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] transition-colors ${isCategoryDropdownOpen ? "text-[#327C73]" : "text-[#1E293B] hover:text-[#327C73]"
-                        }`}
-                    >
-                      <span>Explore Category</span>
-                      <FiChevronDown className={`text-base text-[#327C73] transition-transform duration-200 ${isCategoryDropdownOpen ? "rotate-180" : ""}`} />
-                    </button>
-
-                    {isCategoryDropdownOpen && (
-                      <div className="absolute left-0 mt-3 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl py-2 flex flex-col z-[60] text-[14px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-                        <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-400">
-                          <span>Categories</span>
-                          <Link
-                            href="/packages"
-                            onClick={() => setIsCategoryDropdownOpen(false)}
-                            className="text-[#327C73] font-medium hover:underline lowercase tracking-normal"
-                          >
-                            view all
-                          </Link>
-                        </div>
-
-                        <div className="max-h-[320px] overflow-y-auto py-1">
-                          {categoryList.length > 0 ? (
-                            categoryList.map((cat: any, index: number) => (
-                              <Link
-                                key={cat.slug || index}
-                                href={`/packages?category=${encodeURIComponent(cat.slug)}`}
-                                onClick={() => setIsCategoryDropdownOpen(false)}
-                                className="px-4 py-2.5 hover:bg-emerald-50/70 hover:text-[#327C73] transition-colors flex items-center justify-between group"
-                              >
-                                <span className="truncate">{cat.name}</span>
-                                <span className="text-gray-300 group-hover:text-[#327C73] transition-colors text-xs">→</span>
-                              </Link>
-                            ))
-                          ) : (
-                            <div className="px-4 py-3 text-sm text-gray-400 text-center">
-                              No categories found
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {!user?.isSeller && (
-                    <Link href="/register?seller=true" className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors">
-                      Become a Seller
-                    </Link>
-                  )}
-
-                  <Link href="/briefs" className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors">
-                    Projects
-                  </Link>
-
-                  <div className="flex items-center gap-5 mr-1 border-l border-gray-200 pl-5">
-                    <HeaderInboxIcon currentUser={user} />
-                    <NotificationBell currentUser={user} />
-                  </div>
-
-                  <div className="relative profile-dropdown-container">
-                    <div className="flex items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}>
-                      <Image src={user.image || "/media/noavatar.png"} width={36} height={36} alt="Profile" className="w-9 h-9 rounded-full object-cover border border-gray-200" unoptimized />
+                {isCategoryDropdownOpen && (
+                  <div className="absolute left-0 mt-3 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl py-2 flex flex-col z-[60] text-[14px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-400">
+                      <span>Categories</span>
+                      <Link
+                        href="/packages"
+                        onClick={() => setIsCategoryDropdownOpen(false)}
+                        className="text-[#327C73] font-medium hover:underline lowercase tracking-normal"
+                      >
+                        view all
+                      </Link>
                     </div>
 
-                    {isProfileDropdownOpen && (
-                      <div className="absolute right-0 mt-4 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-2 flex flex-col z-[60] text-[15px] text-gray-700 font-medium overflow-hidden">
-                        <div className="px-5 py-3 border-b border-gray-100 mb-1">
-                          <p className="font-bold text-gray-900 truncate">@{user?.username}</p>
-                          <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-                        </div>
-                        <Link href="/profile" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
-                          My Profile
-                        </Link>
-                        <Link href="/dashboard" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
-                          Dashboard
-                        </Link>
-                        <Link href="/orders" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
-                          Orders
-                        </Link>
-                        {!user?.isSeller && (
-                          <Link href="/briefs/my-briefs" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
-                            My Projects
+                    <div className="max-h-[320px] overflow-y-auto py-1">
+                      {categoryList.length > 0 ? (
+                        categoryList.map((cat: any, index: number) => (
+                          <Link
+                            key={cat.slug || index}
+                            href={`/packages?category=${encodeURIComponent(cat.slug)}`}
+                            onClick={() => setIsCategoryDropdownOpen(false)}
+                            className="px-4 py-2.5 hover:bg-emerald-50/70 hover:text-[#327C73] transition-colors flex items-center justify-between group"
+                          >
+                            <span className="truncate">{cat.name}</span>
+                            <span className="text-gray-300 group-hover:text-[#327C73] transition-colors text-xs">→</span>
                           </Link>
-                        )}
-                        {user?.isSeller && (
-                          <>
-                            <hr className="my-1 border-gray-100" />
-                            <Link href="/my-packages" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
-                              My Packages
-                            </Link>
-                            <Link href="/organize" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
-                              Add New Package
-                            </Link>
-                            <Link href="/earnings" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center justify-between">
-                              <span>Earnings</span>
-                            </Link>
-                            <Link href="/kyc" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center justify-between">
-                              <span>ID Verification</span>
-                              {!user?.isKycVerified ? (
-                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Verify</span>
-                              ) : (
-                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">🛡️ Verified</span>
-                              )}
-                            </Link>
-                          </>
-                        )}
-                        <hr className="my-1 border-gray-100" />
-                        <span onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }} className="px-5 py-2.5 hover:bg-red-50 text-red-500 cursor-pointer transition-colors flex items-center gap-3">
-                          Logout
-                        </span>
-                      </div>
-                    )}
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-sm text-gray-400 text-center">
+                          No categories found
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </>
-              )}
+                )}
+              </div>
+
+              <Link href="/register?seller=true" className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors">
+                Become a Seller
+              </Link>
+
+              <Link href="/briefs" className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors">
+                Projects
+              </Link>
+
+              <Link
+                href="/login"
+                className="px-5 py-2.5 rounded-xl bg-[#F1F3F5] hover:bg-[#E5E7EB] text-[#1E293B] font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] transition-colors"
+              >
+                Sign in
+              </Link>
+
+              <Link
+                href="/register"
+                className="px-5 py-2.5 rounded-xl bg-[#0B0F19] hover:bg-black text-white font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] transition-colors flex items-center gap-1.5 shadow-sm"
+              >
+                <span>Join Now</span>
+                <FiArrowRight className="text-sm" />
+              </Link>
+            </>
+          ) : isBuyer ? (
+            /* Logged-in Buyer Navbar - Pixel-perfect to design */
+            <div className="flex items-center gap-5 xl:gap-6 font-sf-pro font-medium text-[16px] text-[#1E293B]">
+              <Link
+                href="/orders"
+                className="font-semibold text-[15px] text-[#18181B] hover:text-[#327C73] transition-colors"
+              >
+                Order
+              </Link>
+
+              <HeaderInboxIcon
+                currentUser={user}
+                className="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer"
+                iconClassName="text-[19px]"
+              />
+
+              <NotificationBell
+                currentUser={user}
+                triggerClassName="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer"
+                iconClassName="text-[19px]"
+              />
+
+              <AiGradientButton
+                href="/briefs/create"
+                text="Post a Project with AI"
+                px="px-4"
+                py="py-2"
+                className="h-10 rounded-xl text-[14px] font-medium text-[#112131] shadow-none shrink-0"
+              />
+
+              <div className="relative profile-dropdown-container">
+                <div
+                  className="flex items-center cursor-pointer hover:opacity-85 transition-opacity"
+                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                >
+                  <Image
+                    src={user.image || "/media/noavatar.png"}
+                    width={40}
+                    height={40}
+                    alt="Profile"
+                    className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                    unoptimized
+                  />
+                </div>
+
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 mt-3 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-2 flex flex-col z-[60] text-[15px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="px-5 py-3 border-b border-gray-100 mb-1">
+                      <p className="font-bold text-gray-900 truncate">@{user?.username}</p>
+                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                    </div>
+                    <Link href="/profile" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                      My Profile
+                    </Link>
+                    <Link href="/dashboard" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                      Dashboard
+                    </Link>
+                    <Link href="/orders" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                      Orders
+                    </Link>
+                    <Link href="/briefs/my-briefs" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                      My Projects
+                    </Link>
+                    <hr className="my-1 border-gray-100" />
+                    <span onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }} className="px-5 py-2.5 hover:bg-red-50 text-red-500 cursor-pointer transition-colors flex items-center gap-3">
+                      Logout
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* Logged-in Seller Navbar */
+            <>
+              {/* Explore Category Dropdown */}
+              <div className="relative category-dropdown-container">
+                <button
+                  onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                  className={`flex items-center gap-1.5 cursor-pointer py-1 font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] transition-colors ${isCategoryDropdownOpen ? "text-[#327C73]" : "text-[#1E293B] hover:text-[#327C73]"
+                    }`}
+                >
+                  <span>Explore Category</span>
+                  <FiChevronDown className={`text-base text-[#327C73] transition-transform duration-200 ${isCategoryDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {isCategoryDropdownOpen && (
+                  <div className="absolute left-0 mt-3 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl py-2 flex flex-col z-[60] text-[14px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-400">
+                      <span>Categories</span>
+                      <Link
+                        href="/packages"
+                        onClick={() => setIsCategoryDropdownOpen(false)}
+                        className="text-[#327C73] font-medium hover:underline lowercase tracking-normal"
+                      >
+                        view all
+                      </Link>
+                    </div>
+
+                    <div className="max-h-[320px] overflow-y-auto py-1">
+                      {categoryList.length > 0 ? (
+                        categoryList.map((cat: any, index: number) => (
+                          <Link
+                            key={cat.slug || index}
+                            href={`/packages?category=${encodeURIComponent(cat.slug)}`}
+                            onClick={() => setIsCategoryDropdownOpen(false)}
+                            className="px-4 py-2.5 hover:bg-emerald-50/70 hover:text-[#327C73] transition-colors flex items-center justify-between group"
+                          >
+                            <span className="truncate">{cat.name}</span>
+                            <span className="text-gray-300 group-hover:text-[#327C73] transition-colors text-xs">→</span>
+                          </Link>
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-sm text-gray-400 text-center">
+                          No categories found
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <Link href="/briefs" className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors">
+                Projects
+              </Link>
+
+              <div className="flex items-center gap-5 mr-1 border-l border-gray-200 pl-5">
+                <HeaderInboxIcon currentUser={user} />
+                <NotificationBell currentUser={user} />
+              </div>
+
+              <div className="relative profile-dropdown-container">
+                <div className="flex items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}>
+                  <Image src={user.image || "/media/noavatar.png"} width={36} height={36} alt="Profile" className="w-9 h-9 rounded-full object-cover border border-gray-200" unoptimized />
+                </div>
+
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 mt-4 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-2 flex flex-col z-[60] text-[15px] text-gray-700 font-medium overflow-hidden">
+                    <div className="px-5 py-3 border-b border-gray-100 mb-1">
+                      <p className="font-bold text-gray-900 truncate">@{user?.username}</p>
+                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                    </div>
+                    <Link href="/profile" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                      My Profile
+                    </Link>
+                    <Link href="/dashboard" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                      Dashboard
+                    </Link>
+                    <Link href="/orders" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                      Orders
+                    </Link>
+                    <hr className="my-1 border-gray-100" />
+                    <Link href="/my-packages" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                      My Packages
+                    </Link>
+                    <Link href="/organize" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                      Add New Package
+                    </Link>
+                    <Link href="/earnings" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center justify-between">
+                      <span>Earnings</span>
+                    </Link>
+                    <Link href="/kyc" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center justify-between">
+                      <span>ID Verification</span>
+                      {!user?.isKycVerified ? (
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Verify</span>
+                      ) : (
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">🛡️ Verified</span>
+                      )}
+                    </Link>
+                    <hr className="my-1 border-gray-100" />
+                    <span onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }} className="px-5 py-2.5 hover:bg-red-50 text-red-500 cursor-pointer transition-colors flex items-center gap-3">
+                      Logout
+                    </span>
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>
 
         {/* Mobile Hamburger Button & Pre-reserved Icons Container */}
-        <div className="flex lg:hidden items-center gap-3 md:gap-4 shrink-0 min-h-[32px]">
+        <div className="flex lg:hidden items-center gap-2.5 shrink-0 min-h-[36px]">
           {user && !isLoading && (
-            <div className="flex items-center gap-4 mr-1 shrink-0 min-w-[64px] min-h-[24px]">
-              <HeaderInboxIcon currentUser={user} />
-              <NotificationBell currentUser={user} />
+            <div className="flex items-center gap-2 mr-1 shrink-0">
+              <HeaderInboxIcon
+                currentUser={user}
+                className="w-9 h-9 rounded-full bg-[#F5F5F7] flex items-center justify-center text-gray-700 relative"
+                iconClassName="text-[17px]"
+              />
+              <NotificationBell
+                currentUser={user}
+                triggerClassName="w-9 h-9 rounded-full bg-[#F5F5F7] flex items-center justify-center text-gray-700 relative"
+                iconClassName="text-[17px]"
+              />
             </div>
           )}
           <button onClick={() => setIsMobileMenuOpen(true)} className="text-2xl text-gray-700 focus:outline-none hover:text-brand-green transition-colors ml-1 p-1 rounded-lg shrink-0" aria-label="Open menu">
@@ -460,7 +521,17 @@ const Navbar = () => {
                   </Link>
                 </>
               ) : (
-                <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a Seller</Link>
+                <>
+                  <div className="my-1">
+                    <AiGradientButton
+                      href="/briefs/create"
+                      text="Post a Project with AI"
+                      className="w-full h-11 rounded-xl text-[14px] font-medium"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    />
+                  </div>
+                  <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a Seller</Link>
+                </>
               )}
               <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Orders</Link>
               {!user.isSeller && (

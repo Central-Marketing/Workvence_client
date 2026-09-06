@@ -10,11 +10,13 @@ import "./NotificationBell.scss";
 
 interface NotificationBellProps {
   currentUser: any;
+  triggerClassName?: string;
+  iconClassName?: string;
 }
 
 const processedNotifMessageIds = new Set<string>();
 
-const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
+const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, triggerClassName, iconClassName }) => {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -206,11 +208,11 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser }) => {
     <div className="notification-wrapper relative flex items-center" ref={dropdownRef}>
       {/* Header Bell Icon with Red Badge */}
       <button 
-        className="bell-btn text-gray-500 hover:text-brand-green transition-colors relative" 
+        className={triggerClassName || "bell-btn text-gray-500 hover:text-brand-green transition-colors relative"} 
         onClick={() => setIsOpen(!isOpen)}
         title="Notifications"
       >
-        <FiBell className={`text-[22px] transition-transform ${isAnimating ? 'animate-bounce text-brand-green' : ''}`} />
+        <FiBell className={iconClassName || `text-[22px] transition-transform ${isAnimating ? 'animate-bounce text-brand-green' : ''}`} />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
             {unreadCount > 99 ? "99+" : unreadCount}

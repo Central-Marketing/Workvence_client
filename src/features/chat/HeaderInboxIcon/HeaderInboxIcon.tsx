@@ -9,9 +9,11 @@ import { isConversationUnread, isTargetConversation } from "@/utils/chatHelpers"
 
 interface HeaderInboxIconProps {
   currentUser: any;
+  className?: string;
+  iconClassName?: string;
 }
 
-const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser }) => {
+const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser, className, iconClassName }) => {
   const queryClient = useQueryClient();
   const [isAnimating, setIsAnimating] = useState(false);
   const userId = currentUser?._id || currentUser?.id;
@@ -109,10 +111,14 @@ const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser }) => {
   }, [conversations, currentUser]);
 
   return (
-    <Link href="/messages" className="text-gray-500 hover:text-brand-green transition-colors relative" title="Messages">
-      <FiMessageSquare className={`text-[22px] transition-transform ${isAnimating ? 'animate-bounce text-brand-green' : ''}`} />
+    <Link
+      href="/messages"
+      className={className || "text-gray-500 hover:text-brand-green transition-colors relative"}
+      title="Messages"
+    >
+      <FiMessageSquare className={iconClassName || `text-[22px] transition-transform ${isAnimating ? 'animate-bounce text-brand-green' : ''}`} />
       {unreadChatsCount > 0 && (
-        <span className="absolute -top-1.5 -right-2 bg-brand-green text-white text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center shadow-sm border-2 border-white">
+        <span className="absolute -top-1 -right-1 bg-brand-green text-white text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center shadow-sm border-2 border-white">
           {unreadChatsCount > 99 ? "99+" : unreadChatsCount}
         </span>
       )}

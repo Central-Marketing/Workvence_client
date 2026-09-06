@@ -44,11 +44,10 @@ const SubcategoryFilterBar: React.FC<SubcategoryFilterBarProps> = ({
                 key={idx}
                 type="button"
                 onClick={() => (isSelected ? onClearTag() : onSelectTag(item))}
-                className={`px-4 py-1.5 rounded-full text-[13px] sm:text-[13.5px] font-medium transition-all duration-200 whitespace-nowrap cursor-pointer ${
-                  isSelected
-                    ? "bg-gray-900 text-white border border-gray-900 shadow-xs"
-                    : "bg-white text-gray-800 border border-gray-200/90 hover:border-gray-900"
-                }`}
+                className={`px-4 py-1.5 rounded-full text-[13px] sm:text-[13.5px] font-medium transition-all duration-200 whitespace-nowrap cursor-pointer ${isSelected
+                  ? "bg-gray-900 text-white border border-gray-900 shadow-xs"
+                  : "bg-white text-gray-800 border border-gray-200/90 hover:border-gray-900"
+                  }`}
               >
                 {item}
               </button>
@@ -61,7 +60,7 @@ const SubcategoryFilterBar: React.FC<SubcategoryFilterBarProps> = ({
       <button
         type="button"
         onClick={onClearTag}
-        className="shrink-0 bg-black text-white hover:bg-neutral-800 px-4.5 py-1.5 rounded-full text-[13px] sm:text-[13.5px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+        className="shrink-0 bg-black text-white hover:bg-neutral-800 px-6 py-3 rounded-[10px] text-[13px] sm:text-[13.5px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
       >
         <span>View All</span>
         <FiArrowRight className="w-3.5 h-3.5" />

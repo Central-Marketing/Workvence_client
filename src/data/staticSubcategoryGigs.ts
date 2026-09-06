@@ -72,7 +72,7 @@ export const STATIC_SUBCATEGORY_GIGS: StaticGigItem[] = [
     _id: "mock-gig-4",
     id: "mock-gig-4",
     title: "I will design,redesign business wordpress website as divi expert",
-    cover: "/images/mock-gigs/thumb-4.png",
+    cover: "/images/mock-gigs/thumb-1.png",
     price: 150,
     star: 4.9,
     starNumber: 57,
@@ -82,7 +82,7 @@ export const STATIC_SUBCATEGORY_GIGS: StaticGigItem[] = [
     user: {
       _id: "seller-4",
       username: "Nick Jonas",
-      image: "/images/mock-gigs/avatar-4.png"
+      image: "/images/mock-gigs/avatar-1.png"
     }
   },
   {
@@ -140,7 +140,7 @@ export const STATIC_SUBCATEGORY_GIGS: StaticGigItem[] = [
     _id: "mock-gig-8",
     id: "mock-gig-8",
     title: "I will design,redesign business wordpress website as divi expert",
-    cover: "/images/mock-gigs/thumb-4.png",
+    cover: "/images/mock-gigs/thumb-1.png",
     price: 150,
     star: 4.9,
     starNumber: 57,
@@ -150,7 +150,7 @@ export const STATIC_SUBCATEGORY_GIGS: StaticGigItem[] = [
     user: {
       _id: "seller-8",
       username: "Nick Jonas",
-      image: "/images/mock-gigs/avatar-4.png"
+      image: "/images/mock-gigs/avatar-1.png"
     }
   }
 ];

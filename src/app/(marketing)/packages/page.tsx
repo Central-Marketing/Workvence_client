@@ -384,7 +384,7 @@ const Packages = () => {
   );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#F8F8F8]">
 
       {/* Sidebar Filter Modal / Drawer (Accessible across all views) */}
       {showFilter && (

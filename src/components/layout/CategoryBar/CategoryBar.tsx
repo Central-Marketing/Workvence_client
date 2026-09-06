@@ -16,6 +16,19 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
   const searchParams = useSearchParams();
   const currentCategory = searchParams?.get('category') || '';
 
+  // Suppress CategoryBar on subcategory, specific service, or search filtered routes on /packages
+  const isSubcategoryRoute =
+    pathname === '/packages' &&
+    Boolean(
+      searchParams?.get('search') ||
+      searchParams?.get('subcat') ||
+      searchParams?.get('subcategory') ||
+      searchParams?.get('tag') ||
+      searchParams?.get('service')
+    );
+
+  const isBarVisible = visible && !isSubcategoryRoute;
+
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -69,8 +82,8 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
 
   return (
     <div
-      className={`w-full border-t border-gray-100 bg-white/98 backdrop-blur-md transition-all duration-300 overflow-hidden ${
-        visible ? 'max-h-16 opacity-100 visible' : 'max-h-0 opacity-0 invisible pointer-events-none'
+      className={`w-full bg-white/98 backdrop-blur-md transition-all duration-300 overflow-hidden ${
+        isBarVisible ? 'max-h-16 opacity-100 visible border-t border-gray-100' : 'max-h-0 opacity-0 invisible pointer-events-none border-none'
       }`}
     >
       <div className="w-full container mx-auto px-4 md:px-6 flex items-center justify-between gap-2.5 py-2.5 relative">

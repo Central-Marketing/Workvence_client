@@ -38,7 +38,7 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
   };
 
   return (
-    <div id="section-packages" className="scroll-mt-36 bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
+    <div id="section-packages" className="scroll-mt-36 bg-[#F5F5F5] border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
       {/* Header */}
       <div className="flex items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
@@ -82,8 +82,11 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
           }}
         />
 
-        {/* Dark Gradient Overlay for Readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent flex flex-col justify-end p-5 sm:p-7 text-white">
+        {/* Frosted Glass Background Blur & Dark Gradient Overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-black/90 via-black/55 to-transparent backdrop-blur-md [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_25%)] [mask-image:linear-gradient(to_bottom,transparent,black_25%)] pointer-events-none" />
+
+        {/* Text Content */}
+        <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-7 text-white">
           <h3 className="text-lg sm:text-xl font-bold mb-1.5 drop-shadow-sm">
             {currentProject.title}
           </h3>
@@ -127,11 +130,10 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
               key={idx}
               type="button"
               onClick={() => setActiveIndex(idx % projectList.length)}
-              className={`relative aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 ${
-                isSelected
-                  ? "border-gray-900 ring-1 ring-gray-900 shadow-xs scale-98"
-                  : "border-transparent opacity-75 hover:opacity-100 hover:border-gray-300"
-              }`}
+              className={`relative aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 ${isSelected
+                ? "border-gray-900 ring-1 ring-gray-900 shadow-xs scale-98"
+                : "border-transparent opacity-75 hover:opacity-100 hover:border-gray-300"
+                }`}
             >
               <img
                 src={thumb}

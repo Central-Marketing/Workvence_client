@@ -109,7 +109,7 @@ export const FALLBACK_IMAGES = {
   sellerAvatar: '/images/mock-package/avatar-seller.png',
   reviewerAvatar: '/images/mock-package/avatar-reviewer.png',
   reviewLunar: '/images/mock-package/review-lunar.png',
-  portfolioShowcase: '/images/mock-package/portfolio-showcase.png',
+  portfolioShowcase: '/images/mock-package/main-banner.png',
   thumbs: [
     '/images/mock-package/thumb-1.png',
     '/images/mock-package/thumb-2.png',

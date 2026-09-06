@@ -16,7 +16,7 @@ export const PackageAboutSection: React.FC<PackageAboutSectionProps> = ({
   whyMe = [],
 }) => {
   return (
-    <div id="section-about" className="scroll-mt-36 bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
+    <div id="section-about" className="scroll-mt-36 bg-[#F5F5F5] border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
       {/* Section Header */}
       <div className="flex items-center justify-between gap-4 mb-6 pb-2">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">

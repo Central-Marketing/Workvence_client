@@ -649,6 +649,14 @@ const Packages = () => {
               setActiveTag('');
               syncUrlWithFilters({ tag: '', resetPage: true });
             }}
+            onViewAll={() => {
+              setViewTab('hub');
+              setActiveSubcatId('');
+              setActiveTag('');
+              setSearchVal('');
+              syncUrlWithFilters({ subcat: '', tag: '', searchVal: '' });
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             onOpenFilter={() => setShowFilter(true)}
           />
 

@@ -1,11 +1,12 @@
 "use client";
 
 import React from "react";
-import { FiSliders, FiArrowRight } from "react-icons/fi";
+import { FiSliders, FiArrowRight, FiX } from "react-icons/fi";
 
 interface SubcategoryFilterBarProps {
   items: string[];
   activeTag: string;
+  isFilterOpen?: boolean;
   onSelectTag: (tag: string) => void;
   onClearTag?: () => void;
   onViewAll?: () => void;
@@ -15,6 +16,7 @@ interface SubcategoryFilterBarProps {
 const SubcategoryFilterBar: React.FC<SubcategoryFilterBarProps> = ({
   items = [],
   activeTag,
+  isFilterOpen = false,
   onSelectTag,
   onClearTag,
   onViewAll,
@@ -28,10 +30,15 @@ const SubcategoryFilterBar: React.FC<SubcategoryFilterBarProps> = ({
         <button
           type="button"
           onClick={onOpenFilter}
-          className="flex items-center gap-2 text-gray-800 font-medium text-[13.5px] hover:text-black transition-colors px-2 py-1.5 rounded-lg hover:bg-gray-100/70 cursor-pointer shrink-0"
+          className="flex items-center gap-1.5 text-gray-800 font-medium text-[13.5px] hover:text-black transition-colors px-2 py-1.5 rounded-lg hover:bg-gray-100/70 cursor-pointer shrink-0"
         >
           <FiSliders className="w-4 h-4 text-gray-700" />
           <span>Filter</span>
+          {isFilterOpen && (
+            <span className="flex items-center justify-center text-red-500 hover:text-red-600 ml-0.5">
+              <FiX className="w-3.5 h-3.5 stroke-[2.5]" />
+            </span>
+          )}
         </button>
 
         {/* Vertical Divider */}

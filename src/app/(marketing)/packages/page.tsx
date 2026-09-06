@@ -11,6 +11,7 @@ import {
   SubcategoryCard,
   SubcategoryHeader,
   SubcategoryFilterBar,
+  LeftFilterSidebar,
 } from '@/components';
 import { getCategoryTaxonomy, SubcategoryItem } from '@/data/categoryTaxonomy';
 import { STATIC_SUBCATEGORY_GIGS, getStaticSubcategoryGigs } from '@/data/staticSubcategoryGigs';
@@ -54,7 +55,7 @@ const Packages = () => {
   const [activeCategory, setActiveCategory] = useState(initialCat);
   const [activeSubcatId, setActiveSubcatId] = useState(initialSubcat);
   const [activeTag, setActiveTag] = useState(initialTag);
-  const [showFilter, setShowFilter] = useState(false);
+  const [showFilter, setShowFilter] = useState(true);
   const [page, setPage] = useState(initialPage);
   const [viewTab, setViewTab] = useState<'hub' | 'gigs'>(
     (initialSearch || initialMin || initialMax || initialSubcat || initialTag) ? 'gigs' : 'hub'
@@ -386,8 +387,8 @@ const Packages = () => {
   return (
     <div className="min-h-screen bg-[#F8F8F8]">
 
-      {/* Sidebar Filter Modal / Drawer (Accessible across all views) */}
-      {showFilter && (
+      {/* Sidebar Filter Modal / Drawer (Only for non-subcategory views) */}
+      {showFilter && !isSubcategoryMode && (
         <div className="fixed inset-0 z-50 flex justify-end">
           {/* Dark Overlay */}
           <div
@@ -641,6 +642,7 @@ const Packages = () => {
           <SubcategoryFilterBar
             items={activeSubcategory.items || []}
             activeTag={activeTag}
+            isFilterOpen={showFilter}
             onSelectTag={(tag) => {
               setActiveTag(tag);
               syncUrlWithFilters({ tag, resetPage: true });
@@ -657,7 +659,7 @@ const Packages = () => {
               syncUrlWithFilters({ subcat: '', tag: '', searchVal: '' });
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            onOpenFilter={() => setShowFilter(true)}
+            onOpenFilter={() => setShowFilter(!showFilter)}
           />
 
           {/* 3. Results Count */}
@@ -667,39 +669,96 @@ const Packages = () => {
             </p>
           </div>
 
-          {/* 4. 4-Column Responsive Grid of Package Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-            {displayPackages.map((pkg: any, idx: number) => (
-              <PackageCard key={pkg._id || pkg.id || idx} data={pkg} priority={idx < 4} />
-            ))}
-          </div>
+          {/* 4. Filter Sidebar (Left) + Package Cards Grid (Right) */}
+          <div className="flex flex-col lg:flex-row items-start gap-7">
+            {showFilter && (
+              <div className="w-full lg:w-[270px] xl:w-[280px] shrink-0 sticky top-24">
+                <LeftFilterSidebar
+                  searchVal={searchVal}
+                  onSearchChange={(val) => {
+                    setSearchVal(val);
+                    syncUrlWithFilters({ searchVal: val });
+                  }}
+                  onSearchSubmit={() => {
+                    syncUrlWithFilters();
+                    refetch();
+                  }}
+                  categories={categories.filter((c: any) => c.slug !== 'All services')}
+                  selectedCategory={filterCategory || (activeCategory !== 'All services' ? activeCategory : '')}
+                  onCategoryChange={(cat) => {
+                    setFilterCategory(cat);
+                    syncUrlWithFilters({ category: cat, resetPage: true });
+                  }}
+                  experience={{
+                    entry: experience.entry,
+                    mid: experience.intermediate,
+                    senior: experience.expert,
+                  }}
+                  onExperienceToggle={(lvl) => {
+                    const mappedKey = lvl === 'entry' ? 'entry' : lvl === 'mid' ? 'intermediate' : 'expert';
+                    toggleExperience(mappedKey);
+                  }}
+                  minPrice={minPrice}
+                  maxPrice={maxPrice}
+                  onMinPriceChange={(val) => {
+                    setMinPrice(val);
+                    syncUrlWithFilters({ minPrice: val });
+                  }}
+                  onMaxPriceChange={(val) => {
+                    setMaxPrice(val);
+                    syncUrlWithFilters({ maxPrice: val });
+                  }}
+                  englishLevel={englishLevel}
+                  onEnglishLevelChange={(val) => {
+                    setEnglishLevel(val);
+                    syncUrlWithFilters({ englishLevel: val });
+                  }}
+                  clientLocation={clientLocation}
+                  onClientLocationChange={(val) => {
+                    setClientLocation(val);
+                    syncUrlWithFilters({ clientLocation: val });
+                  }}
+                  onReset={handleReset}
+                />
+              </div>
+            )}
 
-          {/* Pagination Controls */}
-          {displayPackages.length > 0 && (
-            <div className="flex justify-center items-center gap-4 mt-12 mb-4">
-              <button
-                onClick={() => {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                  syncUrlWithFilters({ page: page - 1 });
-                }}
-                disabled={page === 1}
-                className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
-              >
-                Previous
-              </button>
-              <span className="font-semibold text-gray-800 bg-gray-100 px-4 py-2 rounded-lg">Page {page}</span>
-              <button
-                onClick={() => {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                  syncUrlWithFilters({ page: page + 1 });
-                }}
-                disabled={displayPackages.length < 8}
-                className="px-6 py-2.5 bg-brand-green text-white font-semibold rounded-xl hover:bg-[#3ea917] disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
-              >
-                Next
-              </button>
+            {/* Right side: Cards Grid (3 columns when showFilter is true, 4 columns when false) */}
+            <div className="flex-1 min-w-0 w-full">
+              <div className={`grid grid-cols-1 sm:grid-cols-2 ${showFilter ? 'xl:grid-cols-3' : 'lg:grid-cols-4'} gap-4 md:gap-5`}>
+                {displayPackages.map((pkg: any, idx: number) => (
+                  <PackageCard key={pkg._id || pkg.id || idx} data={pkg} priority={idx < 4} />
+                ))}
+              </div>
+
+              {/* Pagination Controls */}
+              {displayPackages.length > 0 && (
+                <div className="flex justify-center items-center gap-4 mt-12 mb-4">
+                  <button
+                    onClick={() => {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      syncUrlWithFilters({ page: page - 1 });
+                    }}
+                    disabled={page === 1}
+                    className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+                  >
+                    Previous
+                  </button>
+                  <span className="font-semibold text-gray-800 bg-gray-100 px-4 py-2 rounded-lg">Page {page}</span>
+                  <button
+                    onClick={() => {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      syncUrlWithFilters({ page: page + 1 });
+                    }}
+                    disabled={displayPackages.length < 8}
+                    className="px-6 py-2.5 bg-brand-green text-white font-semibold rounded-xl hover:bg-[#3ea917] disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       ) : (
         /* Main Content - Gigs Listing View */

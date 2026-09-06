@@ -151,15 +151,15 @@ const Footer = () => {
   return (
     <footer className="w-full bg-white text-[#222427] pt-16 sm:pt-20 pb-10 border-t border-gray-100">
       <div className="container mx-auto px-4 md:px-6">
-        
+
         {/* Main Footer Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 mb-16 sm:mb-20">
-          
+
           {/* Left Column: Brand & Newsletter */}
           <div className="lg:col-span-4 flex flex-col items-start max-w-sm">
             <Link href="/" className="inline-block mb-6">
               <Image
-                src="/Workvence-logo-Horizontal 1.png"
+                src="/Workvence-logo-Horizontal3.png"
                 alt="Workvence"
                 width={150}
                 height={36}
@@ -198,10 +198,9 @@ const Footer = () => {
               </div>
 
               {subscribedMsg && (
-                <p className={`text-xs mt-2 font-medium ${
-                  subscribedMsg.type === 'success' ? 'text-emerald-600' :
+                <p className={`text-xs mt-2 font-medium ${subscribedMsg.type === 'success' ? 'text-emerald-600' :
                   subscribedMsg.type === 'info' ? 'text-blue-600' : 'text-rose-600'
-                }`}>
+                  }`}>
                   {subscribedMsg.text}
                 </p>
               )}
@@ -235,7 +234,7 @@ const Footer = () => {
 
         {/* Bottom Bar Divider */}
         <div className="border-t border-gray-100 pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-5 text-[13px] text-[#8E8E93]">
-          
+
           {/* Copyright */}
           <p className="font-sf-pro">
             ©Workvence International Ltd. {new Date().getFullYear()}
@@ -243,7 +242,7 @@ const Footer = () => {
 
           {/* Right Preferences & Social Links */}
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            
+
             {/* Language & Currency */}
             <div className="flex items-center gap-3 text-[#6E6E6E]">
               <button className="flex items-center gap-1.5 hover:text-[#222427] transition-colors">

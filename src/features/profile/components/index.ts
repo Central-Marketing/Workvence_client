@@ -3,3 +3,4 @@ export { default as SellerAboutSidebar } from "./SellerAboutSidebar";
 export { default as SellerGigsGrid } from "./SellerGigsGrid";
 export { default as SellerReviewsSection } from "./SellerReviewsSection";
 export { default as SellerFaqSection } from "./SellerFaqSection";
+export { default as SellerCard } from "./SellerCard";

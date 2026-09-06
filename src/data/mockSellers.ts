@@ -1,0 +1,186 @@
+export interface MockSeller {
+  id: string;
+  username: string;
+  name: string;
+  role: string;
+  avatar: string;
+  rating: number;
+  reviewCount: number;
+  badge?: 'Pro' | 'Basic';
+}
+
+export const MOCK_SELLERS: MockSeller[] = [
+  // Row 1
+  {
+    id: 's-1',
+    username: 'nilson-norman',
+    name: 'Nilson Norman',
+    role: 'Web Designer',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.8,
+    reviewCount: 226,
+    badge: 'Pro',
+  },
+  {
+    id: 's-2',
+    username: 'elias-monroe',
+    name: 'Elias Monroe',
+    role: 'Product Manager',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.9,
+    reviewCount: 312,
+  },
+  {
+    id: 's-3',
+    username: 'clara-benson',
+    name: 'Clara Benson',
+    role: 'UX Researcher',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.6,
+    reviewCount: 198,
+  },
+  {
+    id: 's-4',
+    username: 'maya-patel',
+    name: 'Maya Patel',
+    role: 'Graphic Designer',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.7,
+    reviewCount: 254,
+  },
+  {
+    id: 's-5',
+    username: 'nilson-norman',
+    name: 'Nilson Norman',
+    role: 'Web Designer',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.8,
+    reviewCount: 226,
+  },
+  {
+    id: 's-6',
+    username: 'jasper-lane',
+    name: 'Jasper Lane',
+    role: 'Front-end Developer',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.5,
+    reviewCount: 187,
+    badge: 'Basic',
+  },
+
+  // Row 2
+  {
+    id: 's-7',
+    username: 'liam-chen',
+    name: 'Liam Chen',
+    role: 'Data Scientist',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.9,
+    reviewCount: 320,
+  },
+  {
+    id: 's-8',
+    username: 'noah-martinez',
+    name: 'Noah Martinez',
+    role: 'SEO Analyst',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.4,
+    reviewCount: 180,
+    badge: 'Basic',
+  },
+  {
+    id: 's-9',
+    username: 'zara-khan',
+    name: 'Zara Khan',
+    role: 'Marketing Specialist',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.5,
+    reviewCount: 190,
+  },
+  {
+    id: 's-10',
+    username: 'ethan-brooks',
+    name: 'Ethan Brooks',
+    role: 'Mobile App Developer',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.6,
+    reviewCount: 240,
+  },
+  {
+    id: 's-11',
+    username: 'sofia-rivera',
+    name: 'Sofia Rivera',
+    role: 'Content Strategist',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.7,
+    reviewCount: 215,
+    badge: 'Pro',
+  },
+  {
+    id: 's-12',
+    username: 'sofia-rivera',
+    name: 'Sofia Rivera',
+    role: 'Content Strategist',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.7,
+    reviewCount: 210,
+  },
+
+  // Row 3
+  {
+    id: 's-13',
+    username: 'oliver-grant',
+    name: 'Oliver Grant',
+    role: 'Full Stack Developer',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.8,
+    reviewCount: 305,
+  },
+  {
+    id: 's-14',
+    username: 'amara-singh',
+    name: 'Amara Singh',
+    role: 'Digital Marketer',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.6,
+    reviewCount: 210,
+  },
+  {
+    id: 's-15',
+    username: 'isabella-cruz',
+    name: 'Isabella Cruz',
+    role: 'UX Designer',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.9,
+    reviewCount: 230,
+    badge: 'Pro',
+  },
+  {
+    id: 's-16',
+    username: 'mia-thompson',
+    name: 'Mia Thompson',
+    role: 'Quality Assurance',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.3,
+    reviewCount: 175,
+    badge: 'Basic',
+  },
+  {
+    id: 's-17',
+    username: 'lucas-meyer',
+    name: 'Lucas Meyer',
+    role: 'System Analyst',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.7,
+    reviewCount: 255,
+  },
+  {
+    id: 's-18',
+    username: 'isabella-cruz',
+    name: 'Isabella Cruz',
+    role: 'UX Designer',
+    avatar: '/images/mock-package/avatar-seller.png',
+    rating: 4.9,
+    reviewCount: 230,
+  },
+];

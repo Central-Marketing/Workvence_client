@@ -13,6 +13,8 @@ export { default as ConfirmModal } from "./ui/ConfirmModal/ConfirmModal";
 export { default as Slide } from "./ui/Slide/Slide";
 export { default as PrevArrow } from "./ui/Arrows/PrevArrow";
 export { default as NextArrow } from "./ui/Arrows/NextArrow";
+export { default as AiGradientButton, GradientButton } from "./ui/AiGradientButton/AiGradientButton";
+export type { AiGradientButtonProps } from "./ui/AiGradientButton/AiGradientButton";
 export * from "./ui/Skeletons";
 
 // Marketing components

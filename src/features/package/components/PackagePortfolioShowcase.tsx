@@ -37,6 +37,14 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
     setActiveIndex((prev) => (prev < projectList.length - 1 ? prev + 1 : 0));
   };
 
+  const showcaseThumbs = [
+    '/images/mock-package/thumb-1.png',
+    '/images/mock-package/thumb-2.png',
+    '/images/mock-package/thumb-3.png',
+    '/images/mock-package/thumb-1.png',
+    '/images/mock-package/thumb-2.png',
+  ];
+
   return (
     <div id="section-packages" className="scroll-mt-36 bg-[#F5F5F5] border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
       {/* Header */}
@@ -121,9 +129,9 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
         </div>
       </div>
 
-      {/* Thumbnails Track Below Showcase */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2.5">
-        {FALLBACK_IMAGES.thumbs.map((thumb, idx) => {
+      {/* Thumbnails Track Below Showcase (Single Row of 5 items) */}
+      <div className="grid grid-cols-5 gap-2 sm:gap-2.5">
+        {showcaseThumbs.map((thumb, idx) => {
           const isSelected = activeIndex === idx;
           return (
             <button
@@ -131,8 +139,8 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
               type="button"
               onClick={() => setActiveIndex(idx % projectList.length)}
               className={`relative aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 ${isSelected
-                ? "border-gray-900 ring-1 ring-gray-900 shadow-xs scale-98"
-                : "border-transparent opacity-75 hover:opacity-100 hover:border-gray-300"
+                  ? "border-gray-900 ring-1 ring-gray-900 shadow-xs scale-98"
+                  : "border-transparent opacity-75 hover:opacity-100 hover:border-gray-300"
                 }`}
             >
               <img

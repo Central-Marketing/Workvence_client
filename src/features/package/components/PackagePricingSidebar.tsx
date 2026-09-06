@@ -5,6 +5,7 @@ import { FaStar } from "react-icons/fa";
 import { FiClock, FiRepeat, FiCheckSquare, FiArrowRight } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi";
 import { PackageTierDetails, SellerDetails, FALLBACK_IMAGES } from "../utils/packageDetailsNormalizer";
+import { AiGradientButton } from "@/components/ui";
 
 interface PackagePricingSidebarProps {
   packages: {
@@ -198,14 +199,11 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
         </div>
 
         {/* Analysis Seller Profile CTA Button */}
-        <button
-          type="button"
+        <AiGradientButton
           onClick={onViewSellerProfile}
-          className="w-full py-3 bg-[#67e8f9] hover:bg-[#22d3ee] text-teal-950 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs active:scale-98"
-        >
-          <span>Analysis Seller Profile</span>
-          <HiSparkles className="w-4 h-4 text-teal-900" />
-        </button>
+          className="w-full py-3 text-xs sm:text-sm font-bold"
+          text="Analysis Seller Profile"
+        />
       </div>
     </div>
   );

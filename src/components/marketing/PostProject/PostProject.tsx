@@ -1,9 +1,6 @@
-"use client";
-
 import React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { Sparkles } from 'lucide-react';
+import { AiGradientButton } from '@/components/ui';
 
 const PostProject = () => {
     return (
@@ -47,16 +44,11 @@ const PostProject = () => {
                             </p>
 
                             <div>
-                                <Link
+                                <AiGradientButton
                                     href="/briefs/create"
-                                    className="inline-flex items-center justify-center gap-[10px] w-[282px] h-[48px] px-[24px] py-[12px] rounded-[10px] text-[#112131] font-sf-pro font-medium text-[15px] hover:opacity-95 hover:shadow-md hover:shadow-[#9AFFDA]/30 active:scale-[0.98] transition-all duration-200"
-                                    style={{
-                                        background: 'linear-gradient(90deg, #9AFFDA 0%, #82C2FD 100%)',
-                                    }}
-                                >
-                                    <span>Post a Project with AI</span>
-                                    <Sparkles size={18} className="text-[#112131] stroke-[2]" />
-                                </Link>
+                                    className="w-[282px] h-[48px]"
+                                    text="Post a Project with AI"
+                                />
                             </div>
                         </div>
 

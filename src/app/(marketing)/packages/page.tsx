@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import useAdminCategories from "@/hooks/useAdminCategories";
+import useDebounce from "@/hooks/useDebounce";
 import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 
 const DEFAULT_CATEGORIES = [
@@ -49,6 +50,11 @@ const Packages = () => {
   const [maxPrice, setMaxPrice] = useState(initialMax);
   const [englishLevel, setEnglishLevel] = useState('');
   const [clientLocation, setClientLocation] = useState('');
+
+  // Debounce rapidly changing search and price filter inputs to prevent request storms while typing
+  const debouncedSearchVal = useDebounce(searchVal, 350);
+  const debouncedMinPrice = useDebounce(minPrice, 400);
+  const debouncedMaxPrice = useDebounce(maxPrice, 400);
 
   const categoryScrollRef = useRef<HTMLDivElement>(null);
 
@@ -128,11 +134,11 @@ const Packages = () => {
   const { isLoading, isError, error, data, refetch } = useQuery({
     queryKey: [
       'packages',
-      searchVal,
+      debouncedSearchVal,
       activeCategory,
       filterCategory,
-      minPrice,
-      maxPrice,
+      debouncedMinPrice,
+      debouncedMaxPrice,
       sortBy,
       page,
       JSON.stringify(experience),
@@ -142,8 +148,8 @@ const Packages = () => {
     queryFn: async () => {
       const queryParams = new URLSearchParams();
 
-      if (searchVal && searchVal.trim()) {
-        queryParams.set('search', searchVal.trim());
+      if (debouncedSearchVal && debouncedSearchVal.trim()) {
+        queryParams.set('search', debouncedSearchVal.trim());
       }
 
       const selectedCat = filterCategory || (activeCategory !== 'All services' ? activeCategory : '');
@@ -152,8 +158,8 @@ const Packages = () => {
         queryParams.set('category', catSlug);
       }
 
-      if (minPrice) queryParams.set('min', minPrice);
-      if (maxPrice) queryParams.set('max', maxPrice);
+      if (debouncedMinPrice) queryParams.set('min', debouncedMinPrice);
+      if (debouncedMaxPrice) queryParams.set('max', debouncedMaxPrice);
       if (sortBy) queryParams.set('sort', sortBy);
       queryParams.set('limit', '20');
       queryParams.set('page', page.toString());

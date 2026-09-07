@@ -87,8 +87,20 @@ const Navbar = () => {
   };
 
   useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          isActive();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
     isActive();
-    window.addEventListener("scroll", isActive);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     // Close dropdowns if clicked outside
     const handleClickOutside = (e: any) => {
@@ -102,7 +114,7 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      window.removeEventListener("scroll", isActive);
+      window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [pathname]);

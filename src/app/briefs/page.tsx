@@ -232,15 +232,7 @@ const BriefsFeed = () => {
                       e.stopPropagation();
                       router.push(`/briefs/${brief._id}`);
                     }}
-                    style={{
-                      padding: '6px 12px',
-                      background: '#6ad724',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontSize: '14px'
-                    }}
+                    className="px-3 py-1.5 bg-brand-green text-white rounded text-sm font-medium hover:bg-brand-green/90 transition-colors cursor-pointer border-none"
                   >
                     View Project
                   </button>

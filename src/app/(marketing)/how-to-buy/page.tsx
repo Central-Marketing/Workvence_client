@@ -1,6 +1,5 @@
-"use client";
-
-import React, { useState } from "react";
+import React from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ShieldCheck,
@@ -13,9 +12,9 @@ import {
   MessageSquare,
   FileCheck,
   Star,
-  ChevronDown,
   RefreshCw
 } from "lucide-react";
+import HowToBuyFaq from "./HowToBuyFaq";
 
 const buyerGuarantees = [
   {
@@ -82,8 +81,12 @@ const buyerFaqs = [
   }
 ];
 
+export const metadata: Metadata = {
+  title: "How to Buy | Workvence Buyer Guide & Escrow Protection",
+  description: "Learn how to safely hire top freelancers with 100% escrow protection, verified reviews, and guaranteed commercial ownership.",
+};
+
 export default function HowToBuyPage() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
     <div className="min-h-screen bg-white text-[#112131] font-sans">
@@ -190,29 +193,7 @@ export default function HowToBuyPage() {
             <h2 className="text-3xl font-bold text-[#0f172a]">Buying FAQ</h2>
           </div>
 
-          <div className="space-y-3">
-            {buyerFaqs.map((faq, i) => (
-              <div
-                key={i}
-                className="bg-[#f8fafc] border border-gray-200/90 rounded-2xl p-5 cursor-pointer"
-                onClick={() => setOpenFaq(openFaq === i ? null : i)}
-              >
-                <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-bold text-[#0f172a]">{faq.q}</h4>
-                  <ChevronDown
-                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
-                      openFaq === i ? "rotate-180 text-[#327C73]" : ""
-                    }`}
-                  />
-                </div>
-                {openFaq === i && (
-                  <p className="text-xs text-gray-600 pt-3 mt-3 border-t border-gray-200 leading-relaxed font-normal">
-                    {faq.a}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
+          <HowToBuyFaq faqs={buyerFaqs} />
 
           <div className="mt-12 text-center">
             <Link

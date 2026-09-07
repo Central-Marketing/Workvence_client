@@ -1,6 +1,5 @@
-"use client";
-
 import React from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ShieldAlert,
@@ -42,6 +41,11 @@ const standards = [
     dont: "Submit pirated code, unauthorized third-party templates, copyrighted media without licenses, or plagiarized copy."
   }
 ];
+
+export const metadata: Metadata = {
+  title: "Community Standards | Workvence",
+  description: "Workvence standards governing interactions across the marketplace to ensure a safe, fair, professional, and trustworthy environment for everyone.",
+};
 
 export default function CommunityStandardsPage() {
   return (

@@ -1,7 +1,4 @@
-/**
- * Server-side data fetching service for Workvence gigs and packages.
- * Designed for Next.js SSR and ISR with built-in timeout and graceful fallback shielding.
- */
+
 
 const getBackendBaseUrl = (): string => {
   const envUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL;

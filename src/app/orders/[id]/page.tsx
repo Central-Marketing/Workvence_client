@@ -321,13 +321,13 @@ const OrderDetail = () => {
     }
     setSubmitting(true);
     try {
-      const calculatedStar = Math.round(((communicationRating + qualityRating + valueRating) / 3) * 10) / 10;
+      const calculatedStar = Math.min(5, Math.max(1, Math.round((communicationRating + qualityRating + valueRating) / 3)));
       await axiosFetch.post(`/reviews`, {
         orderID: order._id,
         communicationRating,
         qualityRating,
         valueRating,
-        description: reviewDescription,
+        description: reviewDescription.trim(),
         star: calculatedStar,
       });
       toast.success("Review submitted successfully!");
@@ -684,7 +684,7 @@ const OrderDetail = () => {
                 <h4>Leave a Review</h4>
                 <p>Rate your experience with this seller across the 3 key criteria below.</p>
               </div>
-              <form onSubmit={handleReviewSubmit} className="mt-5">
+              <form onSubmit={handleReviewSubmit} noValidate className="mt-5">
                 {/* 3 Criteria Star Selectors */}
                 <div className="flex flex-col gap-3.5 mb-5">
                   {[
@@ -726,7 +726,7 @@ const OrderDetail = () => {
                               aria-label={`${crit.label} ${starNum} stars`}
                             >
                               <svg
-                                className={`w-5.5 h-5.5 ${starNum <= crit.value ? 'fill-amber-400' : 'fill-slate-300'}`}
+                                className={`w-5 h-5 sm:w-[22px] sm:h-[22px] ${starNum <= crit.value ? 'fill-amber-400' : 'fill-slate-300'}`}
                                 viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg"
                               >
@@ -749,7 +749,7 @@ const OrderDetail = () => {
                     Calculated Overall Rating:
                   </span>
                   <div className="flex items-center gap-1.5">
-                    <svg className="w-4.5 h-4.5 fill-amber-400" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-[18px] h-[18px] fill-amber-400" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                     <span className="text-[15px] font-extrabold text-emerald-800">
@@ -765,9 +765,8 @@ const OrderDetail = () => {
                     rows={4}
                     value={reviewDescription}
                     onChange={(e) => setReviewDescription(e.target.value)}
-                    placeholder="Outstanding work! Code is clean, well-tested, and delivered ahead of schedule."
+                    placeholder="Write a review describing your experience with this seller..."
                     className="w-full p-3 rounded-lg border border-slate-200 text-[15px] resize-y focus:outline-none focus:border-brand-green"
-                    required
                   ></textarea>
                 </div>
                 <button

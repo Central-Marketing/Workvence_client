@@ -186,7 +186,7 @@ export default function AffiliatesPage() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-3xl p-8 sm:p-12 shadow-2xl space-y-8">
             <div className="text-center space-y-2">
-              <span className="text-xs font-bold text-[#6ad724] uppercase tracking-wider">
+              <span className="text-xs font-bold text-brand-green uppercase tracking-wider">
                 Affiliate Revenue Calculator
               </span>
               <h2 className="text-3xl font-bold text-white">Estimate Your Monthly Earnings</h2>

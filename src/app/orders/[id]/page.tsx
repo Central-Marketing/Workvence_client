@@ -772,7 +772,7 @@ const OrderDetail = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full p-3.5 bg-[#6ad724] hover:brightness-95 text-white rounded-lg text-base font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-0 shadow-xs"
+                  className="w-full p-3.5 bg-brand-green hover:brightness-95 text-white rounded-lg text-base font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-0 shadow-xs"
                 >
                   {submitting ? 'Submitting...' : 'Submit Review'}
                 </button>

@@ -12,7 +12,7 @@ interface SellerDashboardProps {
   onSwitchToBuyer?: () => void;
 }
 
-export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user, onSwitchToBuyer }) => {
+export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
   const router = useRouter();
 
   // Fetch orders
@@ -42,26 +42,18 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user, onSwitch
       <div className="container mx-auto px-4 md:px-6 space-y-8">
 
         {/* Welcome Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#1e293b] to-[#0f172a] rounded-2xl p-6 sm:p-8 shadow-sm">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               Welcome back, {user?.name || user?.username}!
             </h1>
-            <p className="text-gray-500 text-sm mt-1">
-              Here is your seller performance, earnings, and order fulfillment overview.
+            <p className="text-slate-300 text-sm mt-1">
+              Here is what is happening with your Workvence projects today.
             </p>
-            {onSwitchToBuyer && (
-              <button
-                onClick={onSwitchToBuyer}
-                className="mt-2 text-xs font-semibold text-[#327C73] hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                Switch to Buyer Dashboard →
-              </button>
-            )}
           </div>
           <div className="flex items-center gap-2">
-            <span className="bg-[#360083]/10 text-[#360083] font-bold text-xs px-3 py-1.5 rounded-full">
-              Seller Account
+            <span className="bg-emerald-950/60 text-emerald-400 border border-emerald-500/30 text-xs font-semibold px-3.5 py-1.5 rounded-full uppercase tracking-wider">
+              SELLER ACCOUNT
             </span>
           </div>
         </div>
@@ -69,7 +61,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user, onSwitch
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Cleared Revenue</span>
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">TOTAL REVENUE</span>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2 mb-1">
               {totalFinancialAmount.toLocaleString("en-US", {
                 style: "currency",
@@ -77,25 +69,25 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user, onSwitch
                 maximumFractionDigits: 0,
               })}
             </h2>
-            <p className="text-xs text-gray-500">From {completedOrders.length} successfully delivered orders</p>
+            <p className="text-xs text-gray-500">Cleared earnings from {completedOrders.length} packages</p>
           </div>
 
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Active In-Progress</span>
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">ACTIVE ORDERS</span>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2 mb-1">{pendingOrders.length}</h2>
-            <p className="text-xs text-gray-500">Currently awaiting delivery</p>
+            <p className="text-xs text-gray-500">Currently in progress</p>
           </div>
 
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Completed Orders</span>
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">COMPLETED ORDERS</span>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2 mb-1">{completedOrders.length}</h2>
-            <p className="text-xs text-gray-500">Packages delivered to happy clients</p>
+            <p className="text-xs text-gray-500">Packages successfully closed</p>
           </div>
 
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Unread Messages</span>
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">UNREAD MESSAGES</span>
             <h2 className="text-2xl sm:text-3xl font-bold text-[#327C73] mt-2 mb-1">{unreadMessagesCount}</h2>
-            <p className="text-xs text-gray-500">Awaiting your response in Inbox</p>
+            <p className="text-xs text-gray-500">Awaiting your response</p>
           </div>
         </div>
 
@@ -105,9 +97,9 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user, onSwitch
           {/* Recent Orders Card */}
           <div className="lg:col-span-8 bg-white border border-gray-100 rounded-2xl p-6 sm:p-7 shadow-sm">
             <div className="flex items-center justify-between pb-5 border-b border-gray-100 mb-4">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Recent Fulfillment Orders</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Recent Orders</h2>
               <Link href="/orders" className="text-xs font-semibold text-[#327C73] hover:underline">
-                View All Orders →
+                View All
               </Link>
             </div>
 
@@ -120,10 +112,10 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user, onSwitch
                 <table className="w-full text-left text-sm">
                   <thead>
                     <tr className="text-xs text-gray-400 border-b border-gray-50">
-                      <th className="pb-3 font-semibold">Package</th>
-                      <th className="pb-3 font-semibold">Title</th>
-                      <th className="pb-3 font-semibold">Price</th>
-                      <th className="pb-3 font-semibold">Status</th>
+                      <th className="pb-3 font-semibold uppercase">IMAGE</th>
+                      <th className="pb-3 font-semibold uppercase">TITLE</th>
+                      <th className="pb-3 font-semibold uppercase">PRICE</th>
+                      <th className="pb-3 font-semibold uppercase">STATUS</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
@@ -154,14 +146,14 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user, onSwitch
                           </td>
                           <td className="py-3.5">
                             <span
-                              className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${isOrdCompleted
+                              className={`text-[11px] font-bold px-2.5 py-1 rounded-full uppercase ${isOrdCompleted
                                   ? "bg-emerald-50 text-emerald-700"
                                   : isOrdDelivered
                                     ? "bg-blue-50 text-blue-700"
                                     : "bg-amber-50 text-amber-700"
                                 }`}
                             >
-                              {isOrdCompleted ? "Completed" : isOrdDelivered ? "Delivered" : "In Progress"}
+                              {isOrdCompleted ? "COMPLETED" : isOrdDelivered ? "DELIVERED" : "IN PROGRESS"}
                             </span>
                           </td>
                         </tr>
@@ -180,34 +172,34 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user, onSwitch
             </h2>
             <div className="flex flex-col gap-2.5">
               <Link
-                href="/organize"
-                className="w-full py-2.5 px-4 rounded-xl bg-[#0B0F19] hover:bg-black text-white font-medium text-sm text-center transition-colors shadow-sm"
+                href="/packages"
+                className="w-full py-3 px-4 rounded-xl bg-brand-green hover:bg-brand-green/90 text-white font-medium text-sm text-center transition-colors shadow-sm block"
               >
-                + Publish a New Package
-              </Link>
-              <Link
-                href="/my-packages"
-                className="w-full py-2.5 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-800 font-medium text-sm text-center transition-colors border border-gray-200"
-              >
-                Manage My Packages
-              </Link>
-              <Link
-                href="/briefs"
-                className="w-full py-2.5 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-800 font-medium text-sm text-center transition-colors border border-gray-200"
-              >
-                Browse Client Job Briefs
-              </Link>
-              <Link
-                href="/earnings"
-                className="w-full py-2.5 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-800 font-medium text-sm text-center transition-colors border border-gray-200"
-              >
-                View Earnings Statement
+                Browse Services
               </Link>
               <Link
                 href="/messages"
-                className="w-full py-2.5 px-4 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-800 font-medium text-sm text-center transition-colors border border-gray-200"
+                className="w-full py-3 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium text-sm text-center transition-colors block"
               >
-                Open Inbox Chat ({unreadMessagesCount})
+                Open Inbox Chat
+              </Link>
+              <Link
+                href="/organize"
+                className="w-full py-3 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium text-sm text-center transition-colors block"
+              >
+                Publish a new Package
+              </Link>
+              <Link
+                href="/briefs"
+                className="w-full py-3 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium text-sm text-center transition-colors block"
+              >
+                Browse Job Projects
+              </Link>
+              <Link
+                href="/earnings"
+                className="w-full py-3 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium text-sm text-center transition-colors block"
+              >
+                View Earnings Statement
               </Link>
             </div>
           </div>

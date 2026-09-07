@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import adminAxios from '@/utils/adminAxios';
+import { useUserStore } from '@/store/userStore';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 interface CategoryBarProps {
@@ -15,6 +16,7 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentCategory = searchParams?.get('category') || '';
+  const user = useUserStore((state) => state.user);
 
   // Suppress CategoryBar on subcategory, specific service, or search filtered routes on /packages
   const isSubcategoryRoute =
@@ -27,7 +29,9 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
       searchParams?.get('service')
     );
 
-  const isBarVisible = visible && !isSubcategoryRoute;
+  const isSellerDashboard = pathname === '/dashboard' && Boolean(user?.isSeller);
+
+  const isBarVisible = visible && !isSubcategoryRoute && !isSellerDashboard;
 
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);

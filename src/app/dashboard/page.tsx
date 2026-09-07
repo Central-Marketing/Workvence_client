@@ -29,12 +29,7 @@ export default function DashboardPage() {
   }
 
   if (currentView === "seller") {
-    return (
-      <SellerDashboard
-        user={user}
-        onSwitchToBuyer={() => setRoleView("buyer")}
-      />
-    );
+    return <SellerDashboard user={user} />;
   }
 
   return (

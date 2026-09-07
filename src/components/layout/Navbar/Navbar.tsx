@@ -93,6 +93,11 @@ const Navbar = () => {
   const isActive = () => {
     const scrollPos = window.scrollY;
     setShowMenu(scrollPos > 0);
+    // Suppress category bar on seller dashboard
+    if (pathname === "/dashboard" && user?.isSeller) {
+      setShowCategoryBar(false);
+      return;
+    }
     // Show category bar when scrolled past featured section (~500px) on home page, or always on subpages
     setShowCategoryBar(scrollPos > 520 || pathname !== "/");
   };
@@ -116,7 +121,7 @@ const Navbar = () => {
       window.removeEventListener("scroll", isActive);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [pathname]);
+  }, [pathname, user]);
 
   const handleLogout = async () => {
     try {

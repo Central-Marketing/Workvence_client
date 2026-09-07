@@ -56,6 +56,7 @@ const Packages = () => {
   const [activeSubcatId, setActiveSubcatId] = useState(initialSubcat);
   const [activeTag, setActiveTag] = useState(initialTag);
   const [showFilter, setShowFilter] = useState(true);
+  const [showFilterDrawer, setShowFilterDrawer] = useState(false);
   const [page, setPage] = useState(initialPage);
   const [viewTab, setViewTab] = useState<'hub' | 'gigs'>(
     (initialSearch || initialMin || initialMax || initialSubcat || initialTag) ? 'gigs' : 'hub'
@@ -309,7 +310,7 @@ const Packages = () => {
   const handleApplyFilter = () => {
     syncUrlWithFilters();
     refetch();
-    setShowFilter(false);
+    setShowFilterDrawer(false);
   };
 
   const handleCategoryClick = (cat: any) => {
@@ -364,6 +365,7 @@ const Packages = () => {
     setExperience({ entry: false, intermediate: false, expert: false });
     setEnglishLevel('');
     setClientLocation('');
+    setShowFilterDrawer(false);
     navigate.push('/packages', { scroll: false });
   };
 
@@ -388,12 +390,12 @@ const Packages = () => {
     <div className="min-h-screen bg-[#F8F8F8]">
 
       {/* Sidebar Filter Modal / Drawer (Only for non-subcategory views) */}
-      {showFilter && !isSubcategoryMode && (
+      {showFilterDrawer && !isSubcategoryMode && (
         <div className="fixed inset-0 z-50 flex justify-end">
           {/* Dark Overlay */}
           <div
             className="fixed inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity animate-fadeIn"
-            onClick={() => setShowFilter(false)}
+            onClick={() => setShowFilterDrawer(false)}
           />
 
           {/* Slide-out Panel */}
@@ -415,7 +417,7 @@ const Packages = () => {
                 <h3 className="text-xl font-bold text-gray-900">Filters</h3>
               </div>
               <button
-                onClick={() => setShowFilter(false)}
+                onClick={() => setShowFilterDrawer(false)}
                 className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -781,7 +783,7 @@ const Packages = () => {
               </p>
             </div>
             <button
-              onClick={() => setShowFilter(true)}
+              onClick={() => setShowFilterDrawer(true)}
               className="flex items-center gap-2 bg-brand-green hover:bg-brand-green text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

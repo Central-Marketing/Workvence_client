@@ -25,6 +25,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/package',
+        destination: '/packages',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     let rawMainUrl = (
       process.env.NEXT_PUBLIC_SERVER_API_URL ||

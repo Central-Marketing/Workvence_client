@@ -16,9 +16,12 @@ export interface CustomOffer {
 export interface MeetingInvite {
   meetingId: string;
   roomUrl: string;
+  joinUrl?: string;
   title: string;
   hostEmail?: string;
+  password?: string;
   isPrivate?: boolean;
+  autoRecording?: string;
   createdAt?: string;
   status?: string;
 }

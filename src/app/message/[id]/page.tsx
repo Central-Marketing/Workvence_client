@@ -640,19 +640,27 @@ const Message = () => {
     const toastId = toast.loading("Generating video meeting link...");
 
     try {
-      const { data } = await axios.post(
-        'https://helping-yeti-duly.ngrok-free.app/api/v1/external/meetings',
-        { title },
-        { headers: { 'Content-Type': 'application/json' } }
+      const { data } = await axiosFetch.post(
+        '/meetings',
+        {
+          title,
+          conversationId: conversationID,
+        },
+        {
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true,
+        }
       );
 
-      if (data && (data.roomUrl || data.meetingId)) {
+      if (data && (data.roomUrl || data.joinUrl || data.meeting || data.meetingId)) {
         const meetingPayload = {
           meetingId: data.meetingId || '',
-          roomUrl: data.roomUrl || '',
+          roomUrl: data.joinUrl || data.roomUrl || data.meeting || '',
           title: data.title || title,
           hostEmail: data.hostEmail || '',
+          password: data.password || '',
           isPrivate: Boolean(data.isPrivate),
+          autoRecording: data.autoRecording || '',
           createdAt: data.createdAt || new Date().toISOString(),
           status: data.status || 'success'
         };
@@ -1106,6 +1114,12 @@ const Message = () => {
                                       <>
                                         <span>•</span>
                                         <span className="font-mono text-slate-600 font-semibold">ID: {meeting.meetingId}</span>
+                                      </>
+                                    )}
+                                    {meeting.password && (
+                                      <>
+                                        <span>•</span>
+                                        <span className="font-mono text-slate-600 font-semibold">Passcode: {meeting.password}</span>
                                       </>
                                     )}
                                   </div>

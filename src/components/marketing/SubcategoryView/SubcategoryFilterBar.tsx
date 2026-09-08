@@ -23,9 +23,9 @@ const SubcategoryFilterBar: React.FC<SubcategoryFilterBarProps> = ({
   onOpenFilter,
 }) => {
   return (
-    <div className="w-full flex items-center justify-between gap-4 mb-6 py-2 overflow-x-auto no-scrollbar">
+    <div className="w-full flex items-center justify-between gap-4 mb-6 py-2">
       {/* Left: Filter Trigger Button + Divider + Sub-service Pills */}
-      <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-1">
+      <div className="flex items-center gap-3 overflow-hidden min-w-0">
         {/* Filter Toggle Button */}
         <button
           type="button"
@@ -45,7 +45,7 @@ const SubcategoryFilterBar: React.FC<SubcategoryFilterBarProps> = ({
         <div className="h-5 w-[1px] bg-gray-200 shrink-0" />
 
         {/* Sub-service Pills */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 h-[40px] overflow-hidden min-w-0">
           {items.map((item, idx) => {
             const isSelected = activeTag.toLowerCase() === item.toLowerCase();
             return (
@@ -53,7 +53,7 @@ const SubcategoryFilterBar: React.FC<SubcategoryFilterBarProps> = ({
                 key={idx}
                 type="button"
                 onClick={() => (isSelected ? onClearTag?.() : onSelectTag(item))}
-                className={`px-4 py-1.5 rounded-full text-[13px] sm:text-[13.5px] font-medium transition-all duration-200 whitespace-nowrap cursor-pointer ${isSelected
+                className={`px-4 py-1.5 rounded-full text-base font-[510] font-sf-pro transition-all duration-200 whitespace-nowrap cursor-pointer ${isSelected
                   ? "bg-gray-900 text-white border border-gray-900 shadow-xs"
                   : "bg-white text-gray-800 border border-gray-200/90 hover:border-gray-900"
                   }`}
@@ -69,7 +69,7 @@ const SubcategoryFilterBar: React.FC<SubcategoryFilterBarProps> = ({
       <button
         type="button"
         onClick={onViewAll || onClearTag}
-        className="shrink-0 bg-black text-white hover:bg-neutral-800 px-6 py-3 rounded-[10px] text-[13px] sm:text-[13.5px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs active:scale-95"
+        className="shrink-0 bg-black text-white hover:bg-neutral-800 px-6 py-3 rounded-[10px] text-xl font-[510] font-sf-pro flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs active:scale-95"
       >
         <span>View All</span>
         <FiArrowRight className="w-3.5 h-3.5" />

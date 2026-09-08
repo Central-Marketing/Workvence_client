@@ -107,7 +107,7 @@ export interface NormalizedPackageData {
 export const FALLBACK_IMAGES = {
   mainBanner: '/images/mock-package/main-banner.png',
   sellerAvatar: '/images/mock-package/avatar-seller.png',
-  reviewerAvatar: '/images/mock-package/avatar-reviewer.png',
+  reviewerAvatar: '/images/mock-package/avatar-seller.png',
   reviewLunar: '/images/mock-package/review-lunar.png',
   portfolioShowcase: '/images/mock-package/main-banner.png',
   thumbs: [

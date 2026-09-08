@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { FiCheckCircle, FiFigma, FiMonitor, FiSmartphone, FiPenTool } from "react-icons/fi";
+import { FiFigma, FiMonitor, FiSmartphone, FiPenTool } from "react-icons/fi";
 import { SiFramer } from "react-icons/si";
+import { FaSquareCheck } from "react-icons/fa6";
 
 interface PackageAboutSectionProps {
   description: string;
@@ -49,10 +50,10 @@ export const PackageAboutSection: React.FC<PackageAboutSectionProps> = ({
           <h3 className="text-base font-bold text-gray-900 mb-3.5">
             Area Covered :
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div className="flex flex-col gap-y-1.5">
             {areaCovered.map((item, idx) => (
               <div key={idx} className="flex items-center gap-2.5 text-[14px] text-gray-700">
-                <FiCheckCircle className="w-4 h-4 text-emerald-600 shrink-0 fill-emerald-50" />
+                <FaSquareCheck className="w-4 h-4 text-brand-green shrink-0 fill-brand-green" />
                 <span>{item}</span>
               </div>
             ))}

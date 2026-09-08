@@ -666,7 +666,7 @@ const Packages = () => {
 
           {/* 3. Results Count */}
           <div className="mb-6">
-            <p className="text-[14.5px] sm:text-[15px] font-semibold text-gray-700">
+            <p className="text-xl font-normal font-inter text-[#4A4A4A]">
               {activeSubcategory.resultCount || "1,40,000+ Results"}
             </p>
           </div>

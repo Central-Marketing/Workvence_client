@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 
 interface SubcategoryCardProps {
   id?: string;
@@ -28,19 +29,21 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
   };
 
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col">
+    <div className="bg-white border border-gray-100 rounded-[10px] overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col">
       {/* Inset Rounded Banner Image with Padding */}
       <div className="p-3 pb-0">
         <div
           onClick={handleCardClick}
-          className="relative w-full aspect-[2.04/1] bg-gray-50 rounded-xl overflow-hidden cursor-pointer group/banner"
+          className="relative w-full h-[190px] bg-gray-50 rounded-[5px] overflow-hidden cursor-pointer group/banner"
           title={title}
         >
-          <img
+          <Image
             src={banner}
             alt={title}
-            className="w-full h-full object-cover group-hover/banner:scale-105 transition-transform duration-500"
-            loading="lazy"
+            width={385}
+            height={190}
+            className="w-full h-full object-cover rounded-[5px] group-hover/banner:scale-105 transition-transform duration-500"
+            unoptimized
           />
         </div>
       </div>

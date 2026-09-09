@@ -39,9 +39,9 @@ const OrderDetail = () => {
   const [isOverdue, setIsOverdue] = useState(false);
 
   // Review states
-  const [communicationRating, setCommunicationRating] = useState(5);
-  const [qualityRating, setQualityRating] = useState(5);
-  const [valueRating, setValueRating] = useState(5);
+  const [communicationRating, setCommunicationRating] = useState(0);
+  const [qualityRating, setQualityRating] = useState(0);
+  const [valueRating, setValueRating] = useState(0);
   const [reviewDescription, setReviewDescription] = useState("");
   const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
 
@@ -313,8 +313,20 @@ const OrderDetail = () => {
     }
   };
 
+  const isReviewRatingsValid = communicationRating >= 1 && qualityRating >= 1 && valueRating >= 1;
+
   const handleReviewSubmit = async (e: any) => {
     e.preventDefault();
+    if (!isReviewRatingsValid) {
+      if (communicationRating < 1) {
+        toast.error("Please rate seller communication level (minimum 1 star).");
+      } else if (qualityRating < 1) {
+        toast.error("Please rate quality of delivery (minimum 1 star).");
+      } else {
+        toast.error("Please rate value of delivery (minimum 1 star).");
+      }
+      return;
+    }
     if (!reviewDescription.trim()) {
       toast.error("Please enter a review description.");
       return;
@@ -709,10 +721,13 @@ const OrderDetail = () => {
                   ].map((crit, idx) => (
                     <div
                       key={idx}
-                      className="p-3.5 sm:px-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3"
+                      className={`p-3.5 sm:px-4 bg-slate-50 rounded-xl border ${crit.value < 1 ? 'border-amber-200/70' : 'border-slate-200'} flex flex-wrap items-center justify-between gap-3`}
                     >
                       <div>
-                        <div className="font-semibold text-slate-800 text-sm">{crit.label}</div>
+                        <div className="font-semibold text-slate-800 text-sm flex items-center gap-1.5">
+                          {crit.label}
+                          <span className="text-rose-500 font-bold" title="Minimum 1 star required">*</span>
+                        </div>
                         <div className="text-xs text-slate-500 mt-0.5">{crit.description}</div>
                       </div>
                       <div className="flex items-center gap-2.5">
@@ -735,8 +750,8 @@ const OrderDetail = () => {
                             </button>
                           ))}
                         </div>
-                        <span className="text-[13px] font-bold text-slate-800 min-w-[24px] text-right">
-                          {crit.value}.0
+                        <span className={`text-[13px] font-bold min-w-[24px] text-right ${crit.value < 1 ? 'text-slate-400' : 'text-slate-800'}`}>
+                          {crit.value > 0 ? `${crit.value}.0` : '0.0'}
                         </span>
                       </div>
                     </div>
@@ -753,7 +768,9 @@ const OrderDetail = () => {
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                     <span className="text-[15px] font-extrabold text-emerald-800">
-                      {((communicationRating + qualityRating + valueRating) / 3).toFixed(1)} / 5.0
+                      {isReviewRatingsValid
+                        ? `${((communicationRating + qualityRating + valueRating) / 3).toFixed(1)} / 5.0`
+                        : '-- / 5.0'}
                     </span>
                   </div>
                 </div>
@@ -771,11 +788,16 @@ const OrderDetail = () => {
                 </div>
                 <button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || !isReviewRatingsValid}
                   className="w-full p-3.5 bg-brand-green hover:brightness-95 text-white rounded-lg text-base font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer border-0 shadow-xs"
                 >
                   {submitting ? 'Submitting...' : 'Submit Review'}
                 </button>
+                {!isReviewRatingsValid && (
+                  <p className="text-xs text-amber-600 text-center mt-2.5 font-medium">
+                    * Please rate each category with at least 1 star to submit your review.
+                  </p>
+                )}
               </form>
             </div>
           )}

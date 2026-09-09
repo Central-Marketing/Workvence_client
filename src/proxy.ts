@@ -79,6 +79,45 @@ export async function proxy(req: NextRequest) {
     (!refreshPayload.exp || refreshPayload.exp * 1000 > Date.now())
   );
 
+  // Automatic server-side access token refresh if expired but refresh token is valid
+  let refreshedAccessToken: string | null = null;
+  let refreshFailed = false;
+
+  if (!isJwtValid && isRefreshTokenValid && refreshCookie) {
+    try {
+      const rawMainUrl = (
+        process.env.NEXT_PUBLIC_SERVER_API_URL ||
+        process.env.NEXT_PUBLIC_API_URL ||
+        "http://localhost:8080/api"
+      ).trim().replace(/\/$/, "");
+      const mainApiUrl = rawMainUrl.endsWith("/api") ? rawMainUrl : `${rawMainUrl}/api`;
+
+      const refreshRes = await fetch(`${mainApiUrl}/auth/refresh-token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Cookie": `refreshToken=${refreshCookie}`,
+          "x-refresh-token": refreshCookie,
+        },
+      });
+
+      if (refreshRes.ok) {
+        const data = await refreshRes.json();
+        if (data?.accessToken) {
+          refreshedAccessToken = data.accessToken;
+        }
+      } else if (refreshRes.status === 401) {
+        refreshFailed = true;
+      }
+    } catch {
+      // Backend unreachable or offline, proceed with client-side fallback
+    }
+  }
+
+  const effectiveJwtPayload = refreshedAccessToken
+    ? decodeJwtPayload(refreshedAccessToken)
+    : jwtPayload;
+
   const userCookie = req.cookies.get("user")?.value;
   let parsedUser: User | null = null;
   if (userCookie && userCookie !== "undefined" && userCookie !== "null") {
@@ -100,18 +139,21 @@ export async function proxy(req: NextRequest) {
   );
 
   const hasValidJwtUser = Boolean(
-    jwtPayload &&
-    (!jwtPayload.exp || jwtPayload.exp * 1000 > Date.now()) &&
-    (jwtPayload.id || jwtPayload._id || jwtPayload.username || jwtPayload.email)
+    (refreshedAccessToken || isJwtValid) &&
+    effectiveJwtPayload &&
+    (effectiveJwtPayload.id || effectiveJwtPayload._id || effectiveJwtPayload.username || effectiveJwtPayload.email)
   );
 
   const hasSessionToken = Boolean(
-    (authCookie && authCookie.trim() !== "" && authCookie !== "undefined" && authCookie !== "null") ||
-    (refreshCookie && refreshCookie.trim() !== "" && refreshCookie !== "undefined" && refreshCookie !== "null")
+    refreshedAccessToken ||
+    (!refreshFailed && (
+      (authCookie && authCookie.trim() !== "" && authCookie !== "undefined" && authCookie !== "null") ||
+      (refreshCookie && refreshCookie.trim() !== "" && refreshCookie !== "undefined" && refreshCookie !== "null")
+    ))
   );
 
   // Authenticated requires either a verified unexpired JWT with user identity OR a verified user cookie paired with an active session token
-  const isAuthenticated = hasValidJwtUser || (isParsedUserValid && hasSessionToken);
+  const isAuthenticated = !refreshFailed && (hasValidJwtUser || (isParsedUserValid && hasSessionToken));
 
   const isSellerCookie = req.cookies.get("isSeller")?.value;
   const roleCookie = req.cookies.get("role")?.value?.toLowerCase();
@@ -122,8 +164,8 @@ export async function proxy(req: NextRequest) {
     roleCookie === "seller" ||
     parsedUser?.isSeller === true ||
     parsedUser?.role === "seller" ||
-    jwtPayload?.isSeller === true ||
-    jwtPayload?.role === "seller" ||
+    effectiveJwtPayload?.isSeller === true ||
+    effectiveJwtPayload?.role === "seller" ||
     refreshPayload?.isSeller === true ||
     refreshPayload?.role === "seller"
   );
@@ -131,11 +173,23 @@ export async function proxy(req: NextRequest) {
     roleCookie === "admin" ||
     parsedUser?.isAdmin === true ||
     parsedUser?.role === "admin" ||
-    jwtPayload?.isAdmin === true ||
-    jwtPayload?.role === "admin" ||
+    effectiveJwtPayload?.isAdmin === true ||
+    effectiveJwtPayload?.role === "admin" ||
     refreshPayload?.isAdmin === true ||
     refreshPayload?.role === "admin"
   );
+
+  // Helper to attach renewed access token cookie to responses
+  const applyRefreshedCookie = (response: NextResponse): NextResponse => {
+    if (refreshedAccessToken) {
+      response.cookies.set("accessToken", refreshedAccessToken, {
+        path: "/",
+        maxAge: 3600, // 1 hour lifetime
+        sameSite: "lax",
+      });
+    }
+    return response;
+  };
 
   // 2. Match Route Groups
   const isAuthGuestRoute = AUTH_GUEST_ROUTES.some(
@@ -162,15 +216,15 @@ export async function proxy(req: NextRequest) {
     const isSellerIntent = searchParams.get("seller") === "true";
     // Allow /register?seller=true to remain accessible for both authenticated and unauthenticated users
     if (pathname === "/register" && isSellerIntent) {
-      return NextResponse.next();
+      return applyRefreshedCookie(NextResponse.next());
     }
 
-    const redirectUrl = searchParams.get("redirect") || "/dashboard";
+    const redirectTarget = searchParams.get("redirect") || "/dashboard";
     // Prevent open redirect loops to auth pages
-    const safeTarget = (redirectUrl.startsWith("/") && !redirectUrl.startsWith("/login") && !redirectUrl.startsWith("/register"))
-      ? redirectUrl
+    const safeTarget = (redirectTarget.startsWith("/") && !redirectTarget.startsWith("/login") && !redirectTarget.startsWith("/register"))
+      ? redirectTarget
       : "/dashboard";
-    return NextResponse.redirect(new URL(safeTarget, req.url));
+    return applyRefreshedCookie(NextResponse.redirect(new URL(safeTarget, req.url)));
   }
 
   // -------------------------------------------------------------
@@ -179,7 +233,14 @@ export async function proxy(req: NextRequest) {
   if (isAnyProtectedRoute && !isAuthenticated) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+    const response = NextResponse.redirect(loginUrl);
+    // Clear cookies if refresh failed or tokens are invalid
+    if (refreshFailed) {
+      ["accessToken", "refreshToken", "user", "isSeller", "role"].forEach((cookieName) => {
+        response.cookies.delete(cookieName);
+      });
+    }
+    return response;
   }
 
   // -------------------------------------------------------------
@@ -187,7 +248,7 @@ export async function proxy(req: NextRequest) {
   // -------------------------------------------------------------
   if (isAdminRoute && !isAdmin) {
     // If regular authenticated user attempts to access /admin, redirect to dashboard
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+    return applyRefreshedCookie(NextResponse.redirect(new URL("/dashboard", req.url)));
   }
 
   // -------------------------------------------------------------
@@ -195,15 +256,15 @@ export async function proxy(req: NextRequest) {
   // -------------------------------------------------------------
   if (isSellerRoute && !isSeller && !isAdmin) {
     // If explicitly verified as a non-seller buyer, redirect to dashboard
-    if (isSellerCookie === "false" || parsedUser?.isSeller === false || jwtPayload?.isSeller === false) {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
+    if (isSellerCookie === "false" || parsedUser?.isSeller === false || effectiveJwtPayload?.isSeller === false) {
+      return applyRefreshedCookie(NextResponse.redirect(new URL("/dashboard", req.url)));
     }
   }
 
   // -------------------------------------------------------------
   // RULE E: Allow Request to Proceed
   // -------------------------------------------------------------
-  return NextResponse.next();
+  return applyRefreshedCookie(NextResponse.next());
 }
 
 /**

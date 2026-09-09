@@ -181,7 +181,7 @@ const Earnings = () => {
 
   // Payout Request Mutation
   const payoutMutation = useMutation({
-    mutationFn: (payload: { amount: number; method?: string }) => axiosFetch.post("/payouts", payload),
+    mutationFn: (payload: { amount: number; payoutMethod?: string }) => axiosFetch.post("/payouts", payload),
     onSuccess: ({ data }) => {
       toast.success(data.message || "Payout request submitted!");
       setShowPayoutModal(false);
@@ -302,7 +302,7 @@ const Earnings = () => {
 
     payoutMutation.mutate({
       amount: amt,
-      method: selectedMethod,
+      payoutMethod: selectedMethod,
     });
   };
 
@@ -448,7 +448,7 @@ const Earnings = () => {
                 <tbody>
                   {payouts.map((p: any) => {
                     const sc = statusColor(p.status);
-                    const method = (p.method || p.provider || "stripe").toLowerCase();
+                    const method = (p.payoutMethod || p.provider || "stripe").toLowerCase();
                     const isPayoneer = method === "payoneer";
 
                     return (

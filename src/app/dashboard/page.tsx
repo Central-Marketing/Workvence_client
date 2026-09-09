@@ -32,27 +32,37 @@ const Dashboard = () => {
     queryFn: () =>
       axiosFetch.get("/orders").then(({ data }) => data ?? []).catch(() => []),
     enabled: !!user,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
-  // Fetch conversations
+  // Fetch conversations (unified queryKey with Header and Messages page)
   const { isLoading: convsLoading, data: conversations = [] } = useQuery({
-    queryKey: ["dashboard-convs"],
+    queryKey: ["conversations"],
     queryFn: () =>
-      axiosFetch.get("/conversations").then(({ data }) => data ?? []).catch(() => []),
+      axiosFetch.get("/conversations")
+        .then(({ data }) => Array.isArray(data) ? data : (data?.conversations || data?.data || []))
+        .catch(() => []),
     enabled: !!user,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   // Fetch favorite gigs & favorite sellers for buyers
   const { data: favoriteGigs = [] } = useQuery({
     queryKey: ["dashboard-favorite-gigs"],
     queryFn: () => axiosFetch.get("/gigs/favorites").then(({ data }) => data?.favorites || []).catch(() => []),
-    enabled: !!user && !user.isSeller
+    enabled: !!user && !user.isSeller,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   const { data: favoriteSellers = [] } = useQuery({
     queryKey: ["dashboard-favorite-sellers"],
     queryFn: () => axiosFetch.get("/users/favorite-sellers").then(({ data }) => data?.sellers || []).catch(() => []),
-    enabled: !!user && !user.isSeller
+    enabled: !!user && !user.isSeller,
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   if (!user) {

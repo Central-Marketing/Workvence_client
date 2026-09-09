@@ -28,7 +28,9 @@ const Messages = () => {
         .catch((err) => {
           console.log(err?.response || err);
           return [];
-        })
+        }),
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   const mutation = useMutation({

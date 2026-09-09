@@ -43,6 +43,8 @@ const Earnings = () => {
     queryKey: ["seller-earnings-statement"],
     queryFn: () =>
       axiosFetch.get("/earnings/statement").then(({ data }) => data).catch(() => ({ orders: [], summary: {} })),
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   // Payouts history query
@@ -50,6 +52,8 @@ const Earnings = () => {
     queryKey: ["my-payouts"],
     queryFn: () =>
       axiosFetch.get("/payouts").then(({ data }) => data).catch(() => []),
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   // Unified Payout Status Query (GET /api/payouts/status)
@@ -82,6 +86,8 @@ const Earnings = () => {
             return null;
           }
         }),
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   // Derived readiness states from exact schema

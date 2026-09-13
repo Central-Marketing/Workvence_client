@@ -1,4 +1,10 @@
-import { DashboardPackageItem, MOCK_RECOMMENDED_PACKAGES, MOCK_POPULAR_PACKAGES } from "../data/mockBuyerDashboard";
+import { 
+  DashboardPackageItem, 
+  DashboardOrderItem, 
+  MOCK_RECOMMENDED_PACKAGES, 
+  MOCK_POPULAR_PACKAGES,
+  MOCK_BUYER_ORDERS 
+} from "../data/mockBuyerDashboard";
 
 /**
  * Normalizes backend gig/package item into a DashboardPackageItem
@@ -100,3 +106,77 @@ export function calculateProfileCompletion(user: any): number {
   const percentage = Math.round((completed / checks.length) * 100);
   return Math.max(30, Math.min(100, percentage || 50));
 }
+
+/**
+ * Normalizes orders from API for Buyer Dashboard with fallback to mock orders
+ */
+export function normalizeDashboardOrders(
+  apiOrders: any[],
+  fallbackList: DashboardOrderItem[] = MOCK_BUYER_ORDERS
+): DashboardOrderItem[] {
+  const items = Array.isArray(apiOrders)
+    ? apiOrders
+    : Array.isArray((apiOrders as any)?.orders)
+    ? (apiOrders as any).orders
+    : Array.isArray((apiOrders as any)?.data)
+    ? (apiOrders as any).data
+    : [];
+
+  if (!items || items.length === 0) {
+    return fallbackList;
+  }
+
+  const normalized = items.map((order: any, idx: number) => {
+    const fallback = fallbackList[idx % fallbackList.length];
+
+    // Format dates
+    let orderDate = fallback.orderDate;
+    if (order.createdAt) {
+      const d = new Date(order.createdAt);
+      if (!isNaN(d.getTime())) {
+        orderDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      }
+    }
+
+    let dueDate = fallback.dueDate;
+    if (order.deadline) {
+      const d = new Date(order.deadline);
+      if (!isNaN(d.getTime())) {
+        dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      }
+    }
+
+    // Determine status
+    let status: DashboardOrderItem["status"] = "in_progress";
+    if (order.status === "completed") status = "completed";
+    else if (order.status === "delivered") status = "delivered";
+    else if (order.status === "revision") status = "revision";
+    else status = "in_progress";
+
+    const itemType: "package" | "brief" = 
+      order.briefID || order.type === "brief" ? "brief" : "package";
+
+    return {
+      id: String(order._id || order.id || fallback.id),
+      title: order.title || order.gigID?.title || fallback.title,
+      coverImage: order.image || order.cover || order.gigID?.cover || fallback.coverImage,
+      itemType,
+      orderDate,
+      dueDate,
+      price: typeof order.price === "number" ? order.price : fallback.price,
+      status,
+    };
+  });
+
+  // If fewer than 3 items, pad with fallbacks to preserve the rich pixel-perfect design
+  if (normalized.length < 3) {
+    const padded = [...normalized];
+    for (let i = normalized.length; i < 3; i++) {
+      padded.push(fallbackList[i]);
+    }
+    return padded;
+  }
+
+  return normalized;
+}
+

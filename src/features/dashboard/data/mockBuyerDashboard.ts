@@ -123,3 +123,48 @@ export const MOCK_POPULAR_PACKAGES: DashboardPackageItem[] = [
     },
   },
 ];
+
+export interface DashboardOrderItem {
+  id: string;
+  title: string;
+  coverImage: string;
+  itemType: "package" | "brief";
+  orderDate: string;
+  dueDate: string;
+  price: number;
+  status: "revision" | "in_progress" | "delivered" | "completed";
+}
+
+export const MOCK_BUYER_ORDERS: DashboardOrderItem[] = [
+  {
+    id: "ord-101",
+    title: "I will create a stunning portfolio website using Elementor.",
+    coverImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80",
+    itemType: "package",
+    orderDate: "Dec 12",
+    dueDate: "Dec 16",
+    price: 200.0,
+    status: "revision",
+  },
+  {
+    id: "ord-102",
+    title: "I will develop a custom e-commerce platform tailored to your needs.",
+    coverImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80",
+    itemType: "package",
+    orderDate: "Dec 12",
+    dueDate: "Dec 16",
+    price: 110.0,
+    status: "in_progress",
+  },
+  {
+    id: "ord-103",
+    title: "Design engaging mobile app interfaces with Sketch and InVision.",
+    coverImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&auto=format&fit=crop&q=80",
+    itemType: "brief",
+    orderDate: "Dec 14",
+    dueDate: "Dec 21",
+    price: 500.0,
+    status: "delivered",
+  },
+];
+

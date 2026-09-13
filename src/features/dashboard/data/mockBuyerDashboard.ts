@@ -168,3 +168,110 @@ export const MOCK_BUYER_ORDERS: DashboardOrderItem[] = [
   },
 ];
 
+export interface ManageOrderItem {
+  id: string;
+  seller: {
+    id: string;
+    name: string;
+    avatar: string;
+    role: string;
+    badge?: "Expert" | "Pro" | "Legend";
+  };
+  projectTitle: string;
+  projectDescription: string;
+  dueDate: string;
+  notes: string;
+  price: number;
+  status: "revision" | "inprogress" | "delivered" | "failed" | "pending" | "completed" | "cancelled" | "late";
+  starred?: boolean;
+}
+
+export const MOCK_MANAGE_ORDERS: ManageOrderItem[] = [
+  {
+    id: "ord-manage-1",
+    seller: {
+      id: "sel-1",
+      name: "Leah Martinez",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      role: "Graphic Artist",
+      badge: "Expert",
+    },
+    projectTitle: "Full Stack Web Development",
+    projectDescription: "I will create a stunning portfolio website using Elementor.",
+    dueDate: "Dec 16",
+    notes: "Figma design system and homepage assets received. Revision underway for responsive tablet layout.",
+    price: 200.0,
+    status: "revision",
+    starred: true,
+  },
+  {
+    id: "ord-manage-2",
+    seller: {
+      id: "sel-2",
+      name: "Omar Singh",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+      role: "UI/UX Specialist",
+      badge: "Pro",
+    },
+    projectTitle: "Mobile App Design",
+    projectDescription: "Crafting intuitive and engaging UI for Android and iOS apps.",
+    dueDate: "Dec 16",
+    notes: "User flows and low-fidelity prototypes completed. Awaiting brand guidelines feedback.",
+    price: 110.0,
+    status: "inprogress",
+    starred: false,
+  },
+  {
+    id: "ord-manage-3",
+    seller: {
+      id: "sel-3",
+      name: "Jasmine Lee",
+      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+      role: "Product Designer",
+      badge: "Expert",
+    },
+    projectTitle: "SEO Optimization",
+    projectDescription: "Boost your website's visibility with expert on-page and off-page SEO strategies.",
+    dueDate: "Dec 21",
+    notes: "Full audit report and initial deliverable archive uploaded. Ready for review.",
+    price: 500.0,
+    status: "delivered",
+    starred: true,
+  },
+  {
+    id: "ord-manage-4",
+    seller: {
+      id: "sel-4",
+      name: "Marcus Bell",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+      role: "Front-End Developer",
+      badge: "Pro",
+    },
+    projectTitle: "E-commerce Solutions",
+    projectDescription: "Developing secure and scalable online stores with seamless user experience.",
+    dueDate: "Dec 20",
+    notes: "Webhook verification issue encountered during staging deployment. Escalated to support.",
+    price: 300.0,
+    status: "failed",
+    starred: false,
+  },
+  {
+    id: "ord-manage-5",
+    seller: {
+      id: "sel-5",
+      name: "Sofia Russo",
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
+      role: "Visual Designer",
+      badge: "Legend",
+    },
+    projectTitle: "Content Strategy",
+    projectDescription: "Creating compelling content plans to drive traffic and increase user engagement.",
+    dueDate: "Dec 22",
+    notes: "Kickoff questionnaire sent to client. Awaiting input on target demographic.",
+    price: 80.0,
+    status: "pending",
+    starred: false,
+  },
+];
+
+

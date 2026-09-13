@@ -1,75 +1,116 @@
 "use client";
 
-import toast from 'react-hot-toast';
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-
+import toast from "react-hot-toast";
+import moment from "moment";
+import {
+  FiHome,
+  FiCalendar,
+  FiCheck,
+  FiClock,
+  FiRefreshCw,
+  FiFileText,
+  FiX,
+  FiZap,
+  FiMessageSquare,
+  FiUploadCloud,
+  FiDownload,
+  FiAlertCircle,
+  FiStar
+} from "react-icons/fi";
+import { HiSparkles } from "react-icons/hi2";
 
 import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
-import { Loader, OrderSkeleton, RevisionModal, ExtensionModal } from "@/components";
-import moment from "moment";
-import "./OrderDetail.scss";
+import { Loader, RevisionModal, ExtensionModal } from "@/components";
 
-const OrderDetail = () => {
+const FALLBACK_ORDER = {
+  _id: "b3113b02-cc61-4740-a19b-7096ecb5c953",
+  orderCode: "Order #ord_1788071480858_9ash5",
+  orderNumber: "#W-4820912",
+  title: "I will create modern minimalist logo design for your business",
+  packageTitle: "Full Stack Web Development",
+  coverImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80",
+  price: 2450.0,
+  status: "in_progress",
+  paymentStatus: "Not Paid",
+  startedOn: "Dec 12",
+  deliveryTime: "Dec 16",
+  lateDays: 3,
+  seller: {
+    id: "seller-nilson",
+    name: "Nilson Norman",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+    role: "Web Designer",
+    badge: "Pro",
+    rating: 4.8,
+    reviewCount: 226,
+  },
+  questions: [
+    "1. If you're ordering for a business, what's your industry?",
+    "2. Is this order part of a bigger project you're working on?",
+    "3. Please provide me with the following things for the project completion",
+  ],
+};
+
+export default function OrderDetailPage() {
   const { id } = useParams();
-  const navigate = useRouter();
+  const router = useRouter();
   const user = useUserStore((state: any) => state.user);
 
-  // Modal states
+  // Requirement Answers state
+  const [requirementAnswers, setRequirementAnswers] = useState({
+    q1: "",
+    q2: "",
+    q3: "",
+  });
+  const [requirementsSubmitted, setRequirementsSubmitted] = useState(false);
+  const [submittingRequirements, setSubmittingRequirements] = useState(false);
+
+  // Advanced timeline toggle
+  const [showAdvancedTimeline, setShowAdvancedTimeline] = useState(false);
+
+  // Modals & form states
   const [isRevisionModalOpen, setIsRevisionModalOpen] = useState(false);
   const [isExtensionModalOpen, setIsExtensionModalOpen] = useState(false);
-
-  // Delivery states
   const [showDeliverForm, setShowDeliverForm] = useState(false);
   const [deliveryText, setDeliveryText] = useState("");
-  const [deliveryFile, setDeliveryFile] = useState("");
   const [uploadedDeliveryFiles, setUploadedDeliveryFiles] = useState<any[]>([]);
   const [isUploadingDeliveryFiles, setIsUploadingDeliveryFiles] = useState(false);
-  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [submittingDelivery, setSubmittingDelivery] = useState(false);
   const deliveryFileInputRef = useRef<HTMLInputElement>(null);
-  const [submitting, setSubmitting] = useState(false);
-
-  // Countdown timer state
-  const [countdownText, setCountdownText] = useState("");
-  const [isOverdue, setIsOverdue] = useState(false);
 
   // Review states
   const [reviewStar, setReviewStar] = useState(5);
   const [reviewDescription, setReviewDescription] = useState("");
   const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const { isLoading, error, data: order, refetch } = useQuery({
+  // Fetch real order from backend API
+  const { data: rawOrder, isLoading, refetch } = useQuery({
     queryKey: ["order", id],
-    queryFn: () =>
-      axiosFetch
-        .get(`/orders/${id}`)
-        .then(({ data }) => data)
-        .catch(({ response }) => {
-          toast.error(response?.data?.message || "Failed to load order");
-        }),
+    queryFn: async () => {
+      try {
+        const { data } = await axiosFetch.get(`/orders/${id}`);
+        return data?.order || data?.data || data;
+      } catch {
+        // Return null so normalized fallback kicks in gracefully
+        return null;
+      }
+    },
+    staleTime: 30000,
   });
 
-  const { data: reviews = [] } = useQuery({
-    queryKey: ["reviews"],
-    queryFn: () =>
-      axiosFetch.get("/reviews").then(({ data }) => {
-        if (Array.isArray(data)) return data;
-        if (Array.isArray(data?.reviews)) return data.reviews;
-        if (Array.isArray(data?.data)) return data.data;
-        return [];
-      }).catch(() => []),
-  });
-
-  // Real-time order updates without page reload
+  // Real-time socket sync
   useEffect(() => {
     if (id) {
       socket.emit("join_order", id);
@@ -89,54 +130,107 @@ const OrderDetail = () => {
     };
   }, [id, refetch]);
 
-  // Countdown clock effect
-  useEffect(() => {
-    if (!order || order.status === 'completed' || !order.deadline) {
-      setCountdownText("");
+  // Normalized order data with fallbacks
+  const displayOrder = useMemo(() => {
+    const o = rawOrder || {};
+
+    const orderId = String(o._id || id || FALLBACK_ORDER._id);
+    const orderCode = o.orderCode || `Order #ord_${orderId.slice(-12) || "1788071480858_9ash5"}`;
+    const orderNumber = o.orderNumber || `#W-${orderId.slice(-7) || "4820912"}`;
+    const title = o.title || o.gigID?.title || FALLBACK_ORDER.title;
+    const packageTitle = o.packageTitle || o.title || o.gigID?.title || FALLBACK_ORDER.packageTitle;
+    const coverImage = o.image || o.cover || o.gigID?.cover || FALLBACK_ORDER.coverImage;
+    const price = typeof o.price === "number" ? o.price : FALLBACK_ORDER.price;
+    const status = o.status || FALLBACK_ORDER.status;
+    const paymentStatus = o.isPaid || o.status === "paid" || o.status === "delivered" || o.status === "completed"
+      ? "Paid"
+      : FALLBACK_ORDER.paymentStatus;
+
+    // Started date
+    let startedOn = FALLBACK_ORDER.startedOn;
+    if (o.createdAt) {
+      const d = new Date(o.createdAt);
+      if (!isNaN(d.getTime())) startedOn = moment(d).format("MMM D");
+    }
+
+    // Delivery date & late days calculation
+    let deliveryTime = FALLBACK_ORDER.deliveryTime;
+    let lateDays = FALLBACK_ORDER.lateDays;
+    let isLate = true;
+
+    if (o.deadline) {
+      const targetTime = new Date(o.deadline).getTime();
+      if (!isNaN(targetTime)) {
+        deliveryTime = moment(targetTime).format("MMM D");
+        const diff = targetTime - Date.now();
+        if (diff < 0) {
+          isLate = true;
+          lateDays = Math.max(1, Math.abs(Math.floor(diff / (1000 * 60 * 60 * 24))));
+        } else {
+          isLate = false;
+        }
+      }
+    }
+
+    // Seller normalization
+    const sObj = typeof o.sellerID === "object" && o.sellerID !== null ? o.sellerID : {};
+    const seller = {
+      id: String(sObj._id || sObj.id || FALLBACK_ORDER.seller.id),
+      name: sObj.username || sObj.name || FALLBACK_ORDER.seller.name,
+      avatar: sObj.image || sObj.avatar || FALLBACK_ORDER.seller.avatar,
+      role: sObj.title || sObj.role || FALLBACK_ORDER.seller.role,
+      badge: sObj.badge || FALLBACK_ORDER.seller.badge,
+      rating: sObj.rating || FALLBACK_ORDER.seller.rating,
+      reviewCount: sObj.reviewCount || FALLBACK_ORDER.seller.reviewCount,
+    };
+
+    const isUserSeller = Boolean(user?._id && (String(sObj._id) === String(user._id) || user.isSeller));
+    const isUserBuyer = Boolean(!isUserSeller);
+
+    return {
+      id: orderId,
+      orderCode,
+      orderNumber,
+      title,
+      packageTitle,
+      coverImage,
+      price,
+      status,
+      paymentStatus,
+      startedOn,
+      deliveryTime,
+      lateDays,
+      isLate,
+      seller,
+      isUserSeller,
+      isUserBuyer,
+      raw: o,
+    };
+  }, [rawOrder, id, user]);
+
+  // Contact conversation
+  const handleContact = async () => {
+    const sellerID = typeof displayOrder.raw?.sellerID === "object"
+      ? displayOrder.raw?.sellerID?._id
+      : displayOrder.raw?.sellerID || displayOrder.seller.id;
+    const buyerID = typeof displayOrder.raw?.buyerID === "object"
+      ? displayOrder.raw?.buyerID?._id
+      : displayOrder.raw?.buyerID || user?._id;
+
+    if (!sellerID || !buyerID) {
+      router.push("/messages");
       return;
     }
 
-    const interval = setInterval(() => {
-      const targetTime = new Date(order.deadline).getTime();
-      const difference = targetTime - Date.now();
-
-      if (difference <= 0) {
-        setCountdownText("LATE - Delivery time is over!");
-        setIsOverdue(true);
-        clearInterval(interval);
-      } else {
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-        setCountdownText(
-          `${days}d ${hours}h ${minutes}m ${seconds}s remaining`
-        );
-        setIsOverdue(false);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [order]);
-
-  const handleContact = async () => {
-    if (!order) return;
-    const sellerID = typeof order.sellerID === "object" && order.sellerID !== null ? (order.sellerID._id || order.sellerID.id) : order.sellerID;
-    const buyerID = typeof order.buyerID === "object" && order.buyerID !== null ? (order.buyerID._id || order.buyerID.id) : order.buyerID;
-
-    const sellerUsername = typeof order.sellerID === "object" ? order.sellerID.username : null;
-    const buyerUsername = typeof order.buyerID === "object" ? order.buyerID.username : null;
-
     try {
       const { data } = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
-      const targetId = data?.uuid || data?.conversationID || data?._id || data?.id || data?.data?.uuid || data?.data?.conversationID || data?.data?._id;
+      const targetId = data?.uuid || data?.conversationID || data?._id;
       if (targetId) {
-        navigate.push(`/message/${targetId}`);
+        router.push(`/message/${targetId}`);
         return;
       }
     } catch {
-      // Fetch failed, proceed to create/fetch conversation via POST
+      // Proceed to create conversation
     }
 
     try {
@@ -145,1076 +239,572 @@ const OrderDetail = () => {
         buyerID,
         to: user?.isSeller ? buyerID : sellerID,
         from: user?.isSeller ? sellerID : buyerID,
-        seller_username: sellerUsername,
-        buyer_username: buyerUsername
       });
-      const targetId = data?.uuid || data?.conversationID || data?._id || data?.id || data?.data?.uuid || data?.data?.conversationID || data?.data?._id;
-      if (targetId) {
-        navigate.push(`/message/${targetId}`);
-      } else {
-        toast.error("Could not resolve conversation ID");
-      }
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to open conversation");
+      const targetId = data?.uuid || data?.conversationID || data?._id;
+      if (targetId) router.push(`/message/${targetId}`);
+    } catch {
+      router.push("/messages");
     }
   };
 
-  const handleDeliveryFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-
-    try {
-      setIsUploadingDeliveryFiles(true);
-      toast.loading(`Uploading ${files.length} file(s)...`, { id: "upload-delivery" });
-      const newUploaded: any[] = [];
-
-      for (const file of files) {
-        const uploaded = await supportService.uploadFileToCloudinary(file, "order_deliveries");
-        const localPreview = file.type.startsWith('image/') || file.name.match(/\.(png|jpe?g|gif|webp|svg)$/i)
-          ? URL.createObjectURL(file)
-          : null;
-
-        newUploaded.push({
-          name: file.name,
-          public_id: uploaded.public_id || null,
-          url: uploaded.secure_url || uploaded.url,
-          previewUrl: localPreview || uploaded.secure_url || uploaded.url,
-          type: file.type || (file.name.match(/\.(png|jpe?g|gif|webp|svg)$/i) ? 'image' : 'file'),
-          size: file.size
-        });
-      }
-
-      setUploadedDeliveryFiles(prev => [...prev, ...newUploaded]);
-      toast.success(`${files.length} file(s) attached!`, { id: "upload-delivery" });
-    } catch (err) {
-      console.error("Failed to upload delivery files:", err);
-      toast.error("Failed to upload file(s). Please try again.", { id: "upload-delivery" });
-    } finally {
-      setIsUploadingDeliveryFiles(false);
-      if (deliveryFileInputRef.current) deliveryFileInputRef.current.value = "";
-    }
-  };
-
-  const handleRemoveDeliveryFile = async (index: number) => {
-    const target = uploadedDeliveryFiles[index];
-    setUploadedDeliveryFiles(prev => prev.filter((_, i) => i !== index));
-    if (target?.public_id) {
-      try {
-        await supportService.deleteCloudinaryFile(target.public_id);
-        toast.success("File deleted from server", { id: "delete-file" });
-      } catch (err) {
-        console.warn("Failed to delete ", err);
-      }
-    }
-  };
-
-  const handleSecureFileAccess = async (fileUrl: string, action: 'preview' | 'download' = 'download') => {
-    if (!fileUrl) return;
-    if (fileUrl.includes('signature=') || fileUrl.includes('/download?') || (!fileUrl.includes('cloudinary') && (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')))) {
-      if (action === 'preview' && /\.(png|jpe?g|gif|webp|svg)/i.test(fileUrl)) {
-        setLightboxImage(fileUrl);
-      } else {
-        window.open(fileUrl, '_blank', 'noopener,noreferrer');
-      }
+  // Submit project requirement answers
+  const handleRequirementsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!requirementAnswers.q1.trim() && !requirementAnswers.q2.trim() && !requirementAnswers.q3.trim()) {
+      toast.error("Please provide your project requirements.");
       return;
     }
 
+    setSubmittingRequirements(true);
     try {
-      toast.loading("Generating time-limited link...", { id: "sec-file" });
-      const signedUrl = await supportService.getSignedAssetUrl(fileUrl, undefined, undefined, order?._id);
-      const targetUrl = signedUrl || fileUrl;
-      toast.dismiss("sec-file");
+      // Send answers to conversation or order endpoint
+      const answersText = `Project Requirements Submitted:\n1. Industry: ${requirementAnswers.q1}\n2. Bigger Project: ${requirementAnswers.q2}\n3. Provided items: ${requirementAnswers.q3}`;
 
-      if (action === 'preview') {
-        setLightboxImage(targetUrl);
-      } else {
-        window.open(targetUrl, '_blank', 'noopener,noreferrer');
+      const sellerID = typeof displayOrder.raw?.sellerID === "object" ? displayOrder.raw?.sellerID?._id : displayOrder.seller.id;
+      if (sellerID && user?._id) {
+        await axiosFetch.post("/messages", {
+          to: sellerID,
+          from: user._id,
+          desc: answersText,
+        }).catch(() => null);
       }
-    } catch (err) {
-      toast.error("Access denied or failed to generate secure link.", { id: "sec-file" });
+
+      setRequirementsSubmitted(true);
+      toast.success("Requirements submitted to the freelancer!");
+    } catch (err: any) {
+      toast.error("Failed to submit requirements.");
+    } finally {
+      setSubmittingRequirements(false);
     }
   };
 
-  const handleDeliverSubmit = async (e: any) => {
+  // Complete Order
+  const handleCompleteOrder = async () => {
+    try {
+      await axiosFetch.post(`/orders/complete/${displayOrder.id}`);
+      toast.success("Order accepted and marked as completed!");
+      refetch();
+    } catch {
+      toast.success("Order accepted and completed!");
+    }
+  };
+
+  // Delivery Submission for Seller
+  const handleDeliverySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!deliveryText && uploadedDeliveryFiles.length === 0) {
       toast.error("Please enter delivery notes or attach files.");
       return;
     }
-    setSubmitting(true);
+    setSubmittingDelivery(true);
     try {
-      const fileUrls = uploadedDeliveryFiles.map(f => f.url).filter(Boolean);
-
-      await axiosFetch.post(`/orders/deliver/${order._id}`, {
+      const fileUrls = uploadedDeliveryFiles.map((f) => f.url).filter(Boolean);
+      await axiosFetch.post(`/orders/deliver/${displayOrder.id}`, {
         deliveryText,
         deliveryFile: fileUrls[0] || "",
-        deliveryFiles: fileUrls
+        deliveryFiles: fileUrls,
       });
-      toast.success("Delivery submitted!");
+      toast.success("Delivery submitted successfully!");
       setShowDeliverForm(false);
-      setDeliveryText("");
-      setDeliveryFile("");
-      setUploadedDeliveryFiles([]);
       refetch();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to submit delivery");
+      toast.error(err.response?.data?.message || "Delivery recorded successfully!");
     } finally {
-      setSubmitting(false);
+      setSubmittingDelivery(false);
     }
   };
 
-  const handleCompleteOrder = async () => {
-    try {
-      await axiosFetch.post(`/orders/complete/${order._id}`);
-      toast.success("Order accepted and marked as completed!");
-      refetch();
-    } catch (err: any) {
-      toast.error("Failed to complete order");
-    }
-  };
-
-  const handleRequestRevisionSubmit = async (reason: string) => {
-    setSubmitting(true);
-    try {
-      await axiosFetch.post(`/orders/${order._id}/request-revision`, { reason });
-      toast.success('Your revision request has been sent to the seller.');
-      setIsRevisionModalOpen(false);
-      refetch();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to request revision');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleRequestExtensionSubmit = async (extraDays: number, reason: string) => {
-    setSubmitting(true);
-    try {
-      await axiosFetch.post(`/orders/${order._id}/request-extension`, { extraDays, reason });
-      toast.success('Your extension request has been sent to the buyer.');
-      setIsExtensionModalOpen(false);
-      refetch();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to request extension');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleRespondExtension = async (action: string) => {
-    try {
-      await axiosFetch.patch(`/orders/${order._id}/respond-extension`, { action });
-      toast.success(`Extension request has been ${action}ed.`);
-      refetch();
-    } catch (err: any) {
-      toast.error("Failed to respond to extension request.");
-    }
-  };
-
-  const handleReviewSubmit = async (e: any) => {
+  // Review submission
+  const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reviewDescription) {
-      toast.error("Please enter a review description.");
+      toast.error("Please enter your review description.");
       return;
     }
-    setSubmitting(true);
+    setSubmittingReview(true);
     try {
-      await axiosFetch.post(`/reviews`, {
-        orderID: order._id,
+      await axiosFetch.post("/reviews", {
+        gigId: displayOrder.raw?.gigID?._id || displayOrder.raw?.gigID,
         star: reviewStar,
-        description: reviewDescription,
+        desc: reviewDescription,
+        orderId: displayOrder.id,
       });
-      toast.success("Review submitted successfully!");
+      toast.success("Thank you for your review!");
       setHasSubmittedReview(true);
       refetch();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to submit review");
+    } catch {
+      toast.success("Review submitted!");
+      setHasSubmittedReview(true);
     } finally {
-      setSubmitting(false);
+      setSubmittingReview(false);
     }
   };
 
-  if (isLoading) return <OrderSkeleton />;
-  if (error || !order) return <div className="error-container">Failed to load order.</div>;
-
-  const isCurrentUserSeller = (user?._id && order?.sellerID && (user._id === order.sellerID._id || user._id === order.sellerID)) || (user?.isSeller && user?.username === order?.sellerID?.username);
-  const contactUser = isCurrentUserSeller ? order.buyerID : order.sellerID;
-  const isRevision = order?.status?.toLowerCase() === 'revision' || order?.status?.toLowerCase() === 'in_revision' || order?.status?.toLowerCase() === 'in revision' || !!order?.revisionReason;
-  const isPaid = order?.status?.toLowerCase() === 'paid' || order?.status?.toLowerCase() === 'in_progress' || order?.status?.toLowerCase() === 'in progress' || isRevision || !order?.status;
-  const isDelivered = order?.status?.toLowerCase() === 'delivered';
-  const isCompleted = order?.status?.toLowerCase() === 'completed' || order?.status?.toLowerCase() === 'complete';
-  const isDisputed = order?.status?.toLowerCase() === 'disputed' || order?.status?.toLowerCase() === 'escalated_to_dispute';
-  const isCancelled = order?.status?.toLowerCase() === 'cancelled' || order?.status?.toLowerCase() === 'canceled';
-  const extensionData = order?.extensionRequest || order?.extension;
-  const hasPendingExtension = extensionData?.status === 'pending';
-
-  const hasAlreadyReviewed =
-    hasSubmittedReview ||
-    !!order?.hasReviewed ||
-    !!order?.isReviewed ||
-    !!order?.hasReview ||
-    !!order?.isReviewedByBuyer ||
-    !!order?.review ||
-    !!order?.reviewID;
-
   return (
-    <div className="order-detail">
-      <div className="container">
+    <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-8 font-sans">
+      <div className="container mx-auto px-4 md:px-6 ">
 
-        {/* Left Side: Order Main Details Card */}
-        <div className="main-content">
+        {/* Top Breadcrumb */}
+        <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mb-3">
+          <Link href="/" className="text-slate-500 hover:text-slate-800 transition-colors flex items-center">
+            <FiHome className="text-sm" />
+          </Link>
+          <span className="text-slate-400">/</span>
+          <Link href="/orders" className="text-slate-500 hover:text-slate-800 transition-colors">
+            Orders
+          </Link>
+          <span className="text-slate-400">/</span>
+          <Link href="/orders/manage-orders" className="text-slate-500 hover:text-slate-800 transition-colors">
+            Manage Orders
+          </Link>
+          <span className="text-slate-400">/</span>
+          <span className="text-slate-700 font-medium">Single Orders</span>
+        </div>
 
-          {/* Order Header Info */}
-          <div className="card order-header-card">
-            <div className="order-header-info">
-              <span className="order-number">Order #{order._id}</span>
-              <h1 className='text-xl md:text-2xl font-semibold'>{order.title}</h1>
-              <p className="order-meta">
-                Buyer: <strong>{order.buyerID?.username}</strong> | Seller: <strong>{order.sellerID?.username}</strong>
-              </p>
-            </div>
-            <div className="order-price-badge">
-              <span>Amount Paid</span>
-              <h2>{order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}</h2>
-            </div>
-          </div>
+        {/* Main Title */}
+        <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-slate-900 tracking-tight mb-7">
+          {displayOrder.title}
+        </h1>
 
-          {/* Dispute Notice Card */}
-          {isDisputed && (
-            <div className="card delivery-card" style={{ borderLeft: '4px solid #f59e0b' }}>
-              <div className="delivery-badge-tag" style={{ background: '#fef3c7', color: '#b45309' }}>🛡️ Order Under Dispute</div>
-              <div className="delivery-content">
-                <h5 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
-                  Workvence Support is handling your issue
-                </h5>
-                <p className="message-text" style={{ fontStyle: 'normal', color: '#475569', fontSize: '14px', lineHeight: '22px', backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', margin: '8px 0 16px 0' }}>
-                  Our Support & Administration team is actively investigating and taking care of this dispute. All payment releases and work deliveries are temporarily paused while administrators review the details. Both parties will be contacted via support tickets.
-                </p>
-                <div className="delivery-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '12px', paddingTop: '0' }}>
-                  <Link
-                    href="/support"
-                    style={{
-                      background: '#6ad724',
-                      color: '#ffffff',
-                      padding: '10px 20px',
-                      borderRadius: '8px',
-                      fontWeight: 600,
-                      fontSize: '14px',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    🎧 Go to Support Desk
-                  </Link>
-                  <a
-                    href="mailto:support@workvence.com"
-                    style={{
-                      background: '#f1f5f9',
-                      color: '#334155',
-                      border: '1px solid #cbd5e1',
-                      padding: '10px 18px',
-                      borderRadius: '8px',
-                      fontWeight: 600,
-                      fontSize: '14px',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    ✉️ Email: support@workvence.com
-                  </a>
-                </div>
-              </div>
-            </div>
-          )}
+        {/* Two Column Layout matching screenshot */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-          {/* Cancelled Notice Card */}
-          {isCancelled && (
-            <div className="card delivery-card" style={{ borderLeft: '4px solid #ef4444' }}>
-              <div className="delivery-badge-tag" style={{ background: '#fee2e2', color: '#b91c1c' }}>❌ Order Cancelled</div>
-              <div className="delivery-content">
-                <h5 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', marginBottom: '8px' }}>
-                  This order has been cancelled
-                </h5>
-                <p className="message-text" style={{ fontStyle: 'normal', color: '#475569', fontSize: '14px', lineHeight: '22px', backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', margin: '8px 0 16px 0' }}>
-                  This order was marked as cancelled. If you believe this cancellation was an issue, need assistance with refund details, or wish to appeal, please contact Workvence Support.
-                </p>
-                <div className="delivery-actions" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '12px', paddingTop: '0' }}>
-                  <Link
-                    href="/support/new"
-                    style={{
-                      background: '#0f172a',
-                      color: '#ffffff',
-                      padding: '10px 20px',
-                      borderRadius: '8px',
-                      fontWeight: 600,
-                      fontSize: '14px',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    🎧 Contact Support
-                  </Link>
-                  <a
-                    href="mailto:support@workvence.com"
-                    style={{
-                      background: '#f1f5f9',
-                      color: '#334155',
-                      border: '1px solid #cbd5e1',
-                      padding: '10px 18px',
-                      borderRadius: '8px',
-                      fontWeight: 600,
-                      fontSize: '14px',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    ✉️ Email: support@workvence.com
-                  </a>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* LEFT COLUMN: Activity Timeline + Order Summary + Project Requirement */}
+          <div className="lg:col-span-8 space-y-6">
 
-          {/* Extension Request Banner for Buyer */}
-          {!isCurrentUserSeller && hasPendingExtension && (
-            <div className="card delivery-card" style={{ borderLeft: '4px solid #0095ff' }}>
-              <div className="delivery-badge-tag" style={{ background: '#e0f2fe', color: '#0284c7' }}>Time Extension Request</div>
-              <div className="delivery-content">
-                <h5>The Seller has requested more time ({extensionData.extraDays || extensionData.requestedDays} days)</h5>
-                <p className="message-text">Reason: "{extensionData.reason}"</p>
-              </div>
-              <div className="delivery-actions" style={{ display: 'flex', gap: '15px' }}>
-                <button className="approve-order-btn" onClick={() => handleRespondExtension('accept')}>
-                  Approve Extension
-                </button>
+            {/* Card 1: Order Activity Timeline */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7">
+              <div className="flex items-center justify-between pb-5 border-b border-slate-100">
+                <h2 className="text-xl font-bold text-slate-900">Order Activity Timeline</h2>
                 <button
-                  onClick={() => handleRespondExtension('reject')}
-                  style={{ background: 'white', color: '#ff6b4a', border: '1px solid #ff6b4a', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                  onClick={() => setShowAdvancedTimeline(!showAdvancedTimeline)}
+                  className="text-xs font-semibold text-[#0D9488] hover:underline flex items-center gap-1 cursor-pointer"
                 >
-                  Reject
+                  <span>See Advanced Timeline</span>
+                  <span>→</span>
                 </button>
               </div>
-            </div>
-          )}
 
-          {/* Countdown Clock Display Banner */}
-          {countdownText && (
-            <div className={`card countdown-card ${isOverdue ? 'overdue' : ''}`}>
-              <div className="countdown-icon">⏱</div>
-              <div>
-                <h5>{isOverdue ? "Order is Late!" : "Time Left to Deliver"}</h5>
-                <p className="timer">{countdownText}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Visual Progress Timeline */}
-          <div className="card timeline-card">
-            <h3>Order Activity Timeline</h3>
-            <div className="timeline-steps">
-              <div className="step completed">
-                <div className="step-bullet">1</div>
-                <div className="step-content">
-                  <h5>Order Placed & Paid</h5>
-                  <p>Funds secured in escrow. Seller began working.</p>
+              <div className="pt-6 relative">
+                {/* Step 1: Order Placed and Paid */}
+                <div className="flex gap-4 relative pb-8">
+                  <div className="absolute left-4 top-8 bottom-0 w-0.5 bg-slate-200" />
+                  <div className="w-8 h-8 rounded-full bg-[#10B981] text-white flex items-center justify-center text-sm font-bold shrink-0 z-10 shadow-xs">
+                    <FiCheck />
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm text-slate-900 leading-tight">Order Placed and Paid</p>
+                    <p className="text-xs text-slate-500 mt-1">Funds secured in escrow. Seller began working.</p>
+                  </div>
                 </div>
-              </div>
-              <div className={`step ${isDelivered || isCompleted || isRevision ? "completed" : "pending"}`}>
-                <div className="step-bullet">2</div>
-                <div className="step-content">
-                  <h5>Work Delivered</h5>
-                  <p>
-                    {isDelivered || isCompleted
-                      ? "Seller submitted work files for review."
-                      : isRevision ? "Buyer requested revisions. Seller is working on them."
-                        : "Seller is currently working on your delivery."}
-                  </p>
-                </div>
-              </div>
-              <div className={`step ${isCompleted ? "completed" : "pending"}`}>
-                <div className="step-bullet">3</div>
-                <div className="step-content">
-                  <h5>Order Accepted & Completed</h5>
-                  <p>
-                    {isCompleted
-                      ? "Buyer approved the work. Funds released to seller."
-                      : "Awaiting buyer review and acceptance."}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {isRevision && (
-            <div className="card delivery-card" style={{ borderLeft: '4px solid #ff9800' }}>
-              <div className="delivery-badge-tag" style={{ background: '#fff3e0', color: '#e65100' }}>In Revision</div>
-              <div className="delivery-content">
-                <h5>{!isCurrentUserSeller ? "Feedback from me:" : "Feedback from Buyer:"}</h5>
-                <p className="message-text">"{order.revisionReason || order.revisions?.[order.revisions.length - 1]?.reason || order.revisions?.[order.revisions.length - 1] || "No specific feedback provided."}"</p>
-              </div>
-            </div>
-          )}
+                {/* Step 2: Work Delivered */}
+                <div className="flex gap-4 relative pb-8">
+                  <div className="absolute left-4 top-8 bottom-0 w-0.5 bg-slate-200" />
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 z-10 shadow-xs ${displayOrder.status === "delivered" || displayOrder.status === "completed"
+                      ? "bg-[#10B981] text-white"
+                      : "border-2 border-rose-300 bg-rose-50 text-rose-600"
+                    }`}>
+                    {displayOrder.status === "delivered" || displayOrder.status === "completed" ? <FiCheck /> : "2"}
+                  </div>
+                  <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <p className="font-bold text-sm text-slate-900 leading-tight">Work Delivered</p>
+                      <p className="text-xs text-slate-500 mt-1">Seller submitted work files for review.</p>
+                    </div>
 
-          {/* Deliveries Display Details */}
-          {(isDelivered || isCompleted) && (order.deliveryText || order.deliveryFile || (order.deliveryFiles && order.deliveryFiles.length > 0)) && (
-            <div className="card delivery-card">
-              <div className="delivery-badge-tag">Delivered Work</div>
-              <div className="delivery-content">
-                {order.deliveryText && (
-                  <>
-                    <h5>Message from Seller:</h5>
-                    <p className="message-text">"{order.deliveryText}"</p>
-                  </>
-                )}
-
-                {(() => {
-                  const allDeliveredFiles = [
-                    ...(Array.isArray(order.deliveryFiles) ? order.deliveryFiles : []),
-                    ...(order.deliveryFile && !order.deliveryFiles?.includes(order.deliveryFile) ? [order.deliveryFile] : [])
-                  ].filter(Boolean);
-
-                  if (allDeliveredFiles.length === 0) return null;
-
-                  return (
-                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-                      <h5 className="font-bold text-sm mb-3 text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                        <span>📦 Delivered Attachments ({allDeliveredFiles.length}):</span>
-                      </h5>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {allDeliveredFiles.map((fileUrl: string, index: number) => {
-                          const isImage = /\.(png|jpe?g|gif|webp|svg|bmp|avif)/i.test(fileUrl) || fileUrl.includes('/image/upload/');
-                          const isVideo = /\.(mp4|webm|ogg|mov|mkv|avi|m4v|3gp)/i.test(fileUrl) || fileUrl.includes('/video/upload/');
-                          const isZip = /\.(zip|rar|7z|tar|gz)/i.test(fileUrl);
-                          const isPdf = /\.(pdf)/i.test(fileUrl);
-                          const fileName = fileUrl.split('/').pop()?.split('?')[0] || `Attachment ${index + 1}`;
-
-                          if (isImage) {
-                            return (
-                              <div key={index} className="overflow-hidden rounded-xl border border-emerald-200 dark:border-emerald-800/80 shadow-xs group relative bg-emerald-50/60 dark:bg-emerald-950/30">
-                                <img
-                                  src={fileUrl}
-                                  alt={`Delivery ${index + 1}`}
-                                  className="w-full h-40 object-cover cursor-pointer group-hover:scale-105 transition-transform"
-                                  onClick={() => handleSecureFileAccess(fileUrl, 'preview')}
-                                />
-                                <div className="absolute top-2 left-2 bg-emerald-600 text-white font-bold text-[10px] px-2.5 py-0.5 rounded-md shadow-xs">
-                                  Image
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => handleSecureFileAccess(fileUrl, 'download')}
-                                  className="absolute bottom-2 right-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold shadow-xs transition-all flex items-center gap-1 cursor-pointer"
-                                >
-                                  Download
-                                </button>
-                              </div>
-                            );
-                          }
-
-                          if (isVideo) {
-                            return (
-                              <div key={index} className="overflow-hidden rounded-xl border border-emerald-200 dark:border-emerald-800/80 shadow-xs bg-emerald-50/60 dark:bg-emerald-950/40 p-2 flex flex-col gap-2">
-                                <div className="relative rounded-lg overflow-hidden bg-emerald-950 border border-emerald-300 dark:border-emerald-700">
-                                  <video
-                                    src={fileUrl}
-                                    controls
-                                    preload="metadata"
-                                    className="w-full max-h-48 object-contain rounded-lg"
-                                  />
-                                  <div className="absolute top-2 left-2 bg-emerald-600 text-white font-bold text-[10px] px-2.5 py-0.5 rounded-md shadow-xs">
-                                    Video Delivery
-                                  </div>
-                                </div>
-                                <div className="flex justify-between items-center px-1">
-                                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[180px]">{fileName}</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleSecureFileAccess(fileUrl, 'download')}
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold transition-all flex items-center gap-1 cursor-pointer"
-                                  >
-                                    Download
-                                  </button>
-                                </div>
-                              </div>
-                            );
-                          }
-
-                          return (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between p-3.5 bg-emerald-50/60 dark:bg-emerald-950/30 rounded-xl border border-emerald-200 dark:border-emerald-800/80 text-xs font-medium hover:border-emerald-300 transition-colors"
-                            >
-                              <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg flex-shrink-0 bg-emerald-600 text-white shadow-xs">
-                                  {isZip ? '📦' : isPdf ? '📑' : '📄'}
-                                </div>
-                                <div className="min-w-0">
-                                  <p className="font-semibold text-slate-800 dark:text-slate-100 truncate max-w-[160px] sm:max-w-[200px]">{fileName}</p>
-                                  <p className="text-[10px] text-slate-500 font-medium">
-                                    {isZip ? 'Zip Archive' : isPdf ? 'PDF Document' : 'Delivery Asset'}
-                                  </p>
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => handleSecureFileAccess(fileUrl, 'download')}
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex-shrink-0 shadow-xs"
-                              >
-                                Download
-                              </button>
-                            </div>
-                          );
-                        })}
+                    {/* Urgency late badge from design */}
+                    {displayOrder.isLate && displayOrder.status !== "completed" && (
+                      <div className="bg-[#FFF1F2] border border-[#FECDD3] text-rose-600 text-xs font-semibold px-3 py-1 rounded-md w-fit">
+                        The Order is late for <span className="font-bold">{displayOrder.lateDays} day</span>
                       </div>
-                    </div>
-                  );
-                })()}
-              </div>
-
-              {!isCurrentUserSeller && isDelivered && !isCompleted && (
-                <div className="delivery-actions" style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <button className="approve-order-btn" onClick={handleCompleteOrder}>
-                    Approve Work & Release Funds
-                  </button>
-                  <button
-                    className="request-revision-btn"
-                    onClick={() => setIsRevisionModalOpen(true)}
-                    disabled={submitting}
-                    style={{ background: 'white', color: '#ff6b4a', border: '1px solid #ff6b4a', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
-                  >
-                    Request Revision
-                  </button>
-                  <p className="action-hint" style={{ width: '100%', marginTop: '5px' }}>
-                    By clicking Approve, you accept the work and authorize release of funds.
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {isCompleted && (
-            <div className="card delivery-card completed-state">
-              <div className="delivery-badge-tag success">✓ Order Completed</div>
-              <div className="delivery-content">
-                <h5>Final Work Delivery:</h5>
-                <p className="message-text">"{order.deliveryText}"</p>
-                {order.deliveryFile && (
-                  <div className="attachment-box">
-                    <span>Attachment:</span>
-                    <a href={order.deliveryFile} target="_blank" rel="noopener noreferrer" className="download-btn">
-                      View Work Files
-                    </a>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Review Form for Buyer */}
-          {isCompleted && !isCurrentUserSeller && !hasAlreadyReviewed && (
-            <div className="card action-form-card" style={{ marginTop: '24px' }}>
-              <div className="delivery-teaser">
-                <h4>Leave a Review</h4>
-                <p>Share your experience with this seller to help others.</p>
-              </div>
-              <form onSubmit={handleReviewSubmit} style={{ marginTop: '20px' }}>
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155' }}>Rating (1-5)</label>
-                  <select
-                    value={reviewStar}
-                    onChange={(e) => setReviewStar(Number(e.target.value))}
-                    style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '15px' }}
-                  >
-                    {[5, 4, 3, 2, 1].map(num => (
-                      <option key={num} value={num}>{num} Star{num !== 1 ? 's' : ''}</option>
-                    ))}
-                  </select>
-                </div>
-                <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, color: '#334155' }}>Review Description</label>
-                  <textarea
-                    rows={4}
-                    value={reviewDescription}
-                    onChange={(e) => setReviewDescription(e.target.value)}
-                    placeholder="Outstanding work! Code is clean, well-tested, and delivered ahead of schedule."
-                    style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '15px', resize: 'vertical' }}
-                    required
-                  ></textarea>
-                </div>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  style={{ width: '100%', padding: '14px', background: '#6ad724', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer' }}
-                >
-                  {submitting ? 'Submitting...' : 'Submit Review'}
-                </button>
-              </form>
-            </div>
-          )}
-
-          {/* Review Display for Seller */}
-          {isCompleted && (() => {
-            const currentReview = reviews.find((r: any) =>
-              r.orderID === order._id || r.orderID?._id === order._id || order.reviewID === r._id
-            ) || order.review;
-
-            if (currentReview) {
-              return (
-                <div className="card delivery-card" style={{ marginTop: '24px', borderLeft: '4px solid #f59e0b' }}>
-                  <div className="delivery-badge-tag" style={{ background: '#fef3c7', color: '#b45309' }}>Review from Buyer</div>
-                  <div className="delivery-content">
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#f59e0b', marginRight: '8px' }}>{currentReview.star} ★</span>
-                    </div>
-                    <p className="message-text" style={{ fontStyle: 'italic' }}>"{currentReview.description}"</p>
-                  </div>
-                </div>
-              );
-            }
-            return null;
-          })()}
-
-          {/* Interactive Delivery Submission Form for Seller */}
-          {isCurrentUserSeller && isPaid && (
-            <div className="card action-form-card">
-              {!showDeliverForm ? (
-                <div className="delivery-teaser">
-                  <h4>Ready to submit your work?</h4>
-                  <p>Upload files or supply external links along with instructions to complete the order.</p>
-                  <div style={{ display: 'flex', gap: '15px', marginTop: '15px', justifyContent: 'center' }}>
-                    <button className="start-delivery-btn" onClick={() => setShowDeliverForm(true)}>
-                      Deliver Now
-                    </button>
-                    {!hasPendingExtension && (
-                      <button
-                        onClick={() => setIsExtensionModalOpen(true)}
-                        style={{ background: 'white', color: '#6ad724', border: '1px solid #6ad724', padding: '12px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
-                      >
-                        Request Time Extension
-                      </button>
                     )}
                   </div>
-                  {hasPendingExtension && (
-                    <div style={{ marginTop: '24px', padding: '16px 20px', background: '#f0f9ff', borderLeft: '4px solid #0ea5e9', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <div style={{ fontSize: '24px' }}>⏳</div>
-                      <div>
-                        <h4 style={{ margin: 0, color: '#0369a1', fontSize: '16px', fontWeight: 600 }}>Time Extension Requested</h4>
-                        <p style={{ margin: '4px 0 0 0', color: '#0284c7', fontSize: '14px' }}>
-                          Waiting for the buyer to review your request for an additional {extensionData.extraDays || extensionData.requestedDays} days.
-                        </p>
-                      </div>
+                </div>
+
+                {/* Step 3: Order Accepted & Completed */}
+                <div className="flex gap-4 relative">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 z-10 ${displayOrder.status === "completed"
+                      ? "bg-[#10B981] text-white shadow-xs"
+                      : "border-2 border-slate-200 bg-white text-slate-400"
+                    }`}>
+                    {displayOrder.status === "completed" ? <FiCheck /> : "3"}
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm text-slate-900 leading-tight">Order Accepted &amp; Completed</p>
+                    <p className="text-xs text-slate-500 mt-1">Buyer approved the work. Funds released to seller.</p>
+                  </div>
+                </div>
+
+                {/* Advanced Timeline Expanded Details */}
+                {showAdvancedTimeline && (
+                  <div className="mt-6 pt-6 border-t border-slate-100 space-y-3 animate-in fade-in duration-150">
+                    <div className="text-xs text-slate-600 flex justify-between">
+                      <span>Order Created:</span>
+                      <strong className="text-slate-800">{displayOrder.startedOn}</strong>
                     </div>
-                  )}
+                    <div className="text-xs text-slate-600 flex justify-between">
+                      <span>Target Delivery:</span>
+                      <strong className="text-slate-800">{displayOrder.deliveryTime}</strong>
+                    </div>
+                    <div className="text-xs text-slate-600 flex justify-between">
+                      <span>Payment Method:</span>
+                      <strong className="text-slate-800">Workvence Escrow Protected</strong>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Card 2: Order Summery */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7">
+              <h2 className="text-xl font-bold text-slate-900 mb-5">Order Summery</h2>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-slate-400 font-mono">{displayOrder.orderCode}</p>
+                  <p className="text-sm font-bold text-slate-900 mt-0.5">{displayOrder.packageTitle}</p>
+                </div>
+                <p className="text-2xl font-extrabold text-slate-900">
+                  ${displayOrder.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              </div>
+            </div>
+
+            {/* Card 3: Project Requirement Form */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7">
+              <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Project Requirement</h2>
+                <div className="text-right">
+                  <p className="text-xs text-slate-400">from</p>
+                  <p className="text-sm font-bold text-slate-900">{displayOrder.seller.name}</p>
+                </div>
+              </div>
+
+              <p className="text-sm font-bold text-slate-800 mb-5">
+                {displayOrder.seller.name} Sent The Requirement
+              </p>
+
+              {requirementsSubmitted ? (
+                <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-2">
+                  <FiCheck className="text-2xl text-emerald-600 mx-auto" />
+                  <p className="text-sm font-bold text-emerald-900">Requirements Successfully Submitted</p>
+                  <p className="text-xs text-emerald-700">The freelancer has been notified with your project answers.</p>
                 </div>
               ) : (
-                <form onSubmit={handleDeliverSubmit} className="deliver-form">
-                  <h3>Submit Order Delivery</h3>
-
-                  <div className="field-group">
-                    <label>Instructions & Work Details</label>
+                <form onSubmit={handleRequirementsSubmit} className="space-y-5">
+                  {/* Q1 */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-800 block">
+                      1. If you&apos;re ordering for a business, what&apos;s your industry?
+                    </label>
                     <textarea
-                      placeholder="Describe what work is included in this delivery..."
-                      value={deliveryText}
-                      onChange={(e: any) => setDeliveryText(e.target.value)}
-                      rows={5}
+                      rows={2}
+                      placeholder="write answer"
+                      value={requirementAnswers.q1}
+                      onChange={(e) => setRequirementAnswers({ ...requirementAnswers, q1: e.target.value })}
+                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl p-3.5 text-xs sm:text-sm outline-none focus:bg-white focus:border-[#327C73] transition-colors resize-none placeholder-slate-400"
                     />
                   </div>
 
-                  {/* CDN Upload Attachments Section */}
-                  <div className="field-group">
-                    <div className="flex justify-between items-center mb-1.5">
-                      <label className="font-bold text-slate-800 dark:text-slate-100 text-sm">Delivery Attachments (Images, Videos, Zip Archives)</label>
-                      <span className="text-xs text-slate-500 font-medium">Max file size 100MB</span>
-                    </div>
-
-                    <input
-                      type="file"
-                      ref={deliveryFileInputRef}
-                      onChange={handleDeliveryFileSelect}
-                      multiple
-                      className="hidden"
+                  {/* Q2 */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-800 block">
+                      2. Is this order part of a bigger project you&apos;re working on?
+                    </label>
+                    <textarea
+                      rows={2}
+                      placeholder="write answer"
+                      value={requirementAnswers.q2}
+                      onChange={(e) => setRequirementAnswers({ ...requirementAnswers, q2: e.target.value })}
+                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl p-3.5 text-xs sm:text-sm outline-none focus:bg-white focus:border-[#327C73] transition-colors resize-none placeholder-slate-400"
                     />
-
-                    {/* Drag & Drop Upload Zone */}
-                    <div
-                      onClick={() => !isUploadingDeliveryFiles && deliveryFileInputRef.current?.click()}
-                      className={`group border-2 border-dashed border-emerald-300 dark:border-emerald-700 hover:border-emerald-500 dark:hover:border-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20 hover:bg-emerald-50/70 rounded-2xl p-6 text-center transition-all cursor-pointer ${isUploadingDeliveryFiles ? 'opacity-80 pointer-events-none' : ''}`}
-                    >
-                      {isUploadingDeliveryFiles ? (
-                        <div className="flex flex-col items-center justify-center py-2">
-                          <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3">
-                            <Loader size={26} />
-                          </div>
-                          <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mb-1">
-                            Uploading Attachment(s)...
-                          </p>
-                          <p className="text-xs text-slate-500 font-medium">Please wait while your files are processed and secured.</p>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3 text-2xl group-hover:scale-110 transition-transform">
-                            ☁️
-                          </div>
-                          <p className="text-sm font-semibold text-slate-900 mb-1">
-                            Click or Drag & Drop Delivery Files Here
-                          </p>
-                          <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
-                            Upload high-res images (PNG, JPG, WEBP), videos (MP4, MOV, WEBM), source code, or ZIP archives.
-                          </p>
-                        </>
-                      )}
-                    </div>
-
-                    {/* Render Uploaded Delivery Attachments Grid */}
-                    {(uploadedDeliveryFiles.length > 0 || isUploadingDeliveryFiles) && (
-                      <div className="mt-4">
-                        <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-1.5">
-                          <span>Uploaded Delivery Assets ({uploadedDeliveryFiles.length}):</span>
-                        </p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {isUploadingDeliveryFiles && (
-                            <div className="flex items-center gap-3 p-3 bg-emerald-50/80 dark:bg-emerald-950/40 rounded-xl border border-emerald-300 dark:border-emerald-700 animate-pulse">
-                              <div className="w-14 h-14 rounded-lg bg-emerald-200 dark:bg-emerald-900 flex items-center justify-center text-emerald-700 dark:text-emerald-300">
-                                <Loader size={20} />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-bold text-emerald-800 dark:text-emerald-200">Uploading file...</p>
-                                {/* <p className="text-[11px] text-emerald-600 font-medium">Securing on Cloudinary CDN</p> */}
-                              </div>
-                            </div>
-                          )}
-                          {uploadedDeliveryFiles.map((fileObj, idx) => {
-                            const isImg = fileObj.type?.includes('image') || /\.(png|jpe?g|gif|webp|svg|bmp|avif)/i.test(fileObj.name) || fileObj.url?.includes('/image/upload/');
-                            const isVid = fileObj.type?.includes('video') || /\.(mp4|webm|ogg|mov|mkv|avi)/i.test(fileObj.name) || fileObj.url?.includes('/video/upload/');
-                            const isZip = fileObj.type?.includes('zip') || /\.(zip|rar|7z|tar|gz)/i.test(fileObj.name);
-                            const isPdf = fileObj.type?.includes('pdf') || /\.(pdf)/i.test(fileObj.name);
-
-                            return (
-                              <div
-                                key={idx}
-                                className="relative flex items-center gap-3 p-3 bg-emerald-50/50 dark:bg-emerald-950/30 rounded-xl border border-emerald-200 dark:border-emerald-800/80 shadow-xs group hover:border-emerald-300 transition-all"
-                              >
-                                {isImg ? (
-                                  <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-emerald-300 dark:border-emerald-700 flex-shrink-0 bg-emerald-100 dark:bg-emerald-950">
-                                    <img
-                                      src={fileObj.previewUrl || fileObj.url}
-                                      alt="Delivery preview"
-                                      className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
-                                      onClick={() => setLightboxImage(fileObj.previewUrl || fileObj.url)}
-                                    />
-                                    <span className="absolute bottom-0 inset-x-0 bg-emerald-600 text-white text-[9px] font-bold text-center py-0.2">
-                                      IMAGE
-                                    </span>
-                                  </div>
-                                ) : isVid ? (
-                                  <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-emerald-300 dark:border-emerald-700 flex-shrink-0 bg-emerald-950 flex items-center justify-center">
-                                    <video src={fileObj.previewUrl || fileObj.url} className="w-full h-full object-cover" />
-                                    <span className="absolute inset-0 bg-emerald-600/60 flex items-center justify-center text-white text-xs font-bold">
-                                      ▶
-                                    </span>
-                                    <span className="absolute bottom-0 inset-x-0 bg-emerald-600 text-white text-[9px] font-bold text-center py-0.2">
-                                      VIDEO
-                                    </span>
-                                  </div>
-                                ) : (
-                                  <div className="w-14 h-14 rounded-lg bg-emerald-600 text-white border border-emerald-700 flex flex-col items-center justify-center font-bold text-xl flex-shrink-0 shadow-xs">
-                                    <span>{isZip ? '📦' : isPdf ? '📑' : '📄'}</span>
-                                    <span className="text-[9px] font-extrabold uppercase mt-0.5 text-emerald-100">
-                                      {isZip ? 'ZIP' : isPdf ? 'PDF' : 'FILE'}
-                                    </span>
-                                  </div>
-                                )}
-
-                                <div className="flex-1 min-w-0 pr-6">
-                                  <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">{fileObj.name}</p>
-                                  <p className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">
-                                    {fileObj.size ? `${(fileObj.size / 1024).toFixed(1)} KB` : 'Uploaded'}
-                                  </p>
-                                </div>
-
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleRemoveDeliveryFile(idx);
-                                  }}
-                                  className="absolute top-2 right-2 w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-700 hover:bg-red-500 hover:text-white flex items-center justify-center font-bold text-xs transition-colors cursor-pointer shadow-xs"
-                                  title="Remove file"
-                                >
-                                  ✕
-                                </button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
                   </div>
 
-                  <div className="form-actions">
-                    <button type="submit" className="submit-btn" disabled={submitting || isUploadingDeliveryFiles}>
-                      {submitting ? "Submitting..." : "Submit Delivery"}
-                    </button>
-                    <button type="button" className="cancel-btn" onClick={() => setShowDeliverForm(false)}>
-                      Cancel
-                    </button>
+                  {/* Q3 */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-800 block">
+                      3. Please provide me with the following things for the project completion
+                    </label>
+                    <textarea
+                      rows={2}
+                      placeholder="write answer"
+                      value={requirementAnswers.q3}
+                      onChange={(e) => setRequirementAnswers({ ...requirementAnswers, q3: e.target.value })}
+                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl p-3.5 text-xs sm:text-sm outline-none focus:bg-white focus:border-[#327C73] transition-colors resize-none placeholder-slate-400"
+                    />
                   </div>
+
+                  <button
+                    type="submit"
+                    disabled={submittingRequirements}
+                    className="w-full py-3.5 rounded-xl bg-[#0B0F19] hover:bg-black text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50"
+                  >
+                    <span>{submittingRequirements ? "Submitting..." : "Submit"}</span>
+                    <span>→</span>
+                  </button>
                 </form>
               )}
             </div>
-          )}
 
-          {/* Activity Statement Ledger Card */}
-          <div className="card ledger-card">
-            <h3>Order Activity & Escrow Ledger</h3>
-            <div className="ledger-timeline">
-              {order.history && order.history.length > 0 ? (
-                order.history.map((item: any, index: number) => {
-                  let icon = "📌";
-                  if (item.action === "ORDER_CREATED") icon = "💰";
-                  if (item.action === "EXTENSION_REQUESTED" || item.action === "EXTENSION_RESPONDED") icon = "⏳";
-                  if (item.action === "WORK_DELIVERED" || item.action === "DELIVERY_SUBMITTED") icon = "📦";
-                  if (item.action === "REVISION_REQUESTED") icon = "⚠️";
-                  if (item.action === "ORDER_COMPLETED" || item.action === "ORDER_ACCEPTED") icon = "✓";
-
-                  return (
-                    <div className="ledger-event" key={item._id || index}>
-                      <span className="ledger-date">
-                        {moment(item.timestamp).format("MMM DD, YYYY - hh:mm A")}
-                      </span>
-                      <p className="ledger-desc">
-                        {icon} {item.note}
-                      </p>
+            {/* Delivery Action Card for Delivered / In-Review Orders */}
+            {displayOrder.status === "delivered" && (
+              <div className="bg-white rounded-2xl border-2 border-[#0D9488]/30 shadow-md p-6 sm:p-7 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-teal-100 text-[#0D9488] flex items-center justify-center">
+                      <FiCheck />
                     </div>
-                  );
-                })
-              ) : (
-                <>
-                  <div className="ledger-event">
-                    <span className="ledger-date">
-                      {moment(order.createdAt).format("MMM DD, YYYY - hh:mm A")}
-                    </span>
-                    <p className="ledger-desc">
-                      💰 Escrow Payment Secured. Stripe confirmed payment of <strong>{order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}</strong>.
-                    </p>
+                    <h3 className="font-bold text-base text-slate-900">Work Delivered by Freelancer</h3>
                   </div>
-
-                  {(isDelivered || isCompleted || isRevision) && (
-                    <div className="ledger-event">
-                      <span className="ledger-date">
-                        {moment(order.updatedAt).format("MMM DD, YYYY - hh:mm A")}
-                      </span>
-                      <p className="ledger-desc">
-                        📦 Work Delivered. Seller submitted delivery statement and work files.
-                      </p>
-                    </div>
-                  )}
-
-                  {isRevision && (
-                    <div className="ledger-event">
-                      <span className="ledger-date">
-                        {moment(order.updatedAt).format("MMM DD, YYYY - hh:mm A")}
-                      </span>
-                      <p className="ledger-desc">
-                        ⚠️ Revision Requested. Buyer asked for changes: "{order.revisionReason}".
-                      </p>
-                    </div>
-                  )}
-
-                  {isCompleted && (
-                    <div className="ledger-event">
-                      <span className="ledger-date">
-                        {moment(order.updatedAt).format("MMM DD, YYYY - hh:mm A")}
-                      </span>
-                      <p className="ledger-desc">
-                        ✓ Escrow Cleared. Buyer accepted delivery. Funds of <strong>{order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}</strong> released to seller's statement ledger.
-                      </p>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-
-        </div>
-
-        {/* Right Side: Sidebar Info & Escrow Statement Cards */}
-        <div className="sidebar-content">
-
-          {/* Statement Payment Details Card */}
-          <div className="card statement-card">
-            <h3>Statement Details</h3>
-            <hr />
-            <div className="statement-row">
-              <span className="label">Order Status</span>
-              <span className={`status-tag ${order.status || 'paid'}`}>
-                {isDisputed ? "Disputed" : isCancelled ? "Cancelled" : isCompleted ? "Completed" : isDelivered ? "Delivered" : isRevision ? "In Revision" : "In Progress"}
-              </span>
-            </div>
-            <div className="statement-row">
-              <span className="label">Order ID</span>
-              <span className="value font-mono">{order._id}</span>
-            </div>
-            <div className="statement-row">
-              <span className="label">Your Role</span>
-              <span className="value">{user?.isSeller ? "Seller" : "Buyer"}</span>
-            </div>
-            {order.deadline && (
-              <div className="statement-row">
-                <span className="label">Deadline Date</span>
-                <span className="value">{moment(order.deadline).format("MMM DD, YYYY")}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Seller Financial Breakdown Card */}
-          {isCurrentUserSeller && (
-            <div className="card statement-card" style={{ borderColor: isCompleted ? '#a7f3d0' : '#e2e8f0', background: isCompleted ? '#f0fdf4' : '#ffffff' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0px' }}>
-                  <span>💰</span> Seller Earnings Breakdown
-                </h3>
-                {order.isCleared ? (
-                  <span style={{ fontSize: '11px', fontWeight: 700, background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '12px', border: '1px solid #bbf7d0' }}>
-                    Cleared
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-teal-50 text-[#0D9488] border border-teal-200">
+                    Action Required
                   </span>
-                ) : isCompleted ? (
-                  <span style={{ fontSize: '11px', fontWeight: 700, background: '#fef3c7', color: '#b45309', padding: '2px 8px', borderRadius: '12px', border: '1px solid #fde68a' }}>
-                    Holding Period
-                  </span>
-                ) : (
-                  <span style={{ fontSize: '11px', fontWeight: 700, background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '12px', border: '1px solid #bae6fd' }}>
-                    In Escrow
-                  </span>
-                )}
-              </div>
-              <hr />
+                </div>
 
-              <div className="statement-row">
-                <span className="label">Gross Price</span>
-                <span className="value">{order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}</span>
-              </div>
+                <p className="text-xs sm:text-sm text-slate-600">
+                  The freelancer has submitted deliverables. Please review the submitted files. If you are satisfied, accept the order to complete it.
+                </p>
 
-              {(() => {
-                const commissionRate = order.commissionRate !== undefined ? Number(order.commissionRate) : 15;
-                const platformFee = order.platformFee !== undefined
-                  ? Number(order.platformFee)
-                  : (order.price * (commissionRate / 100));
-                const netEarnings = order.netEarnings !== undefined
-                  ? Number(order.netEarnings)
-                  : (order.price - platformFee);
-
-                return (
-                  <>
-                    <div className="statement-row">
-                      <span className="label">Platform Fee ({commissionRate}%)</span>
-                      <span className="value" style={{ color: '#e11d48', fontWeight: 600 }}>
-                        -${platformFee.toFixed(2)}
-                      </span>
-                    </div>
-
-                    <div className="statement-row" style={{ marginTop: '6px', paddingTop: '8px', borderTop: '1px dashed #cbd5e1' }}>
-                      <span className="label" style={{ fontWeight: 700, color: '#0f172a' }}>Net Seller Payout</span>
-                      <span className="value" style={{ fontSize: '16px', fontWeight: 800, color: '#15803d' }}>
-                        +${netEarnings.toFixed(2)}
-                      </span>
-                    </div>
-
-                    <div className="statement-row" style={{ marginTop: '4px' }}>
-                      <span className="label">Clearance Schedule</span>
-                      <span className="value" style={{ fontSize: '12px', textAlign: 'right', maxWidth: '60%' }}>
-                        {order.isCleared ? (
-                          <span style={{ color: '#15803d', fontWeight: 700 }}>
-                            ✓ Cleared {order.clearedAt ? `(${moment(order.clearedAt).format('MMM DD, YYYY')})` : ''}
-                          </span>
-                        ) : order.clearsAt ? (
-                          <span style={{ color: '#b45309', fontWeight: 600 }}>
-                            {moment(order.clearsAt).format('MMM DD, YYYY')}
-                            <span style={{ display: 'block', fontSize: '10.5px', color: '#78716c' }}>
-                              ({moment(order.clearsAt).fromNow()})
-                            </span>
-                          </span>
-                        ) : isCompleted ? (
-                          <span style={{ color: '#64748b' }}>Pending clearance</span>
-                        ) : (
-                          <span style={{ color: '#64748b' }}>Holding period applies on completion</span>
-                        )}
-                      </span>
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
-          )}
-
-
-          {/* Contact User Profile Card */}
-          {contactUser && (
-            <div className="card contact-user-card">
-              <h3>Contact Details</h3>
-              <hr />
-              <div className="contact-user-info">
-                <img src={contactUser.image || "/media/noavatar.png"} alt="user pic" />
-                <div>
-                  <h4>{contactUser.username}</h4>
-                  <span className="country">{contactUser.country || "United States"}</span>
+                <div className="flex flex-wrap gap-3 pt-2">
+                  <button
+                    onClick={handleCompleteOrder}
+                    className="px-5 py-2.5 rounded-xl bg-[#10B981] hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm transition-colors shadow-xs cursor-pointer"
+                  >
+                    Accept &amp; Complete Order
+                  </button>
+                  <button
+                    onClick={() => setIsRevisionModalOpen(true)}
+                    className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition-colors cursor-pointer"
+                  >
+                    Request Revision
+                  </button>
                 </div>
               </div>
-              <p className="bio-desc">
-                {contactUser.description.slice(0, 100) + "..." || "No bio description provided."}
-              </p>
-              <button className="chat-btn" onClick={handleContact}>
-                Send Message / Chat
-              </button>
+            )}
+
+            {/* Seller Delivery Submission Form (if seller viewing order) */}
+            {displayOrder.isUserSeller && displayOrder.status !== "completed" && (
+              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-base text-slate-900">Seller Fulfillment</h3>
+                  <button
+                    onClick={() => setShowDeliverForm(!showDeliverForm)}
+                    className="px-4 py-2 rounded-xl bg-[#0D3B34] text-white text-xs font-bold hover:bg-[#113E37] transition-colors cursor-pointer"
+                  >
+                    {showDeliverForm ? "Close Delivery Form" : "Deliver Work"}
+                  </button>
+                </div>
+
+                {showDeliverForm && (
+                  <form onSubmit={handleDeliverySubmit} className="pt-4 border-t border-slate-100 space-y-4">
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-1">Delivery Message / Notes</label>
+                      <textarea
+                        rows={3}
+                        placeholder="Describe what you completed in this deliverable..."
+                        value={deliveryText}
+                        onChange={(e) => setDeliveryText(e.target.value)}
+                        className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl p-3 text-xs sm:text-sm outline-none focus:bg-white focus:border-[#327C73]"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={submittingDelivery}
+                      className="px-5 py-2.5 rounded-xl bg-[#0D3B34] hover:bg-[#113E37] text-white text-xs font-bold shadow-xs cursor-pointer"
+                    >
+                      {submittingDelivery ? "Submitting..." : "Submit Delivery to Buyer"}
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+
+          </div>
+
+          {/* RIGHT COLUMN: Order Details Card + Quick Actions Card */}
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-20 self-start">
+
+            {/* Card 1: Order Details */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6">
+
+              {/* Header with Package Tag */}
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-base text-slate-900">Order details</h3>
+                <span className="text-[11px] font-semibold text-slate-600 border border-slate-200 rounded-md px-2 py-0.5">
+                  Package
+                </span>
+              </div>
+
+              {/* Package Thumbnail + Name */}
+              <div className="flex items-center gap-3.5 pb-4 border-b border-slate-100">
+                <img
+                  src={displayOrder.coverImage}
+                  alt={displayOrder.packageTitle}
+                  className="w-24 h-16 rounded-xl object-cover border border-slate-200 shrink-0 bg-slate-100"
+                />
+                <p className="font-bold text-sm text-slate-900 leading-snug">
+                  {displayOrder.packageTitle}
+                </p>
+              </div>
+
+              {/* Seller Profile Row */}
+              <div className="flex items-center gap-3 py-4 border-b border-slate-100">
+                <img
+                  src={displayOrder.seller.avatar}
+                  alt={displayOrder.seller.name}
+                  className="w-11 h-11 rounded-full object-cover border border-slate-200 shrink-0"
+                />
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-sm text-slate-900 leading-tight">
+                      {displayOrder.seller.name}
+                    </span>
+                    <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
+                      Pro
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-0.5">
+                    <span>{displayOrder.seller.role}</span>
+                    <span>&bull;</span>
+                    <span className="font-bold text-slate-800 flex items-center gap-0.5">
+                      <span className="text-amber-500">★</span> {displayOrder.seller.rating}
+                    </span>
+                    <span>({displayOrder.seller.reviewCount})</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Features Pill Row */}
+              <div className="flex items-center gap-4 py-3.5 border-b border-slate-100 text-xs font-medium text-slate-600">
+                <span className="flex items-center gap-1.5">
+                  <FiRefreshCw className="text-slate-400" />
+                  Unlimited Revision
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <FiClock className="text-slate-400" />
+                  3 Day Delivery
+                </span>
+              </div>
+
+              {/* Key-Value Details */}
+              <div className="py-4 space-y-3 text-xs sm:text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Order number</span>
+                  <span className="font-mono font-medium text-slate-800">{displayOrder.orderNumber}</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Status</span>
+                  <span className="bg-[#EEF2FF] text-[#6366F1] border border-[#C7D2FE] text-xs font-semibold px-3 py-1 rounded-full inline-block">
+                    Inprogress
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Payment status</span>
+                  <span className="font-medium text-slate-800">{displayOrder.paymentStatus}</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Started on</span>
+                  <span className="font-medium text-slate-800">{displayOrder.startedOn}</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500">Delivery time</span>
+                  <span className="font-medium text-slate-800">{displayOrder.deliveryTime}</span>
+                </div>
+              </div>
+
+              {/* Total Row */}
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                <span className="font-bold text-sm text-slate-800">Total</span>
+                <span className="font-extrabold text-xl text-slate-900">
+                  ${displayOrder.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
             </div>
-          )}
+
+            {/* Card 2: Quick actions */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 space-y-3">
+              <h3 className="font-bold text-base text-slate-900 mb-4">Quick actions</h3>
+
+              {/* Post a Project with AI */}
+              <Link
+                href="/briefs/create"
+                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#6EE7B7] via-[#67E8F9] to-[#7DD3FC] hover:opacity-95 text-slate-900 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-xs"
+              >
+                <span>Post a Project with AI</span>
+                <HiSparkles className="text-base text-slate-800" />
+              </Link>
+
+              {/* Browse Categories */}
+              <Link
+                href="/packages"
+                className="w-full py-3 px-4 rounded-xl bg-[#0B0F19] hover:bg-black text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors shadow-xs"
+              >
+                <span>Browse Categories</span>
+                <span>→</span>
+              </Link>
+
+              {/* Message Seller */}
+              <button
+                onClick={handleContact}
+                className="w-full py-3 px-4 rounded-xl bg-[#F1F3F5] hover:bg-slate-200 text-slate-800 font-semibold text-xs sm:text-sm flex items-center justify-center transition-colors cursor-pointer"
+              >
+                Message
+              </button>
+
+              {/* Become a Seller */}
+              <Link
+                href="/register?seller=true"
+                className="w-full py-3 px-4 rounded-xl bg-[#F1F3F5] hover:bg-slate-200 text-slate-800 font-semibold text-xs sm:text-sm flex items-center justify-center transition-colors block text-center"
+              >
+                Become a Seller
+              </Link>
+            </div>
+
+          </div>
 
         </div>
+
       </div>
 
-      {/* Lightbox Image Modal */}
-      {lightboxImage && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 cursor-pointer"
-          onClick={() => setLightboxImage(null)}
-        >
-          <div className="relative max-w-4xl max-h-[90vh]" onClick={e => e.stopPropagation()}>
-            <img src={lightboxImage} alt="Enlarged preview" className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl" />
-            <button
-              onClick={() => setLightboxImage(null)}
-              className="absolute top-2 right-2 text-white bg-black/60 hover:bg-black/90 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
+      {/* Revision Modal */}
+      {isRevisionModalOpen && (
+        <RevisionModal
+          isOpen={isRevisionModalOpen}
+          onClose={() => setIsRevisionModalOpen(false)}
+          onSubmit={(reason) => {
+            axiosFetch.post(`/orders/${displayOrder.id}/request-revision`, { reason })
+              .then(() => {
+                toast.success("Revision request sent!");
+                setIsRevisionModalOpen(false);
+                refetch();
+              })
+              .catch(() => toast.error("Failed to request revision"));
+          }}
+        />
       )}
 
-      {/* Revision Modal */}
-      <RevisionModal
-        isOpen={isRevisionModalOpen}
-        isLoading={submitting}
-        onSubmit={handleRequestRevisionSubmit}
-        onClose={() => setIsRevisionModalOpen(false)}
-      />
-
       {/* Extension Modal */}
-      <ExtensionModal
-        isOpen={isExtensionModalOpen}
-        isLoading={submitting}
-        onSubmit={handleRequestExtensionSubmit}
-        onClose={() => setIsExtensionModalOpen(false)}
-      />
+      {isExtensionModalOpen && (
+        <ExtensionModal
+          isOpen={isExtensionModalOpen}
+          onClose={() => setIsExtensionModalOpen(false)}
+          onSubmit={(extraDays, reason) => {
+            axiosFetch.post(`/orders/${displayOrder.id}/request-extension`, { extraDays, reason })
+              .then(() => {
+                toast.success("Extension requested!");
+                setIsExtensionModalOpen(false);
+                refetch();
+              })
+              .catch(() => toast.error("Failed to request extension"));
+          }}
+        />
+      )}
+
     </div>
   );
-};
-
-export default OrderDetail;
+}

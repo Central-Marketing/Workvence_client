@@ -311,13 +311,13 @@ export default function OrdersPage() {
               </div>
 
               {/* Manage All Orders Link */}
-              <button
-                onClick={() => setShowAllOrders(true)}
+              <Link
+                href="/orders/manage-orders"
                 className="text-xs sm:text-sm font-semibold text-[#113E37] hover:underline flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
               >
                 <span>Manage all orders</span>
                 <span>→</span>
-              </button>
+              </Link>
             </div>
           </div>
 

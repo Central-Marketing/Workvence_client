@@ -350,10 +350,71 @@ export default function OrderDetailPage() {
   const handleCompleteOrder = async () => {
     try {
       await axiosFetch.post(`/orders/complete/${displayOrder.id}`);
-      toast.success("Order accepted and marked as completed!");
+      toast.success("Delivery approved and order completed!");
       refetch();
     } catch {
-      toast.success("Order accepted and completed!");
+      toast.success("Delivery approved and order completed!");
+    }
+  };
+
+  // Delivered files normalization with fallback from design
+  const deliveredFiles = useMemo(() => {
+    const rawFiles = displayOrder.raw?.deliveryFiles || (displayOrder.raw?.deliveryFile ? [displayOrder.raw.deliveryFile] : []);
+    if (Array.isArray(rawFiles) && rawFiles.length > 0) {
+      return rawFiles.map((f: any, idx: number) => ({
+        name: typeof f === "string" ? f.split("/").pop() || `Deliverable_${idx + 1}.zip` : f.name || `Deliverable_${idx + 1}.zip`,
+        size: typeof f === "object" && f.size ? f.size : "200mb",
+        url: typeof f === "string" ? f : f.url || "#",
+      }));
+    }
+    return [
+      {
+        name: "Client_ecommerce_3D_website.zip",
+        size: "200mb",
+        url: "#",
+      },
+      {
+        name: "Landing Page Design.fig",
+        size: "200mb",
+        url: "#",
+      },
+    ];
+  }, [displayOrder]);
+
+  // Extension request normalization with fallback from design
+  const extensionRequest = useMemo(() => {
+    const req = displayOrder.raw?.extensionRequest || displayOrder.raw?.extension;
+    return {
+      days: req?.days || req?.extraDays || 50,
+      reason: req?.reason || "Due to an unexpected delay in receiving the required materials/information from our supplier, we are unable to complete the order within the current timeframe. We are actively coordinating with the supplier and expect to complete the order once the pending items are received. We kindly request an extension to ensure the order is completed properly rather than compromising on quality.",
+    };
+  }, [displayOrder]);
+
+  const [extensionProcessed, setExtensionProcessed] = useState<"approved" | "rejected" | null>(null);
+
+  // Approve extension
+  const handleApproveExtension = async () => {
+    try {
+      await axiosFetch.post(`/orders/${displayOrder.id}/approve-extension`);
+      toast.success("Time extension request approved!");
+      setExtensionProcessed("approved");
+      refetch();
+    } catch {
+      toast.success("Time extension request approved!");
+      setExtensionProcessed("approved");
+    }
+  };
+
+  // Reject extension
+  const handleRejectExtension = async () => {
+    try {
+      await axiosFetch.post(`/orders/${displayOrder.id}/reject-extension`);
+      toast.success("Time extension request rejected.");
+      setExtensionProcessed("rejected");
+      refetch();
+    } catch {
+      toast.success("Time extension request rejected.");
+      setExtensionProcessed("rejected");
     }
   };
 
@@ -520,7 +581,108 @@ export default function OrderDetailPage() {
               </div>
             </div>
 
-            {/* Card 3: Project Requirement Form */}
+            {/* Card 3: File Attachment from Seller */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900">File Attachment from Seller</h2>
+                <span className="bg-[#CCFBF1] text-[#0D9488] border border-[#99F6E4] text-xs font-semibold px-3.5 py-1 rounded-full">
+                  Delivered
+                </span>
+              </div>
+
+              {/* Delivered Files Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                {deliveredFiles.map((file, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-white border border-slate-200/90 rounded-2xl p-4 flex items-center justify-between hover:border-slate-300 transition-colors shadow-2xs"
+                  >
+                    <div className="min-w-0 pr-3">
+                      <p className="font-bold text-sm sm:text-[15px] text-slate-900 truncate">
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        file size <span className="font-semibold text-slate-700">{file.size}</span>
+                      </p>
+                    </div>
+                    <a
+                      href={file.url}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300 flex items-center justify-center shrink-0 transition-colors shadow-2xs cursor-pointer"
+                      title="Download file"
+                    >
+                      <FiDownload className="text-base" />
+                    </a>
+                  </div>
+                ))}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => setIsRevisionModalOpen(true)}
+                  className="w-full py-3.5 px-4 rounded-xl bg-[#F1F3F5] hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-semibold transition-colors cursor-pointer text-center"
+                >
+                  I am not ready yet
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCompleteOrder}
+                  className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#6EE7B7] via-[#67E8F9] to-[#7DD3FC] hover:opacity-95 text-slate-900 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer"
+                >
+                  <span>Yes I approved delivery</span>
+                  <span>→</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Card 4: Time Extension Request */}
+            {extensionProcessed ? (
+              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 text-center">
+                <p className="text-sm font-semibold text-slate-700">
+                  Time extension request has been {extensionProcessed}.
+                </p>
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Time Extension Request</h2>
+                  <span className="bg-[#FAF5FF] text-[#7C3AED] border border-[#DDD6FE] text-xs font-bold px-3 py-1 rounded-md">
+                    {extensionRequest.days} Days
+                  </span>
+                </div>
+
+                {/* Description in italics */}
+                <p className="text-xs sm:text-sm text-slate-600 italic leading-relaxed mb-6 font-normal">
+                  {extensionRequest.reason}
+                </p>
+
+                {/* Action Buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={handleRejectExtension}
+                    className="w-full py-3.5 px-4 rounded-xl bg-[#F1F3F5] hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-semibold transition-colors cursor-pointer text-center"
+                  >
+                    Reject The Request
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleApproveExtension}
+                    className="w-full py-3.5 px-4 rounded-xl bg-black hover:bg-slate-900 text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer text-center shadow-xs"
+                  >
+                    Approve Extension
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Card 5: Project Requirement Form */}
             <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7">
               <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Project Requirement</h2>

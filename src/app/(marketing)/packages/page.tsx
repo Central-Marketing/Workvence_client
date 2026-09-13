@@ -956,9 +956,10 @@ const Packages = () => {
               {/* Real Recommended Section (only shown if real items exist) */}
               {recommendedList && recommendedList.length > 0 && (
                 <div className="w-full pt-8 border-t border-gray-100">
-                  <h3 className="text-2xl sm:text-[28px] font-bold text-gray-900 mb-6 text-left">
-                    Recommended for you:
+                  <h3 className="text-5xl sm:text-[42px] font-normal font-sf-pro text-[#292929] text-left mb-2.5">
+                    You May Also Like
                   </h3>
+                  <p className="text-base font-normal font-inter text-[#6E6E6E] text-left mb-12">Explore the recommended packages by our AI system Worka</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
                     {recommendedList.slice(0, 4).map((pkg: any) => (
                       <PackageCard key={pkg._id || pkg.id} data={pkg} />

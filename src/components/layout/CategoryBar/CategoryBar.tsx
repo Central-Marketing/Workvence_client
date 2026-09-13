@@ -29,9 +29,9 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
       searchParams?.get('service')
     );
 
-  const isSellerDashboard = pathname === '/dashboard' && Boolean(user?.isSeller);
+  const isSeller = Boolean(user?.isSeller);
 
-  const isBarVisible = visible && !isSubcategoryRoute && !isSellerDashboard;
+  const isBarVisible = visible && !isSubcategoryRoute && !isSeller;
 
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -40,7 +40,8 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
   // Fetch categories from backend API
   const { data: fetchedCategories = [] } = useQuery({
     queryKey: ['admin-categories-categorybar'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }) => data).catch(() => [])
+    queryFn: () => adminAxios.get('/categories').then(({ data }) => data).catch(() => []),
+    enabled: !isSeller
   });
 
   const rawCats = Array.isArray(fetchedCategories)
@@ -83,6 +84,10 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
       setTimeout(checkScrollButtons, 350);
     }
   };
+
+  if (isSeller) {
+    return null;
+  }
 
   return (
     <div

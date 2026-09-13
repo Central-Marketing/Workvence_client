@@ -58,6 +58,37 @@ const FALLBACK_ORDER = {
   ],
 };
 
+const DEFAULT_LEDGER_GROUPS = [
+  {
+    id: "group-1",
+    date: "Aug 30, 2026 - 01:40 PM",
+    items: [
+      {
+        boldPrefix: "Requested 1 day(s) extension:",
+        text: "Please give me 1 day more",
+      },
+      {
+        boldPrefix: "Accepted 1 day(s) extension.",
+        text: "",
+      },
+      {
+        boldPrefix: "Revision requested:",
+        text: "The file is ready now you can just review",
+      },
+    ],
+  },
+  {
+    id: "group-2",
+    date: "Aug 30, 2026 - 01:40 PM",
+    items: [
+      {
+        boldPrefix: "",
+        text: "Explain the decision based on terms of service, contract scope, and evidence submitted.",
+      },
+    ],
+  },
+];
+
 export default function OrderDetailPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -207,6 +238,43 @@ export default function OrderDetailPage() {
       raw: o,
     };
   }, [rawOrder, id, user]);
+
+  // Normalized ledger groups from raw activities or pixel-perfect fallback
+  const ledgerGroups = useMemo(() => {
+    const rawEvents = displayOrder.raw?.activities || displayOrder.raw?.ledger || displayOrder.raw?.events;
+    if (Array.isArray(rawEvents) && rawEvents.length > 0) {
+      return rawEvents.map((evt: any, idx: number) => ({
+        id: evt._id || `evt-${idx}`,
+        date: evt.date || (evt.createdAt ? moment(evt.createdAt).format("MMM DD, YYYY - hh:mm A") : "Aug 30, 2026 - 01:40 PM"),
+        items: [
+          {
+            boldPrefix: evt.title || (evt.action ? `${evt.action}:` : undefined),
+            text: evt.desc || evt.description || evt.message || "",
+          },
+        ],
+      }));
+    }
+    return DEFAULT_LEDGER_GROUPS;
+  }, [displayOrder]);
+
+  // Close ledger drawer on Escape and lock body scroll
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showAdvancedTimeline) {
+        setShowAdvancedTimeline(false);
+      }
+    };
+    if (showAdvancedTimeline) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", handleKeyDown);
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [showAdvancedTimeline]);
 
   // Contact conversation
   const handleContact = async () => {
@@ -435,24 +503,6 @@ export default function OrderDetailPage() {
                     <p className="text-xs text-slate-500 mt-1">Buyer approved the work. Funds released to seller.</p>
                   </div>
                 </div>
-
-                {/* Advanced Timeline Expanded Details */}
-                {showAdvancedTimeline && (
-                  <div className="mt-6 pt-6 border-t border-slate-100 space-y-3 animate-in fade-in duration-150">
-                    <div className="text-xs text-slate-600 flex justify-between">
-                      <span>Order Created:</span>
-                      <strong className="text-slate-800">{displayOrder.startedOn}</strong>
-                    </div>
-                    <div className="text-xs text-slate-600 flex justify-between">
-                      <span>Target Delivery:</span>
-                      <strong className="text-slate-800">{displayOrder.deliveryTime}</strong>
-                    </div>
-                    <div className="text-xs text-slate-600 flex justify-between">
-                      <span>Payment Method:</span>
-                      <strong className="text-slate-800">Workvence Escrow Protected</strong>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -804,6 +854,97 @@ export default function OrderDetailPage() {
           }}
         />
       )}
+
+      {/* Slide-over Right Drawer: Order Activity & Escrow Ledger */}
+      <div
+        className={`fixed inset-0 z-[1100] overflow-hidden select-none transition-all duration-300 ${
+          showAdvancedTimeline
+            ? "visible opacity-100 pointer-events-auto"
+            : "invisible opacity-0 pointer-events-none"
+        }`}
+      >
+        {/* Backdrop Overlay */}
+        <div
+          className={`fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300 ease-out ${
+            showAdvancedTimeline ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={() => setShowAdvancedTimeline(false)}
+        />
+
+        <div className="fixed inset-y-0 right-0 max-w-full flex">
+          <div
+            className={`w-screen max-w-xl md:max-w-2xl bg-white shadow-2xl flex flex-col z-50 transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              showAdvancedTimeline ? "translate-x-0" : "translate-x-full"
+            }`}
+          >
+              
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between px-6 sm:px-8 py-6 border-b border-slate-200/80">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                  Order Activity &amp; Escrow Ledger
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => setShowAdvancedTimeline(false)}
+                  className="text-rose-500 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
+                  aria-label="Close ledger"
+                >
+                  <FiX className="text-2xl stroke-[2.5]" />
+                </button>
+              </div>
+
+              {/* Drawer Content */}
+              <div className="p-6 sm:p-8 overflow-y-auto flex-1 space-y-7">
+                {ledgerGroups.map((group, groupIdx) => (
+                  <div key={group.id || groupIdx} className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 sm:gap-6 items-start">
+                      
+                      {/* Left Date Badge */}
+                      <div className="sm:col-span-4">
+                        <span className="inline-block bg-[#F1F3F5] border border-slate-200/90 text-slate-700 font-mono text-[11px] sm:text-xs px-3 py-1.5 rounded-md font-medium">
+                          {group.date}
+                        </span>
+                      </div>
+
+                      {/* Right Timeline Events */}
+                      <div className="sm:col-span-8 relative pl-6">
+                        {/* Connecting vertical line for multi-item groups */}
+                        {group.items.length > 1 && (
+                          <div className="absolute left-[9px] top-2 bottom-2 w-0.5 bg-[#5EEAD4]" />
+                        )}
+
+                        <div className="space-y-5">
+                          {group.items.map((item, itemIdx) => (
+                            <div key={itemIdx} className="relative flex items-start gap-3">
+                              {/* Teal Dot with centered line alignment */}
+                              <div className="w-2.5 h-2.5 rounded-full bg-[#14B8A6] shrink-0 mt-1.5 z-10 -ml-6 ring-4 ring-white" />
+                              
+                              <p className="text-xs sm:text-sm text-slate-800 leading-relaxed">
+                                {item.boldPrefix && (
+                                  <strong className="font-bold text-slate-900 mr-1.5">
+                                    {item.boldPrefix}
+                                  </strong>
+                                )}
+                                <span className="text-slate-700">{item.text}</span>
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* Divider between date groups */}
+                    {groupIdx < ledgerGroups.length - 1 && (
+                      <div className="border-b border-slate-200/80 pt-1" />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+            </div>
+        </div>
+      </div>
 
     </div>
   );

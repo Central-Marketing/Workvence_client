@@ -19,7 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import adminAxios from "@/utils/adminAxios";
-import { FiAlertCircle, FiRefreshCw, FiGrid, FiArrowRight, FiArrowLeft } from "react-icons/fi";
+import { FiAlertCircle, FiRefreshCw, FiGrid, FiArrowRight, FiArrowLeft, FiHome } from "react-icons/fi";
 
 const DEFAULT_CATEGORIES = [
   "All services",
@@ -923,25 +923,30 @@ const Packages = () => {
               </button>
             </div>
           ) : (!packagesList || packagesList.length === 0) ? (
-            <div className="py-8 w-full animate-fadeIn">
-              {/* Empty State Illustration & Text */}
-              <div className="text-center flex flex-col items-center justify-center max-w-xl mx-auto mb-16">
-                <img
-                  src="/404.png"
-                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/404Img.png"; }}
-                  alt="No Services Found"
-                  className="w-full max-w-[320px] sm:max-w-[380px] h-auto object-contain mb-6"
-                />
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2.5 tracking-tight">
-                  No services found matching your criteria
+            <div className="py-6 w-full animate-fadeIn">
+              {/* Coral-900 Empty State Banner */}
+              <div className="w-full rounded-[10px] bg-[var(--coral-900,#683733)] py-16 sm:py-24 md:py-32 px-6 text-center flex flex-col items-center justify-center shadow-md mb-12">
+                {/* Breadcrumb */}
+                <div className="flex items-center justify-center gap-2 text-white/60 text-xs sm:text-[13px] font-light mb-3 select-none">
+                  <FiHome className="w-3.5 h-3.5 text-white/70" />
+                  <span>/</span>
+                  <span>Search result</span>
+                </div>
+
+                {/* Main Heading */}
+                <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-[54px] font-normal italic text-white tracking-tight leading-tight my-3 select-none">
+                  Oops! This Gig Doesn&apos;t Exist.
                 </h2>
-                <p className="text-sm sm:text-base text-gray-500 max-w-md leading-relaxed mb-6">
-                  Try adjusting your search keywords, clearing applied filters, or exploring other categories.
+
+                {/* Subtitle */}
+                <p className="text-xs sm:text-sm md:text-[15px] text-white/70 font-light max-w-lg mx-auto leading-relaxed text-center">
+                  The package you&apos;re looking for may have been removed, changed, or is temporarily unavailable.
                 </p>
+
                 {hasActiveFilters && (
                   <button
                     onClick={handleReset}
-                    className="px-6 py-2.5 bg-brand-green text-white text-sm font-semibold rounded-xl hover:bg-[#3ea917] transition-all shadow-sm active:scale-[0.98] cursor-pointer"
+                    className="mt-6 px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/25 rounded-full text-xs sm:text-sm font-medium transition-all backdrop-blur-sm cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98]"
                   >
                     Clear all filters
                   </button>

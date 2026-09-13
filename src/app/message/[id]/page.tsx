@@ -33,6 +33,7 @@ import supportService from "@/utils/supportService";
 import { getOtherUser, isConversationUnread, isTargetConversation, renderMessageTextWithLinks } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
 import { Loader, ChatSkeleton, Skeleton } from "@/components";
+import { MessageModerationBadge } from "@/features/chat";
 import moment from 'moment';
 import "./Message.scss";
 
@@ -985,6 +986,9 @@ const Message = () => {
                   const acceptedOrder = offer ? contactOrders.find((o: any) => (msg.orderID && (o._id === msg.orderID || o.id === msg.orderID)) || (o.title === offer.desc && Number(o.price) === Number(offer.price))) : null;
                   const targetOrderId = msg.orderID || acceptedOrder?._id || acceptedOrder?.id;
                   const isAccepted = isOfferAccepted || Boolean(acceptedOrder);
+                  const isModerated = Boolean(msg.moderation?.flagged);
+                  const modLevel = String(msg.moderation?.warningLevel || 'medium').toLowerCase();
+                  const moderationClass = isModerated ? `moderated moderated-${modLevel}` : '';
 
                   const msgDate = moment(msg.createdAt).format('MMM DD');
                   const prevMsgDate = index > 0 ? moment(filteredMessages[index - 1].createdAt).format('MMM DD') : null;
@@ -1003,11 +1007,16 @@ const Message = () => {
                         )}
 
                         {offer ? (
-                          <div className={`offer-card max-md:p-3.5 ${isWithdrawn ? 'withdrawn' : ''}`}>
+                          <div className={`offer-card max-md:p-3.5 ${isWithdrawn ? 'withdrawn' : ''} ${isModerated ? `border-${modLevel === 'low' ? 'amber-400' : modLevel === 'medium' ? 'orange-400' : modLevel === 'critical' ? 'red-700' : 'red-500'}` : ''}`}>
                             {isWithdrawn ? (
                               <p className="withdrawn-text">↩ This offer was withdrawn by the seller.</p>
                             ) : (
                               <div className="offer-content flex flex-col w-full">
+                                {isModerated && (
+                                  <div className="mb-2">
+                                    <MessageModerationBadge moderation={msg.moderation} isOwner={isOwner} />
+                                  </div>
+                                )}
                                 {isAccepted && (
                                   <div className="flex items-center justify-between gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200/80 rounded-xl px-3.5 py-1.5 text-xs font-bold mb-2.5">
                                     <span>✓ Custom Proposal Accepted</span>
@@ -1159,7 +1168,12 @@ const Message = () => {
                             </div>
                           </div>
                         ) : (
-                          <div className="msg-bubble [overflow-wrap:anywhere] [word-break:break-word]">
+                          <div className={`msg-bubble [overflow-wrap:anywhere] [word-break:break-word] ${moderationClass}`}>
+                            {isModerated && (
+                              <div className="mb-1.5 flex items-center">
+                                <MessageModerationBadge moderation={msg.moderation} isOwner={isOwner} />
+                              </div>
+                            )}
                             {renderMessageAttachment(msg)}
                             {msg.description && <p className="[overflow-wrap:anywhere] [word-break:break-word]">{renderMessageTextWithLinks(msg.description)}</p>}
                             <span className="msg-time">

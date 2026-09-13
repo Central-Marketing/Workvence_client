@@ -34,6 +34,16 @@ export interface MessageAttachment {
   size?: number;
 }
 
+export type ModerationWarningLevel = 'low' | 'medium' | 'high' | 'critical' | string;
+
+export interface MessageModeration {
+  flagged: boolean;
+  warningLevel?: ModerationWarningLevel;
+  matchedWord?: string;
+  flagReason?: string | null;
+  flaggedAt?: string | null;
+}
+
 export interface ChatMessage {
   _id: string;
   id?: string;
@@ -52,6 +62,7 @@ export interface ChatMessage {
   audioUrl?: string;
   createdAt: string;
   read?: boolean;
+  moderation?: MessageModeration | null;
 }
 
 export interface Conversation {

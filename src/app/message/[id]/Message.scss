@@ -255,6 +255,36 @@
       overflow-wrap: anywhere;
       box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 
+      &.moderated {
+        border-width: 1.5px !important;
+        border-style: solid !important;
+
+        &.moderated-low {
+          background-color: #fffbeb !important;
+          border-color: #f59e0b !important; // yellow-500 / amber-500
+          p { color: #78350f; }
+        }
+
+        &.moderated-medium {
+          background-color: #fff7ed !important;
+          border-color: #ea580c !important; // orange-600
+          p { color: #7c2d12; }
+        }
+
+        &.moderated-high {
+          background-color: #fef2f2 !important;
+          border-color: #dc2626 !important; // red-600
+          p { color: #7f1d1d; }
+        }
+
+        &.moderated-critical {
+          background-color: #fee2e2 !important;
+          border-color: #991b1b !important; // red-800 / dark red
+          border-width: 2px !important;
+          p { color: #450a0a; font-weight: 500; }
+        }
+      }
+
       p {
         font-size: 13.5px;
         color: #1e293b;

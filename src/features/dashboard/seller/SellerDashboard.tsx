@@ -98,7 +98,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           <div className="lg:col-span-8 bg-white border border-gray-100 rounded-2xl p-6 sm:p-7 shadow-sm">
             <div className="flex items-center justify-between pb-5 border-b border-gray-100 mb-4">
               <h2 className="text-lg sm:text-xl font-bold text-gray-900">Recent Orders</h2>
-              <Link href="/orders" className="text-xs font-semibold text-[#327C73] hover:underline">
+              <Link href="/manage-orders" className="text-xs font-semibold text-[#327C73] hover:underline">
                 View All
               </Link>
             </div>

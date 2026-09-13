@@ -317,6 +317,10 @@ const Navbar = () => {
                 Projects
               </Link>
 
+              <Link href="/manage-orders" className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors">
+                Orders
+              </Link>
+
               <div className="flex items-center gap-5 mr-1 border-l border-gray-200 pl-5">
                 <HeaderInboxIcon currentUser={user} />
                 <NotificationBell currentUser={user} />
@@ -339,7 +343,7 @@ const Navbar = () => {
                     <Link href="/dashboard" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
                       Dashboard
                     </Link>
-                    <Link href="/orders" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                    <Link href="/manage-orders" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
                       Orders
                     </Link>
                     <hr className="my-1 border-gray-100" />
@@ -470,6 +474,7 @@ const Navbar = () => {
               <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Dashboard</Link>
               {user.isSeller ? (
                 <>
+                  <Link href="/manage-orders" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Manage Orders</Link>
                   <Link href="/my-packages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Packages</Link>
                   <Link href="/organize" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Add New Package</Link>
                   <Link href="/earnings" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Earnings</Link>
@@ -495,7 +500,9 @@ const Navbar = () => {
                   <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a Seller</Link>
                 </>
               )}
-              <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Orders</Link>
+              {!user.isSeller && (
+                <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Orders</Link>
+              )}
               {!user.isSeller && (
                 <Link href="/briefs/my-briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Projects</Link>
               )}

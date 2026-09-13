@@ -20,6 +20,7 @@ const ADMIN_ROUTES = [
 
 // 3. Seller-only routes (requires isSeller role)
 const SELLER_ROUTES = [
+  "/manage-orders",
   "/earnings",
   "/my-packages",
   "/kyc",

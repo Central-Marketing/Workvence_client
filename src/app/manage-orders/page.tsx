@@ -7,7 +7,7 @@ import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from '@/components';
 
-const Orders = () => {
+const ManageOrders = () => {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
 
@@ -30,15 +30,11 @@ const Orders = () => {
         }),
   });
 
-  // Filter orders for Buyer
-  const buyerOrders = data.filter((order: any) => {
+  // Filter orders for Seller
+  const sellerOrders = data.filter((order: any) => {
     if (!user?._id) return true;
-    if (user.isSeller) {
-      const buyerId = typeof order.buyerID === "object" ? order.buyerID?._id : order.buyerID;
-      return String(buyerId) === String(user._id);
-    }
     const sellerId = typeof order.sellerID === "object" ? order.sellerID?._id : order.sellerID;
-    return String(sellerId) !== String(user._id);
+    return String(sellerId) === String(user._id) || !order.buyerID;
   });
 
   const handleContact = async (order: any) => {
@@ -53,8 +49,8 @@ const Orders = () => {
       })
       .catch(async () => {
         const { data } = await axiosFetch.post("/conversations", {
-          to: sellerID,
-          from: buyerID,
+          to: buyerID,
+          from: sellerID,
         });
         const targetId = data.uuid || data.conversationID || data._id;
         router.push(`/message/${targetId}`);
@@ -62,7 +58,7 @@ const Orders = () => {
   };
 
   // Filter orders by selected status tab
-  const filteredOrders = buyerOrders.filter((order: any) => {
+  const filteredOrders = sellerOrders.filter((order: any) => {
     if (statusFilter === "all") return true;
     if (statusFilter === "in_progress") return order.status === "paid" || !order.status;
     return order.status === statusFilter;
@@ -78,7 +74,7 @@ const Orders = () => {
         <div className="container mx-auto px-4 md:px-6 flex flex-col ">
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-5 py-6 md:px-7 md:pb-4 md:pt-6 bg-white">
-              <h1 className="text-2xl font-extrabold text-slate-900 mb-1">My Orders</h1>
+              <h1 className="text-2xl font-extrabold text-slate-900 mb-1">Manage Orders</h1>
               <p className="text-[13.5px] text-slate-500">Click on any order row to track delivery status, view ledger details, or message contacts</p>
             </div>
 
@@ -88,25 +84,25 @@ const Orders = () => {
                 className={`px-4 py-2 rounded-full text-[13px] font-semibold border transition-all ${statusFilter === "all" ? "bg-brand-green text-white border-brand-green" : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-200"}`}
                 onClick={() => setStatusFilter("all")}
               >
-                All Orders ({buyerOrders.length})
+                All Orders ({sellerOrders.length})
               </button>
               <button
                 className={`px-4 py-2 rounded-full text-[13px] font-semibold border transition-all ${statusFilter === "in_progress" ? "bg-brand-green text-white border-brand-green" : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-200"}`}
                 onClick={() => setStatusFilter("in_progress")}
               >
-                In Progress ({buyerOrders.filter((o: any) => o.status === 'paid' || !o.status).length})
+                In Progress ({sellerOrders.filter((o: any) => o.status === 'paid' || !o.status).length})
               </button>
               <button
                 className={`px-4 py-2 rounded-full text-[13px] font-semibold border transition-all ${statusFilter === "delivered" ? "bg-brand-green text-white border-brand-green" : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-200"}`}
                 onClick={() => setStatusFilter("delivered")}
               >
-                Delivered ({buyerOrders.filter((o: any) => o.status === 'delivered').length})
+                Delivered ({sellerOrders.filter((o: any) => o.status === 'delivered').length})
               </button>
               <button
                 className={`px-4 py-2 rounded-full text-[13px] font-semibold border transition-all ${statusFilter === "completed" ? "bg-brand-green text-white border-brand-green" : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-200"}`}
                 onClick={() => setStatusFilter("completed")}
               >
-                Completed ({buyerOrders.filter((o: any) => o.status === 'completed').length})
+                Completed ({sellerOrders.filter((o: any) => o.status === 'completed').length})
               </button>
             </div>
 
@@ -119,7 +115,7 @@ const Orders = () => {
                     </th>
 
                     <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50 whitespace-nowrap">
-                      Seller
+                      Buyer
                     </th>
 
                     <th className="py-3.5 px-5 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50 w-[280px]">
@@ -170,9 +166,9 @@ const Orders = () => {
                           />
                         </td>
 
-                        {/* Seller */}
+                        {/* Buyer */}
                         <td className="py-4 px-5 border-b border-slate-100 align-middle text-sm font-semibold text-slate-800 whitespace-nowrap">
-                          {order.sellerID?.username || "Seller"}
+                          {order.buyerID?.username || "Buyer"}
                         </td>
 
                         {/* Title */}
@@ -241,6 +237,6 @@ const Orders = () => {
   );
 };
 
-export default function OrdersPage() {
-  return <Orders />;
+export default function ManageOrdersPage() {
+  return <ManageOrders />;
 }

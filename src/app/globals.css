@@ -377,3 +377,73 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+/* Not Found Page Layout & Keyframe Animations */
+body:has(#not-found-page) nav,
+body.hide-navbar nav {
+  display: none !important;
+}
+
+@property --rotate-transform {
+  syntax: '<angle>';
+  initial-value: 0rad;
+  inherits: false;
+}
+
+.primary-btn-anim {
+  animation: kf_71_33996_opacity_0 0.3s linear;
+}
+
+.arrow-anim-icon {
+  animation: kf_71_33997_opacity_0 0.3s linear;
+  transform: rotate(var(--rotate-transform, 0rad));
+}
+
+.group:hover .arrow-anim-icon {
+  animation:
+    kf_71_34102_rotate_0 0.3s linear forwards,
+    kf_71_34102_translate_0 0.3s linear forwards;
+}
+
+@keyframes kf_71_33996_opacity_0 {
+  0% {
+    animation-timing-function: ease-out;
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes kf_71_33997_opacity_0 {
+  0% {
+    animation-timing-function: ease-out;
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes kf_71_34102_rotate_0 {
+  0% {
+    animation-timing-function: ease-out;
+    --rotate-transform: -3.142rad;
+    transform: rotate(-3.142rad);
+  }
+  100% {
+    --rotate-transform: -6.283rad;
+    transform: rotate(-6.283rad);
+  }
+}
+
+@keyframes kf_71_34102_translate_0 {
+  0% {
+    animation-timing-function: ease-out;
+    translate: 0px 0px;
+  }
+  100% {
+    translate: 12px 0px;
+  }
+}
+

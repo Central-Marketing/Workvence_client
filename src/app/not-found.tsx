@@ -1,45 +1,68 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft, Home } from "lucide-react";
+import React, { useEffect } from "react";
+import Link from 'next/link';
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const NotFound = () => {
+  useEffect(() => {
+    document.body.classList.add("hide-navbar");
+
+    return () => {
+      document.body.classList.remove("hide-navbar");
+    };
+  }, []);
+
   return (
-    <div className="min-h-[80vh] flex items-center justify-center bg-white px-5 py-20">
-      <div className="text-center max-w-2xl mx-auto flex flex-col items-center">
-        {/* Large 404 Background Text */}
-        <div className="relative mb-8">
-          <h1 className="text-[120px] md:text-[180px] font-black text-gray-50 leading-none select-none tracking-tighter">
+    <div id="not-found-page" className="w-full flex justify-center items-center p-4 md:p-8 lg:p-10 bg-slate-50 dark:bg-slate-950">
+      {/* 404 Container */}
+      <div className="w-full max-w-[1760px] h-[clamp(650px,85vh,1000px)] min-h-[620px] rounded-[10px] bg-[var(--warning-900,#650000)] relative overflow-hidden flex flex-col items-center justify-center shadow-2xl">
+        {/* SVG Repeating Pattern Background */}
+        <div
+          className="absolute inset-0 w-full h-full bg-[url('/media/not-found-pattern.svg')] bg-repeat [background-size:150px_102px] opacity-55 pointer-events-none z-1"
+          aria-hidden="true"
+        />
+
+        {/* Radial Vignette Overlay for Depth */}
+        <div
+          className="absolute inset-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(101,0,0,0.2)_0%,rgba(60,0,0,0.75)_100%)] pointer-events-none z-2"
+          aria-hidden="true"
+        />
+
+        {/* Content */}
+        <div className="relative z-10 text-center px-5 max-w-[900px] flex flex-col items-center justify-center">
+          <h1 className="font-outfit text-[clamp(120px,20vw,290px)] font-black italic leading-[0.95] tracking-tighter text-[#fff0f3] drop-shadow-2xl select-none mb-2">
             404
           </h1>
-          <div className="absolute inset-0 flex items-center justify-center flex-col">
-            <div className="w-16 h-1 bg-brand-green rounded-full mb-6"></div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
-              Page Not Found
-            </h2>
+
+          <h2 className="text-[clamp(28px,4.5vw,56px)] font-normal italic tracking-tight text-white leading-tight drop-shadow-md">
+            Oops! Page Not Found
+          </h2>
+
+          <p className="text-[clamp(13px,1.4vw,17px)] text-white/70 font-light mt-4 mb-9 max-w-[580px] leading-relaxed tracking-wide">
+            The page you are looking for doesn't exist or has been moved.
+          </p>
+
+          <div className="flex flex-row flex-wrap items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white border border-white/25 hover:border-white/45 rounded-full text-[15px] font-semibold transition-all duration-200 backdrop-blur-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Go Back</span>
+            </button>
+
+            <Link
+              href="/"
+              className="primary-btn-anim group inline-flex items-center justify-center gap-3 px-7 py-3.5 bg-white hover:bg-[#fff5f6] text-[#650000] rounded-full text-[15px] font-bold shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+            >
+              <span>Back to Home</span>
+              <span className="arrow-anim-icon inline-flex items-center justify-center">
+                <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
           </div>
-        </div>
-
-        <p className="text-gray-500 text-[15px] md:text-[17px] mb-10 max-w-md leading-relaxed">
-          Oops! The page you are looking for doesn't exist, has been moved, or you don't have permission to view it.
-        </p>
-
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-          <button 
-            onClick={() => window.history.back()}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors font-semibold text-[15px]"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Go Back
-          </button>
-          
-          <Link 
-            href="/"
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-white bg-brand-green hover:bg-[#399d14] transition-all shadow-md hover:shadow-lg font-semibold text-[15px]"
-          >
-            <Home className="w-4 h-4" />
-            Back to Home
-          </Link>
         </div>
       </div>
     </div>

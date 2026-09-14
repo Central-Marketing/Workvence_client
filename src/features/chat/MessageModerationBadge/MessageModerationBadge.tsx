@@ -31,11 +31,14 @@ export const MessageModerationBadge: React.FC<MessageModerationBadgeProps> = ({
           e.stopPropagation();
           setIsOpen((prev) => !prev);
         }}
-        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all cursor-pointer shadow-2xs ${config.badgeBg} ${config.badgeText} ${config.badgeBorder} hover:brightness-95 select-none`}
+        className={`inline-flex items-center justify-center w-7 h-7 rounded-md
+    transition-colors cursor-pointer
+    ${config.badgeText}
+    hover:bg-muted
+    focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1`}
         aria-label={config.badgeLabel}
       >
-        <RiAlertFill className={`w-3.5 h-3.5 ${config.iconColor} flex-shrink-0`} />
-        <span>{config.badgeLabel}</span>
+        <RiAlertFill className={`w-4 h-4 ${config.iconColor}`} />
       </button>
 
       {/* Friendly Marketplace Tooltip */}
@@ -43,9 +46,8 @@ export const MessageModerationBadge: React.FC<MessageModerationBadgeProps> = ({
         <div
           onMouseEnter={() => setIsOpen(true)}
           onMouseLeave={() => setIsOpen(false)}
-          className={`absolute bottom-full mb-2 z-50 w-64 p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-800 dark:text-slate-100 text-xs transition-all pointer-events-auto ${
-            isOwner ? 'right-0' : 'left-0'
-          }`}
+          className={`absolute bottom-full mb-2 z-50 w-64 p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-800 dark:text-slate-100 text-xs transition-all pointer-events-auto ${isOwner ? 'right-0' : 'left-0'
+            }`}
           style={{
             boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08)',
           }}
@@ -68,9 +70,8 @@ export const MessageModerationBadge: React.FC<MessageModerationBadgeProps> = ({
 
           {/* Tooltip triangle arrow */}
           <div
-            className={`absolute top-full w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-white dark:border-t-slate-900 ${
-              isOwner ? 'right-4' : 'left-4'
-            }`}
+            className={`absolute top-full w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-white dark:border-t-slate-900 ${isOwner ? 'right-4' : 'left-4'
+              }`}
           />
         </div>
       )}

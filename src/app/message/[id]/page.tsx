@@ -416,10 +416,14 @@ const Message = () => {
 
 
   const contactOrders = allOrders.filter((o: any) => {
-    const sId = o.sellerID?._id || o.sellerID;
-    const bId = o.buyerID?._id || o.buyerID;
-    return (sId === user._id || bId === user._id) &&
-      (sId === recipientUser?._id || bId === recipientUser?._id);
+    const sId = String(o.sellerID?._id || o.sellerID || "");
+    const bId = String(o.buyerID?._id || o.buyerID || "");
+    const currentUserId = String(user?._id || user?.id || "");
+    const targetUserId = String(finalRecipientUser?._id || finalRecipientUser?.id || recipientUser?._id || "");
+    return (
+      (sId === currentUserId || bId === currentUserId) &&
+      (sId === targetUserId || bId === targetUserId)
+    );
   });
 
   const mutation = useMutation({
@@ -1314,91 +1318,91 @@ const Message = () => {
 
         {/* ── RIGHT: About This Contact ── */}
         {finalRecipientUser && (
-          <aside className={`contact-sidebar transform transition-transform duration-300 ease-in-out max-lg:absolute max-lg:right-0 max-lg:z-40 max-lg:shadow-xl max-lg:h-full max-lg:!flex ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
-            <div className="sidebar-card relative">
-              <button className="lg:hidden absolute top-2 right-2 text-gray-500 text-2xl" onClick={() => setIsRightSideOpen(false)}><RiCloseLine /></button>
-              <div className="sidebar-section-header">
-                <h3>About {finalRecipientUser.username}</h3>
-              </div>
-              <div className="sidebar-details">
-                <div className="detail-row">
-                  <span className="detail-label">From</span>
-                  <span className="detail-value">{finalRecipientUser.country || 'United States'}</span>
+          <aside className={`contact-sidebar h-full max-h-full min-h-0 flex-shrink-0 max-lg:fixed max-lg:top-0 max-lg:bottom-0 max-lg:right-0 max-lg:z-40 max-lg:shadow-2xl max-lg:h-full max-lg:!flex max-lg:transform max-lg:transition-transform max-lg:duration-300 max-lg:ease-in-out ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
+            <div className="w-full flex flex-col gap-5 pb-20">
+              <div className="sidebar-card relative">
+                <button className="lg:hidden absolute top-2 right-2 text-gray-500 text-2xl" onClick={() => setIsRightSideOpen(false)}><RiCloseLine /></button>
+                <div className="sidebar-section-header">
+                  <h3>About {finalRecipientUser.username}</h3>
                 </div>
-                <div className="detail-row">
-                  <span className="detail-label">On Workvence since</span>
-                  <span className="detail-value">{moment(finalRecipientUser.createdAt).format('MMM YYYY')}</span>
-                </div>
-                {Array.isArray(finalRecipientUser?.languages) && finalRecipientUser.languages.length > 0 ? (
-                  finalRecipientUser.languages.map((item: any, index: number) => {
-                    const label = typeof item === 'string' ? item : item?.language || item?.lang || item?.name || 'English';
-                    const value = typeof item === 'string' ? 'Fluent' : item?.level || 'Fluent';
-                    return (
-                      <div className="detail-row" key={index}>
-                        <span className="detail-label">{label}</span>
-                        <span className="detail-value">{value}</span>
-                      </div>
-                    );
-                  })
-                ) : (
+                <div className="sidebar-details">
                   <div className="detail-row">
-                    <span className="detail-label">Languages</span>
-                    <span className="detail-value">English</span>
+                    <span className="detail-label">From</span>
+                    <span className="detail-value">{finalRecipientUser.country || 'United States'}</span>
                   </div>
-                )}
-                <div className="detail-row">
-                  <span className="detail-label">Response rate</span>
-                  <span className="detail-value">{finalRecipientUser.responseTimeHours} h</span>
-                </div>
-                <button className="view-profile-btn" onClick={() => navigate.push(`/seller/${finalRecipientUser._id}`)}>
-                  View Profile
-                </button>
-              </div>
-            </div>
-
-            {contactOrders.length > 0 && (
-              <div className="sidebar-card" style={{ marginTop: '20px' }}>
-                <div className="sidebar-section-header" style={{ marginBottom: '14px' }}>
-                  <h3>Orders ({contactOrders.length})</h3>
-                </div>
-                <div className="flex flex-col gap-2.5 px-2">
-                  {contactOrders.slice(0, 4).map((order: any) => (
-                    <div
-                      key={order._id}
-                      className="relative rounded-lg border border-slate-100 overflow-hidden cursor-pointer hover:shadow-md hover:border-slate-200 transition-all duration-200 group"
-                      onClick={() => navigate.push(`/orders/${order._id}`)}
-                    >
-                      <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${order.status === 'completed' ? 'bg-green-500' :
-                        order.status === 'delivered' ? 'bg-blue-500' : 'bg-amber-500'
-                        }`} />
-                      <div className="px-2 py-2.5">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-[2px] rounded ${order.status === 'completed' ? 'bg-green-50 text-green-600' :
-                            order.status === 'delivered' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'
-                            }`}>
-                            {order.status === 'completed' ? 'Completed' : order.status === 'delivered' ? 'Delivered' : 'In Progress'}
-                          </span>
-                          <span className="text-sm font-bold text-slate-800">${order.price}</span>
+                  <div className="detail-row">
+                    <span className="detail-label">On Workvence since</span>
+                    <span className="detail-value">{moment(finalRecipientUser.createdAt).format('MMM YYYY')}</span>
+                  </div>
+                  {Array.isArray(finalRecipientUser?.languages) && finalRecipientUser.languages.length > 0 ? (
+                    finalRecipientUser.languages.map((item: any, index: number) => {
+                      const label = typeof item === 'string' ? item : item?.language || item?.lang || item?.name || 'English';
+                      const value = typeof item === 'string' ? 'Fluent' : item?.level || 'Fluent';
+                      return (
+                        <div className="detail-row" key={index}>
+                          <span className="detail-label">{label}</span>
+                          <span className="detail-value">{value}</span>
                         </div>
-                        <h4 className="text-[12px] font-medium text-slate-600 line-clamp-1 group-hover:text-slate-900 transition-colors">
-                          {order.title}
-                        </h4>
-                      </div>
+                      );
+                    })
+                  ) : (
+                    <div className="detail-row">
+                      <span className="detail-label">Languages</span>
+                      <span className="detail-value">English</span>
                     </div>
-                  ))}
-                </div>
-                {contactOrders.length > 3 && (
-                  <button
-                    className="w-full mt-3 py-2 text-[12px] font-bold text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
-                    onClick={() => navigate.push('/orders')}
-                  >
-                    View All Orders →
+                  )}
+                  <div className="detail-row">
+                    <span className="detail-label">Response rate</span>
+                    <span className="detail-value">{finalRecipientUser.responseTimeHours ? `${finalRecipientUser.responseTimeHours} h` : '1 hr'}</span>
+                  </div>
+                  <button className="view-profile-btn" onClick={() => navigate.push(`/seller/${finalRecipientUser._id}`)}>
+                    View Profile
                   </button>
-                )}
+                </div>
               </div>
-            )}
 
-
+              {contactOrders.length > 0 && (
+                <div className="sidebar-card">
+                  <div className="sidebar-section-header" style={{ marginBottom: '14px' }}>
+                    <h3>Orders ({contactOrders.length})</h3>
+                  </div>
+                  <div className="flex flex-col gap-2.5 px-2">
+                    {contactOrders.slice(0, 4).map((order: any) => (
+                      <div
+                        key={order._id}
+                        className="relative rounded-lg border border-slate-100 overflow-hidden cursor-pointer hover:shadow-md hover:border-slate-200 transition-all duration-200 group"
+                        onClick={() => navigate.push(`/orders/${order._id}`)}
+                      >
+                        <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${order.status === 'completed' ? 'bg-green-500' :
+                          order.status === 'delivered' ? 'bg-blue-500' : 'bg-amber-500'
+                          }`} />
+                        <div className="px-2 py-2.5">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-[2px] rounded ${order.status === 'completed' ? 'bg-green-50 text-green-600' :
+                              order.status === 'delivered' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'
+                              }`}>
+                              {order.status === 'completed' ? 'Completed' : order.status === 'delivered' ? 'Delivered' : 'In Progress'}
+                            </span>
+                            <span className="text-sm font-bold text-slate-800">${order.price}</span>
+                          </div>
+                          <h4 className="text-[12px] font-medium text-slate-600 line-clamp-1 group-hover:text-slate-900 transition-colors">
+                            {order.title}
+                          </h4>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {contactOrders.length > 3 && (
+                    <button
+                      className="w-full mt-3 py-2 text-[12px] font-bold text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                      onClick={() => navigate.push('/orders')}
+                    >
+                      View All Orders →
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </aside>
         )}
       </div>

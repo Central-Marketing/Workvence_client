@@ -9,7 +9,7 @@ import { X, FileText, Upload } from 'lucide-react';
 import 'react-quill-new/dist/quill.snow.css';
 import { packageReducer, initialState } from '@/reducers/packageReducer';
 import { axiosFetch, generateImageURL } from '@/utils';
-import adminAxios from '@/utils/adminAxios';
+import useAdminCategories from '@/hooks/useAdminCategories';
 import supportService from '@/utils/supportService';
 import { Loader, CustomSelect } from '@/components';
 
@@ -71,16 +71,7 @@ const EditPackage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const { data: fetchedCategories = [] } = useQuery({
-    queryKey: ['admin-categories'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }) => data)
-  });
-
-  const categoryList = Array.isArray(fetchedCategories)
-    ? fetchedCategories
-    : Array.isArray(fetchedCategories?.data)
-      ? fetchedCategories.data
-      : fetchedCategories?.categories || [];
+  const { categoryList } = useAdminCategories();
 
   // Fetch the existing package details
   const { isLoading, error, data: packageData } = useQuery({

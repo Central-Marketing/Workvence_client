@@ -3,29 +3,42 @@
    ==================================================== */
 
 .message-page {
-  height: calc(100vh - 70px);
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
   background: #fff;
   display: flex;
   overflow: hidden;
+  width: 100%;
+  flex: 1;
 }
 
 .inbox-layout {
   display: flex;
   width: 100%;
   height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  flex: 1;
   overflow: hidden;
   position: relative;
 }
 
 /* ── LEFT: Conversation List ── */
 .conversation-list {
-  width: 320px;
-  min-width: 320px;
+  width: 300px;
+  min-width: 280px;
   border-right: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
   background: #fff;
   overflow: hidden;
+  box-sizing: border-box;
+
+  @media (min-width: 1280px) {
+    width: 320px;
+    min-width: 320px;
+  }
 
   .inbox-header {
     padding: 16px;
@@ -203,6 +216,7 @@
   .messages-scroll {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -251,6 +265,36 @@
       overflow-wrap: anywhere;
       box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 
+      &.moderated {
+        border-width: 1.5px !important;
+        border-style: solid !important;
+
+        &.moderated-low {
+          background-color: #fffbeb !important;
+          border-color: #f59e0b !important; // yellow-500 / amber-500
+          p { color: #78350f; }
+        }
+
+        &.moderated-medium {
+          background-color: #fff7ed !important;
+          border-color: #ea580c !important; // orange-600
+          p { color: #7c2d12; }
+        }
+
+        &.moderated-high {
+          background-color: #fef2f2 !important;
+          border-color: #dc2626 !important; // red-600
+          p { color: #7f1d1d; }
+        }
+
+        &.moderated-critical {
+          background-color: #fee2e2 !important;
+          border-color: #991b1b !important; // red-800 / dark red
+          border-width: 2px !important;
+          p { color: #450a0a; font-weight: 500; }
+        }
+      }
+
       p {
         font-size: 13.5px;
         color: #1e293b;
@@ -286,6 +330,20 @@
     .offer-content {
       display: flex; gap: 20px; align-items: stretch;
       
+      @media (max-width: 1150px) {
+        flex-direction: column;
+        gap: 14px;
+        .offer-seller-info {
+          border-right: none !important;
+          border-bottom: 1px solid #f1f5f9;
+          padding-right: 0 !important;
+          padding-bottom: 10px;
+        }
+        .offer-actions {
+          flex-direction: row !important;
+        }
+      }
+      
       .offer-seller-info {
         display: flex; align-items: center; gap: 10px; min-width: 140px;
         border-right: 1px solid #f1f5f9; padding-right: 15px;
@@ -316,6 +374,21 @@
           &.withdraw-btn { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; &:hover { background: #fee2e2; } }
         }
       }
+    }
+  }
+
+  /* Video Meeting Card */
+  .meeting-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    width: 480px;
+    max-width: 100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
     }
   }
 
@@ -358,17 +431,28 @@
 
 /* ── RIGHT: Contact Sidebar ── */
 .contact-sidebar {
-  width: 340px;
-  min-width: 340px;
+  width: 320px;
+  min-width: 280px;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
   border-left: 1px solid #e2e8f0;
   background: #f8fafc;
   overflow-y: auto;
-  padding: 24px 20px;
+  overflow-x: hidden;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+
+  @media (min-width: 1280px) {
+    width: 340px;
+    min-width: 320px;
+    padding: 20px;
+  }
   
-  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar { width: 5px; }
   &::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
   .sidebar-card {

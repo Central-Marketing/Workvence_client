@@ -3,9 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
-import adminAxios from "@/utils/adminAxios";
+import useAdminCategories from "@/hooks/useAdminCategories";
 import toast from "react-hot-toast";
 import { ArrowRight, Globe } from "lucide-react";
 
@@ -27,53 +26,74 @@ interface FooterColumn {
   links: FooterLink[];
 }
 
-const defaultCategoryLinks: FooterLink[] = [
-  { name: "Graphics & Design", href: "/packages?category=graphics-and-design" },
-  { name: "User Experience Design", href: "/packages?category=user-experience-design" },
-  { name: "Animation & Motion Graphics", href: "/packages?category=animation-and-motion-graphics" },
-  { name: "Illustration", href: "/packages?category=illustration" },
-  { name: "Brand Identity & Logo", href: "/packages?category=brand-identity-and-logo" },
-  { name: "3D Modeling & Rendering", href: "/packages?category=3d-modeling-and-rendering" },
-  { name: "Print Design", href: "/packages?category=print-design" },
-  { name: "Photography", href: "/packages?category=photography" },
-  { name: "Packaging Design", href: "/packages?category=packaging-design" },
-  { name: "Typography", href: "/packages?category=typography" },
-];
-
 const staticFooterColumns: FooterColumn[] = [
   {
     title: "Categories",
-    links: defaultCategoryLinks,
+    links: [
+      { name: "AI Services", href: "/packages?category=ai-services" },
+      { name: "Business & Consulting", href: "/packages?category=business-and-consulting" },
+      { name: "Data & Analytics", href: "/packages?category=data-and-analytics" },
+      { name: "Digital Marketing", href: "/packages?category=digital-marketing" },
+      { name: "E-Commerce", href: "/packages?category=e-commerce" },
+      { name: "Graphics & Design", href: "/packages?category=graphics-and-design" },
+      { name: "Music & Audio", href: "/packages?category=music-and-audio" },
+      { name: "Other & General", href: "/packages?category=other-and-general" },
+      { name: "Programming & Tech", href: "/packages?category=programming-and-tech" },
+      { name: "Video & Animation", href: "/packages?category=video-and-animation" },
+    ]
   },
   {
-    title: "For Freelancers",
+    title: "About",
     links: [
-      { name: "Become a workvence Freelancer", href: "/register?seller=true" },
-      { name: "Community Hub", href: "/help-center" },
-      { name: "Blogs", href: "/help-center" },
-    ],
-  },
-  {
-    title: "For Clients",
-    links: [
-      { name: "How Workvence Works", href: "/help-center" },
-      { name: "Customer Success Stories", href: "/recommended-sellers" },
-      { name: "Workvence Guide", href: "/help-center" },
-      { name: "Refund Policy", href: "/terms" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { name: "About Workvence", href: "/trust-safety" },
-      { name: "Support Agent", href: "/support" },
-      { name: "Help Center", href: "/help-center" },
-      { name: "Trust and Safety", href: "/trust-safety" },
-      { name: "Terms of Services", href: "/terms" },
+      // { name: "Careers", href: "/careers" },
+      { name: "Press & News", href: "/press" },
+      { name: "Partnerships", href: "/partnerships" },
       { name: "Privacy Policy", href: "/privacy" },
-      { name: "Press Release", href: "/help-center" },
-    ],
+      { name: "Terms of Service", href: "/terms" },
+      { name: "Intellectual Property Claims", href: "/intellectual-property" },
+      { name: "Investor Relations", href: "/investor-relations" },
+    ]
   },
+  {
+    title: "Support",
+    links: [
+      { name: "Help & Support", href: "/help-center" },
+      { name: "Trust & Safety", href: "/trust-safety" },
+      { name: "Selling on Workvence", href: "/how-to-sell" },
+      { name: "Buying on Workvence", href: "/how-to-buy" },
+    ]
+  },
+  {
+    title: "Community",
+    links: [
+      { name: "Customer Success Stories", href: "/success-stories" },
+      { name: "Community Hub", href: "/community" },
+      { name: "Forum", href: "/forum" },
+      { name: "Events", href: "/events" },
+      { name: "Blog", href: "/blog" },
+      { name: "Influencers", href: "/influencers" },
+      { name: "Affiliates", href: "/affiliates" },
+      // { name: "Podcast", href: "/podcast" },
+      // { name: "Invite a Friend", href: "/invite" },
+      { name: "Become a Seller", href: "/become-a-seller" },
+      // { name: "Community Standards", href: "/community-standards" },
+    ]
+  },
+  // {
+  //   title: "More From Workvence",
+  //   links: [
+  //     { name: "Workvence Business", href: "/business" },
+  //     { name: "Workvence Pro", href: "/pro" },
+  //     { name: "Workvence Logo Maker", href: "/logo-maker" },
+  //     { name: "Workvence Guides", href: "/guides" },
+  //     { name: "Get Inspired", href: "/get-inspired" },
+  //     { name: "Workvence Select", href: "/select" },
+  //     { name: "ClearVoice", href: "/clearvoice" },
+  //     { name: "Workvence Workspace", href: "/workspace" },
+  //     { name: "Learn", href: "/learn" },
+  //     { name: "Working Not Working", href: "/working-not-working" },
+  //   ]
+  // }
 ];
 
 const Footer = () => {
@@ -83,30 +103,21 @@ const Footer = () => {
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim()) return;
+
+    setIsSubscribing(true);
     setSubscribedMsg(null);
 
-    const trimmedEmail = email.trim();
-
-    if (!trimmedEmail) {
-      toast.error("Email address is required.");
-      setSubscribedMsg({ type: 'error', text: "Email address is required." });
-      return;
-    }
-
     try {
-      setIsSubscribing(true);
-      const res = await axiosFetch.post('/newsletter/subscribe', { email: trimmedEmail });
-      const resData = res.data || {};
-
-      if (resData.alreadySubscribed) {
-        const msg = resData.message || "This email is already subscribed to our newsletter.";
-        toast.error(msg);
-        setSubscribedMsg({ type: 'info', text: msg });
-      } else {
-        const msg = resData.message || "Thank you for subscribing to our newsletter!";
-        toast.success(msg);
-        setSubscribedMsg({ type: 'success', text: msg });
+      const res = await axiosFetch.post('/newsletter/subscribe', { email: email.trim() });
+      if (res.data?.success) {
+        toast.success("Successfully subscribed to newsletter!");
+        setSubscribedMsg({ type: 'success', text: "Thank you for subscribing!" });
         setEmail("");
+      } else {
+        const msg = res.data?.message || "Failed to subscribe. Please try again.";
+        toast.error(msg);
+        setSubscribedMsg({ type: 'error', text: msg });
       }
     } catch (err: any) {
       const errMsg = err.response?.data?.message || "Please provide a valid email address.";
@@ -117,16 +128,7 @@ const Footer = () => {
     }
   };
 
-  const { data: fetchedCategories = [] } = useQuery({
-    queryKey: ['admin-categories-footer'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }) => data).catch(() => [])
-  });
-
-  const categoryList = Array.isArray(fetchedCategories)
-    ? fetchedCategories
-    : Array.isArray(fetchedCategories?.data)
-      ? fetchedCategories.data
-      : fetchedCategories?.categories || [];
+  const { categoryList } = useAdminCategories();
 
   const footerColumns: FooterColumn[] = staticFooterColumns.map(col => {
     if (col.title === "Categories") {

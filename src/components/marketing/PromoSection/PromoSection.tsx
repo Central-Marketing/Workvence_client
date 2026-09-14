@@ -59,25 +59,15 @@ const PromoSection = () => {
               ref={videoRef}
               className="w-full h-full object-cover"
               autoPlay
+              preload='true'
+              controls={false}
               muted
               loop
               playsInline
               src="https://res.cloudinary.com/cqtrqtyu/video/upload/v1786602492/WhatsApp_Video_2026-08-13_at_12.22.47_PM_odf8xi.mp4"
             />
 
-            {/* Ambient Play / Pause Button Overlay on Hover/Pause */}
-            <div
-              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 pointer-events-none ${isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'
-                }`}
-            >
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white border border-white/20 shadow-xl transition-transform duration-200 group-hover:scale-105">
-                {isPlaying ? (
-                  <Pause size={24} className="text-white fill-white" />
-                ) : (
-                  <Play size={24} className="text-white fill-white ml-1" />
-                )}
-              </div>
-            </div>
+
           </div>
         </div>
 

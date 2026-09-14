@@ -6,8 +6,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { RiSearchLine } from "react-icons/ri";
 import { FiMenu, FiX, FiMessageSquare, FiBell, FiChevronDown, FiGrid, FiArrowRight } from "react-icons/fi";
-import { useQuery } from "@tanstack/react-query";
-import adminAxios from "@/utils/adminAxios";
+import useAdminCategories from "@/hooks/useAdminCategories";
 
 import toast from 'react-hot-toast';
 import { axiosFetch, socket } from '@/utils';
@@ -31,17 +30,7 @@ const Navbar = () => {
   const isSeller = Boolean(user?.isSeller);
 
   // Fetch real categories from backend
-  const { data: fetchedCategories = [] } = useQuery({
-    queryKey: ['admin-categories-navbar'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }) => data).catch(() => []),
-    enabled: !isSeller
-  });
-
-  const rawCats = Array.isArray(fetchedCategories)
-    ? fetchedCategories
-    : Array.isArray(fetchedCategories?.data)
-      ? fetchedCategories.data
-      : fetchedCategories?.categories || [];
+  const { categoryList: rawCats } = useAdminCategories();
 
   const categoryList = rawCats.map((cat: any) => {
     if (typeof cat === 'string') {

@@ -17,6 +17,8 @@ export const useUserStore = create<UserState>((set) => ({
           document.cookie = `role=${user.role}; path=/; max-age=2592000; SameSite=Lax`;
         }
       } else {
+        document.cookie = `accessToken=; path=/; max-age=0; SameSite=Lax`;
+        document.cookie = `refreshToken=; path=/; max-age=0; SameSite=Lax`;
         document.cookie = `isSeller=; path=/; max-age=0; SameSite=Lax`;
         document.cookie = `user=; path=/; max-age=0; SameSite=Lax`;
         document.cookie = `role=; path=/; max-age=0; SameSite=Lax`;

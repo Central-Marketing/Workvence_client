@@ -46,6 +46,8 @@ const Earnings = () => {
     queryKey: ["seller-earnings-statement"],
     queryFn: () =>
       axiosFetch.get("/earnings/statement").then(({ data }) => data).catch(() => ({ orders: [], summary: {} })),
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   // Payouts history query
@@ -53,6 +55,8 @@ const Earnings = () => {
     queryKey: ["my-payouts"],
     queryFn: () =>
       axiosFetch.get("/payouts").then(({ data }) => data).catch(() => []),
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   // Unified Payout Status Query (GET /api/payouts/status)
@@ -84,6 +88,8 @@ const Earnings = () => {
             return null;
           }
         }),
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   // Readiness states
@@ -185,7 +191,7 @@ const Earnings = () => {
 
   // Payout Request Mutation
   const payoutMutation = useMutation({
-    mutationFn: (payload: { amount: number; method?: string }) => axiosFetch.post("/payouts", payload),
+    mutationFn: (payload: { amount: number; payoutMethod?: string }) => axiosFetch.post("/payouts", payload),
     onSuccess: ({ data }) => {
       toast.success(data.message || "Payout request submitted!");
       setShowPayoutModal(false);
@@ -330,7 +336,7 @@ const Earnings = () => {
 
     payoutMutation.mutate({
       amount: amt,
-      method: selectedMethod,
+      payoutMethod: selectedMethod,
     });
   };
 
@@ -446,9 +452,13 @@ const Earnings = () => {
                   syncClearanceMutation.isPending ? "animate-spin text-gray-500" : "text-gray-700"
                 }`}
               />
-              <span>Sync funds</span>
+              <span>{syncClearanceMutation.isPending ? "Syncing..." : "Sync funds"}</span>
+              {readyToSync > 0 && !syncClearanceMutation.isPending && (
+                <span className="ml-1 bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  ${readyToSync.toFixed(2)}
+                </span>
+              )}
             </button>
-
             <button
               type="button"
               onClick={() => setShowWalletModal(true)}
@@ -609,7 +619,7 @@ const Earnings = () => {
                     </tr>
                   ) : (
                     filteredPayouts.map((p: any) => {
-                      const method = (p.method || p.provider || "stripe").toLowerCase();
+                      const method = (p.payoutMethod || p.method || p.provider || "stripe").toLowerCase();
                       const isPayoneer = method === "payoneer";
                       const status = (p.status || "pending").toLowerCase();
 

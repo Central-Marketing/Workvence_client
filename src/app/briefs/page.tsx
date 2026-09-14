@@ -20,6 +20,7 @@ import {
 import { RiSearchLine } from "react-icons/ri";
 
 import { axiosFetch } from "@/utils";
+import useAdminCategories from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 import { ClientBrief } from "@/types";
@@ -469,6 +470,9 @@ function BriefsContent() {
       setViewMode("feed");
     }
   }, [searchParams]);
+
+  // Fetch categories dynamically from backend
+  const { categoryList } = useAdminCategories();
 
   // Fetch real client briefs from backend
   const { isLoading, data: briefs = [] } = useQuery<ClientBrief[]>({

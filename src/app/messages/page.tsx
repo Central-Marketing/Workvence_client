@@ -28,7 +28,9 @@ const Messages = () => {
         .catch((err) => {
           console.log(err?.response || err);
           return [];
-        })
+        }),
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   const mutation = useMutation({
@@ -129,6 +131,14 @@ const Messages = () => {
                                         return `✉ Custom Offer Proposal - $${offer.price}: ${offer.desc}`;
                                       } catch (err) {
                                         return "✉ Custom Offer Proposal";
+                                      }
+                                    }
+                                    if (msg.startsWith('[MEETING_INVITE]')) {
+                                      try {
+                                        const meet = JSON.parse(msg.replace('[MEETING_INVITE]', ''));
+                                        return `📹 Video Meeting: ${meet.title || 'Freelancer Job Discussion'}`;
+                                      } catch (err) {
+                                        return "📹 Video Meeting Invitation";
                                       }
                                     }
                                     return msg;

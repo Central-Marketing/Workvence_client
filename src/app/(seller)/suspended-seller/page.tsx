@@ -1,7 +1,11 @@
-"use client";
-
 import React, { Suspense } from "react";
+import type { Metadata } from "next";
 import { SuspendedSeller, Loader } from "@/components";
+
+export const metadata: Metadata = {
+  title: "Seller Suspended | Workvence",
+  description: "This seller profile is currently unavailable.",
+};
 
 export default function SuspendedSellerPage() {
   return (

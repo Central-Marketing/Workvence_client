@@ -13,12 +13,35 @@ export interface CustomOffer {
   briefId?: string;
 }
 
+export interface MeetingInvite {
+  meetingId: string;
+  roomUrl: string;
+  joinUrl?: string;
+  title: string;
+  hostEmail?: string;
+  password?: string;
+  isPrivate?: boolean;
+  autoRecording?: string;
+  createdAt?: string;
+  status?: string;
+}
+
 export interface MessageAttachment {
   url: string;
   name?: string;
   type?: string;
   public_id?: string;
   size?: number;
+}
+
+export type ModerationWarningLevel = 'low' | 'medium' | 'high' | 'critical' | string;
+
+export interface MessageModeration {
+  flagged: boolean;
+  warningLevel?: ModerationWarningLevel;
+  matchedWord?: string;
+  flagReason?: string | null;
+  flaggedAt?: string | null;
 }
 
 export interface ChatMessage {
@@ -39,6 +62,7 @@ export interface ChatMessage {
   audioUrl?: string;
   createdAt: string;
   read?: boolean;
+  moderation?: MessageModeration | null;
 }
 
 export interface Conversation {

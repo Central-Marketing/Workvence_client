@@ -1,4 +1,4 @@
-import { User } from './user';
+import { User, RatingBreakdown, StarCounts } from './user';
 
 export interface PricingTierDetails {
   title: string;
@@ -37,6 +37,11 @@ export interface GigPackage {
   sales?: number;
   starNumber?: number;
   totalStars?: number;
+  starRating?: number;
+  totalReviews?: number;
+  ratingBreakdown?: RatingBreakdown;
+  starCounts?: StarCounts;
+  reviews?: any[];
   createdAt: string;
   updatedAt: string;
   [key: string]: any;

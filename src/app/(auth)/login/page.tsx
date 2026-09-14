@@ -1,15 +1,15 @@
 "use client";
 
 import toast from 'react-hot-toast';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { axiosFetch } from '@/utils';
 import { useUserStore } from '@/store/userStore';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import Image from 'next/image';
 
-const Login = () => {
+const LoginForm = () => {
   const [formInput, setFormInput] = useState({
     username: '',
     password: ''
@@ -19,6 +19,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const setUser = useUserStore((state) => state.setUser);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -57,11 +58,11 @@ const Login = () => {
       sessionStorage.removeItem("kyc_prompt_dismissed_session");
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
-      toast.success(`Welcome back, ${user.username || 'user'}!`, {
-        duration: 3000,
-        icon: "😃"
-      });
-      router.push('/dashboard');
+      const redirectTarget = searchParams?.get('redirect');
+      const safeTarget = (redirectTarget && redirectTarget.startsWith('/') && !redirectTarget.startsWith('/login') && !redirectTarget.startsWith('/register'))
+        ? redirectTarget
+        : '/dashboard';
+      router.push(safeTarget);
       setLoading(false);
       return;
     } catch (apiErr: any) {
@@ -170,7 +171,7 @@ const Login = () => {
 
             <div className="mt-auto pt-10 text-left w-full">
               <p className="mb-4 text-sm text-gray-600 text-center md:text-left">
-                Don't have an account? <Link href="/register" className="text-emerald-500 font-semibold hover:underline">Sign up</Link>
+                Don't have an account? <Link href="/register" prefetch={false} className="text-emerald-500 font-semibold hover:underline">Sign up</Link>
               </p>
               <p className="text-[13px] text-[#aaa] text-center md:text-left">©2026 workvence All right reserved</p>
             </div>
@@ -188,6 +189,14 @@ const Login = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const Login = () => {
+  return (
+    <Suspense fallback={<div className="login-container p-10 flex items-center justify-center min-h-[400px]">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 };
 

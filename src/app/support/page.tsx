@@ -132,7 +132,7 @@ export default function SupportDashboardPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        
+
         {/* Header Banner */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 md:p-8 rounded-2xl border border-[#e2e8f0] shadow-xs">
           <div className="space-y-1.5">
@@ -165,7 +165,7 @@ export default function SupportDashboardPage() {
               Total Tickets
             </span>
             <div className="flex items-center justify-between">
-              <span className="text-3xl font-extrabold text-[#0f172a]">{stats.total}</span>
+              <span className="text-3xl font-bold text-[#0f172a]">{stats.total}</span>
               <div className="p-2.5 rounded-lg bg-[#f1f5f9] text-[#475569]">
                 <Inbox className="w-5 h-5" />
               </div>
@@ -177,7 +177,7 @@ export default function SupportDashboardPage() {
               Open Tickets
             </span>
             <div className="flex items-center justify-between">
-              <span className="text-3xl font-extrabold text-amber-700">{stats.open}</span>
+              <span className="text-3xl font-bold text-amber-700">{stats.open}</span>
               <div className="p-2.5 rounded-lg bg-amber-100 text-amber-700">
                 <AlertTriangle className="w-5 h-5" />
               </div>
@@ -189,7 +189,7 @@ export default function SupportDashboardPage() {
               In Progress
             </span>
             <div className="flex items-center justify-between">
-              <span className="text-3xl font-extrabold text-blue-700">{stats.inProgress}</span>
+              <span className="text-3xl font-bold text-blue-700">{stats.inProgress}</span>
               <div className="p-2.5 rounded-lg bg-blue-100 text-blue-700">
                 <Clock className="w-5 h-5" />
               </div>
@@ -201,7 +201,7 @@ export default function SupportDashboardPage() {
               Resolved / Closed
             </span>
             <div className="flex items-center justify-between">
-              <span className="text-3xl font-extrabold text-[#1dbf73]">{stats.resolvedClosed}</span>
+              <span className="text-3xl font-bold text-[#1dbf73]">{stats.resolvedClosed}</span>
               <div className="p-2.5 rounded-lg bg-[#1dbf73]/10 text-[#1dbf73]">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
@@ -211,7 +211,7 @@ export default function SupportDashboardPage() {
 
         {/* Filter and Search Bar */}
         <div className="bg-white p-6 rounded-2xl border border-[#e2e8f0] shadow-xs space-y-4">
-          
+
           {/* Category Tabs */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
             {CATEGORIES.map((cat) => {
@@ -221,11 +221,10 @@ export default function SupportDashboardPage() {
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
-                    isSelected
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition cursor-pointer ${isSelected
                       ? "bg-[#1dbf73] text-white shadow-xs"
                       : "bg-[#f1f5f9] text-[#475569] hover:bg-[#e2e8f0]"
-                  }`}
+                    }`}
                 >
                   <Icon className="w-4 h-4" />
                   <span>{cat.label}</span>
@@ -236,7 +235,7 @@ export default function SupportDashboardPage() {
 
           {/* Search & Status Controls */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-3 border-t border-[#e2e8f0]">
-            
+
             {/* Status Pills */}
             <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto">
               <span className="text-xs font-semibold text-[#64748b] mr-1">Status:</span>
@@ -244,11 +243,10 @@ export default function SupportDashboardPage() {
                 <button
                   key={st}
                   onClick={() => setSelectedStatus(st)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition cursor-pointer ${
-                    selectedStatus === st
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition cursor-pointer ${selectedStatus === st
                       ? "bg-[#0f172a] text-white shadow-xs"
                       : "text-[#64748b] hover:text-[#0f172a]"
-                  }`}
+                    }`}
                 >
                   {st.replace(/_/g, " ")}
                 </button>

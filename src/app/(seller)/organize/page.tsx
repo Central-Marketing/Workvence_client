@@ -8,6 +8,7 @@ import { X, Check, ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2 } from "
 import { packageReducer, initialState } from "@/reducers/packageReducer";
 import { axiosFetch, generateImageURL } from "@/utils";
 import adminAxios from "@/utils/adminAxios";
+import useAdminCategories from "@/hooks/useAdminCategories";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
@@ -61,17 +62,7 @@ const OrganizePage = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  // Fetch Categories
-  const { data: fetchedCategories = [] } = useQuery({
-    queryKey: ["admin-categories"],
-    queryFn: () => adminAxios.get("/categories").then(({ data }) => data),
-  });
-
-  const categoryList = Array.isArray(fetchedCategories)
-    ? fetchedCategories
-    : Array.isArray(fetchedCategories?.data)
-    ? fetchedCategories.data
-    : fetchedCategories?.categories || [];
+  const { categoryList } = useAdminCategories();
 
   useEffect(() => {
     window.scrollTo(0, 0);

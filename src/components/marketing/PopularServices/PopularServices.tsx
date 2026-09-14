@@ -5,9 +5,8 @@ import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import useAdminCategories from '@/hooks/useAdminCategories';
 import { axiosFetch } from '@/utils';
-import adminAxios from '@/utils/adminAxios';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -18,20 +17,11 @@ import Image from 'next/image';
 const PopularServices = () => {
   const swiperRef = useRef<any>(null);
 
-  const { isLoading, data: fetchedCategories = [] } = useQuery({
-    queryKey: ['admin-categories-popular'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }) => data)
-  });
+  const { isLoading, categoryList: rawList } = useAdminCategories();
 
   if (isLoading) {
     return <CategoryCarouselSkeleton />;
   }
-
-  const rawList = Array.isArray(fetchedCategories)
-    ? fetchedCategories
-    : Array.isArray(fetchedCategories?.data)
-      ? fetchedCategories.data
-      : fetchedCategories?.categories || [];
 
   const regularCats = rawList.filter((c: any) =>
     c.slug !== 'other-and-general' &&

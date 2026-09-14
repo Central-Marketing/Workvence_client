@@ -21,7 +21,11 @@ export interface ReviewItem {
   _id?: string;
   id?: string;
   userID?: ReviewUser;
+  user?: ReviewUser;
   star?: number;
+  communicationRating?: number;
+  qualityRating?: number;
+  valueRating?: number;
   description?: string;
   createdAt?: string;
   price?: number | string;
@@ -36,15 +40,16 @@ export interface ReviewProps {
 const Review: React.FC<ReviewProps> = ({ review }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const country = getCountryFlag(review?.userID?.country);
-  const countryName = review?.userID?.country || "Unknown Country";
-  const avatar = review?.userID?.image || review?.userID?.img || "/media/noavatar.png";
-  const username = review?.userID?.username || "Anonymous User";
-  
+  const userObj = review?.userID || review?.user;
+  const country = getCountryFlag(userObj?.country);
+  const countryName = userObj?.country || "Unknown Country";
+  const avatar = userObj?.image || userObj?.img || "/media/noavatar.png";
+  const username = userObj?.username || "Anonymous User";
+
   // Strict binding from API payload
   const rating = typeof review?.star === 'number' && review.star >= 0 && review.star <= 5 ? review.star : 0;
   const rawText = review?.description || "No description provided.";
-  
+
   const formattedDate = review?.createdAt
     ? moment(review.createdAt).isValid()
       ? moment(review.createdAt).fromNow()
@@ -53,7 +58,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
 
   const isLong = rawText.length > 180;
   const displayDesc = isExpanded || !isLong ? rawText : `${rawText.slice(0, 180)}...`;
-  
+
   const price = review?.gigID?.price !== undefined ? `$${review.gigID.price}` : (review?.price ? (String(review.price).startsWith('$') ? review.price : `$${review.price}`) : null);
   const gigTitle = review?.gigID?.title || null;
   const duration = review?.duration || null;
@@ -70,7 +75,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
               className="w-11 h-11 sm:w-12 sm:h-12 rounded-full object-cover border border-gray-200 shadow-2xs shrink-0"
             />
             <div className="min-w-0 flex-1">
-              <h4 className="text-sm sm:text-[15px] font-extrabold text-gray-900 leading-tight truncate">
+              <h4 className="text-sm sm:text-[15px] font-bold text-gray-900 leading-tight truncate">
                 {username}
               </h4>
               <div className="flex flex-wrap items-center gap-1.5 text-xs font-medium text-gray-400 mt-1">
@@ -99,13 +104,13 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
                   </svg>
                 ))}
               </div>
-              <span className="ml-0.5 text-xs sm:text-sm font-extrabold">{rating.toFixed(1)}</span>
+              <span className="ml-0.5 text-xs sm:text-sm font-bold">{rating.toFixed(1)}</span>
             </div>
           )}
         </div>
 
         {/* Review body paragraph */}
-        <p className="text-gray-600 text-[14px] leading-relaxed mb-4 font-normal">
+        <p className="text-gray-600 text-[14px] leading-relaxed mb-3 font-normal">
           {displayDesc}
           {isLong && (
             <button
@@ -117,6 +122,45 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
             </button>
           )}
         </p>
+
+        {/* Multi-Criteria Ratings Badges */}
+        {(Boolean(review?.communicationRating) || Boolean(review?.qualityRating) || Boolean(review?.valueRating)) && (
+          <div className="flex flex-wrap items-center gap-2 mb-3.5 pt-1">
+            {review?.communicationRating !== undefined && review.communicationRating > 0 && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-200/80 text-[11px] font-medium text-gray-600">
+                <span>Communication</span>
+                <span className="font-bold text-gray-900 flex items-center">
+                  <svg className="w-3 h-3 fill-current text-amber-400 mr-0.5" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  {review.communicationRating.toFixed(1)}
+                </span>
+              </span>
+            )}
+            {review?.qualityRating !== undefined && review.qualityRating > 0 && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-200/80 text-[11px] font-medium text-gray-600">
+                <span>Quality</span>
+                <span className="font-bold text-gray-900 flex items-center">
+                  <svg className="w-3 h-3 fill-current text-amber-400 mr-0.5" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  {review.qualityRating.toFixed(1)}
+                </span>
+              </span>
+            )}
+            {review?.valueRating !== undefined && review.valueRating > 0 && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-200/80 text-[11px] font-medium text-gray-600">
+                <span>Value</span>
+                <span className="font-bold text-gray-900 flex items-center">
+                  <svg className="w-3 h-3 fill-current text-amber-400 mr-0.5" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  {review.valueRating.toFixed(1)}
+                </span>
+              </span>
+            )}
+          </div>
+        )}
 
         {gigTitle && (
           <p className="text-xs text-gray-400 italic mb-4 truncate">

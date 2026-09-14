@@ -113,6 +113,7 @@ const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser, classNam
   return (
     <Link
       href="/messages"
+      prefetch={false}
       className={className || "text-gray-500 hover:text-brand-green transition-colors relative"}
       title="Messages"
     >

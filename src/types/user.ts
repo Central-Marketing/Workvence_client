@@ -12,6 +12,22 @@ export interface ExperienceItem {
   duration?: string;
 }
 
+export interface RatingBreakdown {
+  communication?: number;
+  qualityOfDelivery?: number;
+  valueOfDelivery?: number;
+  [key: string]: any;
+}
+
+export interface StarCounts {
+  "1"?: number;
+  "2"?: number;
+  "3"?: number;
+  "4"?: number;
+  "5"?: number;
+  [key: string]: number | undefined;
+}
+
 export interface User {
   _id?: string;
   id?: string;
@@ -37,9 +53,12 @@ export interface User {
   education?: EducationItem[];
   experience?: ExperienceItem[];
   rating?: number;
+  starRating?: number;
   totalReviews?: number;
   starNumber?: number;
   totalStars?: number;
+  ratingBreakdown?: RatingBreakdown;
+  starCounts?: StarCounts;
   earnings?: number;
   activeOrders?: number;
   [key: string]: any;

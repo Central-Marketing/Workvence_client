@@ -20,7 +20,11 @@ import {
   RiMoneyDollarCircleLine,
   RiMenuLine,
   RiInformationLine,
-  RiCloseLine
+  RiCloseLine,
+  RiVideoChatLine,
+  RiVidiconLine,
+  RiFileCopyLine,
+  RiExternalLinkLine
 } from "react-icons/ri";
 
 import axios from 'axios';
@@ -29,6 +33,7 @@ import supportService from "@/utils/supportService";
 import { getOtherUser, isConversationUnread, isTargetConversation, renderMessageTextWithLinks } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
 import { Loader, ChatSkeleton, Skeleton } from "@/components";
+import { MessageModerationBadge } from "@/features/chat";
 import moment from 'moment';
 import "./Message.scss";
 
@@ -41,6 +46,9 @@ const Message = () => {
   const navigate = useRouter();
 
   const [showOfferModal, setShowOfferModal] = useState(false);
+  const [showMeetingModal, setShowMeetingModal] = useState(false);
+  const [meetingTitle, setMeetingTitle] = useState("");
+  const [isCreatingMeeting, setIsCreatingMeeting] = useState(false);
   const [selectedPackageId, setSelectedPackageId] = useState("");
   const [selectedBriefId, setSelectedBriefId] = useState("");
   const [offerDesc, setOfferDesc] = useState("");
@@ -408,10 +416,14 @@ const Message = () => {
 
 
   const contactOrders = allOrders.filter((o: any) => {
-    const sId = o.sellerID?._id || o.sellerID;
-    const bId = o.buyerID?._id || o.buyerID;
-    return (sId === user._id || bId === user._id) &&
-      (sId === recipientUser?._id || bId === recipientUser?._id);
+    const sId = String(o.sellerID?._id || o.sellerID || "");
+    const bId = String(o.buyerID?._id || o.buyerID || "");
+    const currentUserId = String(user?._id || user?.id || "");
+    const targetUserId = String(finalRecipientUser?._id || finalRecipientUser?.id || recipientUser?._id || "");
+    return (
+      (sId === currentUserId || bId === currentUserId) &&
+      (sId === targetUserId || bId === targetUserId)
+    );
   });
 
   const mutation = useMutation({
@@ -615,6 +627,76 @@ const Message = () => {
     return null;
   };
 
+  const parseMeeting = (desc?: string) => {
+    if (desc?.startsWith('[MEETING_INVITE]')) {
+      try { return JSON.parse(desc.replace('[MEETING_INVITE]', '')); } catch { return null; }
+    }
+    return null;
+  };
+
+  const handleCreateMeeting = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (isCreatingMeeting) return;
+
+    const targetContactName = finalRecipientUser?.username || partnerUsername || 'Client';
+    const title = meetingTitle.trim() || `Job Discussion with @${targetContactName}`;
+
+    setIsCreatingMeeting(true);
+    const toastId = toast.loading("Generating video meeting link...");
+
+    try {
+      const { data } = await axiosFetch.post(
+        '/meetings',
+        {
+          title,
+          conversationId: conversationID,
+        },
+        {
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true,
+        }
+      );
+
+      if (data && (data.roomUrl || data.joinUrl || data.meeting || data.meetingId)) {
+        const meetingPayload = {
+          meetingId: data.meetingId || '',
+          roomUrl: data.joinUrl || data.roomUrl || data.meeting || '',
+          title: data.title || title,
+          hostEmail: data.hostEmail || '',
+          password: data.password || '',
+          isPrivate: Boolean(data.isPrivate),
+          autoRecording: data.autoRecording || '',
+          createdAt: data.createdAt || new Date().toISOString(),
+          status: data.status || 'success'
+        };
+
+        mutation.mutate({
+          conversationID,
+          description: `[MEETING_INVITE]${JSON.stringify(meetingPayload)}`,
+          isSeller: Boolean(user?.isSeller)
+        });
+
+        toast.success("Meeting room created and sent to chat!", { id: toastId });
+        setShowMeetingModal(false);
+        setMeetingTitle("");
+      } else {
+        toast.error("Failed to generate meeting link. Please try again.", { id: toastId });
+      }
+    } catch (err: any) {
+      console.error("Meeting creation error:", err);
+      toast.error(err?.response?.data?.message || err?.message || "Failed to create meeting", { id: toastId });
+    } finally {
+      setIsCreatingMeeting(false);
+    }
+  };
+
+  const handleCopyMeetingLink = (roomUrl: string) => {
+    if (!roomUrl) return;
+    navigator.clipboard.writeText(roomUrl)
+      .then(() => toast.success("Meeting link copied to clipboard!"))
+      .catch(() => toast.error("Could not copy link"));
+  };
+
   const fmt = (d: any) => moment(d).format('MMM DD, HH:mm');
 
   const activeConv = conversations.find((c: any) => {
@@ -754,7 +836,9 @@ const Message = () => {
               const contact = getOtherUser(conv, user);
               const lastMsg = conv.lastMessage?.startsWith('[CUSTOM_OFFER]')
                 ? '📋 Custom Offer'
-                : conv.lastMessage || 'No messages yet';
+                : conv.lastMessage?.startsWith('[MEETING_INVITE]')
+                  ? '📹 Video Meeting Invitation'
+                  : conv.lastMessage || 'No messages yet';
               const canonicalId = conv.uuid || conv.conversationID || conv._id || conv.id;
               const isActive = isTargetConversation(conv, conversationID);
               return (
@@ -823,7 +907,21 @@ const Message = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="head-actions">
+                    <div className="head-actions flex items-center gap-2">
+
+                      <button
+                        type="button"
+                        className="action-icon p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600 transition-colors flex items-center justify-center cursor-pointer"
+                        onClick={() => {
+                          setMeetingTitle(`Job Discussion with @${finalRecipientUser?.username || 'Client'}`);
+                          setShowMeetingModal(true);
+                        }}
+                        title="Start Video Meeting"
+                        aria-label="Start Video Meeting"
+                      >
+                        <RiVideoChatLine className="w-5 h-5 text-brand-green" />
+                      </button>
+
                       {isMsgSearchActive ? (
                         <div style={{ display: 'flex', alignItems: 'center', background: '#f1f5f9', borderRadius: '20px', padding: '2px 10px' }}>
                           <input
@@ -886,11 +984,15 @@ const Message = () => {
                   const currentUserIdStr = String(user?._id || user?.id || '');
                   const isOwner = currentUserIdStr !== '' && senderIdStr === currentUserIdStr;
                   const offer = msg.isCustomOffer || msg.description?.startsWith('[CUSTOM_OFFER]') ? parseOffer(msg.description) : null;
+                  const meeting = msg.description?.startsWith('[MEETING_INVITE]') ? parseMeeting(msg.description) : null;
                   const isOfferAccepted = Boolean(msg.isOfferAccepted || msg.offerStatus === 'accepted');
                   const isWithdrawn = Boolean(msg.withdrawn || msg.offerStatus === 'withdrawn');
                   const acceptedOrder = offer ? contactOrders.find((o: any) => (msg.orderID && (o._id === msg.orderID || o.id === msg.orderID)) || (o.title === offer.desc && Number(o.price) === Number(offer.price))) : null;
                   const targetOrderId = msg.orderID || acceptedOrder?._id || acceptedOrder?.id;
                   const isAccepted = isOfferAccepted || Boolean(acceptedOrder);
+                  const isModerated = Boolean(msg.moderation?.flagged);
+                  const modLevel = String(msg.moderation?.warningLevel || 'medium').toLowerCase();
+                  const moderationClass = isModerated ? `moderated moderated-${modLevel}` : '';
 
                   const msgDate = moment(msg.createdAt).format('MMM DD');
                   const prevMsgDate = index > 0 ? moment(filteredMessages[index - 1].createdAt).format('MMM DD') : null;
@@ -903,17 +1005,22 @@ const Message = () => {
                           <span className="date-pill">{msgDate === moment().format('MMM DD') ? 'Today' : msgDate}</span>
                         </div>
                       )}
-                      <div className={`msg-row max-md:max-w-[85%] ${isOwner ? 'msg-owner' : 'msg-other'} ${offer ? 'has-offer !max-w-[95%] xl:!max-w-[85%]' : ''}`}>
+                      <div className={`msg-row max-md:max-w-[85%] ${isOwner ? 'msg-owner' : 'msg-other'} ${offer ? 'has-offer !max-w-[95%] xl:!max-w-[85%]' : ''} ${meeting ? 'has-meeting !max-w-[95%] xl:!max-w-[85%]' : ''}`}>
                         {!isOwner && (
                           <img className="msg-avatar" src={senderObj?.image || finalRecipientUser?.image || '/media/noavatar.png'} alt="" />
                         )}
 
                         {offer ? (
-                          <div className={`offer-card max-md:p-3.5 ${isWithdrawn ? 'withdrawn' : ''}`}>
+                          <div className={`offer-card max-md:p-3.5 ${isWithdrawn ? 'withdrawn' : ''} ${isModerated ? `border-${modLevel === 'low' ? 'amber-400' : modLevel === 'medium' ? 'orange-400' : modLevel === 'critical' ? 'red-700' : 'red-500'}` : ''}`}>
                             {isWithdrawn ? (
                               <p className="withdrawn-text">↩ This offer was withdrawn by the seller.</p>
                             ) : (
                               <div className="offer-content flex flex-col w-full">
+                                {isModerated && (
+                                  <div className="mb-2">
+                                    <MessageModerationBadge moderation={msg.moderation} isOwner={isOwner} />
+                                  </div>
+                                )}
                                 {isAccepted && (
                                   <div className="flex items-center justify-between gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200/80 rounded-xl px-3.5 py-1.5 text-xs font-bold mb-2.5">
                                     <span>✓ Custom Proposal Accepted</span>
@@ -952,7 +1059,7 @@ const Message = () => {
                                       );
                                     })()}
                                   </div>
-                                  <div className="text-xl sm:text-2xl font-black text-slate-900 shrink-0 whitespace-nowrap flex-shrink-0">${offer.price}</div>
+                                  <div className="text-xl sm:text-2xl font-bold text-slate-900 shrink-0 whitespace-nowrap flex-shrink-0">${offer.price}</div>
                                 </div>
 
                                 <div className="flex items-center gap-5 py-3 border-y border-slate-100 my-2 flex-wrap">
@@ -1004,8 +1111,73 @@ const Message = () => {
                               </div>
                             )}
                           </div>
+                        ) : meeting ? (
+                          <div className="meeting-card max-md:p-3.5 w-[460px] max-w-full bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs overflow-hidden">
+                            <div className="flex items-center justify-between gap-2 mb-3 pb-2.5 border-b border-slate-100">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg flex-shrink-0 border border-emerald-100/80">
+                                  <RiVideoChatLine className="w-5 h-5 text-brand-green" />
+                                </div>
+                                <div>
+                                  <h4 className="text-sm font-bold text-slate-900 leading-tight">Video Meeting Invitation</h4>
+                                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
+                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span className="text-emerald-700 font-medium">Ready to join</span>
+                                    {meeting.meetingId && (
+                                      <>
+                                        <span>•</span>
+                                        <span className="font-mono text-slate-600 font-semibold">ID: {meeting.meetingId}</span>
+                                      </>
+                                    )}
+                                    {meeting.password && (
+                                      <>
+                                        <span>•</span>
+                                        <span className="font-mono text-slate-600 font-semibold">Passcode: {meeting.password}</span>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="mb-4">
+                              <h5 className="text-[15px] font-bold text-slate-800 leading-snug mb-1">
+                                {meeting.title || "Freelancer Job Discussion"}
+                              </h5>
+                              <p className="text-xs text-slate-500 leading-relaxed">
+                                Join the real-time video consultation room to discuss project requirements, scope, and deliverables.
+                              </p>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                              <a
+                                href={meeting.roomUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-brand-green hover:brightness-95 text-white transition-all text-center flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                                style={{ background: '#000000', color: '#ffffff' }}
+                              >
+                                <RiVideoChatLine className="w-4 h-4" />
+                                <span>Join Video Room</span>
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => handleCopyMeetingLink(meeting.roomUrl)}
+                                className="py-2.5 px-3.5 rounded-xl font-semibold text-xs sm:text-sm border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+                                title="Copy meeting room link"
+                              >
+                                <RiFileCopyLine className="w-4 h-4 text-slate-500" />
+                                <span>Copy Link</span>
+                              </button>
+                            </div>
+                          </div>
                         ) : (
-                          <div className="msg-bubble [overflow-wrap:anywhere] [word-break:break-word]">
+                          <div className={`msg-bubble [overflow-wrap:anywhere] [word-break:break-word] ${moderationClass}`}>
+                            {isModerated && (
+                              <div className="mb-1.5 flex items-center">
+                                <MessageModerationBadge moderation={msg.moderation} isOwner={isOwner} />
+                              </div>
+                            )}
                             {renderMessageAttachment(msg)}
                             {msg.description && <p className="[overflow-wrap:anywhere] [word-break:break-word]">{renderMessageTextWithLinks(msg.description)}</p>}
                             <span className="msg-time">
@@ -1101,8 +1273,10 @@ const Message = () => {
                       )}
                     </button>
 
-                    {/* Optional Seller Offer Button */}
+                    {/* Optional Seller Action Buttons: Video Meeting & Create Offer */}
                     {user?.isSeller && (
+
+
                       <button
                         type="button"
                         className="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap flex-shrink-0 mb-0.5"
@@ -1110,6 +1284,7 @@ const Message = () => {
                       >
                         Create Offer
                       </button>
+
                     )}
 
                     {/* Message Textarea */}
@@ -1143,91 +1318,91 @@ const Message = () => {
 
         {/* ── RIGHT: About This Contact ── */}
         {finalRecipientUser && (
-          <aside className={`contact-sidebar transform transition-transform duration-300 ease-in-out max-lg:absolute max-lg:right-0 max-lg:z-40 max-lg:shadow-xl max-lg:h-full max-lg:!flex ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
-            <div className="sidebar-card relative">
-              <button className="lg:hidden absolute top-2 right-2 text-gray-500 text-2xl" onClick={() => setIsRightSideOpen(false)}><RiCloseLine /></button>
-              <div className="sidebar-section-header">
-                <h3>About {finalRecipientUser.username}</h3>
-              </div>
-              <div className="sidebar-details">
-                <div className="detail-row">
-                  <span className="detail-label">From</span>
-                  <span className="detail-value">{finalRecipientUser.country || 'United States'}</span>
+          <aside className={`contact-sidebar h-full max-h-full min-h-0 flex-shrink-0 max-lg:fixed max-lg:top-0 max-lg:bottom-0 max-lg:right-0 max-lg:z-40 max-lg:shadow-2xl max-lg:h-full max-lg:!flex max-lg:transform max-lg:transition-transform max-lg:duration-300 max-lg:ease-in-out ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
+            <div className="w-full flex flex-col gap-5 pb-20">
+              <div className="sidebar-card relative">
+                <button className="lg:hidden absolute top-2 right-2 text-gray-500 text-2xl" onClick={() => setIsRightSideOpen(false)}><RiCloseLine /></button>
+                <div className="sidebar-section-header">
+                  <h3>About {finalRecipientUser.username}</h3>
                 </div>
-                <div className="detail-row">
-                  <span className="detail-label">On Workvence since</span>
-                  <span className="detail-value">{moment(finalRecipientUser.createdAt).format('MMM YYYY')}</span>
-                </div>
-                {Array.isArray(finalRecipientUser?.languages) && finalRecipientUser.languages.length > 0 ? (
-                  finalRecipientUser.languages.map((item: any, index: number) => {
-                    const label = typeof item === 'string' ? item : item?.language || item?.lang || item?.name || 'English';
-                    const value = typeof item === 'string' ? 'Fluent' : item?.level || 'Fluent';
-                    return (
-                      <div className="detail-row" key={index}>
-                        <span className="detail-label">{label}</span>
-                        <span className="detail-value">{value}</span>
-                      </div>
-                    );
-                  })
-                ) : (
+                <div className="sidebar-details">
                   <div className="detail-row">
-                    <span className="detail-label">Languages</span>
-                    <span className="detail-value">English</span>
+                    <span className="detail-label">From</span>
+                    <span className="detail-value">{finalRecipientUser.country || 'United States'}</span>
                   </div>
-                )}
-                <div className="detail-row">
-                  <span className="detail-label">Response rate</span>
-                  <span className="detail-value">{finalRecipientUser.responseTimeHours} h</span>
-                </div>
-                <button className="view-profile-btn" onClick={() => navigate.push(`/seller/${finalRecipientUser._id}`)}>
-                  View Profile
-                </button>
-              </div>
-            </div>
-
-            {contactOrders.length > 0 && (
-              <div className="sidebar-card" style={{ marginTop: '20px' }}>
-                <div className="sidebar-section-header" style={{ marginBottom: '14px' }}>
-                  <h3>Orders ({contactOrders.length})</h3>
-                </div>
-                <div className="flex flex-col gap-2.5 px-2">
-                  {contactOrders.slice(0, 4).map((order: any) => (
-                    <div
-                      key={order._id}
-                      className="relative rounded-lg border border-slate-100 overflow-hidden cursor-pointer hover:shadow-md hover:border-slate-200 transition-all duration-200 group"
-                      onClick={() => navigate.push(`/orders/${order._id}`)}
-                    >
-                      <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${order.status === 'completed' ? 'bg-green-500' :
-                        order.status === 'delivered' ? 'bg-blue-500' : 'bg-amber-500'
-                        }`} />
-                      <div className="px-2 py-2.5">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-[2px] rounded ${order.status === 'completed' ? 'bg-green-50 text-green-600' :
-                            order.status === 'delivered' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'
-                            }`}>
-                            {order.status === 'completed' ? 'Completed' : order.status === 'delivered' ? 'Delivered' : 'In Progress'}
-                          </span>
-                          <span className="text-sm font-extrabold text-slate-800">${order.price}</span>
+                  <div className="detail-row">
+                    <span className="detail-label">On Workvence since</span>
+                    <span className="detail-value">{moment(finalRecipientUser.createdAt).format('MMM YYYY')}</span>
+                  </div>
+                  {Array.isArray(finalRecipientUser?.languages) && finalRecipientUser.languages.length > 0 ? (
+                    finalRecipientUser.languages.map((item: any, index: number) => {
+                      const label = typeof item === 'string' ? item : item?.language || item?.lang || item?.name || 'English';
+                      const value = typeof item === 'string' ? 'Fluent' : item?.level || 'Fluent';
+                      return (
+                        <div className="detail-row" key={index}>
+                          <span className="detail-label">{label}</span>
+                          <span className="detail-value">{value}</span>
                         </div>
-                        <h4 className="text-[12px] font-medium text-slate-600 line-clamp-1 group-hover:text-slate-900 transition-colors">
-                          {order.title}
-                        </h4>
-                      </div>
+                      );
+                    })
+                  ) : (
+                    <div className="detail-row">
+                      <span className="detail-label">Languages</span>
+                      <span className="detail-value">English</span>
                     </div>
-                  ))}
-                </div>
-                {contactOrders.length > 3 && (
-                  <button
-                    className="w-full mt-3 py-2 text-[12px] font-bold text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
-                    onClick={() => navigate.push('/orders')}
-                  >
-                    View All Orders →
+                  )}
+                  <div className="detail-row">
+                    <span className="detail-label">Response rate</span>
+                    <span className="detail-value">{finalRecipientUser.responseTimeHours ? `${finalRecipientUser.responseTimeHours} h` : '1 hr'}</span>
+                  </div>
+                  <button className="view-profile-btn" onClick={() => navigate.push(`/seller/${finalRecipientUser._id}`)}>
+                    View Profile
                   </button>
-                )}
+                </div>
               </div>
-            )}
 
-
+              {contactOrders.length > 0 && (
+                <div className="sidebar-card">
+                  <div className="sidebar-section-header" style={{ marginBottom: '14px' }}>
+                    <h3>Orders ({contactOrders.length})</h3>
+                  </div>
+                  <div className="flex flex-col gap-2.5 px-2">
+                    {contactOrders.slice(0, 4).map((order: any) => (
+                      <div
+                        key={order._id}
+                        className="relative rounded-lg border border-slate-100 overflow-hidden cursor-pointer hover:shadow-md hover:border-slate-200 transition-all duration-200 group"
+                        onClick={() => navigate.push(`/orders/${order._id}`)}
+                      >
+                        <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${order.status === 'completed' ? 'bg-green-500' :
+                          order.status === 'delivered' ? 'bg-blue-500' : 'bg-amber-500'
+                          }`} />
+                        <div className="px-2 py-2.5">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-[2px] rounded ${order.status === 'completed' ? 'bg-green-50 text-green-600' :
+                              order.status === 'delivered' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'
+                              }`}>
+                              {order.status === 'completed' ? 'Completed' : order.status === 'delivered' ? 'Delivered' : 'In Progress'}
+                            </span>
+                            <span className="text-sm font-bold text-slate-800">${order.price}</span>
+                          </div>
+                          <h4 className="text-[12px] font-medium text-slate-600 line-clamp-1 group-hover:text-slate-900 transition-colors">
+                            {order.title}
+                          </h4>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {contactOrders.length > 3 && (
+                    <button
+                      className="w-full mt-3 py-2 text-[12px] font-bold text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                      onClick={() => navigate.push('/orders')}
+                    >
+                      View All Orders →
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </aside>
         )}
       </div>
@@ -1284,6 +1459,79 @@ const Message = () => {
         </div>
       )}
 
+      {/* Video Meeting Creation Modal */}
+      {showMeetingModal && (
+        <div className="modal-backdrop" onClick={() => !isCreatingMeeting && setShowMeetingModal(false)}>
+          <div className="modal-box max-md:w-[96%] max-w-md p-6 bg-white rounded-3xl shadow-2xl border border-slate-100" onClick={e => e.stopPropagation()}>
+            <div className="modal-head flex justify-between items-center pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold border border-emerald-100">
+                  <RiVideoChatLine className="w-5 h-5 text-brand-green" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900">Create Video Meeting</h3>
+              </div>
+              <button
+                type="button"
+                disabled={isCreatingMeeting}
+                onClick={() => setShowMeetingModal(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateMeeting} className="space-y-4 pt-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                  Meeting Topic / Title
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Freelancer Job Discussion"
+                  value={meetingTitle}
+                  onChange={(e) => setMeetingTitle(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-brand-green bg-slate-50/50"
+                  required
+                  autoFocus
+                />
+                <p className="text-[11px] text-slate-400 mt-1.5">
+                  A dedicated video room will be created and instantly sent to the buyer in this chat.
+                </p>
+              </div>
+
+              <div className="pt-2 flex gap-2">
+                <button
+                  type="submit"
+                  disabled={isCreatingMeeting}
+                  className="flex-1 py-3 rounded-xl font-semibold text-sm bg-brand-green text-white hover:brightness-95 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
+                  style={{ background: '#000000', color: '#ffffff' }}
+                >
+                  {isCreatingMeeting ? (
+                    <>
+                      <Loader size={18} />
+                      <span>Creating Room...</span>
+                    </>
+                  ) : (
+                    <>
+                      <RiVideoChatLine className="w-4 h-4" />
+                      <span>Create & Send Link</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  disabled={isCreatingMeeting}
+                  onClick={() => setShowMeetingModal(false)}
+                  className="py-3 px-4 rounded-xl font-semibold text-sm border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Full Proposal Details Modal */}
       {viewingOfferDetails && (
         <div
@@ -1307,7 +1555,7 @@ const Message = () => {
             <div className="flex justify-between items-center bg-emerald-50/70 border border-emerald-200/60 rounded-2xl p-4">
               <div>
                 <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Price</span>
-                <span className="text-2xl font-black text-emerald-700">${viewingOfferDetails.offer?.price}</span>
+                <span className="text-2xl font-bold text-emerald-700">${viewingOfferDetails.offer?.price}</span>
               </div>
               <div className="text-right">
                 <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Delivery Time</span>

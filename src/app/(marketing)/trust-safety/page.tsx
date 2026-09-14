@@ -1,7 +1,10 @@
-"use client";
+import React from "react";
+import type { Metadata } from "next";
 
-import React, { useEffect } from "react";
-import Head from "next/head";
+export const metadata: Metadata = {
+  title: "Trust & Safety | Workvence",
+  description: "Work safely. Build trust. Stay informed.",
+};
 
 const IMG_HERO = "/trust&safety/bg_removal [Background removed].png";
 const IMG_COMMUNITY = "/trust&safety/1884482e872b3c8a657f004c91f6e80d794d34b0.jpg";
@@ -10,16 +13,8 @@ const IMG_SERVICES = "/trust&safety/8674d26b00b286e82436990f9025aae6f770121c.jpg
 const IMG_COMMITMENT = "/trust&safety/ChatGPT Image Jul 7, 2026, 11_03_31 AM.png";
 
 const TrustSafetyPage = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900">
-      <Head>
-        <title>Trust & Safety | Workvence</title>
-        <meta name="description" content="Work safely. Build trust. Stay informed." />
-      </Head>
 
       {/* 1. HERO SECTION */}
       <section className="bg-[#f6f5ef] py-16 md:py-24">

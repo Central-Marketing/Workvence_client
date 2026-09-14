@@ -80,14 +80,14 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
             <h1 className="text-3xl sm:text-4xl md:text-[38px] font-normal text-gray-800 tracking-tight leading-tight">
               Welcome to Workvence, <span className="font-extrabold text-gray-950">{userDisplayName}</span>
             </h1>
-            {user?.isSeller && onSwitchToSeller && (
+            {/* {user?.isSeller && onSwitchToSeller && (
               <button
                 onClick={onSwitchToSeller}
                 className="mt-2 text-xs font-semibold text-[#327C73] hover:underline flex items-center gap-1 cursor-pointer"
               >
                 Switch to Seller Dashboard →
               </button>
-            )}
+            )} */}
           </div>
 
           {/* Complete Your Profile Bar */}

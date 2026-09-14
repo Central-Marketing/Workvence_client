@@ -55,9 +55,9 @@ export default function DashboardPage() {
       onSwitchToSeller={
         user?.isSeller
           ? () => {
-              setRoleView("seller");
-              router.push("/dashboard/seller");
-            }
+            setRoleView("seller");
+            router.push("/dashboard/seller");
+          }
           : undefined
       }
     />

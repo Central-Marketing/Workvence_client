@@ -1,694 +1,1019 @@
 "use client";
 
-import toast from 'react-hot-toast';
-import { useEffect, useReducer, useState } from 'react';
-import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
+import React, { useEffect, useReducer, useState, useRef } from "react";
+import toast from "react-hot-toast";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import dynamic from 'next/dynamic';
-import { X, FileText, Upload } from 'lucide-react';
-import 'react-quill-new/dist/quill.snow.css';
-import { packageReducer, initialState } from '@/reducers/packageReducer';
-import { axiosFetch, generateImageURL } from '@/utils';
-import adminAxios from '@/utils/adminAxios';
-import supportService from '@/utils/supportService';
-
+import { X, Check, ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { packageReducer, initialState } from "@/reducers/packageReducer";
+import { axiosFetch, generateImageURL } from "@/utils";
+import adminAxios from "@/utils/adminAxios";
+import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
-import { CustomSelect } from '@/components';
+import { Loader } from "@/components";
 
-// Dynamically import ReactQuill to ensure SSG/SSR compatibility
-const ReactQuill = dynamic(() => import('react-quill-new'), {
-  ssr: false,
-  loading: () => (
-    <div className="h-44 flex flex-col items-center justify-center space-y-2 border border-slate-200 bg-slate-50 rounded-xl">
-      <span className="text-xs font-semibold text-slate-400">Loading Rich Text Editor...</span>
-    </div>
-  ),
-});
+type SectionTab = "about" | "seller" | "packages" | "faq";
+type TierKey = "basic" | "standard" | "premium";
 
-const quillModules = {
-  toolbar: [
-    [{ header: [1, 2, 3, 4, 5, 6, false] }],
-    [{ size: ['small', false, 'large', 'huge'] }],
-    ['bold', 'italic', 'underline', 'strike'],
-
-    [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
-    [{ align: [] }],
-  ],
-};
-
-const quillFormats = [
-  'header',
-  'size',
-  'bold',
-  'italic',
-  'underline',
-  'strike',
-  'color',
-  'background',
-  'list',
-  'indent',
-  'align',
-  'blockquote',
-  'code-block',
-  'link',
-];
-
-const Add = () => {
+const OrganizePage = () => {
   const user = useUserStore((state: any) => state.user);
   const [state, dispatch] = useReducer(packageReducer, initialState);
-  const [coverImage, setCoverImage] = useState<File | null>(null);
-  const [packageImages, setPackageImages] = useState<File[]>([]);
+  const [activeTab, setActiveTab] = useState<SectionTab>("about");
+  const [activeTier, setActiveTier] = useState<TierKey>("basic");
+
+  // Areas covered checklist state
+  const [areasCovered, setAreasCovered] = useState<string[]>([
+    "SaaS Landing page",
+    "Marketing Agency",
+    "Startup",
+  ]);
+  const [newAreaInput, setNewAreaInput] = useState("");
+  const [showAddArea, setShowAddArea] = useState(false);
+
+  // Why Me text input
+  const [whyMeInput, setWhyMeInput] = useState("");
+
+  // Design tools tags state
+  const [toolsList, setToolsList] = useState<string[]>(["Figma", "Sketch", "Photoshop"]);
+  const [newToolInput, setNewToolInput] = useState("");
+  const [showAddTool, setShowAddTool] = useState(false);
+
+  // New feature input for active tier
+  const [newFeatureInput, setNewFeatureInput] = useState("");
+  const [showAddFeature, setShowAddFeature] = useState(false);
+
+  // FAQs
+  const [faqQuestion, setFaqQuestion] = useState("");
+  const [faqAnswer, setFaqAnswer] = useState("");
+
+  // Media upload refs & states
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const subImagesInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [disabled, setDisabled] = useState(false);
-  const [activeTier, setActiveTier] = useState('basic');
-  const [faqQuestion, setFaqQuestion] = useState('');
-  const [faqAnswer, setFaqAnswer] = useState('');
-  const navigate = useRouter();
+
+  const router = useRouter();
   const queryClient = useQueryClient();
 
+  // Fetch Categories
   const { data: fetchedCategories = [] } = useQuery({
-    queryKey: ['admin-categories'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }) => data)
+    queryKey: ["admin-categories"],
+    queryFn: () => adminAxios.get("/categories").then(({ data }) => data),
   });
 
   const categoryList = Array.isArray(fetchedCategories)
     ? fetchedCategories
     : Array.isArray(fetchedCategories?.data)
-      ? fetchedCategories.data
-      : fetchedCategories?.categories || [];
+    ? fetchedCategories.data
+    : fetchedCategories?.categories || [];
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Mutation to create package
   const mutation = useMutation({
     mutationFn: async (pkg: any) => {
-      const { data } = await axiosFetch.post('/gigs', pkg);
+      const { data } = await axiosFetch.post("/gigs", pkg);
       return data;
     },
     onSuccess: () => {
-      toast.success("Congratulations! Package created successfully!");
-      queryClient.invalidateQueries({ queryKey: ['my-packages'] });
+      toast.success("Package published successfully!");
+      queryClient.invalidateQueries({ queryKey: ["my-packages"] });
       setTimeout(() => {
-        navigate.push('/my-packages');
-      }, 1500);
+        router.push("/my-packages");
+      }, 1200);
     },
     onError: (error: any) => {
-      console.error('Create package failed:', error);
-      toast.error(error?.response?.data?.message || 'Failed to create package');
-    }
+      console.error("Create package failed:", error);
+      toast.error(error?.response?.data?.message || "Failed to create package");
+    },
   });
 
-  const handleFormChange = (event: any) => {
-    const { name, value } = event.target;
+  // Handle main form changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
     dispatch({
-      type: 'CHANGE_INPUT',
-      payload: { name, value }
+      type: "CHANGE_INPUT",
+      payload: { name, value },
     });
   };
 
-  const handlePackageFormChange = (event: any) => {
-    const { name, value } = event.target;
-    if (name === 'price') {
-      if (value !== '' && Number(value) <= 0) {
-        toast.error('Price must be a positive number greater than $0', { id: 'price-error' });
+  // Handle tier package changes
+  const handleTierInputChange = (name: string, value: any) => {
+    if (name === "price") {
+      if (value !== "" && Number(value) < 0) {
+        toast.error("Price must be a positive number", { id: "price-error" });
         return;
       }
     }
     dispatch({
-      type: 'CHANGE_PACKAGE_INPUT',
-      payload: { tier: activeTier, name, value }
+      type: "CHANGE_PACKAGE_INPUT",
+      payload: { tier: activeTier, name, value },
     });
-    if (activeTier === 'basic') {
+
+    // If basic tier, also sync root fields
+    if (activeTier === "basic") {
       dispatch({
-        type: 'CHANGE_INPUT',
-        payload: { name, value }
+        type: "CHANGE_INPUT",
+        payload: { name, value },
       });
-      // Also sync basic tier title if editing shortTitle or title
-      if (name === 'shortTitle' || name === 'title') {
+      if (name === "title" || name === "shortTitle") {
         dispatch({
-          type: 'CHANGE_PACKAGE_INPUT',
-          payload: { tier: 'basic', name: 'title', value }
+          type: "CHANGE_PACKAGE_INPUT",
+          payload: { tier: "basic", name: "title", value },
         });
         dispatch({
-          type: 'CHANGE_PACKAGE_INPUT',
-          payload: { tier: 'basic', name: 'shortTitle', value }
+          type: "CHANGE_PACKAGE_INPUT",
+          payload: { tier: "basic", name: "shortTitle", value },
         });
       }
     }
   };
 
-  const handlePackageFeatureAdd = (event: any) => {
-    event.preventDefault();
-    if (!event.target[0].value) return;
+  // Add/Remove Features
+  const handleAddFeature = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!newFeatureInput.trim()) return;
     dispatch({
-      type: 'ADD_PACKAGE_FEATURE',
-      payload: { tier: activeTier, feature: event.target[0].value }
+      type: "ADD_PACKAGE_FEATURE",
+      payload: { tier: activeTier, feature: newFeatureInput.trim() },
     });
-    if (activeTier === 'basic') {
+    if (activeTier === "basic") {
       dispatch({
-        type: 'ADD_FEATURE',
-        payload: event.target[0].value
+        type: "ADD_FEATURE",
+        payload: newFeatureInput.trim(),
       });
     }
-    event.target.reset();
+    setNewFeatureInput("");
+    setShowAddFeature(false);
   };
 
-  const handlePackageFeatureRemove = (feature: string) => {
+  const handleRemoveFeature = (feature: string) => {
     dispatch({
-      type: 'REMOVE_PACKAGE_FEATURE',
-      payload: { tier: activeTier, feature }
+      type: "REMOVE_PACKAGE_FEATURE",
+      payload: { tier: activeTier, feature },
     });
-    if (activeTier === 'basic') {
+    if (activeTier === "basic") {
       dispatch({
-        type: 'REMOVE_FEATURE',
-        payload: feature
+        type: "REMOVE_FEATURE",
+        payload: feature,
       });
     }
   };
 
-  const handleAddFaq = (e: any) => {
+  // Area covered toggle & add
+  const toggleArea = (area: string) => {
+    if (areasCovered.includes(area)) {
+      setAreasCovered(areasCovered.filter((a) => a !== area));
+    } else {
+      setAreasCovered([...areasCovered, area]);
+    }
+  };
+
+  const handleAddArea = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAreaInput.trim()) return;
+    if (!areasCovered.includes(newAreaInput.trim())) {
+      setAreasCovered([...areasCovered, newAreaInput.trim()]);
+    }
+    setNewAreaInput("");
+    setShowAddArea(false);
+  };
+
+  // Tools toggle & add
+  const handleAddTool = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newToolInput.trim()) return;
+    if (!toolsList.includes(newToolInput.trim())) {
+      setToolsList([...toolsList, newToolInput.trim()]);
+    }
+    setNewToolInput("");
+    setShowAddTool(false);
+  };
+
+  const handleRemoveTool = (tool: string) => {
+    setToolsList(toolsList.filter((t) => t !== tool));
+  };
+
+  // FAQs
+  const handleAddFaq = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!faqQuestion.trim() || !faqAnswer.trim()) {
-      toast.error('Please enter both Question and Answer for FAQ');
+      toast.error("Please enter both Question and Answer");
       return;
     }
     dispatch({
-      type: 'ADD_FAQ',
-      payload: { question: faqQuestion.trim(), answer: faqAnswer.trim() }
+      type: "ADD_FAQ",
+      payload: { question: faqQuestion.trim(), answer: faqAnswer.trim() },
     });
-    setFaqQuestion('');
-    setFaqAnswer('');
+    setFaqQuestion("");
+    setFaqAnswer("");
   };
 
   const handleRemoveFaq = (index: number) => {
     dispatch({
-      type: 'REMOVE_FAQ',
-      payload: index
+      type: "REMOVE_FAQ",
+      payload: index,
     });
   };
 
-  const toggleTier = (tier: string) => {
-    dispatch({
-      type: 'TOGGLE_PACKAGE_TIER',
-      payload: { tier }
-    });
-  };
-
-  // Select local attachment files
-  const handleFilesSelected = (e: any) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const newFiles = Array.from(e.target.files) as File[];
-      setPackageImages((prev) => [...prev, ...newFiles]);
-      setDisabled(false);
-    }
-  };
-
-  // Remove a local file before upload
-  const handleRemoveLocalFile = (indexToRemove: number) => {
-    setPackageImages((prev) => prev.filter((_, index) => index !== indexToRemove));
-  };
-
-  // Remove an uploaded CDN image URL
-  const handleRemoveCdnImage = async (urlToRemove: string) => {
-    if (urlToRemove && (urlToRemove.includes('cloudinary.com') || urlToRemove.includes('/upload/'))) {
-      try {
-        toast.loading('Deleting asset ...', { id: 'delete-asset' });
-        await supportService.deleteCloudinaryFile(urlToRemove);
-        toast.success('Asset deleted', { id: 'delete-asset' });
-      } catch (err) {
-        console.warn('Failed to delete asset:', err);
-        toast.dismiss('delete-asset');
-      }
-    }
-    dispatch({
-      type: 'ADD_IMAGES',
-      payload: {
-        cover: state.cover,
-        images: (state.images || []).filter((img: string) => img !== urlToRemove)
-      }
-    });
-  };
-
-  // Remove cover image
-  const handleRemoveCover = async () => {
-    const currentCoverUrl = state.cover;
-    setCoverImage(null);
-    dispatch({
-      type: 'ADD_IMAGES',
-      payload: {
-        cover: '',
-        images: state.images || []
-      }
-    });
-    if (currentCoverUrl && (currentCoverUrl.includes('cloudinary.com') || currentCoverUrl.includes('/upload/'))) {
-      try {
-        toast.loading('Deleting cover image ...', { id: 'delete-cover' });
-        await supportService.deleteCloudinaryFile(currentCoverUrl);
-        toast.success('Cover image deleted', { id: 'delete-cover' });
-      } catch (err) {
-        console.warn('Failed to delete cover image:', err);
-        toast.dismiss('delete-cover');
-      }
-    }
-  };
-
-  // Upload image/attachment to CDN (Cloudinary) with fallback to ImgBB
+  // File Upload Handlers (Cloudinary with ImgBB fallback)
   const uploadToCDN = async (file: File) => {
-    if (!file) return { url: '' };
     try {
-      const uploaded = await supportService.uploadFileToCloudinary(file, 'gig_attachments');
+      const uploaded = await supportService.uploadFileToCloudinary(file, "gig_attachments");
       if (uploaded?.secure_url || uploaded?.url) {
-        return { url: uploaded.secure_url || uploaded.url };
+        return uploaded.secure_url || uploaded.url;
       }
     } catch (err) {
-      console.warn(' upload failed, trying fallback:', err);
+      console.warn("Cloudinary upload failed, using fallback:", err);
     }
-    return await generateImageURL(file);
+    const fallback = await generateImageURL(file);
+    return fallback?.url || "";
   };
 
-  const handleImageUploads = async () => {
-    if (!coverImage && packageImages.length === 0) {
-      toast.error('Please select a cover image or package images first');
-      return;
-    }
+  const handleCoverSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
     try {
       setUploading(true);
-
-      const oldCoverUrl = state.cover;
-      let newCoverUrl = state.cover || '';
-
-      if (coverImage) {
-        if (oldCoverUrl && (oldCoverUrl.includes('cloudinary.com') || oldCoverUrl.includes('/upload/'))) {
-          try {
-            await supportService.deleteCloudinaryFile(oldCoverUrl);
-          } catch (err) {
-            console.warn('Failed deleting old cover image:', err);
-          }
-        }
-        const uploadedCover = await uploadToCDN(coverImage);
-        newCoverUrl = uploadedCover.url || '';
-        setCoverImage(null);
-      }
-
-      const newUploaded = await Promise.all(
-        packageImages.map(async (img) => await uploadToCDN(img))
-      );
-      const newUrls = newUploaded.map((img) => img.url).filter(Boolean);
-      const combinedImages = [...(state.images || []), ...newUrls];
-
+      toast.loading("Uploading banner image...", { id: "upload-cover" });
+      const url = await uploadToCDN(file);
       dispatch({
-        type: 'ADD_IMAGES',
+        type: "ADD_IMAGES",
         payload: {
-          cover: newCoverUrl,
-          images: combinedImages
-        }
+          cover: url,
+          images: state.images || [],
+        },
       });
-      setPackageImages([]);
+      toast.success("Banner uploaded successfully!", { id: "upload-cover" });
+    } catch {
+      toast.error("Failed to upload banner", { id: "upload-cover" });
+    } finally {
       setUploading(false);
-      setDisabled(true);
-      toast.success('Attachments uploaded and old cover replaced!');
-    }
-    catch (error) {
-      console.error(error);
-      setUploading(false);
-      toast.error('Failed uploading attachments');
     }
   };
 
-  const handleFormSubmit = (event: any) => {
-    if (event) event.preventDefault();
+  const handleSubImagesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length === 0) return;
+    try {
+      setUploading(true);
+      toast.loading(`Uploading ${files.length} images...`, { id: "upload-subs" });
+      const uploadedUrls = await Promise.all(files.map((f) => uploadToCDN(f)));
+      const validUrls = uploadedUrls.filter(Boolean);
+      dispatch({
+        type: "ADD_IMAGES",
+        payload: {
+          cover: state.cover,
+          images: [...(state.images || []), ...validUrls],
+        },
+      });
+      toast.success("Sub images added successfully!", { id: "upload-subs" });
+    } catch {
+      toast.error("Failed uploading images", { id: "upload-subs" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveImage = (urlToRemove: string) => {
+    if (urlToRemove === state.cover) {
+      dispatch({
+        type: "ADD_IMAGES",
+        payload: {
+          cover: "",
+          images: state.images || [],
+        },
+      });
+    } else {
+      dispatch({
+        type: "ADD_IMAGES",
+        payload: {
+          cover: state.cover,
+          images: (state.images || []).filter((img: string) => img !== urlToRemove),
+        },
+      });
+    }
+    toast.success("Image removed");
+  };
+
+  // Submit Handler
+  const handleSubmit = (isDraft = false) => {
     const form = {
       ...state,
       userID: user?._id || user?.id,
-      faqs: state.faqs || []
+      faqs: state.faqs || [],
+      isDraft,
+      areasCovered,
+      tools: toolsList,
+      whyMe: whyMeInput,
     };
 
-    // Ensure basic package fields are synced
+    // Ensure basic tier sync
     if (form.packages?.basic) {
-      const bTitle = form.packages.basic.title || form.packages.basic.shortTitle || form.shortTitle || form.title || '';
-      form.packages.basic.title = bTitle;
-      form.packages.basic.shortDesc = form.packages.basic.shortDesc || form.shortDesc || '';
+      form.packages.basic.title =
+        form.packages.basic.title || form.packages.basic.shortTitle || form.shortTitle || form.title || "";
+      form.packages.basic.shortDesc =
+        form.packages.basic.shortDesc || form.shortDesc || form.description || "";
       form.packages.basic.price = Number(form.packages.basic.price || form.price || 0);
-      form.packages.basic.deliveryTime = form.packages.basic.deliveryTime || form.deliveryTime || '';
+      form.packages.basic.deliveryTime =
+        form.packages.basic.deliveryTime || form.deliveryTime || "7";
     }
 
-    // Basic root level validation
-    if (!form.title || !form.category || !form.description || form.description === '<p><br></p>') {
-      toast.error('Please fill all main gig details (Title, Category, and Description)');
-      return;
-    }
-
-    // Basic tier validation
-    const basicTitle = form.packages?.basic?.title || form.packages?.basic?.shortDesc;
-    if (!basicTitle || !form.packages?.basic?.shortDesc || !form.packages?.basic?.price || !form.packages?.basic?.deliveryTime) {
-      toast.error('Please fill all Basic package details (Title, Short Description, Delivery Time, and Price)');
-      return;
-    }
-
-    // Validate that prices for all enabled package tiers are positive (> 0)
-    const tiers = ['basic', 'standard', 'premium'];
-    for (const tier of tiers) {
-      const pkg = form.packages?.[tier];
-      if (pkg) {
-        const pkgPrice = Number(pkg.price);
-        if (isNaN(pkgPrice) || pkgPrice <= 0) {
-          toast.error(`Price for ${tier.charAt(0).toUpperCase() + tier.slice(1)} package must be a positive number greater than $0`);
-          return;
-        }
+    if (!isDraft) {
+      if (!form.title) {
+        toast.error("Please enter a package title");
+        return;
+      }
+      if (!form.category) {
+        toast.error("Please select a category");
+        return;
+      }
+      if (!form.description) {
+        toast.error("Please provide a package description");
+        return;
+      }
+      const basicPrice = Number(form.packages?.basic?.price);
+      if (isNaN(basicPrice) || basicPrice <= 0) {
+        toast.error("Please enter a valid price for the Basic package");
+        return;
       }
     }
 
     mutation.mutate(form);
   };
 
-  const inputClasses = "p-3.5 border border-slate-200 rounded-lg text-slate-800 bg-slate-50 transition-all duration-300 w-full placeholder:text-slate-400 focus:outline-none focus:border-brand-green focus:bg-white focus:ring-4 focus:ring-brand-green/10";
-  const labelClasses = "text-slate-700 text-sm font-semibold -mb-2";
-  const btnClasses = "px-6 py-4 rounded-lg bg-brand-green font-semibold text-base text-white transition-all duration-300 shadow-[0_4px_12px_rgba(16,185,129,0.2)] hover:bg-[#059669] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(16,185,129,0.3)] disabled:bg-slate-300 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none";
+  // Current active tier object (or default empty tier)
+  const currentTierData =
+    (state.packages as any)?.[activeTier] || {
+      title: "",
+      shortDesc: "",
+      price: "",
+      deliveryTime: "",
+      features: [],
+    };
 
-  const activePackage = (state.packages as any)?.[activeTier];
+  const selectedCategoryObj = categoryList.find(
+    (c: any) => (c.slug || c.name || c._id) === state.category
+  );
+  const categoryBadgeLabel = selectedCategoryObj?.name || "Blog, Business House";
+
+  // Gallery items to show: user's uploaded images, or default demo thumbnails
+  const MOCK_DEMO_THUMBS = [
+    "/images/dashboard/packages/demo_1.png",
+    "/images/dashboard/packages/demo_2.png",
+    "/images/dashboard/packages/demo_3.png",
+    "/images/dashboard/packages/demo_4.png",
+    "/images/dashboard/packages/demo_5.png",
+  ];
+
+  const galleryItems = [
+    ...(state.cover ? [state.cover] : []),
+    ...(state.images || []),
+  ];
 
   return (
-    <div className='min-h-screen bg-slate-50 py-10 flex justify-center font-sans'>
-      <div className="w-[95%] md:w-[90%] max-w-[1100px] bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.05)] p-8 md:py-12 md:px-16 mx-auto">
-        <h1 className="text-slate-900 font-bold text-2xl md:text-3xl mb-10 border-b-2 border-slate-100 pb-5">Add New Package</h1>
+    <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-7">
 
-        <div className="flex flex-col md:flex-row justify-between gap-10 md:gap-16">
-          <div className="flex-1 flex flex-col gap-6">
-            <label className={labelClasses}>Gig Title</label>
-            <input name='title' type="text" className={inputClasses} placeholder="e.g. I will do something I'm really good at" onChange={handleFormChange} value={state.title || ''} />
+        {/* 1. Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-[32px] font-bold tracking-tight text-gray-950">
+              Create New Package
+            </h1>
+            <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-2xl leading-relaxed">
+              Set up your package with clear details, pricing, and deliverables so clients know exactly what to expect before they hire you.
+            </p>
+          </div>
 
-            <label className={labelClasses}>Category</label>
-            <CustomSelect
-              options={categoryList.map((item: any) => ({
-                value: item.slug || item.name || item._id || String(item),
-                label: item.name || (item.slug ? item.slug[0].toUpperCase() + item.slug.slice(1) : String(item))
-              }))}
-              value={state.category || ''}
-              onChange={(val) => handleFormChange({ target: { name: 'category', value: val } })}
-              placeholder="Category"
-            />
-
-            {/* Media & Attachment Section */}
-            <div className="flex flex-col gap-5 p-5 bg-slate-50 border border-dashed border-slate-300 rounded-xl">
-              {/* 1. Cover Image Upload & Remove */}
-              <div className="flex flex-col gap-2">
-                <label className="text-slate-700 text-sm font-semibold">Cover Image</label>
-                <input
-                  type="file"
-                  accept='image/*,.pdf,.zip'
-                  className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer text-sm text-slate-600"
-                  onChange={(event: any) => {
-                    if (event.target.files?.[0]) {
-                      setCoverImage(event.target.files[0]);
-                      setDisabled(false);
-                    }
-                  }}
-                />
-
-                {(coverImage || state.cover) && (
-                  <div className="relative group w-24 h-16 rounded-lg overflow-hidden border border-slate-200 shadow-xs mt-2 bg-slate-100">
-                    <img
-                      src={coverImage ? URL.createObjectURL(coverImage) : state.cover}
-                      alt="Cover Preview"
-                      className="w-full h-full object-cover"
-                    />
-                    <button
-                      type="button"
-                      className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-90 hover:opacity-100 transition-opacity shadow-xs"
-                      onClick={handleRemoveCover}
-                      title="Remove Cover Image"
-                    >
-                      <X size={12} strokeWidth={2.5} />
-                    </button>
-                    <span className="absolute bottom-0 inset-x-0 bg-slate-900/70 text-white text-[9px] text-center font-bold py-0.5">
-                      COVER
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* 2. Attachments / Gallery Images Upload & Remove */}
-              <div className="flex flex-col gap-2 mt-2">
-                <label className="text-slate-700 text-sm font-semibold">
-                  Upload Attachments / Images
-                </label>
-                <input
-                  type="file"
-                  accept='image/*,.pdf,.zip,.doc,.docx'
-                  multiple
-                  className="p-2.5 bg-white border border-slate-200 rounded-md cursor-pointer text-sm text-slate-600"
-                  onChange={handleFilesSelected}
-                />
-
-                {((state.images && state.images.length > 0) || packageImages.length > 0) && (
-                  <div className="flex flex-wrap gap-3 mt-3">
-                    {/* CDN Uploaded Images */}
-                    {state.images?.map((url: string, index: number) => (
-                      <div key={`cdn-${index}`} className="relative group w-20 h-20 rounded-lg overflow-hidden border border-slate-200 bg-white shadow-xs">
-                        {url.match(/\.(jpeg|jpg|gif|png|webp)/i) || url.includes('cloudinary') || url.includes('ibb.co') ? (
-                          <img src={url} alt="Attachment" className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 p-1 text-slate-500">
-                            <FileText size={20} />
-                            <span className="text-[9px] font-semibold uppercase mt-1 truncate max-w-full px-1">File</span>
-                          </div>
-                        )}
-                        <button
-                          type="button"
-                          className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-90 hover:opacity-100 transition-opacity shadow-xs"
-                          onClick={() => handleRemoveCdnImage(url)}
-                          title="Remove Attachment"
-                        >
-                          <X size={12} strokeWidth={2.5} />
-                        </button>
-                      </div>
-                    ))}
-
-                    {/* Newly Selected Local Files */}
-                    {packageImages.map((file: File, index: number) => (
-                      <div key={`local-${index}`} className="relative group w-20 h-20 rounded-lg overflow-hidden border border-brand-green/40 bg-white shadow-xs">
-                        {file.type.startsWith('image/') ? (
-                          <img src={URL.createObjectURL(file)} alt={file.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 p-1 text-slate-600">
-                            <FileText size={20} />
-                            <span className="text-[9px] font-semibold truncate max-w-full px-1">{file.name}</span>
-                          </div>
-                        )}
-                        <button
-                          type="button"
-                          className="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full opacity-90 hover:opacity-100 transition-opacity shadow-xs"
-                          onClick={() => handleRemoveLocalFile(index)}
-                          title="Remove File"
-                        >
-                          <X size={12} strokeWidth={2.5} />
-                        </button>
-                        <span className="absolute bottom-0 inset-x-0 bg-brand-green text-white text-[8px] text-center font-bold py-0.5">
-                          NEW
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <button
-                type="button"
-                className={`${btnClasses} mt-2 px-6 py-2.5 text-sm w-auto self-start`}
-                disabled={!!disabled || uploading || (!coverImage && packageImages.length === 0)}
-                onClick={handleImageUploads}
-              >
-                {uploading ? 'Uploading...' : disabled ? 'Uploaded' : 'Upload Attachments'}
-              </button>
-            </div>
-
-            <label className={labelClasses}>Description (Rich Text Editor)</label>
-            <div className="bg-white rounded-xl overflow-hidden border border-slate-200">
-              <ReactQuill
-                theme="snow"
-                value={state.description || ''}
-                onChange={(html) => dispatch({ type: 'CHANGE_INPUT', payload: { name: 'description', value: html } })}
-                modules={quillModules}
-                formats={quillFormats}
-                placeholder="Write rich descriptions to introduce your service to customers..."
-              />
-            </div>
-
-            {/* Frequently Asked Questions (FAQ) Section */}
-            <div className="flex flex-col gap-4 p-5 bg-slate-50 border border-slate-200 rounded-xl mt-2">
-              <div className="flex items-center justify-between">
-                <label className="text-slate-700 text-sm font-semibold">Frequently Asked Questions (FAQs)</label>
-                <span className="text-xs text-slate-500 font-medium">Optional</span>
-              </div>
-
-              <div className="flex flex-col gap-3 bg-white p-4 rounded-lg border border-slate-200">
-                <input
-                  type="text"
-                  className={inputClasses}
-                  placeholder="Question (e.g. Do you provide source code?)"
-                  value={faqQuestion}
-                  onChange={(e) => setFaqQuestion(e.target.value)}
-                />
-                <textarea
-                  className={`${inputClasses} min-h-[80px] resize-y`}
-                  placeholder="Answer (e.g. Yes, full repository access and clean source code is included.)"
-                  value={faqAnswer}
-                  onChange={(e) => setFaqAnswer(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className={`${btnClasses} px-5 py-2 text-sm self-end h-auto m-0`}
-                  onClick={handleAddFaq}
-                >
-                  Add FAQ
-                </button>
-              </div>
-
-              {/* Displayed FAQs List */}
-              {state.faqs && state.faqs.length > 0 && (
-                <div className="space-y-3 mt-1">
-                  {state.faqs.map((faq: { question: string; answer: string }, idx: number) => (
-                    <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3.5 flex justify-between items-start gap-3 shadow-2xs">
-                      <div className="space-y-1">
-                        <h5 className="text-xs sm:text-sm font-bold text-slate-800">Q: {faq.question}</h5>
-                        <p className="text-xs sm:text-sm text-slate-600 font-normal">A: {faq.answer}</p>
-                      </div>
-                      <button
-                        type="button"
-                        className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-full transition-colors shrink-0 cursor-pointer"
-                        onClick={() => handleRemoveFaq(idx)}
-                        title="Remove FAQ"
-                      >
-                        <X size={14} strokeWidth={2.5} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+          {/* Action Buttons: Draft and Save & Save and Publish */}
+          <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
+            <button
+              type="button"
+              onClick={() => handleSubmit(true)}
+              disabled={mutation.isPending}
+              className="bg-[#F1F3F5] hover:bg-gray-200 text-gray-800 font-semibold text-xs sm:text-[13px] px-5 py-2.5 rounded-lg transition-colors cursor-pointer"
+            >
+              Draft and Save
+            </button>
 
             <button
               type="button"
-              className={`${btnClasses} mt-4 flex items-center justify-center gap-2`}
-              onClick={handleFormSubmit}
+              onClick={() => handleSubmit(false)}
               disabled={mutation.isPending}
+              className="bg-black hover:bg-gray-900 text-white font-semibold text-xs sm:text-[13px] px-5 py-2.5 rounded-lg transition-colors shadow-2xs cursor-pointer flex items-center gap-2"
             >
               {mutation.isPending ? (
                 <>
-                  <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  Creating Package...
+                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  Publishing...
                 </>
               ) : (
-                'Create Package'
+                "Save and Publish"
               )}
             </button>
           </div>
+        </div>
 
-          <div className="flex-1 flex flex-col gap-6">
-            {/* Tabs */}
-            <div className="flex border-b border-slate-200 mb-2">
-              {['basic', 'standard', 'premium'].map((tier) => (
-                <button
-                  key={tier}
-                  type="button"
-                  className={`flex-1 py-3 text-sm font-semibold text-center border-b-2 transition-colors ${activeTier === tier
-                    ? 'border-brand-green text-brand-green'
-                    : 'border-transparent text-slate-500 hover:text-slate-700'
-                    }`}
-                  onClick={() => setActiveTier(tier)}
-                >
-                  {tier.charAt(0).toUpperCase() + tier.slice(1)}
-                </button>
-              ))}
-            </div>
+        {/* 2. Top Navigation Tabs */}
+        <div className="bg-white border border-gray-200/90 rounded-xl p-1 inline-flex items-center gap-1 shadow-2xs">
+          {(["about", "seller", "packages", "faq"] as SectionTab[]).map((tab) => {
+            const labelMap: Record<SectionTab, string> = {
+              about: "About",
+              seller: "Seller Info",
+              packages: "Packages",
+              faq: "FAQ",
+            };
+            const isActive = activeTab === tab;
+            return (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 sm:px-5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  isActive
+                    ? "bg-[#0B3A33] text-white shadow-2xs"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                {labelMap[tab]}
+              </button>
+            );
+          })}
+        </div>
 
-            {activePackage === null ? (
-              <div className="flex flex-col items-center justify-center py-12 bg-slate-50 rounded-xl border border-slate-200 border-dashed">
-                <p className="text-slate-500 mb-4">{activeTier.charAt(0).toUpperCase() + activeTier.slice(1)} Package is not active.</p>
-                <button type="button" className={`${btnClasses} px-6 py-2 text-sm h-auto`} onClick={() => toggleTier(activeTier)}>
-                  Enable {activeTier.charAt(0).toUpperCase() + activeTier.slice(1)} Package
-                </button>
+        {/* 3. Main Grid (About + Pricing Tier) */}
+        {activeTab === "about" && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            {/* Left Column: About this packages */}
+            <div className="lg:col-span-8 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+              <div className="flex items-center justify-between gap-3 border-b border-gray-100 pb-4">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-950">
+                  About this packages
+                </h2>
+                <span className="bg-[#F8F9FA] border border-gray-200/80 text-gray-600 text-[11px] font-medium px-3 py-1 rounded-md">
+                  {categoryBadgeLabel}
+                </span>
               </div>
-            ) : (
-              <>
-                <div className="flex justify-between items-center -mb-2">
-                  <label className={labelClasses}>Service Title ({activeTier})</label>
-                  {activeTier !== 'basic' && (
-                    <button type="button" className="text-xs text-red-500 hover:text-red-700 font-medium" onClick={() => toggleTier(activeTier)}>
-                      Disable
-                    </button>
-                  )}
-                </div>
+
+              {/* Package Title */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-gray-700 block">
+                  Package title
+                </label>
                 <input
                   type="text"
-                  name={activeTier === 'basic' ? 'shortTitle' : 'title'}
-                  className={inputClasses}
-                  placeholder='e.g. One-page web design'
-                  onChange={handlePackageFormChange}
-                  value={activeTier === 'basic' ? (activePackage.shortTitle || activePackage.title || '') : (activePackage.title || '')}
+                  name="title"
+                  value={state.title || ""}
+                  onChange={handleInputChange}
+                  placeholder="e.g I will do something i am really good at"
+                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all"
                 />
+              </div>
 
-                <label className={labelClasses}>Short Description</label>
-                <textarea name='shortDesc' className={`${inputClasses} min-h-[120px] resize-y`} placeholder='Short description of your service' onChange={handlePackageFormChange} value={activePackage.shortDesc || ''}></textarea>
+              {/* Package Description */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-gray-700 block">
+                  Package description
+                </label>
+                <textarea
+                  name="description"
+                  value={state.description || ""}
+                  onChange={handleInputChange}
+                  placeholder="write description"
+                  rows={5}
+                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[120px]"
+                />
+              </div>
 
-                <div className="flex gap-4">
-                  <div className="flex-1 flex flex-col gap-6">
-                    <label className={labelClasses}>Delivery Time (Days)</label>
-                    <input type="number" name='deliveryTime' min='1' className={inputClasses} onChange={handlePackageFormChange} value={activePackage.deliveryTime || ''} />
-                  </div>
-                  <div className="flex-1 flex flex-col gap-6">
-                    <label className={labelClasses}>Revision Number</label>
-                    <input type="number" name='revisionNumber' min='1' className={inputClasses} onChange={handlePackageFormChange} value={activePackage.revisionNumber || ''} />
-                  </div>
+              {/* Category */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-gray-700 block">
+                  Category
+                </label>
+                <div className="relative">
+                  <select
+                    name="category"
+                    value={state.category || ""}
+                    onChange={handleInputChange}
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10"
+                  >
+                    <option value="" disabled>Select Category</option>
+                    {categoryList.map((c: any) => (
+                      <option key={c._id || c.slug} value={c.slug || c.name || c._id}>
+                        {c.name || c.slug}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
                 </div>
+              </div>
 
-                <label className={labelClasses}>Add Feature</label>
-                <form className='flex justify-between items-center gap-3' onSubmit={handlePackageFeatureAdd}>
-                  <input type="text" className={`${inputClasses} flex-1`} placeholder='e.g. page design' />
-                  <button type='submit' className={`${btnClasses} px-6 py-3.5 h-auto m-0 whitespace-nowrap`}>Add</button>
-                </form>
-
-                <div className="flex flex-wrap gap-2.5 mt-1">
-                  {
-                    activePackage.features?.map((feature: any) => (
-                      <div key={feature} className="group cursor-pointer">
-                        <button
-                          type="button"
-                          className="px-3 py-1.5 text-[13px] font-medium bg-slate-100 text-slate-600 rounded-full flex items-center gap-2 border border-slate-200 transition-all duration-200 group-hover:bg-red-100 group-hover:border-red-300 group-hover:text-red-500"
-                          onClick={() => handlePackageFeatureRemove(feature)}
-                        >
-                          {feature}
-                          <span className="bg-slate-200 text-slate-500 w-4 h-4 flex items-center justify-center rounded-full text-[10px] font-bold transition-all duration-200 group-hover:bg-red-500 group-hover:text-white">X</span>
-                        </button>
+              {/* Area Covered Checklist */}
+              <div className="space-y-3 pt-2">
+                <label className="text-xs sm:text-[13px] font-bold text-gray-900 block">
+                  Area Covered :
+                </label>
+                <div className="space-y-2.5">
+                  {areasCovered.map((area) => (
+                    <div
+                      key={area}
+                      onClick={() => toggleArea(area)}
+                      className="flex items-center gap-2.5 cursor-pointer select-none group"
+                    >
+                      <div className="w-4 h-4 rounded bg-[#0B3A33] flex items-center justify-center text-white shrink-0 shadow-2xs">
+                        <Check className="w-3 h-3 stroke-[3]" />
                       </div>
-                    ))
-                  }
+                      <span className="text-xs sm:text-[13px] text-gray-700 group-hover:text-gray-950 font-normal">
+                        {area}
+                      </span>
+                    </div>
+                  ))}
                 </div>
 
-                <label className={labelClasses}>Price ($)</label>
+                {/* Add More Area */}
+                {showAddArea ? (
+                  <form onSubmit={handleAddArea} className="flex items-center gap-2 mt-2">
+                    <input
+                      type="text"
+                      placeholder="e.g. E-commerce Website"
+                      value={newAreaInput}
+                      onChange={(e) => setNewAreaInput(e.target.value)}
+                      className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-800 outline-none w-48 sm:w-56"
+                      autoFocus
+                    />
+                    <button
+                      type="submit"
+                      className="bg-[#0B3A33] text-white text-xs px-3 py-1.5 rounded-lg font-semibold cursor-pointer"
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddArea(false)}
+                      className="text-gray-400 hover:text-gray-600 text-xs px-2"
+                    >
+                      Cancel
+                    </button>
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowAddArea(true)}
+                    className="text-[#0D6D5F] hover:text-[#0A5348] text-xs font-semibold flex items-center gap-1 cursor-pointer pt-1 transition-colors"
+                  >
+                    Add More <Plus className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Why Me? Section */}
+              <div className="space-y-3 pt-2 border-t border-gray-100">
+                <label className="text-xs sm:text-[13px] font-bold text-gray-900 block">
+                  Why Me?
+                </label>
+                <div className="space-y-1 text-xs text-gray-500 leading-relaxed">
+                  <p>500+ Five Star reviews</p>
+                  <p>Custom designs 100% original, no templates</p>
+                  <p>Delivery only after your 100% Satisfaction</p>
+                  <p>7+ years of experience</p>
+                </div>
+
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-xs font-semibold text-gray-700 block">
+                    Why Me?
+                  </label>
+                  <input
+                    type="text"
+                    value={whyMeInput}
+                    onChange={(e) => setWhyMeInput(e.target.value)}
+                    placeholder="Write here"
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Add Design Tool Section */}
+              <div className="space-y-3 pt-2 border-t border-gray-100">
+                <label className="text-xs sm:text-[13px] font-bold text-gray-900 block">
+                  Add Design Tool
+                </label>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {toolsList.map((tool) => (
+                    <span
+                      key={tool}
+                      className="inline-flex items-center gap-1.5 bg-[#F4F5F7] border border-gray-200/80 px-2.5 py-1 rounded-lg text-xs font-medium text-gray-700"
+                    >
+                      {tool}
+                      <X
+                        className="w-3 h-3 text-gray-400 hover:text-red-500 cursor-pointer"
+                        onClick={() => handleRemoveTool(tool)}
+                      />
+                    </span>
+                  ))}
+                </div>
+
+                {showAddTool ? (
+                  <form onSubmit={handleAddTool} className="flex items-center gap-2 mt-1">
+                    <input
+                      type="text"
+                      placeholder="e.g. Figma, Illustrator"
+                      value={newToolInput}
+                      onChange={(e) => setNewToolInput(e.target.value)}
+                      className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-800 outline-none w-48 sm:w-56"
+                      autoFocus
+                    />
+                    <button
+                      type="submit"
+                      className="bg-[#0B3A33] text-white text-xs px-3 py-1.5 rounded-lg font-semibold cursor-pointer"
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddTool(false)}
+                      className="text-gray-400 hover:text-gray-600 text-xs px-2"
+                    >
+                      Cancel
+                    </button>
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowAddTool(true)}
+                    className="text-[#0D6D5F] hover:text-[#0A5348] text-xs font-semibold flex items-center gap-1 cursor-pointer pt-1 transition-colors"
+                  >
+                    Add Tool <Plus className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+            </div>
+
+            {/* Right Column: Pricing Tier Card */}
+            <div className="lg:col-span-4 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-5 space-y-4">
+
+              {/* Tier Pills Tabs: Basic, Silver (standard), Platinum (premium) */}
+              <div className="bg-[#F4F5F7] rounded-xl p-1 flex items-center gap-1">
+                {(["basic", "standard", "premium"] as TierKey[]).map((tierKey) => {
+                  const displayLabels: Record<TierKey, string> = {
+                    basic: "Basic",
+                    standard: "Silver",
+                    platinum: "Platinum",
+                  } as any;
+                  const label = displayLabels[tierKey] || (tierKey === "standard" ? "Silver" : tierKey === "premium" ? "Platinum" : "Basic");
+                  const isCurrent = activeTier === tierKey;
+
+                  return (
+                    <button
+                      key={tierKey}
+                      type="button"
+                      onClick={() => {
+                        setActiveTier(tierKey);
+                        if (!(state.packages as any)?.[tierKey]) {
+                          dispatch({
+                            type: "TOGGLE_PACKAGE_TIER",
+                            payload: { tier: tierKey },
+                          });
+                        }
+                      }}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition-all cursor-pointer ${
+                        isCurrent
+                          ? "bg-[#0B3A33] text-white shadow-2xs"
+                          : "text-gray-600 hover:text-gray-900"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Tier Title */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-gray-700 block">
+                  Package title
+                </label>
                 <input
-                  name='price'
-                  type="number"
-                  min='1'
-                  step='any'
-                  className={inputClasses}
-                  placeholder="e.g. 50"
-                  onKeyDown={(e) => {
-                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                      e.preventDefault();
-                    }
-                  }}
-                  onChange={handlePackageFormChange}
-                  value={activePackage.price || ''}
+                  type="text"
+                  value={currentTierData.title || ""}
+                  onChange={(e) => handleTierInputChange("title", e.target.value)}
+                  placeholder="e.g I will do something i am really good at"
+                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
                 />
-              </>
+              </div>
+
+              {/* Tier Description */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-gray-700 block">
+                  Package description
+                </label>
+                <textarea
+                  value={currentTierData.shortDesc || ""}
+                  onChange={(e) => handleTierInputChange("shortDesc", e.target.value)}
+                  placeholder="write description"
+                  rows={3}
+                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[80px]"
+                />
+              </div>
+
+              {/* Add Delivery Time */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-gray-700 block">
+                  Add delivery time
+                </label>
+                <div className="relative">
+                  <select
+                    value={currentTierData.deliveryTime || ""}
+                    onChange={(e) => handleTierInputChange("deliveryTime", e.target.value)}
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
+                  >
+                    <option value="" disabled>e.g 12 days</option>
+                    <option value="1">1 day</option>
+                    <option value="3">3 days</option>
+                    <option value="7">7 days</option>
+                    <option value="12">12 days</option>
+                    <option value="14">14 days</option>
+                    <option value="30">30 days</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-3.5 h-3.5" />
+                </div>
+              </div>
+
+              {/* Add Features */}
+              <div className="space-y-2 pt-1">
+                <div className="flex flex-wrap gap-1.5">
+                  {currentTierData.features?.map((f: string) => (
+                    <span
+                      key={f}
+                      className="inline-flex items-center gap-1 bg-[#F4F5F7] border border-gray-200/60 px-2 py-0.5 rounded text-[11px] text-gray-700"
+                    >
+                      {f}
+                      <X
+                        className="w-3 h-3 text-gray-400 hover:text-red-500 cursor-pointer"
+                        onClick={() => handleRemoveFeature(f)}
+                      />
+                    </span>
+                  ))}
+                </div>
+
+                {showAddFeature ? (
+                  <form onSubmit={handleAddFeature} className="flex items-center gap-1.5">
+                    <input
+                      type="text"
+                      placeholder="e.g. Responsive design"
+                      value={newFeatureInput}
+                      onChange={(e) => setNewFeatureInput(e.target.value)}
+                      className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-2.5 py-1 text-xs text-gray-800 outline-none flex-1"
+                      autoFocus
+                    />
+                    <button
+                      type="submit"
+                      className="bg-[#0B3A33] text-white text-xs px-2.5 py-1 rounded font-semibold cursor-pointer"
+                    >
+                      Add
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddFeature(false)}
+                      className="text-gray-400 hover:text-gray-600 text-xs px-1"
+                    >
+                      ✕
+                    </button>
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowAddFeature(true)}
+                    className="text-[#0D6D5F] hover:text-[#0A5348] text-xs font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    Add Features <Plus className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Set Price */}
+              <div className="space-y-1 pt-1">
+                <label className="text-xs font-semibold text-gray-700 block">
+                  Set price
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="1"
+                    value={currentTierData.price || ""}
+                    onChange={(e) => handleTierInputChange("price", e.target.value)}
+                    placeholder="e.g $200"
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+        {/* 4. Seller Info Tab */}
+        {activeTab === "seller" && (
+          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-950 border-b border-gray-100 pb-3">
+              Seller Information
+            </h2>
+            <div className="flex items-center gap-4">
+              <img
+                src={user?.image || "/media/noavatar.png"}
+                alt={user?.name || "Seller"}
+                className="w-16 h-16 rounded-full object-cover border border-gray-200"
+              />
+              <div>
+                <h3 className="text-base font-bold text-gray-900">{user?.name || user?.username || "Freelancer"}</h3>
+                <p className="text-xs text-gray-500 mt-0.5">{user?.shortTitle || "Professional Creator & Freelancer"}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{user?.country || user?.location || "Worldwide"}</p>
+              </div>
+            </div>
+            <div className="bg-[#F8F9FA] rounded-xl p-4 text-xs text-gray-600 leading-relaxed">
+              {user?.description || user?.bio || "No bio entered yet. You can complete your detailed profile under Account Settings."}
+            </div>
+          </div>
+        )}
+
+        {/* 5. FAQ Tab */}
+        {activeTab === "faq" && (
+          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+            <div className="border-b border-gray-100 pb-3">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-950">
+                Frequently Asked Questions (FAQ)
+              </h2>
+              <p className="text-xs text-gray-500 mt-1">
+                Add common questions clients may have regarding revisions, deliverables, and requirements.
+              </p>
+            </div>
+
+            <div className="bg-[#F8F9FA] p-4 sm:p-5 rounded-xl border border-gray-200/80 space-y-3">
+              <input
+                type="text"
+                value={faqQuestion}
+                onChange={(e) => setFaqQuestion(e.target.value)}
+                placeholder="Question (e.g. Do you provide responsive source files?)"
+                className="w-full bg-white border border-gray-200 rounded-lg px-3.5 py-2.5 text-xs text-gray-800 outline-none focus:border-[#0B3A33]"
+              />
+              <textarea
+                value={faqAnswer}
+                onChange={(e) => setFaqAnswer(e.target.value)}
+                placeholder="Answer (e.g. Yes, complete source code and assets are included.)"
+                rows={3}
+                className="w-full bg-white border border-gray-200 rounded-lg px-3.5 py-2.5 text-xs text-gray-800 outline-none focus:border-[#0B3A33] resize-y"
+              />
+              <button
+                type="button"
+                onClick={handleAddFaq}
+                className="bg-[#0B3A33] text-white text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer hover:bg-[#082a24] transition-colors"
+              >
+                Add FAQ
+              </button>
+            </div>
+
+            {state.faqs && state.faqs.length > 0 && (
+              <div className="space-y-3">
+                {state.faqs.map((faq: any, idx: number) => (
+                  <div
+                    key={idx}
+                    className="p-4 rounded-xl border border-gray-200 flex items-start justify-between gap-4 bg-white"
+                  >
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-bold text-gray-900">Q: {faq.question}</h4>
+                      <p className="text-xs text-gray-600 mt-1">A: {faq.answer}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFaq(idx)}
+                      className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
-        </div>
+        )}
+
+        {/* 6. Packages Media & Upload Card (Visible on About and Packages tab) */}
+        {(activeTab === "about" || activeTab === "packages") && (
+          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+
+            {/* Header: Packages title & arrow controls */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-950">
+                Packages
+              </h2>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  title="Previous"
+                  className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  title="Next"
+                  className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Hidden file inputs */}
+            <input
+              type="file"
+              ref={coverInputRef}
+              accept="image/*"
+              className="hidden"
+              onChange={handleCoverSelected}
+            />
+            <input
+              type="file"
+              ref={subImagesInputRef}
+              accept="image/*,.pdf,.zip"
+              multiple
+              className="hidden"
+              onChange={handleSubImagesSelected}
+            />
+
+            {/* Upload Box Container */}
+            <div className="bg-[#F8F9FA]/80 border border-gray-200/80 rounded-2xl p-6 sm:p-8 space-y-4">
+              {/* Add Banner Dropzone */}
+              <div
+                onClick={() => coverInputRef.current?.click()}
+                className="border border-dashed border-gray-300 hover:border-gray-400 rounded-xl p-5 text-center cursor-pointer transition-colors bg-white hover:bg-gray-50/60 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-600"
+              >
+                <span>Add Banner</span>
+                <Plus className="w-3.5 h-3.5" />
+              </div>
+
+              {/* Add Sub Images Dropzone */}
+              <div
+                onClick={() => subImagesInputRef.current?.click()}
+                className="border border-dashed border-gray-300 hover:border-gray-400 rounded-xl p-5 text-center cursor-pointer transition-colors bg-white hover:bg-gray-50/60 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-600"
+              >
+                <span>Add Sub Images</span>
+                <Plus className="w-3.5 h-3.5" />
+              </div>
+            </div>
+
+            {/* Uploaded or Demo Preview Gallery Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5 pt-2">
+              {galleryItems.length > 0
+                ? galleryItems.map((imgUrl, idx) => (
+                    <div
+                      key={idx}
+                      className="relative group aspect-[16/10] rounded-xl overflow-hidden border border-gray-200 bg-gray-100 shadow-2xs"
+                    >
+                      <img
+                        src={imgUrl}
+                        alt={`Attachment ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(imgUrl)}
+                        className="absolute top-1.5 right-1.5 bg-red-600 hover:bg-red-700 text-white p-1 rounded-full opacity-90 hover:opacity-100 transition-opacity shadow-xs"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                      {imgUrl === state.cover && (
+                        <span className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[9px] font-bold text-center py-0.5">
+                          BANNER
+                        </span>
+                      )}
+                    </div>
+                  ))
+                : MOCK_DEMO_THUMBS.map((thumbUrl, idx) => (
+                    <div
+                      key={idx}
+                      className="relative aspect-[16/10] rounded-xl overflow-hidden border border-gray-200/80 bg-gray-100 shadow-2xs group"
+                    >
+                      <img
+                        src={thumbUrl}
+                        alt={`Sample ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+            </div>
+
+          </div>
+        )}
+
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Add;
+export default OrganizePage;

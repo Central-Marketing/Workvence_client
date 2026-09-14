@@ -95,18 +95,19 @@ export function calculateProfileCompletion(user: any): number {
   if (!user) return 50;
 
   const checks = [
-    Boolean(user.username),
+    Boolean(user.username || user.name),
     Boolean(user.email),
     Boolean(user.image && user.image !== "/media/noavatar.png"),
-    Boolean(user.desc || user.bio || user.description),
+    Boolean(user.desc || user.bio || user.description || user.shortTitle),
     Boolean(user.country || user.location),
     Boolean(user.phone),
+    Boolean(Array.isArray(user.skills) && user.skills.length > 0),
+    Boolean(Array.isArray(user.languages) && user.languages.length > 0),
   ];
 
   const completed = checks.filter(Boolean).length;
-  // Scale between 40% and 100% so it looks encouraging
   const percentage = Math.round((completed / checks.length) * 100);
-  return Math.max(30, Math.min(100, percentage || 50));
+  return Math.max(25, Math.min(100, percentage));
 }
 
 /**

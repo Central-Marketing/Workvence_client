@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
-import { Loader, RecentOrdersSkeleton } from "@/components";
+import { calculateProfileCompletion } from "../utils/dashboardNormalizer";
 
 interface SellerDashboardProps {
   user: any;
@@ -15,196 +15,139 @@ interface SellerDashboardProps {
 export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
   const router = useRouter();
 
-  // Fetch orders
-  const { isLoading: ordersLoading, data: orders = [] } = useQuery({
-    queryKey: ["seller-dashboard-orders"],
-    queryFn: () => axiosFetch.get("/orders").then(({ data }) => data ?? []).catch(() => []),
+  // Fetch seller's packages
+  const { data: packages = [] } = useQuery({
+    queryKey: ["my-packages"],
+    queryFn: () =>
+      axiosFetch(`/gigs?userID=${user?._id || user?.id}`)
+        .then(({ data }) => (Array.isArray(data) ? data : []))
+        .catch(() => []),
     enabled: !!user,
   });
 
-  // Fetch conversations
-  const { data: conversations = [] } = useQuery({
-    queryKey: ["seller-dashboard-convs"],
-    queryFn: () => axiosFetch.get("/conversations").then(({ data }) => data ?? []).catch(() => []),
-    enabled: !!user,
-  });
-
-  // Calculate statistics using the delivery status flow
-  const completedOrders = orders.filter((o: any) => o.status === "completed");
-  const pendingOrders = orders.filter((o: any) => o.status === "paid" || o.status === "delivered" || !o.status);
-
-  const totalFinancialAmount = completedOrders.reduce((sum: number, order: any) => sum + (order.price || 0), 0);
-
-  const unreadMessagesCount = conversations.filter((c: any) => !c.readBySeller).length;
+  const completionPercentage = calculateProfileCompletion(user) || 50;
+  const packagesList = Array.isArray(packages) ? packages : [];
+  const hasPackages = packagesList.length > 0;
+  const displayName = user?.name ? user.name.split(" ")[0] : (user?.username || "Tomas");
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-8 sm:py-10 md:py-12">
-      <div className="container mx-auto px-4 md:px-6 space-y-8">
+    <div className="min-h-screen bg-[#F8F8F8] py-8 sm:py-10 font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
 
-        {/* Welcome Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-[#1e293b] to-[#0f172a] rounded-2xl p-6 sm:p-8 shadow-sm">
+        {/* 1. Header: Welcome & Profile Completion (Shown by default) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Welcome back, {user?.name || user?.username}!
+            <h1 className="text-2xl sm:text-[26px] text-[#555E68] font-normal tracking-tight">
+              Welcome to Workvence, <span className="font-bold text-black">{displayName}</span>
             </h1>
-            <p className="text-slate-300 text-sm mt-1">
-              Here is what is happening with your Workvence projects today.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="bg-emerald-950/60 text-emerald-400 border border-emerald-500/30 text-xs font-semibold px-3.5 py-1.5 rounded-full uppercase tracking-wider">
-              SELLER ACCOUNT
-            </span>
-          </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">TOTAL REVENUE</span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2 mb-1">
-              {totalFinancialAmount.toLocaleString("en-US", {
-                style: "currency",
-                currency: "USD",
-                maximumFractionDigits: 0,
-              })}
-            </h2>
-            <p className="text-xs text-gray-500">Cleared earnings from {completedOrders.length} packages</p>
           </div>
 
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">ACTIVE ORDERS</span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2 mb-1">{pendingOrders.length}</h2>
-            <p className="text-xs text-gray-500">Currently in progress</p>
-          </div>
-
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">COMPLETED ORDERS</span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2 mb-1">{completedOrders.length}</h2>
-            <p className="text-xs text-gray-500">Packages successfully closed</p>
-          </div>
-
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">UNREAD MESSAGES</span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#327C73] mt-2 mb-1">{unreadMessagesCount}</h2>
-            <p className="text-xs text-gray-500">Awaiting your response</p>
-          </div>
-        </div>
-
-        {/* Two Column Layout: Recent Orders & Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-          {/* Recent Orders Card */}
-          <div className="lg:col-span-8 bg-white border border-gray-100 rounded-2xl p-6 sm:p-7 shadow-sm">
-            <div className="flex items-center justify-between pb-5 border-b border-gray-100 mb-4">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Recent Orders</h2>
-              <Link href="/manage-orders" className="text-xs font-semibold text-[#327C73] hover:underline">
-                View All
-              </Link>
+          {/* Profile Completion Bar */}
+          <Link
+            href="/profile"
+            className="flex flex-col items-start sm:items-end gap-1.5 group cursor-pointer self-start sm:self-auto"
+          >
+            <div className="flex items-center gap-3 text-[11px] sm:text-xs">
+              <span className="text-[#374151] group-hover:text-teal-600 transition-colors underline underline-offset-2">
+                Complete your profile
+              </span>
+              <span className="font-bold text-[#111827]">{completionPercentage}%</span>
             </div>
+            <div className="w-[170px] sm:w-[200px] h-[5px] bg-[#E9EBEF] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-[#00E575] to-[#00E3A2] rounded-full transition-all duration-500"
+                style={{ width: `${completionPercentage}%` }}
+              />
+            </div>
+          </Link>
+        </div>
 
-            {ordersLoading ? (
-              <RecentOrdersSkeleton rows={4} />
-            ) : orders.length === 0 ? (
-              <p className="text-sm text-gray-400 py-10 text-center">No orders received yet.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead>
-                    <tr className="text-xs text-gray-400 border-b border-gray-50">
-                      <th className="pb-3 font-semibold uppercase">IMAGE</th>
-                      <th className="pb-3 font-semibold uppercase">TITLE</th>
-                      <th className="pb-3 font-semibold uppercase">PRICE</th>
-                      <th className="pb-3 font-semibold uppercase">STATUS</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {orders.slice(0, 5).map((order: any) => {
-                      const isOrdDelivered = order.status === "delivered";
-                      const isOrdCompleted = order.status === "completed";
-                      return (
-                        <tr
-                          key={order._id}
-                          onClick={() => router.push(`/orders/${order._id}`)}
-                          className="hover:bg-gray-50/80 cursor-pointer transition-colors"
-                        >
-                          <td className="py-3.5 pr-3">
-                            <img
-                              src={order.image || "/media/noavatar.png"}
-                              alt=""
-                              className="w-12 h-9 rounded-lg object-cover bg-gray-100 border border-gray-200"
-                            />
-                          </td>
-                          <td className="py-3.5 pr-3 max-w-[240px] truncate font-medium text-gray-800">
-                            {order.title}
-                          </td>
-                          <td className="py-3.5 pr-3 font-bold text-gray-900">
-                            {order.price?.toLocaleString("en-US", {
-                              style: "currency",
-                              currency: "USD",
-                            })}
-                          </td>
-                          <td className="py-3.5">
-                            <span
-                              className={`text-[11px] font-bold px-2.5 py-1 rounded-full uppercase ${isOrdCompleted
-                                  ? "bg-emerald-50 text-emerald-700"
-                                  : isOrdDelivered
-                                    ? "bg-blue-50 text-blue-700"
-                                    : "bg-amber-50 text-amber-700"
-                                }`}
-                            >
-                              {isOrdCompleted ? "COMPLETED" : isOrdDelivered ? "DELIVERED" : "IN PROGRESS"}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+        {/* 2. Card 1: Ready to Grow Your Business? (Shown by default) */}
+        <div className="bg-white rounded-[18px] sm:rounded-[22px] border border-[#EBECEF] p-8 sm:py-12 sm:px-12 flex flex-col items-center justify-center text-center shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+          <div className="w-[140px] sm:w-[165px] h-auto mb-3.5 flex items-center justify-center">
+            <img
+              src="/images/dashboard/seller_grow_exact.png"
+              alt="Ready to Grow Your Business?"
+              className="w-full h-auto object-contain"
+            />
+          </div>
+          <h2 className="text-lg sm:text-[22px] font-bold text-[#111827] mb-2 tracking-tight">
+            Ready to Grow Your Business?
+          </h2>
+          <p className="text-[#6B7280] text-xs sm:text-[13px] max-w-[480px] mx-auto leading-relaxed mb-6">
+            Showcase your expertise, connect with the right clients, and turn your skills into meaningful opportunities on WorkVench.
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <Link
+              href="/briefs"
+              className="px-5 py-2.5 rounded-lg bg-[#EFEFEF] hover:bg-[#E5E5E5] text-[#1F2937] text-xs sm:text-[13px] font-semibold transition-colors"
+            >
+              Explore Projects
+            </Link>
+            <Link
+              href="/profile"
+              className="px-5 py-2.5 rounded-lg bg-black hover:bg-zinc-800 text-white text-xs sm:text-[13px] font-semibold transition-colors"
+            >
+              Complete Profile
+            </Link>
+          </div>
+        </div>
+
+        {/* 3. Section 2: Packages (Shown on length: when packages exist) */}
+        {hasPackages && (
+          <div className="space-y-4 pt-1">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl sm:text-[24px] font-bold text-[#111827] tracking-tight">
+                Packages <span className="text-sm font-normal text-slate-500">({packagesList.length})</span>
+              </h2>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/my-packages"
+                  className="text-xs sm:text-sm font-semibold text-[#327C73] hover:underline"
+                >
+                  Manage All
+                </Link>
+                <Link
+                  href="/organize"
+                  className="px-4 py-2 rounded-lg bg-brand-green hover:bg-brand-green/90 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
+                >
+                  + Add New Package
+                </Link>
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* Quick Actions Card */}
-          <div className="lg:col-span-4 bg-white border border-gray-100 rounded-2xl p-6 sm:p-7 shadow-sm space-y-4">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 pb-3 border-b border-gray-100">
-              Quick Actions
-            </h2>
-            <div className="flex flex-col gap-2.5">
-              <Link
-                href="/packages"
-                className="w-full py-3 px-4 rounded-xl bg-brand-green hover:bg-brand-green/90 text-white font-medium text-sm text-center transition-colors shadow-sm block"
-              >
-                Browse Services
-              </Link>
-              <Link
-                href="/messages"
-                className="w-full py-3 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium text-sm text-center transition-colors block"
-              >
-                Open Inbox Chat
-              </Link>
-              <Link
-                href="/organize"
-                className="w-full py-3 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium text-sm text-center transition-colors block"
-              >
-                Publish a new Package
-              </Link>
-              <Link
-                href="/briefs"
-                className="w-full py-3 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium text-sm text-center transition-colors block"
-              >
-                Browse Job Projects
-              </Link>
-              <Link
-                href="/earnings"
-                className="w-full py-3 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium text-sm text-center transition-colors block"
-              >
-                View Earnings Statement
-              </Link>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {packagesList.map((pkg: any) => (
+                <div
+                  key={pkg._id}
+                  onClick={() => router.push(`/package/${pkg._id}`)}
+                  className="bg-white rounded-xl border border-slate-100 shadow-xs hover:shadow-md transition-all overflow-hidden cursor-pointer group flex flex-col"
+                >
+                  <div className="relative aspect-[16/10] w-full bg-slate-100 overflow-hidden">
+                    <img
+                      src={pkg.cover || pkg.image || "/images/mock-dashboard/rec-1.png"}
+                      alt={pkg.title || "Package"}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-4 flex flex-col flex-1 justify-between gap-3">
+                    <h3 className="font-semibold text-sm text-slate-800 line-clamp-2 group-hover:text-teal-700 transition-colors">
+                      {pkg.title}
+                    </h3>
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-50 text-xs">
+                      <span className="text-slate-500">
+                        Sales: <strong className="text-slate-700">{pkg.sales || 0}</strong>
+                      </span>
+                      <span className="font-bold text-sm text-slate-900">
+                        {(pkg.price || 0).toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-
-        </div>
+        )}
 
       </div>
     </div>

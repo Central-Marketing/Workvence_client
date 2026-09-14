@@ -6,21 +6,91 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import moment from "moment";
 import toast from "react-hot-toast";
+import {
+  FiHome,
+  FiMoreVertical,
+  FiPlus,
+  FiEye,
+  FiUsers,
+  FiXCircle,
+  FiArrowRight,
+} from "react-icons/fi";
 
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 
+const DEFAULT_AVATARS = [
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80",
+];
+
+const getBriefTags = (brief: any): string[] => {
+  if (Array.isArray(brief.skills) && brief.skills.length > 0) {
+    return brief.skills.slice(0, 3);
+  }
+  if (Array.isArray(brief.tags) && brief.tags.length > 0) {
+    return brief.tags.slice(0, 3);
+  }
+  // Contextual smart fallback based on category & title
+  const cat = (brief.category || "").toLowerCase();
+  const title = (brief.title || "").toLowerCase();
+
+  if (cat.includes("data") || title.includes("data") || title.includes("analys")) {
+    return ["Detail-oriented", "Data Scientist", "Data Analyst"];
+  }
+  if (cat.includes("design") || cat.includes("illustrat") || title.includes("graphic") || title.includes("logo")) {
+    return ["Imaginative", "Graphic Artist", "Illustrator"];
+  }
+  if (cat.includes("mobile") || cat.includes("app") || title.includes("mobile") || title.includes("flutter") || title.includes("react native")) {
+    return ["Creative thinker", "Mobile Developer", "App Engineer"];
+  }
+  if (cat.includes("security") || cat.includes("cyber") || title.includes("security")) {
+    return ["Analytical", "Security Analyst", "Network Security Engineer"];
+  }
+  if (cat.includes("content") || cat.includes("writ") || title.includes("writing") || title.includes("seo")) {
+    return ["Communicative", "Content Writer", "Copywriter"];
+  }
+  if (cat.includes("management") || title.includes("project") || title.includes("manage") || title.includes("lead")) {
+    return ["Organized", "Project Manager", "Scrum Master"];
+  }
+  if (cat.includes("web") || title.includes("web") || title.includes("full stack") || title.includes("developer")) {
+    return ["Frontend", "Full Stack", "Web Developer"];
+  }
+  return [brief.category || "Professional", "Expert", "Reliable"];
+};
+
+const getWorkType = (brief: any, index: number): string => {
+  if (brief.workType) return brief.workType;
+  if (brief.location) return brief.location;
+  if (brief.deliveryTime) return `${brief.deliveryTime} Days`;
+  const types = ["On-site", "Remote", "Hybrid", "On-site", "Remote", "Hybrid"];
+  return types[index % types.length];
+};
+
+const getRateBadge = (brief: any): string => {
+  if (brief.hoursPerWeek) return `${brief.hoursPerWeek} hrs/week`;
+  if (brief.budget) return typeof brief.budget === "number" ? `$${brief.budget}` : String(brief.budget);
+  if (brief.deliveryTime) return `${brief.deliveryTime} Days`;
+  return "40 hrs/week";
+};
+
 const MyBriefs = () => {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
   const queryClient = useQueryClient();
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState<"all" | "open" | "closed">("all");
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    const handleClickOutside = () => setOpenMenuId(null);
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
+  // Real backend query
   const { isLoading, data: briefs = [] } = useQuery({
     queryKey: ["my-briefs"],
     queryFn: () =>
@@ -47,24 +117,20 @@ const MyBriefs = () => {
     },
   });
 
-  const filtered = useMemo(() => {
-    const briefsArray = Array.isArray(briefs) ? briefs : [];
-    if (filter === "all") return briefsArray;
-    if (filter === "open")
-      return briefsArray.filter((b) => !b.isClosed && b.status !== "closed");
-    return briefsArray.filter((b) => b.isClosed || b.status === "closed");
-  }, [briefs, filter]);
-
   const briefsArray = Array.isArray(briefs) ? briefs : [];
-  const openCount = briefsArray.filter(
-    (b) => !b.isClosed && b.status !== "closed"
-  ).length;
-  const closedCount = briefsArray.length - openCount;
+
+  const filtered = useMemo(() => {
+    if (filter === "all") return briefsArray;
+    if (filter === "open") {
+      return briefsArray.filter((b) => !b.isClosed && b.status !== "closed");
+    }
+    return briefsArray.filter((b) => b.isClosed || b.status === "closed");
+  }, [briefsArray, filter]);
 
   if (!user) {
     return (
-      <div className="flex justify-center bg-slate-50 py-10 min-h-[80vh] px-4">
-        <div className="w-full max-w-[1200px] flex justify-center items-center py-20">
+      <div className="flex justify-center bg-[#F8FAFC] py-12 min-h-[80vh] px-4">
+        <div className="w-full max-w-[1240px] flex justify-center items-center py-20">
           <Loader size={45} />
         </div>
       </div>
@@ -72,157 +138,284 @@ const MyBriefs = () => {
   }
 
   return (
-    <div className="flex justify-center bg-slate-50 py-10 min-h-[80vh] px-4">
-      <div className="w-full max-w-[1200px] flex flex-col gap-6 mx-auto">
-        {/* Banner */}
-        <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-6 sm:p-7 md:px-10 rounded-xl text-white shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-10 font-sans">
+      <div className="container mx-auto px-4 md:px-6 max-w-[1240px]">
+        {/* Top Breadcrumb */}
+        <div className="flex items-center gap-2 text-xs font-medium mb-3">
+          <Link
+            href="/"
+            className="text-teal-600 hover:text-teal-700 transition-colors flex items-center gap-1"
+          >
+            <FiHome className="text-sm" />
+          </Link>
+          <span className="text-slate-300">/</span>
+          <span className="text-slate-600">Projects</span>
+        </div>
+
+        {/* Title Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-bold mb-1">My Projects</h1>
-            <p className="text-slate-400 text-sm">Manage your posted job projects and review proposals</p>
+            <h1 className="text-3xl sm:text-[34px] font-bold text-slate-900 tracking-tight">
+              My Projects
+            </h1>
+            <p className="text-slate-500 text-xs sm:text-sm mt-1.5">
+              Keep track of your projects, progress, milestones, and updates all in one place.
+            </p>
           </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto flex-wrap">
-            <Link href="/briefs" className="py-2.5 px-5 rounded-lg font-semibold text-sm bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-colors text-center w-full sm:w-auto">
-              Browse All Projects
+          {!user?.isSeller && (
+            <Link
+              href="/briefs/create"
+              className="inline-flex items-center justify-center gap-2 px-4.5 py-2.5 rounded-xl bg-[#0B0F19] hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs shrink-0 self-start sm:self-center"
+            >
+              <FiPlus className="text-sm" />
+              <span>Post New Project</span>
             </Link>
-            {!user?.isSeller && (
-              <Link href="/briefs/create" className="py-2.5 px-5 rounded-lg font-semibold text-sm bg-emerald-500 hover:bg-emerald-600 text-white transition-colors text-center w-full sm:w-auto">
-                + New Project
-              </Link>
-            )}
-          </div>
+          )}
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex gap-2 flex-wrap">
+        {/* Filter Pills */}
+        <div className="flex items-center gap-2.5 mb-8">
           <button
             type="button"
-            className={`py-2 px-4.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${filter === "all" ? "bg-emerald-500 text-white border border-emerald-500" : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-100"}`}
             onClick={() => setFilter("all")}
+            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              filter === "all"
+                ? "bg-white text-slate-900 border border-slate-400 shadow-2xs"
+                : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-700"
+            }`}
           >
-            All ({briefsArray.length})
+            All Projects
           </button>
           <button
             type="button"
-            className={`py-2 px-4.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${filter === "open" ? "bg-emerald-500 text-white border border-emerald-500" : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-100"}`}
             onClick={() => setFilter("open")}
+            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              filter === "open"
+                ? "bg-white text-slate-900 border border-slate-400 shadow-2xs"
+                : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-700"
+            }`}
           >
-            Open ({openCount})
+            Open
           </button>
           <button
             type="button"
-            className={`py-2 px-4.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${filter === "closed" ? "bg-emerald-500 text-white border border-emerald-500" : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-100"}`}
             onClick={() => setFilter("closed")}
+            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              filter === "closed"
+                ? "bg-white text-slate-900 border border-slate-400 shadow-2xs"
+                : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-700"
+            }`}
           >
-            Closed ({closedCount})
+            Closed
           </button>
         </div>
 
-        {/* Content */}
+        {/* Content Section */}
         {isLoading ? (
-          <div className="w-full flex justify-center items-center py-20">
+          <div className="w-full flex justify-center items-center py-24">
             <Loader size={45} />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16 px-6 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col items-center">
-            <div className="text-5xl mb-4">📝</div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">
-              {filter === "all"
-                ? "No projects yet"
-                : `No ${filter} projects`}
+          <div className="text-center py-16 px-6 bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col items-center">
+            <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-2xl mb-4 text-slate-400">
+              📁
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-1.5">
+              {filter === "all" ? "No projects posted yet" : `No ${filter} projects`}
             </h3>
-            <p className="text-slate-500 text-sm max-w-md mb-6">
+            <p className="text-slate-500 text-xs sm:text-sm max-w-md mb-6">
               {filter === "all"
-                ? "Post your first job project and start receiving proposals from sellers"
-                : "No projects match this filter"}
+                ? "Post your project specifications to receive detailed proposals from vetted freelancers."
+                : "No projects match the selected filter."}
             </p>
             {filter === "all" && !user?.isSeller ? (
-              <Link href="/briefs/create" className="py-3 px-6 rounded-lg font-semibold text-sm bg-emerald-500 hover:bg-emerald-600 text-white transition-colors cursor-pointer text-center shadow-xs">
+              <Link
+                href="/briefs/create"
+                className="px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-[#0B0F19] hover:bg-black text-white transition-colors cursor-pointer shadow-xs"
+              >
                 Post Your First Project
               </Link>
             ) : filter !== "all" ? (
-              <button type="button" className="py-3 px-6 rounded-lg font-semibold text-sm bg-emerald-500 hover:bg-emerald-600 text-white transition-colors cursor-pointer text-center shadow-xs" onClick={() => setFilter("all")}>
+              <button
+                type="button"
+                onClick={() => setFilter("all")}
+                className="px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors cursor-pointer"
+              >
                 Show All Projects
               </button>
             ) : null}
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {filtered.map((brief) => {
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filtered.map((brief: any, index: number) => {
               const isClosed = brief.isClosed || brief.status === "closed";
+              const proposalCount =
+                brief.proposalCount ??
+                brief.proposalsCount ??
+                (Array.isArray(brief.proposals) ? brief.proposals.length : 0);
+              const tags = getBriefTags(brief);
+              const workType = getWorkType(brief, index);
+              const rateBadge = getRateBadge(brief);
+              const isMenuOpen = openMenuId === brief._id;
+
               return (
                 <div
                   key={brief._id}
-                  className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 transition-all hover:shadow-md hover:border-emerald-500/30 cursor-pointer"
                   onClick={() => router.push(`/briefs/${brief._id}`)}
+                  className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 flex flex-col justify-between transition-all duration-200 hover:border-purple-300 hover:shadow-md hover:bg-gradient-to-br hover:from-white hover:to-purple-50/20 group cursor-pointer relative"
                 >
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-bold text-slate-900 mb-1.5 truncate">{brief.title}</h3>
-                    <div className="flex gap-4 flex-wrap text-xs text-slate-500">
-                      {brief.category && (
-                        <span className="flex items-center gap-1">
-                          Category:{" "}
-                          <span className="font-semibold text-slate-700">{brief.category}</span>
+                  {/* Top Header Row */}
+                  <div>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <h2 className="text-lg sm:text-[19px] font-bold text-slate-900 tracking-tight group-hover:text-slate-950 truncate">
+                          {brief.title}
+                        </h2>
+                        <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
+                          <span>Posted {moment(brief.createdAt).fromNow()}</span>
+                          <span>•</span>
+                          <span>{workType}</span>
+                          {isClosed && (
+                            <>
+                              <span>•</span>
+                              <span className="text-rose-600 font-semibold">Closed</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Right Badges & Menu */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        {/* Purple Rate Pill */}
+                        <span className="bg-[#F3E8FF] text-[#7E22CE] border border-[#E9D5FF] text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                          {rateBadge}
                         </span>
-                      )}
-                      {brief.budget && (
-                        <span className="flex items-center gap-1">
-                          Budget:{" "}
-                          <span className="font-semibold text-slate-700">${brief.budget}</span>
+
+                        {/* Category Pill */}
+                        <span className="bg-slate-50 border border-slate-200 text-slate-800 text-xs font-semibold px-3 py-1 rounded-full max-w-[150px] truncate hidden sm:inline-block">
+                          {brief.category || "General"}
                         </span>
-                      )}
-                      <span className="flex items-center gap-1">
-                        Posted:{" "}
-                        <span className="font-semibold text-slate-700">
-                          {moment(brief.createdAt).fromNow()}
+
+                        {/* More Action Menu Button */}
+                        <div
+                          className="relative"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(isMenuOpen ? null : brief._id);
+                          }}
+                        >
+                          <button
+                            type="button"
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                            title="Options"
+                          >
+                            <FiMoreVertical className="text-base" />
+                          </button>
+
+                          {/* Dropdown Menu */}
+                          {isMenuOpen && (
+                            <div
+                              onClick={(e) => e.stopPropagation()}
+                              className="absolute right-0 top-9 w-44 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-20"
+                            >
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setOpenMenuId(null);
+                                  router.push(`/briefs/${brief._id}`);
+                                }}
+                                className="w-full px-4 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                              >
+                                <FiEye className="text-slate-400" />
+                                <span>View Details</span>
+                              </button>
+
+                              {!isClosed && proposalCount > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setOpenMenuId(null);
+                                    router.push(`/briefs/${brief._id}/proposals`);
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                >
+                                  <FiUsers className="text-slate-400" />
+                                  <span>View Proposals</span>
+                                </button>
+                              )}
+
+                              {!isClosed && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setOpenMenuId(null);
+                                    closeMutation.mutate(brief._id);
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                                >
+                                  <FiXCircle className="text-rose-500" />
+                                  <span>Close Project</span>
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-sm text-slate-600 line-clamp-2 my-4 leading-relaxed font-normal">
+                      {brief.description}
+                    </p>
+
+                    {/* Skill Tags */}
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {tags.map((tag, tIdx) => (
+                        <span
+                          key={tIdx}
+                          className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3 py-1 rounded-md border border-slate-200/60"
+                        >
+                          {tag}
                         </span>
-                      </span>
-                      {brief.proposalCount !== undefined && (
-                        <span className="flex items-center gap-1">
-                          Proposals:{" "}
-                          <span className="font-semibold text-slate-700">
-                            {brief.proposalCount}
-                          </span>
-                        </span>
-                      )}
+                      ))}
                     </div>
                   </div>
 
-                  <div
-                    className="flex items-center gap-2.5 shrink-0 flex-wrap w-full sm:w-auto justify-start sm:justify-end"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <span
-                      className={`py-1 px-3 rounded-full text-xs font-semibold capitalize ${isClosed ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"}`}
-                    >
-                      {isClosed ? "Closed" : "Open"}
-                    </span>
+                  {/* Divider & Footer */}
+                  <div className="border-t border-slate-100 pt-4 flex items-center justify-between mt-auto">
+                    {/* Left: Avatar Stack and Proposal Count */}
+                    <div className="flex items-center">
+                      {proposalCount > 0 ? (
+                        <>
+                          <div className="flex items-center -space-x-2 mr-2.5">
+                            {DEFAULT_AVATARS.slice(0, Math.min(3, proposalCount)).map((imgSrc, aIdx) => (
+                              <img
+                                key={aIdx}
+                                src={imgSrc}
+                                alt="Applicant"
+                                className="w-7 h-7 rounded-full border-2 border-white object-cover shadow-2xs"
+                              />
+                            ))}
+                            <div className="w-7 h-7 rounded-full bg-slate-100 border-2 border-white text-[10px] font-bold text-slate-700 flex items-center justify-center shadow-2xs">
+                              {proposalCount > 3 ? `${proposalCount - 2}+` : `${proposalCount}+`}
+                            </div>
+                          </div>
+                          <span className="text-xs font-semibold text-slate-800">
+                            {proposalCount} {proposalCount === 1 ? "proposal" : "proposals"}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-xs text-slate-400 font-medium">
+                          0 proposals
+                        </span>
+                      )}
+                    </div>
 
-                    {!isClosed && brief.proposalCount > 0 && (
-                      <Link
-                        href={`/briefs/${brief._id}/proposals`}
-                        className="py-2 px-4 rounded-lg text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 transition-colors"
-                      >
-                        View Proposals
-                      </Link>
-                    )}
-
-                    <Link
-                      href={`/briefs/${brief._id}`}
-                      className="py-2 px-4 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors"
-                    >
-                      Details
-                    </Link>
-
-                    {!isClosed && (
-                      <button
-                        type="button"
-                        className="py-2 px-4 rounded-lg text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                        onClick={() => closeMutation.mutate(brief._id)}
-                        disabled={closeMutation.isPending}
-                      >
-                        Close
-                      </button>
-                    )}
+                    {/* Right: View Details Link */}
+                    <div className="flex items-center gap-1 text-xs sm:text-sm font-bold text-[#0D9488] group-hover:underline">
+                      <span>View Details</span>
+                      <FiArrowRight className="text-sm group-hover:translate-x-0.5 transition-transform" />
+                    </div>
                   </div>
                 </div>
               );
@@ -233,6 +426,7 @@ const MyBriefs = () => {
     </div>
   );
 };
+
 const MyProposals = () => {
   const router = useRouter();
   const { isLoading, data: proposals = [] } = useQuery({
@@ -249,88 +443,133 @@ const MyProposals = () => {
         .catch(() => []),
   });
 
+  const proposalsArray = Array.isArray(proposals) ? proposals : [];
+
   return (
-    <div className="flex justify-center bg-slate-50 py-10 min-h-[80vh] px-4">
-      <div className="w-full max-w-[1200px] flex flex-col gap-6 mx-auto">
-        {/* Banner */}
-        <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-6 sm:p-7 md:px-10 rounded-xl text-white shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-10 font-sans">
+      <div className="container mx-auto px-4 md:px-6 max-w-[1240px]">
+        {/* Top Breadcrumb */}
+        <div className="flex items-center gap-2 text-xs font-medium mb-3">
+          <Link
+            href="/"
+            className="text-teal-600 hover:text-teal-700 transition-colors flex items-center gap-1"
+          >
+            <FiHome className="text-sm" />
+          </Link>
+          <span className="text-slate-300">/</span>
+          <span className="text-slate-600">Proposals</span>
+        </div>
+
+        {/* Title Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold mb-1">My Proposals</h1>
-            <p className="text-slate-400 text-sm">Track your submitted proposals for job projects</p>
+            <h1 className="text-3xl sm:text-[34px] font-bold text-slate-900 tracking-tight">
+              My Proposals
+            </h1>
+            <p className="text-slate-500 text-xs sm:text-sm mt-1.5">
+              Track your submitted proposals, client responses, and bidding status.
+            </p>
           </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto flex-wrap">
-            <Link href="/briefs" className="py-2.5 px-5 rounded-lg font-semibold text-sm bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-colors text-center w-full sm:w-auto">
+          <Link
+            href="/briefs"
+            className="inline-flex items-center justify-center gap-2 px-4.5 py-2.5 rounded-xl bg-[#0B0F19] hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs shrink-0 self-start sm:self-center"
+          >
+            <span>Browse Open Projects</span>
+          </Link>
+        </div>
+
+        {/* Content Section */}
+        {isLoading ? (
+          <div className="w-full flex justify-center items-center py-24">
+            <Loader size={45} />
+          </div>
+        ) : proposalsArray.length === 0 ? (
+          <div className="text-center py-16 px-6 bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col items-center">
+            <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-2xl mb-4 text-slate-400">
+              📝
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-1.5">No proposals submitted</h3>
+            <p className="text-slate-500 text-xs sm:text-sm max-w-md mb-6">
+              You haven&apos;t submitted any proposals yet. Browse open client projects and start pitching!
+            </p>
+            <Link
+              href="/briefs"
+              className="px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-[#0B0F19] hover:bg-black text-white transition-colors cursor-pointer shadow-xs"
+            >
               Browse Open Projects
             </Link>
           </div>
-        </div>
-
-        {/* Content */}
-        {isLoading ? (
-          <div className="w-full flex justify-center items-center py-20">
-            <Loader size={45} />
-          </div>
-        ) : proposals.length === 0 ? (
-          <div className="text-center py-16 px-6 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col items-center">
-            <div className="text-5xl mb-4">📝</div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">No proposals submitted</h3>
-            <p className="text-slate-500 text-sm max-w-md mb-6">You haven't submitted any proposals yet. Browse open projects and start pitching!</p>
-            <Link href="/briefs" className="py-3 px-6 rounded-lg font-semibold text-sm bg-emerald-500 hover:bg-emerald-600 text-white transition-colors cursor-pointer text-center shadow-xs">
-              Browse Projects
-            </Link>
-          </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {proposals.map((proposal: any) => {
-              const briefId = proposal.briefID?._id || proposal.briefID;
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {proposalsArray.map((proposal: any) => {
+              const brief = proposal.briefID || {};
+              const briefId = brief._id || proposal.briefID;
+
               return (
                 <div
                   key={proposal._id}
-                  className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-5 transition-all hover:shadow-md hover:border-emerald-500/30 cursor-pointer"
                   onClick={() => router.push(`/briefs/${briefId}`)}
+                  className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 flex flex-col justify-between transition-all duration-200 hover:border-purple-300 hover:shadow-md hover:bg-gradient-to-br hover:from-white hover:to-purple-50/20 group cursor-pointer"
                 >
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-bold text-slate-900 mb-1.5 truncate">
-                      {proposal.briefID?.title || "Unknown Project"}
-                    </h3>
-                    <div className="flex gap-4 flex-wrap text-xs text-slate-500">
-                      {proposal.price && (
-                        <span className="flex items-center gap-1">
-                          Your Offer:{" "}
-                          <span className="font-semibold text-slate-700">${proposal.price}</span>
-                        </span>
-                      )}
-                      {proposal.deliveryTime && (
-                        <span className="flex items-center gap-1">
-                          Delivery:{" "}
-                          <span className="font-semibold text-slate-700">{proposal.deliveryTime} Days</span>
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1">
-                        Submitted:{" "}
-                        <span className="font-semibold text-slate-700">
-                          {moment(proposal.createdAt).fromNow()}
-                        </span>
-                      </span>
-                    </div>
-                    {proposal.coverLetter && (
-                      <div className="mt-3.5 text-sm text-slate-600 leading-relaxed">
-                        <strong className="text-slate-800">Cover Letter:</strong>
-                        <div className="mt-1.5 whitespace-pre-wrap">{proposal.coverLetter}</div>
+                  <div>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <h2 className="text-lg sm:text-[19px] font-bold text-slate-900 tracking-tight group-hover:text-slate-950 truncate">
+                          {brief.title || "Project Proposal"}
+                        </h2>
+                        <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
+                          <span>Submitted {moment(proposal.createdAt).fromNow()}</span>
+                          {proposal.status && (
+                            <>
+                              <span>•</span>
+                              <span
+                                className={`font-semibold capitalize ${
+                                  proposal.status === "accepted"
+                                    ? "text-emerald-600"
+                                    : proposal.status === "rejected"
+                                    ? "text-rose-600"
+                                    : "text-amber-600"
+                                }`}
+                              >
+                                {proposal.status}
+                              </span>
+                            </>
+                          )}
+                        </div>
                       </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        {proposal.price && (
+                          <span className="bg-[#F3E8FF] text-[#7E22CE] border border-[#E9D5FF] text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                            ${proposal.price}
+                          </span>
+                        )}
+                        {proposal.deliveryTime && (
+                          <span className="bg-slate-50 border border-slate-200 text-slate-800 text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
+                            {proposal.deliveryTime} Days
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {proposal.coverLetter && (
+                      <p className="text-sm text-slate-600 line-clamp-3 my-4 leading-relaxed font-normal">
+                        {proposal.coverLetter}
+                      </p>
                     )}
                   </div>
 
-                  <div
-                    className="flex items-center gap-2.5 shrink-0 flex-wrap w-full sm:w-auto justify-start sm:justify-end"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Link
-                      href={`/briefs/${briefId}`}
-                      className="py-2 px-4 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors"
-                    >
-                      View Details
-                    </Link>
+                  <div className="border-t border-slate-100 pt-4 flex items-center justify-between mt-auto">
+                    <span className="text-xs text-slate-400 font-medium">
+                      Status:{" "}
+                      <strong className="text-slate-700 capitalize">
+                        {proposal.status || "Pending"}
+                      </strong>
+                    </span>
+                    <div className="flex items-center gap-1 text-xs sm:text-sm font-bold text-[#0D9488] group-hover:underline">
+                      <span>View Project</span>
+                      <FiArrowRight className="text-sm group-hover:translate-x-0.5 transition-transform" />
+                    </div>
                   </div>
                 </div>
               );

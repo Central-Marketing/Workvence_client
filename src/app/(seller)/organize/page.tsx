@@ -12,7 +12,7 @@ import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 
-type SectionTab = "about" | "seller" | "packages" | "faq";
+type SectionTab = "about" | "packages" | "seller" | "faq";
 type TierKey = "basic" | "standard" | "premium";
 
 const OrganizePage = () => {
@@ -22,11 +22,7 @@ const OrganizePage = () => {
   const [activeTier, setActiveTier] = useState<TierKey>("basic");
 
   // Areas covered checklist state
-  const [areasCovered, setAreasCovered] = useState<string[]>([
-    "SaaS Landing page",
-    "Marketing Agency",
-    "Startup",
-  ]);
+  const [areasCovered, setAreasCovered] = useState<string[]>([]);
   const [newAreaInput, setNewAreaInput] = useState("");
   const [showAddArea, setShowAddArea] = useState(false);
 
@@ -34,7 +30,7 @@ const OrganizePage = () => {
   const [whyMeInput, setWhyMeInput] = useState("");
 
   // Design tools tags state
-  const [toolsList, setToolsList] = useState<string[]>(["Figma", "Sketch", "Photoshop"]);
+  const [toolsList, setToolsList] = useState<string[]>([]);
   const [newToolInput, setNewToolInput] = useState("");
   const [showAddTool, setShowAddTool] = useState(false);
 
@@ -79,17 +75,44 @@ const OrganizePage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    // Seed default FAQ if none exists yet
-    if (!state.faqs || state.faqs.length === 0) {
-      dispatch({
-        type: "ADD_FAQ",
-        payload: {
-          question: "How does escrow payment protection work?",
-          answer:
-            "Your payment is held securely while the seller completes the order. It is released after you review and approve the agreed delivery. This ensures both parties are protected throughout the transaction lifecycle.",
-        },
-      });
+  }, []);
+
+  // Smooth scroll to section
+  const scrollToSection = (tab: SectionTab) => {
+    setActiveTab(tab);
+    const element = document.getElementById(`section-${tab}`);
+    if (element) {
+      const yOffset = -90;
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
     }
+  };
+
+  // Scrollspy: update active tab based on scroll position
+  useEffect(() => {
+    const sections: SectionTab[] = ["about", "packages", "seller", "faq"];
+    let isThrottled = false;
+
+    const handleScroll = () => {
+      if (isThrottled) return;
+      isThrottled = true;
+      setTimeout(() => {
+        isThrottled = false;
+      }, 60);
+
+      const scrollPosition = window.scrollY + 130;
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i];
+        const el = document.getElementById(`section-${section}`);
+        if (el && el.offsetTop <= scrollPosition) {
+          setActiveTab(section);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Mutation to create package
@@ -432,13 +455,13 @@ const OrganizePage = () => {
           </div>
         </div>
 
-        {/* 2. Top Navigation Tabs */}
-        <div className="bg-white border border-gray-200/90 rounded-xl p-1 inline-flex items-center gap-1 shadow-2xs">
-          {(["about", "seller", "packages", "faq"] as SectionTab[]).map((tab) => {
+        {/* 2. Top Navigation Tabs (Sticky & Scroll-Based) */}
+        <div className="sticky top-4 z-30 bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-xl p-1 inline-flex items-center gap-1 shadow-sm">
+          {(["about", "packages", "seller", "faq"] as SectionTab[]).map((tab) => {
             const labelMap: Record<SectionTab, string> = {
               about: "About",
-              seller: "Seller Info",
               packages: "Packages",
+              seller: "Seller Info",
               faq: "FAQ",
             };
             const isActive = activeTab === tab;
@@ -446,7 +469,7 @@ const OrganizePage = () => {
               <button
                 key={tab}
                 type="button"
-                onClick={() => setActiveTab(tab)}
+                onClick={() => scrollToSection(tab)}
                 className={`px-4 sm:px-5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                   isActive
                     ? "bg-[#0B3A33] text-white shadow-2xs"
@@ -459,9 +482,8 @@ const OrganizePage = () => {
           })}
         </div>
 
-        {/* 3. Main Grid (About + Pricing Tier) */}
-        {activeTab === "about" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* 3. Section: About & Pricing Tier */}
+        <div id="section-about" className="scroll-mt-24 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
             {/* Left Column: About this packages */}
             <div className="lg:col-span-8 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
@@ -532,22 +554,26 @@ const OrganizePage = () => {
                 <label className="text-xs sm:text-[13px] font-bold text-gray-900 block">
                   Area Covered :
                 </label>
-                <div className="space-y-2.5">
-                  {areasCovered.map((area) => (
-                    <div
-                      key={area}
-                      onClick={() => toggleArea(area)}
-                      className="flex items-center gap-2.5 cursor-pointer select-none group"
-                    >
-                      <div className="w-4 h-4 rounded bg-[#0B3A33] flex items-center justify-center text-white shrink-0 shadow-2xs">
-                        <Check className="w-3 h-3 stroke-[3]" />
+                {areasCovered.length > 0 ? (
+                  <div className="space-y-2.5">
+                    {areasCovered.map((area) => (
+                      <div
+                        key={area}
+                        onClick={() => toggleArea(area)}
+                        className="flex items-center gap-2.5 cursor-pointer select-none group"
+                      >
+                        <div className="w-4 h-4 rounded bg-[#0B3A33] flex items-center justify-center text-white shrink-0 shadow-2xs">
+                          <Check className="w-3 h-3 stroke-[3]" />
+                        </div>
+                        <span className="text-xs sm:text-[13px] text-gray-700 group-hover:text-gray-950 font-normal">
+                          {area}
+                        </span>
                       </div>
-                      <span className="text-xs sm:text-[13px] text-gray-700 group-hover:text-gray-950 font-normal">
-                        {area}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-400 italic">No areas specified yet. Click &ldquo;Add More&rdquo; to add project areas.</p>
+                )}
 
                 {/* Add More Area */}
                 {showAddArea ? (
@@ -590,23 +616,13 @@ const OrganizePage = () => {
                 <label className="text-xs sm:text-[13px] font-bold text-gray-900 block">
                   Why Me?
                 </label>
-                <div className="space-y-1 text-xs text-gray-500 leading-relaxed">
-                  <p>500+ Five Star reviews</p>
-                  <p>Custom designs 100% original, no templates</p>
-                  <p>Delivery only after your 100% Satisfaction</p>
-                  <p>7+ years of experience</p>
-                </div>
-
-                <div className="space-y-1.5 pt-1">
-                  <label className="text-xs font-semibold text-gray-700 block">
-                    Why Me?
-                  </label>
-                  <input
-                    type="text"
+                <div className="space-y-1.5">
+                  <textarea
                     value={whyMeInput}
                     onChange={(e) => setWhyMeInput(e.target.value)}
-                    placeholder="Write here"
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
+                    placeholder="Describe why clients should choose you (e.g. your strengths, experience, or satisfaction guarantee)..."
+                    rows={3}
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[75px]"
                   />
                 </div>
               </div>
@@ -617,20 +633,24 @@ const OrganizePage = () => {
                   Add Design Tool
                 </label>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  {toolsList.map((tool) => (
-                    <span
-                      key={tool}
-                      className="inline-flex items-center gap-1.5 bg-[#F4F5F7] border border-gray-200/80 px-2.5 py-1 rounded-lg text-xs font-medium text-gray-700"
-                    >
-                      {tool}
-                      <X
-                        className="w-3 h-3 text-gray-400 hover:text-red-500 cursor-pointer"
-                        onClick={() => handleRemoveTool(tool)}
-                      />
-                    </span>
-                  ))}
-                </div>
+                {toolsList.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {toolsList.map((tool) => (
+                      <span
+                        key={tool}
+                        className="inline-flex items-center gap-1.5 bg-[#F4F5F7] border border-gray-200/80 px-2.5 py-1 rounded-lg text-xs font-medium text-gray-700"
+                      >
+                        {tool}
+                        <X
+                          className="w-3 h-3 text-gray-400 hover:text-red-500 cursor-pointer"
+                          onClick={() => handleRemoveTool(tool)}
+                        />
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-400 italic">No design tools added yet.</p>
+                )}
 
                 {showAddTool ? (
                   <form onSubmit={handleAddTool} className="flex items-center gap-2 mt-1">
@@ -827,236 +847,230 @@ const OrganizePage = () => {
                   />
                 </div>
               </div>
-
             </div>
 
           </div>
-        )}
 
-        {/* 4. Seller Info Tab */}
-        {activeTab === "seller" && (
-          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-950 border-b border-gray-100 pb-3">
-              Seller Information
+        {/* 4. Section: Packages Media & Upload */}
+        <div id="section-packages" className="scroll-mt-24 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+
+          {/* Header: Packages title & arrow controls */}
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-950">
+              Packages Media &amp; Gallery
             </h2>
-            <div className="flex items-center gap-4">
-              <img
-                src={user?.image || "/media/noavatar.png"}
-                alt={user?.name || "Seller"}
-                className="w-16 h-16 rounded-full object-cover border border-gray-200"
-              />
-              <div>
-                <h3 className="text-base font-bold text-gray-900">{user?.name || user?.username || "Freelancer"}</h3>
-                <p className="text-xs text-gray-500 mt-0.5">{user?.shortTitle || "Professional Creator & Freelancer"}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{user?.country || user?.location || "Worldwide"}</p>
-              </div>
-            </div>
-            <div className="bg-[#F8F9FA] rounded-xl p-4 text-xs text-gray-600 leading-relaxed">
-              {user?.description || user?.bio || "No bio entered yet. You can complete your detailed profile under Account Settings."}
-            </div>
-          </div>
-        )}
-
-        {/* 5. Packages Media & Upload Card (Visible on About and Packages tab) */}
-        {(activeTab === "about" || activeTab === "packages") && (
-          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
-
-            {/* Header: Packages title & arrow controls */}
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-950">
-                Packages
-              </h2>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => scrollGallery("left")}
-                  title="Previous"
-                  className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => scrollGallery("right")}
-                  title="Next"
-                  className="w-8 h-8 rounded-full bg-[#EAECEF] hover:bg-gray-300 flex items-center justify-center text-gray-700 hover:text-gray-950 transition-colors cursor-pointer"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Hidden file inputs */}
-            <input
-              type="file"
-              ref={coverInputRef}
-              accept="image/*"
-              className="hidden"
-              onChange={handleCoverSelected}
-            />
-            <input
-              type="file"
-              ref={subImagesInputRef}
-              accept="image/*,.pdf,.zip"
-              multiple
-              className="hidden"
-              onChange={handleSubImagesSelected}
-            />
-
-            {/* Upload Box Container */}
-            <div className="border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-4 bg-white">
-              {/* Add Banner Dropzone */}
-              <div
-                onClick={() => coverInputRef.current?.click()}
-                className="border border-dashed border-gray-300 hover:border-[#0D6D5F] rounded-xl py-6 text-center cursor-pointer transition-all bg-white hover:bg-gray-50/70 flex items-center justify-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0D6D5F]"
-              >
-                <span>Add Banner</span>
-                <Plus className="w-4 h-4" />
-              </div>
-
-              {/* Add Sub Images Dropzone */}
-              <div
-                onClick={() => subImagesInputRef.current?.click()}
-                className="border border-dashed border-gray-300 hover:border-[#0D6D5F] rounded-xl py-6 text-center cursor-pointer transition-all bg-white hover:bg-gray-50/70 flex items-center justify-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0D6D5F]"
-              >
-                <span>Add Sub Images</span>
-                <Plus className="w-4 h-4" />
-              </div>
-            </div>
-
-            {/* Real Uploaded Images Gallery Row (No demo images by default, only seller uploads) */}
-            {galleryItems.length > 0 && (
-              <div
-                ref={galleryScrollRef}
-                className="flex items-center gap-3.5 pt-1 overflow-x-auto scrollbar-none scroll-smooth"
-              >
-                {galleryItems.map((imgUrl, idx) => (
-                  <div
-                    key={idx}
-                    className="relative shrink-0 w-44 sm:w-52 aspect-[16/10] rounded-xl overflow-hidden border border-gray-200 bg-gray-100 shadow-2xs group"
-                  >
-                    <img
-                      src={imgUrl}
-                      alt={`Attachment ${idx + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveImage(imgUrl)}
-                      className="absolute top-1.5 right-1.5 bg-red-600 hover:bg-red-700 text-white p-1 rounded-full opacity-90 hover:opacity-100 transition-opacity shadow-xs cursor-pointer z-10"
-                      title="Remove image"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                    {imgUrl === state.cover ? (
-                      <span className="absolute bottom-0 inset-x-0 bg-black/75 text-white text-[9px] font-bold text-center py-0.5 tracking-wider uppercase">
-                        BANNER
-                      </span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          dispatch({
-                            type: "ADD_IMAGES",
-                            payload: {
-                              cover: imgUrl,
-                              images: (state.images || []).filter((i: string) => i !== imgUrl),
-                            },
-                          });
-                          toast.success("Set as banner!");
-                        }}
-                        className="absolute bottom-0 inset-x-0 bg-black/60 hover:bg-black/80 text-white text-[9px] font-semibold text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                      >
-                        Set as Banner
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-          </div>
-        )}
-
-        {/* 6. Frequently asked questions Section */}
-        {(activeTab === "about" || activeTab === "packages" || activeTab === "faq") && (
-          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
-            <div className="flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-950">
-                Frequently asked questions
-              </h2>
-              <span className="bg-[#F8F9FA] border border-gray-200/90 text-gray-600 text-xs font-semibold px-3 py-1 rounded-md">
-                {categoryBadgeLabel}
-              </span>
-            </div>
-
-            {/* Existing FAQs List */}
-            {state.faqs && state.faqs.length > 0 && (
-              <div className="space-y-4">
-                {state.faqs.map((faq: any, idx: number) => (
-                  <div key={idx} className="border-b border-gray-100 pb-4 last:border-b-0">
-                    <div className="flex items-start justify-between gap-4">
-                      <h4 className="text-sm sm:text-base font-bold text-gray-900 leading-snug">
-                        {faq.question}
-                      </h4>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveFaq(idx)}
-                        className="text-red-500 hover:text-red-700 p-1 cursor-pointer transition-colors shrink-0"
-                        title="Delete question"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </button>
-                    </div>
-                    <p className="text-xs sm:text-[13px] text-gray-600 mt-2 leading-relaxed">
-                      {faq.answer}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* New FAQ Input Card */}
-            <div className="bg-white rounded-2xl border border-gray-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs sm:text-sm font-bold text-gray-900 block">
-                  Question
-                </label>
-                <input
-                  type="text"
-                  value={faqQuestion}
-                  onChange={(e) => setFaqQuestion(e.target.value)}
-                  placeholder="Write here"
-                  className="w-full bg-[#ECEEF1]/70 hover:bg-[#ECEEF1] focus:bg-white border border-transparent focus:border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs sm:text-sm font-bold text-gray-900 block">
-                  Answer
-                </label>
-                <textarea
-                  value={faqAnswer}
-                  onChange={(e) => setFaqAnswer(e.target.value)}
-                  placeholder="Write here"
-                  rows={3}
-                  className="w-full bg-[#ECEEF1]/70 hover:bg-[#ECEEF1] focus:bg-white border border-transparent focus:border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[70px]"
-                />
-              </div>
-            </div>
-
-            {/* Add Another + Button */}
-            <div>
+            <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={handleAddFaq}
-                className="text-[#0D6D5F] hover:text-[#0A5348] text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer pt-1 transition-colors"
+                onClick={() => scrollGallery("left")}
+                title="Previous"
+                className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
               >
-                Add Another <Plus className="w-4 h-4" />
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollGallery("right")}
+                title="Next"
+                className="w-8 h-8 rounded-full bg-[#EAECEF] hover:bg-gray-300 flex items-center justify-center text-gray-700 hover:text-gray-950 transition-colors cursor-pointer"
+              >
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
-        )}
+
+          {/* Hidden file inputs */}
+          <input
+            type="file"
+            ref={coverInputRef}
+            accept="image/*"
+            className="hidden"
+            onChange={handleCoverSelected}
+          />
+          <input
+            type="file"
+            ref={subImagesInputRef}
+            accept="image/*,.pdf,.zip"
+            multiple
+            className="hidden"
+            onChange={handleSubImagesSelected}
+          />
+
+          {/* Upload Box Container */}
+          <div className="border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-4 bg-white">
+            {/* Add Banner Dropzone */}
+            <div
+              onClick={() => coverInputRef.current?.click()}
+              className="border border-dashed border-gray-300 hover:border-[#0D6D5F] rounded-xl py-6 text-center cursor-pointer transition-all bg-white hover:bg-gray-50/70 flex items-center justify-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0D6D5F]"
+            >
+              <span>Add Banner</span>
+              <Plus className="w-4 h-4" />
+            </div>
+
+            {/* Add Sub Images Dropzone */}
+            <div
+              onClick={() => subImagesInputRef.current?.click()}
+              className="border border-dashed border-gray-300 hover:border-[#0D6D5F] rounded-xl py-6 text-center cursor-pointer transition-all bg-white hover:bg-gray-50/70 flex items-center justify-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0D6D5F]"
+            >
+              <span>Add Sub Images</span>
+              <Plus className="w-4 h-4" />
+            </div>
+          </div>
+
+          {/* Real Uploaded Images Gallery Row */}
+          {galleryItems.length > 0 && (
+            <div
+              ref={galleryScrollRef}
+              className="flex items-center gap-3.5 pt-1 overflow-x-auto scrollbar-none scroll-smooth"
+            >
+              {galleryItems.map((imgUrl, idx) => (
+                <div
+                  key={idx}
+                  className="relative shrink-0 w-44 sm:w-52 aspect-[16/10] rounded-xl overflow-hidden border border-gray-200 bg-gray-100 shadow-2xs group"
+                >
+                  <img
+                    src={imgUrl}
+                    alt={`Attachment ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(imgUrl)}
+                    className="absolute top-1.5 right-1.5 bg-red-600 hover:bg-red-700 text-white p-1 rounded-full opacity-90 hover:opacity-100 transition-opacity shadow-xs cursor-pointer z-10"
+                    title="Remove image"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                  {imgUrl === state.cover ? (
+                    <span className="absolute bottom-0 inset-x-0 bg-black/75 text-white text-[9px] font-bold text-center py-0.5 tracking-wider uppercase">
+                      BANNER
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        dispatch({
+                          type: "ADD_IMAGES",
+                          payload: {
+                            cover: imgUrl,
+                            images: (state.images || []).filter((i: string) => i !== imgUrl),
+                          },
+                        });
+                        toast.success("Set as banner!");
+                      }}
+                      className="absolute bottom-0 inset-x-0 bg-black/60 hover:bg-black/80 text-white text-[9px] font-semibold text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    >
+                      Set as Banner
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+        </div>
+
+        {/* 5. Section: Seller Info */}
+        <div id="section-seller" className="scroll-mt-24 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-950 border-b border-gray-100 pb-3">
+            Seller Information
+          </h2>
+          <div className="flex items-center gap-4">
+            <img
+              src={user?.image || "/media/noavatar.png"}
+              alt={user?.name || "Seller"}
+              className="w-16 h-16 rounded-full object-cover border border-gray-200"
+            />
+            <div>
+              <h3 className="text-base font-bold text-gray-900">{user?.name || user?.username || "Freelancer"}</h3>
+              <p className="text-xs text-gray-500 mt-0.5">{user?.shortTitle || "Professional Creator & Freelancer"}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{user?.country || user?.location || "Worldwide"}</p>
+            </div>
+          </div>
+          <div className="bg-[#F8F9FA] rounded-xl p-4 text-xs text-gray-600 leading-relaxed">
+            {user?.description || user?.bio || "No bio entered yet. You can complete your detailed profile under Account Settings."}
+          </div>
+        </div>
+
+        {/* 6. Section: Frequently asked questions */}
+        <div id="section-faq" className="scroll-mt-24 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <div className="flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-950">
+              Frequently asked questions
+            </h2>
+            <span className="bg-[#F8F9FA] border border-gray-200/90 text-gray-600 text-xs font-semibold px-3 py-1 rounded-md">
+              {categoryBadgeLabel}
+            </span>
+          </div>
+
+          {/* Existing FAQs List */}
+          {state.faqs && state.faqs.length > 0 ? (
+            <div className="space-y-4">
+              {state.faqs.map((faq: any, idx: number) => (
+                <div key={idx} className="border-b border-gray-100 pb-4 last:border-b-0">
+                  <div className="flex items-start justify-between gap-4">
+                    <h4 className="text-sm sm:text-base font-bold text-gray-900 leading-snug">
+                      {faq.question}
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFaq(idx)}
+                      className="text-red-500 hover:text-red-700 p-1 cursor-pointer transition-colors shrink-0"
+                      title="Delete question"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </button>
+                  </div>
+                  <p className="text-xs sm:text-[13px] text-gray-600 mt-2 leading-relaxed">
+                    {faq.answer}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-gray-400 italic">No questions added yet. Use the form below to add frequently asked questions.</p>
+          )}
+
+          {/* New FAQ Input Card */}
+          <div className="bg-white rounded-2xl border border-gray-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs sm:text-sm font-bold text-gray-900 block">
+                Question
+              </label>
+              <input
+                type="text"
+                value={faqQuestion}
+                onChange={(e) => setFaqQuestion(e.target.value)}
+                placeholder="Write here"
+                className="w-full bg-[#ECEEF1]/70 hover:bg-[#ECEEF1] focus:bg-white border border-transparent focus:border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs sm:text-sm font-bold text-gray-900 block">
+                Answer
+              </label>
+              <textarea
+                value={faqAnswer}
+                onChange={(e) => setFaqAnswer(e.target.value)}
+                placeholder="Write here"
+                rows={3}
+                className="w-full bg-[#ECEEF1]/70 hover:bg-[#ECEEF1] focus:bg-white border border-transparent focus:border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[70px]"
+              />
+            </div>
+          </div>
+
+          {/* Add Another + Button */}
+          <div>
+            <button
+              type="button"
+              onClick={handleAddFaq}
+              className="text-[#0D6D5F] hover:text-[#0A5348] text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer pt-1 transition-colors"
+            >
+              Add Another <Plus className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
 
       </div>
     </div>

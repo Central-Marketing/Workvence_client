@@ -2,32 +2,35 @@
 export const dynamic = 'force-dynamic';
 
 import { Suspense, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
-import { Loader, KycRequiredModal, StripeLogo, StripeIcon, PayoneerLogo, PayoneerIcon } from "@/components";
+import { Loader, KycRequiredModal, PayoneerLogo, PayoneerIcon } from "@/components";
 import { FaStripe } from "react-icons/fa";
 import moment from "moment";
 import toast from "react-hot-toast";
 import {
-  Wallet,
-  CreditCard,
-  Building2,
-  ExternalLink,
-  CheckCircle2,
-  AlertCircle,
-  X,
-  ChevronRight,
-  ShieldCheck,
+  Home,
   RefreshCw,
+  Calendar as CalendarIcon,
+  Search,
+  ArrowUpRight,
+  CheckCircle2,
+  X,
+  ExternalLink,
 } from "lucide-react";
+
+type EarningsTab = "payout" | "clearance";
 
 const Earnings = () => {
   const user = useUserStore((state) => state.user);
   const router = useRouter();
   const queryClient = useQueryClient();
 
+  const [activeTab, setActiveTab] = useState<EarningsTab>("payout");
+  const [searchQuery, setSearchQuery] = useState("");
   const [showPayoutModal, setShowPayoutModal] = useState(false);
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [showKycRequiredModal, setShowKycRequiredModal] = useState(false);
@@ -38,7 +41,7 @@ const Earnings = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Statement query
+  // Statement query (Orders and Summary)
   const { isLoading, error, data: statementData } = useQuery({
     queryKey: ["seller-earnings-statement"],
     queryFn: () =>
@@ -60,7 +63,6 @@ const Earnings = () => {
         .get("/payouts/status")
         .then(({ data }) => data)
         .catch(async () => {
-          // Fallback to legacy endpoint if /payouts/status is not yet deployed
           try {
             const fallback = await axiosFetch.get("/payouts/connect/status");
             return {
@@ -78,13 +80,13 @@ const Earnings = () => {
                 payeeId: null,
               },
             };
-          } catch (e) {
+          } catch {
             return null;
           }
         }),
   });
 
-  // Derived readiness states from exact schema
+  // Readiness states
   const isStripeReady = Boolean(
     payoutStatus?.stripe?.payoutsEnabled && payoutStatus?.stripe?.isConnected
   );
@@ -233,56 +235,80 @@ const Earnings = () => {
     },
   });
 
-  if (isLoading) return <div className="loader-container min-h-[70vh] flex items-center justify-center"><Loader size={50} /></div>;
-  if (error) return <div className="error-container p-12 text-center text-red-500 font-bold">Something went wrong fetching statement!</div>;
+  if (isLoading) {
+    return (
+      <div className="loader-container min-h-[70vh] flex items-center justify-center">
+        <Loader size={50} />
+      </div>
+    );
+  }
 
-  // Extract orders and summary from statement response
+  if (error) {
+    return (
+      <div className="error-container p-12 text-center text-red-500 font-bold">
+        Something went wrong fetching statement!
+      </div>
+    );
+  }
+
+  // Extract orders and summary
   const orders: any[] = Array.isArray(statementData)
     ? statementData
-    : (statementData?.orders || []);
+    : statementData?.orders || [];
 
   const summary = statementData?.summary || {};
 
   const payouts: any[] = (statementData?.payouts && statementData.payouts.length > 0)
     ? statementData.payouts
-    : (Array.isArray(payoutsData) ? payoutsData : (payoutsData?.payouts || []));
+    : Array.isArray(payoutsData)
+    ? payoutsData
+    : payoutsData?.payouts || [];
 
   const completedOrders = orders.filter((o: any) => o.status === "completed" || o.isCompleted);
   const clearedOrders = orders.filter((o: any) => o.isCleared === true);
   const unclearedOrders = orders.filter((o: any) => !o.isCleared);
 
   // Net Income
-  const netIncome = summary.lifetimeTotalIncome !== undefined
-    ? Number(summary.lifetimeTotalIncome)
-    : (summary.clearedIncome !== undefined
+  const netIncome =
+    summary.lifetimeTotalIncome !== undefined
+      ? Number(summary.lifetimeTotalIncome)
+      : summary.clearedIncome !== undefined
       ? Number(summary.clearedIncome)
       : completedOrders.reduce((acc: number, curr: any) => {
-        const net = curr.netEarnings !== undefined
-          ? curr.netEarnings
-          : (curr.grossPrice ? curr.grossPrice - (curr.platformFee || 0) : curr.price || 0);
-        return acc + (Number(net) || 0);
-      }, 0));
+          const net =
+            curr.netEarnings !== undefined
+              ? curr.netEarnings
+              : curr.grossPrice
+              ? curr.grossPrice - (curr.platformFee || 0)
+              : curr.price || 0;
+          return acc + (Number(net) || 0);
+        }, 0);
 
   // Awaiting Clearance
-  const awaitingClearance = summary.awaitingClearance !== undefined
-    ? Number(summary.awaitingClearance)
-    : unclearedOrders.reduce((acc: number, curr: any) => {
-      const net = curr.netEarnings !== undefined
-        ? curr.netEarnings
-        : (curr.grossPrice ? curr.grossPrice - (curr.platformFee || 0) : curr.price || 0);
-      return acc + (Number(net) || 0);
-    }, 0);
+  const awaitingClearance =
+    summary.awaitingClearance !== undefined
+      ? Number(summary.awaitingClearance)
+      : unclearedOrders.reduce((acc: number, curr: any) => {
+          const net =
+            curr.netEarnings !== undefined
+              ? curr.netEarnings
+              : curr.grossPrice
+              ? curr.grossPrice - (curr.platformFee || 0)
+              : curr.price || 0;
+          return acc + (Number(net) || 0);
+        }, 0);
 
   // Available Balance
   const totalRequested = payouts
     .filter((p: any) => p.status === "pending" || p.status === "approved")
     .reduce((acc: number, curr: any) => acc + curr.amount, 0);
 
-  const availableBalance = summary.availableBalance !== undefined
-    ? Number(summary.availableBalance)
-    : (user?.earningsBalance !== undefined
+  const availableBalance =
+    summary.availableBalance !== undefined
+      ? Number(summary.availableBalance)
+      : user?.earningsBalance !== undefined
       ? Number(user.earningsBalance)
-      : Math.max(netIncome - totalRequested, 0));
+      : Math.max(netIncome - totalRequested, 0);
 
   const readyToSync = summary?.readyToSyncAmount ? Number(summary.readyToSyncAmount) : 0;
 
@@ -308,69 +334,131 @@ const Earnings = () => {
     });
   };
 
-  const statusColor = (s: string) => ({
-    pending: { bg: "#fffbeb", color: "#d97706" },
-    approved: { bg: "#ecfdf5", color: "#10b981" },
-    processed: { bg: "#ecfdf5", color: "#10b981" },
-    rejected: { bg: "#fef2f2", color: "#ef4444" },
-  }[s?.toLowerCase()] || { bg: "#f1f5f9", color: "#64748b" });
+  // CSV Exporter for Order Clearance
+  const handleExportCSV = () => {
+    if (!orders || orders.length === 0) {
+      toast.error("No orders to export");
+      return;
+    }
+    const headers = ["Date", "Order ID", "Gross Price", "Net Earnings", "Clearance Date", "Status"];
+    const rows = orders.map((o: any) => [
+      moment(o.createdAt).format("YYYY-MM-DD"),
+      o.orderNumber || (o._id ? `#${o._id.slice(-8).toUpperCase()}` : "—"),
+      Number(o.grossPrice ?? o.price ?? 0).toFixed(2),
+      Number(
+        o.netEarnings !== undefined
+          ? o.netEarnings
+          : o.grossPrice
+          ? o.grossPrice - (o.platformFee || 0)
+          : o.price || 0
+      ).toFixed(2),
+      o.clearedAt
+        ? moment(o.clearedAt).format("YYYY-MM-DD")
+        : o.clearsAt
+        ? moment(o.clearsAt).format("YYYY-MM-DD")
+        : "Pending",
+      o.isCleared ? "Cleared" : o.status === "cancelled" ? "Failed" : "Pending",
+    ]);
+
+    const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `order-clearance-${moment().format("YYYY-MM-DD")}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Orders exported to CSV!");
+  };
+
+  // Search filtering for payouts
+  const filteredPayouts = payouts.filter((p: any) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    const dateStr = moment(p.createdAt).format("DD MMM, YYYY").toLowerCase();
+    const amountStr = String(p.amount);
+    const methodStr = String(p.method || p.provider || "").toLowerCase();
+    const statusStr = String(p.status || "").toLowerCase();
+    return (
+      dateStr.includes(q) ||
+      amountStr.includes(q) ||
+      methodStr.includes(q) ||
+      statusStr.includes(q)
+    );
+  });
+
+  // Search filtering for orders
+  const filteredOrders = orders.filter((o: any) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    const dateStr = moment(o.createdAt).format("DD MMM, YYYY").toLowerCase();
+    const orderRef = (o.orderNumber || (o._id ? `#${o._id.slice(-8)}` : "")).toLowerCase();
+    const grossStr = String(o.grossPrice ?? o.price ?? "");
+    const statusStr = (o.isCleared ? "cleared" : o.status || "").toLowerCase();
+    return (
+      dateStr.includes(q) ||
+      orderRef.includes(q) ||
+      grossStr.includes(q) ||
+      statusStr.includes(q)
+    );
+  });
 
   return (
-    <div className="min-h-[80vh] bg-slate-50 py-10 flex justify-center font-sans">
-      <div className="w-[95%] md:w-[90%] max-w-[1280px] flex flex-col gap-7 mx-auto">
+    <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-7">
 
-        {/* ── Balance Header ── */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-5 flex-wrap">
+        {/* 1. Breadcrumb */}
+        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+          <Link href="/" className="hover:text-gray-600 flex items-center">
+            <Home className="w-3.5 h-3.5 text-[#0D6D5F]" />
+          </Link>
+          <span>/</span>
+          <span className="text-gray-600 font-medium">Earnings</span>
+          <span>/</span>
+          <span className="text-gray-400 capitalize">
+            {activeTab === "payout" ? "Payout" : "Order Clearance"}
+          </span>
+        </div>
+
+        {/* 2. Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-[26px] font-extrabold text-slate-900 mb-1">Seller Earnings</h1>
-            <p className="text-sm text-slate-500">Track your income, awaiting clearance, and request multi-channel payouts</p>
+            <h1 className="text-2xl sm:text-[32px] font-bold tracking-tight text-gray-950">
+              My Earnings
+            </h1>
+            <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-2xl leading-relaxed">
+              Track your income, awaiting clearance and multi channel payout
+            </p>
           </div>
 
-          <div className="flex items-center gap-3 w-full md:w-auto flex-wrap sm:flex-nowrap">
-            {/* Connect Wallet / Manage Payout Accounts Button */}
+          {/* Action Buttons: Sync funds, Connect Wallet, Request Payout */}
+          <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0 flex-wrap sm:flex-nowrap">
             <button
               type="button"
-              className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 py-3 px-5 rounded-xl text-[14px] font-bold transition-all shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
-              onClick={() => setShowWalletModal(true)}
-              title="Manage your Stripe Connect and Payoneer withdrawal channels"
-            >
-              <Wallet size={17} className="text-brand-green" />
-              <span>Connect Wallet</span>
-              {hasAnyConnected ? (
-                <span className="w-2 h-2 rounded-full bg-emerald-500 ring-4 ring-emerald-100 ml-1" />
-              ) : (
-                <span className="w-2 h-2 rounded-full bg-amber-500 ring-4 ring-amber-100 ml-1" />
-              )}
-            </button>
-
-            {/* Sync Clearance Button */}
-            <button
-              className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 py-3 px-5 rounded-xl text-[14px] font-bold transition-all disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed whitespace-nowrap shadow-2xs hover:shadow-xs active:scale-[0.98] cursor-pointer"
               onClick={() => syncClearanceMutation.mutate()}
               disabled={syncClearanceMutation.isPending}
-              title="Sync all mature completed orders into your available balance"
+              className="bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 font-semibold text-xs sm:text-[13px] px-4 py-2.5 rounded-lg transition-colors cursor-pointer flex items-center gap-2 shadow-2xs"
+              title="Sync mature completed orders into your available balance"
             >
-              {syncClearanceMutation.isPending ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-slate-400 border-t-slate-700 rounded-full animate-spin inline-block" />
-                  <span>Syncing...</span>
-                </>
-              ) : (
-                <>
-                  <RefreshCw size={15} />
-                  <span>Sync Cleared Funds</span>
-                  {readyToSync > 0 && (
-                    <span className="ml-1 bg-brand-green text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full shadow-xs animate-pulse">
-                      ${readyToSync.toFixed(2)} ready
-                    </span>
-                  )}
-                </>
-              )}
+              <RefreshCw
+                className={`w-3.5 h-3.5 ${
+                  syncClearanceMutation.isPending ? "animate-spin text-gray-500" : "text-gray-700"
+                }`}
+              />
+              <span>Sync funds</span>
             </button>
 
-            {/* Request Payout Button */}
             <button
-              className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-brand-green hover:bg-[#389115] text-white py-3 px-6 rounded-xl text-[14px] font-bold transition-all disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed whitespace-nowrap shadow-md hover:shadow-lg active:scale-[0.98] cursor-pointer"
+              type="button"
+              onClick={() => setShowWalletModal(true)}
+              className="bg-[#F1F3F5] hover:bg-gray-200 text-gray-800 font-semibold text-xs sm:text-[13px] px-5 py-2.5 rounded-lg transition-colors cursor-pointer"
+            >
+              Connect Wallet
+            </button>
+
+            <button
+              type="button"
               onClick={() => {
                 if (!hasAnyConnected) {
                   setShowWalletModal(true);
@@ -380,49 +468,49 @@ const Earnings = () => {
                 }
               }}
               disabled={availableBalance <= 0}
+              className="bg-black hover:bg-gray-900 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold text-xs sm:text-[13px] px-5 py-2.5 rounded-lg transition-colors shadow-2xs cursor-pointer"
             >
-              <span className="text-base leading-none">💸</span>
-              <span>Request Payout</span>
+              Request Payout
             </button>
           </div>
         </div>
 
-        {/* ── Stats Cards ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-6 flex items-start gap-4">
-            <div className="text-2xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0 bg-emerald-50">💰</div>
-            <div>
-              <span className="text-[12.5px] font-bold text-slate-500 uppercase tracking-wide block mb-1.5">Net Income</span>
-              <h2 className="text-[28px] font-extrabold text-slate-900 m-0 mb-1">
+        {/* 3. Stat Cards: Next Income, Awaiting Clearance, Available Balance */}
+        <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-7">
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100 gap-6 md:gap-0">
+            {/* Next Income */}
+            <div className="md:pr-8 space-y-1">
+              <span className="text-xs font-semibold text-gray-500 block">Next Income</span>
+              <h3 className="text-2xl sm:text-[30px] font-bold text-gray-950 tracking-tight">
                 {netIncome.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-              </h2>
-              <p className="text-[12.5px] text-slate-400 m-0">
-                {summary.completedOrdersCount !== undefined ? `${summary.completedOrdersCount} completed orders` : `${completedOrders.length} completed orders`}
+              </h3>
+              <p className="text-xs text-gray-400">
+                Cleared earning from{" "}
+                <strong className="text-gray-700 font-semibold">
+                  {summary.completedOrdersCount !== undefined
+                    ? summary.completedOrdersCount
+                    : completedOrders.length}
+                </strong>{" "}
+                packages
               </p>
             </div>
-          </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-6 flex items-start gap-4">
-            <div className="text-2xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0 bg-amber-50">⏳</div>
-            <div>
-              <span className="text-[12.5px] font-bold text-slate-500 uppercase tracking-wide block mb-1.5">Awaiting Clearance</span>
-              <h2 className="text-[28px] font-extrabold text-slate-900 m-0 mb-1">
+            {/* Awaiting Clearance */}
+            <div className="pt-6 md:pt-0 md:px-8 space-y-1">
+              <span className="text-xs font-semibold text-gray-500 block">Awaiting Clearance</span>
+              <h3 className="text-2xl sm:text-[30px] font-bold text-gray-950 tracking-tight">
                 {awaitingClearance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-              </h2>
-              <p className="text-[12.5px] text-slate-400 m-0">
-                {summary.unclearedOrdersCount !== undefined ? `${summary.unclearedOrdersCount} order(s) pending clearance` : `${unclearedOrders.length} order(s) pending clearance`}
-              </p>
+              </h3>
+              <p className="text-xs text-gray-400">Currently in progress</p>
             </div>
-          </div>
 
-          <div className="bg-emerald-50 rounded-2xl border border-emerald-200 shadow-sm overflow-hidden p-6 flex items-start gap-4">
-            <div className="text-2xl w-12 h-12 flex items-center justify-center rounded-xl shrink-0 bg-blue-50">🏦</div>
-            <div>
-              <span className="text-[12.5px] font-bold text-emerald-800 uppercase tracking-wide block mb-1.5">Available Balance</span>
-              <h2 className="text-[28px] font-extrabold text-emerald-700 m-0 mb-1">
+            {/* Available Balance */}
+            <div className="pt-6 md:pt-0 md:pl-8 space-y-1">
+              <span className="text-xs font-semibold text-gray-500 block">Available Balance</span>
+              <h3 className="text-2xl sm:text-[30px] font-bold text-gray-950 tracking-tight">
                 {availableBalance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-              </h2>
-              <p className="text-[12.5px] text-slate-500 m-0">
+              </h3>
+              <p className="text-xs text-gray-400">
                 Ready to withdraw
                 {readyToSync > 0 && ` • $${readyToSync.toFixed(2)} ready to sync`}
               </p>
@@ -430,486 +518,436 @@ const Earnings = () => {
           </div>
         </div>
 
-        {/* ── Payout Request History ── */}
-        {payouts.length > 0 && (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="p-5 md:px-7 md:py-5 border-b border-slate-200">
-              <h2 className="text-lg font-bold text-slate-900 mb-1">Payout Requests</h2>
-              <p className="text-[13.5px] text-slate-500">Your submitted withdrawal requests</p>
+        {/* 4. Tab Navigation Pills */}
+        <div className="bg-[#F1F3F5] rounded-xl p-1 inline-flex items-center gap-1 shadow-2xs">
+          <button
+            type="button"
+            onClick={() => setActiveTab("payout")}
+            className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === "payout"
+                ? "bg-[#0B3A33] text-white shadow-2xs"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            Payout Request
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("clearance")}
+            className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === "clearance"
+                ? "bg-[#0B3A33] text-white shadow-2xs"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            Order Clearance
+          </button>
+        </div>
+
+        {/* 5. Main Card for Tab Content */}
+        <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+
+          {/* Tab Header with Search & Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-950">
+              {activeTab === "payout" ? "Payout Request" : "Order Clearance"}
+            </h2>
+
+            <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+              {/* Calendar Filter Icon */}
+              <button
+                type="button"
+                className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors cursor-pointer"
+                title="Filter by date"
+              >
+                <CalendarIcon className="w-4 h-4" />
+              </button>
+
+              {/* Search Bar */}
+              <div className="relative flex-1 sm:w-64">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="What are you looking for"
+                  className="w-full bg-white border border-gray-200 rounded-lg pl-9 pr-3.5 py-2 text-xs text-gray-800 placeholder-gray-400 outline-none focus:border-gray-400 transition-colors"
+                />
+              </div>
+
+              {/* Export CSV (Visible on Order Clearance tab) */}
+              {activeTab === "clearance" && (
+                <button
+                  type="button"
+                  onClick={handleExportCSV}
+                  className="bg-black hover:bg-gray-900 text-white font-semibold text-xs px-4 py-2 rounded-lg transition-colors cursor-pointer shrink-0"
+                >
+                  Export CSV
+                </button>
+              )}
             </div>
+          </div>
+
+          {/* TAB 1: Payout Request Table */}
+          {activeTab === "payout" && (
             <div className="w-full overflow-x-auto">
-              <table className="w-full border-collapse text-left min-w-[850px] whitespace-nowrap">
+              <table className="w-full border-collapse text-left min-w-[700px]">
                 <thead>
-                  <tr>
-                    <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Date</th>
-                    <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Amount</th>
-                    <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Payout Method</th>
-                    <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Status</th>
+                  <tr className="border-b border-gray-100">
+                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Date</th>
+                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Payment Menthod</th>
+                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Amount</th>
+                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Status</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {payouts.map((p: any) => {
-                    const sc = statusColor(p.status);
-                    const method = (p.method || p.provider || "stripe").toLowerCase();
-                    const isPayoneer = method === "payoneer";
+                <tbody className="divide-y divide-gray-100/90">
+                  {filteredPayouts.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="py-12 text-center text-xs text-gray-400">
+                        No payout requests recorded yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredPayouts.map((p: any) => {
+                      const method = (p.method || p.provider || "stripe").toLowerCase();
+                      const isPayoneer = method === "payoneer";
+                      const status = (p.status || "pending").toLowerCase();
 
-                    return (
-                      <tr key={p._id || p.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-600 whitespace-nowrap">
-                          {moment(p.createdAt).format("MMM DD, YYYY")}
-                        </td>
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-[15px] font-bold text-emerald-700">
-                          {p.amount.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                        </td>
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm">
-                          {isPayoneer ? (
-                            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-[#fff0eb] text-[#ff4800] border border-[#ffd8cc]">
-                              <PayoneerIcon className="w-4 h-4" />
-                              <span>Payoneer</span>
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#f4f3ff] text-[#635bff] border border-[#e0ddff]">
-                              <FaStripe size={26} className="text-[#635bff]" />
-                              <span>Connect</span>
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm text-slate-700">
-                          <span
-                            className="text-[11px] font-bold py-1 px-3 rounded-full uppercase tracking-wide inline-block"
-                            style={{ background: sc.bg, color: sc.color }}
-                          >
-                            {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                      return (
+                        <tr key={p._id || p.id} className="hover:bg-gray-50/60 transition-colors">
+                          <td className="py-4 px-4 text-xs sm:text-[13px] font-medium text-gray-700 whitespace-nowrap">
+                            {moment(p.createdAt).format("DD MMM, YYYY")}
+                          </td>
+                          <td className="py-4 px-4 align-middle whitespace-nowrap">
+                            {isPayoneer ? (
+                              <PayoneerLogo className="h-5" />
+                            ) : (
+                              <div className="flex items-center">
+                                <FaStripe size={36} className="text-[#635bff]" />
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-4 px-4 text-xs sm:text-[13px] font-bold text-gray-900 whitespace-nowrap">
+                            {Number(p.amount).toLocaleString("en-US", {
+                              style: "currency",
+                              currency: "USD",
+                            })}
+                          </td>
+                          <td className="py-4 px-4 align-middle whitespace-nowrap">
+                            {status === "approved" || status === "processed" || status === "cleared" ? (
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-[#E6F7F3] text-[#0D6D5F]">
+                                Approved
+                              </span>
+                            ) : status === "rejected" || status === "failed" ? (
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-[#FDE8E8] text-[#E02424]">
+                                Reject
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-[#FEF6E7] text-[#D97706]">
+                                Pending
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* ── Financial Statement Table ── */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-5 md:px-7 md:py-5 border-b border-slate-200 flex justify-between items-center flex-wrap gap-2">
-            <div>
-              <h2 className="text-lg font-bold text-slate-900 mb-1">Financial Statement History</h2>
-              <p className="text-[13.5px] text-slate-500">Complete transaction ledger and clearance schedule for all your orders</p>
-            </div>
-          </div>
-          <div className="w-full overflow-x-auto">
-            <table className="w-full border-collapse text-left min-w-[950px]">
-              <thead>
-                <tr>
-                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Date</th>
-                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Order Reference</th>
-                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Description</th>
-                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Gross Price</th>
-                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Net Earnings</th>
-                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Clearance Date</th>
-                  <th className="py-3.5 px-6 text-slate-500 font-semibold text-[12.5px] uppercase border-b border-slate-100 bg-slate-50">Clearance Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="text-center p-12 text-slate-400 font-medium">
-                      No financial transactions recorded yet.
-                    </td>
+          {/* TAB 2: Order Clearance Table */}
+          {activeTab === "clearance" && (
+            <div className="w-full overflow-x-auto">
+              <table className="w-full border-collapse text-left min-w-[800px]">
+                <thead>
+                  <tr className="border-b border-gray-100">
+                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Date</th>
+                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Order Id</th>
+                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Gross Price</th>
+                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Net Earning</th>
+                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Clearance Date</th>
+                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Status</th>
                   </tr>
-                ) : (
-                  orders.map((order: any) => {
-                    const gross = Number(order.grossPrice ?? order.price ?? 0);
-                    const net = Number(
-                      order.netEarnings !== undefined
-                        ? order.netEarnings
-                        : (order.grossPrice ? order.grossPrice - (order.platformFee || 0) : order.price || 0)
-                    );
-                    const orderRef = order.orderNumber || (order._id || order.id ? `#${(order._id || order.id).slice(-8)}` : "—");
+                </thead>
+                <tbody className="divide-y divide-gray-100/90">
+                  {filteredOrders.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-12 text-center text-xs text-gray-400">
+                        No financial orders recorded yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredOrders.map((order: any) => {
+                      const gross = Number(order.grossPrice ?? order.price ?? 0);
+                      const net = Number(
+                        order.netEarnings !== undefined
+                          ? order.netEarnings
+                          : order.grossPrice
+                          ? order.grossPrice - (order.platformFee || 0)
+                          : order.price || 0
+                      );
+                      const orderRef =
+                        order.orderNumber ||
+                        (order._id ? `#${order._id.slice(-8).toUpperCase()}` : "—");
+                      const clearanceDate = order.clearedAt
+                        ? moment(order.clearedAt).format("DD MMM, YYYY")
+                        : order.clearsAt
+                        ? moment(order.clearsAt).format("DD MMM, YYYY")
+                        : "14 days from delivery";
 
-                    return (
-                      <tr key={order._id || order.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-600 whitespace-nowrap">
-                          {moment(order.createdAt).format("MMM DD, YYYY")}
-                        </td>
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-[12px] font-mono font-semibold text-slate-700 whitespace-nowrap">
-                          {orderRef}
-                        </td>
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-medium text-slate-800 min-w-[260px]">
-                          {order.title}
-                        </td>
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm font-semibold text-slate-700 whitespace-nowrap">
-                          {gross.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                        </td>
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-[15px] font-bold text-emerald-700 whitespace-nowrap">
-                          +{net.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                        </td>
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm text-slate-600 whitespace-nowrap">
-                          {order.clearedAt ? (
-                            <span className="font-medium text-emerald-700" title="Date cleared into wallet">
-                              {moment(order.clearedAt).format("MMM DD, YYYY")}
-                            </span>
-                          ) : order.clearsAt ? (
-                            <span className="font-medium text-slate-700" title="Scheduled clearance date">
-                              {moment(order.clearsAt).format("MMM DD, YYYY")}
-                            </span>
-                          ) : (
-                            <span className="text-slate-400 font-normal">—</span>
-                          )}
-                        </td>
-                        <td className="py-4 px-6 border-b border-slate-100 align-middle text-sm whitespace-nowrap">
-                          {order.isCleared ? (
-                            <span className="text-[11px] font-bold py-1 px-3 rounded-full uppercase tracking-wide inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                              Cleared
-                            </span>
-                          ) : (
-                            <span className="text-[11px] font-bold py-1 px-3 rounded-full uppercase tracking-wide inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200">
-                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                              Pending
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+                      const isFailed = order.status === "cancelled" || order.status === "failed";
+                      const isCleared = order.isCleared === true;
+
+                      return (
+                        <tr key={order._id || order.id} className="hover:bg-gray-50/60 transition-colors">
+                          <td className="py-4 px-4 text-xs sm:text-[13px] font-medium text-gray-700 whitespace-nowrap">
+                            {moment(order.createdAt).format("DD MMM, YYYY")}
+                          </td>
+                          <td className="py-4 px-4 text-xs sm:text-[13px] font-mono text-gray-800 whitespace-nowrap">
+                            {orderRef}
+                          </td>
+                          <td className="py-4 px-4 text-xs sm:text-[13px] font-semibold text-gray-800 whitespace-nowrap">
+                            {gross.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                          </td>
+                          <td className="py-4 px-4 text-xs sm:text-[13px] font-bold text-[#0D6D5F] whitespace-nowrap">
+                            +{net.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                          </td>
+                          <td className="py-4 px-4 text-xs sm:text-[13px] text-gray-700 whitespace-nowrap">
+                            {clearanceDate}
+                          </td>
+                          <td className="py-4 px-4 align-middle whitespace-nowrap">
+                            {isCleared ? (
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-[#E6F7F3] text-[#0D6D5F]">
+                                Cleared
+                              </span>
+                            ) : isFailed ? (
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-[#FDE8E8] text-[#E02424]">
+                                Failed
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-[#FEF6E7] text-[#D97706]">
+                                Pending
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+
         </div>
 
       </div>
 
-      {/* ── Connect Wallet / Payout Methods Modal ── */}
+      {/* ── MODAL 1: Payout Channel (Image 3) ── */}
       {showWalletModal && (
         <div
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[1000] p-4 animate-in fade-in duration-200 select-none"
+          className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-[1000] p-4 animate-in fade-in duration-200 select-none"
           onClick={() => setShowWalletModal(false)}
         >
           <div
-            className="bg-white w-full max-w-[640px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200"
+            className="bg-white w-full max-w-[480px] sm:max-w-[500px] rounded-3xl shadow-2xl border border-gray-100 p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center py-5 px-6 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-brand-green">
-                  <Wallet size={20} />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900 m-0">Payout Channels</h3>
-                  <p className="text-xs text-slate-500 m-0">Connect and manage your withdrawal accounts</p>
-                </div>
-              </div>
-              <button
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
-                onClick={() => setShowWalletModal(false)}
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="p-6 space-y-4">
-              {/* Stripe Connect Card */}
-              <div className="p-5 rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-start gap-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center p-2 shrink-0">
-                    <FaStripe size={32} className="text-[#635bff]" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-base font-bold text-slate-900">Stripe Connect</h4>
-                      {isStripeReady ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                          Connected & Ready
-                        </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">
-                          Not Connected
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Direct automated bank account deposits & card payouts
-                    </p>
-                  </div>
-                </div>
-
-                <div className="self-end sm:self-auto shrink-0">
-                  {isStripeReady ? (
-                    <button
-                      type="button"
-                      onClick={() => connectDashboardMutation.mutate()}
-                      disabled={connectDashboardMutation.isPending}
-                      className="px-4 py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer"
-                    >
-                      {connectDashboardMutation.isPending ? (
-                        <RefreshCw size={13} className="animate-spin" />
-                      ) : (
-                        <ExternalLink size={13} />
-                      )}
-                      Express Dashboard
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => connectOnboardMutation.mutate()}
-                      disabled={connectOnboardMutation.isPending}
-                      className="px-5 py-2.5 bg-brand-black hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
-                    >
-                      {connectOnboardMutation.isPending ? (
-                        <>
-                          <RefreshCw size={13} className="animate-spin" />
-                          Connecting...
-                        </>
-                      ) : (
-                        <>Connect Stripe</>
-                      )}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Payoneer Card */}
-              <div className="p-5 rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-start gap-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center p-2.5 shrink-0">
-                    <PayoneerIcon className="w-7 h-7" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-base font-bold text-slate-900">Payoneer</h4>
-                      {isPayoneerReady ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                          Connected & Ready
-                        </span>
-                      ) : payoutStatus?.payoneer?.status === "PENDING" ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                          Pending Activation
-                        </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">
-                          Not Connected
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Global bank transfers & Payoneer balance transfers
-                    </p>
-                  </div>
-                </div>
-
-                <div className="self-end sm:self-auto shrink-0">
-                  {isPayoneerReady ? (
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
-                      <CheckCircle2 size={14} /> Ready for Payouts
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => payoneerOnboardMutation.mutate()}
-                      disabled={payoneerOnboardMutation.isPending}
-                      className="px-5 py-2.5 bg-brand-black hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
-                    >
-                      {payoneerOnboardMutation.isPending ? (
-                        <>
-                          <RefreshCw size={13} className="animate-spin" />
-                          Connecting...
-                        </>
-                      ) : (
-                        <>Connect Payoneer</>
-                      )}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Info Note */}
-              <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 flex items-start gap-2.5 text-xs text-emerald-900 leading-relaxed">
-                <AlertCircle size={16} className="text-brand-green mt-0.5 shrink-0" />
-                <span>
-                  You can connect multiple payout methods and pick your preferred channel each time you submit a withdrawal request.
-                </span>
-              </div>
-            </div>
-
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+            {/* Header */}
+            <div className="flex justify-between items-center pb-1">
+              <h3 className="text-base sm:text-lg font-bold text-gray-950">Payout Channel</h3>
               <button
                 type="button"
-                className="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                className="text-gray-400 hover:text-gray-700 p-1 cursor-pointer transition-colors"
                 onClick={() => setShowWalletModal(false)}
               >
-                Close
+                <X className="w-5 h-5" />
               </button>
+            </div>
+
+            {/* Channels List */}
+            <div className="space-y-3.5">
+              {/* Stripe Connect Option */}
+              <div
+                onClick={() => {
+                  if (isStripeReady) {
+                    connectDashboardMutation.mutate();
+                  } else {
+                    connectOnboardMutation.mutate();
+                  }
+                }}
+                className="bg-[#F7F4FF] hover:bg-[#F2EDFF] border border-purple-100 rounded-2xl p-4 sm:p-5 flex items-start justify-between cursor-pointer transition-all group"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center">
+                    <FaStripe size={36} className="text-[#635bff]" />
+                  </div>
+                  <h4 className="text-sm font-bold text-gray-950 pt-0.5">Stripe Connect</h4>
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    Direct automated bank account deposits & card payouts
+                  </p>
+                </div>
+                <div className="shrink-0 text-[#635bff] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform pt-1">
+                  <ArrowUpRight className="w-5 h-5" />
+                </div>
+              </div>
+
+              {/* Payoneer Option */}
+              <div
+                onClick={() => payoneerOnboardMutation.mutate()}
+                className="bg-[#FAFCFB] hover:bg-[#F4F9F7] border border-gray-100 rounded-2xl p-4 sm:p-5 flex items-start justify-between cursor-pointer transition-all group"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center">
+                    <PayoneerLogo className="h-6" />
+                  </div>
+                  <h4 className="text-sm font-bold text-gray-950 pt-0.5">Payoneer</h4>
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    Global bank transfer and payoneer balance transfer
+                  </p>
+                </div>
+                <div className="shrink-0 text-teal-700 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform pt-1">
+                  <ArrowUpRight className="w-5 h-5" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── Multi-Channel Payout Request Modal ── */}
+      {/* ── MODAL 2: Request Balance Payout (Image 4) ── */}
       {showPayoutModal && (
         <div
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[1000] p-4 animate-in fade-in duration-200 select-none"
+          className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-[1000] p-4 animate-in fade-in duration-200 select-none"
           onClick={() => setShowPayoutModal(false)}
         >
           <div
-            className="bg-white w-full max-w-[480px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200"
+            className="bg-white w-full max-w-[480px] sm:max-w-[500px] rounded-3xl shadow-2xl border border-gray-100 p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center py-4 px-6 border-b border-slate-100 bg-slate-50/70">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900 m-0">Request Balance Payout</h3>
-                <p className="text-xs text-slate-500 m-0">Withdraw your cleared funds to your bank or wallet</p>
-              </div>
+            {/* Header */}
+            <div className="flex justify-between items-center pb-1">
+              <h3 className="text-base sm:text-lg font-bold text-gray-950">Request Balance Payout</h3>
               <button
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
+                type="button"
+                className="text-gray-400 hover:text-gray-700 p-1 cursor-pointer transition-colors"
                 onClick={() => setShowPayoutModal(false)}
               >
-                <X size={20} />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handlePayoutSubmit} className="p-6 flex flex-col gap-5">
-              {/* Balance Card */}
-              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex justify-between items-center">
-                <div>
-                  <span className="text-xs font-bold text-emerald-800 uppercase tracking-wide block">Available Balance</span>
-                  <span className="text-xs text-emerald-600">Cleared & ready for withdrawal</span>
-                </div>
-                <strong className="text-2xl font-extrabold text-emerald-700">
-                  {availableBalance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                </strong>
-              </div>
-
-              {/* Payout Method Selection */}
+            {/* Available Balance Box */}
+            <div className="border border-gray-100 rounded-2xl p-4 flex items-center justify-between bg-white shadow-2xs">
               <div>
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5 block">
-                  Select Payout Channel <span className="text-red-500">*</span>
-                </label>
-
-                {availableMethods.length === 0 ? (
-                  <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-center">
-                    <p className="text-xs font-semibold text-amber-900 mb-2">
-                      No verified payout methods connected.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowPayoutModal(false);
-                        setShowWalletModal(true);
-                      }}
-                      className="px-4 py-2 bg-brand-green hover:bg-[#389115] text-white text-xs font-bold rounded-xl transition-all shadow-xs"
-                    >
-                      Connect Stripe or Payoneer
-                    </button>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Stripe Option */}
-                    <div
-                      onClick={() => isStripeReady && setSelectedMethod("stripe")}
-                      className={`p-4 rounded-2xl border-2 transition-all flex items-center justify-between ${!isStripeReady
-                        ? "opacity-50 border-slate-200 bg-slate-50 cursor-not-allowed"
-                        : selectedMethod === "stripe"
-                          ? "border-brand-green bg-emerald-50/50 shadow-xs ring-1 ring-brand-green cursor-pointer"
-                          : "border-slate-200 hover:border-slate-300 bg-white cursor-pointer"
-                        }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center p-1 shadow-2xs shrink-0">
-                          <FaStripe size={28} className="text-[#635bff]" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-slate-900">Stripe Connect</p>
-                          <p className="text-[10px] text-slate-500">
-                            {isStripeReady ? "Direct Bank Deposit" : "Not connected"}
-                          </p>
-                        </div>
-                      </div>
-                      {selectedMethod === "stripe" && isStripeReady && (
-                        <CheckCircle2 size={18} className="text-brand-green shrink-0" />
-                      )}
-                    </div>
-
-                    {/* Payoneer Option */}
-                    <div
-                      onClick={() => isPayoneerReady && setSelectedMethod("payoneer")}
-                      className={`p-4 rounded-2xl border-2 transition-all flex items-center justify-between ${!isPayoneerReady
-                        ? "opacity-50 border-slate-200 bg-slate-50 cursor-not-allowed"
-                        : selectedMethod === "payoneer"
-                          ? "border-brand-green bg-emerald-50/50 shadow-xs ring-1 ring-brand-green cursor-pointer"
-                          : "border-slate-200 hover:border-slate-300 bg-white cursor-pointer"
-                        }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center p-1.5 shadow-2xs shrink-0">
-                          <PayoneerIcon className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-slate-900">Payoneer</p>
-                          <p className="text-[10px] text-slate-500">
-                            {isPayoneerReady ? "Global Wallet" : "Not connected"}
-                          </p>
-                        </div>
-                      </div>
-                      {selectedMethod === "payoneer" && isPayoneerReady && (
-                        <CheckCircle2 size={18} className="text-brand-green shrink-0" />
-                      )}
-                    </div>
-                  </div>
-                )}
+                <span className="text-xs sm:text-sm font-bold text-gray-950 block">Available Balance</span>
+                <span className="text-xs text-gray-400">Clear and ready for withdraw</span>
               </div>
+              <strong className="text-base sm:text-lg font-bold text-[#0D6D5F]">
+                {availableBalance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+              </strong>
+            </div>
 
-              {/* Amount Input */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  Amount to Withdraw (USD) <span className="text-red-500">*</span>
-                </label>
-                <div className="flex items-center border border-slate-300 rounded-xl overflow-hidden focus-within:border-brand-green bg-white shadow-2xs">
-                  <span className="px-4 bg-slate-50 text-slate-600 font-bold text-base border-r border-slate-200 flex items-center h-[46px]">
-                    $
-                  </span>
-                  <input
-                    type="number"
-                    className="border-none flex-1 p-3 text-sm text-slate-900 font-bold outline-none"
-                    placeholder="0.00"
-                    value={payoutAmount}
-                    onChange={(e) => setPayoutAmount(e.target.value)}
-                    min="1"
-                    max={availableBalance}
-                    step="0.01"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setPayoutAmount(String(availableBalance))}
-                    className="px-3 py-1 mr-2 text-xs font-bold text-brand-green hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer"
-                  >
-                    Max
-                  </button>
+            {/* Channels Selectable */}
+            <div className="space-y-3">
+              {/* Stripe Option */}
+              <div
+                onClick={() => isStripeReady && setSelectedMethod("stripe")}
+                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${
+                  selectedMethod === "stripe"
+                    ? "bg-[#F7F4FF] border-2 border-purple-300 shadow-2xs"
+                    : "bg-white border border-gray-200 hover:border-gray-300"
+                } ${!isStripeReady ? "opacity-60" : ""}`}
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center">
+                    <FaStripe size={36} className="text-[#635bff]" />
+                  </div>
+                  <h4 className="text-xs sm:text-sm font-bold text-gray-950">Stripe Connect</h4>
+                  <p className="text-[11px] text-gray-500">
+                    Direct automated bank account deposits & card payouts
+                  </p>
+                </div>
+                <div className="shrink-0 pl-3">
+                  {selectedMethod === "stripe" ? (
+                    <CheckCircle2 className="w-5 h-5 text-teal-700" />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full border-2 border-gray-300" />
+                  )}
                 </div>
               </div>
 
-              <p className="text-[12px] text-slate-500 bg-slate-50 rounded-xl p-3.5 m-0 leading-relaxed border border-slate-100">
-                ⚡ Payout requests are processed within 2–3 business days via your selected channel.
-              </p>
+              {/* Payoneer Option */}
+              <div
+                onClick={() => isPayoneerReady && setSelectedMethod("payoneer")}
+                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${
+                  selectedMethod === "payoneer"
+                    ? "bg-[#F7F4FF] border-2 border-purple-300 shadow-2xs"
+                    : "bg-white border border-gray-200 hover:border-gray-300"
+                } ${!isPayoneerReady ? "opacity-60" : ""}`}
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center">
+                    <PayoneerLogo className="h-6" />
+                  </div>
+                  <h4 className="text-xs sm:text-sm font-bold text-gray-950">Payoneer</h4>
+                  <p className="text-[11px] text-gray-500">
+                    Global bank transfer and payoneer balance transfer
+                  </p>
+                </div>
+                <div className="shrink-0 pl-3">
+                  {selectedMethod === "payoneer" ? (
+                    <CheckCircle2 className="w-5 h-5 text-teal-700" />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full border-2 border-gray-300" />
+                  )}
+                </div>
+              </div>
+            </div>
 
-              <div className="flex gap-3 pt-2">
+            {/* Amount to withdraw Input */}
+            <form onSubmit={handlePayoutSubmit} className="space-y-5 pt-1">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-gray-700 block">
+                  Amount to withdraw in <strong className="text-gray-900">USD</strong>
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max={availableBalance}
+                  step="0.01"
+                  value={payoutAmount}
+                  onChange={(e) => setPayoutAmount(e.target.value)}
+                  placeholder="e.g $200"
+                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-sm text-gray-800 placeholder-gray-400 outline-none transition-all"
+                  required
+                />
+              </div>
+
+              {/* Action Buttons: Cancel Request, Submit Payout Request */}
+              <div className="flex items-center justify-between gap-3 pt-2">
                 <button
                   type="button"
-                  className="flex-1 py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer"
                   onClick={() => setShowPayoutModal(false)}
+                  className="flex-1 bg-[#F1F3F5] hover:bg-gray-200 text-gray-800 font-semibold text-xs sm:text-[13px] py-3 px-4 rounded-xl transition-colors cursor-pointer text-center"
                 >
-                  Cancel
+                  Cancel Request
                 </button>
                 <button
                   type="submit"
-                  disabled={payoutMutation.isPending || availableMethods.length === 0}
-                  className="flex-1 py-3 px-4 bg-brand-green hover:bg-[#389115] text-white rounded-xl text-xs font-bold transition-all disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed shadow-md hover:shadow-lg cursor-pointer"
+                  disabled={payoutMutation.isPending || !payoutAmount || Number(payoutAmount) <= 0}
+                  className="flex-1 bg-black hover:bg-gray-900 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold text-xs sm:text-[13px] py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer text-center"
                 >
-                  {payoutMutation.isPending ? "Submitting..." : "Submit Payout Request"}
+                  {payoutMutation.isPending ? (
+                    "Processing..."
+                  ) : (
+                    <>
+                      <span>Submit Payout Request</span>
+                      <span>→</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -917,7 +955,7 @@ const Earnings = () => {
         </div>
       )}
 
-      {/* ── KYC Required 403 Interceptor Modal ── */}
+      {/* ── KYC Required Modal ── */}
       <KycRequiredModal
         isOpen={showKycRequiredModal}
         onClose={() => setShowKycRequiredModal(false)}
@@ -930,7 +968,13 @@ const Earnings = () => {
 
 export default function EarningsPage() {
   return (
-    <Suspense fallback={<div className="loader-container min-h-[80vh] flex items-center justify-center"><Loader size={50} /></div>}>
+    <Suspense
+      fallback={
+        <div className="loader-container min-h-[80vh] flex items-center justify-center">
+          <Loader size={50} />
+        </div>
+      }
+    >
       <Earnings />
     </Suspense>
   );

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
@@ -66,10 +67,23 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
     return String(sellerId) === String(user._id) || !order.buyerID;
   });
 
-  const completedOrders = sellerOrders.filter((o: any) => o.status === "completed");
-  const pendingOrders = sellerOrders.filter(
-    (o: any) => o.status === "paid" || o.status === "delivered" || o.status === "in_progress" || !o.status
+  const completedOrders = sellerOrders.filter(
+    (o: any) => o.status === "completed" || o.isCompleted === true
   );
+  const pendingOrders = sellerOrders.filter((o: any) => {
+    if (o.isCompleted === true || o.status === "completed") return false;
+    if (o.status === "cancelled" || o.status === "failed") return false;
+    return (
+      o.isCompleted === false ||
+      o.status === "in_progress" ||
+      o.status === "inprogress" ||
+      o.status === "paid" ||
+      o.status === "delivered" ||
+      o.status === "revision" ||
+      o.status === "pending" ||
+      !o.status
+    );
+  });
   const totalFinancialAmount = completedOrders.reduce((sum: number, order: any) => sum + (order.price || 0), 0);
   const unreadMessagesCount = conversations.filter((c: any) => !c.readBySeller).length;
 
@@ -85,71 +99,12 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
   // 1. ACTIVE SELLER DASHBOARD (Profile complete 100% & packages > 0)
   // -------------------------------------------------------------
   if (showActiveDashboard) {
-    // Mock fallback orders matching the reference image when the seller has no orders yet in database
-    const MOCK_SELLER_IMAGE_ORDERS = [
-      {
-        _id: "mock-s-1",
-        title: "I will create a stunning portfolio website using Elementor.",
-        type: "package",
-        createdAt: "2026-12-12",
-        deadline: "2026-12-16",
-        price: 200,
-        status: "revision",
-        image: "/images/dashboard/orders/order_1.png",
-      },
-      {
-        _id: "mock-s-2",
-        title: "I will develop a custom e-commerce platform tailored to your needs.",
-        type: "package",
-        createdAt: "2026-12-12",
-        deadline: "2026-12-16",
-        price: 110,
-        status: "inprogress",
-        image: "/images/dashboard/orders/order_2.png",
-      },
-      {
-        _id: "mock-s-3",
-        title: "Design engaging mobile app interfaces with Sketch and InVision.",
-        type: "brief",
-        createdAt: "2026-12-14",
-        deadline: "2026-12-21",
-        price: 500,
-        status: "delivered",
-        image: "/images/dashboard/orders/order_3.png",
-      },
-      {
-        _id: "mock-s-4",
-        title: "Build a dynamic blog site with WordPress and SEO optimization.",
-        type: "package",
-        createdAt: "2026-12-13",
-        deadline: "2026-12-20",
-        price: 300,
-        status: "failed",
-        image: "/images/dashboard/orders/order_4.png",
-      },
-      {
-        _id: "mock-s-5",
-        title: "Enhance website visibility with targeted SEO and content strategies.",
-        type: "brief",
-        createdAt: "2026-12-15",
-        deadline: "2026-12-22",
-        price: 80,
-        status: "pending",
-        image: "/images/dashboard/orders/order_5.png",
-      },
-    ];
+    const ordersToDisplay = filteredOrders;
 
-    // Use real orders if available, otherwise display the high-fidelity mock list matching the mockup
-    const ordersToDisplay = filteredOrders.length > 0 ? filteredOrders : MOCK_SELLER_IMAGE_ORDERS.filter((o: any) => {
-      if (orderTypeFilter === "package") return o.type === "package";
-      if (orderTypeFilter === "brief") return o.type === "brief";
-      return true;
-    });
-
-    const displayRevenue = totalFinancialAmount > 0 ? totalFinancialAmount : 32302;
-    const displayActiveOrders = pendingOrders.length > 0 ? pendingOrders.length : 4;
-    const displayCompletedOrders = completedOrders.length > 0 ? completedOrders.length : 12;
-    const displayUnreadMessages = unreadMessagesCount > 0 ? unreadMessagesCount : 2;
+    const displayRevenue = totalFinancialAmount;
+    const displayActiveOrders = pendingOrders.length;
+    const displayCompletedOrders = completedOrders.length;
+    const displayUnreadMessages = unreadMessagesCount;
 
     return (
       <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
@@ -194,7 +149,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
               <p className="text-[11px] text-gray-400 mt-1">
                 Cleared earning from{" "}
                 <strong className="font-semibold text-gray-700">
-                  {completedOrders.length > 0 ? completedOrders.length : 12}
+                  {completedOrders.length}
                 </strong>{" "}
                 packages
               </p>
@@ -245,33 +200,30 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                   <button
                     type="button"
                     onClick={() => setOrderTypeFilter("all")}
-                    className={`px-5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                      orderTypeFilter === "all"
+                    className={`px-5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${orderTypeFilter === "all"
                         ? "bg-[#0B3A33] text-white shadow-2xs"
                         : "text-gray-600 hover:text-gray-900"
-                    }`}
+                      }`}
                   >
                     All
                   </button>
                   <button
                     type="button"
                     onClick={() => setOrderTypeFilter("package")}
-                    className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                      orderTypeFilter === "package"
+                    className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${orderTypeFilter === "package"
                         ? "bg-[#0B3A33] text-white shadow-2xs"
                         : "text-gray-600 hover:text-gray-900"
-                    }`}
+                      }`}
                   >
                     Packages
                   </button>
                   <button
                     type="button"
                     onClick={() => setOrderTypeFilter("brief")}
-                    className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                      orderTypeFilter === "brief"
+                    className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${orderTypeFilter === "brief"
                         ? "bg-[#0B3A33] text-white shadow-2xs"
                         : "text-gray-600 hover:text-gray-900"
-                    }`}
+                      }`}
                   >
                     Briefs
                   </button>
@@ -310,10 +262,10 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                       const isBrief = Boolean(order.briefID || order.type === "brief");
                       const orderDate = order.createdAt
                         ? new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                        : "Dec 12";
+                        : "-";
                       const dueDate = order.deadline
                         ? new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                        : "Dec 16";
+                        : "-";
 
                       // Determine status pill badge style
                       const st = (order.status || "inprogress").toLowerCase();
@@ -322,7 +274,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                         style: "bg-[#E0F2FE] text-[#0284C7]",
                       };
 
-                      if (st === "completed") {
+                      if (st === "completed" || order.isCompleted === true) {
                         statusBadge = {
                           label: "Completed",
                           style: "bg-[#D1FAE5] text-[#059669]",
@@ -353,19 +305,29 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                         <tr
                           key={order._id}
                           onClick={() => {
-                            if (!order._id.startsWith("mock-")) {
-                              router.push(`/orders/${order._id}`);
-                            }
+                            router.push(`/orders/${order._id}`);
                           }}
                           className="hover:bg-slate-50/70 cursor-pointer transition-colors"
                         >
                           <td className="py-4 px-3 align-middle">
                             <div className="flex items-center gap-3.5">
-                              <img
-                                src={order.image || order.cover || "/images/dashboard/orders/order_1.png"}
-                                alt=""
-                                className="w-20 sm:w-24 h-12 sm:h-13 rounded-lg object-cover bg-gray-100 border border-gray-200/80 shrink-0"
-                              />
+                              <div className="relative w-24 sm:w-36 md:w-[180px] lg:w-[220px] aspect-[16/9] rounded-lg overflow-hidden bg-gray-100 border border-gray-200/80 shrink-0">
+                                <Image
+                                  src={
+                                    order.image ||
+                                    order.cover ||
+                                    order.packageID?.cover ||
+                                    order.packageID?.image ||
+                                    order.packageID?.images?.[0] ||
+                                    "/images/dashboard/orders/order_1.jpg"
+                                  }
+                                  alt={order.title || "Order deliverable"}
+                                  fill
+                                  sizes="(max-width: 640px) 96px, (max-width: 1024px) 180px, 220px"
+                                  className="object-cover"
+                                  unoptimized
+                                />
+                              </div>
                               <div className="flex flex-col gap-1 min-w-0">
                                 <span className="text-xs sm:text-[13px] font-normal text-gray-800 line-clamp-2 leading-snug">
                                   {order.title || "Custom Deliverable"}

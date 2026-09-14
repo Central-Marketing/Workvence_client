@@ -9,79 +9,7 @@ import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 import { FiHome, FiCalendar, FiSearch } from "react-icons/fi";
 
-// Mock fallback orders strictly matching the user's reference mockup image
-const MOCK_MANAGE_ORDERS_IMAGE = [
-  {
-    _id: "mock-mo-1",
-    buyer: {
-      name: "Leah Martinez",
-      role: "Owner",
-      avatar: "/images/dashboard/orders/buyer_avatar_mock.png",
-      verified: false,
-    },
-    projectTitle: "Full Stack Web Development",
-    projectDescription: "I will create a stunning portfolio website using Elementor.",
-    orderIdText: "ORD_1827129182",
-    price: 200,
-    status: "revision",
-  },
-  {
-    _id: "mock-mo-2",
-    buyer: {
-      name: "Omar Singh",
-      role: "Agency Owner",
-      avatar: "/images/dashboard/orders/buyer_avatar_mock.png",
-      verified: false,
-    },
-    projectTitle: "Mobile App Design",
-    projectDescription: "Crafting intuitive and engaging UI for Android and iOS apps.",
-    orderIdText: "Dec 16",
-    price: 110,
-    status: "inprogress",
-  },
-  {
-    _id: "mock-mo-3",
-    buyer: {
-      name: "Jasmine Lee",
-      role: "Solo Maker",
-      avatar: "/images/dashboard/orders/buyer_avatar_mock.png",
-      verified: false,
-    },
-    projectTitle: "SEO Optimization",
-    projectDescription: "Boost your website's visibility with expert on-page and off-page SEO strategies.",
-    orderIdText: "Dec 21",
-    price: 500,
-    status: "delivered",
-  },
-  {
-    _id: "mock-mo-4",
-    buyer: {
-      name: "Marcus Bell",
-      role: "--",
-      avatar: "/images/dashboard/orders/buyer_avatar_mock.png",
-      verified: true,
-    },
-    projectTitle: "E-commerce Solutions",
-    projectDescription: "Developing secure and scalable online stores with seamless user experience.",
-    orderIdText: "Dec 20",
-    price: 300,
-    status: "failed",
-  },
-  {
-    _id: "mock-mo-5",
-    buyer: {
-      name: "Sofia Russo",
-      role: "--",
-      avatar: "/images/dashboard/orders/buyer_avatar_mock.png",
-      verified: false,
-    },
-    projectTitle: "Content Strategy",
-    projectDescription: "Creating compelling content plans to drive traffic and increase user engagement.",
-    orderIdText: "Dec 22",
-    price: 80,
-    status: "pending",
-  },
-];
+
 
 type FilterTab = "priority" | "active" | "late" | "delivered" | "completed" | "cancelled" | "starred";
 
@@ -137,24 +65,30 @@ const ManageOrders = () => {
   };
 
   // Helper for status badge style matching the mockup
-  const getStatusBadge = (status?: string) => {
-    const st = (status || "inprogress").toLowerCase();
-    if (st === "completed") {
+  const getStatusBadge = (status?: string, isCompleted?: boolean) => {
+    if (isCompleted || status === "completed") {
       return {
         label: "Completed",
         style: "bg-[#D1FAE5] text-[#059669]",
       };
     }
+    const st = (status || "inprogress").toLowerCase();
     if (st === "delivered") {
       return {
         label: "Delivered",
         style: "bg-[#D1FAE5] text-[#059669]",
       };
     }
-    if (st === "revision") {
+    if (st === "revision" || st === "in_revision") {
       return {
         label: "Revision",
         style: "bg-[#F3E8FF] text-[#9333EA]",
+      };
+    }
+    if (st === "late") {
+      return {
+        label: "Late",
+        style: "bg-[#FEE2E2] text-[#DC2626]",
       };
     }
     if (st === "failed" || st === "cancelled") {
@@ -175,23 +109,33 @@ const ManageOrders = () => {
     };
   };
 
-  // Build normalized list from real backend orders or use fallback mock data if empty
-  const ordersList = sellerOrders.length > 0 ? sellerOrders : MOCK_MANAGE_ORDERS_IMAGE;
+  // Real backend orders for seller
+  const ordersList = sellerOrders;
 
   // Filter orders by active tab
   const tabFilteredOrders = ordersList.filter((item: any) => {
+    const isCompleted = item.status === "completed" || item.isCompleted === true;
     const st = (item.status || "inprogress").toLowerCase();
     if (activeTab === "priority") return true;
     if (activeTab === "active") {
-      return st === "paid" || st === "in_progress" || st === "inprogress" || !item.status;
+      if (isCompleted) return false;
+      if (st === "cancelled" || st === "failed") return false;
+      return (
+        item.isCompleted === false ||
+        st === "paid" ||
+        st === "in_progress" ||
+        st === "inprogress" ||
+        st === "delivered" ||
+        st === "in_revision" ||
+        st === "revision" ||
+        st === "pending" ||
+        st === "late" ||
+        !item.status
+      );
     }
-    if (activeTab === "late") {
-      if (!item.deadline) return false;
-      const isPast = new Date(item.deadline).getTime() < Date.now();
-      return isPast && st !== "completed" && st !== "cancelled";
-    }
+    if (activeTab === "late") return st === "late";
     if (activeTab === "delivered") return st === "delivered";
-    if (activeTab === "completed") return st === "completed";
+    if (activeTab === "completed") return isCompleted;
     if (activeTab === "cancelled") return st === "cancelled" || st === "failed";
     if (activeTab === "starred") return Boolean(item.starred);
     return true;
@@ -277,11 +221,10 @@ const ManageOrders = () => {
                       key={tab.id}
                       type="button"
                       onClick={() => setActiveTab(tab.id)}
-                      className={`px-4 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                        isActive
+                      className={`px-4 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${isActive
                           ? "bg-[#0B3A33] text-white shadow-2xs"
                           : "text-gray-600 hover:text-gray-900"
-                      }`}
+                        }`}
                     >
                       {tab.label}
                     </button>
@@ -348,7 +291,7 @@ const ManageOrders = () => {
                       const buyerAvatar =
                         order.buyer?.avatar ||
                         order.buyerID?.image ||
-                        "/images/dashboard/orders/buyer_avatar_mock.png";
+                        "/media/noavatar.png";
                       const isVerified = Boolean(
                         order.buyer?.verified ||
                         order.buyerID?.isVerified ||
@@ -369,30 +312,28 @@ const ManageOrders = () => {
                         "";
 
                       // Extract Order ID or Due Date text
-                      let orderIdDisplay = order.orderIdText;
+                      let orderIdDisplay = order.orderNumber || order.code || order.orderIdText;
                       if (!orderIdDisplay) {
                         if (order.deadline) {
                           orderIdDisplay = new Date(order.deadline).toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
                           });
-                        } else if (order._id && !order._id.startsWith("mock-")) {
-                          orderIdDisplay = `ORD_${order._id.slice(-10).toUpperCase()}`;
+                        } else if (order._id) {
+                          orderIdDisplay = `ORD_${order._id.slice(-8).toUpperCase()}`;
                         } else {
-                          orderIdDisplay = "ORD_1827129182";
+                          orderIdDisplay = "-";
                         }
                       }
 
                       // Status pill styling
-                      const statusBadge = getStatusBadge(order.status);
+                      const statusBadge = getStatusBadge(order.status, order.isCompleted);
 
                       return (
                         <tr
                           key={order._id}
                           onClick={() => {
-                            if (!order._id.startsWith("mock-")) {
-                              router.push(`/orders/${order._id}`);
-                            }
+                            router.push(`/orders/${order._id}`);
                           }}
                           className="hover:bg-slate-50/70 cursor-pointer transition-colors"
                         >

@@ -29,7 +29,14 @@ const SELLER_ROUTES = [
   "/suspended-seller",
 ];
 
-// 4. Authenticated routes accessible by both Buyers and Sellers
+// 4. Buyer-only routes (sellers should be redirected to seller manage-orders)
+const BUYER_ROUTES = [
+  "/orders",
+  "/orders/manage",
+  "/orders/manage-orders",
+];
+
+// 5. Authenticated routes accessible by both Buyers and Sellers
 const GENERAL_PROTECTED_ROUTES = [
   "/dashboard",
   "/profile",
@@ -127,13 +134,14 @@ export async function proxy(req: NextRequest) {
   const isSellerRoute = SELLER_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
+  const isBuyerRoute = BUYER_ROUTES.includes(pathname);
   const isGeneralProtectedRoute =
     GENERAL_PROTECTED_ROUTES.some(
       (route) => pathname === route || pathname.startsWith(`${route}/`)
     ) ||
     (pathname.startsWith("/briefs/") && pathname.endsWith("/proposals"));
 
-  const isAnyProtectedRoute = isAdminRoute || isSellerRoute || isGeneralProtectedRoute;
+  const isAnyProtectedRoute = isAdminRoute || isSellerRoute || isBuyerRoute || isGeneralProtectedRoute;
 
   // -------------------------------------------------------------
   // RULE A: Redirect Logged-In Users away from Guest Auth Pages
@@ -180,7 +188,14 @@ export async function proxy(req: NextRequest) {
   }
 
   // -------------------------------------------------------------
-  // RULE E: Allow Request to Proceed
+  // RULE E: Protect Buyer Routes (Redirect Sellers to /manage-orders)
+  // -------------------------------------------------------------
+  if (isBuyerRoute && isSeller && !isAdmin) {
+    return NextResponse.redirect(new URL("/manage-orders", req.url));
+  }
+
+  // -------------------------------------------------------------
+  // RULE F: Allow Request to Proceed
   // -------------------------------------------------------------
   return NextResponse.next();
 }

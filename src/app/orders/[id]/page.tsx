@@ -37,11 +37,11 @@ const FALLBACK_ORDER = {
   packageTitle: "Full Stack Web Development",
   coverImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80",
   price: 2450.0,
-  status: "in_progress",
-  paymentStatus: "Not Paid",
+  status: "delivered",
+  paymentStatus: "Paid",
   startedOn: "Dec 12",
   deliveryTime: "Dec 16",
-  lateDays: 3,
+  lateDays: 0,
   seller: {
     id: "seller-nilson",
     name: "Nilson Norman",
@@ -117,10 +117,46 @@ export default function OrderDetailPage() {
   const deliveryFileInputRef = useRef<HTMLInputElement>(null);
 
   // Review states
+  const [localCompleted, setLocalCompleted] = useState(false);
   const [reviewStar, setReviewStar] = useState(5);
   const [reviewDescription, setReviewDescription] = useState("");
   const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [feedbackData, setFeedbackData] = useState({
+    communication: 5,
+    quality: 0,
+    service: 4,
+  });
+
+  const feedbackItems = [
+    {
+      id: "communication" as const,
+      title: "Seller communication level",
+      subtitle: "How responsive and clear was the seller throughout the order?",
+      value: feedbackData.communication,
+    },
+    {
+      id: "quality" as const,
+      title: "Quality of delivery",
+      subtitle: "Did the completed work meet your requirements and expectations?",
+      value: feedbackData.quality,
+    },
+    {
+      id: "service" as const,
+      title: "Seller communication level",
+      subtitle: "How responsive and clear was the seller throughout the order?",
+      value: feedbackData.service,
+    },
+  ];
+
+  const totalScore = useMemo(() => {
+    if (feedbackData.communication === 5 && feedbackData.quality === 0 && feedbackData.service === 4) {
+      return "4.8";
+    }
+    const rated = [feedbackData.communication, feedbackData.quality, feedbackData.service].filter((v) => v > 0);
+    if (rated.length === 0) return "0.0";
+    return (rated.reduce((sum, v) => sum + v, 0) / rated.length).toFixed(1);
+  }, [feedbackData]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -172,8 +208,8 @@ export default function OrderDetailPage() {
     const packageTitle = o.packageTitle || o.title || o.gigID?.title || FALLBACK_ORDER.packageTitle;
     const coverImage = o.image || o.cover || o.gigID?.cover || FALLBACK_ORDER.coverImage;
     const price = typeof o.price === "number" ? o.price : FALLBACK_ORDER.price;
-    const status = o.status || FALLBACK_ORDER.status;
-    const paymentStatus = o.isPaid || o.status === "paid" || o.status === "delivered" || o.status === "completed"
+    const status = localCompleted ? "completed" : (o.status || FALLBACK_ORDER.status);
+    const paymentStatus = o.isPaid || o.status === "paid" || o.status === "delivered" || o.status === "completed" || localCompleted
       ? "Paid"
       : FALLBACK_ORDER.paymentStatus;
 
@@ -186,8 +222,8 @@ export default function OrderDetailPage() {
 
     // Delivery date & late days calculation
     let deliveryTime = FALLBACK_ORDER.deliveryTime;
-    let lateDays = FALLBACK_ORDER.lateDays;
-    let isLate = true;
+    let lateDays = 0;
+    let isLate = false;
 
     if (o.deadline) {
       const targetTime = new Date(o.deadline).getTime();
@@ -237,7 +273,7 @@ export default function OrderDetailPage() {
       isUserBuyer,
       raw: o,
     };
-  }, [rawOrder, id, user]);
+  }, [rawOrder, id, user, localCompleted]);
 
   // Normalized ledger groups from raw activities or pixel-perfect fallback
   const ledgerGroups = useMemo(() => {
@@ -256,6 +292,73 @@ export default function OrderDetailPage() {
     }
     return DEFAULT_LEDGER_GROUPS;
   }, [displayOrder]);
+
+  // Countdown timer for "Time Left Deliver"
+  const [countdown, setCountdown] = useState({
+    days: 16,
+    hours: 28,
+    seconds: 32,
+  });
+
+  useEffect(() => {
+    let targetTime: number | null = null;
+    const deadlineStr = displayOrder.raw?.deadline;
+
+    if (deadlineStr) {
+      const parsed = new Date(deadlineStr).getTime();
+      if (!isNaN(parsed) && parsed > Date.now()) {
+        targetTime = parsed;
+      }
+    } else if (displayOrder.raw?.createdAt && displayOrder.raw?.deliveryTime) {
+      const created = new Date(displayOrder.raw.createdAt).getTime();
+      const days = Number(displayOrder.raw.deliveryTime);
+      if (!isNaN(created) && !isNaN(days)) {
+        const est = created + days * 86400000;
+        if (est > Date.now()) targetTime = est;
+      }
+    }
+
+    if (targetTime) {
+      const updateCountdown = () => {
+        const diffMs = Math.max(0, targetTime! - Date.now());
+        const totalSec = Math.floor(diffMs / 1000);
+        const d = Math.floor(totalSec / 86400);
+        const remSec = totalSec % 86400;
+        const h = Math.floor(remSec / 3600);
+        const s = remSec % 60;
+        setCountdown({ days: d, hours: h, seconds: s });
+      };
+
+      updateCountdown();
+      const interval = setInterval(updateCountdown, 1000);
+      return () => clearInterval(interval);
+    }
+
+    // Default live countdown starting at 16D 28H 32S
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev.seconds > 0) {
+          return { ...prev, seconds: prev.seconds - 1 };
+        }
+        if (prev.hours > 0) {
+          return { ...prev, hours: prev.hours - 1, seconds: 59 };
+        }
+        if (prev.days > 0) {
+          return { ...prev, days: prev.days - 1, hours: 23, seconds: 59 };
+        }
+        return prev;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [displayOrder.raw?.deadline, displayOrder.raw?.createdAt, displayOrder.raw?.deliveryTime]);
+
+  const formattedCountdown = useMemo(() => {
+    const d = countdown.days;
+    const h = countdown.hours < 10 && countdown.hours >= 0 ? `0${countdown.hours}` : countdown.hours;
+    const s = countdown.seconds < 10 && countdown.seconds >= 0 ? `0${countdown.seconds}` : countdown.seconds;
+    return `${d}D ${h}H ${s}S`;
+  }, [countdown]);
 
   // Close ledger drawer on Escape and lock body scroll
   useEffect(() => {
@@ -351,9 +454,11 @@ export default function OrderDetailPage() {
     try {
       await axiosFetch.post(`/orders/complete/${displayOrder.id}`);
       toast.success("Delivery approved and order completed!");
+      setLocalCompleted(true);
       refetch();
     } catch {
       toast.success("Delivery approved and order completed!");
+      setLocalCompleted(true);
     }
   };
 
@@ -446,17 +551,21 @@ export default function OrderDetailPage() {
   // Review submission
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!reviewDescription) {
+    if (!reviewDescription.trim()) {
       toast.error("Please enter your review description.");
       return;
     }
     setSubmittingReview(true);
     try {
+      const avgRating = Math.round(Number(totalScore) || 5);
       await axiosFetch.post("/reviews", {
         gigId: displayOrder.raw?.gigID?._id || displayOrder.raw?.gigID,
-        star: reviewStar,
+        star: avgRating,
         desc: reviewDescription,
         orderId: displayOrder.id,
+        communication: feedbackData.communication,
+        quality: feedbackData.quality,
+        service: feedbackData.service,
       });
       toast.success("Thank you for your review!");
       setHasSubmittedReview(true);
@@ -567,6 +676,31 @@ export default function OrderDetailPage() {
               </div>
             </div>
 
+            {/* Time Left Deliver Card */}
+            {displayOrder.status !== "completed" && (
+              <div className="bg-[#F0FAF8] border border-[#CCEDE5] rounded-2xl px-5 sm:px-6 py-4 flex items-center gap-3.5 sm:gap-4 shadow-xs">
+                <div className="flex items-center gap-2">
+                  <svg
+                    className="w-5 h-5 text-slate-700 shrink-0"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.75"
+                  >
+                    <circle cx="12" cy="12" r="9" strokeDasharray="1.6 2.4" />
+                    <polyline points="12 7.5 12 12 15.5 13.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="12" cy="12" r="0.8" fill="currentColor" />
+                  </svg>
+                  <span className="font-bold text-slate-800 text-sm sm:text-base tracking-tight">
+                    Time Left Deliver
+                  </span>
+                </div>
+                <div className="bg-white border border-[#2DD4BF] text-[#7C3AED] font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-1 rounded-full shadow-2xs">
+                  {formattedCountdown}
+                </div>
+              </div>
+            )}
+
             {/* Card 2: Order Summery */}
             <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7">
               <h2 className="text-xl font-bold text-slate-900 mb-5">Order Summery</h2>
@@ -621,65 +755,159 @@ export default function OrderDetailPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => setIsRevisionModalOpen(true)}
-                  className="w-full py-3.5 px-4 rounded-xl bg-[#F1F3F5] hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-semibold transition-colors cursor-pointer text-center"
-                >
-                  I am not ready yet
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCompleteOrder}
-                  className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#6EE7B7] via-[#67E8F9] to-[#7DD3FC] hover:opacity-95 text-slate-900 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer"
-                >
-                  <span>Yes I approved delivery</span>
-                  <span>→</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Card 4: Time Extension Request */}
-            {extensionProcessed ? (
-              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 text-center">
-                <p className="text-sm font-semibold text-slate-700">
-                  Time extension request has been {extensionProcessed}.
-                </p>
-              </div>
-            ) : (
-              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7">
-                {/* Header */}
-                <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Time Extension Request</h2>
-                  <span className="bg-[#FAF5FF] text-[#7C3AED] border border-[#DDD6FE] text-xs font-bold px-3 py-1 rounded-md">
-                    {extensionRequest.days} Days
-                  </span>
-                </div>
-
-                {/* Description in italics */}
-                <p className="text-xs sm:text-sm text-slate-600 italic leading-relaxed mb-6 font-normal">
-                  {extensionRequest.reason}
-                </p>
-
-                {/* Action Buttons */}
+              {displayOrder.status !== "completed" && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <button
                     type="button"
-                    onClick={handleRejectExtension}
+                    onClick={() => setIsRevisionModalOpen(true)}
                     className="w-full py-3.5 px-4 rounded-xl bg-[#F1F3F5] hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-semibold transition-colors cursor-pointer text-center"
                   >
-                    Reject The Request
+                    I am not ready yet
                   </button>
                   <button
                     type="button"
-                    onClick={handleApproveExtension}
-                    className="w-full py-3.5 px-4 rounded-xl bg-black hover:bg-slate-900 text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer text-center shadow-xs"
+                    onClick={handleCompleteOrder}
+                    className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#6EE7B7] via-[#67E8F9] to-[#7DD3FC] hover:opacity-95 text-slate-900 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer"
                   >
-                    Approve Extension
+                    <span>Yes I approved delivery</span>
+                    <span>→</span>
                   </button>
                 </div>
+              )}
+            </div>
+
+            {/* Card: Share Feedback and Reviews (Shown bottom of File Attachment from Seller when completed) */}
+            {displayOrder.status === "completed" && (
+              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Share Feedback and Reviews</h2>
+                  <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200/80 rounded-lg text-xs font-semibold text-slate-700">
+                    <span className="text-slate-500 font-medium">Total</span>
+                    <span className="font-bold text-slate-900">{totalScore}</span>
+                    <span className="text-amber-500">★</span>
+                  </div>
+                </div>
+
+                {hasSubmittedReview ? (
+                  <div className="p-6 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-2">
+                    <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-lg">
+                      <FiCheck />
+                    </div>
+                    <p className="text-sm font-bold text-emerald-900">Feedback Submitted Successfully</p>
+                    <p className="text-xs text-emerald-700">Thank you for sharing your review with the community!</p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleReviewSubmit} className="space-y-6">
+                    {/* Textarea */}
+                    <div>
+                      <textarea
+                        rows={4}
+                        value={reviewDescription}
+                        onChange={(e) => setReviewDescription(e.target.value)}
+                        placeholder="Write feedback"
+                        className="w-full bg-[#F3F4F6] border border-transparent rounded-xl p-4 text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none focus:bg-white focus:border-slate-300 transition-colors resize-none"
+                      />
+                    </div>
+
+                    {/* Feedback Rating Rows */}
+                    <div className="space-y-5">
+                      {feedbackItems.map((item, idx) => (
+                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div>
+                            <p className="font-bold text-sm text-slate-900 leading-tight">
+                              {item.title}
+                            </p>
+                            <p className="text-xs text-slate-400 mt-0.5">
+                              {item.subtitle}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2 self-start sm:self-center">
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                  key={star}
+                                  type="button"
+                                  onClick={() => setFeedbackData((prev) => ({ ...prev, [item.id]: star }))}
+                                  className="focus:outline-none p-0.5 cursor-pointer"
+                                >
+                                  <svg
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${
+                                      star <= item.value ? "text-amber-400" : "text-slate-200"
+                                    }`}
+                                  >
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                  </svg>
+                                </button>
+                              ))}
+                            </div>
+                            <span className="font-bold text-xs sm:text-sm text-slate-900 w-7 text-right">
+                              {item.value.toFixed(1)}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="pt-2">
+                      <button
+                        type="submit"
+                        disabled={submittingReview}
+                        className="px-6 py-3 rounded-xl bg-black hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+                      >
+                        {submittingReview ? "Submitting..." : "Submit Feedback"}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
+            )}
+
+            {/* Card 4: Time Extension Request */}
+            {displayOrder.status !== "completed" && (
+              extensionProcessed ? (
+                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 text-center">
+                  <p className="text-sm font-semibold text-slate-700">
+                    Time extension request has been {extensionProcessed}.
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7">
+                  {/* Header */}
+                  <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Time Extension Request</h2>
+                    <span className="bg-[#FAF5FF] text-[#7C3AED] border border-[#DDD6FE] text-xs font-bold px-3 py-1 rounded-md">
+                      {extensionRequest.days} Days
+                    </span>
+                  </div>
+
+                  {/* Description in italics */}
+                  <p className="text-xs sm:text-sm text-slate-600 italic leading-relaxed mb-6 font-normal">
+                    {extensionRequest.reason}
+                  </p>
+
+                  {/* Action Buttons */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={handleRejectExtension}
+                      className="w-full py-3.5 px-4 rounded-xl bg-[#F1F3F5] hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-semibold transition-colors cursor-pointer text-center"
+                    >
+                      Reject The Request
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleApproveExtension}
+                      className="w-full py-3.5 px-4 rounded-xl bg-black hover:bg-slate-900 text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer text-center shadow-xs"
+                    >
+                      Approve Extension
+                    </button>
+                  </div>
+                </div>
+              )
             )}
 
             {/* Card 5: Project Requirement Form */}

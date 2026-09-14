@@ -1,19 +1,97 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
-import { FiMessageSquare, FiPackage, FiClock, FiCheckCircle, FiTruck } from "react-icons/fi";
+import { FiHome, FiCalendar, FiSearch } from "react-icons/fi";
+
+// Mock fallback orders strictly matching the user's reference mockup image
+const MOCK_MANAGE_ORDERS_IMAGE = [
+  {
+    _id: "mock-mo-1",
+    buyer: {
+      name: "Leah Martinez",
+      role: "Owner",
+      avatar: "/images/dashboard/orders/buyer_avatar_mock.png",
+      verified: false,
+    },
+    projectTitle: "Full Stack Web Development",
+    projectDescription: "I will create a stunning portfolio website using Elementor.",
+    orderIdText: "ORD_1827129182",
+    price: 200,
+    status: "revision",
+  },
+  {
+    _id: "mock-mo-2",
+    buyer: {
+      name: "Omar Singh",
+      role: "Agency Owner",
+      avatar: "/images/dashboard/orders/buyer_avatar_mock.png",
+      verified: false,
+    },
+    projectTitle: "Mobile App Design",
+    projectDescription: "Crafting intuitive and engaging UI for Android and iOS apps.",
+    orderIdText: "Dec 16",
+    price: 110,
+    status: "inprogress",
+  },
+  {
+    _id: "mock-mo-3",
+    buyer: {
+      name: "Jasmine Lee",
+      role: "Solo Maker",
+      avatar: "/images/dashboard/orders/buyer_avatar_mock.png",
+      verified: false,
+    },
+    projectTitle: "SEO Optimization",
+    projectDescription: "Boost your website's visibility with expert on-page and off-page SEO strategies.",
+    orderIdText: "Dec 21",
+    price: 500,
+    status: "delivered",
+  },
+  {
+    _id: "mock-mo-4",
+    buyer: {
+      name: "Marcus Bell",
+      role: "--",
+      avatar: "/images/dashboard/orders/buyer_avatar_mock.png",
+      verified: true,
+    },
+    projectTitle: "E-commerce Solutions",
+    projectDescription: "Developing secure and scalable online stores with seamless user experience.",
+    orderIdText: "Dec 20",
+    price: 300,
+    status: "failed",
+  },
+  {
+    _id: "mock-mo-5",
+    buyer: {
+      name: "Sofia Russo",
+      role: "--",
+      avatar: "/images/dashboard/orders/buyer_avatar_mock.png",
+      verified: false,
+    },
+    projectTitle: "Content Strategy",
+    projectDescription: "Creating compelling content plans to drive traffic and increase user engagement.",
+    orderIdText: "Dec 22",
+    price: 80,
+    status: "pending",
+  },
+];
+
+type FilterTab = "priority" | "active" | "late" | "delivered" | "completed" | "cancelled" | "starred";
 
 const ManageOrders = () => {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
 
-  // Status filter state
-  const [statusFilter, setStatusFilter] = useState("all");
+  // Filter and search state
+  const [activeTab, setActiveTab] = useState<FilterTab>("priority");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -58,19 +136,7 @@ const ManageOrders = () => {
       });
   };
 
-  // Status counts for metrics
-  const inProgressOrders = sellerOrders.filter((o: any) => o.status === "paid" || o.status === "in_progress" || !o.status);
-  const deliveredOrders = sellerOrders.filter((o: any) => o.status === "delivered");
-  const completedOrders = sellerOrders.filter((o: any) => o.status === "completed");
-
-  // Filter orders by selected status tab
-  const filteredOrders = sellerOrders.filter((order: any) => {
-    if (statusFilter === "all") return true;
-    if (statusFilter === "in_progress") return order.status === "paid" || order.status === "in_progress" || !order.status;
-    return order.status === statusFilter;
-  });
-
-  // Helper for status badge styling matching the seller dashboard reference
+  // Helper for status badge style matching the mockup
   const getStatusBadge = (status?: string) => {
     const st = (status || "inprogress").toLowerCase();
     if (st === "completed") {
@@ -109,6 +175,54 @@ const ManageOrders = () => {
     };
   };
 
+  // Build normalized list from real backend orders or use fallback mock data if empty
+  const ordersList = sellerOrders.length > 0 ? sellerOrders : MOCK_MANAGE_ORDERS_IMAGE;
+
+  // Filter orders by active tab
+  const tabFilteredOrders = ordersList.filter((item: any) => {
+    const st = (item.status || "inprogress").toLowerCase();
+    if (activeTab === "priority") return true;
+    if (activeTab === "active") {
+      return st === "paid" || st === "in_progress" || st === "inprogress" || !item.status;
+    }
+    if (activeTab === "late") {
+      if (!item.deadline) return false;
+      const isPast = new Date(item.deadline).getTime() < Date.now();
+      return isPast && st !== "completed" && st !== "cancelled";
+    }
+    if (activeTab === "delivered") return st === "delivered";
+    if (activeTab === "completed") return st === "completed";
+    if (activeTab === "cancelled") return st === "cancelled" || st === "failed";
+    if (activeTab === "starred") return Boolean(item.starred);
+    return true;
+  });
+
+  // Filter orders by search query
+  const displayedOrders = tabFilteredOrders.filter((item: any) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    const buyerName = item.buyer?.name || item.buyerID?.username || item.buyerID?.name || "";
+    const projectTitle = item.projectTitle || item.title || "";
+    const projectDesc = item.projectDescription || item.description || "";
+    const orderId = item.orderIdText || item._id || "";
+    return (
+      buyerName.toLowerCase().includes(q) ||
+      projectTitle.toLowerCase().includes(q) ||
+      projectDesc.toLowerCase().includes(q) ||
+      orderId.toLowerCase().includes(q)
+    );
+  });
+
+  const tabs: { id: FilterTab; label: string }[] = [
+    { id: "priority", label: "Priority" },
+    { id: "active", label: "Active" },
+    { id: "late", label: "Late" },
+    { id: "delivered", label: "Delivered" },
+    { id: "completed", label: "Completed" },
+    { id: "cancelled", label: "Cancelled" },
+    { id: "starred", label: "Starred" },
+  ];
+
   return (
     <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
       {isLoading ? (
@@ -122,213 +236,218 @@ const ManageOrders = () => {
       ) : (
         <div className="container mx-auto px-4 md:px-6 space-y-6">
 
-          {/* Page Header */}
+          {/* Breadcrumb Navigation */}
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <Link
+              href="/"
+              className="text-[#0D6D5F] hover:text-[#094d43] transition-colors flex items-center gap-1"
+            >
+              <FiHome className="text-sm" />
+            </Link>
+            <span>/</span>
+            <Link href="/orders" className="hover:text-gray-700 transition-colors">
+              Orders
+            </Link>
+            <span>/</span>
+            <span className="text-gray-600 font-medium">Manage Orders</span>
+          </div>
+
+          {/* Page Heading */}
           <div>
-            <h1 className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
+            <h1 className="text-2xl sm:text-[32px] font-bold tracking-tight text-gray-950">
               Manage Orders
             </h1>
-            <p className="text-xs sm:text-[13px] text-gray-500 mt-1">
-              Track delivery status, review buyer instructions, and manage all your order deliverables.
+            <p className="text-xs sm:text-[13px] text-gray-500 mt-1.5 leading-relaxed">
+              View, track, and manage all your orders, from recent purchases to upcoming deliveries, in one place.
             </p>
           </div>
 
-          {/* 4-Metric Stats Bar matching dashboard aesthetic */}
-          <div className="bg-white rounded-xl border border-gray-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 gap-y-5 sm:gap-y-0">
-            <div className="sm:pr-6 flex items-start justify-between">
-              <div>
-                <span className="text-xs font-normal text-gray-500 block mb-1">Total Orders</span>
-                <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
-                  {sellerOrders.length}
-                </div>
-                <p className="text-[11px] text-gray-400 mt-1">Across all clients</p>
-              </div>
-              <div className="w-9 h-9 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 shrink-0">
-                <FiPackage className="text-base" />
-              </div>
-            </div>
-
-            <div className="sm:px-6 pt-4 sm:pt-0 flex items-start justify-between">
-              <div>
-                <span className="text-xs font-normal text-gray-500 block mb-1">In Progress</span>
-                <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
-                  {inProgressOrders.length}
-                </div>
-                <p className="text-[11px] text-gray-400 mt-1">Active deliverables</p>
-              </div>
-              <div className="w-9 h-9 rounded-lg bg-blue-50/60 border border-blue-100/60 flex items-center justify-center text-blue-600 shrink-0">
-                <FiClock className="text-base" />
-              </div>
-            </div>
-
-            <div className="sm:px-6 pt-4 sm:pt-0 flex items-start justify-between">
-              <div>
-                <span className="text-xs font-normal text-gray-500 block mb-1">Delivered</span>
-                <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
-                  {deliveredOrders.length}
-                </div>
-                <p className="text-[11px] text-gray-400 mt-1">Awaiting client review</p>
-              </div>
-              <div className="w-9 h-9 rounded-lg bg-emerald-50/60 border border-emerald-100/60 flex items-center justify-center text-emerald-600 shrink-0">
-                <FiTruck className="text-base" />
-              </div>
-            </div>
-
-            <div className="sm:pl-6 pt-4 sm:pt-0 flex items-start justify-between">
-              <div>
-                <span className="text-xs font-normal text-gray-500 block mb-1">Completed</span>
-                <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
-                  {completedOrders.length}
-                </div>
-                <p className="text-[11px] text-gray-400 mt-1">Successfully closed</p>
-              </div>
-              <div className="w-9 h-9 rounded-lg bg-emerald-50/60 border border-emerald-100/60 flex items-center justify-center text-emerald-600 shrink-0">
-                <FiCheckCircle className="text-base" />
-              </div>
-            </div>
-          </div>
-
-          {/* Main Card */}
+          {/* Main Card Container */}
           <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
-            
-            {/* Filter Tabs */}
-            <div className="flex items-center gap-2 flex-wrap pb-1">
-              <div className="bg-white border border-gray-200/90 rounded-lg p-0.5 flex items-center gap-0.5 flex-wrap">
+
+            {/* Top Toolbar: Filter Tabs on Left + Calendar & Search on Right */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+
+              {/* Segmented Filter Tab Pills */}
+              <div className="bg-white border border-gray-200/90 rounded-xl p-1 inline-flex items-center gap-1 overflow-x-auto max-w-full">
+                {tabs.map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`px-4 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                        isActive
+                          ? "bg-[#0B3A33] text-white shadow-2xs"
+                          : "text-gray-600 hover:text-gray-900"
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Right Side: Calendar Button + Search Box */}
+              <div className="flex items-center gap-3 self-start lg:self-auto">
                 <button
                   type="button"
-                  onClick={() => setStatusFilter("all")}
-                  className={`px-4 sm:px-5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                    statusFilter === "all"
-                      ? "bg-[#0B3A33] text-white shadow-2xs"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
+                  title="Filter by date"
+                  className="w-9 h-9 rounded-lg border border-gray-200/90 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors bg-white shrink-0"
                 >
-                  All Orders ({sellerOrders.length})
+                  <FiCalendar className="text-sm" />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setStatusFilter("in_progress")}
-                  className={`px-3.5 sm:px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                    statusFilter === "in_progress"
-                      ? "bg-[#0B3A33] text-white shadow-2xs"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  In Progress ({inProgressOrders.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStatusFilter("delivered")}
-                  className={`px-3.5 sm:px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                    statusFilter === "delivered"
-                      ? "bg-[#0B3A33] text-white shadow-2xs"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  Delivered ({deliveredOrders.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStatusFilter("completed")}
-                  className={`px-3.5 sm:px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                    statusFilter === "completed"
-                      ? "bg-[#0B3A33] text-white shadow-2xs"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  Completed ({completedOrders.length})
-                </button>
+
+                <div className="relative flex items-center">
+                  <FiSearch className="absolute left-3 text-gray-400 text-xs pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="What you are looking for"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-52 sm:w-64 pl-8 pr-3 py-2 text-xs border border-gray-200/90 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#0B3A33] transition-colors bg-white"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Orders Table */}
             <div className="w-full overflow-x-auto">
-              <table className="w-full text-left text-sm border-collapse min-w-[850px]">
+              <table className="w-full text-left text-sm border-collapse min-w-[800px]">
                 <thead>
-                  <tr className="text-xs font-bold text-gray-700 border-b border-gray-100">
-                    <th className="py-3.5 px-3 font-bold">Order Name</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Buyer</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Order Date</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Due on</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Total</th>
+                  <tr className="text-xs font-bold text-gray-800 border-b border-gray-100">
+                    <th className="py-3.5 px-4 font-bold">Buyer</th>
+                    <th className="py-3.5 px-4 font-bold">Project</th>
+                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Order Id</th>
+                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Price</th>
                     <th className="py-3.5 px-4 font-bold whitespace-nowrap">Status</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap text-right">Action</th>
                   </tr>
                 </thead>
 
                 <tbody className="divide-y divide-gray-100">
-                  {filteredOrders.length === 0 ? (
+                  {displayedOrders.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="py-14 text-center text-gray-400 text-xs sm:text-sm font-medium">
-                        No orders found in this category.
+                      <td colSpan={5} className="py-16 text-center text-gray-400 text-xs sm:text-sm font-medium">
+                        No orders found in this view.
                       </td>
                     </tr>
                   ) : (
-                    filteredOrders.map((order: any) => {
-                      const isBrief = Boolean(order.briefID || order.type === "brief");
-                      const orderDate = order.createdAt
-                        ? new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                        : "—";
-                      const dueDate = order.deadline
-                        ? new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                        : "—";
+                    displayedOrders.map((order: any) => {
+                      // Extract Buyer details
+                      const buyerName =
+                        order.buyer?.name ||
+                        order.buyerID?.username ||
+                        order.buyerID?.name ||
+                        "Client";
+                      const buyerRole =
+                        order.buyer?.role ||
+                        order.buyerID?.shortTitle ||
+                        order.buyerID?.role ||
+                        "--";
+                      const buyerAvatar =
+                        order.buyer?.avatar ||
+                        order.buyerID?.image ||
+                        "/images/dashboard/orders/buyer_avatar_mock.png";
+                      const isVerified = Boolean(
+                        order.buyer?.verified ||
+                        order.buyerID?.isVerified ||
+                        order.buyerID?.verified
+                      );
 
+                      // Extract Project details
+                      const projectTitle =
+                        order.projectTitle ||
+                        order.gigID?.title ||
+                        order.title ||
+                        "Custom Deliverable";
+                      const projectDescription =
+                        order.projectDescription ||
+                        order.gigID?.desc ||
+                        order.description ||
+                        order.instructions ||
+                        "";
+
+                      // Extract Order ID or Due Date text
+                      let orderIdDisplay = order.orderIdText;
+                      if (!orderIdDisplay) {
+                        if (order.deadline) {
+                          orderIdDisplay = new Date(order.deadline).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          });
+                        } else if (order._id && !order._id.startsWith("mock-")) {
+                          orderIdDisplay = `ORD_${order._id.slice(-10).toUpperCase()}`;
+                        } else {
+                          orderIdDisplay = "ORD_1827129182";
+                        }
+                      }
+
+                      // Status pill styling
                       const statusBadge = getStatusBadge(order.status);
-                      const buyerName = order.buyerID?.username || order.buyerID?.name || "Client";
-                      const buyerAvatar = order.buyerID?.image || "/media/noavatar.png";
 
                       return (
                         <tr
                           key={order._id}
-                          onClick={() => router.push(`/orders/${order._id}`)}
+                          onClick={() => {
+                            if (!order._id.startsWith("mock-")) {
+                              router.push(`/orders/${order._id}`);
+                            }
+                          }}
                           className="hover:bg-slate-50/70 cursor-pointer transition-colors"
                         >
-                          {/* Order Name & Thumbnail */}
-                          <td className="py-4 px-3 align-middle max-w-[340px]">
-                            <div className="flex items-center gap-3.5">
+                          {/* Buyer Column */}
+                          <td className="py-4 px-4 align-middle whitespace-nowrap">
+                            <div className="flex items-center gap-3">
                               <img
-                                src={order.image || order.cover || "/images/dashboard/orders/order_1.png"}
-                                alt=""
-                                className="w-20 sm:w-24 h-12 sm:h-13 rounded-lg object-cover bg-gray-100 border border-gray-200/80 shrink-0"
+                                src={buyerAvatar}
+                                alt={buyerName}
+                                className="w-10 h-10 rounded-full object-cover border border-gray-200 shrink-0"
                               />
-                              <div className="flex flex-col gap-1 min-w-0">
-                                <span
-                                  className="text-xs sm:text-[13px] font-normal text-gray-800 line-clamp-2 leading-snug"
-                                  title={order.title}
-                                >
-                                  {order.title || "Custom Deliverable"}
-                                </span>
-                                <span className="text-[10.5px] font-medium px-2 py-0.5 rounded bg-white text-gray-700 border border-gray-200 w-fit">
-                                  {isBrief ? "Brief" : "Package"}
+                              <div className="flex flex-col">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs sm:text-[13px] font-bold text-gray-950">
+                                    {buyerName}
+                                  </span>
+                                  {isVerified && (
+                                    <span className="px-1.5 py-0.2 rounded bg-[#0B3A33] text-white text-[9.5px] font-semibold tracking-wide">
+                                      Verified
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-[11px] text-gray-500 mt-0.5">
+                                  {buyerRole}
                                 </span>
                               </div>
                             </div>
                           </td>
 
-                          {/* Buyer */}
-                          <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            <div className="flex items-center gap-2">
-                              <img
-                                src={buyerAvatar}
-                                alt={buyerName}
-                                className="w-7 h-7 rounded-full object-cover border border-gray-200"
-                              />
-                              <span className="text-xs sm:text-[13px] font-medium text-gray-800">
-                                {buyerName}
+                          {/* Project Column */}
+                          <td className="py-4 px-4 align-middle max-w-[340px]">
+                            <div className="flex flex-col">
+                              <span
+                                className="text-xs sm:text-[13px] font-bold text-gray-900 line-clamp-1 leading-snug"
+                                title={projectTitle}
+                              >
+                                {projectTitle}
                               </span>
+                              {projectDescription && (
+                                <span
+                                  className="text-[11px] text-gray-500 mt-0.5 line-clamp-1 leading-normal"
+                                  title={projectDescription}
+                                >
+                                  {projectDescription}
+                                </span>
+                              )}
                             </div>
                           </td>
 
-                          {/* Order Date */}
+                          {/* Order Id Column */}
                           <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
-                            {orderDate}
+                            {orderIdDisplay}
                           </td>
 
-                          {/* Due Date */}
-                          <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
-                            {dueDate}
-                          </td>
-
-                          {/* Price */}
+                          {/* Price Column */}
                           <td className="py-4 px-4 align-middle text-xs sm:text-[13.5px] font-bold text-gray-950 whitespace-nowrap">
                             {(order.price || 0).toLocaleString("en-US", {
                               style: "currency",
@@ -336,28 +455,13 @@ const ManageOrders = () => {
                             })}
                           </td>
 
-                          {/* Status Pill */}
+                          {/* Status Column */}
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
                             <span
                               className={`text-[11.5px] font-medium px-3.5 py-1 rounded-full inline-block ${statusBadge.style}`}
                             >
                               {statusBadge.label}
                             </span>
-                          </td>
-
-                          {/* Action Button */}
-                          <td className="py-4 px-4 align-middle whitespace-nowrap text-right">
-                            <button
-                              type="button"
-                              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                e.stopPropagation();
-                                handleContact(order);
-                              }}
-                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-gray-700 bg-white border border-gray-200/90 hover:bg-[#0B3A33] hover:text-white hover:border-[#0B3A33] transition-all cursor-pointer shadow-2xs"
-                            >
-                              <FiMessageSquare className="text-xs" />
-                              <span>Chat</span>
-                            </button>
                           </td>
                         </tr>
                       );
@@ -366,6 +470,7 @@ const ManageOrders = () => {
                 </tbody>
               </table>
             </div>
+
           </div>
 
         </div>

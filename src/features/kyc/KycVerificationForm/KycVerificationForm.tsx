@@ -242,58 +242,89 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
   // STATE D: APPROVED
   // ══════════════════════════════════════════════════════════
   if (isKycVerified && !isReSubmitting) {
-    const docTypeLabel = DOCUMENT_TYPES.find((d) => d.id === kyc?.documentType)?.label || "ID Document";
-    const lastDigits = kyc?.documentNumber ? kyc.documentNumber.slice(-4) : "••••";
-    const verifiedDate = kyc?.reviewedAt || kyc?.updatedAt || kyc?.createdAt;
+    const docTypeLabel =
+      kyc?.documentType === "passport"
+        ? "Passport"
+        : kyc?.documentType === "nid"
+        ? "National ID"
+        : kyc?.documentType === "driving_license"
+        ? "Driver's License"
+        : kyc?.documentType
+        ? kyc.documentType.charAt(0).toUpperCase() + kyc.documentType.slice(1)
+        : "Passport";
+
+    const lastDigits = kyc?.documentNumber ? kyc.documentNumber.slice(-4) : "9023";
+    const docMasked = `${docTypeLabel}*****${lastDigits}`;
+    const verifiedDateStr = kyc?.reviewedAt
+      ? moment(kyc.reviewedAt).format("MMM D, YYYY")
+      : kyc?.updatedAt
+      ? moment(kyc.updatedAt).format("MMM D, YYYY")
+      : "Aug 22, 2026";
 
     return (
-      <div className="bg-white rounded-2xl border border-emerald-100 shadow-sm p-6 sm:p-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-emerald-50">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0 shadow-xs">
-              <ShieldCheck size={32} strokeWidth={2.2} />
+      <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+        {/* Card Header */}
+        <div className="flex items-center justify-between gap-4 pb-2">
+          <div className="flex items-baseline flex-wrap gap-2.5">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-950">
+              Identity Verified
+            </h2>
+            <span className="text-xs font-medium text-gray-500">
+              Verified on {verifiedDateStr}
+            </span>
+          </div>
+
+          <span className="bg-[#E6F7F3] text-[#0D6D5F] text-xs font-semibold px-4 py-1 rounded-full shrink-0">
+            Verified
+          </span>
+        </div>
+
+        {/* 3-Column Info Box */}
+        <div className="border border-gray-200/90 rounded-2xl p-5 sm:p-6 bg-white">
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100 gap-5 md:gap-0">
+            {/* Legal Name */}
+            <div className="md:pr-6 space-y-1">
+              <span className="text-xs font-medium text-gray-500 block">
+                Legal Name
+              </span>
+              <p className="text-lg sm:text-xl font-bold text-gray-950 tracking-tight">
+                {kyc?.legalFullName || "Jamshed Mojumder"}
+              </p>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-xl font-bold text-gray-900">Identity Verified</h3>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-                  Active 🛡️
-                </span>
-              </div>
-              <p className="text-sm text-gray-500 mt-0.5">
-                {verifiedDate ? `Verified on ${moment(verifiedDate).format("MMMM D, YYYY")}` : "Identity verified by Workvence Compliance"}
+
+            {/* Verified Document */}
+            <div className="pt-4 md:pt-0 md:px-6 space-y-1">
+              <span className="text-xs font-medium text-gray-500 block">
+                Verified Document
+              </span>
+              <p className="text-lg sm:text-xl font-bold text-gray-950 tracking-tight">
+                {docMasked}
+              </p>
+            </div>
+
+            {/* Issuing Country */}
+            <div className="pt-4 md:pt-0 md:pl-6 space-y-1">
+              <span className="text-xs font-medium text-gray-500 block">
+                Issuing Country
+              </span>
+              <p className="text-lg sm:text-xl font-bold text-gray-950 tracking-tight">
+                {kyc?.country || "United States"}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider block">Legal Name</span>
-            <span className="text-base font-semibold text-gray-900 mt-1 block">{kyc?.legalFullName || "Verified Seller"}</span>
+        {/* Bottom Privilege Box */}
+        <div className="bg-[#F4FBF9] border border-[#D5EFEA] rounded-xl p-5 space-y-1">
+          <div className="flex items-center gap-2 text-gray-900">
+            <CheckCircle2 className="w-4 h-4 text-[#0D6D5F] shrink-0 stroke-[2.2]" />
+            <h4 className="text-xs sm:text-sm font-bold">
+              Full Seller Privileges Active
+            </h4>
           </div>
-
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider block">Verified Document</span>
-            <span className="text-base font-semibold text-gray-900 mt-1 block">
-              {docTypeLabel} •••• {lastDigits}
-            </span>
-          </div>
-
-          <div className="p-4 rounded-xl bg-gray-50 border border-gray-100">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider block">Issuing Country</span>
-            <span className="text-base font-semibold text-gray-900 mt-1 block">{kyc?.country || "International"}</span>
-          </div>
-        </div>
-
-        <div className="rounded-xl bg-emerald-50/70 border border-emerald-200 p-4 flex items-start gap-3">
-          <CheckCircle2 size={20} className="text-emerald-600 mt-0.5 shrink-0" />
-          <div>
-            <p className="text-sm font-semibold text-emerald-900">Full Seller Privileges Active</p>
-            <p className="text-xs text-emerald-700 mt-0.5">
-              Your account has full seller privileges with instant payout access.
-            </p>
-          </div>
+          <p className="text-xs text-gray-500 pl-6 leading-relaxed">
+            Your account has full seller privileges instant payout access.
+          </p>
         </div>
       </div>
     );

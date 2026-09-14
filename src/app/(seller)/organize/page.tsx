@@ -49,7 +49,18 @@ const OrganizePage = () => {
   // Media upload refs & states
   const coverInputRef = useRef<HTMLInputElement>(null);
   const subImagesInputRef = useRef<HTMLInputElement>(null);
+  const galleryScrollRef = useRef<HTMLDivElement>(null);
   const [uploading, setUploading] = useState(false);
+
+  const scrollGallery = (direction: "left" | "right") => {
+    if (galleryScrollRef.current) {
+      const scrollAmount = 260;
+      galleryScrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
 
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -68,6 +79,17 @@ const OrganizePage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    // Seed default FAQ if none exists yet
+    if (!state.faqs || state.faqs.length === 0) {
+      dispatch({
+        type: "ADD_FAQ",
+        payload: {
+          question: "How does escrow payment protection work?",
+          answer:
+            "Your payment is held securely while the seller completes the order. It is released after you review and approve the agreed delivery. This ensures both parties are protected throughout the transaction lifecycle.",
+        },
+      });
+    }
   }, []);
 
   // Mutation to create package
@@ -208,6 +230,7 @@ const OrganizePage = () => {
     });
     setFaqQuestion("");
     setFaqAnswer("");
+    toast.success("FAQ added successfully!");
   };
 
   const handleRemoveFaq = (index: number) => {
@@ -215,6 +238,7 @@ const OrganizePage = () => {
       type: "REMOVE_FAQ",
       payload: index,
     });
+    toast.success("FAQ removed");
   };
 
   // File Upload Handlers (Cloudinary with ImgBB fallback)
@@ -358,15 +382,7 @@ const OrganizePage = () => {
   );
   const categoryBadgeLabel = selectedCategoryObj?.name || "Blog, Business House";
 
-  // Gallery items to show: user's uploaded images, or default demo thumbnails
-  const MOCK_DEMO_THUMBS = [
-    "/images/dashboard/packages/demo_1.png",
-    "/images/dashboard/packages/demo_2.png",
-    "/images/dashboard/packages/demo_3.png",
-    "/images/dashboard/packages/demo_4.png",
-    "/images/dashboard/packages/demo_5.png",
-  ];
-
+  // Real uploaded gallery items (cover banner + sub-images)
   const galleryItems = [
     ...(state.cover ? [state.cover] : []),
     ...(state.images || []),
@@ -841,68 +857,7 @@ const OrganizePage = () => {
           </div>
         )}
 
-        {/* 5. FAQ Tab */}
-        {activeTab === "faq" && (
-          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
-            <div className="border-b border-gray-100 pb-3">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-950">
-                Frequently Asked Questions (FAQ)
-              </h2>
-              <p className="text-xs text-gray-500 mt-1">
-                Add common questions clients may have regarding revisions, deliverables, and requirements.
-              </p>
-            </div>
-
-            <div className="bg-[#F8F9FA] p-4 sm:p-5 rounded-xl border border-gray-200/80 space-y-3">
-              <input
-                type="text"
-                value={faqQuestion}
-                onChange={(e) => setFaqQuestion(e.target.value)}
-                placeholder="Question (e.g. Do you provide responsive source files?)"
-                className="w-full bg-white border border-gray-200 rounded-lg px-3.5 py-2.5 text-xs text-gray-800 outline-none focus:border-[#0B3A33]"
-              />
-              <textarea
-                value={faqAnswer}
-                onChange={(e) => setFaqAnswer(e.target.value)}
-                placeholder="Answer (e.g. Yes, complete source code and assets are included.)"
-                rows={3}
-                className="w-full bg-white border border-gray-200 rounded-lg px-3.5 py-2.5 text-xs text-gray-800 outline-none focus:border-[#0B3A33] resize-y"
-              />
-              <button
-                type="button"
-                onClick={handleAddFaq}
-                className="bg-[#0B3A33] text-white text-xs font-semibold px-4 py-2 rounded-lg cursor-pointer hover:bg-[#082a24] transition-colors"
-              >
-                Add FAQ
-              </button>
-            </div>
-
-            {state.faqs && state.faqs.length > 0 && (
-              <div className="space-y-3">
-                {state.faqs.map((faq: any, idx: number) => (
-                  <div
-                    key={idx}
-                    className="p-4 rounded-xl border border-gray-200 flex items-start justify-between gap-4 bg-white"
-                  >
-                    <div>
-                      <h4 className="text-xs sm:text-sm font-bold text-gray-900">Q: {faq.question}</h4>
-                      <p className="text-xs text-gray-600 mt-1">A: {faq.answer}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveFaq(idx)}
-                      className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 6. Packages Media & Upload Card (Visible on About and Packages tab) */}
+        {/* 5. Packages Media & Upload Card (Visible on About and Packages tab) */}
         {(activeTab === "about" || activeTab === "packages") && (
           <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
 
@@ -914,15 +869,17 @@ const OrganizePage = () => {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
+                  onClick={() => scrollGallery("left")}
                   title="Previous"
-                  className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
                   type="button"
+                  onClick={() => scrollGallery("right")}
                   title="Next"
-                  className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="w-8 h-8 rounded-full bg-[#EAECEF] hover:bg-gray-300 flex items-center justify-center text-gray-700 hover:text-gray-950 transition-colors cursor-pointer"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -947,67 +904,157 @@ const OrganizePage = () => {
             />
 
             {/* Upload Box Container */}
-            <div className="bg-[#F8F9FA]/80 border border-gray-200/80 rounded-2xl p-6 sm:p-8 space-y-4">
+            <div className="border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-4 bg-white">
               {/* Add Banner Dropzone */}
               <div
                 onClick={() => coverInputRef.current?.click()}
-                className="border border-dashed border-gray-300 hover:border-gray-400 rounded-xl p-5 text-center cursor-pointer transition-colors bg-white hover:bg-gray-50/60 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-600"
+                className="border border-dashed border-gray-300 hover:border-[#0D6D5F] rounded-xl py-6 text-center cursor-pointer transition-all bg-white hover:bg-gray-50/70 flex items-center justify-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0D6D5F]"
               >
                 <span>Add Banner</span>
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-4 h-4" />
               </div>
 
               {/* Add Sub Images Dropzone */}
               <div
                 onClick={() => subImagesInputRef.current?.click()}
-                className="border border-dashed border-gray-300 hover:border-gray-400 rounded-xl p-5 text-center cursor-pointer transition-colors bg-white hover:bg-gray-50/60 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-600"
+                className="border border-dashed border-gray-300 hover:border-[#0D6D5F] rounded-xl py-6 text-center cursor-pointer transition-all bg-white hover:bg-gray-50/70 flex items-center justify-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0D6D5F]"
               >
                 <span>Add Sub Images</span>
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-4 h-4" />
               </div>
             </div>
 
-            {/* Uploaded or Demo Preview Gallery Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5 pt-2">
-              {galleryItems.length > 0
-                ? galleryItems.map((imgUrl, idx) => (
-                    <div
-                      key={idx}
-                      className="relative group aspect-[16/10] rounded-xl overflow-hidden border border-gray-200 bg-gray-100 shadow-2xs"
+            {/* Real Uploaded Images Gallery Row (No demo images by default, only seller uploads) */}
+            {galleryItems.length > 0 && (
+              <div
+                ref={galleryScrollRef}
+                className="flex items-center gap-3.5 pt-1 overflow-x-auto scrollbar-none scroll-smooth"
+              >
+                {galleryItems.map((imgUrl, idx) => (
+                  <div
+                    key={idx}
+                    className="relative shrink-0 w-44 sm:w-52 aspect-[16/10] rounded-xl overflow-hidden border border-gray-200 bg-gray-100 shadow-2xs group"
+                  >
+                    <img
+                      src={imgUrl}
+                      alt={`Attachment ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(imgUrl)}
+                      className="absolute top-1.5 right-1.5 bg-red-600 hover:bg-red-700 text-white p-1 rounded-full opacity-90 hover:opacity-100 transition-opacity shadow-xs cursor-pointer z-10"
+                      title="Remove image"
                     >
-                      <img
-                        src={imgUrl}
-                        alt={`Attachment ${idx + 1}`}
-                        className="w-full h-full object-cover"
-                      />
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                    {imgUrl === state.cover ? (
+                      <span className="absolute bottom-0 inset-x-0 bg-black/75 text-white text-[9px] font-bold text-center py-0.5 tracking-wider uppercase">
+                        BANNER
+                      </span>
+                    ) : (
                       <button
                         type="button"
-                        onClick={() => handleRemoveImage(imgUrl)}
-                        className="absolute top-1.5 right-1.5 bg-red-600 hover:bg-red-700 text-white p-1 rounded-full opacity-90 hover:opacity-100 transition-opacity shadow-xs"
+                        onClick={() => {
+                          dispatch({
+                            type: "ADD_IMAGES",
+                            payload: {
+                              cover: imgUrl,
+                              images: (state.images || []).filter((i: string) => i !== imgUrl),
+                            },
+                          });
+                          toast.success("Set as banner!");
+                        }}
+                        className="absolute bottom-0 inset-x-0 bg-black/60 hover:bg-black/80 text-white text-[9px] font-semibold text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                       >
-                        <X className="w-3.5 h-3.5" />
+                        Set as Banner
                       </button>
-                      {imgUrl === state.cover && (
-                        <span className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[9px] font-bold text-center py-0.5">
-                          BANNER
-                        </span>
-                      )}
-                    </div>
-                  ))
-                : MOCK_DEMO_THUMBS.map((thumbUrl, idx) => (
-                    <div
-                      key={idx}
-                      className="relative aspect-[16/10] rounded-xl overflow-hidden border border-gray-200/80 bg-gray-100 shadow-2xs group"
-                    >
-                      <img
-                        src={thumbUrl}
-                        alt={`Sample ${idx + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ))}
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+          </div>
+        )}
+
+        {/* 6. Frequently asked questions Section */}
+        {(activeTab === "about" || activeTab === "packages" || activeTab === "faq") && (
+          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+            <div className="flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-950">
+                Frequently asked questions
+              </h2>
+              <span className="bg-[#F8F9FA] border border-gray-200/90 text-gray-600 text-xs font-semibold px-3 py-1 rounded-md">
+                {categoryBadgeLabel}
+              </span>
             </div>
 
+            {/* Existing FAQs List */}
+            {state.faqs && state.faqs.length > 0 && (
+              <div className="space-y-4">
+                {state.faqs.map((faq: any, idx: number) => (
+                  <div key={idx} className="border-b border-gray-100 pb-4 last:border-b-0">
+                    <div className="flex items-start justify-between gap-4">
+                      <h4 className="text-sm sm:text-base font-bold text-gray-900 leading-snug">
+                        {faq.question}
+                      </h4>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveFaq(idx)}
+                        className="text-red-500 hover:text-red-700 p-1 cursor-pointer transition-colors shrink-0"
+                        title="Delete question"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </button>
+                    </div>
+                    <p className="text-xs sm:text-[13px] text-gray-600 mt-2 leading-relaxed">
+                      {faq.answer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* New FAQ Input Card */}
+            <div className="bg-white rounded-2xl border border-gray-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs sm:text-sm font-bold text-gray-900 block">
+                  Question
+                </label>
+                <input
+                  type="text"
+                  value={faqQuestion}
+                  onChange={(e) => setFaqQuestion(e.target.value)}
+                  placeholder="Write here"
+                  className="w-full bg-[#ECEEF1]/70 hover:bg-[#ECEEF1] focus:bg-white border border-transparent focus:border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs sm:text-sm font-bold text-gray-900 block">
+                  Answer
+                </label>
+                <textarea
+                  value={faqAnswer}
+                  onChange={(e) => setFaqAnswer(e.target.value)}
+                  placeholder="Write here"
+                  rows={3}
+                  className="w-full bg-[#ECEEF1]/70 hover:bg-[#ECEEF1] focus:bg-white border border-transparent focus:border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[70px]"
+                />
+              </div>
+            </div>
+
+            {/* Add Another + Button */}
+            <div>
+              <button
+                type="button"
+                onClick={handleAddFaq}
+                className="text-[#0D6D5F] hover:text-[#0A5348] text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer pt-1 transition-colors"
+              >
+                Add Another <Plus className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         )}
 

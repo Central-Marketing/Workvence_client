@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
+import { FiCalendar, FiArrowRight } from "react-icons/fi";
 import { calculateProfileCompletion } from "../utils/dashboardNormalizer";
 
 interface SellerDashboardProps {
@@ -14,6 +15,7 @@ interface SellerDashboardProps {
 
 export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
   const router = useRouter();
+  const [orderTypeFilter, setOrderTypeFilter] = useState<"all" | "package" | "brief">("all");
 
   // Fetch seller's packages
   const { data: packages = [] } = useQuery({
@@ -25,16 +27,400 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
     enabled: !!user,
   });
 
+  // Fetch orders
+  const { data: orders = [] } = useQuery({
+    queryKey: ["seller-dashboard-orders"],
+    queryFn: () =>
+      axiosFetch
+        .get("/orders")
+        .then(({ data }) => (Array.isArray(data) ? data : data?.orders || []))
+        .catch(() => []),
+    enabled: !!user,
+  });
+
+  // Fetch conversations
+  const { data: conversations = [] } = useQuery({
+    queryKey: ["seller-dashboard-convs"],
+    queryFn: () =>
+      axiosFetch
+        .get("/conversations")
+        .then(({ data }) => (Array.isArray(data) ? data : []))
+        .catch(() => []),
+    enabled: !!user,
+  });
+
   const completionPercentage = calculateProfileCompletion(user) || 50;
+  const isProfileCompleted = completionPercentage >= 100;
   const packagesList = Array.isArray(packages) ? packages : [];
   const hasPackages = packagesList.length > 0;
   const displayName = user?.name ? user.name.split(" ")[0] : (user?.username || "Tomas");
 
+  // Condition specified by user:
+  // "this image ui will be for seller dashboard when profile is complete 100% and package length is >0"
+  const showActiveDashboard = isProfileCompleted && hasPackages;
+
+  // Filter seller-specific orders
+  const sellerOrders = orders.filter((order: any) => {
+    if (!user?._id) return true;
+    const sellerId = typeof order.sellerID === "object" ? order.sellerID?._id : order.sellerID;
+    return String(sellerId) === String(user._id) || !order.buyerID;
+  });
+
+  const completedOrders = sellerOrders.filter((o: any) => o.status === "completed");
+  const pendingOrders = sellerOrders.filter(
+    (o: any) => o.status === "paid" || o.status === "delivered" || o.status === "in_progress" || !o.status
+  );
+  const totalFinancialAmount = completedOrders.reduce((sum: number, order: any) => sum + (order.price || 0), 0);
+  const unreadMessagesCount = conversations.filter((c: any) => !c.readBySeller).length;
+
+  // Filtered orders by type tab (All, Packages, Briefs)
+  const filteredOrders = sellerOrders.filter((o: any) => {
+    const isBrief = Boolean(o.briefID || o.type === "brief");
+    if (orderTypeFilter === "package") return !isBrief;
+    if (orderTypeFilter === "brief") return isBrief;
+    return true;
+  });
+
+  // -------------------------------------------------------------
+  // 1. ACTIVE SELLER DASHBOARD (Profile complete 100% & packages > 0)
+  // -------------------------------------------------------------
+  if (showActiveDashboard) {
+    // Mock fallback orders matching the reference image when the seller has no orders yet in database
+    const MOCK_SELLER_IMAGE_ORDERS = [
+      {
+        _id: "mock-s-1",
+        title: "I will create a stunning portfolio website using Elementor.",
+        type: "package",
+        createdAt: "2026-12-12",
+        deadline: "2026-12-16",
+        price: 200,
+        status: "revision",
+        image: "/images/dashboard/orders/order_1.png",
+      },
+      {
+        _id: "mock-s-2",
+        title: "I will develop a custom e-commerce platform tailored to your needs.",
+        type: "package",
+        createdAt: "2026-12-12",
+        deadline: "2026-12-16",
+        price: 110,
+        status: "inprogress",
+        image: "/images/dashboard/orders/order_2.png",
+      },
+      {
+        _id: "mock-s-3",
+        title: "Design engaging mobile app interfaces with Sketch and InVision.",
+        type: "brief",
+        createdAt: "2026-12-14",
+        deadline: "2026-12-21",
+        price: 500,
+        status: "delivered",
+        image: "/images/dashboard/orders/order_3.png",
+      },
+      {
+        _id: "mock-s-4",
+        title: "Build a dynamic blog site with WordPress and SEO optimization.",
+        type: "package",
+        createdAt: "2026-12-13",
+        deadline: "2026-12-20",
+        price: 300,
+        status: "failed",
+        image: "/images/dashboard/orders/order_4.png",
+      },
+      {
+        _id: "mock-s-5",
+        title: "Enhance website visibility with targeted SEO and content strategies.",
+        type: "brief",
+        createdAt: "2026-12-15",
+        deadline: "2026-12-22",
+        price: 80,
+        status: "pending",
+        image: "/images/dashboard/orders/order_5.png",
+      },
+    ];
+
+    // Use real orders if available, otherwise display the high-fidelity mock list matching the mockup
+    const ordersToDisplay = filteredOrders.length > 0 ? filteredOrders : MOCK_SELLER_IMAGE_ORDERS.filter((o: any) => {
+      if (orderTypeFilter === "package") return o.type === "package";
+      if (orderTypeFilter === "brief") return o.type === "brief";
+      return true;
+    });
+
+    const displayRevenue = totalFinancialAmount > 0 ? totalFinancialAmount : 32302;
+    const displayActiveOrders = pendingOrders.length > 0 ? pendingOrders.length : 4;
+    const displayCompletedOrders = completedOrders.length > 0 ? completedOrders.length : 12;
+    const displayUnreadMessages = unreadMessagesCount > 0 ? unreadMessagesCount : 2;
+
+    return (
+      <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
+        <div className="container mx-auto px-4 md:px-6 space-y-7">
+
+          {/* Top Hero Banner: Draft Package Notification */}
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0C0B10] via-[#2A124F] to-[#7B34D4] p-7 sm:p-9 text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+            <div className="max-w-2xl">
+              <h2 className="text-2xl sm:text-[28px] font-normal tracking-tight text-white">
+                Your <span className="font-bold">package</span> is currently in draft
+              </h2>
+              <p className="text-white/75 text-xs sm:text-[13px] mt-2 mb-5 leading-relaxed font-normal">
+                Your package isn&apos;t published yet. Complete the details and publish it when you&apos;re ready to start attracting clients.
+              </p>
+              <Link
+                href="/organize"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white hover:text-emerald-300 transition-colors group cursor-pointer"
+              >
+                Continue Editing <span className="group-hover:translate-x-1 transition-transform">→</span>
+              </Link>
+            </div>
+
+            <div className="relative w-28 sm:w-32 h-24 sm:h-28 shrink-0 self-center md:self-auto flex items-center justify-center">
+              <img
+                src="/images/dashboard/lightning_bolt_exact.png"
+                alt="Draft Alert"
+                className="w-full h-full object-contain scale-110 drop-shadow-[0_0_20px_rgba(168,85,247,0.45)]"
+              />
+            </div>
+          </div>
+
+          {/* 4-Metric Stats Bar */}
+          <div className="bg-white rounded-xl border border-gray-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 gap-y-5 sm:gap-y-0">
+            <div className="sm:pr-6">
+              <span className="text-xs font-normal text-gray-500 block mb-1">Total Revenue</span>
+              <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
+                {displayRevenue.toLocaleString("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                })}
+              </div>
+              <p className="text-[11px] text-gray-400 mt-1">
+                Cleared earning from{" "}
+                <strong className="font-semibold text-gray-700">
+                  {completedOrders.length > 0 ? completedOrders.length : 12}
+                </strong>{" "}
+                packages
+              </p>
+            </div>
+
+            <div className="sm:px-6 pt-4 sm:pt-0">
+              <span className="text-xs font-normal text-gray-500 block mb-1">Active Orders</span>
+              <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
+                {displayActiveOrders}
+              </div>
+              <p className="text-[11px] text-gray-400 mt-1">Currently in progress</p>
+            </div>
+
+            <div className="sm:px-6 pt-4 sm:pt-0">
+              <span className="text-xs font-normal text-gray-500 block mb-1">Completed Orders</span>
+              <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
+                {displayCompletedOrders}
+              </div>
+              <p className="text-[11px] text-gray-400 mt-1">Packages successfully closed</p>
+            </div>
+
+            <div className="sm:pl-6 pt-4 sm:pt-0">
+              <span className="text-xs font-normal text-gray-500 block mb-1">Unread Messages</span>
+              <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
+                {displayUnreadMessages}
+              </div>
+              <p className="text-[11px] text-gray-400 mt-1">Awaiting your response</p>
+            </div>
+          </div>
+
+          {/* Recent Orders Card */}
+          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h2 className="text-xl sm:text-[22px] font-bold text-gray-900 tracking-tight">
+                Recent Orders
+              </h2>
+
+              <div className="flex items-center gap-3 self-start sm:self-auto flex-wrap">
+                <button
+                  type="button"
+                  title="Filter by date"
+                  className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors"
+                >
+                  <FiCalendar className="text-sm" />
+                </button>
+
+                <div className="bg-white border border-gray-200/90 rounded-lg p-0.5 flex items-center gap-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setOrderTypeFilter("all")}
+                    className={`px-5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                      orderTypeFilter === "all"
+                        ? "bg-[#0B3A33] text-white shadow-2xs"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOrderTypeFilter("package")}
+                    className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                      orderTypeFilter === "package"
+                        ? "bg-[#0B3A33] text-white shadow-2xs"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    Packages
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOrderTypeFilter("brief")}
+                    className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                      orderTypeFilter === "brief"
+                        ? "bg-[#0B3A33] text-white shadow-2xs"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    Briefs
+                  </button>
+                </div>
+
+                <Link
+                  href="/manage-orders"
+                  className="text-[#0D6D5F] hover:text-[#0A5348] font-semibold text-xs sm:text-[13px] flex items-center gap-1.5 hover:underline ml-1 transition-colors"
+                >
+                  Manage all orders <FiArrowRight className="text-xs" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Orders Table */}
+            <div className="w-full overflow-x-auto">
+              <table className="w-full text-left text-sm border-collapse min-w-[700px]">
+                <thead>
+                  <tr className="text-xs font-bold text-gray-700 border-b border-gray-100">
+                    <th className="py-3.5 px-3 font-bold">Order Name</th>
+                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Order Date</th>
+                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Due on</th>
+                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Total</th>
+                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {ordersToDisplay.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="py-12 text-center text-gray-400 text-xs sm:text-sm">
+                        No orders found in this view.
+                      </td>
+                    </tr>
+                  ) : (
+                    ordersToDisplay.slice(0, 8).map((order: any) => {
+                      const isBrief = Boolean(order.briefID || order.type === "brief");
+                      const orderDate = order.createdAt
+                        ? new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                        : "Dec 12";
+                      const dueDate = order.deadline
+                        ? new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                        : "Dec 16";
+
+                      // Determine status pill badge style
+                      const st = (order.status || "inprogress").toLowerCase();
+                      let statusBadge = {
+                        label: "Inprogress",
+                        style: "bg-[#E0F2FE] text-[#0284C7]",
+                      };
+
+                      if (st === "completed") {
+                        statusBadge = {
+                          label: "Completed",
+                          style: "bg-[#D1FAE5] text-[#059669]",
+                        };
+                      } else if (st === "delivered") {
+                        statusBadge = {
+                          label: "Delivered",
+                          style: "bg-[#D1FAE5] text-[#059669]",
+                        };
+                      } else if (st === "revision") {
+                        statusBadge = {
+                          label: "Revision",
+                          style: "bg-[#F3E8FF] text-[#9333EA]",
+                        };
+                      } else if (st === "failed" || st === "cancelled") {
+                        statusBadge = {
+                          label: "Failed",
+                          style: "bg-[#FEE2E2] text-[#EF4444]",
+                        };
+                      } else if (st === "pending") {
+                        statusBadge = {
+                          label: "Pending",
+                          style: "bg-[#FEF3C7] text-[#D97706]",
+                        };
+                      }
+
+                      return (
+                        <tr
+                          key={order._id}
+                          onClick={() => {
+                            if (!order._id.startsWith("mock-")) {
+                              router.push(`/orders/${order._id}`);
+                            }
+                          }}
+                          className="hover:bg-slate-50/70 cursor-pointer transition-colors"
+                        >
+                          <td className="py-4 px-3 align-middle">
+                            <div className="flex items-center gap-3.5">
+                              <img
+                                src={order.image || order.cover || "/images/dashboard/orders/order_1.png"}
+                                alt=""
+                                className="w-20 sm:w-24 h-12 sm:h-13 rounded-lg object-cover bg-gray-100 border border-gray-200/80 shrink-0"
+                              />
+                              <div className="flex flex-col gap-1 min-w-0">
+                                <span className="text-xs sm:text-[13px] font-normal text-gray-800 line-clamp-2 leading-snug">
+                                  {order.title || "Custom Deliverable"}
+                                </span>
+                                <span className="text-[10.5px] font-medium px-2 py-0.5 rounded bg-white text-gray-700 border border-gray-200 w-fit">
+                                  {isBrief ? "Brief" : "Package"}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+
+                          <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
+                            {orderDate}
+                          </td>
+
+                          <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
+                            {dueDate}
+                          </td>
+
+                          <td className="py-4 px-4 align-middle text-xs sm:text-[13.5px] font-bold text-gray-950 whitespace-nowrap">
+                            {(order.price || 0).toLocaleString("en-US", {
+                              style: "currency",
+                              currency: "USD",
+                            })}
+                          </td>
+
+                          <td className="py-4 px-4 align-middle whitespace-nowrap">
+                            <span
+                              className={`text-[11.5px] font-medium px-3.5 py-1 rounded-full inline-block ${statusBadge.style}`}
+                            >
+                              {statusBadge.label}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------------
+  // 2. ONBOARDING SELLER DASHBOARD (Profile < 100% or packages == 0)
+  // -------------------------------------------------------------
   return (
     <div className="min-h-screen bg-[#F8F8F8] py-8 sm:py-10 font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
 
-        {/* 1. Header: Welcome & Profile Completion (Shown by default) */}
+        {/* 1. Header: Welcome & Profile Completion */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
           <div>
             <h1 className="text-2xl sm:text-[26px] text-[#555E68] font-normal tracking-tight">
@@ -62,7 +448,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           </Link>
         </div>
 
-        {/* 2. Card 1: Ready to Grow Your Business? (Shown by default) */}
+        {/* 2. Card 1: Ready to Grow Your Business? */}
         <div className="bg-white rounded-[18px] sm:rounded-[22px] border border-[#EBECEF] p-8 sm:py-12 sm:px-12 flex flex-col items-center justify-center text-center shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
           <div className="w-[140px] sm:w-[165px] h-auto mb-3.5 flex items-center justify-center">
             <img

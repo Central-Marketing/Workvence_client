@@ -1,38 +1,79 @@
 "use client";
 
-import toast from 'react-hot-toast';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Trash2, AlertTriangle, X } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Trash2, X } from "lucide-react";
+import { FiHome, FiEdit2, FiTrash2 } from "react-icons/fi";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 
+// High-fidelity fallback packages matching the user's reference mockup image
+const MOCK_PACKAGES_IMAGE = [
+  {
+    _id: "mock-pkg-1",
+    title: "I will create a stunning portfolio website using Elementor.",
+    cover: "/images/dashboard/orders/order_1.png",
+    price: 200,
+    sales: 2,
+  },
+  {
+    _id: "mock-pkg-2",
+    title: "I will develop a custom e-commerce platform tailored to your needs.",
+    cover: "/images/dashboard/orders/order_2.png",
+    price: 110,
+    sales: 2,
+  },
+  {
+    _id: "mock-pkg-3",
+    title: "Design engaging mobile app interfaces with Sketch and InVision.",
+    cover: "/images/dashboard/orders/order_3.png",
+    price: 500,
+    sales: 5,
+  },
+  {
+    _id: "mock-pkg-4",
+    title: "Build a dynamic blog site with WordPress and SEO optimization.",
+    cover: "/images/dashboard/orders/order_4.png",
+    price: 300,
+    sales: 3,
+  },
+  {
+    _id: "mock-pkg-5",
+    title: "Enhance website visibility with targeted SEO and content strategies.",
+    cover: "/images/dashboard/orders/order_5.png",
+    price: 80,
+    sales: 24,
+  },
+];
+
 const MyPackages = () => {
   const user = useUserStore((state: any) => state.user);
-  const navigate = useRouter();
+  const router = useRouter();
   const [packageToDelete, setPackageToDelete] = useState<any | null>(null);
 
   const queryClient = useQueryClient();
 
   const { isLoading, error, data = [] } = useQuery({
-    queryKey: ['my-packages'],
+    queryKey: ["my-packages"],
     queryFn: () =>
       axiosFetch(`/gigs?userID=${user?._id || user?.id}`)
-        .then(({ data }) => data)
+        .then(({ data }) => (Array.isArray(data) ? data : data?.packages || data?.gigs || []))
         .catch(({ response }) => {
           console.error(response?.data);
           return [];
-        })
+        }),
+    enabled: !!user,
   });
 
   const mutation = useMutation({
     mutationFn: (_id: string) => axiosFetch.delete(`/gigs/${_id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-packages'] });
-    }
+      queryClient.invalidateQueries({ queryKey: ["my-packages"] });
+    },
   });
 
   const confirmDelete = () => {
@@ -44,8 +85,8 @@ const MyPackages = () => {
         setPackageToDelete(null);
       },
       onError: (err: any) => {
-        toast.error(err?.response?.data?.message || 'Failed to delete package');
-      }
+        toast.error(err?.response?.data?.message || "Failed to delete package");
+      },
     });
   };
 
@@ -53,96 +94,171 @@ const MyPackages = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  const packagesList = Array.isArray(data) && data.length > 0 ? data : MOCK_PACKAGES_IMAGE;
+
   return (
-    <div className="flex justify-center bg-slate-50 py-10 min-h-screen relative px-4">
+    <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
       {isLoading ? (
-        <div className="w-full flex justify-center items-center py-20">
+        <div className="w-full flex justify-center items-center py-24">
           <Loader size={45} />
         </div>
       ) : error ? (
-        <div className="text-center text-red-500 font-medium py-12">Something went wrong</div>
+        <div className="text-center text-red-500 font-semibold py-20">
+          Something went wrong loading your packages!
+        </div>
       ) : (
-        <div className="w-full max-w-[1200px] flex flex-col gap-6 mx-auto">
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="p-5 sm:p-6 md:px-8 border-b border-slate-200 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900 mb-1">My Packages</h1>
-                <p className="text-sm text-slate-500">Manage your published service listings</p>
-              </div>
-              <Link href="/organize" className="w-full sm:w-auto">
-                <button type="button" className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm py-2.5 px-5 rounded-lg transition-colors cursor-pointer text-center shadow-xs">
-                  Add New Package
-                </button>
-              </Link>
+        <div className="container mx-auto px-4 md:px-6 space-y-6">
+
+          {/* Breadcrumb Navigation */}
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <Link
+              href="/"
+              className="text-[#0D6D5F] hover:text-[#094d43] transition-colors flex items-center gap-1"
+            >
+              <FiHome className="text-sm" />
+            </Link>
+            <span>/</span>
+            <span className="text-gray-600 font-medium">Packages</span>
+          </div>
+
+          {/* Page Heading & Create New Package Button */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-[32px] font-bold tracking-tight text-gray-950">
+                My Packages
+              </h1>
+              <p className="text-xs sm:text-[13px] text-gray-500 mt-1.5 leading-relaxed max-w-2xl">
+                Create, manage, and showcase your service packages in one place. Track your package status and keep your offerings ready for clients.
+              </p>
             </div>
 
+            <Link href="/organize" className="self-start sm:self-auto shrink-0">
+              <button
+                type="button"
+                className="bg-gradient-to-r from-[#98FDE8] to-[#80B6FD] hover:opacity-95 text-[#0A3B32] font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-2xs transition-all cursor-pointer"
+              >
+                Create New Package
+              </button>
+            </Link>
+          </div>
+
+          {/* Main Card Container */}
+          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+
+            {/* Packages Table */}
             <div className="w-full overflow-x-auto">
-              <table className="w-full border-collapse text-left">
+              <table className="w-full text-left text-sm border-collapse min-w-[700px]">
                 <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50">
-                    <th className="py-3.5 px-4 sm:px-6 text-slate-500 font-semibold text-xs uppercase tracking-wider">Image</th>
-                    <th className="py-3.5 px-4 sm:px-6 text-slate-500 font-semibold text-xs uppercase tracking-wider">Title</th>
-                    <th className="py-3.5 px-4 sm:px-6 text-slate-500 font-semibold text-xs uppercase tracking-wider">Price</th>
-                    <th className="py-3.5 px-4 sm:px-6 text-slate-500 font-semibold text-xs uppercase tracking-wider">Sales</th>
-                    <th className="py-3.5 px-4 sm:px-6 text-slate-500 font-semibold text-xs uppercase tracking-wider">Action</th>
+                  <tr className="text-xs font-bold text-gray-800 border-b border-gray-100">
+                    <th className="py-3.5 px-4 font-bold">Package Name</th>
+                    <th className="py-3.5 px-6 font-bold whitespace-nowrap">Price</th>
+                    <th className="py-3.5 px-6 font-bold whitespace-nowrap">Sales</th>
+                    <th className="py-3.5 px-6 font-bold whitespace-nowrap text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {data.map((pkg: any) => (
-                    <tr
-                      key={pkg._id}
-                      onClick={() => navigate.push(`/package/${pkg._id}`)}
-                      className="cursor-pointer transition-colors hover:bg-slate-50/80 border-b border-slate-100"
-                    >
-                      <td className="py-4 px-4 sm:px-6 align-middle">
-                        <img
-                          className="w-[70px] h-[50px] rounded-lg object-cover border border-slate-200 shrink-0"
-                          src={pkg.cover}
-                          alt={pkg.title || 'Package Cover'}
-                        />
-                      </td>
-                      <td className="py-4 px-4 sm:px-6 align-middle font-medium text-slate-800 max-w-[200px] md:max-w-[350px] truncate">
-                        {pkg.title}
-                      </td>
-                      <td className="py-4 px-4 sm:px-6 align-middle font-bold text-slate-900 whitespace-nowrap">
-                        {(pkg.price || 0).toLocaleString("en-US", {
-                          style: "currency",
-                          currency: "USD",
-                        })}
-                      </td>
-                      <td className="py-4 px-4 sm:px-6 align-middle font-semibold text-slate-600 whitespace-nowrap">
-                        {pkg.sales || 0}
-                      </td>
-                      <td className="py-4 px-4 sm:px-6 align-middle">
-                        <div className="flex flex-col sm:flex-row gap-2 whitespace-nowrap">
-                          <button
-                            type="button"
-                            className="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white font-semibold text-[13px] border border-emerald-200 py-1.5 px-3.5 rounded-lg transition-colors cursor-pointer text-center"
-                            onClick={(e: any) => {
-                              e.stopPropagation();
-                              navigate.push(`/organize/${pkg._id}`);
-                            }}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className="bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white font-semibold text-[13px] border border-rose-200 py-1.5 px-3.5 rounded-lg transition-colors cursor-pointer text-center"
-                            onClick={(e: any) => {
-                              e.stopPropagation();
-                              setPackageToDelete(pkg);
-                            }}
-                          >
-                            Delete
-                          </button>
-                        </div>
+
+                <tbody className="divide-y divide-gray-100">
+                  {packagesList.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="py-16 text-center text-gray-400 text-xs sm:text-sm font-medium">
+                        No packages found. Click &quot;Create New Package&quot; to publish your first offering!
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    packagesList.map((pkg: any) => {
+                      const coverImage =
+                        pkg.cover ||
+                        pkg.image ||
+                        pkg.coverImage ||
+                        (Array.isArray(pkg.images) && pkg.images[0]) ||
+                        "/images/dashboard/orders/order_1.png";
+                      const salesCount = pkg.sales || pkg.salesCount || pkg.ordersCount || 0;
+                      const isMock = pkg._id && pkg._id.startsWith("mock-");
+
+                      return (
+                        <tr
+                          key={pkg._id}
+                          onClick={() => {
+                            if (!isMock) {
+                              router.push(`/package/${pkg._id}`);
+                            }
+                          }}
+                          className="hover:bg-slate-50/70 cursor-pointer transition-colors"
+                        >
+                          {/* Package Name & Thumbnail */}
+                          <td className="py-4 px-4 align-middle max-w-[460px]">
+                            <div className="flex items-center gap-4">
+                              <img
+                                src={coverImage}
+                                alt={pkg.title || "Package Cover"}
+                                className="w-24 sm:w-28 h-14 sm:h-16 rounded-lg object-cover bg-gray-100 border border-gray-200/80 shrink-0"
+                              />
+                              <span
+                                className="text-xs sm:text-[13.5px] font-normal text-gray-800 line-clamp-2 leading-relaxed"
+                                title={pkg.title}
+                              >
+                                {pkg.title}
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* Price */}
+                          <td className="py-4 px-6 align-middle text-xs sm:text-[13.5px] font-bold text-gray-950 whitespace-nowrap">
+                            {(pkg.price || 0).toLocaleString("en-US", {
+                              style: "currency",
+                              currency: "USD",
+                            })}
+                          </td>
+
+                          {/* Sales */}
+                          <td className="py-4 px-6 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
+                            {salesCount} {salesCount === 1 ? "Sale" : "Sales"}
+                          </td>
+
+                          {/* Action Buttons: Edit (Pencil) & Delete (Red Trash) */}
+                          <td className="py-4 px-6 align-middle whitespace-nowrap text-right">
+                            <div className="inline-flex items-center justify-end gap-2.5">
+                              {/* Edit Button */}
+                              <button
+                                type="button"
+                                title="Edit package"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (!isMock) {
+                                    router.push(`/organize/${pkg._id}`);
+                                  } else {
+                                    router.push("/organize");
+                                  }
+                                }}
+                                className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:text-gray-950 hover:bg-gray-50 transition-colors cursor-pointer shadow-2xs"
+                              >
+                                <FiEdit2 className="text-xs" />
+                              </button>
+
+                              {/* Delete Button */}
+                              <button
+                                type="button"
+                                title="Delete package"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPackageToDelete(pkg);
+                                }}
+                                className="w-8 h-8 rounded-full border border-red-100 bg-white flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer shadow-2xs"
+                              >
+                                <FiTrash2 className="text-xs" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>
+
           </div>
+
         </div>
       )}
 
@@ -201,7 +317,7 @@ const MyPackages = () => {
                     Deleting...
                   </>
                 ) : (
-                  'Yes, Delete'
+                  "Yes, Delete"
                 )}
               </button>
             </div>

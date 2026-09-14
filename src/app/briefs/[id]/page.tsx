@@ -368,7 +368,7 @@ const BriefDetail = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center bg-[#F8FAFC] py-16 min-h-[80vh]">
-        <div className="w-full max-w-[1100px] flex justify-center items-center py-20">
+        <div className="container mx-auto px-4 md:px-6 flex justify-center items-center py-20">
           <Loader size={45} />
         </div>
       </div>
@@ -378,7 +378,7 @@ const BriefDetail = () => {
   if (error || !brief) {
     return (
       <div className="flex justify-center bg-[#F8FAFC] py-16 min-h-[80vh]">
-        <div className="w-full max-w-[1100px] flex flex-col items-center justify-center text-center py-20">
+        <div className="container mx-auto px-4 md:px-6 flex flex-col items-center justify-center text-center py-20">
           <h3 className="text-xl font-bold text-slate-900 mb-2">Project not found</h3>
           <p className="text-slate-500 mb-6">This project may have been removed or the link is invalid.</p>
           <Link
@@ -415,7 +415,7 @@ const BriefDetail = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-10 font-sans">
-      <div className="container mx-auto px-4 md:px-8 max-w-[1140px]">
+      <div className="container mx-auto px-4 md:px-6">
         {/* Top Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-4">
           <Link

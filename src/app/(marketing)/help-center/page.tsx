@@ -209,7 +209,7 @@ const HelpCenter = () => {
 
       {/* 2. MAIN CATEGORIES & SIDEBAR */}
       <section className="py-16">
-        <div className="container mx-auto px-4 md:px-8 max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="container mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
 
           <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-8">
 
@@ -308,7 +308,7 @@ const HelpCenter = () => {
 
       {/* 3. POPULAR ARTICLES */}
       <section className="pb-24">
-        <div className="container mx-auto px-4 md:px-8 max-w-7xl">
+        <div className="container mx-auto px-4 md:px-8">
           <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 md:p-12">
 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 pb-6 border-b border-gray-100">

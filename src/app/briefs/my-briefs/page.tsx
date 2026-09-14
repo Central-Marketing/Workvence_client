@@ -130,7 +130,7 @@ const MyBriefs = () => {
   if (!user) {
     return (
       <div className="flex justify-center bg-[#F8FAFC] py-12 min-h-[80vh] px-4">
-        <div className="w-full max-w-[1240px] flex justify-center items-center py-20">
+        <div className="container mx-auto px-4 md:px-6 flex justify-center items-center py-20">
           <Loader size={45} />
         </div>
       </div>
@@ -139,7 +139,7 @@ const MyBriefs = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-10 font-sans">
-      <div className="container mx-auto px-4 md:px-6 max-w-[1240px]">
+      <div className="container mx-auto px-4 md:px-6">
         {/* Top Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-medium mb-3">
           <Link
@@ -447,7 +447,7 @@ const MyProposals = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-10 font-sans">
-      <div className="container mx-auto px-4 md:px-6 max-w-[1240px]">
+      <div className="container mx-auto px-4 md:px-6">
         {/* Top Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-medium mb-3">
           <Link

@@ -383,9 +383,9 @@ const OrganizePage = () => {
       // userID: user?._id || user?.id,
       faqs: state.faqs || [],
       isDraft,
-      tools: toolsList,
-      keywords: keywordsList,
+      tools_use: toolsList,
       tags: keywordsList,
+      // tags: keywordsList,
     };
 
     // Ensure basic tier sync

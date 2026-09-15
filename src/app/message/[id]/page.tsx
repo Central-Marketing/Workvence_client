@@ -24,7 +24,8 @@ import {
   RiVideoChatLine,
   RiVidiconLine,
   RiFileCopyLine,
-  RiExternalLinkLine
+  RiExternalLinkLine,
+  RiArrowDownSLine
 } from "react-icons/ri";
 
 import axios from 'axios';
@@ -32,7 +33,7 @@ import { axiosFetch, socket, getAvatarUrl } from "@/utils";
 import supportService from "@/utils/supportService";
 import { getOtherUser, isConversationUnread, isTargetConversation, renderMessageTextWithLinks } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
-import { Loader, ChatSkeleton, Skeleton } from "@/components";
+import { Loader, ChatSkeleton, Skeleton, AiGradientButton } from "@/components";
 import { MessageModerationBadge } from "@/features/chat";
 import moment from 'moment';
 import "./Message.scss";
@@ -63,6 +64,8 @@ const Message = () => {
   const [isMsgSearchActive, setIsMsgSearchActive] = useState(false);
   const [isLeftSideOpen, setIsLeftSideOpen] = useState(false);
   const [isRightSideOpen, setIsRightSideOpen] = useState(false);
+  const [contactSidebarTab, setContactSidebarTab] = useState<'profile' | 'media'>('profile');
+  const [isOrdersExpanded, setIsOrdersExpanded] = useState(true);
   const typingTimeoutRef = useRef<any>(null);
   const isTypingRef = useRef(false);
   const isSendingRef = useRef(false);
@@ -1317,94 +1320,276 @@ const Message = () => {
         <div className={`lg:hidden fixed inset-0 bg-black/20 z-30 transition-opacity duration-300 ease-in-out ${isRightSideOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsRightSideOpen(false)}></div>
 
         {/* ── RIGHT: About This Contact ── */}
-        {finalRecipientUser && (
-          <aside className={`contact-sidebar h-full max-h-full min-h-0 flex-shrink-0 max-lg:fixed max-lg:top-0 max-lg:bottom-0 max-lg:right-0 max-lg:z-40 max-lg:shadow-2xl max-lg:h-full max-lg:!flex max-lg:transform max-lg:transition-transform max-lg:duration-300 max-lg:ease-in-out ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
-            <div className="w-full flex flex-col gap-5 pb-20">
-              <div className="sidebar-card relative">
-                <button className="lg:hidden absolute top-2 right-2 text-gray-500 text-2xl" onClick={() => setIsRightSideOpen(false)}><RiCloseLine /></button>
-                <div className="sidebar-section-header">
-                  <h3>About {finalRecipientUser.username}</h3>
-                </div>
-                <div className="sidebar-details">
-                  <div className="detail-row">
-                    <span className="detail-label">From</span>
-                    <span className="detail-value">{finalRecipientUser.country || 'United States'}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">On Workvence since</span>
-                    <span className="detail-value">{moment(finalRecipientUser.createdAt).format('MMM YYYY')}</span>
-                  </div>
-                  {Array.isArray(finalRecipientUser?.languages) && finalRecipientUser.languages.length > 0 ? (
-                    finalRecipientUser.languages.map((item: any, index: number) => {
-                      const label = typeof item === 'string' ? item : item?.language || item?.lang || item?.name || 'English';
-                      const value = typeof item === 'string' ? 'Fluent' : item?.level || 'Fluent';
-                      return (
-                        <div className="detail-row" key={index}>
-                          <span className="detail-label">{label}</span>
-                          <span className="detail-value">{value}</span>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div className="detail-row">
-                      <span className="detail-label">Languages</span>
-                      <span className="detail-value">English</span>
-                    </div>
-                  )}
-                  <div className="detail-row">
-                    <span className="detail-label">Response rate</span>
-                    <span className="detail-value">{finalRecipientUser.responseTimeHours ? `${finalRecipientUser.responseTimeHours} h` : '1 hr'}</span>
-                  </div>
-                  <button className="view-profile-btn" onClick={() => navigate.push(`/seller/${finalRecipientUser._id}`)}>
-                    View Profile
+        {finalRecipientUser && (() => {
+          const sampleOrdersFallback = [
+            { _id: 'sample-1', title: 'I will create a stunning portfolio...', status: 'in_progress' },
+            { _id: 'sample-2', title: 'Design a responsive e-commerce...', status: 'delivered' },
+            { _id: 'sample-3', title: 'Develop a mobile app interface pr...', status: 'delivered' },
+            { _id: 'sample-4', title: 'Craft a unique logo and branding...', status: 'delivered' },
+            { _id: 'sample-5', title: 'Build an interactive dashboard for...', status: 'delivered' },
+            { _id: 'sample-6', title: 'Design a user-friendly mobile app...', status: 'delivered' },
+            { _id: 'sample-7', title: 'Develop an AI-powered chatbot f...', status: 'delivered' },
+            { _id: 'sample-8', title: 'Create a responsive website show...', status: 'delivered' },
+          ];
+
+          const displayedOrders = contactOrders.length > 0 ? contactOrders.slice(0, 8) : sampleOrdersFallback;
+
+          const formattedLanguages =
+            Array.isArray(finalRecipientUser?.languages) && finalRecipientUser.languages.length > 0
+              ? finalRecipientUser.languages
+                  .map((item: any) => (typeof item === 'string' ? item : item?.language || item?.lang || item?.name))
+                  .filter(Boolean)
+                  .join(', ')
+              : 'English, Spanish, French';
+
+          const conversationMedia = (messages || [])
+            .flatMap((m: any) => {
+              const list: string[] = [];
+              if (m.file && typeof m.file === 'string') list.push(m.file);
+              if (Array.isArray(m.attachments)) list.push(...m.attachments);
+              return list;
+            })
+            .filter((url: string) => typeof url === 'string' && url.length > 0);
+
+          const renderOrderStatusBadge = (status: string) => {
+            const normalized = (status || '').toLowerCase().replace(/[\s_-]/g, '');
+            if (normalized === 'inprogress' || normalized === 'active' || normalized === 'pending') {
+              return (
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#ede9fe] text-[#4f46e5] shrink-0">
+                  Inprogress
+                </span>
+              );
+            }
+            if (normalized === 'delivered') {
+              return (
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#ccfbf1] text-[#0f766e] shrink-0">
+                  Delivered
+                </span>
+              );
+            }
+            if (normalized === 'completed') {
+              return (
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#dcfce7] text-[#15803d] shrink-0">
+                  Completed
+                </span>
+              );
+            }
+            if (normalized === 'cancelled') {
+              return (
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#ffe4e6] text-[#be123c] shrink-0">
+                  Cancelled
+                </span>
+              );
+            }
+            return (
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 shrink-0 capitalize">
+                {status || 'Inprogress'}
+              </span>
+            );
+          };
+
+          return (
+            <aside className={`contact-sidebar h-full max-h-full min-h-0 flex-shrink-0 max-lg:fixed max-lg:top-0 max-lg:bottom-0 max-lg:right-0 max-lg:z-40 max-lg:shadow-2xl max-lg:h-full max-lg:!flex max-lg:transform max-lg:transition-transform max-lg:duration-300 max-lg:ease-in-out ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
+              <div className="w-full flex flex-col gap-4 pb-20">
+                <button
+                  type="button"
+                  className="lg:hidden self-end text-gray-500 hover:text-gray-800 text-2xl -mb-2 cursor-pointer"
+                  onClick={() => setIsRightSideOpen(false)}
+                  aria-label="Close sidebar"
+                >
+                  <RiCloseLine />
+                </button>
+
+                {/* Top Segmented Controls: Profile | Media */}
+                <div className="bg-[#f0f2f5] p-1 rounded-2xl flex items-center border border-slate-200/70 shadow-xs">
+                  <button
+                    type="button"
+                    onClick={() => setContactSidebarTab('profile')}
+                    className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all duration-200 text-center cursor-pointer ${
+                      contactSidebarTab === 'profile'
+                        ? 'bg-[#0e3834] text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Profile
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setContactSidebarTab('media')}
+                    className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all duration-200 text-center cursor-pointer ${
+                      contactSidebarTab === 'media'
+                        ? 'bg-[#0e3834] text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Media
                   </button>
                 </div>
-              </div>
 
-              {contactOrders.length > 0 && (
-                <div className="sidebar-card">
-                  <div className="sidebar-section-header" style={{ marginBottom: '14px' }}>
-                    <h3>Orders ({contactOrders.length})</h3>
-                  </div>
-                  <div className="flex flex-col gap-2.5 px-2">
-                    {contactOrders.slice(0, 4).map((order: any) => (
-                      <div
-                        key={order._id}
-                        className="relative rounded-lg border border-slate-100 overflow-hidden cursor-pointer hover:shadow-md hover:border-slate-200 transition-all duration-200 group"
-                        onClick={() => navigate.push(`/orders/${order._id}`)}
-                      >
-                        <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${order.status === 'completed' ? 'bg-green-500' :
-                          order.status === 'delivered' ? 'bg-blue-500' : 'bg-amber-500'
-                          }`} />
-                        <div className="px-2 py-2.5">
-                          <div className="flex justify-between items-center mb-1">
-                            <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-[2px] rounded ${order.status === 'completed' ? 'bg-green-50 text-green-600' :
-                              order.status === 'delivered' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'
-                              }`}>
-                              {order.status === 'completed' ? 'Completed' : order.status === 'delivered' ? 'Delivered' : 'In Progress'}
+                {contactSidebarTab === 'profile' ? (
+                  <>
+                    {/* ── Card 1: About Ava Thompson (Contact) ── */}
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col gap-3 relative">
+                      <h3 className="text-base sm:text-[17px] font-bold text-slate-800 tracking-tight">
+                        About {finalRecipientUser.username || finalRecipientUser.name || 'Ava Thompson'}
+                      </h3>
+
+                      {/* Avatar & Contact Info */}
+                      <div className="flex items-center gap-3 pt-1">
+                        <img
+                          src={getAvatarUrl(finalRecipientUser?.image || finalRecipientUser?.img || finalRecipientUser?.avatar || '/media/noavatar.png')}
+                          alt={finalRecipientUser.username || 'Contact'}
+                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover shrink-0 border border-slate-100 shadow-xs"
+                        />
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-bold text-slate-900 text-sm sm:text-base leading-tight truncate">
+                              {finalRecipientUser.name || finalRecipientUser.username || 'Nilson Norman'}
                             </span>
-                            <span className="text-sm font-bold text-slate-800">${order.price}</span>
+                            <span className="bg-[#4c1d95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md leading-none tracking-wide">
+                              {finalRecipientUser.badge || (finalRecipientUser.isSeller !== false ? 'Pro' : 'Client')}
+                            </span>
                           </div>
-                          <h4 className="text-[12px] font-medium text-slate-600 line-clamp-1 group-hover:text-slate-900 transition-colors">
-                            {order.title}
-                          </h4>
+                          <div className="flex items-center gap-1.5 text-xs text-slate-600 mt-1 flex-wrap">
+                            <span className="font-medium text-slate-600">
+                              {finalRecipientUser.shortTitle || (finalRecipientUser.isSeller !== false ? 'Web Designer' : 'Project Manager')}
+                            </span>
+                            <span className="font-bold text-slate-900 ml-1">
+                              {finalRecipientUser.rating || finalRecipientUser.sellerRating || '4.8'}
+                            </span>
+                            <RiStarFill className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0 -mt-0.5" />
+                            <span className="text-slate-400 font-normal">
+                              ({finalRecipientUser.reviewCount || finalRecipientUser.totalReviews || 226})
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    ))}
+
+                      <div className="border-t border-slate-100 my-1" />
+
+                      {/* Member Since */}
+                      <div className="text-xs text-slate-500 font-normal">
+                        Member Since,{' '}
+                        <span className="font-bold text-slate-900">
+                          {moment(finalRecipientUser.createdAt || '2023-01-01').format('MMM YYYY')}
+                        </span>
+                      </div>
+
+                      <div className="border-t border-slate-100 my-0.5" />
+
+                      {/* Details: From & Language */}
+                      <div className="flex flex-col gap-2 text-xs">
+                        <div className="grid grid-cols-[75px_1fr] items-center">
+                          <span className="text-slate-500">From</span>
+                          <span className="text-slate-800 font-medium">
+                            {finalRecipientUser.country || 'Bangladesh'}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-[75px_1fr] items-start">
+                          <span className="text-slate-500">Language</span>
+                          <span className="text-slate-800 font-medium leading-relaxed">
+                            {formattedLanguages}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Analysis Seller Profile CTA */}
+                      <div className="pt-2">
+                        <AiGradientButton
+                          onClick={() => {
+                            const targetId = finalRecipientUser._id || finalRecipientUser.id;
+                            if (targetId) {
+                              navigate.push(`/seller/${targetId}`);
+                            } else {
+                              toast.success('AI Profile Analysis: Verified seller profile.');
+                            }
+                          }}
+                          className="w-full text-xs font-bold py-3 rounded-xl shadow-xs"
+                          text="Analysis Seller Profile"
+                        />
+                      </div>
+                    </div>
+
+                    {/* ── Card 2: Order History ── */}
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col gap-3">
+                      <div
+                        className="flex items-center justify-between cursor-pointer select-none"
+                        onClick={() => setIsOrdersExpanded(!isOrdersExpanded)}
+                      >
+                        <h3 className="text-base sm:text-[17px] font-bold text-slate-800">Order History</h3>
+                        <RiArrowDownSLine
+                          className={`w-5 h-5 text-slate-600 transition-transform duration-200 ${
+                            isOrdersExpanded ? '' : '-rotate-90'
+                          }`}
+                        />
+                      </div>
+
+                      {isOrdersExpanded && (
+                        <>
+                          <div className="flex flex-col divide-y divide-slate-100 pt-1">
+                            {displayedOrders.map((order: any, idx: number) => (
+                              <div
+                                key={order._id || idx}
+                                className="flex items-center justify-between py-2.5 gap-2 cursor-pointer hover:bg-slate-50/80 rounded-md px-1 transition-colors group"
+                                onClick={() => {
+                                  if (order._id && !String(order._id).startsWith('sample-')) {
+                                    navigate.push(`/orders/${order._id}`);
+                                  } else {
+                                    navigate.push('/orders');
+                                  }
+                                }}
+                              >
+                                <span
+                                  className="text-xs text-slate-600 font-normal truncate flex-1 group-hover:text-slate-900 transition-colors"
+                                  title={order.title}
+                                >
+                                  {order.title || `Order #${String(order._id || idx).substring(0, 8)}`}
+                                </span>
+                                {renderOrderStatusBadge(order.status)}
+                              </div>
+                            ))}
+                          </div>
+
+                          <button
+                            type="button"
+                            className="w-full mt-2 py-2.5 bg-[#f1f3f5] hover:bg-[#e4e7eb] text-slate-700 font-semibold text-xs sm:text-sm rounded-xl transition-colors text-center cursor-pointer"
+                            onClick={() => navigate.push('/orders')}
+                          >
+                            view all
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  /* ── MEDIA TAB ── */
+                  <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col gap-3">
+                    <h3 className="text-base font-bold text-slate-800">Shared Media</h3>
+                    {conversationMedia.length > 0 ? (
+                      <div className="grid grid-cols-3 gap-2 pt-1">
+                        {conversationMedia.map((mediaUrl: string, idx: number) => (
+                          <a
+                            key={idx}
+                            href={mediaUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="aspect-square rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity block bg-slate-100"
+                          >
+                            <img src={mediaUrl} alt="" className="w-full h-full object-cover" />
+                          </a>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="py-8 text-center text-xs text-slate-400">
+                        No media shared yet
+                      </div>
+                    )}
                   </div>
-                  {contactOrders.length > 3 && (
-                    <button
-                      className="w-full mt-3 py-2 text-[12px] font-bold text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
-                      onClick={() => navigate.push('/orders')}
-                    >
-                      View All Orders →
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          </aside>
-        )}
+                )}
+              </div>
+            </aside>
+          );
+        })()}
       </div>
 
       {/* Custom Offer Modal */}

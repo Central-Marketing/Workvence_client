@@ -6,7 +6,7 @@ export interface PackageFormFaq {
 }
 
 export interface PackageFormState {
-  userID: string;
+  // userID?: string;
   title: string;
   category: string;
   cover: string;
@@ -28,7 +28,7 @@ export interface PackageFormState {
 }
 
 export const initialState: PackageFormState = {
-  userID: '',
+  // userID: '',
   title: '',
   category: '',
   cover: '',

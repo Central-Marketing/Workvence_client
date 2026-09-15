@@ -74,7 +74,9 @@ const Add = () => {
 
   const mutation = useMutation({
     mutationFn: async (pkg: any) => {
-      const { data } = await axiosFetch.post('/gigs', pkg);
+      // userID is commented out from payload (backend resolves seller from auth session)
+      const { userID: _unused, ...payload } = pkg;
+      const { data } = await axiosFetch.post('/gigs', payload);
       return data;
     },
     onSuccess: () => {
@@ -309,8 +311,9 @@ const Add = () => {
 
   const handleFormSubmit = (event: any) => {
     if (event) event.preventDefault();
+    const { userID: _unused, ...stateWithoutUserId } = (state as any);
     const form = {
-      ...state,
+      ...stateWithoutUserId,
       // userID: user?._id || user?.id,
       faqs: state.faqs || []
     };

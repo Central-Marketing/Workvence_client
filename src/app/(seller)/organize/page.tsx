@@ -144,10 +144,11 @@ const OrganizePage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Mutation to create package
   const mutation = useMutation({
     mutationFn: async (pkg: any) => {
-      const { data } = await axiosFetch.post("/gigs", pkg);
+      // userID is commented out from payload (backend resolves seller from auth session)
+      const { userID: _unused, ...payload } = pkg;
+      const { data } = await axiosFetch.post('/gigs', payload);
       return data;
     },
     onSuccess: () => {
@@ -376,9 +377,10 @@ const OrganizePage = () => {
 
   // Submit Handler
   const handleSubmit = (isDraft = false) => {
+    const { userID: _unused, ...stateWithoutUserId } = (state as any);
     const form = {
-      ...state,
-      userID: user?._id || user?.id,
+      ...stateWithoutUserId,
+      // userID: user?._id || user?.id,
       faqs: state.faqs || [],
       isDraft,
       tools: toolsList,

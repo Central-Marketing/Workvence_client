@@ -447,3 +447,13 @@ body.hide-navbar nav {
   }
 }
 
+.custom-gradient-card {
+  border-radius: 20px !important;
+  border: 3px solid transparent !important;
+  background:
+    linear-gradient(#FFF, #FFF) padding-box,
+    linear-gradient(135deg, #00A6FF 0%, #3ED419 50%, #F29EFF 100%) border-box !important;
+  background-clip: padding-box, border-box !important;
+  -webkit-background-clip: padding-box, border-box !important;
+}
+

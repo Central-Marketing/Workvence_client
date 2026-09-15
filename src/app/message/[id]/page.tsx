@@ -3,7 +3,7 @@
 import toast from 'react-hot-toast';
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Flag, ArrowRight } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   RiSearchLine,
@@ -37,7 +37,6 @@ import { useUserStore } from "@/store/userStore";
 import { Loader, ChatSkeleton, Skeleton, AiGradientButton } from "@/components";
 import { MessageModerationBadge } from "@/features/chat";
 import moment from 'moment';
-import "./Message.scss";
 
 const Message = () => {
   const user = useUserStore((state: any) => state.user);
@@ -56,6 +55,7 @@ const Message = () => {
   const [offerDesc, setOfferDesc] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
   const [offerDelivery, setOfferDelivery] = useState("");
+  const [offerRevisions, setOfferRevisions] = useState("Unlimited Revision");
   const [messageText, setMessageText] = useState("");
   const [isRecipientTyping, setIsRecipientTyping] = useState(false);
   const [partnerUsername, setPartnerUsername] = useState("");
@@ -82,6 +82,25 @@ const Message = () => {
 
   useEffect(() => { userRef.current = user; }, [user]);
   useEffect(() => { convIdRef.current = conversationID; }, [conversationID]);
+
+  // Ensure user session is hydrated immediately even when Navbar is not rendered
+  useEffect(() => {
+    if (!user && typeof window !== 'undefined') {
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        try {
+          useUserStore.getState().setUser(JSON.parse(stored));
+        } catch (e) {
+          console.warn("Could not parse user from localStorage:", e);
+        }
+      }
+      axiosFetch.get('/auth/me').then(({ data }) => {
+        if (data?.user) {
+          useUserStore.getState().setUser(data.user);
+        }
+      }).catch(() => { });
+    }
+  }, [user]);
 
   const [attachment, setAttachment] = useState<any>(null);
   const [isUploadingAttachment, setIsUploadingAttachment] = useState(false);
@@ -388,7 +407,7 @@ const Message = () => {
         .get(`/conversations/${conversationID}`)
         .then(({ data }) => data?.conversation || data?.data || data)
         .catch(() => null),
-    enabled: isValidId && conversations.length > 0 && !conversations.some((c: any) => isTargetConversation(c, conversationID)),
+    enabled: isValidId && !conversations.some((c: any) => isTargetConversation(c, conversationID)),
     staleTime: 30000
   });
 
@@ -398,21 +417,50 @@ const Message = () => {
 
   const recipientUser = getOtherUser(activeConversation, user);
 
-  // If conversation room isn't populated yet, attempt fallback recipient resolution from 48-char ID
+  // Extract other user's ID and username from activeConversation if available
+  const targetOtherUserId = (() => {
+    if (recipientUser?._id || recipientUser?.id) return String(recipientUser._id || recipientUser.id);
+    if (!activeConversation) return null;
+    const currentUid = String(user?._id || user?.id || '');
+    const sId = String(activeConversation.sellerID?._id || activeConversation.sellerID || '');
+    const bId = String(activeConversation.buyerID?._id || activeConversation.buyerID || '');
+    if (sId && sId !== currentUid) return sId;
+    if (bId && bId !== currentUid) return bId;
+    return null;
+  })();
+
+  const targetOtherUsername = (() => {
+    if (recipientUser?.username) return recipientUser.username;
+    if (!activeConversation) return null;
+    const currentUsername = String(user?.username || '').toLowerCase();
+    const sName = activeConversation.seller_username || activeConversation.sellerID?.username;
+    const bName = activeConversation.buyer_username || activeConversation.buyerID?.username;
+    if (sName && sName.toLowerCase() !== currentUsername) return sName;
+    if (bName && bName.toLowerCase() !== currentUsername) return bName;
+    return null;
+  })();
+
+  // Fallback resolution if conversationID is a 48-char combined ID
   const fallbackRecipientId =
-    !recipientUser && conversationID?.length === 48
+    !targetOtherUserId && conversationID?.length === 48
       ? conversationID.substring(0, 24) === String(user?._id || user?.id)
         ? conversationID.substring(24)
         : conversationID.substring(0, 24)
       : null;
 
-  const { data: fallbackUser } = useQuery({
-    queryKey: ['user-fallback', fallbackRecipientId],
-    queryFn: () => axiosFetch.get(`/users/${fallbackRecipientId}`).then(({ data }) => data).catch(() => null),
-    enabled: !recipientUser && !!fallbackRecipientId
+  const resolveUserId = targetOtherUserId || fallbackRecipientId;
+
+  // Fetch complete real user profile from backend
+  const { data: fetchedProfileUser, isLoading: isFetchingTargetUser } = useQuery({
+    queryKey: ['user-profile', resolveUserId],
+    queryFn: () => axiosFetch.get(`/users/${resolveUserId}`).then(({ data }) => data?.user || data?.data || data).catch(() => null),
+    enabled: Boolean(resolveUserId && (!recipientUser?.createdAt || !recipientUser?.country))
   });
 
-  const finalRecipientUser = recipientUser || fallbackUser;
+  const finalRecipientUser =
+    (fetchedProfileUser && typeof fetchedProfileUser === 'object' ? { ...recipientUser, ...fetchedProfileUser } : null) ||
+    recipientUser ||
+    (targetOtherUsername || resolveUserId ? { username: targetOtherUsername || 'User', _id: resolveUserId } : null);
 
   useEffect(() => {
     activeConvRef.current = activeConversation;
@@ -592,13 +640,22 @@ const Message = () => {
       price: Number(offerPrice),
       desc: offerDesc,
       delivery: Number(offerDelivery),
+      revisions: offerRevisions || "Unlimited Revision",
       sellerID: user._id
     };
-    if (selectedPackageId) payload.packageID = selectedPackageId;
-    if (selectedBriefId) payload.briefID = selectedBriefId;
+    if (selectedPackageId) {
+      payload.packageID = selectedPackageId;
+      const pkg = sellerPackages.find((p: any) => (p._id || p.id) === selectedPackageId);
+      if (pkg?.title) payload.title = pkg.title;
+    }
+    if (selectedBriefId) {
+      payload.briefID = selectedBriefId;
+      const brief = chatBriefs.find((b: any) => (b._id || b.id) === selectedBriefId);
+      if (brief?.title) payload.title = brief.title;
+    }
 
     mutation.mutate({ conversationID, description: `[CUSTOM_OFFER]${JSON.stringify(payload)}` });
-    setSelectedPackageId(""); setSelectedBriefId(""); setOfferDesc(""); setOfferPrice(""); setOfferDelivery("");
+    setSelectedPackageId(""); setSelectedBriefId(""); setOfferDesc(""); setOfferPrice(""); setOfferDelivery(""); setOfferRevisions("Unlimited Revision");
     setShowOfferModal(false);
     toast.success("Custom offer sent!");
   };
@@ -700,6 +757,13 @@ const Message = () => {
     navigator.clipboard.writeText(roomUrl)
       .then(() => toast.success("Meeting link copied to clipboard!"))
       .catch(() => toast.error("Could not copy link"));
+  };
+
+  const handleCopyText = (text: string, msg: string = "Copied to clipboard!") => {
+    if (!text) return;
+    navigator.clipboard.writeText(text)
+      .then(() => toast.success(msg))
+      .catch(() => toast.error("Could not copy text"));
   };
 
   const fmt = (d: any) => moment(d).format('MMM DD, HH:mm');
@@ -812,60 +876,77 @@ const Message = () => {
     );
   };
 
+  const renderMessageContent = (msg: any) => {
+    const text = msg.description || '';
+    if (!text) return null;
+
+    const matchedWord = msg.moderation?.matchedWord || '';
+    if (msg.moderation?.flagged && matchedWord && matchedWord.trim().length > 0) {
+      try {
+        const escaped = matchedWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escaped})`, 'gi');
+        const parts = text.split(regex);
+        return (
+          <p className="text-[13.5px] text-slate-900 m-0 whitespace-pre-wrap [overflow-wrap:anywhere] [word-break:break-word] leading-relaxed">
+            {parts.map((part: string, idx: number) =>
+              regex.test(part) ? (
+                <mark key={idx} className="bg-[#FFE600] text-slate-900 px-0.5 rounded-[2px] font-medium">
+                  {part}
+                </mark>
+              ) : (
+                renderMessageTextWithLinks(part)
+              )
+            )}
+          </p>
+        );
+      } catch { }
+    }
+
+    return (
+      <p className="text-[13.5px] text-slate-800 m-0 whitespace-pre-wrap [overflow-wrap:anywhere] [word-break:break-word] leading-relaxed">
+        {renderMessageTextWithLinks(text)}
+      </p>
+    );
+  };
+
   if (convsLoading && conversations.length === 0) {
     return <ChatSkeleton />;
   }
 
   return (
-    <div className="message-page">
-      <div className="inbox-layout">
+    <div className="h-full max-h-full min-h-0 bg-white flex overflow-hidden w-full flex-1">
+      <div className="flex w-full h-full max-h-full min-h-0 flex-1 overflow-hidden relative">
 
         <div className={`md:hidden fixed inset-0 bg-black/20 z-30 transition-opacity duration-300 ease-in-out ${isLeftSideOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsLeftSideOpen(false)}></div>
 
         {/* ── LEFT: Conversation List ── */}
         {(() => {
-          const sampleConversationsFallback = [
-            { _id: 'sample-c1', contactName: 'Ava Thompson', image: '/media/noavatar.png', lastMessage: 'Let’s set up some time next...', time: '8:32 PM', unreadCount: 0 },
-            { _id: 'sample-c2', contactName: 'Liam Martinez', image: '/media/noavatar.png', lastMessage: 'Can you review the late...', time: '9:15 PM', unreadCount: 0 },
-            { _id: 'sample-c3', contactName: 'Sophia Patel', image: '/media/noavatar.png', lastMessage: 'I’ll send over the files sh...', time: '9:45 PM', unreadCount: 3 },
-            { _id: 'sample-c4', contactName: 'Noah Kim', image: '/media/noavatar.png', lastMessage: 'Great job on the present...', time: '10:05 PM', unreadCount: 0 },
-            { _id: 'sample-c5', contactName: 'Isabella Garcia', image: '/media/noavatar.png', lastMessage: 'Do you have any update...', time: '10:30 PM', unreadCount: 0 },
-            { _id: 'sample-c6', contactName: 'Mason Nguyen', image: '/media/noavatar.png', lastMessage: 'Meeting rescheduled to...', time: '11:00 PM', unreadCount: 0 },
-            { _id: 'sample-c7', contactName: 'Mia Johnson', image: '/media/noavatar.png', lastMessage: 'I’ll be out of office next...', time: '11:25 PM', unreadCount: 0 },
-            { _id: 'sample-c8', contactName: 'Ethan Wilson', image: '/media/noavatar.png', lastMessage: 'Let’s grab lunch someti...', time: '11:50 PM', unreadCount: 0 },
-            { _id: 'sample-c9', contactName: 'Olivia Brown', image: '/media/noavatar.png', lastMessage: 'Thanks for your quick re...', time: '12:10 AM', unreadCount: 0 },
-            { _id: 'sample-c10', contactName: 'James Davis', image: '/media/noavatar.png', lastMessage: 'Can we push the deadli...', time: '12:45 AM', unreadCount: 0 },
-            { _id: 'sample-c11', contactName: 'Emily Lopez', image: '/media/noavatar.png', lastMessage: 'Here’s the feedback fro...', time: '1:05 AM', unreadCount: 0 },
-          ];
-
-          const readCount = conversations.length > 0
-            ? conversations.filter((c: any) => !isConversationUnread(c, user)).length
-            : 3;
-
-          const displayedConversations = conversations.length > 0
-            ? filteredConversations
-            : sampleConversationsFallback.filter((c: any) => {
-                if (convFilterTab === 'read' && c.unreadCount > 0) return false;
-                if (convFilterTab === 'unread' && c.unreadCount === 0) return false;
-                if (!convSearchQuery) return true;
-                const searchLower = convSearchQuery.toLowerCase();
-                return c.contactName.toLowerCase().includes(searchLower) || c.lastMessage.toLowerCase().includes(searchLower);
-              });
+          const readCount = conversations.filter((c: any) => !isConversationUnread(c, user)).length;
+          const displayedConversations = filteredConversations;
 
           return (
-            <aside className={`conversation-list md:!w-[320px] lg:!w-[340px] xl:!w-[350px] transform transition-transform duration-300 ease-in-out max-md:absolute max-md:z-40 max-md:w-[320px] max-md:h-full max-md:shadow-xl max-md:!flex ${isLeftSideOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'}`}>
+            <aside className={`w-[300px] min-w-[280px] md:w-[320px] lg:w-[340px] xl:w-[350px] border-r border-[rgba(0,0,0,0.10)] flex flex-col bg-[var(--Foundation-White-white-200,#F8F8F8)] overflow-hidden box-border transform transition-transform duration-300 ease-in-out max-md:absolute max-md:z-40 max-md:w-[320px] max-md:h-full max-md:shadow-xl max-md:flex ${isLeftSideOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'}`}>
               {/* Header: Back Button + Messages Heading */}
-              <div className="p-4 sm:p-5 pb-3 flex flex-col gap-3.5 border-b border-slate-100 bg-white">
+              <div className="p-4 sm:p-5 pb-3 flex flex-col gap-3.5 border-b border-slate-100">
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
                     onClick={() => navigate.push('/messages')}
-                    className="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors shrink-0 cursor-pointer"
+                    className="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-[#126D6B] bg-[#ffffff] hover:bg-slate-50 transition-colors shrink-0 cursor-pointer"
                     aria-label="Back to messages"
                   >
                     <ArrowLeft className="w-4 h-4 text-slate-700" />
                   </button>
-                  <h2 className="text-2xl sm:text-[28px] font-bold text-slate-900 tracking-tight leading-none">
+                  <h2 className="text-[32px]
+  sm:text-[36px]
+  md:text-[40px]
+  lg:text-[44px]
+  xl:text-[48px]
+  font-normal
+  leading-normal
+  tracking-normal
+  text-[#292929]
+  font-sf-pro">
                     Messages
                   </h2>
                 </div>
@@ -887,22 +968,20 @@ const Message = () => {
                   <button
                     type="button"
                     onClick={() => setConvFilterTab('all')}
-                    className={`px-4 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
-                      convFilterTab === 'all'
-                        ? 'border-teal-700 text-teal-800 bg-white shadow-2xs font-semibold'
-                        : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'
-                    }`}
+                    className={`px-4 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${convFilterTab === 'all'
+                      ? 'border-teal-700 text-teal-800 bg-white shadow-2xs font-semibold'
+                      : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'
+                      }`}
                   >
                     All
                   </button>
                   <button
                     type="button"
                     onClick={() => setConvFilterTab('read')}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors flex items-center gap-1.5 cursor-pointer ${
-                      convFilterTab === 'read'
-                        ? 'border-teal-700 text-teal-800 bg-white shadow-2xs font-semibold'
-                        : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'
-                    }`}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors flex items-center gap-1.5 cursor-pointer ${convFilterTab === 'read'
+                      ? 'border-teal-700 text-teal-800 bg-white shadow-2xs font-semibold'
+                      : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'
+                      }`}
                   >
                     <span>Read</span>
                     <span className="px-1.5 py-0.2 bg-slate-100 text-slate-500 rounded-full text-[10px] font-semibold">
@@ -912,11 +991,10 @@ const Message = () => {
                   <button
                     type="button"
                     onClick={() => setConvFilterTab('unread')}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
-                      convFilterTab === 'unread'
-                        ? 'border-teal-700 text-teal-800 bg-white shadow-2xs font-semibold'
-                        : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'
-                    }`}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${convFilterTab === 'unread'
+                      ? 'border-teal-700 text-teal-800 bg-white shadow-2xs font-semibold'
+                      : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'
+                      }`}
                   >
                     Unread
                   </button>
@@ -933,35 +1011,31 @@ const Message = () => {
                   </div>
                 ) : (
                   displayedConversations.map((conv: any) => {
-                    const isReal = Boolean(conv._id && !String(conv._id).startsWith('sample-'));
-                    const isUnread = isReal ? isConversationUnread(conv, user) : Boolean(conv.unreadCount && conv.unreadCount > 0);
-                    const contact = isReal ? getOtherUser(conv, user) : null;
-                    const contactName = isReal
-                      ? (contact?.name || contact?.username || 'User')
-                      : (conv.contactName || 'User');
-                    const avatarSrc = isReal
-                      ? getAvatarUrl(contact?.image || contact?.img || contact?.avatar || '/media/noavatar.png')
-                      : (conv.image || '/media/noavatar.png');
-                    const lastMsg = isReal
-                      ? (conv.lastMessage?.startsWith('[CUSTOM_OFFER]')
-                          ? '📋 Custom Offer'
-                          : conv.lastMessage?.startsWith('[MEETING_INVITE]')
-                            ? '📹 Video Meeting Invitation'
-                            : conv.lastMessage || 'No messages yet')
-                      : (conv.lastMessage || 'No messages yet');
-                    const canonicalId = isReal ? (conv.uuid || conv.conversationID || conv._id || conv.id) : conv._id;
-                    const isActive = isReal ? isTargetConversation(conv, conversationID) : false;
-                    const timeText = isReal ? moment(conv.updatedAt).format('h:mm A') : (conv.time || '12:00 PM');
-                    const unreadCountBadge = isReal ? (conv.unreadCount || (isUnread ? 1 : 0)) : (conv.unreadCount || 0);
+                    const isUnread = isConversationUnread(conv, user);
+                    const contact = getOtherUser(conv, user);
+                    const contactName =
+                      contact?.username ||
+                      contact?.name ||
+                      (user?.isSeller ? conv.buyer_username : conv.seller_username) ||
+                      'User';
+                    const avatarSrc = getAvatarUrl(contact?.image || contact?.img || contact?.avatar || '/media/noavatar.png');
+                    const lastMsg = conv.lastMessage?.startsWith('[CUSTOM_OFFER]')
+                      ? '📋 Custom Offer'
+                      : conv.lastMessage?.startsWith('[MEETING_INVITE]')
+                        ? '📹 Video Meeting Invitation'
+                        : conv.lastMessage || 'No messages yet';
+                    const canonicalId = conv.uuid || conv.conversationID || conv._id || conv.id;
+                    const isActive = isTargetConversation(conv, conversationID);
+                    const timeText = conv.updatedAt ? moment(conv.updatedAt).format('h:mm A') : '';
+                    const unreadCountBadge = conv.unreadCount || (isUnread ? 1 : 0);
 
                     return (
                       <div
                         key={conv._id || canonicalId}
-                        className={`flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl cursor-pointer transition-all duration-150 ${
-                          isActive ? 'bg-slate-100/90' : 'hover:bg-slate-50'
-                        }`}
+                        className={`flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl cursor-pointer transition-all duration-150 ${isActive ? 'bg-white' : 'hover:bg-slate-50'
+                          }`}
                         onClick={() => {
-                          if (isReal) {
+                          if (canonicalId) {
                             navigate.push(`/message/${canonicalId}`);
                           }
                           setIsLeftSideOpen(false);
@@ -1002,29 +1076,29 @@ const Message = () => {
         })()}
 
         {/* ── CENTER: Chat Window ── */}
-        <main className="chat-window">
+        <main className="flex-1 flex flex-col overflow-hidden bg-white min-w-0">
           {!conversationID ? (
-            <div className="chat-empty-state">
-              <div className="empty-icon">💬</div>
-              <h3>Select a conversation</h3>
-              <p>Choose from your inbox on the left to start chatting</p>
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400 gap-2">
+              <div className="text-4xl mb-2">💬</div>
+              <h3 className="text-lg font-bold text-slate-800">Select a conversation</h3>
+              <p className="text-sm text-slate-500">Choose from your inbox on the left to start chatting</p>
             </div>
           ) : (
             <>
               {/* Header */}
-              <div className="chat-head max-md:px-3.5 max-md:py-2.5">
-                <button className="md:hidden mr-3 text-slate-500 text-xl flex-shrink-0" onClick={() => setIsLeftSideOpen(true)}>
+              <div className="px-5 py-3.5 border-b border-[rgba(0,0,0,0.10)] flex justify-between items-center bg-[#F8F8F8] max-md:px-3.5 max-md:py-2.5">
+                <button className="md:hidden mr-3 text-slate-500 text-xl flex-shrink-0 cursor-pointer" onClick={() => setIsLeftSideOpen(true)}>
                   <RiMenuLine />
                 </button>
                 {finalRecipientUser ? (
                   <>
-                    <div className="head-user flex-1 cursor-pointer" onClick={() => setIsRightSideOpen(true)}>
-                      <div className="head-avatar">
-                        <img src={finalRecipientUser.image || '/media/noavatar.png'} alt="" />
+                    <div className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer" onClick={() => setIsRightSideOpen(true)}>
+                      <div className="shrink-0">
+                        <img src={finalRecipientUser.image || '/media/noavatar.png'} alt="" className="w-10 h-10 rounded-full object-cover border border-slate-100" />
                       </div>
-                      <div className="head-info">
-                        <h3>{finalRecipientUser.username}</h3>
-                        <span className="head-status font-medium">
+                      <div className="min-w-0">
+                        <h3 className="text-[15px] font-bold text-slate-900 leading-tight truncate">{finalRecipientUser.username}</h3>
+                        <span className="text-xs text-slate-500 font-medium">
                           {isRecipientTyping ? (
                             <span className="text-brand-green font-semibold animate-pulse flex items-center gap-1">
                               <span className="w-1.5 h-1.5 bg-brand-green rounded-full"></span> typing...
@@ -1035,11 +1109,21 @@ const Message = () => {
                         </span>
                       </div>
                     </div>
-                    <div className="head-actions flex items-center gap-2">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      {/* Optional Seller Action Buttons: Create Offer */}
+                      {user?.isSeller && (
+                        <button
+                          type="button"
+                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#000000] text-white hover:bg-gray-200 hover:text-black transition-colors whitespace-nowrap flex-shrink-0 mb-0.5 cursor-pointer"
+                          onClick={() => setShowOfferModal(true)}
+                        >
+                          Create Offer
+                        </button>
+                      )}
 
                       <button
                         type="button"
-                        className="action-icon p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600 transition-colors flex items-center justify-center cursor-pointer"
+                        className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600 transition-colors flex items-center justify-center cursor-pointer"
                         onClick={() => {
                           setMeetingTitle(`Job Discussion with @${finalRecipientUser?.username || 'Client'}`);
                           setShowMeetingModal(true);
@@ -1047,31 +1131,38 @@ const Message = () => {
                         title="Start Video Meeting"
                         aria-label="Start Video Meeting"
                       >
-                        <RiVideoChatLine className="w-5 h-5 text-brand-green" />
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M2 11C2 7.70017 2 6.05025 3.02513 5.02513C4.05025 4 5.70017 4 9 4H10C13.2998 4 14.9497 4 15.9749 5.02513C17 6.05025 17 7.70017 17 11V13C17 16.2998 17 17.9497 15.9749 18.9749C14.9497 20 13.2998 20 10 20H9C5.70017 20 4.05025 20 3.02513 18.9749C2 17.9497 2 16.2998 2 13V11Z" stroke="#292929" stroke-width="1.5" />
+                          <path d="M17 8.90585L17.1259 8.80196C19.2417 7.05623 20.2996 6.18336 21.1498 6.60482C22 7.02628 22 8.42355 22 11.2181V12.7819C22 15.5765 22 16.9737 21.1498 17.3952C20.2996 17.8166 19.2417 16.9438 17.1259 15.198L17 15.0941" stroke="#292929" stroke-width="1.5" stroke-linecap="round" />
+                          <path d="M11.5 11C12.3284 11 13 10.3284 13 9.5C13 8.67157 12.3284 8 11.5 8C10.6716 8 10 8.67157 10 9.5C10 10.3284 10.6716 11 11.5 11Z" stroke="#292929" stroke-width="1.5" />
+                        </svg>
                       </button>
 
                       {isMsgSearchActive ? (
-                        <div style={{ display: 'flex', alignItems: 'center', background: '#f1f5f9', borderRadius: '20px', padding: '2px 10px' }}>
+                        <div className="flex items-center bg-slate-100 rounded-full px-2.5 py-0.5">
                           <input
                             type="text"
                             placeholder="Search in chat..."
                             value={msgSearchQuery}
                             onChange={(e) => setMsgSearchQuery(e.target.value)}
-                            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '14px', padding: '4px', width: '150px' }}
+                            className="border-none bg-transparent outline-none text-sm p-1 w-36 text-slate-800 placeholder:text-slate-400"
                             autoFocus
                           />
-                          <button className="action-icon" onClick={() => { setIsMsgSearchActive(false); setMsgSearchQuery(''); }} style={{ margin: 0, padding: 0, fontSize: '18px' }}>&times;</button>
+                          <button className="text-slate-500 hover:text-slate-800 p-0 text-lg cursor-pointer leading-none" onClick={() => { setIsMsgSearchActive(false); setMsgSearchQuery(''); }}>&times;</button>
                         </div>
                       ) : (
-                        <button className="action-icon" onClick={() => setIsMsgSearchActive(true)}><RiSearchLine /></button>
+                        <button className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors flex items-center justify-center cursor-pointer" onClick={() => setIsMsgSearchActive(true)}><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M17 17L21 21" stroke="#292929" stroke-width="1.5" stroke-linecap="round" strokeLinejoin="round" />
+                          <path d="M19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C15.4183 19 19 15.4183 19 11Z" stroke="#292929" stroke-width="1.5" stroke-linecap="round" strokeLinejoin="round" />
+                        </svg></button>
                       )}
-                      <button className="lg:hidden action-icon ml-1" onClick={() => setIsRightSideOpen(true)}><RiInformationLine /></button>
+                      <button className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors flex items-center justify-center cursor-pointer ml-1 text-xl" onClick={() => setIsRightSideOpen(true)}><RiInformationLine /></button>
                     </div>
                   </>
-                ) : <h3>Conversation</h3>}
+                ) : <h3 className="text-base font-bold text-slate-800">Conversation</h3>}
               </div>
               {/* Messages */}
-              <div className="messages-scroll">
+              <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-5 flex flex-col gap-4 bg-[#F0F0F0] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full">
                 {msgsError ? (
                   <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-red-50/50 dark:bg-red-950/20 m-6 rounded-2xl border border-red-200 dark:border-red-900/50 shadow-sm">
                     <div className="w-16 h-16 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center text-3xl mb-4 font-bold">🚫</div>
@@ -1085,32 +1176,37 @@ const Message = () => {
                     <div className="flex gap-3 max-w-md">
                       <Skeleton className="w-8 h-8 rounded-full flex-shrink-0" />
                       <div className="space-y-2">
-                        <Skeleton className="w-48 h-12 rounded-2xl rounded-tl-none" />
+                        <Skeleton className="w-48 h-12 rounded-[10px_10px_10px_0]" />
                         <Skeleton className="w-16 h-3" />
                       </div>
                     </div>
                     <div className="flex gap-3 max-w-md ml-auto flex-row-reverse">
                       <Skeleton className="w-8 h-8 rounded-full flex-shrink-0" />
                       <div className="space-y-2 flex flex-col items-end">
-                        <Skeleton className="w-64 h-16 rounded-2xl rounded-tr-none" />
+                        <Skeleton className="w-64 h-16 rounded-[10px_10px_0_10px]" />
                         <Skeleton className="w-16 h-3" />
                       </div>
                     </div>
                     <div className="flex gap-3 max-w-md">
                       <Skeleton className="w-8 h-8 rounded-full flex-shrink-0" />
                       <div className="space-y-2">
-                        <Skeleton className="w-36 h-10 rounded-2xl rounded-tl-none" />
+                        <Skeleton className="w-36 h-10 rounded-[10px_10px_10px_0]" />
                         <Skeleton className="w-16 h-3" />
                       </div>
                     </div>
                   </div>
                 ) : filteredMessages.length === 0 ? (
-                  <div className="scroll-empty">{msgSearchQuery ? "No messages found" : "Send the first message!"}</div>
+                  <div className="py-12 m-auto text-center text-sm text-slate-400 font-medium">{msgSearchQuery ? "No messages found" : "Send the first message!"}</div>
                 ) : filteredMessages.map((msg: any, index: number) => {
                   const senderObj = msg.senderID || msg.userID;
                   const senderIdStr = String(senderObj?._id || senderObj?.id || senderObj || '');
                   const currentUserIdStr = String(user?._id || user?.id || '');
-                  const isOwner = currentUserIdStr !== '' && senderIdStr === currentUserIdStr;
+                  const currentUsername = String(user?.username || '').toLowerCase();
+                  const senderUsername = String(senderObj?.username || msg.username || '').toLowerCase();
+                  const isOwner = Boolean(
+                    (currentUserIdStr && senderIdStr && currentUserIdStr === senderIdStr) ||
+                    (currentUsername && senderUsername && currentUsername === senderUsername)
+                  );
                   const offer = msg.isCustomOffer || msg.description?.startsWith('[CUSTOM_OFFER]') ? parseOffer(msg.description) : null;
                   const meeting = msg.description?.startsWith('[MEETING_INVITE]') ? parseMeeting(msg.description) : null;
                   const isOfferAccepted = Boolean(msg.isOfferAccepted || msg.offerStatus === 'accepted');
@@ -1120,203 +1216,300 @@ const Message = () => {
                   const isAccepted = isOfferAccepted || Boolean(acceptedOrder);
                   const isModerated = Boolean(msg.moderation?.flagged);
                   const modLevel = String(msg.moderation?.warningLevel || 'medium').toLowerCase();
-                  const moderationClass = isModerated ? `moderated moderated-${modLevel}` : '';
+                  const bubbleModerationClass = isModerated
+                    ? '!rounded-[10px_10px_10px_0] !border !border-[var(--warning-500,#F00000)] !bg-[#FFF]'
+                    : '';
 
-                  const msgDate = moment(msg.createdAt).format('MMM DD');
-                  const prevMsgDate = index > 0 ? moment(filteredMessages[index - 1].createdAt).format('MMM DD') : null;
-                  const showDateDivider = msgDate !== prevMsgDate;
+                  const msgDateKey = moment(msg.createdAt).format('YYYY-MM-DD');
+                  const prevMsgDateKey = index > 0 ? moment(filteredMessages[index - 1].createdAt).format('YYYY-MM-DD') : null;
+                  const showDateDivider = msgDateKey !== prevMsgDateKey;
+                  const isToday = moment(msg.createdAt).isSame(moment(), 'day');
+                  const dateText = isToday ? 'Today' : moment(msg.createdAt).format('dddd, MMMM D');
 
                   return (
-                    <div key={msg._id || msg.id} className="msg-wrapper">
+                    <div key={msg._id || msg.id} className="flex flex-col gap-4">
                       {showDateDivider && (
-                        <div className="date-separator">
-                          <span className="date-pill">{msgDate === moment().format('MMM DD') ? 'Today' : msgDate}</span>
+                        <div className="flex items-center justify-center gap-4 my-2 w-full before:flex-1 before:h-[1px] before:bg-slate-200 after:flex-1 after:h-[1px] after:bg-slate-200">
+                          <span className="text-xs text-slate-400 font-normal px-1 whitespace-nowrap">{dateText}</span>
                         </div>
                       )}
-                      <div className={`msg-row max-md:max-w-[85%] ${isOwner ? 'msg-owner' : 'msg-other'} ${offer ? 'has-offer !max-w-[95%] xl:!max-w-[85%]' : ''} ${meeting ? 'has-meeting !max-w-[95%] xl:!max-w-[85%]' : ''}`}>
+                      <div className={`flex gap-3 items-end max-w-[85%] sm:max-w-[75%] [overflow-wrap:anywhere] [word-break:break-word] ${isOwner ? 'self-end justify-end ml-auto' : 'self-start mr-auto'} ${offer || meeting ? '!max-w-[95%] xl:!max-w-[85%]' : ''}`}>
                         {!isOwner && (
-                          <img className="msg-avatar" src={senderObj?.image || finalRecipientUser?.image || '/media/noavatar.png'} alt="" />
+                          <img className="w-8 h-8 rounded-full object-cover self-end shrink-0 border border-slate-100" src={senderObj?.image || finalRecipientUser?.image || '/media/noavatar.png'} alt="" />
                         )}
 
                         {offer ? (
-                          <div className={`offer-card max-md:p-3.5 ${isWithdrawn ? 'withdrawn' : ''} ${isModerated ? `border-${modLevel === 'low' ? 'amber-400' : modLevel === 'medium' ? 'orange-400' : modLevel === 'critical' ? 'red-700' : 'red-500'}` : ''}`}>
-                            {isWithdrawn ? (
-                              <p className="withdrawn-text">↩ This offer was withdrawn by the seller.</p>
-                            ) : (
-                              <div className="offer-content flex flex-col w-full">
-                                {isModerated && (
-                                  <div className="mb-2">
-                                    <MessageModerationBadge moderation={msg.moderation} isOwner={isOwner} />
-                                  </div>
+                          <div
+                            className={`w-[410px] max-w-full p-5 flex flex-col justify-center items-start gap-5 shadow-sm custom-gradient-card ${isWithdrawn ? 'opacity-80' : ''
+                              }`}
+                            style={{
+                              borderRadius: '20px',
+                              border: '3px solid transparent',
+                              background:
+                                'linear-gradient(#FFF, #FFF) padding-box, linear-gradient(135deg, #00A6FF 0%, #3ED419 50%, #F29EFF 100%) border-box',
+                              WebkitBackgroundClip: 'padding-box, border-box',
+                              backgroundClip: 'padding-box, border-box',
+                            }}
+                          >
+                            {isWithdrawn && (
+                              <p className="text-xs text-red-600 italic font-medium m-0">
+                                ↩ This offer was withdrawn by the seller.
+                              </p>
+                            )}
+
+                            {isAccepted && (
+                              <div className="w-full flex items-center justify-between gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200/80 rounded-xl px-3.5 py-2 text-xs font-bold">
+                                <span>✓ Custom Proposal Accepted</span>
+                                {targetOrderId && (
+                                  <span className="text-[11px] font-mono text-emerald-700">
+                                    Order #{String(targetOrderId).slice(-6)}
+                                  </span>
                                 )}
-                                {isAccepted && (
-                                  <div className="flex items-center justify-between gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200/80 rounded-xl px-3.5 py-1.5 text-xs font-bold mb-2.5">
-                                    <span>✓ Custom Proposal Accepted</span>
-                                    {targetOrderId && (
-                                      <span className="text-[11px] font-mono text-emerald-700">Order #{String(targetOrderId).slice(-6)}</span>
-                                    )}
-                                  </div>
-                                )}
-
-                                <div className="flex justify-between items-start mb-2 gap-4">
-                                  <div className="flex-1 min-w-0">
-                                    <h4 className="text-base font-bold text-slate-900 leading-tight mb-1.5">Custom Proposal</h4>
-                                    {(() => {
-                                      const isExpanded = Boolean(expandedProposalIds[msg._id || msg.id]);
-                                      const descText = offer.desc || 'No description provided.';
-                                      const isLongDesc = descText.length > 80;
-
-                                      return (
-                                        <div className="text-sm text-slate-700">
-                                          <p className={isExpanded ? "whitespace-pre-wrap leading-relaxed text-slate-800" : "line-clamp-2 text-slate-600"}>
-                                            {renderMessageTextWithLinks(descText)}
-                                          </p>
-                                          {isLongDesc && (
-                                            <button
-                                              type="button"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                toggleProposalExpand(msg._id || msg.id);
-                                              }}
-                                              className="text-xs font-bold text-brand-green hover:underline mt-1 cursor-pointer inline-flex items-center gap-1"
-                                            >
-                                              {isExpanded ? "See less ▲" : "... See more ▼"}
-                                            </button>
-                                          )}
-                                        </div>
-                                      );
-                                    })()}
-                                  </div>
-                                  <div className="text-xl sm:text-2xl font-bold text-slate-900 shrink-0 whitespace-nowrap flex-shrink-0">${offer.price}</div>
-                                </div>
-
-                                <div className="flex items-center gap-5 py-3 border-y border-slate-100 my-2 flex-wrap">
-                                  <div className="flex items-center gap-1.5 text-sm text-slate-600">
-                                    <RiTimeLine className="text-slate-400 text-lg" />
-                                    <span className="font-semibold">{offer.delivery} Days Delivery</span>
-                                  </div>
-                                </div>
-
-                                <div className="flex gap-2 w-full mt-1">
-                                  {isAccepted ? (
-                                    <button
-                                      className="flex-1 py-2 px-3 rounded-lg font-bold text-sm bg-brand-green text-white hover:brightness-95 transition-all text-center"
-                                      onClick={() => {
-                                        if (targetOrderId) navigate.push(`/orders/${targetOrderId}`);
-                                        else navigate.push('/orders');
-                                      }}
-                                    >
-                                      View Order
-                                    </button>
-                                  ) : (
-                                    <>
-                                      {!isOwner && (
-                                        <button className="flex-1 py-2 px-3 rounded-lg font-bold text-sm bg-brand-green text-white hover:brightness-95 transition-all" onClick={() => handleAcceptOffer(offer)}>Accept</button>
-                                      )}
-                                      {isOwner && (
-                                        <button className="flex-1 py-2 px-3 rounded-lg font-bold text-sm bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all" onClick={() => handleWithdraw(msg._id || msg.id)}>Withdraw</button>
-                                      )}
-                                    </>
-                                  )}
-                                  <button
-                                    className="flex-1 py-2 px-3 rounded-lg font-bold text-sm border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all cursor-pointer"
-                                    onClick={() => {
-                                      const gigId = offer?.packageID || offer?.gigID || msg?.gigID || (msg?.gig ? (msg.gig._id || msg.gig.id) : null);
-                                      const briefId = offer?.briefID || msg?.briefID || (msg?.brief ? (msg.brief._id || msg.brief.id) : null);
-
-                                      if (gigId) {
-                                        navigate.push(`/package/${gigId}`);
-                                      } else if (briefId) {
-                                        navigate.push(`/briefs/${briefId}`);
-                                      } else {
-                                        setViewingOfferDetails({ offer, msgId: msg._id || msg.id, acceptedOrder: isAccepted ? (targetOrderId || true) : null, isOwner });
-                                      }
-                                    }}
-                                  >
-                                    View Details
-                                  </button>
-                                </div>
                               </div>
                             )}
-                          </div>
-                        ) : meeting ? (
-                          <div className="meeting-card max-md:p-3.5 w-[460px] max-w-full bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs overflow-hidden">
-                            <div className="flex items-center justify-between gap-2 mb-3 pb-2.5 border-b border-slate-100">
-                              <div className="flex items-center gap-2.5">
-                                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg flex-shrink-0 border border-emerald-100/80">
-                                  <RiVideoChatLine className="w-5 h-5 text-brand-green" />
+
+                            {/* Top Row: Package/Offer Title + Price */}
+                            <div className="w-full flex items-start justify-between gap-4">
+                              <h4 className="text-[17px] sm:text-[18px] font-bold text-slate-900 leading-[1.3] flex-1 min-w-0 pr-2">
+                                {offer.packageTitle ||
+                                  offer.gigTitle ||
+                                  offer.title ||
+                                  (offer.packageID && sellerPackages.find((p: any) => (p._id || p.id) === offer.packageID)?.title) ||
+                                  (offer.briefID && chatBriefs.find((b: any) => (b._id || b.id) === offer.briefID)?.title) ||
+                                  "I will help you design better landing landing pages"}
+                              </h4>
+                              <div className="text-[26px] sm:text-[28px] font-bold text-black shrink-0 leading-none">
+                                ${offer.price}
+                              </div>
+                            </div>
+
+                            <div className="w-full h-[1px] bg-[#EBEBEB] -my-1" />
+
+                            {/* Middle Section: Title + Description + Read Full Proposal */}
+                            <div className="w-full flex flex-col gap-2">
+                              <span className="text-[15px] font-medium text-slate-900">Title</span>
+                              <p className="text-[14px] text-slate-600 leading-relaxed m-0 font-normal">
+                                {renderMessageTextWithLinks(offer.desc || "1 Screen -Clean Dashboard UI UX design - Developer-ready Figma files - Unlimited revisions")}
+                              </p>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setViewingOfferDetails({
+                                    offer,
+                                    msgId: msg._id || msg.id,
+                                    acceptedOrder: isAccepted ? (targetOrderId || true) : null,
+                                    isOwner,
+                                  });
+                                }}
+                                className="text-[14px] font-medium text-[#007A64] hover:text-[#005c4b] cursor-pointer flex items-center gap-1.5 w-fit mt-0.5 transition-colors"
+                              >
+                                <span>Read Full Proposal</span>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                                  <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
+                              </button>
+                            </div>
+
+                            <div className="w-full h-[1px] bg-[#EBEBEB] -my-1" />
+
+                            {/* Inclusions Row: Header + Revisions + Delivery */}
+                            <div className="w-full flex flex-col gap-3">
+                              <span className="text-[15px] font-medium text-slate-900">The offer includes</span>
+                              <div className="flex items-center gap-6 text-[14px] text-slate-700 flex-wrap">
+                                <div className="flex items-center gap-2">
+                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#292929" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                    <path d="M3 3v5h5" />
+                                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                                    <path d="M21 21v-5h-5" />
+                                  </svg>
+                                  <span>{offer.revision || offer.revisions || "Unlimited Revision"}</span>
                                 </div>
-                                <div>
-                                  <h4 className="text-sm font-bold text-slate-900 leading-tight">Video Meeting Invitation</h4>
-                                  <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    <span className="text-emerald-700 font-medium">Ready to join</span>
-                                    {meeting.meetingId && (
-                                      <>
-                                        <span>•</span>
-                                        <span className="font-mono text-slate-600 font-semibold">ID: {meeting.meetingId}</span>
-                                      </>
-                                    )}
-                                    {meeting.password && (
-                                      <>
-                                        <span>•</span>
-                                        <span className="font-mono text-slate-600 font-semibold">Passcode: {meeting.password}</span>
-                                      </>
-                                    )}
-                                  </div>
+                                <div className="flex items-center gap-2">
+                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#292929" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="9" />
+                                    <polyline points="12 7 12 12 15 14" />
+                                  </svg>
+                                  <span>{offer.delivery} Day Delivery</span>
                                 </div>
                               </div>
                             </div>
 
-                            <div className="mb-4">
-                              <h5 className="text-[15px] font-bold text-slate-800 leading-snug mb-1">
-                                {meeting.title || "Freelancer Job Discussion"}
+                            {/* Action Button */}
+                            <div className="w-full pt-1">
+                              {isAccepted ? (
+                                <button
+                                  type="button"
+                                  className="w-full h-12 rounded-[10px] font-semibold text-[15px] bg-[#000000] text-white hover:bg-neutral-800 active:scale-[0.99] transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-xs"
+                                  onClick={() => {
+                                    if (targetOrderId) navigate.push(`/orders/${targetOrderId}`);
+                                    else navigate.push('/orders');
+                                  }}
+                                >
+                                  <span>View Order</span>
+                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                  </svg>
+                                </button>
+                              ) : isWithdrawn ? (
+                                <div className="w-full h-12 rounded-[10px] font-semibold text-[15px] bg-[#F3F4F6] text-slate-400 flex items-center justify-center select-none">
+                                  Withdrawn
+                                </div>
+                              ) : !isOwner ? (
+                                <button
+                                  type="button"
+                                  className="w-full h-12 rounded-[10px] font-semibold text-[15px] bg-[#000000] text-white hover:bg-neutral-800 active:scale-[0.99] transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-xs"
+                                  onClick={() => handleAcceptOffer(offer)}
+                                >
+                                  <span>Accept Offer</span>
+                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                  </svg>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="w-full h-12 rounded-[10px] font-semibold text-[15px] bg-[#ECECEC] text-[#1E293B] hover:bg-[#E0E0E0] active:scale-[0.99] transition-all flex items-center justify-center cursor-pointer shadow-xs"
+                                  onClick={() => handleWithdraw(msg._id || msg.id)}
+                                >
+                                  <span>Withdraw</span>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ) : meeting ? (
+                          <div
+                            className="w-[410px] max-w-full p-5 flex flex-col justify-center items-start gap-5 shadow-sm custom-gradient-card"
+                            style={{
+                              borderRadius: '20px',
+                              border: '3px solid transparent',
+                              background:
+                                'linear-gradient(#FFF, #FFF) padding-box, linear-gradient(135deg, #00A6FF 0%, #3ED419 50%, #F29EFF 100%) border-box',
+                              WebkitBackgroundClip: 'padding-box, border-box',
+                              backgroundClip: 'padding-box, border-box',
+                            }}
+                          >
+                            {/* Top Header: Video Camera Icon + Title + Copy Link */}
+                            <div className="w-full flex items-center justify-between">
+                              <div className="flex items-center gap-2.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                  <path d="M2 11C2 7.70017 2 6.05025 3.02513 5.02513C4.05025 4 5.70017 4 9 4H10C13.2998 4 14.9497 4 15.9749 5.02513C17 6.05025 17 7.70017 17 11V13C17 16.2998 17 17.9497 15.9749 18.9749C14.9497 20 13.2998 20 10 20H9C5.70017 20 4.05025 20 3.02513 18.9749C2 17.9497 2 16.2998 2 13V11Z" stroke="#354B9A" stroke-width="1.5" />
+                                  <path d="M17 8.90585L17.1259 8.80196C19.2417 7.05623 20.2996 6.18336 21.1498 6.60482C22 7.02628 22 8.42355 22 11.2181V12.7819C22 15.5765 22 16.9737 21.1498 17.3952C20.2996 17.8166 19.2417 16.9438 17.1259 15.198L17 15.0941" stroke="#354B9A" stroke-width="1.5" stroke-linecap="round" />
+                                  <path d="M11.5 11C12.3284 11 13 10.3284 13 9.5C13 8.67157 12.3284 8 11.5 8C10.6716 8 10 8.67157 10 9.5C10 10.3284 10.6716 11 11.5 11Z" stroke="#354B9A" stroke-width="1.5" />
+                                </svg>
+                                <span className="text-[16px] font-bold text-slate-900 leading-none">Video Meeting Invitation</span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleCopyText(meeting.roomUrl || meeting.joinUrl || `Meeting ID: ${meeting.meetingId || ''}`, "Meeting link copied to clipboard!")}
+                                className="text-slate-700 hover:text-black cursor-pointer p-1 rounded-md hover:bg-slate-100 transition-colors"
+                                title="Copy meeting link"
+                              >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                                  <rect x="8" y="8" width="13" height="13" rx="3" />
+                                  <path d="M5 16H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1" />
+                                </svg>
+                              </button>
+                            </div>
+
+                            <div className="w-full h-[1px] bg-[#EBEBEB] -my-1" />
+
+                            {/* Credentials Row: ID & Passcode pills */}
+                            <div className="w-full flex items-center gap-3">
+                              <div className="flex-1 bg-[#F0F0F0] rounded-[10px] px-3.5 py-2.5 flex items-center justify-between gap-2 min-w-0">
+                                <span className="text-sm font-medium text-slate-700 truncate">
+                                  ID- {meeting.meetingId || (meeting.roomUrl ? String(meeting.roomUrl).split('/').pop() : '81346682237')}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyText(meeting.meetingId || (meeting.roomUrl ? String(meeting.roomUrl).split('/').pop() : ''), "Meeting ID copied!")}
+                                  className="text-slate-600 hover:text-black shrink-0 cursor-pointer p-0.5"
+                                  title="Copy Meeting ID"
+                                >
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="8" y="8" width="13" height="13" rx="3" />
+                                    <path d="M5 16H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1" />
+                                  </svg>
+                                </button>
+                              </div>
+
+                              <div className="flex-1 bg-[#F0F0F0] rounded-[10px] px-3.5 py-2.5 flex items-center justify-between gap-2 min-w-0">
+                                <span className="text-sm font-medium text-slate-700 truncate">
+                                  Pass- {meeting.password || meeting.passcode || 'i4Rs8N'}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyText(meeting.password || meeting.passcode || '', "Passcode copied!")}
+                                  className="text-slate-600 hover:text-black shrink-0 cursor-pointer p-0.5"
+                                  title="Copy Passcode"
+                                >
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="8" y="8" width="13" height="13" rx="3" />
+                                    <path d="M5 16H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="w-full h-[1px] bg-[#EBEBEB] -my-1" />
+
+                            {/* Title & Description */}
+                            <div className="w-full flex flex-col gap-2">
+                              <h5 className="text-[16px] font-bold text-slate-900 leading-snug m-0">
+                                {meeting.title || `Job Discussion with @${finalRecipientUser?.username || partnerUsername || 'Nilson_dev'}`}
                               </h5>
-                              <p className="text-xs text-slate-500 leading-relaxed">
-                                Join the real-time video consultation room to discuss project requirements, scope, and deliverables.
+                              <p className="text-[14px] text-slate-600 leading-relaxed m-0 font-normal">
+                                {meeting.description || "Join the real-time video consultation room to discuss projectrequirement, scope and deliverable"}
                               </p>
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                            {/* Action Button: Join Meeting */}
+                            <div className="w-full pt-1">
                               <a
-                                href={meeting.roomUrl}
+                                href={meeting.roomUrl || meeting.joinUrl || '#'}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-brand-green hover:brightness-95 text-white transition-all text-center flex items-center justify-center gap-2 shadow-xs cursor-pointer"
-                                style={{ background: '#000000', color: '#ffffff' }}
+                                className="w-full h-12 rounded-[10px] font-semibold text-[15px] bg-[#000000] text-white hover:bg-neutral-800 active:scale-[0.99] transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-xs"
                               >
-                                <RiVideoChatLine className="w-4 h-4" />
-                                <span>Join Video Room</span>
+                                <span>Join Meeting</span>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                                  <polyline points="12 5 19 12 12 19"></polyline>
+                                </svg>
                               </a>
-                              <button
-                                type="button"
-                                onClick={() => handleCopyMeetingLink(meeting.roomUrl)}
-                                className="py-2.5 px-3.5 rounded-xl font-semibold text-xs sm:text-sm border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
-                                title="Copy meeting room link"
-                              >
-                                <RiFileCopyLine className="w-4 h-4 text-slate-500" />
-                                <span>Copy Link</span>
-                              </button>
                             </div>
                           </div>
                         ) : (
-                          <div className={`msg-bubble [overflow-wrap:anywhere] [word-break:break-word] ${moderationClass}`}>
+                          <>
+                            <div
+                              className={`relative px-4 py-3 min-w-[100px] max-w-full shadow-2xs [overflow-wrap:anywhere] [word-break:break-word] ${bubbleModerationClass} ${isOwner
+                                ? 'rounded-[10px_10px_10px_0] border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-300,#F5F5F5)]'
+                                : 'rounded-[10px_10px_10px_0] bg-[#FFF] border-0'
+                                }`}
+                            >
+                              {renderMessageAttachment(msg)}
+                              {renderMessageContent(msg)}
+                              <span className="text-[11px] text-slate-400 block mt-1">
+                                {moment(msg.createdAt).format('h:mm A')}
+                              </span>
+                            </div>
                             {isModerated && (
-                              <div className="mb-1.5 flex items-center">
-                                <MessageModerationBadge moderation={msg.moderation} isOwner={isOwner} />
+                              <div
+                                className="self-end mb-1 shrink-0 select-none cursor-pointer"
+                                title={msg.moderation?.flagReason || "Flagged content"}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                  <path d="M5.0249 21C5.04385 19.2643 5.04366 17.5541 5.0366 15.9209M5.0366 15.9209C5.01301 10.4614 4.91276 5.86186 5.19475 4.04271C5.5611 1.67939 9.39301 3.82993 13.9703 5.59842L16.0328 6.48729C17.5508 7.1415 19.7187 8.30352 18.7662 9.66084C18.3738 10.22 17.56 10.8596 16.0575 11.567L5.0366 15.9209Z" stroke="#DA0000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
                               </div>
                             )}
-                            {renderMessageAttachment(msg)}
-                            {msg.description && <p className="[overflow-wrap:anywhere] [word-break:break-word]">{renderMessageTextWithLinks(msg.description)}</p>}
-                            <span className="msg-time">
-                              {moment(msg.createdAt).format('HH:mm')}
-                              {/* {isOwner && <RiCheckDoubleLine className={`check-icon ${isMsgReadByRecipient(msg) ? 'read' : ''}`} />} */}
-                            </span>
-                          </div>
+                          </>
                         )}
-                        {isOwner && (
-                          <img className="msg-avatar" src={user?.image || '/media/noavatar.png'} alt="" />
-                        )}
+
                       </div>
                     </div>
                   );
@@ -1335,7 +1528,7 @@ const Message = () => {
               </div>
 
               {/* Compose Area */}
-              <div className="compose-area max-md:p-3 relative">
+              <div className="p-4 sm:px-5 sm:py-4 bg-[#f0f0f0] relative max-md:p-3">
                 {attachment && (
                   <div className="flex items-center gap-3 mb-3 p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 shadow-sm max-w-sm">
                     {attachment.type?.includes('image') || /\.(png|jpe?g|gif|webp|svg)/i.test(attachment.name) || attachment.url?.includes('/image/upload/') ? (
@@ -1376,7 +1569,7 @@ const Message = () => {
                 {!msgsError && (
                   <form
                     onSubmit={handleSend}
-                    className="compose-form relative flex items-end gap-2 p-2 bg-white border border-gray-200 rounded-2xl shadow-sm max-md:px-2 max-md:py-1.5 max-md:gap-1.5"
+                    className="relative flex items-end gap-2 p-2 bg-white border border-gray-200 rounded-2xl shadow-sm max-md:px-2 max-md:py-1.5 max-md:gap-1.5"
                   >
                     <input
                       type="file"
@@ -1401,19 +1594,6 @@ const Message = () => {
                       )}
                     </button>
 
-                    {/* Optional Seller Action Buttons: Video Meeting & Create Offer */}
-                    {user?.isSeller && (
-
-
-                      <button
-                        type="button"
-                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors whitespace-nowrap flex-shrink-0 mb-0.5"
-                        onClick={() => setShowOfferModal(true)}
-                      >
-                        Create Offer
-                      </button>
-
-                    )}
 
                     {/* Message Textarea */}
                     <textarea
@@ -1445,27 +1625,29 @@ const Message = () => {
         <div className={`lg:hidden fixed inset-0 bg-black/20 z-30 transition-opacity duration-300 ease-in-out ${isRightSideOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsRightSideOpen(false)}></div>
 
         {/* ── RIGHT: About This Contact ── */}
-        {finalRecipientUser && (() => {
-          const sampleOrdersFallback = [
-            { _id: 'sample-1', title: 'I will create a stunning portfolio...', status: 'in_progress' },
-            { _id: 'sample-2', title: 'Design a responsive e-commerce...', status: 'delivered' },
-            { _id: 'sample-3', title: 'Develop a mobile app interface pr...', status: 'delivered' },
-            { _id: 'sample-4', title: 'Craft a unique logo and branding...', status: 'delivered' },
-            { _id: 'sample-5', title: 'Build an interactive dashboard for...', status: 'delivered' },
-            { _id: 'sample-6', title: 'Design a user-friendly mobile app...', status: 'delivered' },
-            { _id: 'sample-7', title: 'Develop an AI-powered chatbot f...', status: 'delivered' },
-            { _id: 'sample-8', title: 'Create a responsive website show...', status: 'delivered' },
-          ];
+        {isValidId && (() => {
+          if (!finalRecipientUser && isFetchingTargetUser) {
+            return (
+              <aside className={`w-[320px] min-w-[280px] xl:w-[340px] xl:min-w-[320px] h-full max-h-full min-h-0 border-l border-[rgba(0, 0, 0, 0.10)] bg-[#F8F8F8] overflow-y-auto overflow-x-hidden p-4 xl:p-5 flex flex-col shrink-0 box-border max-lg:fixed max-lg:top-0 max-lg:bottom-0 max-lg:right-0 max-lg:z-40 max-lg:shadow-2xl max-lg:h-full max-lg:flex max-lg:transform max-lg:transition-transform max-lg:duration-300 max-lg:ease-in-out ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
+                <div className="flex flex-col gap-4">
+                  <Skeleton className="w-full h-44 rounded-2xl" />
+                  <Skeleton className="w-full h-36 rounded-2xl" />
+                </div>
+              </aside>
+            );
+          }
 
-          const displayedOrders = contactOrders.length > 0 ? contactOrders.slice(0, 8) : sampleOrdersFallback;
+          if (!finalRecipientUser) return null;
+
+          const displayedOrders = contactOrders.slice(0, 8);
 
           const formattedLanguages =
             Array.isArray(finalRecipientUser?.languages) && finalRecipientUser.languages.length > 0
               ? finalRecipientUser.languages
-                  .map((item: any) => (typeof item === 'string' ? item : item?.language || item?.lang || item?.name))
-                  .filter(Boolean)
-                  .join(', ')
-              : 'English, Spanish, French';
+                .map((item: any) => (typeof item === 'string' ? item : item?.language || item?.lang || item?.name))
+                .filter(Boolean)
+                .join(', ')
+              : '';
 
           const conversationMedia = (messages || [])
             .flatMap((m: any) => {
@@ -1514,7 +1696,7 @@ const Message = () => {
           };
 
           return (
-            <aside className={`contact-sidebar h-full max-h-full min-h-0 flex-shrink-0 max-lg:fixed max-lg:top-0 max-lg:bottom-0 max-lg:right-0 max-lg:z-40 max-lg:shadow-2xl max-lg:h-full max-lg:!flex max-lg:transform max-lg:transition-transform max-lg:duration-300 max-lg:ease-in-out ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
+            <aside className={`w-[320px] min-w-[280px] xl:w-[340px] xl:min-w-[320px] h-full max-h-full min-h-0 border-l border-[rgba(0, 0, 0, 0.10)] bg-[#F8F8F8] overflow-y-auto overflow-x-hidden p-4 xl:p-5 flex flex-col shrink-0 box-border [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full max-lg:fixed max-lg:top-0 max-lg:bottom-0 max-lg:right-0 max-lg:z-40 max-lg:shadow-2xl max-lg:h-full max-lg:flex max-lg:transform max-lg:transition-transform max-lg:duration-300 max-lg:ease-in-out ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
               <div className="w-full flex flex-col gap-4 pb-20">
                 <button
                   type="button"
@@ -1530,22 +1712,20 @@ const Message = () => {
                   <button
                     type="button"
                     onClick={() => setContactSidebarTab('profile')}
-                    className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all duration-200 text-center cursor-pointer ${
-                      contactSidebarTab === 'profile'
-                        ? 'bg-[#0e3834] text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all duration-200 text-center cursor-pointer ${contactSidebarTab === 'profile'
+                      ? 'bg-[#0e3834] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                      }`}
                   >
                     Profile
                   </button>
                   <button
                     type="button"
                     onClick={() => setContactSidebarTab('media')}
-                    className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all duration-200 text-center cursor-pointer ${
-                      contactSidebarTab === 'media'
-                        ? 'bg-[#0e3834] text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all duration-200 text-center cursor-pointer ${contactSidebarTab === 'media'
+                      ? 'bg-[#0e3834] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                      }`}
                   >
                     Media
                   </button>
@@ -1553,10 +1733,10 @@ const Message = () => {
 
                 {contactSidebarTab === 'profile' ? (
                   <>
-                    {/* ── Card 1: About Ava Thompson (Contact) ── */}
+                    {/* ── Card 1: About Contact ── */}
                     <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col gap-3 relative">
                       <h3 className="text-base sm:text-[17px] font-bold text-slate-800 tracking-tight">
-                        About {finalRecipientUser.username || finalRecipientUser.name || 'Ava Thompson'}
+                        About {finalRecipientUser.username || finalRecipientUser.name || 'Contact'}
                       </h3>
 
                       {/* Avatar & Contact Info */}
@@ -1569,36 +1749,44 @@ const Message = () => {
                         <div className="flex flex-col min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-bold text-slate-900 text-sm sm:text-base leading-tight truncate">
-                              {finalRecipientUser.name || finalRecipientUser.username || 'Nilson Norman'}
+                              {finalRecipientUser.name || finalRecipientUser.username || 'User'}
                             </span>
                             <span className="bg-[#4c1d95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md leading-none tracking-wide">
-                              {finalRecipientUser.badge || (finalRecipientUser.isSeller !== false ? 'Pro' : 'Client')}
+                              {finalRecipientUser.badge || (finalRecipientUser.isSeller ? 'Seller' : 'Buyer')}
                             </span>
                           </div>
                           <div className="flex items-center gap-1.5 text-xs text-slate-600 mt-1 flex-wrap">
-                            <span className="font-medium text-slate-600">
-                              {finalRecipientUser.shortTitle || (finalRecipientUser.isSeller !== false ? 'Web Designer' : 'Project Manager')}
-                            </span>
-                            <span className="font-bold text-slate-900 ml-1">
-                              {finalRecipientUser.rating || finalRecipientUser.sellerRating || '4.8'}
-                            </span>
-                            <RiStarFill className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0 -mt-0.5" />
-                            <span className="text-slate-400 font-normal">
-                              ({finalRecipientUser.reviewCount || finalRecipientUser.totalReviews || 226})
-                            </span>
+                            {(finalRecipientUser.shortTitle || finalRecipientUser.occupation || finalRecipientUser.title) && (
+                              <span className="font-medium text-slate-600">
+                                {finalRecipientUser.shortTitle || finalRecipientUser.occupation || finalRecipientUser.title}
+                              </span>
+                            )}
+                            {(finalRecipientUser.rating || finalRecipientUser.sellerRating) ? (
+                              <>
+                                <span className="font-bold text-slate-900 ml-1">
+                                  {finalRecipientUser.rating || finalRecipientUser.sellerRating}
+                                </span>
+                                <RiStarFill className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0 -mt-0.5" />
+                                <span className="text-slate-400 font-normal">
+                                  ({finalRecipientUser.reviewCount || finalRecipientUser.totalReviews || 0})
+                                </span>
+                              </>
+                            ) : null}
                           </div>
                         </div>
                       </div>
 
-                      <div className="border-t border-slate-100 my-1" />
-
-                      {/* Member Since */}
-                      <div className="text-xs text-slate-500 font-normal">
-                        Member Since,{' '}
-                        <span className="font-bold text-slate-900">
-                          {moment(finalRecipientUser.createdAt || '2023-01-01').format('MMM YYYY')}
-                        </span>
-                      </div>
+                      {finalRecipientUser.createdAt && (
+                        <>
+                          <div className="border-t border-slate-100 my-1" />
+                          <div className="text-xs text-slate-500 font-normal">
+                            Member Since,{' '}
+                            <span className="font-bold text-slate-900">
+                              {moment(finalRecipientUser.createdAt).format('MMM YYYY')}
+                            </span>
+                          </div>
+                        </>
+                      )}
 
                       <div className="border-t border-slate-100 my-0.5" />
 
@@ -1607,13 +1795,13 @@ const Message = () => {
                         <div className="grid grid-cols-[75px_1fr] items-center">
                           <span className="text-slate-500">From</span>
                           <span className="text-slate-800 font-medium">
-                            {finalRecipientUser.country || 'Bangladesh'}
+                            {finalRecipientUser.country || 'Not specified'}
                           </span>
                         </div>
                         <div className="grid grid-cols-[75px_1fr] items-start">
                           <span className="text-slate-500">Language</span>
                           <span className="text-slate-800 font-medium leading-relaxed">
-                            {formattedLanguages}
+                            {formattedLanguages || 'Not specified'}
                           </span>
                         </div>
                       </div>
@@ -1626,7 +1814,7 @@ const Message = () => {
                             if (targetId) {
                               navigate.push(`/seller/${targetId}`);
                             } else {
-                              toast.success('AI Profile Analysis: Verified seller profile.');
+                              toast.success('AI Profile Analysis: Verified user profile.');
                             }
                           }}
                           className="w-full text-xs font-bold py-3 rounded-xl shadow-xs"
@@ -1643,45 +1831,52 @@ const Message = () => {
                       >
                         <h3 className="text-base sm:text-[17px] font-bold text-slate-800">Order History</h3>
                         <RiArrowDownSLine
-                          className={`w-5 h-5 text-slate-600 transition-transform duration-200 ${
-                            isOrdersExpanded ? '' : '-rotate-90'
-                          }`}
+                          className={`w-5 h-5 text-slate-600 transition-transform duration-200 ${isOrdersExpanded ? '' : '-rotate-90'
+                            }`}
                         />
                       </div>
 
                       {isOrdersExpanded && (
                         <>
-                          <div className="flex flex-col divide-y divide-slate-100 pt-1">
-                            {displayedOrders.map((order: any, idx: number) => (
-                              <div
-                                key={order._id || idx}
-                                className="flex items-center justify-between py-2.5 gap-2 cursor-pointer hover:bg-slate-50/80 rounded-md px-1 transition-colors group"
-                                onClick={() => {
-                                  if (order._id && !String(order._id).startsWith('sample-')) {
-                                    navigate.push(`/orders/${order._id}`);
-                                  } else {
-                                    navigate.push('/orders');
-                                  }
-                                }}
-                              >
-                                <span
-                                  className="text-xs text-slate-600 font-normal truncate flex-1 group-hover:text-slate-900 transition-colors"
-                                  title={order.title}
+                          {displayedOrders.length === 0 ? (
+                            <div className="py-6 text-center text-xs text-slate-400">
+                              No order history yet
+                            </div>
+                          ) : (
+                            <div className="flex flex-col divide-y divide-slate-100 pt-1">
+                              {displayedOrders.map((order: any, idx: number) => (
+                                <div
+                                  key={order._id || idx}
+                                  className="flex items-center justify-between py-2.5 gap-2 cursor-pointer hover:bg-slate-50/80 rounded-md px-1 transition-colors group"
+                                  onClick={() => {
+                                    if (order._id) {
+                                      navigate.push(`/orders/${order._id}`);
+                                    } else {
+                                      navigate.push('/orders');
+                                    }
+                                  }}
                                 >
-                                  {order.title || `Order #${String(order._id || idx).substring(0, 8)}`}
-                                </span>
-                                {renderOrderStatusBadge(order.status)}
-                              </div>
-                            ))}
-                          </div>
+                                  <span
+                                    className="text-xs text-slate-600 font-normal truncate flex-1 group-hover:text-slate-900 transition-colors"
+                                    title={order.title}
+                                  >
+                                    {order.title || `Order #${String(order._id || idx).substring(0, 8)}`}
+                                  </span>
+                                  {renderOrderStatusBadge(order.status)}
+                                </div>
+                              ))}
+                            </div>
+                          )}
 
-                          <button
-                            type="button"
-                            className="w-full mt-2 py-2.5 bg-[#f1f3f5] hover:bg-[#e4e7eb] text-slate-700 font-semibold text-xs sm:text-sm rounded-xl transition-colors text-center cursor-pointer"
-                            onClick={() => navigate.push('/orders')}
-                          >
-                            view all
-                          </button>
+                          {displayedOrders.length > 0 && (
+                            <button
+                              type="button"
+                              className="w-full mt-2 py-2.5 bg-[#f1f3f5] hover:bg-[#e4e7eb] text-slate-700 font-semibold text-xs sm:text-sm rounded-xl transition-colors text-center cursor-pointer"
+                              onClick={() => navigate.push('/orders')}
+                            >
+                              view all
+                            </button>
+                          )}
                         </>
                       )}
                     </div>
@@ -1719,23 +1914,31 @@ const Message = () => {
 
       {/* Custom Offer Modal */}
       {showOfferModal && (
-        <div className="modal-backdrop" onClick={() => setShowOfferModal(false)}>
-          <div className="modal-box max-md:w-[96%] max-md:max-h-[95vh] max-md:overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="modal-head">
-              <h3>Create Custom Offer</h3>
-              <button onClick={() => setShowOfferModal(false)}>&times;</button>
+        <div className="fixed inset-0 bg-slate-900/45 backdrop-blur-xs flex items-center justify-center z-50 p-4 transition-opacity" onClick={() => setShowOfferModal(false)}>
+          <div className="bg-white w-[92%] max-w-[460px] max-h-[calc(100vh-40px)] flex flex-col overflow-hidden rounded-2xl shadow-2xl border border-slate-100 max-md:w-[96%] max-md:max-h-[95vh]" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center px-5 py-4 border-b border-slate-200 bg-slate-50/80 shrink-0">
+              <h3 className="text-[15px] font-bold text-slate-900 m-0">Create Custom Offer</h3>
+              <button type="button" onClick={() => setShowOfferModal(false)} className="text-slate-400 hover:text-slate-800 text-2xl leading-none cursor-pointer p-1">&times;</button>
             </div>
-            <form onSubmit={handleOfferSubmit} className="offer-form">
-              <div className="fg">
-                <label>Package Reference <span className="text-xs text-gray-400">(optional)</span></label>
-                <select value={selectedPackageId} onChange={e => setSelectedPackageId(e.target.value)}>
+            <form onSubmit={handleOfferSubmit} className="p-5 flex flex-col gap-3.5 overflow-y-auto">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-slate-600">Package Reference <span className="text-xs text-slate-400 font-normal">(optional)</span></label>
+                <select
+                  value={selectedPackageId}
+                  onChange={e => setSelectedPackageId(e.target.value)}
+                  className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
+                >
                   <option value="">-- Select one of your Packages --</option>
                   {sellerPackages.map((g: any) => <option key={g._id || g.id} value={g._id || g.id}>{g.title}</option>)}
                 </select>
               </div>
-              <div className="fg">
-                <label>Project Reference <span className="text-xs text-gray-400">(optional)</span></label>
-                <select value={selectedBriefId} onChange={e => setSelectedBriefId(e.target.value)}>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-slate-600">Project Reference <span className="text-xs text-slate-400 font-normal">(optional)</span></label>
+                <select
+                  value={selectedBriefId}
+                  onChange={e => setSelectedBriefId(e.target.value)}
+                  className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
+                >
                   <option value="">-- Select a Project --</option>
                   {chatBriefs.length === 0
                     ? <option disabled>No projects available for this chat</option>
@@ -1744,25 +1947,69 @@ const Message = () => {
                 </select>
               </div>
               {!selectedPackageId && !selectedBriefId && (
-                <p className="text-amber-600 text-xs mt-1">⚠ Please select at least a Package or a Project</p>
+                <p className="text-amber-600 text-xs mt-0.5">⚠ Please select at least a Package or a Project</p>
               )}
-              <div className="fg">
-                <label>Offer Description</label>
-                <textarea placeholder="Describe the service…" value={offerDesc} onChange={e => setOfferDesc(e.target.value)} rows={3} required />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-slate-600">Offer Description</label>
+                <textarea
+                  placeholder="Describe the service…"
+                  value={offerDesc}
+                  onChange={e => setOfferDesc(e.target.value)}
+                  rows={3}
+                  required
+                  className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white resize-none transition-colors"
+                />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-1">
-                <div className="fg">
-                  <label>Price (USD)</label>
-                  <input type="number" placeholder="150" value={offerPrice} onChange={e => setOfferPrice(e.target.value)} required min="1" />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-1">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-600">Price (USD)</label>
+                  <input
+                    type="number"
+                    placeholder="150"
+                    value={offerPrice}
+                    onChange={e => setOfferPrice(e.target.value)}
+                    required
+                    min="1"
+                    className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
+                  />
                 </div>
-                <div className="fg">
-                  <label>Delivery (Days)</label>
-                  <input type="number" placeholder="3" value={offerDelivery} onChange={e => setOfferDelivery(e.target.value)} required min="1" />
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-600">Delivery (Days)</label>
+                  <input
+                    type="number"
+                    placeholder="3"
+                    value={offerDelivery}
+                    onChange={e => setOfferDelivery(e.target.value)}
+                    required
+                    min="1"
+                    className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-slate-600">Revisions</label>
+                  <input
+                    type="text"
+                    placeholder="Unlimited Revision"
+                    value={offerRevisions}
+                    onChange={e => setOfferRevisions(e.target.value)}
+                    className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
+                  />
                 </div>
               </div>
-              <div className="modal-actions">
-                <button type="submit">Send Offer</button>
-                <button type="button" className="cancel" onClick={() => setShowOfferModal(false)}>Cancel</button>
+              <div className="flex gap-2.5 mt-2">
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 px-4 rounded-xl font-bold text-sm bg-black text-white hover:bg-neutral-800 transition-colors cursor-pointer"
+                >
+                  Send Offer
+                </button>
+                <button
+                  type="button"
+                  className="flex-1 py-2.5 px-4 rounded-xl font-semibold text-sm bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer border border-slate-200"
+                  onClick={() => setShowOfferModal(false)}
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
@@ -1771,9 +2018,9 @@ const Message = () => {
 
       {/* Video Meeting Creation Modal */}
       {showMeetingModal && (
-        <div className="modal-backdrop" onClick={() => !isCreatingMeeting && setShowMeetingModal(false)}>
-          <div className="modal-box max-md:w-[96%] max-w-md p-6 bg-white rounded-3xl shadow-2xl border border-slate-100" onClick={e => e.stopPropagation()}>
-            <div className="modal-head flex justify-between items-center pb-4 border-b border-slate-100">
+        <div className="fixed inset-0 bg-slate-900/45 backdrop-blur-xs flex items-center justify-center z-50 p-4" onClick={() => !isCreatingMeeting && setShowMeetingModal(false)}>
+          <div className="w-[92%] max-w-md p-6 bg-white rounded-3xl shadow-2xl border border-slate-100 max-h-[calc(100vh-40px)] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center pb-4 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold border border-emerald-100">
                   <RiVideoChatLine className="w-5 h-5 text-brand-green" />

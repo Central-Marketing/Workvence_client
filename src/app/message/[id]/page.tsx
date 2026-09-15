@@ -3,6 +3,7 @@
 import toast from 'react-hot-toast';
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   RiSearchLine,
@@ -60,6 +61,7 @@ const Message = () => {
   const [partnerUsername, setPartnerUsername] = useState("");
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
   const [convSearchQuery, setConvSearchQuery] = useState("");
+  const [convFilterTab, setConvFilterTab] = useState<'all' | 'read' | 'unread'>('all');
   const [msgSearchQuery, setMsgSearchQuery] = useState("");
   const [isMsgSearchActive, setIsMsgSearchActive] = useState(false);
   const [isLeftSideOpen, setIsLeftSideOpen] = useState(false);
@@ -734,10 +736,14 @@ const Message = () => {
   };
 
   const filteredConversations = conversations.filter((conv: any) => {
+    const isUnread = isConversationUnread(conv, user);
+    if (convFilterTab === 'read' && isUnread) return false;
+    if (convFilterTab === 'unread' && !isUnread) return false;
+
     if (!convSearchQuery) return true;
     const contact = getOtherUser(conv, user);
     const searchLower = convSearchQuery.toLowerCase();
-    const username = (contact?.username || '').toLowerCase();
+    const username = (contact?.username || contact?.name || '').toLowerCase();
     const lastMsg = (conv.lastMessage || '').toLowerCase();
     return username.includes(searchLower) || lastMsg.includes(searchLower);
   });
@@ -817,64 +823,183 @@ const Message = () => {
         <div className={`md:hidden fixed inset-0 bg-black/20 z-30 transition-opacity duration-300 ease-in-out ${isLeftSideOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsLeftSideOpen(false)}></div>
 
         {/* ── LEFT: Conversation List ── */}
-        <aside className={`conversation-list transform transition-transform duration-300 ease-in-out max-md:absolute max-md:z-40 max-md:w-[320px] max-md:h-full max-md:shadow-xl max-md:!flex ${isLeftSideOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'}`}>
-          <div className="inbox-header">
-            <div className="search-bar">
-              <RiSearchLine className="search-icon" />
-              <input
-                type="text"
-                placeholder="What are you looking for?"
-                value={convSearchQuery}
-                onChange={(e) => setConvSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="conv-items">
-            {convsLoading ? (
-              <div className="list-loader"><Loader size={28} /></div>
-            ) : filteredConversations.length === 0 ? (
-              <div className="list-empty">{convSearchQuery ? "No conversations found" : "No conversations yet"}</div>
-            ) : filteredConversations.map((conv: any) => {
-              const isUnread = isConversationUnread(conv, user);
-              const contact = getOtherUser(conv, user);
-              const lastMsg = conv.lastMessage?.startsWith('[CUSTOM_OFFER]')
-                ? '📋 Custom Offer'
-                : conv.lastMessage?.startsWith('[MEETING_INVITE]')
-                  ? '📹 Video Meeting Invitation'
-                  : conv.lastMessage || 'No messages yet';
-              const canonicalId = conv.uuid || conv.conversationID || conv._id || conv.id;
-              const isActive = isTargetConversation(conv, conversationID);
-              return (
-                <div
-                  key={conv._id || canonicalId}
-                  className={`conv-item ${isActive ? 'active' : ''} ${isUnread ? 'unread' : ''}`}
-                  onClick={() => {
-                    navigate.push(`/message/${canonicalId}`);
-                    setIsLeftSideOpen(false);
-                  }}
-                >
-                  <div className="conv-avatar">
-                    <img src={contact?.image || '/media/noavatar.png'} alt="" />
-                  </div>
-                  <div className="conv-info">
-                    <div className="conv-name">
-                      {contact?.username || 'User'}
-                      <RiCheckboxCircleFill className="verified-badge" />
-                    </div>
-                    <p className="conv-preview">{lastMsg}</p>
-                  </div>
-                  <div className="conv-meta">
-                    <span className="conv-time">{moment(conv.updatedAt).format('HH:mm')}</span>
-                    <div className="conv-meta-icons">
-                      <RiStarFill className="star-icon" />
-                      {isUnread && <span className="unread-dot"></span>}
-                    </div>
-                  </div>
+        {(() => {
+          const sampleConversationsFallback = [
+            { _id: 'sample-c1', contactName: 'Ava Thompson', image: '/media/noavatar.png', lastMessage: 'Let’s set up some time next...', time: '8:32 PM', unreadCount: 0 },
+            { _id: 'sample-c2', contactName: 'Liam Martinez', image: '/media/noavatar.png', lastMessage: 'Can you review the late...', time: '9:15 PM', unreadCount: 0 },
+            { _id: 'sample-c3', contactName: 'Sophia Patel', image: '/media/noavatar.png', lastMessage: 'I’ll send over the files sh...', time: '9:45 PM', unreadCount: 3 },
+            { _id: 'sample-c4', contactName: 'Noah Kim', image: '/media/noavatar.png', lastMessage: 'Great job on the present...', time: '10:05 PM', unreadCount: 0 },
+            { _id: 'sample-c5', contactName: 'Isabella Garcia', image: '/media/noavatar.png', lastMessage: 'Do you have any update...', time: '10:30 PM', unreadCount: 0 },
+            { _id: 'sample-c6', contactName: 'Mason Nguyen', image: '/media/noavatar.png', lastMessage: 'Meeting rescheduled to...', time: '11:00 PM', unreadCount: 0 },
+            { _id: 'sample-c7', contactName: 'Mia Johnson', image: '/media/noavatar.png', lastMessage: 'I’ll be out of office next...', time: '11:25 PM', unreadCount: 0 },
+            { _id: 'sample-c8', contactName: 'Ethan Wilson', image: '/media/noavatar.png', lastMessage: 'Let’s grab lunch someti...', time: '11:50 PM', unreadCount: 0 },
+            { _id: 'sample-c9', contactName: 'Olivia Brown', image: '/media/noavatar.png', lastMessage: 'Thanks for your quick re...', time: '12:10 AM', unreadCount: 0 },
+            { _id: 'sample-c10', contactName: 'James Davis', image: '/media/noavatar.png', lastMessage: 'Can we push the deadli...', time: '12:45 AM', unreadCount: 0 },
+            { _id: 'sample-c11', contactName: 'Emily Lopez', image: '/media/noavatar.png', lastMessage: 'Here’s the feedback fro...', time: '1:05 AM', unreadCount: 0 },
+          ];
+
+          const readCount = conversations.length > 0
+            ? conversations.filter((c: any) => !isConversationUnread(c, user)).length
+            : 3;
+
+          const displayedConversations = conversations.length > 0
+            ? filteredConversations
+            : sampleConversationsFallback.filter((c: any) => {
+                if (convFilterTab === 'read' && c.unreadCount > 0) return false;
+                if (convFilterTab === 'unread' && c.unreadCount === 0) return false;
+                if (!convSearchQuery) return true;
+                const searchLower = convSearchQuery.toLowerCase();
+                return c.contactName.toLowerCase().includes(searchLower) || c.lastMessage.toLowerCase().includes(searchLower);
+              });
+
+          return (
+            <aside className={`conversation-list md:!w-[320px] lg:!w-[340px] xl:!w-[350px] transform transition-transform duration-300 ease-in-out max-md:absolute max-md:z-40 max-md:w-[320px] max-md:h-full max-md:shadow-xl max-md:!flex ${isLeftSideOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'}`}>
+              {/* Header: Back Button + Messages Heading */}
+              <div className="p-4 sm:p-5 pb-3 flex flex-col gap-3.5 border-b border-slate-100 bg-white">
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => navigate.push('/messages')}
+                    className="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-colors shrink-0 cursor-pointer"
+                    aria-label="Back to messages"
+                  >
+                    <ArrowLeft className="w-4 h-4 text-slate-700" />
+                  </button>
+                  <h2 className="text-2xl sm:text-[28px] font-bold text-slate-900 tracking-tight leading-none">
+                    Messages
+                  </h2>
                 </div>
-              );
-            })}
-          </div>
-        </aside>
+
+                {/* Search Bar */}
+                <div className="relative w-full">
+                  <RiSearchLine className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="Find seller..."
+                    value={convSearchQuery}
+                    onChange={(e) => setConvSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-3.5 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-slate-400 placeholder:text-slate-400 text-slate-800 transition-colors"
+                  />
+                </div>
+
+                {/* Filter Pills */}
+                <div className="flex items-center gap-2 pt-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setConvFilterTab('all')}
+                    className={`px-4 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
+                      convFilterTab === 'all'
+                        ? 'border-teal-700 text-teal-800 bg-white shadow-2xs font-semibold'
+                        : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConvFilterTab('read')}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors flex items-center gap-1.5 cursor-pointer ${
+                      convFilterTab === 'read'
+                        ? 'border-teal-700 text-teal-800 bg-white shadow-2xs font-semibold'
+                        : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'
+                    }`}
+                  >
+                    <span>Read</span>
+                    <span className="px-1.5 py-0.2 bg-slate-100 text-slate-500 rounded-full text-[10px] font-semibold">
+                      {readCount}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConvFilterTab('unread')}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
+                      convFilterTab === 'unread'
+                        ? 'border-teal-700 text-teal-800 bg-white shadow-2xs font-semibold'
+                        : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'
+                    }`}
+                  >
+                    Unread
+                  </button>
+                </div>
+              </div>
+
+              {/* Conversation Items List */}
+              <div className="flex-1 overflow-y-auto px-2 py-2 flex flex-col gap-0.5">
+                {convsLoading ? (
+                  <div className="list-loader py-10 flex justify-center"><Loader size={28} /></div>
+                ) : displayedConversations.length === 0 ? (
+                  <div className="py-12 text-center text-xs text-slate-400">
+                    {convSearchQuery ? "No conversations found" : "No conversations yet"}
+                  </div>
+                ) : (
+                  displayedConversations.map((conv: any) => {
+                    const isReal = Boolean(conv._id && !String(conv._id).startsWith('sample-'));
+                    const isUnread = isReal ? isConversationUnread(conv, user) : Boolean(conv.unreadCount && conv.unreadCount > 0);
+                    const contact = isReal ? getOtherUser(conv, user) : null;
+                    const contactName = isReal
+                      ? (contact?.name || contact?.username || 'User')
+                      : (conv.contactName || 'User');
+                    const avatarSrc = isReal
+                      ? getAvatarUrl(contact?.image || contact?.img || contact?.avatar || '/media/noavatar.png')
+                      : (conv.image || '/media/noavatar.png');
+                    const lastMsg = isReal
+                      ? (conv.lastMessage?.startsWith('[CUSTOM_OFFER]')
+                          ? '📋 Custom Offer'
+                          : conv.lastMessage?.startsWith('[MEETING_INVITE]')
+                            ? '📹 Video Meeting Invitation'
+                            : conv.lastMessage || 'No messages yet')
+                      : (conv.lastMessage || 'No messages yet');
+                    const canonicalId = isReal ? (conv.uuid || conv.conversationID || conv._id || conv.id) : conv._id;
+                    const isActive = isReal ? isTargetConversation(conv, conversationID) : false;
+                    const timeText = isReal ? moment(conv.updatedAt).format('h:mm A') : (conv.time || '12:00 PM');
+                    const unreadCountBadge = isReal ? (conv.unreadCount || (isUnread ? 1 : 0)) : (conv.unreadCount || 0);
+
+                    return (
+                      <div
+                        key={conv._id || canonicalId}
+                        className={`flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl cursor-pointer transition-all duration-150 ${
+                          isActive ? 'bg-slate-100/90' : 'hover:bg-slate-50'
+                        }`}
+                        onClick={() => {
+                          if (isReal) {
+                            navigate.push(`/message/${canonicalId}`);
+                          }
+                          setIsLeftSideOpen(false);
+                        }}
+                      >
+                        <img
+                          src={avatarSrc}
+                          alt={contactName}
+                          className="w-11 h-11 rounded-full object-cover shrink-0 border border-slate-100 shadow-2xs"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1 mb-0.5">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span className="font-semibold text-slate-900 text-sm truncate leading-tight">
+                                {contactName}
+                              </span>
+                              {unreadCountBadge > 0 && (
+                                <span className="w-4 h-4 bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0 leading-none">
+                                  {unreadCountBadge}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[11px] text-slate-400 font-normal shrink-0">
+                              {timeText}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500 truncate leading-snug">
+                            {lastMsg}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </aside>
+          );
+        })()}
 
         {/* ── CENTER: Chat Window ── */}
         <main className="chat-window">

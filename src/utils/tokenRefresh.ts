@@ -66,11 +66,18 @@ export function decodeJwtPayload(token?: string): JwtPayload | null {
 
 /**
  * Check if the current access token is expired or expiring within bufferSeconds (default: 5 mins)
+ * Returns false if no session tokens exist (guest state).
  */
 export function isAccessTokenExpiringSoon(bufferSeconds: number = 300): boolean {
   const token = getCookie("accessToken");
-  if (!token) return true;
-  const payload = decodeJwtPayload(token);
+  const refreshToken = getCookie("refreshToken");
+
+  // If user has neither access token nor refresh token, there is no active session to refresh
+  if (!token && !refreshToken) return false;
+  // If access token is missing but refresh token exists, renew immediately
+  if (!token && refreshToken) return true;
+
+  const payload = decodeJwtPayload(token!);
   if (!payload || !payload.exp) return true;
   // payload.exp is in seconds
   const remainingMs = payload.exp * 1000 - Date.now();
@@ -80,7 +87,7 @@ export function isAccessTokenExpiringSoon(bufferSeconds: number = 300): boolean 
 /**
  * Handle authentication expiration:
  * Clears cookies, local/session storage, userStore, disconnects socket,
- * and redirects to /login on 401 errors.
+ * and redirects to /login on 401 errors ONLY if on a protected route or explicitly requested.
  */
 export function handleAuthExpired(redirectPath?: string): void {
   if (typeof window === "undefined") return;
@@ -109,15 +116,42 @@ export function handleAuthExpired(redirectPath?: string): void {
     // Ignore socket error
   }
 
-  // 5. Redirect to /login
+  // 5. Redirect to /login only if currently on a protected route or explicitly provided redirectPath
+  const currentPath = redirectPath || window.location.pathname;
   const currentTarget = redirectPath || (window.location.pathname + window.location.search);
-  const isGuestAuthRoute =
-    currentTarget.startsWith("/login") ||
-    currentTarget.startsWith("/register") ||
-    currentTarget.startsWith("/forgot-password") ||
-    currentTarget.startsWith("/reset-password");
 
-  if (!isGuestAuthRoute) {
+  const isGuestAuthRoute =
+    currentPath.startsWith("/login") ||
+    currentPath.startsWith("/register") ||
+    currentPath.startsWith("/forgot-password") ||
+    currentPath.startsWith("/reset-password");
+
+  const PROTECTED_PREFIXES = [
+    "/dashboard",
+    "/profile",
+    "/orders",
+    "/messages",
+    "/message",
+    "/favorites",
+    "/pay",
+    "/organize",
+    "/briefs/create",
+    "/briefs/my-briefs",
+    "/earnings",
+    "/my-packages",
+    "/kyc",
+    "/settings",
+    "/seller/suspended",
+    "/suspended-seller",
+    "/admin",
+  ];
+
+  const isProtectedRoute = PROTECTED_PREFIXES.some(
+    (prefix) => currentPath === prefix || currentPath.startsWith(`${prefix}/`)
+  );
+
+  // Never redirect if browsing public/marketing pages (e.g. homepage "/", "/packages", "/help-center", etc.)
+  if (!isGuestAuthRoute && (Boolean(redirectPath) || isProtectedRoute)) {
     const loginUrl = `/login?redirect=${encodeURIComponent(currentTarget)}`;
     window.location.href = loginUrl;
   }

@@ -63,6 +63,12 @@ axiosFetch.interceptors.response.use(
     if (originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
 
+      // Only attempt refresh if a refresh token actually exists
+      const hasRefreshToken = Boolean(getCookie("refreshToken"));
+      if (!hasRefreshToken) {
+        return Promise.reject(error);
+      }
+
       try {
         const newAccessToken = await refreshAccessToken();
         if (newAccessToken) {

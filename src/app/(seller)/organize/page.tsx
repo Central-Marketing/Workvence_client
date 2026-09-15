@@ -311,7 +311,7 @@ const Add = () => {
     if (event) event.preventDefault();
     const form = {
       ...state,
-      userID: user?._id || user?.id,
+      // userID: user?._id || user?.id,
       faqs: state.faqs || []
     };
 

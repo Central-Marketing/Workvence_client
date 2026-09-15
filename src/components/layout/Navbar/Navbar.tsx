@@ -9,7 +9,7 @@ import { FiMenu, FiX, FiMessageSquare, FiBell, FiChevronDown, FiGrid, FiArrowRig
 import useAdminCategories from "@/hooks/useAdminCategories";
 
 import toast from 'react-hot-toast';
-import { axiosFetch, socket, handleAuthExpired, isAccessTokenExpiringSoon, refreshAccessToken } from '@/utils';
+import { axiosFetch, socket, handleAuthExpired, isAccessTokenExpiringSoon, refreshAccessToken, getCookie } from '@/utils';
 import { useUserStore } from "@/store/userStore";
 import { Loader, NotificationBell, HeaderInboxIcon } from '@/components';
 import CategoryBar from "../CategoryBar/CategoryBar";
@@ -65,9 +65,13 @@ const Navbar = () => {
         }
       }
       catch (error: any) {
-        // Only log out if it's explicitly an auth error and refresh also failed
+        // If unauthenticated or token expired, reset local state without forcing redirects on public pages
         if (error.response?.status === 401 || error.response?.status === 403) {
-          handleAuthExpired();
+          try {
+            socket.disconnect();
+          } catch {}
+          localStorage.removeItem('user');
+          setUser(null);
         }
         console.log(error.response?.data?.message || 'Session verification failed');
       }
@@ -76,11 +80,12 @@ const Navbar = () => {
       }
     })();
 
-    // 3. Proactively refresh access token before it expires (checks every 2 minutes)
+    // 3. Proactively refresh access token before it expires (only if an active session exists)
     const proactiveInterval = setInterval(() => {
-      if (isAccessTokenExpiringSoon(300)) {
+      const hasAuth = Boolean(getCookie("accessToken") || getCookie("refreshToken"));
+      if (hasAuth && isAccessTokenExpiringSoon(300)) {
         refreshAccessToken().catch(() => {
-          // Token renewal error is handled internally via handleAuthExpired on 401
+          // Token renewal error is handled internally
         });
       }
     }, 2 * 60 * 1000);

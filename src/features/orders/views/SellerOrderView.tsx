@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import moment from "moment";
+import { useQuery } from "@tanstack/react-query";
 import {
   FiClock,
   FiUploadCloud,
@@ -15,6 +17,9 @@ import {
   FiCalendar,
   FiX,
   FiFileText,
+  FiStar,
+  FiShield,
+  FiCheckCircle,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
@@ -35,11 +40,13 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
   // Modals & form state
   const [isExtensionModalOpen, setIsExtensionModalOpen] = useState(false);
   const [isExtensionLoading, setIsExtensionLoading] = useState(false);
+  const [isRespondingExtension, setIsRespondingExtension] = useState(false);
   const [showDeliverModal, setShowDeliverModal] = useState(false);
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ name: string; size: string; url: string }>>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmittingDelivery, setIsSubmittingDelivery] = useState(false);
+  const [isContacting, setIsContacting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Dynamic countdown
@@ -80,6 +87,32 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
       setCountdown({ days: 0, hours: 0, seconds: 0 });
     }
   }, [order]);
+
+  // Fetch reviews for completed order
+  const { data: reviews = [] } = useQuery({
+    queryKey: ["reviews"],
+    queryFn: () =>
+      axiosFetch
+        .get("/reviews")
+        .then(({ data }) => {
+          if (Array.isArray(data)) return data;
+          if (Array.isArray(data?.reviews)) return data.reviews;
+          if (Array.isArray(data?.data)) return data.data;
+          return [];
+        })
+        .catch(() => []),
+    enabled: order.status === "completed" || order.raw?.status === "completed",
+  });
+
+  const buyerReview =
+    reviews.find(
+      (r: any) =>
+        r.orderID === order.id ||
+        r.orderID?._id === order.id ||
+        r.orderID === order.raw?._id ||
+        r.orderID?._id === order.raw?._id ||
+        order.raw?.reviewID === r._id
+    ) || order.raw?.review;
 
   // Handle file upload
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,18 +191,120 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
     }
   };
 
-  const isCompleted = order.status === "completed";
-  const isDelivered = order.status === "delivered";
-  const isLate = order.status === "late";
+  // Respond to extension request
+  const handleRespondExtension = async (action: "accept" | "reject") => {
+    setIsRespondingExtension(true);
+    try {
+      await axiosFetch.patch(`/orders/${order.id}/respond-extension`, { action });
+      toast.success(`Extension request has been ${action}ed.`);
+      refetch();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to respond to extension request.");
+    } finally {
+      setIsRespondingExtension(false);
+    }
+  };
 
-  const netEarnings = (order.price * 0.8).toLocaleString("en-US", {
+  // Contact buyer with direct conversation check / creation
+  const handleContact = async () => {
+    setIsContacting(true);
+    const sellerID = order.seller?.id || order.raw?.sellerID?._id || order.raw?.sellerID;
+    const buyerID = order.buyer?.id || order.raw?.buyerID?._id || order.raw?.buyerID;
+    const sellerUsername = order.seller?.name || order.raw?.sellerID?.username;
+    const buyerUsername = order.buyer?.name || order.raw?.buyerID?.username;
+
+    if (!sellerID || !buyerID) {
+      router.push(`/message/${order.buyer.id}`);
+      setIsContacting(false);
+      return;
+    }
+
+    try {
+      const { data } = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
+      const targetId =
+        data?.uuid ||
+        data?.conversationID ||
+        data?._id ||
+        data?.id ||
+        data?.data?.uuid ||
+        data?.data?.conversationID ||
+        data?.data?._id;
+      if (targetId) {
+        router.push(`/message/${targetId}`);
+        return;
+      }
+    } catch {
+      // If not existing, proceed to create conversation via POST
+    }
+
+    try {
+      const { data } = await axiosFetch.post("/conversations", {
+        sellerID,
+        buyerID,
+        to: buyerID,
+        from: sellerID,
+        seller_username: sellerUsername,
+        buyer_username: buyerUsername,
+      });
+      const targetId =
+        data?.uuid ||
+        data?.conversationID ||
+        data?._id ||
+        data?.id ||
+        data?.data?.uuid ||
+        data?.data?.conversationID ||
+        data?.data?._id;
+      if (targetId) {
+        router.push(`/message/${targetId}`);
+      } else {
+        router.push(`/message/${buyerID}`);
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to open conversation");
+    } finally {
+      setIsContacting(false);
+    }
+  };
+
+  // Status flags
+  const statusLower = order.status?.toLowerCase() || "";
+  const isCompleted = statusLower === "completed" || statusLower === "complete";
+  const isDelivered = statusLower === "delivered";
+  const isLate = statusLower === "late";
+  const isDisputed = statusLower === "disputed" || statusLower === "escalated_to_dispute";
+  const isCancelled = statusLower === "cancelled" || statusLower === "canceled";
+
+  // Extension state
+  const extensionData = order.raw?.extensionRequest || order.raw?.extension || order.extensionRequest;
+  const hasPendingExtension = extensionData?.status === "pending";
+  const extensionDays = extensionData?.extraDays || extensionData?.requestedDays || extensionData?.days || 1;
+  const extensionReason = extensionData?.reason || "Additional time requested to deliver quality work.";
+  const isExtensionRequestedByBuyer =
+    extensionData?.requestedBy === "buyer" || extensionData?.requestedBy === order.buyer?.id;
+
+  // Earnings & Platform Fee
+  const rawOrder = order.raw || {};
+  const commissionRate = rawOrder.commissionRate !== undefined ? Number(rawOrder.commissionRate) : 15;
+  const platformFee =
+    rawOrder.platformFee !== undefined
+      ? Number(rawOrder.platformFee)
+      : order.price * (commissionRate / 100);
+  const netEarningsAmount =
+    rawOrder.netEarnings !== undefined
+      ? Number(rawOrder.netEarnings)
+      : order.price - platformFee;
+  const netEarnings = netEarningsAmount.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 
+  const isCleared = Boolean(rawOrder.isCleared);
+  const clearsAt = rawOrder.clearsAt;
+  const clearedAt = rawOrder.clearedAt;
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-8 font-sans">
-      <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+      <div className="container mx-auto px-4 md:px-6 ">
 
         {/* Top Breadcrumb & Seller Badge */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -205,28 +340,57 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
               <div className="flex items-center gap-2.5">
                 <span
                   className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
-                    isCompleted
-                      ? "bg-emerald-100 text-emerald-800"
+                    isDisputed
+                      ? "bg-amber-100 text-amber-900 border border-amber-300"
+                      : isCancelled
+                      ? "bg-rose-100 text-rose-800 border border-rose-200"
+                      : isCompleted
+                      ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
                       : isDelivered
-                      ? "bg-teal-100 text-teal-800"
+                      ? "bg-teal-100 text-teal-800 border border-teal-200"
                       : isLate
-                      ? "bg-rose-100 text-rose-800"
-                      : "bg-blue-100 text-blue-800"
+                      ? "bg-rose-100 text-rose-800 border border-rose-200"
+                      : "bg-blue-100 text-blue-800 border border-blue-200"
                   }`}
                 >
-                  {order.status}
+                  {isDisputed ? "Disputed" : isCancelled ? "Cancelled" : order.status}
                 </span>
                 <span className="text-xs text-slate-400">Order placed {order.startedOn}</span>
               </div>
 
-              {isCompleted ? (
+              {isDisputed ? (
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-amber-900 flex items-center gap-2">
+                    <FiShield className="text-amber-600" />
+                    Order Under Dispute
+                  </h2>
+                  <p className="text-xs sm:text-sm text-amber-700 mt-1">
+                    Workvence administration is reviewing this order. Payouts and deliveries are temporarily paused.
+                  </p>
+                </div>
+              ) : isCancelled ? (
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-rose-900 flex items-center gap-2">
+                    <FiAlertCircle className="text-rose-600" />
+                    Order Cancelled
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                    This order was cancelled. Reach out to Workvence Support if you need assistance.
+                  </p>
+                </div>
+              ) : isCompleted ? (
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
                     <FiCheck className="text-emerald-500" />
                     Order Completed!
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                    Your payment of <span className="font-bold text-slate-900">${netEarnings}</span> has cleared to your balance.
+                    Your net earnings of <span className="font-bold text-slate-900">${netEarnings}</span>{" "}
+                    {isCleared
+                      ? "have cleared to your balance."
+                      : clearsAt
+                      ? `will clear ${moment(clearsAt).fromNow()} (${moment(clearsAt).format("MMM DD, YYYY")}).`
+                      : "are currently pending clearance."}
                   </p>
                 </div>
               ) : isDelivered ? (
@@ -252,7 +416,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             </div>
 
             {/* Right: Primary CTAs (Deliver Now / Extend) */}
-            {!isCompleted && (
+            {!isCompleted && !isCancelled && !isDisputed && (
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="button"
@@ -273,6 +437,110 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             )}
           </div>
         </div>
+
+        {/* Dispute Alert Banner */}
+        {isDisputed && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-6">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                <FiShield className="text-xl" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-bold text-base text-amber-950">Workvence Support is handling your dispute</h4>
+                <p className="text-xs sm:text-sm text-amber-800 mt-1 leading-relaxed">
+                  Our Support & Administration team is actively investigating the details of this order. All payment releases
+                  and work deliveries are temporarily paused while administrators review the communication history and deliverables.
+                </p>
+                <div className="flex flex-wrap gap-3 mt-4">
+                  <Link
+                    href="/support"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
+                  >
+                    Go to Support Desk
+                  </Link>
+                  <a
+                    href="mailto:support@workvence.com"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-amber-300 text-amber-900 text-xs sm:text-sm font-semibold hover:bg-amber-100/50 transition-colors"
+                  >
+                    Email: support@workvence.com
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Cancelled Alert Banner */}
+        {isCancelled && (
+          <div className="bg-rose-50 border border-rose-200 rounded-2xl p-6 mb-6">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                <FiAlertCircle className="text-xl" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-bold text-base text-rose-950">This Order Has Been Cancelled</h4>
+                <p className="text-xs sm:text-sm text-rose-800 mt-1 leading-relaxed">
+                  This order was marked as cancelled. If you believe this cancellation was processed in error or need assistance
+                  with payment details, please submit an inquiry to Workvence Support.
+                </p>
+                <div className="flex flex-wrap gap-3 mt-4">
+                  <Link
+                    href="/support"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
+                  >
+                    Contact Support
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Pending Extension Request Banner */}
+        {hasPendingExtension && (
+          <div className="bg-sky-50 border border-sky-200 rounded-2xl p-5 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0 mt-0.5">
+                  <FiClock className="text-xl" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm sm:text-base text-sky-950">
+                    {isExtensionRequestedByBuyer
+                      ? `Buyer Requested a Time Extension (+${extensionDays} days)`
+                      : `Time Extension Requested (+${extensionDays} days)`}
+                  </h4>
+                  <p className="text-xs sm:text-sm text-sky-800 mt-1">
+                    {isExtensionRequestedByBuyer
+                      ? `Reason: "${extensionReason}"`
+                      : `Waiting for the buyer to review your request for an additional ${extensionDays} days.`}
+                  </p>
+                </div>
+              </div>
+
+              {isExtensionRequestedByBuyer && (
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    disabled={isRespondingExtension}
+                    onClick={() => handleRespondExtension("accept")}
+                    className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+                  >
+                    Accept Extension
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isRespondingExtension}
+                    onClick={() => handleRespondExtension("reject")}
+                    className="px-4 py-2 rounded-xl bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer"
+                  >
+                    Reject
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Revision alert banner if buyer requested changes */}
         {order.revisionReason && (
@@ -295,8 +563,73 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-          {/* LEFT COLUMN: Deliveries + Requirements + Timeline */}
+          {/* LEFT COLUMN: Review + Requirements + Deliveries + Stepper + Activity & Escrow Ledger */}
           <div className="lg:col-span-8 space-y-6">
+
+            {/* CARD 0: Buyer Review (Fiverr Style) */}
+            {isCompleted && buyerReview && (
+              <div className="bg-white rounded-2xl border border-amber-200/80 shadow-sm p-6 sm:p-7 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 to-amber-500" />
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100 mb-5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100">
+                      <FiStar className="text-lg fill-amber-400 text-amber-500" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-base text-slate-900">Review from Buyer</h3>
+                      <p className="text-xs text-slate-400">Feedback submitted for this completed order</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
+                    <span className="text-amber-500 text-base">★</span>
+                    <span className="text-sm font-extrabold text-amber-900">
+                      {typeof buyerReview.star === "number" && buyerReview.star > 0
+                        ? Number(buyerReview.star).toFixed(1)
+                        : "5.0"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Rating Criteria Breakdown */}
+                {(buyerReview.communicationRating || buyerReview.qualityRating || buyerReview.valueRating) && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-4">
+                    {buyerReview.communicationRating && (
+                      <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 flex justify-between items-center text-xs">
+                        <span className="text-slate-600">Communication</span>
+                        <span className="font-bold text-slate-900 flex items-center gap-1">
+                          {Number(buyerReview.communicationRating).toFixed(1)} <FiStar className="text-amber-400 fill-amber-400 text-[11px]" />
+                        </span>
+                      </div>
+                    )}
+                    {buyerReview.qualityRating && (
+                      <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 flex justify-between items-center text-xs">
+                        <span className="text-slate-600">Service Quality</span>
+                        <span className="font-bold text-slate-900 flex items-center gap-1">
+                          {Number(buyerReview.qualityRating).toFixed(1)} <FiStar className="text-amber-400 fill-amber-400 text-[11px]" />
+                        </span>
+                      </div>
+                    )}
+                    {buyerReview.valueRating && (
+                      <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 flex justify-between items-center text-xs">
+                        <span className="text-slate-600">Value for Money</span>
+                        <span className="font-bold text-slate-900 flex items-center gap-1">
+                          {Number(buyerReview.valueRating).toFixed(1)} <FiStar className="text-amber-400 fill-amber-400 text-[11px]" />
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {buyerReview.description && (
+                  <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-4">
+                    <p className="text-xs sm:text-sm text-slate-700 italic leading-relaxed">
+                      "{buyerReview.description}"
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* CARD 1: Buyer Project Requirements */}
             <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-7">
@@ -349,8 +682,9 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   </p>
                   <button
                     type="button"
-                    onClick={() => router.push(`/message/${order.buyer.id}`)}
-                    className="mt-3 px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold text-xs hover:bg-black transition-colors"
+                    disabled={isContacting}
+                    onClick={handleContact}
+                    className="mt-3 px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold text-xs hover:bg-black transition-colors disabled:opacity-50"
                   >
                     Contact Buyer
                   </button>
@@ -365,7 +699,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   <h3 className="font-bold text-base text-slate-900">Work Deliverables</h3>
                   <p className="text-xs text-slate-400">Files and notes you provided for this order</p>
                 </div>
-                {!isCompleted && (
+                {!isCompleted && !isCancelled && (
                   <button
                     type="button"
                     onClick={() => setShowDeliverModal(true)}
@@ -379,8 +713,137 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
               <OrderDeliverablesList files={order.deliveryFiles} />
             </div>
 
-            {/* CARD 3: Order Activity Timeline */}
+            {/* CARD 3: Order Activity Timeline Stepper */}
             <OrderTimelineStepper order={order} />
+
+            {/* CARD 4: Order Activity & Escrow Ledger */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-7">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <FiClock />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base text-slate-900">Order Activity &amp; Escrow Ledger</h3>
+                    <p className="text-xs text-slate-400">Chronological statement of escrow events and order status updates</p>
+                  </div>
+                </div>
+                <span className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
+                  Escrow Protected
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                {order.raw?.history && order.raw.history.length > 0 ? (
+                  order.raw.history.map((item: any, index: number) => {
+                    let icon = "📌";
+                    if (item.action === "ORDER_CREATED") icon = "💰";
+                    if (item.action === "EXTENSION_REQUESTED" || item.action === "EXTENSION_RESPONDED") icon = "⏳";
+                    if (item.action === "WORK_DELIVERED" || item.action === "DELIVERY_SUBMITTED") icon = "📦";
+                    if (item.action === "REVISION_REQUESTED") icon = "⚠️";
+                    if (item.action === "ORDER_COMPLETED" || item.action === "ORDER_ACCEPTED") icon = "✓";
+
+                    return (
+                      <div
+                        key={item._id || index}
+                        className="p-4 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col sm:flex-row sm:items-start justify-between gap-2"
+                      >
+                        <div className="flex items-start gap-2.5">
+                          <span className="text-base mt-0.5">{icon}</span>
+                          <div>
+                            <p className="font-bold text-xs sm:text-sm text-slate-900">{item.note || item.action}</p>
+                            {item.details && <p className="text-xs text-slate-500 mt-0.5">{item.details}</p>}
+                          </div>
+                        </div>
+                        <span className="text-[11px] text-slate-400 font-mono shrink-0">
+                          {moment(item.timestamp).format("MMM DD, YYYY · hh:mm A")}
+                        </span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <>
+                    {/* Event 1: Escrow payment secured */}
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                      <div className="flex items-start gap-2.5">
+                        <span className="text-base mt-0.5">💰</span>
+                        <div>
+                          <p className="font-bold text-xs sm:text-sm text-slate-900">
+                            Escrow Payment Secured
+                          </p>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            Stripe confirmed gross payment of <strong className="text-slate-800">${order.price.toFixed(2)}</strong> secured in Workvence Escrow.
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-[11px] text-slate-400 font-mono shrink-0">
+                        {order.raw?.createdAt ? moment(order.raw.createdAt).format("MMM DD, YYYY · hh:mm A") : order.startedOn}
+                      </span>
+                    </div>
+
+                    {/* Event 2: Work Delivered */}
+                    {(order.deliveryFiles.length > 0 || isDelivered || isCompleted || Boolean(order.revisionReason)) && (
+                      <div className="p-4 rounded-xl bg-teal-50/50 border border-teal-200/70 flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                        <div className="flex items-start gap-2.5">
+                          <span className="text-base mt-0.5">📦</span>
+                          <div>
+                            <p className="font-bold text-xs sm:text-sm text-teal-950">
+                              Work Delivered
+                            </p>
+                            <p className="text-xs text-teal-800 mt-0.5">
+                              Seller submitted delivery statement and work files for client inspection.
+                            </p>
+                          </div>
+                        </div>
+                        <span className="text-[11px] text-teal-700 font-mono shrink-0">
+                          {order.raw?.updatedAt ? moment(order.raw.updatedAt).format("MMM DD, YYYY · hh:mm A") : "Delivered"}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Event 3: Revision Requested */}
+                    {order.revisionReason && (
+                      <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200/80 flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                        <div className="flex items-start gap-2.5">
+                          <span className="text-base mt-0.5">⚠️</span>
+                          <div>
+                            <p className="font-bold text-xs sm:text-sm text-amber-950">
+                              Revision Requested
+                            </p>
+                            <p className="text-xs text-amber-800 mt-0.5">
+                              Buyer requested modifications: "{order.revisionReason}"
+                            </p>
+                          </div>
+                        </div>
+                        <span className="text-[11px] text-amber-700 font-mono shrink-0">
+                          {order.raw?.updatedAt ? moment(order.raw.updatedAt).format("MMM DD, YYYY · hh:mm A") : "In Revision"}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Event 4: Escrow Cleared / Order Completed */}
+                    {isCompleted && (
+                      <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200/80 flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                        <div className="flex items-start gap-2.5">
+                          <span className="text-base mt-0.5">✓</span>
+                          <div>
+                            <p className="font-bold text-xs sm:text-sm text-emerald-950">
+                              Escrow Cleared · Order Accepted
+                            </p>
+                            <p className="text-xs text-emerald-800 mt-0.5">
+                              Buyer accepted deliverables. Net funds of <strong className="text-emerald-900">${netEarnings}</strong> released to seller's balance statement.
+                            </p>
+                          </div>
+                        </div>
+                        <span className="text-[11px] text-emerald-700 font-mono shrink-0">
+                          {order.raw?.updatedAt ? moment(order.raw.updatedAt).format("MMM DD, YYYY · hh:mm A") : "Completed"}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
 
           </div>
 
@@ -420,11 +883,12 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
 
               <button
                 type="button"
-                onClick={() => router.push(`/message/${order.buyer.id}`)}
-                className="mt-4 w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                disabled={isContacting}
+                onClick={handleContact}
+                className="mt-4 w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-50"
               >
                 <FiMessageSquare className="text-base" />
-                <span>Message Buyer</span>
+                <span>{isContacting ? "Opening Chat..." : "Message Buyer"}</span>
               </button>
             </div>
 
@@ -456,12 +920,49 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   <span className="font-semibold text-slate-900">${order.price.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-slate-600">
-                  <span>Platform Fee (20%)</span>
-                  <span className="text-slate-500">-${(order.price * 0.2).toFixed(2)}</span>
+                  <span>Platform Fee ({commissionRate}%)</span>
+                  <span className="text-rose-600 font-medium">-${platformFee.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-slate-100 text-sm font-bold text-slate-900">
                   <span>Your Net Earnings</span>
-                  <span className="text-emerald-600">${netEarnings}</span>
+                  <span className="text-emerald-600 font-extrabold">${netEarnings}</span>
+                </div>
+              </div>
+
+              {/* Escrow Clearance Schedule */}
+              <div className="py-3 border-b border-slate-100 text-xs">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-slate-600 font-medium">Escrow Clearance</span>
+                  {isCleared ? (
+                    <span className="text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">
+                      Cleared
+                    </span>
+                  ) : isCompleted ? (
+                    <span className="text-[11px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full border border-amber-200">
+                      Holding Period
+                    </span>
+                  ) : (
+                    <span className="text-[11px] font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full border border-sky-200">
+                      In Escrow
+                    </span>
+                  )}
+                </div>
+                <div className="text-[11.5px] text-slate-500">
+                  {isCleared ? (
+                    <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                      <FiCheckCircle className="text-emerald-600" />
+                      Funds cleared {clearedAt ? `(${moment(clearedAt).format("MMM DD, YYYY")})` : "to balance"}
+                    </span>
+                  ) : clearsAt ? (
+                    <span className="text-amber-700 font-semibold">
+                      Clears {moment(clearsAt).format("MMM DD, YYYY")}{" "}
+                      <span className="text-slate-400 font-normal">({moment(clearsAt).fromNow()})</span>
+                    </span>
+                  ) : isCompleted ? (
+                    <span className="text-slate-500">Pending standard clearance window</span>
+                  ) : (
+                    <span className="text-slate-400">Holding period starts upon order completion</span>
+                  )}
                 </div>
               </div>
 
@@ -479,19 +980,21 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             </div>
 
             {/* Resolution Center Card */}
-            <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 text-center">
-              <h4 className="font-bold text-xs sm:text-sm text-slate-800">Resolution Center</h4>
-              <p className="text-xs text-slate-500 mt-1 mb-3">
-                Need more time or need help resolving an issue with this order?
-              </p>
-              <button
-                type="button"
-                onClick={() => setIsExtensionModalOpen(true)}
-                className="w-full py-2.5 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
-              >
-                Ask for Time Extension
-              </button>
-            </div>
+            {!isCompleted && !isCancelled && !isDisputed && (
+              <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 text-center">
+                <h4 className="font-bold text-xs sm:text-sm text-slate-800">Resolution Center</h4>
+                <p className="text-xs text-slate-500 mt-1 mb-3">
+                  Need more time or need help resolving an issue with this order?
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setIsExtensionModalOpen(true)}
+                  className="w-full py-2.5 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  Ask for Time Extension
+                </button>
+              </div>
+            )}
 
           </div>
         </div>

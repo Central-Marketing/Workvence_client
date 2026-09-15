@@ -300,24 +300,47 @@ const Navbar = () => {
               </div>
             </div>
           ) : (
-            /* Logged-in Seller Navbar */
-            <>
-              <Link href="/briefs" className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors">
-                Projects
+            /* Logged-in Seller Navbar - Pixel-perfect to design */
+            <div className="flex items-center gap-5 xl:gap-6 font-sf-pro font-medium text-[16px] text-[#1E293B]">
+              <Link
+                href="/dashboard/seller"
+                className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors"
+              >
+                Dashboard
               </Link>
 
-              <Link href="/manage-orders" className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors">
-                Orders
+              <Link
+                href="/briefs"
+                className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors"
+              >
+                Find Project
               </Link>
 
-              <div className="flex items-center gap-5 mr-1 border-l border-gray-200 pl-5">
-                <HeaderInboxIcon currentUser={user} />
-                <NotificationBell currentUser={user} />
-              </div>
+              <HeaderInboxIcon
+                currentUser={user}
+                className="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer"
+                iconClassName="text-[19px]"
+              />
+
+              <NotificationBell
+                currentUser={user}
+                triggerClassName="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer"
+                iconClassName="text-[19px]"
+              />
 
               <div className="relative profile-dropdown-container">
-                <div className="flex items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}>
-                  <Image src={user.image || "/media/noavatar.png"} width={36} height={36} alt="Profile" className="w-9 h-9 rounded-full object-cover border border-gray-200" unoptimized />
+                <div
+                  className="flex items-center cursor-pointer hover:opacity-85 transition-opacity"
+                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                >
+                  <Image
+                    src={user.image || "/media/noavatar.png"}
+                    width={40}
+                    height={40}
+                    alt="Profile"
+                    className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                    unoptimized
+                  />
                 </div>
 
                 {isProfileDropdownOpen && (
@@ -360,7 +383,7 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-            </>
+            </div>
           )}
         </div>
 

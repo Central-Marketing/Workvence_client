@@ -4,7 +4,9 @@ import React, { useEffect, useReducer, useState, useRef } from "react";
 import toast from "react-hot-toast";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { X, Check, ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
+import 'react-quill-new/dist/quill.snow.css';
 import { packageReducer, initialState } from "@/reducers/packageReducer";
 import { axiosFetch, generateImageURL } from "@/utils";
 import adminAxios from "@/utils/adminAxios";
@@ -12,6 +14,41 @@ import useAdminCategories from "@/hooks/useAdminCategories";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
+
+// Dynamically import ReactQuill to ensure SSG/SSR compatibility
+const ReactQuill = dynamic(() => import("react-quill-new"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-44 flex flex-col items-center justify-center space-y-2 border border-gray-200 bg-gray-50 rounded-xl">
+      <span className="text-xs font-semibold text-gray-400">Loading Rich Text Editor...</span>
+    </div>
+  ),
+});
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    [{ size: ["small", false, "large", "huge"] }],
+    ["bold", "italic", "underline", "strike"],
+    [{ list: "ordered" }, { list: "bullet" }, { indent: "-1" }, { indent: "+1" }],
+    [{ align: [] }],
+    ["link"],
+    ["clean"],
+  ],
+};
+
+const quillFormats = [
+  "header",
+  "size",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "list",
+  "indent",
+  "align",
+  "link",
+];
 
 type SectionTab = "about" | "packages" | "seller" | "faq";
 type TierKey = "basic" | "standard" | "premium";
@@ -22,18 +59,15 @@ const OrganizePage = () => {
   const [activeTab, setActiveTab] = useState<SectionTab>("about");
   const [activeTier, setActiveTier] = useState<TierKey>("basic");
 
-  // Areas covered checklist state
-  const [areasCovered, setAreasCovered] = useState<string[]>([]);
-  const [newAreaInput, setNewAreaInput] = useState("");
-  const [showAddArea, setShowAddArea] = useState(false);
-
-  // Why Me text input
-  const [whyMeInput, setWhyMeInput] = useState("");
-
   // Design tools tags state
   const [toolsList, setToolsList] = useState<string[]>([]);
   const [newToolInput, setNewToolInput] = useState("");
   const [showAddTool, setShowAddTool] = useState(false);
+
+  // Search keywords / tags state
+  const [keywordsList, setKeywordsList] = useState<string[]>([]);
+  const [newKeywordInput, setNewKeywordInput] = useState("");
+  const [showAddKeyword, setShowAddKeyword] = useState(false);
 
   // New feature input for active tier
   const [newFeatureInput, setNewFeatureInput] = useState("");
@@ -71,9 +105,13 @@ const OrganizePage = () => {
   // Smooth scroll to section
   const scrollToSection = (tab: SectionTab) => {
     setActiveTab(tab);
+    if (tab === "about") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     const element = document.getElementById(`section-${tab}`);
     if (element) {
-      const yOffset = -90;
+      const yOffset = -140;
       const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
       window.scrollTo({ top: y, behavior: "smooth" });
     }
@@ -91,7 +129,7 @@ const OrganizePage = () => {
         isThrottled = false;
       }, 60);
 
-      const scrollPosition = window.scrollY + 130;
+      const scrollPosition = window.scrollY + 150;
       for (let i = sections.length - 1; i >= 0; i--) {
         const section = sections[i];
         const el = document.getElementById(`section-${section}`);
@@ -197,23 +235,24 @@ const OrganizePage = () => {
     }
   };
 
-  // Area covered toggle & add
-  const toggleArea = (area: string) => {
-    if (areasCovered.includes(area)) {
-      setAreasCovered(areasCovered.filter((a) => a !== area));
-    } else {
-      setAreasCovered([...areasCovered, area]);
+  // Keywords toggle & add
+  const handleAddKeyword = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const clean = newKeywordInput.trim().replace(/^#+/, "");
+    if (!clean) return;
+    if (keywordsList.length >= 5) {
+      toast.error("Maximum 5 search keywords allowed");
+      return;
     }
+    if (!keywordsList.includes(clean)) {
+      setKeywordsList([...keywordsList, clean]);
+    }
+    setNewKeywordInput("");
+    setShowAddKeyword(false);
   };
 
-  const handleAddArea = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newAreaInput.trim()) return;
-    if (!areasCovered.includes(newAreaInput.trim())) {
-      setAreasCovered([...areasCovered, newAreaInput.trim()]);
-    }
-    setNewAreaInput("");
-    setShowAddArea(false);
+  const handleRemoveKeyword = (keyword: string) => {
+    setKeywordsList(keywordsList.filter((k) => k !== keyword));
   };
 
   // Tools toggle & add
@@ -342,9 +381,9 @@ const OrganizePage = () => {
       userID: user?._id || user?.id,
       faqs: state.faqs || [],
       isDraft,
-      areasCovered,
       tools: toolsList,
-      whyMe: whyMeInput,
+      keywords: keywordsList,
+      tags: keywordsList,
     };
 
     // Ensure basic tier sync
@@ -367,7 +406,7 @@ const OrganizePage = () => {
         toast.error("Please select a category");
         return;
       }
-      if (!form.description) {
+      if (!form.description || form.description === "<p><br></p>") {
         toast.error("Please provide a package description");
         return;
       }
@@ -447,403 +486,403 @@ const OrganizePage = () => {
         </div>
 
         {/* 2. Top Navigation Tabs (Sticky & Scroll-Based) */}
-        <div className="sticky top-4 z-30 bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-xl p-1 inline-flex items-center gap-1 shadow-sm">
-          {(["about", "packages", "seller", "faq"] as SectionTab[]).map((tab) => {
-            const labelMap: Record<SectionTab, string> = {
-              about: "About",
-              packages: "Packages",
-              seller: "Seller Info",
-              faq: "FAQ",
-            };
-            const isActive = activeTab === tab;
-            return (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => scrollToSection(tab)}
-                className={`px-4 sm:px-5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  isActive
+        <div className="sticky top-[69px] z-30 py-3 bg-[#F8F9FA]/95 backdrop-blur-md -my-1">
+          <div className="bg-white border border-gray-200/90 rounded-xl p-1 inline-flex items-center gap-1 shadow-sm">
+            {(["about", "packages", "seller", "faq"] as SectionTab[]).map((tab) => {
+              const labelMap: Record<SectionTab, string> = {
+                about: "About",
+                packages: "Packages",
+                seller: "Seller Info",
+                faq: "FAQ",
+              };
+              const isActive = activeTab === tab;
+              return (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => scrollToSection(tab)}
+                  className={`px-4 sm:px-5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${isActive
                     ? "bg-[#0B3A33] text-white shadow-2xs"
                     : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                {labelMap[tab]}
-              </button>
-            );
-          })}
+                    }`}
+                >
+                  {labelMap[tab]}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* 3. Section: About & Pricing Tier */}
-        <div id="section-about" className="scroll-mt-24 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div id="section-about" className="scroll-mt-36 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-            {/* Left Column: About this packages */}
-            <div className="lg:col-span-8 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
-              <div className="flex items-center justify-between gap-3 border-b border-gray-100 pb-4">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-950">
-                  About this packages
-                </h2>
-                <span className="bg-[#F8F9FA] border border-gray-200/80 text-gray-600 text-[11px] font-medium px-3 py-1 rounded-md">
+          {/* Left Column: About this packages */}
+          <div className="lg:col-span-8 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+            <div className="flex items-center justify-between gap-3 border-b border-gray-100 pb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-950">
+                About this packages
+              </h2>
+              {/* <span className="bg-[#F8F9FA] border border-gray-200/80 text-gray-600 text-[11px] font-medium px-3 py-1 rounded-md">
                   {categoryBadgeLabel}
-                </span>
-              </div>
-
-              {/* Package Title */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-700 block">
-                  Package title
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={state.title || ""}
-                  onChange={handleInputChange}
-                  placeholder="e.g I will do something i am really good at"
-                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all"
-                />
-              </div>
-
-              {/* Package Description */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-700 block">
-                  Package description
-                </label>
-                <textarea
-                  name="description"
-                  value={state.description || ""}
-                  onChange={handleInputChange}
-                  placeholder="write description"
-                  rows={5}
-                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[120px]"
-                />
-              </div>
-
-              {/* Category */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-700 block">
-                  Category
-                </label>
-                <div className="relative">
-                  <select
-                    name="category"
-                    value={state.category || ""}
-                    onChange={handleInputChange}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10"
-                  >
-                    <option value="" disabled>Select Category</option>
-                    {categoryList.map((c: any) => (
-                      <option key={c._id || c.slug} value={c.slug || c.name || c._id}>
-                        {c.name || c.slug}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
-                </div>
-              </div>
-
-              {/* Area Covered Checklist */}
-              <div className="space-y-3 pt-2">
-                <label className="text-xs sm:text-[13px] font-bold text-gray-900 block">
-                  Area Covered :
-                </label>
-                {areasCovered.length > 0 ? (
-                  <div className="space-y-2.5">
-                    {areasCovered.map((area) => (
-                      <div
-                        key={area}
-                        onClick={() => toggleArea(area)}
-                        className="flex items-center gap-2.5 cursor-pointer select-none group"
-                      >
-                        <div className="w-4 h-4 rounded bg-[#0B3A33] flex items-center justify-center text-white shrink-0 shadow-2xs">
-                          <Check className="w-3 h-3 stroke-[3]" />
-                        </div>
-                        <span className="text-xs sm:text-[13px] text-gray-700 group-hover:text-gray-950 font-normal">
-                          {area}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-gray-400 italic">No areas specified yet. Click &ldquo;Add More&rdquo; to add project areas.</p>
-                )}
-
-                {/* Add More Area */}
-                {showAddArea ? (
-                  <form onSubmit={handleAddArea} className="flex items-center gap-2 mt-2">
-                    <input
-                      type="text"
-                      placeholder="e.g. E-commerce Website"
-                      value={newAreaInput}
-                      onChange={(e) => setNewAreaInput(e.target.value)}
-                      className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-800 outline-none w-48 sm:w-56"
-                      autoFocus
-                    />
-                    <button
-                      type="submit"
-                      className="bg-[#0B3A33] text-white text-xs px-3 py-1.5 rounded-lg font-semibold cursor-pointer"
-                    >
-                      Add
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowAddArea(false)}
-                      className="text-gray-400 hover:text-gray-600 text-xs px-2"
-                    >
-                      Cancel
-                    </button>
-                  </form>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setShowAddArea(true)}
-                    className="text-[#0D6D5F] hover:text-[#0A5348] text-xs font-semibold flex items-center gap-1 cursor-pointer pt-1 transition-colors"
-                  >
-                    Add More <Plus className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-
-              {/* Why Me? Section */}
-              <div className="space-y-3 pt-2 border-t border-gray-100">
-                <label className="text-xs sm:text-[13px] font-bold text-gray-900 block">
-                  Why Me?
-                </label>
-                <div className="space-y-1.5">
-                  <textarea
-                    value={whyMeInput}
-                    onChange={(e) => setWhyMeInput(e.target.value)}
-                    placeholder="Describe why clients should choose you (e.g. your strengths, experience, or satisfaction guarantee)..."
-                    rows={3}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[75px]"
-                  />
-                </div>
-              </div>
-
-              {/* Add Design Tool Section */}
-              <div className="space-y-3 pt-2 border-t border-gray-100">
-                <label className="text-xs sm:text-[13px] font-bold text-gray-900 block">
-                  Add Design Tool
-                </label>
-
-                {toolsList.length > 0 ? (
-                  <div className="flex flex-wrap items-center gap-2">
-                    {toolsList.map((tool) => (
-                      <span
-                        key={tool}
-                        className="inline-flex items-center gap-1.5 bg-[#F4F5F7] border border-gray-200/80 px-2.5 py-1 rounded-lg text-xs font-medium text-gray-700"
-                      >
-                        {tool}
-                        <X
-                          className="w-3 h-3 text-gray-400 hover:text-red-500 cursor-pointer"
-                          onClick={() => handleRemoveTool(tool)}
-                        />
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-gray-400 italic">No design tools added yet.</p>
-                )}
-
-                {showAddTool ? (
-                  <form onSubmit={handleAddTool} className="flex items-center gap-2 mt-1">
-                    <input
-                      type="text"
-                      placeholder="e.g. Figma, Illustrator"
-                      value={newToolInput}
-                      onChange={(e) => setNewToolInput(e.target.value)}
-                      className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-800 outline-none w-48 sm:w-56"
-                      autoFocus
-                    />
-                    <button
-                      type="submit"
-                      className="bg-[#0B3A33] text-white text-xs px-3 py-1.5 rounded-lg font-semibold cursor-pointer"
-                    >
-                      Add
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowAddTool(false)}
-                      className="text-gray-400 hover:text-gray-600 text-xs px-2"
-                    >
-                      Cancel
-                    </button>
-                  </form>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setShowAddTool(true)}
-                    className="text-[#0D6D5F] hover:text-[#0A5348] text-xs font-semibold flex items-center gap-1 cursor-pointer pt-1 transition-colors"
-                  >
-                    Add Tool <Plus className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-
+                </span> */}
             </div>
 
-            {/* Right Column: Pricing Tier Card */}
-            <div className="lg:col-span-4 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-5 space-y-4">
+            {/* Package Title */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700 block">
+                Package title
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={state.title || ""}
+                onChange={handleInputChange}
+                placeholder="e.g I will do something i am really good at"
+                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all"
+              />
+            </div>
 
-              {/* Tier Pills Tabs: Basic, Silver (standard), Platinum (premium) */}
-              <div className="bg-[#F4F5F7] rounded-xl p-1 flex items-center gap-1">
-                {(["basic", "standard", "premium"] as TierKey[]).map((tierKey) => {
-                  const displayLabels: Record<TierKey, string> = {
-                    basic: "Basic",
-                    standard: "Silver",
-                    platinum: "Platinum",
-                  } as any;
-                  const label = displayLabels[tierKey] || (tierKey === "standard" ? "Silver" : tierKey === "premium" ? "Platinum" : "Basic");
-                  const isCurrent = activeTier === tierKey;
-
-                  return (
-                    <button
-                      key={tierKey}
-                      type="button"
-                      onClick={() => {
-                        setActiveTier(tierKey);
-                        if (!(state.packages as any)?.[tierKey]) {
-                          dispatch({
-                            type: "TOGGLE_PACKAGE_TIER",
-                            payload: { tier: tierKey },
-                          });
-                        }
-                      }}
-                      className={`flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition-all cursor-pointer ${
-                        isCurrent
-                          ? "bg-[#0B3A33] text-white shadow-2xs"
-                          : "text-gray-600 hover:text-gray-900"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Tier Title */}
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700 block">
-                  Package title
-                </label>
-                <input
-                  type="text"
-                  value={currentTierData.title || ""}
-                  onChange={(e) => handleTierInputChange("title", e.target.value)}
-                  placeholder="e.g I will do something i am really good at"
-                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
+            {/* Package Description (Rich Text Editor) */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700 block">
+                Package description
+              </label>
+              <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
+                <ReactQuill
+                  theme="snow"
+                  value={state.description || ""}
+                  onChange={(html) =>
+                    dispatch({
+                      type: "CHANGE_INPUT",
+                      payload: { name: "description", value: html },
+                    })
+                  }
+                  modules={quillModules}
+                  formats={quillFormats}
+                  placeholder="Write rich descriptions to introduce your package to clients..."
+                  className="[&_.ql-toolbar]:border-none [&_.ql-toolbar]:border-b [&_.ql-toolbar]:border-gray-200 [&_.ql-container]:border-none [&_.ql-editor]:min-h-[180px] [&_.ql-editor]:text-xs sm:[&_.ql-editor]:text-[13px] [&_.ql-editor]:text-gray-800"
                 />
               </div>
+            </div>
 
-              {/* Tier Description */}
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700 block">
-                  Package description
-                </label>
-                <textarea
-                  value={currentTierData.shortDesc || ""}
-                  onChange={(e) => handleTierInputChange("shortDesc", e.target.value)}
-                  placeholder="write description"
-                  rows={3}
-                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[80px]"
-                />
+            {/* Category */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700 block">
+                Category
+              </label>
+              <div className="relative">
+                <select
+                  name="category"
+                  value={state.category || ""}
+                  onChange={handleInputChange}
+                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10"
+                >
+                  <option value="" disabled>Select Category</option>
+                  {categoryList.map((c: any) => (
+                    <option key={c._id || c.slug} value={c.slug || c.name || c._id}>
+                      {c.name || c.slug}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
               </div>
+            </div>
 
-              {/* Add Delivery Time */}
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700 block">
-                  Add delivery time
-                </label>
-                <div className="relative">
-                  <select
-                    value={currentTierData.deliveryTime || ""}
-                    onChange={(e) => handleTierInputChange("deliveryTime", e.target.value)}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
-                  >
-                    <option value="" disabled>e.g 12 days</option>
-                    <option value="1">1 day</option>
-                    <option value="3">3 days</option>
-                    <option value="7">7 days</option>
-                    <option value="12">12 days</option>
-                    <option value="14">14 days</option>
-                    <option value="30">30 days</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-3.5 h-3.5" />
-                </div>
-              </div>
+            {/* Add Design Tool Section */}
+            <div className="space-y-3 pt-2">
+              <label className="text-xs sm:text-[13px] font-bold text-gray-900 block">
+                Add Design Tool
+              </label>
 
-              {/* Add Features */}
-              <div className="space-y-2 pt-1">
-                <div className="flex flex-wrap gap-1.5">
-                  {currentTierData.features?.map((f: string) => (
+              {toolsList.length > 0 ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  {toolsList.map((tool) => (
                     <span
-                      key={f}
-                      className="inline-flex items-center gap-1 bg-[#F4F5F7] border border-gray-200/60 px-2 py-0.5 rounded text-[11px] text-gray-700"
+                      key={tool}
+                      className="inline-flex items-center gap-1.5 bg-[#F4F5F7] border border-gray-200/80 px-2.5 py-1 rounded-lg text-xs font-medium text-gray-700"
                     >
-                      {f}
+                      {tool}
                       <X
                         className="w-3 h-3 text-gray-400 hover:text-red-500 cursor-pointer"
-                        onClick={() => handleRemoveFeature(f)}
+                        onClick={() => handleRemoveTool(tool)}
                       />
                     </span>
                   ))}
                 </div>
+              ) : (
+                <p className="text-xs text-gray-400 italic">No design tools added yet.</p>
+              )}
 
-                {showAddFeature ? (
-                  <form onSubmit={handleAddFeature} className="flex items-center gap-1.5">
-                    <input
-                      type="text"
-                      placeholder="e.g. Responsive design"
-                      value={newFeatureInput}
-                      onChange={(e) => setNewFeatureInput(e.target.value)}
-                      className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-2.5 py-1 text-xs text-gray-800 outline-none flex-1"
-                      autoFocus
-                    />
-                    <button
-                      type="submit"
-                      className="bg-[#0B3A33] text-white text-xs px-2.5 py-1 rounded font-semibold cursor-pointer"
-                    >
-                      Add
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowAddFeature(false)}
-                      className="text-gray-400 hover:text-gray-600 text-xs px-1"
-                    >
-                      ✕
-                    </button>
-                  </form>
-                ) : (
+              {showAddTool ? (
+                <form onSubmit={handleAddTool} className="flex items-center gap-2 mt-1">
+                  <input
+                    type="text"
+                    placeholder="e.g. Figma, Illustrator"
+                    value={newToolInput}
+                    onChange={(e) => setNewToolInput(e.target.value)}
+                    className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-800 outline-none w-48 sm:w-56"
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    className="bg-[#0B3A33] text-white text-xs px-3 py-1.5 rounded-lg font-semibold cursor-pointer"
+                  >
+                    Add
+                  </button>
                   <button
                     type="button"
-                    onClick={() => setShowAddFeature(true)}
-                    className="text-[#0D6D5F] hover:text-[#0A5348] text-xs font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                    onClick={() => setShowAddTool(false)}
+                    className="text-gray-400 hover:text-gray-600 text-xs px-2"
                   >
-                    Add Features <Plus className="w-3.5 h-3.5" />
+                    Cancel
                   </button>
-                )}
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowAddTool(true)}
+                  className="text-[#0D6D5F] hover:text-[#0A5348] text-xs font-semibold flex items-center gap-1 cursor-pointer pt-1 transition-colors"
+                >
+                  Add Tool <Plus className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Search Keywords / Tags Section */}
+            <div className="space-y-3 pt-2 border-t border-gray-100">
+              <div className="flex items-center justify-between">
+                <label className="text-xs sm:text-[13px] font-bold text-gray-900 block">
+                  Search Keywords / Tags
+                </label>
+                <span className="text-[11px] text-gray-400 font-medium">
+                  {keywordsList.length}/5 tags
+                </span>
               </div>
 
-              {/* Set Price */}
-              <div className="space-y-1 pt-1">
-                <label className="text-xs font-semibold text-gray-700 block">
-                  Set price
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    min="1"
-                    value={currentTierData.price || ""}
-                    onChange={(e) => handleTierInputChange("price", e.target.value)}
-                    placeholder="e.g $200"
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
-                  />
+              {keywordsList.length > 0 ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  {keywordsList.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1.5 bg-[#F4F5F7] border border-gray-200/80 px-2.5 py-1 rounded-lg text-xs font-medium text-gray-700"
+                    >
+                      #{tag}
+                      <X
+                        className="w-3 h-3 text-gray-400 hover:text-red-500 cursor-pointer"
+                        onClick={() => handleRemoveKeyword(tag)}
+                      />
+                    </span>
+                  ))}
                 </div>
-              </div>
+              ) : (
+                <p className="text-xs text-gray-400 italic">No keywords added yet. Add up to 5 keywords to help buyers find your package.</p>
+              )}
+
+              {showAddKeyword ? (
+                <form onSubmit={handleAddKeyword} className="flex items-center gap-2 mt-1">
+                  <input
+                    type="text"
+                    placeholder="e.g. Logo Design, Minimalist"
+                    value={newKeywordInput}
+                    onChange={(e) => setNewKeywordInput(e.target.value)}
+                    className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-800 outline-none w-48 sm:w-56"
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    className="bg-[#0B3A33] text-white text-xs px-3 py-1.5 rounded-lg font-semibold cursor-pointer"
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddKeyword(false);
+                      setNewKeywordInput("");
+                    }}
+                    className="text-gray-400 hover:text-gray-600 text-xs px-2"
+                  >
+                    Cancel
+                  </button>
+                </form>
+              ) : (
+                keywordsList.length < 5 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAddKeyword(true)}
+                    className="text-[#0D6D5F] hover:text-[#0A5348] text-xs font-semibold flex items-center gap-1 cursor-pointer pt-1 transition-colors"
+                  >
+                    Add Keyword <Plus className="w-3.5 h-3.5" />
+                  </button>
+                )
+              )}
             </div>
 
           </div>
 
+          {/* Right Column: Pricing Tier Card (Sticky) */}
+          <div className="lg:col-span-4 lg:sticky lg:top-[140px] self-start bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-5 space-y-4">
+
+            {/* Tier Pills Tabs: Basic, Silver (standard), Platinum (premium) */}
+            <div className="bg-[#F4F5F7] rounded-xl p-1 flex items-center gap-1">
+              {(["basic", "standard", "premium"] as TierKey[]).map((tierKey) => {
+                const displayLabels: Record<TierKey, string> = {
+                  basic: "Basic",
+                  standard: "Silver",
+                  platinum: "Platinum",
+                } as any;
+                const label = displayLabels[tierKey] || (tierKey === "standard" ? "Silver" : tierKey === "premium" ? "Platinum" : "Basic");
+                const isCurrent = activeTier === tierKey;
+
+                return (
+                  <button
+                    key={tierKey}
+                    type="button"
+                    onClick={() => {
+                      setActiveTier(tierKey);
+                      if (!(state.packages as any)?.[tierKey]) {
+                        dispatch({
+                          type: "TOGGLE_PACKAGE_TIER",
+                          payload: { tier: tierKey },
+                        });
+                      }
+                    }}
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition-all cursor-pointer ${isCurrent
+                      ? "bg-[#0B3A33] text-white shadow-2xs"
+                      : "text-gray-600 hover:text-gray-900"
+                      }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Tier Title */}
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-gray-700 block">
+                Package title
+              </label>
+              <input
+                type="text"
+                value={currentTierData.title || ""}
+                onChange={(e) => handleTierInputChange("title", e.target.value)}
+                placeholder="e.g I will do something i am really good at"
+                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
+              />
+            </div>
+
+            {/* Tier Description */}
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-gray-700 block">
+                Package description
+              </label>
+              <textarea
+                value={currentTierData.shortDesc || ""}
+                onChange={(e) => handleTierInputChange("shortDesc", e.target.value)}
+                placeholder="write description"
+                rows={3}
+                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[80px]"
+              />
+            </div>
+
+            {/* Add Delivery Time */}
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-gray-700 block">
+                Add delivery time
+              </label>
+              <div className="relative">
+                <select
+                  value={currentTierData.deliveryTime || ""}
+                  onChange={(e) => handleTierInputChange("deliveryTime", e.target.value)}
+                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
+                >
+                  <option value="" disabled>e.g 12 days</option>
+                  <option value="1">1 day</option>
+                  <option value="3">3 days</option>
+                  <option value="7">7 days</option>
+                  <option value="12">12 days</option>
+                  <option value="14">14 days</option>
+                  <option value="30">30 days</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-3.5 h-3.5" />
+              </div>
+            </div>
+
+            {/* Add Features */}
+            <div className="space-y-2 pt-1">
+              <div className="flex flex-wrap gap-1.5">
+                {currentTierData.features?.map((f: string) => (
+                  <span
+                    key={f}
+                    className="inline-flex items-center gap-1 bg-[#F4F5F7] border border-gray-200/60 px-2 py-0.5 rounded text-[11px] text-gray-700"
+                  >
+                    {f}
+                    <X
+                      className="w-3 h-3 text-gray-400 hover:text-red-500 cursor-pointer"
+                      onClick={() => handleRemoveFeature(f)}
+                    />
+                  </span>
+                ))}
+              </div>
+
+              {showAddFeature ? (
+                <form onSubmit={handleAddFeature} className="flex items-center gap-1.5">
+                  <input
+                    type="text"
+                    placeholder="e.g. Responsive design"
+                    value={newFeatureInput}
+                    onChange={(e) => setNewFeatureInput(e.target.value)}
+                    className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-2.5 py-1 text-xs text-gray-800 outline-none flex-1"
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    className="bg-[#0B3A33] text-white text-xs px-2.5 py-1 rounded font-semibold cursor-pointer"
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddFeature(false)}
+                    className="text-gray-400 hover:text-gray-600 text-xs px-1"
+                  >
+                    ✕
+                  </button>
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowAddFeature(true)}
+                  className="text-[#0D6D5F] hover:text-[#0A5348] text-xs font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                >
+                  Add Features <Plus className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Set Price */}
+            <div className="space-y-1 pt-1">
+              <label className="text-xs font-semibold text-gray-700 block">
+                Set price
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  min="1"
+                  value={currentTierData.price || ""}
+                  onChange={(e) => handleTierInputChange("price", e.target.value)}
+                  placeholder="e.g $200"
+                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
+                />
+              </div>
+            </div>
+          </div>
+
+        </div>
+
         {/* 4. Section: Packages Media & Upload */}
-        <div id="section-packages" className="scroll-mt-24 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+        <div id="section-packages" className="scroll-mt-36 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
 
           {/* Header: Packages title & arrow controls */}
           <div className="flex items-center justify-between">
@@ -962,7 +1001,7 @@ const OrganizePage = () => {
         </div>
 
         {/* 5. Section: Seller Info */}
-        <div id="section-seller" className="scroll-mt-24 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+        <div id="section-seller" className="scroll-mt-36 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
           <h2 className="text-lg sm:text-xl font-bold text-gray-950 border-b border-gray-100 pb-3">
             Seller Information
           </h2>
@@ -984,7 +1023,7 @@ const OrganizePage = () => {
         </div>
 
         {/* 6. Section: Frequently asked questions */}
-        <div id="section-faq" className="scroll-mt-24 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+        <div id="section-faq" className="scroll-mt-36 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
           <div className="flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-950">
               Frequently asked questions

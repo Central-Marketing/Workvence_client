@@ -267,8 +267,8 @@ const Earnings = () => {
   const payouts: any[] = (statementData?.payouts && statementData.payouts.length > 0)
     ? statementData.payouts
     : Array.isArray(payoutsData)
-    ? payoutsData
-    : payoutsData?.payouts || [];
+      ? payoutsData
+      : payoutsData?.payouts || [];
 
   const completedOrders = orders.filter((o: any) => o.status === "completed" || o.isCompleted);
   const clearedOrders = orders.filter((o: any) => o.isCleared === true);
@@ -279,14 +279,14 @@ const Earnings = () => {
     summary.lifetimeTotalIncome !== undefined
       ? Number(summary.lifetimeTotalIncome)
       : summary.clearedIncome !== undefined
-      ? Number(summary.clearedIncome)
-      : completedOrders.reduce((acc: number, curr: any) => {
+        ? Number(summary.clearedIncome)
+        : completedOrders.reduce((acc: number, curr: any) => {
           const net =
             curr.netEarnings !== undefined
               ? curr.netEarnings
               : curr.grossPrice
-              ? curr.grossPrice - (curr.platformFee || 0)
-              : curr.price || 0;
+                ? curr.grossPrice - (curr.platformFee || 0)
+                : curr.price || 0;
           return acc + (Number(net) || 0);
         }, 0);
 
@@ -295,14 +295,14 @@ const Earnings = () => {
     summary.awaitingClearance !== undefined
       ? Number(summary.awaitingClearance)
       : unclearedOrders.reduce((acc: number, curr: any) => {
-          const net =
-            curr.netEarnings !== undefined
-              ? curr.netEarnings
-              : curr.grossPrice
+        const net =
+          curr.netEarnings !== undefined
+            ? curr.netEarnings
+            : curr.grossPrice
               ? curr.grossPrice - (curr.platformFee || 0)
               : curr.price || 0;
-          return acc + (Number(net) || 0);
-        }, 0);
+        return acc + (Number(net) || 0);
+      }, 0);
 
   // Available Balance
   const totalRequested = payouts
@@ -313,8 +313,8 @@ const Earnings = () => {
     summary.availableBalance !== undefined
       ? Number(summary.availableBalance)
       : user?.earningsBalance !== undefined
-      ? Number(user.earningsBalance)
-      : Math.max(netIncome - totalRequested, 0);
+        ? Number(user.earningsBalance)
+        : Math.max(netIncome - totalRequested, 0);
 
   const readyToSync = summary?.readyToSyncAmount ? Number(summary.readyToSyncAmount) : 0;
 
@@ -355,14 +355,14 @@ const Earnings = () => {
         o.netEarnings !== undefined
           ? o.netEarnings
           : o.grossPrice
-          ? o.grossPrice - (o.platformFee || 0)
-          : o.price || 0
+            ? o.grossPrice - (o.platformFee || 0)
+            : o.price || 0
       ).toFixed(2),
       o.clearedAt
         ? moment(o.clearedAt).format("YYYY-MM-DD")
         : o.clearsAt
-        ? moment(o.clearsAt).format("YYYY-MM-DD")
-        : "Pending",
+          ? moment(o.clearsAt).format("YYYY-MM-DD")
+          : "Pending",
       o.isCleared ? "Cleared" : o.status === "cancelled" ? "Failed" : "Pending",
     ]);
 
@@ -429,11 +429,29 @@ const Earnings = () => {
 
         {/* 2. Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-[32px] font-bold tracking-tight text-gray-950">
+          <div className="flex flex-col gap-[10px]">
+            <h1 className="text-[28px]
+  sm:text-[30px]
+  md:text-[36px]
+  lg:text-[40px]
+  xl:text-[44px]
+  2xl:text-[48px]
+  font-normal
+  font-sf-pro
+  leading-none
+  tracking-normal
+  text-[#292929]">
               My Earnings
             </h1>
-            <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-2xl leading-relaxed">
+            <p className="text-[14px]
+  sm:text-[14px]
+  md:text-[15px]
+  lg:text-[16px]
+  font-normal
+  font-inter
+  leading-[22px]
+  tracking-normal
+  text-[#6E6E6E]">
               Track your income, awaiting clearance and multi channel payout
             </p>
           </div>
@@ -444,14 +462,40 @@ const Earnings = () => {
               type="button"
               onClick={() => syncClearanceMutation.mutate()}
               disabled={syncClearanceMutation.isPending}
-              className="bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 font-semibold text-xs sm:text-[13px] px-4 py-2.5 rounded-lg transition-colors cursor-pointer flex items-center gap-2 shadow-2xs"
+              className="bg-[rgb(239_252_250_/_50%)] hover:bg-gray-50 border border-black/10 text-gray-800 font-semibold text-xs sm:text-[13px] px-4 py-2.5 rounded-lg transition-colors cursor-pointer flex items-center gap-2 shadow-2xs"
               title="Sync mature completed orders into your available balance"
             >
-              <RefreshCw
-                className={`w-3.5 h-3.5 ${
-                  syncClearanceMutation.isPending ? "animate-spin text-gray-500" : "text-gray-700"
-                }`}
-              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                className={`w-3.5 h-3.5 ${syncClearanceMutation.isPending ? "animate-spin text-gray-500" : "text-[#292929]"
+                  }`}
+              >
+                <path
+                  d="M16.5 8H18C19.4142 8 20.1213 8 20.5607 7.56066C21 7.12132 21 6.41421 21 5V3.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M3 12C3 7.02943 7.0293 3 12 3C15.571 3 18.0948 4.73053 20 7.08371M21 12C21 16.9705 16.9707 21 12 21C8.42904 21 5.90524 19.2694 4 16.9162"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M7.5 16H6C4.58579 16 3.87868 16 3.43934 16.4393C3 16.8786 3 17.5857 3 19V20.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
               <span>{syncClearanceMutation.isPending ? "Syncing..." : "Sync funds"}</span>
               {readyToSync > 0 && !syncClearanceMutation.isPending && (
                 <span className="ml-1 bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
@@ -486,12 +530,14 @@ const Earnings = () => {
         </div>
 
         {/* 3. Stat Cards: Next Income, Awaiting Clearance, Available Balance */}
-        <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-7">
-          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100 gap-6 md:gap-0">
+        <div className="bg-white rounded-[10px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
             {/* Next Income */}
-            <div className="md:pr-8 space-y-1">
-              <span className="text-xs font-semibold text-gray-500 block">Next Income</span>
-              <h3 className="text-2xl sm:text-[30px] font-bold text-gray-950 tracking-tight">
+            <div className="p-6">
+              <span className="text-sm md:text-[15px] lg:text-[16px] font-bold font-sf-pro leading-none text-[#6E6E6E] block">
+                Next Income
+              </span>
+              <h3 className="text-2xl sm:text-[30px] font-bold text-gray-950 tracking-tight leading-none mt-[10px] mb-[30px]">
                 {netIncome.toLocaleString("en-US", { style: "currency", currency: "USD" })}
               </h3>
               <p className="text-xs text-gray-400">
@@ -506,18 +552,22 @@ const Earnings = () => {
             </div>
 
             {/* Awaiting Clearance */}
-            <div className="pt-6 md:pt-0 md:px-8 space-y-1">
-              <span className="text-xs font-semibold text-gray-500 block">Awaiting Clearance</span>
-              <h3 className="text-2xl sm:text-[30px] font-bold text-gray-950 tracking-tight">
+            <div className="p-6">
+              <span className="text-sm md:text-[15px] lg:text-[16px] font-bold font-sf-pro leading-none text-[#6E6E6E] block">
+                Awaiting Clearance
+              </span>
+              <h3 className="text-2xl sm:text-[30px] font-bold text-gray-950 tracking-tight leading-none mt-[10px] mb-[30px]">
                 {awaitingClearance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
               </h3>
               <p className="text-xs text-gray-400">Currently in progress</p>
             </div>
 
             {/* Available Balance */}
-            <div className="pt-6 md:pt-0 md:pl-8 space-y-1">
-              <span className="text-xs font-semibold text-gray-500 block">Available Balance</span>
-              <h3 className="text-2xl sm:text-[30px] font-bold text-gray-950 tracking-tight">
+            <div className="p-6">
+              <span className="text-sm md:text-[15px] lg:text-[16px] font-bold font-sf-pro leading-none text-[#6E6E6E] block">
+                Available Balance
+              </span>
+              <h3 className="text-2xl sm:text-[30px] font-bold text-gray-950 tracking-tight leading-none mt-[10px] mb-[30px]">
                 {availableBalance.toLocaleString("en-US", { style: "currency", currency: "USD" })}
               </h3>
               <p className="text-xs text-gray-400">
@@ -533,22 +583,20 @@ const Earnings = () => {
           <button
             type="button"
             onClick={() => setActiveTab("payout")}
-            className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-              activeTab === "payout"
-                ? "bg-[#0B3A33] text-white shadow-2xs"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
+            className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${activeTab === "payout"
+              ? "bg-[#0B3A33] text-white shadow-2xs"
+              : "text-gray-600 hover:text-gray-900"
+              }`}
           >
             Payout Request
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("clearance")}
-            className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-              activeTab === "clearance"
-                ? "bg-[#0B3A33] text-white shadow-2xs"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
+            className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${activeTab === "clearance"
+              ? "bg-[#0B3A33] text-white shadow-2xs"
+              : "text-gray-600 hover:text-gray-900"
+              }`}
           >
             Order Clearance
           </button>
@@ -695,8 +743,8 @@ const Earnings = () => {
                         order.netEarnings !== undefined
                           ? order.netEarnings
                           : order.grossPrice
-                          ? order.grossPrice - (order.platformFee || 0)
-                          : order.price || 0
+                            ? order.grossPrice - (order.platformFee || 0)
+                            : order.price || 0
                       );
                       const orderRef =
                         order.orderNumber ||
@@ -704,8 +752,8 @@ const Earnings = () => {
                       const clearanceDate = order.clearedAt
                         ? moment(order.clearedAt).format("DD MMM, YYYY")
                         : order.clearsAt
-                        ? moment(order.clearsAt).format("DD MMM, YYYY")
-                        : "14 days from delivery";
+                          ? moment(order.clearsAt).format("DD MMM, YYYY")
+                          : "14 days from delivery";
 
                       const isFailed = order.status === "cancelled" || order.status === "failed";
                       const isCleared = order.isCleared === true;
@@ -865,11 +913,10 @@ const Earnings = () => {
               {/* Stripe Option */}
               <div
                 onClick={() => isStripeReady && setSelectedMethod("stripe")}
-                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${
-                  selectedMethod === "stripe"
-                    ? "bg-[#F7F4FF] border-2 border-purple-300 shadow-2xs"
-                    : "bg-white border border-gray-200 hover:border-gray-300"
-                } ${!isStripeReady ? "opacity-60" : ""}`}
+                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${selectedMethod === "stripe"
+                  ? "bg-[#F7F4FF] border-2 border-purple-300 shadow-2xs"
+                  : "bg-white border border-gray-200 hover:border-gray-300"
+                  } ${!isStripeReady ? "opacity-60" : ""}`}
               >
                 <div className="space-y-1">
                   <div className="flex items-center">
@@ -892,11 +939,10 @@ const Earnings = () => {
               {/* Payoneer Option */}
               <div
                 onClick={() => isPayoneerReady && setSelectedMethod("payoneer")}
-                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${
-                  selectedMethod === "payoneer"
-                    ? "bg-[#F7F4FF] border-2 border-purple-300 shadow-2xs"
-                    : "bg-white border border-gray-200 hover:border-gray-300"
-                } ${!isPayoneerReady ? "opacity-60" : ""}`}
+                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${selectedMethod === "payoneer"
+                  ? "bg-[#F7F4FF] border-2 border-purple-300 shadow-2xs"
+                  : "bg-white border border-gray-200 hover:border-gray-300"
+                  } ${!isPayoneerReady ? "opacity-60" : ""}`}
               >
                 <div className="space-y-1">
                   <div className="flex items-center">

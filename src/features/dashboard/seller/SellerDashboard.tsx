@@ -111,8 +111,16 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
         <div className="container mx-auto px-4 md:px-6 space-y-7">
 
           {/* Top Hero Banner: Draft Package Notification */}
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0C0B10] via-[#2A124F] to-[#7B34D4] p-7 sm:p-9 text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
-            <div className="max-w-2xl">
+          <div className="relative overflow-hidden rounded-[10px] bg-[#0F0F12] bg-[radial-gradient(ellipse_65%_130%_at_82%_50%,_#7C3AED_0%,_#531A85_38%,_#1D0933_68%,_#0F0F12_100%)] p-7 sm:p-[22px] text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+            {/* Ellipse 15017 ambient glow */}
+            <div
+              className="absolute -right-16 -top-24 w-[620px] h-[440px] rounded-full pointer-events-none blur-[80px] opacity-80"
+              style={{
+                background: "radial-gradient(ellipse at center, #8B5CF6 0%, #7C3AED 35%, #581C87 65%, transparent 85%)",
+              }}
+            />
+
+            <div className="relative z-10 max-w-2xl">
               <h2 className="text-2xl sm:text-[28px] font-normal tracking-tight text-white">
                 Your <span className="font-bold">package</span> is currently in draft
               </h2>
@@ -127,13 +135,16 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
               </Link>
             </div>
 
-            <div className="relative w-28 sm:w-32 h-24 sm:h-28 shrink-0 self-center md:self-auto flex items-center justify-center">
-              <img
-                src="/images/dashboard/lightning_bolt_exact.png"
-                alt="Draft Alert"
-                className="w-full h-full object-contain scale-110 drop-shadow-[0_0_20px_rgba(168,85,247,0.45)]"
-              />
-            </div>
+            <div
+              className="relative w-[180px] sm:w-[215px] h-[172px] sm:h-[206px] shrink-0 self-center md:self-auto z-10 drop-shadow-[0_0_24px_rgba(168,85,247,0.5)]"
+              style={{
+                aspectRatio: "215/206",
+                backgroundImage: "url('/images/dashboard/c43d084049b88664dd8666ff65abaa314387feea.png')",
+                backgroundPosition: "-17.2px -16.448px",
+                backgroundSize: "116% 115.969%",
+                backgroundRepeat: "no-repeat",
+              }}
+            />
           </div>
 
           {/* 4-Metric Stats Bar */}
@@ -201,8 +212,8 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                     type="button"
                     onClick={() => setOrderTypeFilter("all")}
                     className={`px-5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${orderTypeFilter === "all"
-                        ? "bg-[#0B3A33] text-white shadow-2xs"
-                        : "text-gray-600 hover:text-gray-900"
+                      ? "bg-[#0B3A33] text-white shadow-2xs"
+                      : "text-gray-600 hover:text-gray-900"
                       }`}
                   >
                     All
@@ -211,8 +222,8 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                     type="button"
                     onClick={() => setOrderTypeFilter("package")}
                     className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${orderTypeFilter === "package"
-                        ? "bg-[#0B3A33] text-white shadow-2xs"
-                        : "text-gray-600 hover:text-gray-900"
+                      ? "bg-[#0B3A33] text-white shadow-2xs"
+                      : "text-gray-600 hover:text-gray-900"
                       }`}
                   >
                     Packages
@@ -221,8 +232,8 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                     type="button"
                     onClick={() => setOrderTypeFilter("brief")}
                     className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${orderTypeFilter === "brief"
-                        ? "bg-[#0B3A33] text-white shadow-2xs"
-                        : "text-gray-600 hover:text-gray-900"
+                      ? "bg-[#0B3A33] text-white shadow-2xs"
+                      : "text-gray-600 hover:text-gray-900"
                       }`}
                   >
                     Briefs

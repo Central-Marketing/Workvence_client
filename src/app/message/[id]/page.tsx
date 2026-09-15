@@ -1086,80 +1086,256 @@ const Message = () => {
           ) : (
             <>
               {/* Header */}
-              <div className="px-5 py-3.5 border-b border-[rgba(0,0,0,0.10)] flex justify-between items-center bg-[#F8F8F8] max-md:px-3.5 max-md:py-2.5">
-                <button className="md:hidden mr-3 text-slate-500 text-xl flex-shrink-0 cursor-pointer" onClick={() => setIsLeftSideOpen(true)}>
-                  <RiMenuLine />
+              <div className="min-h-[64px] px-4 sm:px-5 py-2.5 sm:py-3.5 border-b border-[rgba(0,0,0,0.10)] flex items-center bg-[#F8F8F8]">
+
+                {/* Mobile Menu */}
+                <button
+                  type="button"
+                  className="md:hidden mr-2 sm:mr-3 shrink-0 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                  onClick={() => setIsLeftSideOpen(true)}
+                  aria-label="Open conversations"
+                >
+                  <RiMenuLine className="text-lg sm:text-xl" />
                 </button>
+
                 {finalRecipientUser ? (
                   <>
-                    <div className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer" onClick={() => setIsRightSideOpen(true)}>
+                    {/* Recipient */}
+                    <div
+                      className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 cursor-pointer"
+                      onClick={() => setIsRightSideOpen(true)}
+                    >
+                      {/* Avatar */}
                       <div className="shrink-0">
-                        <img src={finalRecipientUser.image || '/media/noavatar.png'} alt="" className="w-10 h-10 rounded-full object-cover border border-slate-100" />
+                        <img
+                          src={finalRecipientUser.image || '/media/noavatar.png'}
+                          alt=""
+                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border border-slate-200"
+                        />
                       </div>
-                      <div className="min-w-0">
-                        <h3 className="text-[15px] font-bold text-slate-900 leading-tight truncate">{finalRecipientUser.username}</h3>
-                        <span className="text-xs text-slate-500 font-medium">
+
+                      {/* User Info */}
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-sm sm:text-[15px] font-semibold text-slate-900 leading-tight truncate">
+                          {finalRecipientUser.username}
+                        </h3>
+
+                        <span className="text-[11px] sm:text-xs text-slate-500 font-medium">
                           {isRecipientTyping ? (
                             <span className="text-brand-green font-semibold animate-pulse flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 bg-brand-green rounded-full"></span> typing...
+                              <span className="w-1.5 h-1.5 bg-brand-green rounded-full shrink-0" />
+                              typing...
                             </span>
                           ) : (
-                            "Active Contact"
+                            'Active Contact'
                           )}
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      {/* Optional Seller Action Buttons: Create Offer */}
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-2">
+
+                      {/* Create Offer */}
                       {user?.isSeller && (
                         <button
                           type="button"
-                          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#000000] text-white hover:bg-gray-200 hover:text-black transition-colors whitespace-nowrap flex-shrink-0 mb-0.5 cursor-pointer"
+                          className="
+              h-8 sm:h-9
+              px-2.5 sm:px-3
+              text-[11px] sm:text-xs
+              font-medium
+              rounded-md sm:rounded-lg
+              bg-black
+              text-white
+              hover:bg-gray-800
+              transition-colors
+              whitespace-nowrap
+              shrink-0
+              cursor-pointer
+            "
                           onClick={() => setShowOfferModal(true)}
                         >
-                          Create Offer
+                          <span className="hidden xs:inline sm:inline">
+                            Create Offer
+                          </span>
+                          <span className="xs:hidden">
+                            Offer
+                          </span>
                         </button>
                       )}
 
+                      {/* Video Meeting */}
                       <button
                         type="button"
-                        className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-600 transition-colors flex items-center justify-center cursor-pointer"
+                        className="
+            w-8 h-8 sm:w-9 sm:h-9
+            rounded-md sm:rounded-lg
+            hover:bg-emerald-50
+            text-emerald-600
+            transition-colors
+            flex items-center justify-center
+            shrink-0
+            cursor-pointer
+          "
                         onClick={() => {
-                          setMeetingTitle(`Job Discussion with @${finalRecipientUser?.username || 'Client'}`);
+                          setMeetingTitle(
+                            `Job Discussion with @${finalRecipientUser?.username || 'Client'}`
+                          );
                           setShowMeetingModal(true);
                         }}
                         title="Start Video Meeting"
                         aria-label="Start Video Meeting"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                          <path d="M2 11C2 7.70017 2 6.05025 3.02513 5.02513C4.05025 4 5.70017 4 9 4H10C13.2998 4 14.9497 4 15.9749 5.02513C17 6.05025 17 7.70017 17 11V13C17 16.2998 17 17.9497 15.9749 18.9749C14.9497 20 13.2998 20 10 20H9C5.70017 20 4.05025 20 3.02513 18.9749C2 17.9497 2 16.2998 2 13V11Z" stroke="#292929" stroke-width="1.5" />
-                          <path d="M17 8.90585L17.1259 8.80196C19.2417 7.05623 20.2996 6.18336 21.1498 6.60482C22 7.02628 22 8.42355 22 11.2181V12.7819C22 15.5765 22 16.9737 21.1498 17.3952C20.2996 17.8166 19.2417 16.9438 17.1259 15.198L17 15.0941" stroke="#292929" stroke-width="1.5" stroke-linecap="round" />
-                          <path d="M11.5 11C12.3284 11 13 10.3284 13 9.5C13 8.67157 12.3284 8 11.5 8C10.6716 8 10 8.67157 10 9.5C10 10.3284 10.6716 11 11.5 11Z" stroke="#292929" stroke-width="1.5" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="21"
+                          height="21"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          className="sm:w-6 sm:h-6"
+                        >
+                          <path
+                            d="M2 11C2 7.70017 2 6.05025 3.02513 5.02513C4.05025 4 5.70017 4 9 4H10C13.2998 4 14.9497 4 15.9749 5.02513C17 6.05025 17 7.70017 17 11V13C17 16.2998 17 17.9497 15.9749 18.9749C14.9497 20 13.2998 20 10 20H9C5.70017 20 4.05025 18.9749 3.02513 18.9749C2 17.9497 2 16.2998 2 13V11Z"
+                            stroke="#292929"
+                            strokeWidth="1.5"
+                          />
+                          <path
+                            d="M17 8.90585L17.1259 8.80196C19.2417 7.05623 20.2998 6.18336 21.1498 6.60482C22 7.02628 22 8.42355 22 11.2181V12.7819C22 15.5765 22 16.9737 21.1498 17.3952C20.2996 17.8166 19.2417 16.9438 17.1259 15.198L17 15.0941"
+                            stroke="#292929"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            d="M11.5 11C12.3284 11 13 10.3284 13 9.5C13 8.67157 12.3284 8 11.5 8C10.6716 8 10 8.67157 10 9.5C10 10.3284 10.6716 11 11.5 11Z"
+                            stroke="#292929"
+                            strokeWidth="1.5"
+                          />
                         </svg>
                       </button>
 
+                      {/* Search */}
                       {isMsgSearchActive ? (
-                        <div className="flex items-center bg-slate-100 rounded-full px-2.5 py-0.5">
+                        <div
+                          className="
+              flex items-center
+              h-8 sm:h-9
+              w-[130px] xs:w-[160px] sm:w-[200px]
+              bg-slate-100
+              rounded-md sm:rounded-lg
+              px-2
+              shrink-0
+            "
+                        >
                           <input
                             type="text"
                             placeholder="Search in chat..."
                             value={msgSearchQuery}
                             onChange={(e) => setMsgSearchQuery(e.target.value)}
-                            className="border-none bg-transparent outline-none text-sm p-1 w-36 text-slate-800 placeholder:text-slate-400"
+                            className="
+                border-none
+                bg-transparent
+                outline-none
+                text-xs sm:text-sm
+                py-1
+                min-w-0
+                flex-1
+                text-slate-800
+                placeholder:text-slate-400
+              "
                             autoFocus
                           />
-                          <button className="text-slate-500 hover:text-slate-800 p-0 text-lg cursor-pointer leading-none" onClick={() => { setIsMsgSearchActive(false); setMsgSearchQuery(''); }}>&times;</button>
+
+                          <button
+                            type="button"
+                            className="
+                w-5 h-5
+                shrink-0
+                flex items-center justify-center
+                text-slate-500
+                hover:text-slate-800
+                cursor-pointer
+                text-lg
+                leading-none
+              "
+                            onClick={() => {
+                              setIsMsgSearchActive(false);
+                              setMsgSearchQuery('');
+                            }}
+                            aria-label="Close search"
+                          >
+                            &times;
+                          </button>
                         </div>
                       ) : (
-                        <button className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors flex items-center justify-center cursor-pointer" onClick={() => setIsMsgSearchActive(true)}><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                          <path d="M17 17L21 21" stroke="#292929" stroke-width="1.5" stroke-linecap="round" strokeLinejoin="round" />
-                          <path d="M19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C15.4183 19 19 15.4183 19 11Z" stroke="#292929" stroke-width="1.5" stroke-linecap="round" strokeLinejoin="round" />
-                        </svg></button>
+                        <button
+                          type="button"
+                          className="
+              w-8 h-8 sm:w-9 sm:h-9
+              rounded-md sm:rounded-lg
+              hover:bg-slate-100
+              text-slate-600
+              transition-colors
+              flex items-center justify-center
+              shrink-0
+              cursor-pointer
+            "
+                          onClick={() => setIsMsgSearchActive(true)}
+                          aria-label="Search messages"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="21"
+                            height="21"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            className="sm:w-6 sm:h-6"
+                          >
+                            <path
+                              d="M17 17L21 21"
+                              stroke="#292929"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C15.4183 19 19 15.4183 19 11Z"
+                              stroke="#292929"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </button>
                       )}
-                      <button className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors flex items-center justify-center cursor-pointer ml-1 text-xl" onClick={() => setIsRightSideOpen(true)}><RiInformationLine /></button>
+
+                      {/* Mobile Right Sidebar */}
+                      <button
+                        type="button"
+                        className="
+            lg:hidden
+            w-8 h-8 sm:w-9 sm:h-9
+            rounded-md sm:rounded-lg
+            hover:bg-slate-100
+            text-slate-600
+            transition-colors
+            flex items-center justify-center
+            shrink-0
+            cursor-pointer
+          "
+                        onClick={() => setIsRightSideOpen(true)}
+                        aria-label="Open contact information"
+                      >
+                        <RiInformationLine className="text-lg sm:text-xl" />
+                      </button>
+
                     </div>
                   </>
-                ) : <h3 className="text-base font-bold text-slate-800">Conversation</h3>}
+                ) : (
+                  <h3 className="text-sm sm:text-base font-semibold text-slate-800">
+                    Conversation
+                  </h3>
+                )}
               </div>
               {/* Messages */}
               <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-5 flex flex-col gap-4 bg-[#F0F0F0] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full">

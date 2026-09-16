@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -45,26 +45,69 @@ function formatCategoryName(cat?: string): string {
     .join(" ");
 }
 
-const normalizeProposal = (p: any, idx: number) => {
-  const seller = p.seller || (typeof p.sellerID === "object" ? p.sellerID : null) || {};
-  const id = p._id || p.id || `prop-${idx}`;
-  const sellerId = seller._id || seller.id || p.sellerID || p.sellerId || "";
-  const name = seller.username || seller.name || "Freelancer";
-  const avatar = seller.image || seller.avatar || "";
-  const country = seller.country || "";
-  const badge = seller.sellerLevel || (seller.isTopRated ? "Top Rated" : "");
+const normalizeProposal = (p: any, idx: number, fullSellerData?: any) => {
+  const rawSeller = p?.seller || (typeof p?.sellerID === "object" ? p?.sellerID : null) || {};
+  const resolvedFull = fullSellerData?.user || fullSellerData?.seller || fullSellerData?.data || fullSellerData || {};
+  const seller = { ...rawSeller, ...resolvedFull };
+  const id = p?._id || p?.id || `prop-${idx}`;
+  const sellerId =
+    seller?._id ||
+    seller?.id ||
+    (typeof p?.sellerID === "string" ? p.sellerID : p?.sellerID?._id || p?.sellerID?.id) ||
+    p?.sellerId ||
+    "";
+  const name = seller?.username || seller?.name || "Freelancer";
+  const avatar = seller?.image || seller?.avatar || "";
+  const country = seller?.country || "";
+  const badge = seller?.sellerLevel || (seller?.isTopRated ? "Top Rated" : "");
+  const tagline = seller?.headline || seller?.tagline || seller?.title || "";
   const rating =
-    typeof seller.starRating === "number"
+    typeof seller?.starRating === "number"
       ? seller.starRating
-      : typeof seller.rating === "number"
-      ? seller.rating
-      : null;
-  const reviewCount = seller.totalReviews ?? seller.reviewCount ?? null;
-  const price = typeof p.price === "number" ? p.price : Number(p.price) || 0;
-  const deliveryTime = p.deliveryTime || 0;
-  const coverLetter = p.coverLetter || p.description || p.message || "";
-  const attachments = Array.isArray(p.attachments) ? p.attachments : [];
-  const createdAt = p.createdAt || "";
+      : typeof seller?.rating === "number"
+        ? seller.rating
+        : typeof seller?.metrics?.overall?.starRating === "number"
+          ? seller.metrics.overall.starRating
+          : null;
+  const reviewCount =
+    typeof seller?.totalReviews === "number"
+      ? seller.totalReviews
+      : typeof seller?.reviewCount === "number"
+        ? seller.reviewCount
+        : typeof seller?.metrics?.overall?.totalReviews === "number"
+          ? seller.metrics.overall.totalReviews
+          : null;
+  const completedProjects =
+    typeof seller?.metrics?.overall?.completedOrdersCount === "number"
+      ? seller.metrics.overall.completedOrdersCount
+      : typeof seller?.completedOrdersCount === "number"
+        ? seller.completedOrdersCount
+        : typeof seller?.completedProjects === "number"
+          ? seller.completedProjects
+          : typeof seller?.ordersCount === "number"
+            ? seller.ordersCount
+            : null;
+  const successRate =
+    typeof seller?.metrics?.overall?.jobSuccessRate === "number"
+      ? `${seller.metrics.overall.jobSuccessRate}%`
+      : typeof seller?.jobSuccessRate === "number"
+        ? `${seller.jobSuccessRate}%`
+        : seller?.successRate
+          ? String(seller.successRate).includes("%")
+            ? String(seller.successRate)
+            : `${seller.successRate}%`
+          : "";
+  const memberSince = seller?.createdAt ? moment(seller.createdAt).format("YYYY") : "";
+  const price = typeof p?.price === "number" ? p.price : Number(p?.price) || 0;
+  const deliveryTime = p?.deliveryTime || 0;
+  const coverLetter = p?.coverLetter || p?.description || p?.message || "";
+  const attachments = Array.isArray(p?.attachments) ? p.attachments.filter(Boolean) : [];
+  const createdAt = p?.createdAt || "";
+  const skills = Array.isArray(seller?.skills) && seller.skills.length > 0
+    ? seller.skills
+    : Array.isArray(p?.skills) && p.skills.length > 0
+      ? p.skills
+      : [];
 
   return {
     id,
@@ -74,13 +117,18 @@ const normalizeProposal = (p: any, idx: number) => {
     avatar,
     country,
     badge,
+    tagline,
     rating,
     reviewCount,
+    completedProjects,
+    successRate,
+    memberSince,
     price,
     deliveryTime,
     coverLetter,
     attachments,
     createdAt,
+    skills,
   };
 };
 
@@ -105,6 +153,17 @@ const BriefDetail = () => {
   const [aiRecommendedIds, setAiRecommendedIds] = useState<string[]>([]);
   const [messagingSellerId, setMessagingSellerId] = useState<string | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
+
+  // Fetch full seller profile on demand for genuine database details
+  const { data: selectedSellerProfile } = useQuery({
+    queryKey: ["seller-full-profile", selectedProposal?.sellerId],
+    queryFn: () =>
+      axiosFetch
+        .get(`/users/${selectedProposal?.sellerId}`)
+        .then(({ data }) => data?.user || data?.seller || data?.data || data)
+        .catch(() => null),
+    enabled: !!selectedProposal?.sellerId && modalView === "detail",
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -163,17 +222,6 @@ const BriefDetail = () => {
     return [];
   }, [brief?.proposals, fetchedProposals]);
 
-  const normalizedProposals = useMemo(() => {
-    return rawProposals.map((p, idx) => normalizeProposal(p, idx));
-  }, [rawProposals]);
-
-  const totalProposalsCount =
-    normalizedProposals.length ||
-    brief?.proposalCount ||
-    brief?._count?.proposals ||
-    brief?.proposalsCount ||
-    0;
-
   const isClosed = brief?.isClosed || brief?.status === "closed";
   const isOwner =
     brief &&
@@ -184,6 +232,79 @@ const BriefDetail = () => {
       brief.user?.id === user._id ||
       brief.user?.id === user.id);
   const isSeller = user?.isSeller;
+
+  // Extract unique seller IDs from proposals to fetch their full live profiles
+  const uniqueSellerIds: string[] = useMemo(() => {
+    const ids = new Set<string>();
+    rawProposals.forEach((p: any) => {
+      const s = p?.seller || (typeof p?.sellerID === "object" ? p?.sellerID : null);
+      const sid = s?._id || s?.id || (typeof p?.sellerID === "string" ? p.sellerID : p?.sellerId);
+      if (sid) ids.add(sid);
+    });
+    return Array.from(ids);
+  }, [rawProposals]);
+
+  const sellerProfilesQueries = useQueries({
+    queries: uniqueSellerIds.map((sid) => ({
+      queryKey: ["seller-full-profile", sid],
+      queryFn: () =>
+        axiosFetch
+          .get(`/users/${sid}`)
+          .then(({ data }) => data?.user || data?.seller || data?.data || data)
+          .catch(() => null),
+      enabled: !!sid && (showProposalsModal || isOwner),
+      staleTime: 5 * 60 * 1000,
+    })),
+  });
+
+  const sellerProfilesMap: Record<string, any> = useMemo(() => {
+    const map: Record<string, any> = {};
+    uniqueSellerIds.forEach((sid, idx) => {
+      const query = sellerProfilesQueries[idx];
+      if (query?.data) {
+        map[sid] = query.data;
+      }
+    });
+    return map;
+  }, [uniqueSellerIds, sellerProfilesQueries]);
+
+  const normalizedProposals = useMemo(() => {
+    return rawProposals.map((p, idx) => {
+      const s = p?.seller || (typeof p?.sellerID === "object" ? p?.sellerID : null);
+      const sid = s?._id || s?.id || (typeof p?.sellerID === "string" ? p.sellerID : p?.sellerId);
+      const fullProfile = sid ? sellerProfilesMap[sid] : null;
+      return normalizeProposal(p, idx, fullProfile);
+    });
+  }, [rawProposals, sellerProfilesMap]);
+
+  const detailedProposal = useMemo(() => {
+    if (!selectedProposal) return null;
+    const fullProfile =
+      (selectedProposal.sellerId ? sellerProfilesMap[selectedProposal.sellerId] : null) ||
+      selectedSellerProfile;
+    return normalizeProposal(selectedProposal.proposal, 0, fullProfile);
+  }, [selectedProposal, sellerProfilesMap, selectedSellerProfile]);
+
+  const displayedProposals = useMemo(() => {
+    if (modalView !== "ai" || aiRecommendedIds.length === 0) {
+      return normalizedProposals;
+    }
+    return [...normalizedProposals].sort((a: any, b: any) => {
+      const idxA = aiRecommendedIds.indexOf(a.id);
+      const idxB = aiRecommendedIds.indexOf(b.id);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return 0;
+    });
+  }, [modalView, normalizedProposals, aiRecommendedIds]);
+
+  const totalProposalsCount =
+    normalizedProposals.length ||
+    brief?.proposalCount ||
+    brief?._count?.proposals ||
+    brief?.proposalsCount ||
+    0;
 
   // Check if seller already submitted a proposal
   const { data: myProposals = [] } = useQuery({
@@ -413,8 +534,8 @@ const BriefDetail = () => {
       ? typeof brief.budget === "number"
         ? `$${brief.budget.toLocaleString()}`
         : String(brief.budget).startsWith("$")
-        ? brief.budget
-        : `$${brief.budget}`
+          ? brief.budget
+          : `$${brief.budget}`
       : "Flexible";
 
   const durationValue = brief.deliveryTime
@@ -578,11 +699,10 @@ const BriefDetail = () => {
           {/* Spec 5: Project Type / Status */}
           <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-3">
             <div
-              className={`w-10 h-10 rounded-xl ${
-                isClosed
-                  ? "bg-rose-50 border border-rose-100"
-                  : "bg-amber-50 border border-amber-100"
-              } flex items-center justify-center shrink-0`}
+              className={`w-10 h-10 rounded-xl ${isClosed
+                ? "bg-rose-50 border border-rose-100"
+                : "bg-amber-50 border border-amber-100"
+                } flex items-center justify-center shrink-0`}
             >
               <FiFileText
                 className={`${isClosed ? "text-rose-500" : "text-amber-500"} text-base`}
@@ -593,9 +713,8 @@ const BriefDetail = () => {
                 Project type
               </span>
               <p
-                className={`font-bold text-sm sm:text-[15px] ${
-                  isClosed ? "text-rose-600" : "text-slate-900"
-                } truncate`}
+                className={`font-bold text-sm sm:text-[15px] ${isClosed ? "text-rose-600" : "text-slate-900"
+                  } truncate`}
               >
                 {projectTypeValue}
               </p>
@@ -654,172 +773,227 @@ const BriefDetail = () => {
           </div>
         ) : null}
 
-        {/* Proposal Activity Section */}
+        {/* Proposal Activity / Proposal Sender Section */}
         <div className="mb-10">
-          <h2 className="text-base sm:text-[17px] font-bold text-slate-900 mb-3">
-            Proposal Activity
-          </h2>
-
-          <div className="flex items-center gap-3">
-            {/* Real Seller Avatars Stack */}
-            <div className="flex items-center -space-x-2">
-              {normalizedProposals.slice(0, 3).map((item, aIdx) =>
-                item.avatar ? (
-                  <img
-                    key={aIdx}
-                    src={item.avatar}
-                    alt={item.name}
-                    className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-2xs"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLElement).style.display = "none";
-                    }}
-                  />
-                ) : (
-                  <div
-                    key={aIdx}
-                    className="w-8 h-8 rounded-full bg-teal-50 border-2 border-white text-[11px] font-bold text-teal-800 flex items-center justify-center shadow-2xs uppercase"
-                  >
-                    {item.name.slice(0, 2)}
-                  </div>
-                )
-              )}
-              {totalProposalsCount > 3 ? (
-                <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white text-[11px] font-bold text-slate-700 flex items-center justify-center shadow-2xs">
-                  {totalProposalsCount}+
-                </div>
-              ) : totalProposalsCount === 0 ? (
-                <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white text-[11px] font-bold text-slate-400 flex items-center justify-center shadow-2xs">
-                  0
-                </div>
-              ) : null}
-            </div>
-
+          {isOwner ? (
+            /* PROJECT OWNER VIEW (Exact Match to Screenshot) */
             <div>
-              <p className="text-xs sm:text-[13px] font-bold text-slate-900 leading-tight">
-                {totalProposalsCount} {totalProposalsCount === 1 ? "proposal" : "proposals"}
-              </p>
-              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
-                {totalProposalsCount > 0
-                  ? "Review candidate proposals"
-                  : "Be the first to submit a proposal"}
-              </p>
-            </div>
-          </div>
+              <h2 className="text-base sm:text-[17px] font-bold text-slate-900 mb-3">
+                Proposal Sender ({totalProposalsCount})
+              </h2>
 
-          {/* Action Button: Guest ("Join Now") vs Logged-in Seller ("Send Proposal" / "Proposal Submitted") vs Owner ("View Proposals") */}
-          <div className="mt-4">
-            {!user ? (
-              <button
-                type="button"
-                onClick={handleProposalAction}
-                className="bg-black hover:bg-slate-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+              <div
+                className="flex items-center gap-3 cursor-pointer group"
+                onClick={() => {
+                  setModalView("list");
+                  setShowProposalsModal(true);
+                }}
               >
-                <span>Join Now</span>
-                <FiArrowRight className="text-xs" />
-              </button>
-            ) : isOwner ? (
-              <button
-                type="button"
-                onClick={handleProposalAction}
-                className="bg-[#327C73] hover:bg-[#256059] text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
-              >
-                <span>View Proposals ({totalProposalsCount})</span>
-                <FiArrowRight className="text-xs" />
-              </button>
-            ) : isSeller ? (
-              showSubmittedUI ? (
+                {/* Real Seller Avatars Stack */}
+                <div className="flex items-center -space-x-2">
+                  {normalizedProposals.slice(0, 3).map((item, aIdx) =>
+                    item.avatar ? (
+                      <img
+                        key={aIdx}
+                        src={item.avatar}
+                        alt={item.name}
+                        className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-2xs group-hover:scale-105 transition-transform"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLElement).style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <div
+                        key={aIdx}
+                        className="w-8 h-8 rounded-full bg-teal-50 border-2 border-white text-[11px] font-bold text-teal-800 flex items-center justify-center shadow-2xs uppercase group-hover:scale-105 transition-transform"
+                      >
+                        {item.name.slice(0, 2)}
+                      </div>
+                    )
+                  )}
+                  {totalProposalsCount > 3 ? (
+                    <div className="w-8 h-8 rounded-full bg-[#E6F4F2] border-2 border-white text-[11px] font-bold text-slate-700 flex items-center justify-center shadow-2xs">
+                      {totalProposalsCount - 3}+
+                    </div>
+                  ) : totalProposalsCount === 0 ? (
+                    <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white text-[11px] font-bold text-slate-400 flex items-center justify-center shadow-2xs">
+                      0
+                    </div>
+                  ) : null}
+                </div>
+
+                {/* Underlined Clickable Proposals Link */}
                 <button
                   type="button"
-                  onClick={handleProposalAction}
-                  className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setModalView("list");
+                    setShowProposalsModal(true);
+                  }}
+                  className="text-xs sm:text-[13px] font-medium text-slate-900 underline group-hover:text-[#327C73] transition-colors cursor-pointer text-left"
                 >
-                  <FiCheck className="text-xs" />
-                  <span>Proposal Submitted</span>
+                  View {totalProposalsCount} {totalProposalsCount === 1 ? "proposal" : "proposals"}
                 </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleProposalAction}
-                  disabled={isClosed}
-                  className={`text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-xs transition-colors ${
-                    isClosed
-                      ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
-                      : "bg-black hover:bg-slate-800 text-white cursor-pointer"
-                  }`}
-                >
-                  <span>{isClosed ? "Project Closed" : "Send Proposal"}</span>
-                  {!isClosed && <FiArrowRight className="text-xs" />}
-                </button>
-              )
-            ) : (
-              <button
-                type="button"
-                onClick={handleProposalAction}
-                className="bg-black hover:bg-slate-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
-              >
-                <span>Join as Seller</span>
-                <FiArrowRight className="text-xs" />
-              </button>
-            )}
-          </div>
+              </div>
+            </div>
+          ) : (
+            /* FREELANCER / GUEST VIEW */
+            <div>
+              <h2 className="text-base sm:text-[17px] font-bold text-slate-900 mb-3">
+                Proposal Activity
+              </h2>
+
+              <div className="flex items-center gap-3">
+                {/* Real Seller Avatars Stack */}
+                <div className="flex items-center -space-x-2">
+                  {normalizedProposals.slice(0, 3).map((item, aIdx) =>
+                    item.avatar ? (
+                      <img
+                        key={aIdx}
+                        src={item.avatar}
+                        alt={item.name}
+                        className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-2xs"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLElement).style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <div
+                        key={aIdx}
+                        className="w-8 h-8 rounded-full bg-teal-50 border-2 border-white text-[11px] font-bold text-teal-800 flex items-center justify-center shadow-2xs uppercase"
+                      >
+                        {item.name.slice(0, 2)}
+                      </div>
+                    )
+                  )}
+                  {totalProposalsCount > 3 ? (
+                    <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white text-[11px] font-bold text-slate-700 flex items-center justify-center shadow-2xs">
+                      {totalProposalsCount}+
+                    </div>
+                  ) : totalProposalsCount === 0 ? (
+                    <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white text-[11px] font-bold text-slate-400 flex items-center justify-center shadow-2xs">
+                      0
+                    </div>
+                  ) : null}
+                </div>
+
+                <div>
+                  <p className="text-xs sm:text-[13px] font-bold text-slate-900 leading-tight">
+                    {totalProposalsCount} {totalProposalsCount === 1 ? "proposal" : "proposals"}
+                  </p>
+                  <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
+                    {totalProposalsCount > 0
+                      ? "Review candidate proposals"
+                      : "Be the first to submit a proposal"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Button: Guest ("Join Now") vs Logged-in Seller ("Send Proposal" / "Proposal Submitted") */}
+              <div className="mt-4">
+                {!user ? (
+                  <button
+                    type="button"
+                    onClick={handleProposalAction}
+                    className="bg-black hover:bg-slate-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>Join Now</span>
+                    <FiArrowRight className="text-xs" />
+                  </button>
+                ) : isSeller ? (
+                  showSubmittedUI ? (
+                    <button
+                      type="button"
+                      onClick={handleProposalAction}
+                      className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                    >
+                      <FiCheck className="text-xs" />
+                      <span>Proposal Submitted</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleProposalAction}
+                      disabled={isClosed}
+                      className={`text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-xs transition-colors ${isClosed
+                        ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
+                        : "bg-black hover:bg-slate-800 text-white cursor-pointer"
+                        }`}
+                    >
+                      <span>{isClosed ? "Project Closed" : "Send Proposal"}</span>
+                      {!isClosed && <FiArrowRight className="text-xs" />}
+                    </button>
+                  )
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleProposalAction}
+                    className="bg-black hover:bg-slate-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>Join as Seller</span>
+                    <FiArrowRight className="text-xs" />
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Bottom Banner: "Find the Right Project" (Exact Match to Screenshot) */}
-        <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden mt-12 mb-6 bg-[#042823] min-h-[300px] sm:min-h-[360px] md:min-h-[420px] flex items-center shadow-lg">
-          {/* Background 3D Layered Cards Image */}
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="/media/find_project_banner.jpg"
-              alt="Find the Right Project"
-              fill
-              className="object-cover object-right md:object-center"
-              priority
-            />
-            {/* Deep Green Gradient Overlay for readability on left */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#042823] via-[#042823]/85 to-transparent w-full md:w-3/5" />
-          </div>
+        {/* Bottom Banner: "Find the Right Project" - Only visible to Freelancers / Guest Users (NOT Project Owner) */}
+        {!isOwner && (
+          <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden mt-12 mb-6 bg-[#042823] min-h-[300px] sm:min-h-[360px] md:min-h-[420px] flex items-center shadow-lg">
+            {/* Background 3D Layered Cards Image */}
+            <div className="absolute inset-0 z-0">
+              <Image
+                src="/media/find_project_banner1.jpg"
+                alt="Find the Right Project"
+                fill
+                className="object-cover object-right md:object-center"
+                priority
+              />
+              {/* Deep Green Gradient Overlay for readability on left */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#042823] via-[#042823]/85 to-transparent w-full md:w-3/5" />
+            </div>
 
-          {/* Banner Left Content */}
-          <div className="relative z-10 p-8 sm:p-12 md:p-16 max-w-lg">
-            <h2 className="text-2xl sm:text-3xl md:text-[38px] font-bold text-white tracking-tight leading-tight font-sf-pro mb-3">
-              Find the Right Project
-            </h2>
-            <p className="text-emerald-100/75 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
-              Explore real project opportunities from clients looking for the right skills and expertise.
-            </p>
-            <button
-              type="button"
-              onClick={handleProposalAction}
-              disabled={isClosed}
-              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 ${
-                isClosed
+            {/* Banner Left Content */}
+            <div className="relative z-10 p-8 sm:p-12 md:p-16 max-w-lg">
+              <h2 className="text-2xl sm:text-3xl md:text-[38px] font-bold text-white tracking-tight leading-tight font-sf-pro mb-3">
+                Find the Right Project
+              </h2>
+              <p className="text-emerald-100/75 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
+                Explore real project opportunities from clients looking for the right skills and expertise.
+              </p>
+              <button
+                type="button"
+                onClick={handleProposalAction}
+                disabled={isClosed}
+                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 ${isClosed
                   ? "bg-slate-200 text-slate-500 cursor-not-allowed"
                   : "bg-white hover:bg-emerald-50 text-slate-900 cursor-pointer"
-              }`}
-            >
-              <span>
-                {isClosed
-                  ? "Project Closed"
-                  : !user
-                  ? "Send Proposal"
-                  : isOwner
-                  ? `View Proposals (${totalProposalsCount})`
-                  : isSeller && showSubmittedUI
-                  ? "View My Proposal"
-                  : isSeller
-                  ? "Send Proposal"
-                  : "Join as Seller"}
-              </span>
-              {!isClosed && (
-                isSeller && showSubmittedUI ? (
-                  <FiCheck className="text-emerald-700 text-xs" />
-                ) : (
-                  <FiArrowRight className="text-xs" />
-                )
-              )}
-            </button>
+                  }`}
+              >
+                <span>
+                  {isClosed
+                    ? "Project Closed"
+                    : !user
+                      ? "Send Proposal"
+                      : isSeller && showSubmittedUI
+                        ? "View My Proposal"
+                        : isSeller
+                          ? "Send Proposal"
+                          : "Join as Seller"}
+                </span>
+                {!isClosed && (
+                  isSeller && showSubmittedUI ? (
+                    <FiCheck className="text-emerald-700 text-xs" />
+                  ) : (
+                    <FiArrowRight className="text-xs" />
+                  )
+                )}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* PROPOSALS MODAL (List, Details, AI Recommendations) */}
@@ -829,7 +1003,10 @@ const BriefDetail = () => {
           onClick={() => setShowProposalsModal(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden relative"
+            className={`bg-white rounded-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden relative transition-all ${modalView === "ai"
+              ? "border-2 border-[#14B8A6] ring-4 ring-teal-500/10 shadow-2xl"
+              : "border border-slate-100 shadow-2xl"
+              }`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* MODAL HEADER */}
@@ -852,27 +1029,27 @@ const BriefDetail = () => {
                 </h2>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 {modalView === "list" && normalizedProposals.length > 0 && (
                   <button
                     type="button"
                     onClick={handleGetAiRecommendation}
                     disabled={aiLoading}
-                    className="bg-gradient-to-r from-teal-100 via-cyan-100 to-sky-100 hover:opacity-90 text-teal-900 border border-teal-200 text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer disabled:opacity-50"
+                    className="bg-[#D8F5ED] hover:bg-[#C3F0E4] text-[#0D6B5D] border border-[#BCE8DE] text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer disabled:opacity-50"
                   >
-                    <HiSparkles className="text-teal-600 text-sm" />
+                    <HiSparkles className="text-[#0D6B5D] text-sm" />
                     <span>{aiLoading ? "Analyzing..." : "Get AI Recommendation"}</span>
                   </button>
                 )}
 
-                {/* Close Button */}
+                {/* Red Close Button */}
                 <button
                   type="button"
                   onClick={() => setShowProposalsModal(false)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-rose-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer text-2xl font-light leading-none"
                   title="Close"
                 >
-                  <FiX className="text-xl" />
+                  &times;
                 </button>
               </div>
             </div>
@@ -880,7 +1057,7 @@ const BriefDetail = () => {
             {/* MODAL CONTENT: VIEW 1 & VIEW 3 (List / AI Recommendation) */}
             {(modalView === "list" || modalView === "ai") && (
               <div className="p-5 sm:p-6 overflow-y-auto space-y-4">
-                {normalizedProposals.length === 0 ? (
+                {displayedProposals.length === 0 ? (
                   <div className="text-center py-16 px-4">
                     <div className="w-12 h-12 rounded-full bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center text-xl mx-auto mb-3">
                       📁
@@ -891,17 +1068,14 @@ const BriefDetail = () => {
                     </p>
                   </div>
                 ) : (
-                  normalizedProposals.map((item, idx) => {
-                    const isAiTop = modalView === "ai" && idx === 0;
-
+                  displayedProposals.map((item: any) => {
                     return (
                       <div
                         key={item.id}
-                        className={`bg-white border rounded-2xl p-4 sm:p-5 transition-all shadow-2xs ${
-                          isAiTop
-                            ? "border-2 border-cyan-400 ring-4 ring-cyan-50/60 shadow-md"
-                            : "border-slate-200/90 hover:border-slate-300"
-                        }`}
+                        className={`bg-white border rounded-2xl p-4 sm:p-5 transition-all shadow-2xs ${modalView === "ai"
+                          ? "border-teal-300 ring-2 ring-teal-50 hover:border-teal-400"
+                          : "border-slate-200/90 hover:border-slate-300"
+                          }`}
                       >
                         {/* Sender Profile Header */}
                         <div className="flex items-start justify-between gap-3 mb-2">
@@ -932,37 +1106,39 @@ const BriefDetail = () => {
                                 )}
                               </div>
                               <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
-                                {item.rating !== null && (
+                                {item.tagline && (
+                                  <span className="font-medium text-slate-600 truncate max-w-[180px]">
+                                    {item.tagline}
+                                  </span>
+                                )}
+                                {typeof item.rating === "number" && item.rating > 0 && (
                                   <span className="font-bold text-slate-800 flex items-center gap-0.5">
                                     <FiStar className="fill-amber-400 text-amber-400 text-xs" />
                                     {item.rating}
                                   </span>
                                 )}
-                                {item.reviewCount !== null && (
-                                  <span>({item.reviewCount} reviews)</span>
-                                )}
-                                {item.country && (
-                                  <span>• {item.country}</span>
+                                {typeof item.reviewCount === "number" && item.reviewCount > 0 && (
+                                  <span>({item.reviewCount})</span>
                                 )}
                               </div>
-                              {item.createdAt && (
-                                <p className="text-[11px] text-slate-400 mt-0.5">
-                                  Submitted {moment(item.createdAt).fromNow()}
-                                </p>
-                              )}
+                              <p className="text-[11px] text-slate-400 mt-0.5">
+                                {item.completedProjects !== null && (
+                                  <span>{item.completedProjects} Projects Completed</span>
+                                )}
+                                {item.createdAt && (
+                                  <span>
+                                    {item.completedProjects !== null ? " | " : ""}Submitted {moment(item.createdAt).fromNow()}
+                                  </span>
+                                )}
+                              </p>
                             </div>
                           </div>
 
-                          {/* Price & Delivery */}
+                          {/* Price */}
                           <div className="text-right shrink-0">
-                            <span className="font-bold text-sm sm:text-base text-[#0D9488]">
+                            <span className="font-bold text-sm sm:text-base text-emerald-600">
                               ${item.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </span>
-                            {item.deliveryTime > 0 && (
-                              <p className="text-[11px] text-slate-400 mt-0.5">
-                                {item.deliveryTime}d delivery
-                              </p>
-                            )}
                           </div>
                         </div>
 
@@ -973,7 +1149,7 @@ const BriefDetail = () => {
                           </p>
                         )}
 
-                        {/* Action Buttons */}
+                        {/* Action Buttons: View Proposal & Message */}
                         <div className="flex items-center gap-2.5 pt-1">
                           <button
                             type="button"
@@ -985,19 +1161,17 @@ const BriefDetail = () => {
                           >
                             View Proposal
                           </button>
-                          {item.sellerId && (
-                            <button
-                              type="button"
-                              disabled={messagingSellerId === item.sellerId}
-                              onClick={() => handleMessageSeller(item.sellerId, item.name)}
-                              className="flex-1 py-2.5 rounded-xl bg-black hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
-                            >
-                              <span>
-                                {messagingSellerId === item.sellerId ? "Connecting..." : "Message"}
-                              </span>
-                              <FiArrowRight className="text-xs" />
-                            </button>
-                          )}
+                          <button
+                            type="button"
+                            disabled={messagingSellerId === item.sellerId}
+                            onClick={() => handleMessageSeller(item.sellerId, item.name)}
+                            className="flex-1 py-2.5 rounded-xl bg-black hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
+                          >
+                            <span>
+                              {messagingSellerId === item.sellerId ? "Connecting..." : "Message"}
+                            </span>
+                            <FiArrowRight className="text-xs" />
+                          </button>
                         </div>
                       </div>
                     );
@@ -1006,16 +1180,16 @@ const BriefDetail = () => {
               </div>
             )}
 
-            {/* MODAL CONTENT: VIEW 2 (Proposal Details) */}
-            {modalView === "detail" && selectedProposal && (
+            {/* MODAL CONTENT: VIEW 2 (Proposal Details with Real Backend Data) */}
+            {modalView === "detail" && detailedProposal && (
               <div className="p-5 sm:p-6 overflow-y-auto space-y-5">
-                {/* Sender Profile Card */}
+                {/* Top Sender Profile Card with Member Since */}
                 <div className="flex items-start justify-between gap-3 pb-4 border-b border-slate-100">
                   <div className="flex items-center gap-3.5 min-w-0">
-                    {selectedProposal.avatar ? (
+                    {detailedProposal.avatar ? (
                       <img
-                        src={selectedProposal.avatar}
-                        alt={selectedProposal.name}
+                        src={detailedProposal.avatar}
+                        alt={detailedProposal.name}
                         className="w-14 h-14 rounded-full object-cover border border-slate-200 shrink-0"
                         onError={(e) => {
                           (e.currentTarget as HTMLElement).style.display = "none";
@@ -1023,106 +1197,164 @@ const BriefDetail = () => {
                       />
                     ) : (
                       <div className="w-14 h-14 rounded-full bg-teal-50 text-teal-800 font-bold text-base flex items-center justify-center border border-teal-200 shrink-0 uppercase">
-                        {selectedProposal.name.slice(0, 2)}
+                        {detailedProposal.name.slice(0, 2)}
                       </div>
                     )}
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-base text-slate-900 truncate">
-                          {selectedProposal.name}
+                          {detailedProposal.name}
                         </span>
-                        {selectedProposal.badge && (
+                        {detailedProposal.badge && (
                           <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
-                            {selectedProposal.badge}
+                            {detailedProposal.badge}
                           </span>
                         )}
                       </div>
                       <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
-                        {selectedProposal.rating !== null && (
-                          <span className="font-bold text-slate-800 flex items-center gap-0.5">
-                            <FiStar className="fill-amber-400 text-amber-400 text-xs" />
-                            {selectedProposal.rating}
+                        {detailedProposal.tagline && (
+                          <span className="font-medium text-slate-600 truncate max-w-[200px]">
+                            {detailedProposal.tagline}
                           </span>
                         )}
-                        {selectedProposal.reviewCount !== null && (
-                          <span>({selectedProposal.reviewCount} reviews)</span>
+                        {typeof detailedProposal.rating === "number" && detailedProposal.rating > 0 && (
+                          <span className="font-bold text-slate-800 flex items-center gap-0.5">
+                            <FiStar className="fill-amber-400 text-amber-400 text-xs" />
+                            {detailedProposal.rating}
+                          </span>
                         )}
-                        {selectedProposal.country && (
-                          <span>• {selectedProposal.country}</span>
+                        {typeof detailedProposal.reviewCount === "number" && detailedProposal.reviewCount > 0 && (
+                          <span>({detailedProposal.reviewCount})</span>
                         )}
                       </div>
-                      {selectedProposal.createdAt && (
-                        <p className="text-[11px] text-slate-400 mt-1">
-                          Submitted {moment(selectedProposal.createdAt).fromNow()}
-                        </p>
-                      )}
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        {detailedProposal.completedProjects !== null && (
+                          <span>{detailedProposal.completedProjects} Projects Completed</span>
+                        )}
+                        {detailedProposal.successRate && (
+                          <span>
+                            {detailedProposal.completedProjects !== null ? " | " : ""}
+                            {detailedProposal.successRate} Success Rate
+                          </span>
+                        )}
+                      </p>
                     </div>
                   </div>
+
+                  {/* Member Since Badge */}
+                  {detailedProposal.memberSince && (
+                    <span className="text-[11px] font-medium text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md shrink-0 whitespace-nowrap">
+                      Member since {detailedProposal.memberSince}
+                    </span>
+                  )}
                 </div>
 
                 {/* Description */}
                 <div>
-                  <h3 className="font-bold text-sm text-slate-900 mb-1.5">Cover Letter</h3>
+                  <h3 className="font-bold text-sm text-slate-900 mb-1.5">Description</h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal whitespace-pre-wrap">
-                    {selectedProposal.coverLetter || "No cover letter provided."}
+                    {detailedProposal.coverLetter || "No description provided."}
                   </p>
                 </div>
 
-                {/* Budget & Timeline */}
-                <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                {/* Budget & Delivery Time */}
+                <div className="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-100">
                   <div>
-                    <span className="text-xs font-semibold text-slate-400 block">Proposed Price</span>
-                    <p className="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">
-                      ${selectedProposal.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <span className="text-xs font-semibold text-slate-400 block mb-1">Budget</span>
+                    <p className="text-xl sm:text-2xl font-extrabold text-emerald-600">
+                      ${detailedProposal.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                   </div>
-                  <div>
-                    <span className="text-xs font-semibold text-slate-400 block">Delivery Time</span>
-                    <p className="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">
-                      {selectedProposal.deliveryTime} Days
-                    </p>
-                  </div>
+                  {detailedProposal.deliveryTime > 0 && (
+                    <div className="text-right">
+                      <span className="text-xs font-semibold text-slate-400 block mb-1">Delivery Time</span>
+                      <p className="text-sm font-bold text-slate-800">
+                        {detailedProposal.deliveryTime} {detailedProposal.deliveryTime === 1 ? "Day" : "Days"}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
-                {/* Attachments if any */}
-                {selectedProposal.attachments && selectedProposal.attachments.length > 0 && (
-                  <div>
-                    <h3 className="font-bold text-sm text-slate-900 mb-2">Attachments</h3>
+                {/* Skills */}
+                <div>
+                  <h3 className="font-bold text-sm text-slate-900 mb-2">Skills</h3>
+                  {detailedProposal.skills.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
-                      {selectedProposal.attachments.map((att: string, aIdx: number) => (
-                        <a
-                          key={aIdx}
-                          href={att}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 transition-colors"
+                      {detailedProposal.skills.slice(0, 6).map((sk: string, sIdx: number) => (
+                        <span
+                          key={sIdx}
+                          className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3 py-1 rounded-md border border-slate-200/60"
                         >
-                          <FiFileText className="text-teal-600" />
-                          <span>Attachment #{aIdx + 1}</span>
-                        </a>
+                          {sk}
+                        </span>
                       ))}
+                      {detailedProposal.skills.length > 6 && (
+                        <span className="bg-[#F1F3F5] text-slate-700 text-xs font-bold px-2 py-1 rounded-md border border-slate-200/60">
+                          +{detailedProposal.skills.length - 6}
+                        </span>
+                      )}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <p className="text-xs text-slate-400">No skills specified by candidate.</p>
+                  )}
+                </div>
 
                 {/* Contact Box */}
-                {selectedProposal.sellerId && (
-                  <div>
+                <div>
+                  <h3 className="font-bold text-sm text-slate-900 mb-2">Contact</h3>
+                  <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-2xs">
+                    <div>
+                      <p className="font-bold text-sm text-slate-900">{detailedProposal.name}</p>
+                      <p className="text-xs text-slate-400 mt-0.5 flex items-center">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1.5 shrink-0" />
+                        <span>Active on Workvence</span>
+                        {detailedProposal.country && (
+                          <span className="ml-1">• {detailedProposal.country}</span>
+                        )}
+                      </p>
+                    </div>
+
                     <button
                       type="button"
-                      disabled={messagingSellerId === selectedProposal.sellerId}
-                      onClick={() => handleMessageSeller(selectedProposal.sellerId, selectedProposal.name)}
+                      disabled={messagingSellerId === detailedProposal.sellerId}
+                      onClick={() => handleMessageSeller(detailedProposal.sellerId, detailedProposal.name)}
                       className="w-full py-3 rounded-xl bg-black hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
                     >
                       <span>
-                        {messagingSellerId === selectedProposal.sellerId
+                        {messagingSellerId === detailedProposal.sellerId
                           ? "Connecting..."
-                          : `Message ${selectedProposal.name}`}
+                          : "Message"}
                       </span>
                       <FiArrowRight className="text-sm" />
                     </button>
                   </div>
-                )}
+                </div>
+
+                {/* Work Sample */}
+                <div>
+                  <h3 className="font-bold text-sm text-slate-900 mb-2">Work Sample</h3>
+                  {detailedProposal.attachments && detailedProposal.attachments.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {detailedProposal.attachments.map((att: string, aIdx: number) => {
+                        const filename = att.split("/").pop() || `Sample #${aIdx + 1}`;
+                        return (
+                          <a
+                            key={aIdx}
+                            href={att}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors"
+                          >
+                            <FiFileText className="text-teal-600 text-base shrink-0" />
+                            <span className="truncate">{filename}</span>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-400">No attachments provided with this proposal.</p>
+                  )}
+                </div>
               </div>
             )}
           </div>

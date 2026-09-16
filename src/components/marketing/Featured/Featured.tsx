@@ -186,7 +186,7 @@ const Featured = () => {
   return (
     <section
       ref={containerRef}
-      className="relative w-full h-[580px] sm:h-[640px] md:h-[700px] lg:h-[740px] xl:h-[780px] bg-[#E8F5F5] overflow-hidden flex flex-col justify-between pt-8 sm:pt-12 md:pt-14 pb-0 select-none"
+      className="relative w-full h-[620px] sm:h-[700px] md:h-[780px] lg:h-[840px] xl:h-[900px] bg-[#E8F5F5] overflow-hidden flex flex-col justify-between pt-8 sm:pt-12 md:pt-14 pb-0 select-none"
     >
       {/* Background ambient radial glow at top */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_50%_at_50%_15%,rgba(242,252,248,0.7),transparent)] pointer-events-none" />
@@ -295,31 +295,31 @@ const Featured = () => {
       {/* BOTTOM IMAGE GALLERY - 5 COLUMNS CONSTRAINED TO CONTAINER */}
       <div
         ref={galleryRef}
-        className="relative z-10 w-full container mx-auto px-4 md:px-6 flex items-end justify-between gap-2.5 sm:gap-3.5 md:gap-4 lg:gap-5 xl:gap-6 mt-auto pointer-events-none"
+        className="relative z-10 w-full max-w-[1800px] mx-auto px-4 md:px-6 flex items-end justify-center gap-4 sm:gap-5 md:gap-6 mt-auto pointer-events-none"
       >
 
         {/* COLUMN 1: LEFTMOST - 2 VERTICAL IMAGES */}
-        <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
-          <div className="w-full flex flex-col gap-2 sm:gap-3 md:gap-4 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-            {/* Top image: Blue head silhouette */}
-            <div className="relative w-full aspect-[3/3.75] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
+        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
+          <div className="w-full flex flex-col gap-4 sm:gap-5 md:gap-6 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
+            {/* Top image: Blue head silhouette (shows full 339x429 card) */}
+            <div className="relative w-full aspect-[339/429] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
               <Image
                 src="/media/hero_images/img4.png"
                 alt="Creative Art"
                 fill
                 priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
                 className="object-cover object-center"
               />
             </div>
-            {/* Bottom image: Laptop code editor */}
-            <div className="relative w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-slate-900">
+            {/* Bottom image: Laptop code editor (showing 15% from top: ~65px of 429px) */}
+            <div className="relative w-full h-[45px] sm:h-[52px] md:h-[58px] lg:h-[65px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-slate-900">
               <Image
                 src="/media/hero_images/img7.png"
                 alt="Code Development"
                 fill
                 priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
                 className="object-cover object-top"
               />
             </div>
@@ -327,7 +327,7 @@ const Featured = () => {
         </div>
 
         {/* COLUMN 2: SECOND - TALL ADOBE BOUQUET CARD */}
-        <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
+        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
           <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
             <div className="relative w-full h-[160px] sm:h-[180px] md:h-[200px] lg:h-[240px] xl:h-[255px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-white">
               <Image
@@ -335,7 +335,7 @@ const Featured = () => {
                 alt="Design Forever"
                 fill
                 priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
                 className="object-cover object-top"
               />
             </div>
@@ -343,7 +343,7 @@ const Featured = () => {
         </div>
 
         {/* COLUMN 3: CENTER - VIBE CODING PHONE (LOWER POSITION) */}
-        <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
+        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
           <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
             <div className="relative w-full h-[110px] sm:h-[155px] md:h-[200px] lg:h-[160px] xl:h-[180px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#a81e55]">
               <Image
@@ -351,7 +351,7 @@ const Featured = () => {
                 alt="Vibe Coding"
                 fill
                 priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
                 className="object-cover object-top"
               />
             </div>
@@ -359,7 +359,7 @@ const Featured = () => {
         </div>
 
         {/* COLUMN 4: FOURTH - TALL VIOLIN POSTER */}
-        <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
+        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
           <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
             <div className="relative w-full h-[160px] sm:h-[220px] md:h-[290px] lg:h-[340px] xl:h-[305px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#fafafa]">
               <Image
@@ -367,7 +367,7 @@ const Featured = () => {
                 alt="Violin Night"
                 fill
                 priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
                 className="object-cover object-top"
               />
             </div>
@@ -375,16 +375,16 @@ const Featured = () => {
         </div>
 
         {/* COLUMN 5: RIGHTMOST - 2 VERTICAL IMAGES */}
-        <div className="hero-gallery-col w-[18%] min-w-[90px] max-w-[245px] shrink-0">
-          <div className="w-full flex flex-col gap-2 sm:gap-3 md:gap-4 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
+        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
+          <div className="w-full flex flex-col gap-4 sm:gap-5 md:gap-6 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
             {/* Top image: The Link (robots / clarity meets creativity) */}
-            <div className="relative w-full aspect-[3/3.75] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
+            <div className="relative w-full aspect-[339/429] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
               <Image
                 src="/media/hero_images/img6.png"
                 alt="Clarity Meets Creativity"
                 fill
                 priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
                 className="object-cover object-center"
               />
             </div>
@@ -395,7 +395,7 @@ const Featured = () => {
                 alt="3D Icon"
                 fill
                 priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 18vw, 245px"
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
                 className="object-cover object-top"
               />
             </div>

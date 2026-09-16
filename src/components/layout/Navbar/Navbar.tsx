@@ -78,7 +78,7 @@ const Navbar = () => {
         if (error.response?.status === 401 || error.response?.status === 403) {
           try {
             socket.disconnect();
-          } catch {}
+          } catch { }
           localStorage.removeItem('user');
           setUser(null);
         }
@@ -151,12 +151,19 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`w-full sticky top-0 z-50 transition-all duration-300 ${showMenu || pathname !== "/" || isBuyer ? "bg-white border-b border-gray-100 shadow-sm text-gray-600" : "bg-transparent text-gray-600"}`}>
-      <div className="w-full container mx-auto flex justify-between items-center px-4 md:px-6 py-3.5">
+    <nav className={`w-full sticky top-0 z-50 transition-all duration-300 ${showMenu || pathname !== "/" || isBuyer ? "bg-white border-b border-gray-100 shadow-sm text-gray-600" : "bg-white text-gray-600"}`}>
+      <div className="w-full container mx-auto flex justify-between items-center px-4 sm:px-6 md:px-10 py-4 md:py-5">
 
         <div className="flex items-center gap-6 lg:gap-8 flex-1">
           <Link href="/" className="flex items-center shrink-0">
-            <Image src="/Workvence-logo-Horizontal3.png" width={160} height={40} alt="Workvence" className="h-8 md:h-9 w-auto object-contain" style={{ width: "auto", height: "auto" }} priority />
+            <Image
+              src="/Workvence-logo-Horizontal3.png"
+              width={209}
+              height={44}
+              alt="Workvence"
+              priority
+              className="h-7 sm:h-8 md:h-9 lg:h-10 xl:h-[44px] w-auto aspect-[19/4] object-contain"
+            />
           </Link>
 
           <div className={`hidden lg:flex items-center overflow-hidden transition-all duration-300 ${showMenu || pathname !== '/' || isBuyer ? 'opacity-100 max-w-[540px] xl:max-w-[720px] 2xl:max-w-[800px] flex-1' : 'opacity-0 max-w-0 pointer-events-none'}`}>
@@ -174,80 +181,92 @@ const Navbar = () => {
           </div>
         </div>
 
-        <div className="hidden lg:flex items-center gap-7 font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B]">
+        <div className="hidden lg:flex items-center gap-[20px] font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B]">
           {isLoading ? (
             <Loader size={35} />
           ) : !effectiveUser ? (
             <>
-              {/* Explore Category Dropdown without extra icons */}
-              <div className="relative category-dropdown-container">
-                <button
-                  onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                  className={`flex items-center gap-1.5 cursor-pointer py-1 font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] transition-colors ${isCategoryDropdownOpen ? "text-[#327C73]" : "text-[#1E293B] hover:text-[#327C73]"
-                    }`}
+              {/* Navlinks Group */}
+              <div className="flex items-center gap-1 font-sf-pro font-[510] text-[16px] leading-normal">
+                {/* Explore Category Dropdown without extra icons */}
+                <div className="relative category-dropdown-container">
+                  <button
+                    onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                    className={`flex items-center gap-1.5 cursor-pointer px-4 py-[10px] rounded-lg font-sf-pro font-[510] text-[16px] leading-normal transition-colors ${isCategoryDropdownOpen ? "text-[#327C73]" : "text-black hover:text-[#327C73]"
+                      }`}
+                  >
+                    <span>Explore Category</span>
+                    <FiChevronDown className={`text-base text-[#327C73] transition-transform duration-200 ${isCategoryDropdownOpen ? "rotate-180" : ""}`} />
+                  </button>
+
+                  {isCategoryDropdownOpen && (
+                    <div className="absolute left-0 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl py-2 flex flex-col z-[60] text-[14px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                      <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-400">
+                        <span>Categories</span>
+                        <Link
+                          href="/packages"
+                          onClick={() => setIsCategoryDropdownOpen(false)}
+                          className="text-[#327C73] font-medium hover:underline lowercase tracking-normal"
+                        >
+                          view all
+                        </Link>
+                      </div>
+
+                      <div className="max-h-[320px] overflow-y-auto py-1">
+                        {categoryList.length > 0 ? (
+                          categoryList.map((cat: any, index: number) => (
+                            <Link
+                              key={cat.slug || index}
+                              href={`/packages?category=${encodeURIComponent(cat.slug)}`}
+                              onClick={() => setIsCategoryDropdownOpen(false)}
+                              className="px-4 py-2.5 hover:bg-emerald-50/70 hover:text-[#327C73] transition-colors flex items-center justify-between group"
+                            >
+                              <span className="truncate">{cat.name}</span>
+                              <span className="text-gray-300 group-hover:text-[#327C73] transition-colors text-xs">→</span>
+                            </Link>
+                          ))
+                        ) : (
+                          <div className="px-4 py-3 text-sm text-gray-400 text-center">
+                            No categories found
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <Link
+                  href="/register?seller=true"
+                  className="px-4 py-[10px] rounded-lg font-sf-pro font-[510] text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors"
                 >
-                  <span>Explore Category</span>
-                  <FiChevronDown className={`text-base text-[#327C73] transition-transform duration-200 ${isCategoryDropdownOpen ? "rotate-180" : ""}`} />
-                </button>
+                  Become a Seller
+                </Link>
 
-                {isCategoryDropdownOpen && (
-                  <div className="absolute left-0 mt-3 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl py-2 flex flex-col z-[60] text-[14px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-                    <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-400">
-                      <span>Categories</span>
-                      <Link
-                        href="/packages"
-                        onClick={() => setIsCategoryDropdownOpen(false)}
-                        className="text-[#327C73] font-medium hover:underline lowercase tracking-normal"
-                      >
-                        view all
-                      </Link>
-                    </div>
-
-                    <div className="max-h-[320px] overflow-y-auto py-1">
-                      {categoryList.length > 0 ? (
-                        categoryList.map((cat: any, index: number) => (
-                          <Link
-                            key={cat.slug || index}
-                            href={`/packages?category=${encodeURIComponent(cat.slug)}`}
-                            onClick={() => setIsCategoryDropdownOpen(false)}
-                            className="px-4 py-2.5 hover:bg-emerald-50/70 hover:text-[#327C73] transition-colors flex items-center justify-between group"
-                          >
-                            <span className="truncate">{cat.name}</span>
-                            <span className="text-gray-300 group-hover:text-[#327C73] transition-colors text-xs">→</span>
-                          </Link>
-                        ))
-                      ) : (
-                        <div className="px-4 py-3 text-sm text-gray-400 text-center">
-                          No categories found
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
+                <Link
+                  href="/briefs"
+                  className="px-4 py-[10px] rounded-lg font-sf-pro font-[510] text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors"
+                >
+                  Projects
+                </Link>
               </div>
 
-              <Link href="/register?seller=true" className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors">
-                Become a Seller
-              </Link>
+              {/* Auth Buttons Group */}
+              <div className="flex items-center gap-[10px]">
+                <Link
+                  href="/login"
+                  className="px-6 py-3 rounded-xl bg-[#F1F3F5] hover:bg-[#E5E7EB] text-[#292929] font-sf-pro font-[510] text-[20px] leading-normal transition-colors"
+                >
+                  Sign in
+                </Link>
 
-              <Link href="/briefs" className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors">
-                Projects
-              </Link>
-
-              <Link
-                href="/login"
-                className="px-5 py-2.5 rounded-xl bg-[#F1F3F5] hover:bg-[#E5E7EB] text-[#1E293B] font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] transition-colors"
-              >
-                Sign in
-              </Link>
-
-              <Link
-                href="/register"
-                className="px-5 py-2.5 rounded-xl bg-[#0B0F19] hover:bg-black text-white font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] transition-colors flex items-center gap-1.5 shadow-sm"
-              >
-                <span>Join Now</span>
-                <FiArrowRight className="text-sm" />
-              </Link>
+                <Link
+                  href="/register"
+                  className="px-6 py-3 rounded-xl bg-[#0B0F19] hover:bg-black text-[#E8F5F5] font-sf-pro font-[510] text-[20px] leading-normal transition-colors flex items-center gap-1.5 shadow-sm"
+                >
+                  <span>Join Now</span>
+                  <FiArrowRight className="text-[18px]" />
+                </Link>
+              </div>
             </>
           ) : isBuyer ? (
             /* Logged-in Buyer Navbar - Pixel-perfect to design */

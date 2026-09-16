@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import { FiClock, FiRepeat, FiCheckSquare, FiArrowRight, FiMessageSquare } from "react-icons/fi";
 import { PackageTierDetails, SellerDetails } from "../utils/packageDetailsNormalizer";
@@ -171,17 +172,31 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
 
         {/* Seller Info Row */}
         <div className="flex items-center gap-3 mb-4">
-          <img
-            src={seller.avatar || defaultAvatar}
-            alt={seller.name}
-            className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-2xs shrink-0"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = defaultAvatar;
-            }}
-          />
+          <Link
+            href={`/seller/${seller.username || seller.name}`}
+            className="shrink-0 group block"
+            title={`View ${seller.name}'s profile`}
+          >
+            <img
+              src={seller.avatar || defaultAvatar}
+              alt={seller.name}
+              className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-2xs group-hover:opacity-90 transition-opacity"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = defaultAvatar;
+              }}
+            />
+          </Link>
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <h4 className="text-sm font-bold text-gray-900">{seller.name}</h4>
+              <Link
+                href={`/seller/${seller.username || seller.name}`}
+                className="text-sm font-bold text-gray-900 hover:text-brand-green transition-colors"
+                title={`View ${seller.name}'s profile`}
+              >
+                <h4 className="text-sm font-bold text-gray-900 hover:text-brand-green transition-colors">
+                  {seller.name}
+                </h4>
+              </Link>
               {seller.isPro && (
                 <span className="bg-[#6D28D9] text-white text-[9px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase">
                   Pro

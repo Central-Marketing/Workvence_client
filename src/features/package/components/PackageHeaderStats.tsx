@@ -68,17 +68,29 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
       {/* 3. Seller Meta Bar + Actions */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 mb-4 border-b border-gray-100">
         <div className="flex items-center gap-3">
-          <img
-            src={seller.avatar || defaultAvatar}
-            alt={seller.name}
-            className="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-xs shrink-0"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = defaultAvatar;
-            }}
-          />
+          <Link
+            href={`/seller/${seller.username || seller.name}`}
+            className="shrink-0 group block"
+            title={`View ${seller.name}'s profile`}
+          >
+            <img
+              src={seller.avatar || defaultAvatar}
+              alt={seller.name}
+              className="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-xs group-hover:opacity-90 transition-opacity"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = defaultAvatar;
+              }}
+            />
+          </Link>
           <div className="flex items-start gap-1 flex-col">
             <div className="flex items-center gap-2">
-              <span className="font-[510] text-black font-sf-pro text-xl sm:text-2xl">{seller.name}</span>
+              <Link
+                href={`/seller/${seller.username || seller.name}`}
+                className="font-[510] text-black font-sf-pro text-xl sm:text-2xl hover:text-brand-green transition-colors"
+                title={`View ${seller.name}'s profile`}
+              >
+                {seller.name}
+              </Link>
               {seller.isPro && (
                 <span className="bg-[#360083] text-white text-[10px] font-bold px-2 py-0.5 rounded-[4px] tracking-wide uppercase">
                   Pro

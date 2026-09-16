@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import { FiMapPin, FiClock, FiPackage } from "react-icons/fi";
 import { SellerDetails } from "../utils/packageDetailsNormalizer";
@@ -34,17 +35,31 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
 
       {/* Seller Header Row */}
       <div className="flex items-center gap-4 mb-6">
-        <img
-          src={seller.avatar || defaultAvatar}
-          alt={seller.name}
-          className="w-14 h-14 rounded-full object-cover border border-gray-200 shadow-xs shrink-0"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = defaultAvatar;
-          }}
-        />
+        <Link
+          href={`/seller/${seller.username || seller.name}`}
+          className="shrink-0 group block"
+          title={`View ${seller.name}'s profile`}
+        >
+          <img
+            src={seller.avatar || defaultAvatar}
+            alt={seller.name}
+            className="w-14 h-14 rounded-full object-cover border border-gray-200 shadow-xs group-hover:opacity-90 transition-opacity"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = defaultAvatar;
+            }}
+          />
+        </Link>
         <div>
           <div className="flex items-center gap-2 mb-0.5">
-            <h3 className="text-base font-bold text-gray-900">{seller.name}</h3>
+            <Link
+              href={`/seller/${seller.username || seller.name}`}
+              className="text-base font-bold text-gray-900 hover:text-brand-green transition-colors"
+              title={`View ${seller.name}'s profile`}
+            >
+              <h3 className="text-base font-bold text-gray-900 hover:text-brand-green transition-colors">
+                {seller.name}
+              </h3>
+            </Link>
             {seller.isPro && (
               <span className="bg-[#6D28D9] text-white text-[10px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase">
                 Pro
@@ -112,6 +127,12 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
         >
           Contact Seller
         </button>
+        <Link
+          href={`/seller/${seller.username || seller.name}`}
+          className="px-6 py-2.5 bg-white border border-gray-300 hover:border-gray-900 hover:bg-gray-50 text-gray-800 text-sm font-semibold rounded-xl transition-colors inline-flex items-center justify-center shadow-2xs"
+        >
+          View Profile
+        </Link>
       </div>
     </div>
   );

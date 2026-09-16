@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import './FAQ.scss';
 
 const faqData = [
   {
@@ -78,7 +77,7 @@ const FAQ = () => {
             {faqData.map((item, index) => (
               <div
                 key={index}
-                className={`faq-item border border-gray-200 rounded-xl bg-white transition-all duration-200 hover:border-gray-300 hover:shadow-sm ${openIndex === index ? 'faq-item--open border-gray-300 shadow-sm' : ''}`}
+                className={`border border-gray-200 rounded-xl bg-white transition-all duration-200 hover:border-gray-300 hover:shadow-sm ${openIndex === index ? 'border-gray-300 shadow-sm' : ''}`}
               >
                 <div
                   className="flex items-center justify-between p-6 cursor-pointer"
@@ -104,7 +103,11 @@ const FAQ = () => {
                     </svg>
                   </button>
                 </div>
-                <div className="faq-item__answer">
+                <div
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                    openIndex === index ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
                   <p className="px-6 pb-6 text-[14.5px] text-gray-500 leading-relaxed m-0 pt-0">
                     {item.answer}
                   </p>

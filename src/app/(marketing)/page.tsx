@@ -1,11 +1,17 @@
 "use client";
 
 import { useEffect } from 'react';
-import { Featured, Slide, TrustedBy, ExploreCategories, PopularServices, HowItWorks, PromoSection, TopRatedSellers, TrustProtection, TwoWays, FAQ, CTA, PostProject } from '@/components';
-import { CategoryCard, ProjectCard } from '@/components';
-import { cards, projects } from '@/data';
-
-import './Home.scss';
+import {
+  Featured,
+  TrustedBy,
+  ExploreCategories,
+  PopularServices,
+  HowItWorks,
+  PromoSection,
+  TrustProtection,
+  CTA,
+  PostProject,
+} from '@/components';
 
 const Home = () => {
 
@@ -13,7 +19,7 @@ const Home = () => {
     window.scrollTo(0, 0)
   }, []);
   return (
-    <div className='home'>
+    <div className="w-full min-h-screen bg-white">
       <Featured />
       <TrustedBy />
       <ExploreCategories />

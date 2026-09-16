@@ -289,7 +289,7 @@ const Packages = () => {
       }
       return packagesList;
     }
-    return getStaticSubcategoryGigs(activeTag);
+    return [];
   }, [packagesList, activeSubcatId, activeTag]);
 
   const isSubcategoryMode = Boolean(
@@ -619,24 +619,26 @@ const Packages = () => {
       {/* Main Content Area: Subcategory Hub, Subcategory Services, or General Gigs Listing */}
       {currentTaxonomy && activeCategory !== 'All services' && viewTab === 'hub' ? (
         <div className="container mx-auto pb-16 animate-fadeIn">
-          {/* 8-Card Subcategory Grid - Pixel Perfect Match */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
-            {currentTaxonomy.subcategories.map((subcat) => (
-              <SubcategoryCard
-                key={subcat.id}
-                id={subcat.id}
-                title={subcat.title}
-                banner={subcat.banner}
-                items={subcat.items}
-                onSelectService={handleSelectSubService}
-                onSelectSubcategory={handleSelectSubcategory}
-              />
-            ))}
-          </div>
+          {/* Subcategory Grid - only rendered if category has subcategories */}
+          {currentTaxonomy.subcategories && currentTaxonomy.subcategories.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+              {currentTaxonomy.subcategories.map((subcat) => (
+                <SubcategoryCard
+                  key={subcat.id}
+                  id={subcat.id}
+                  title={subcat.title}
+                  banner={subcat.banner}
+                  items={subcat.items}
+                  onSelectService={handleSelectSubService}
+                  onSelectSubcategory={handleSelectSubcategory}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Popular Services in Category Preview - Fiverr Style */}
           {packagesList && packagesList.length > 0 && (
-            <div className="mt-14 pt-10 border-t border-gray-200/80">
+            <div className={`${currentTaxonomy.subcategories && currentTaxonomy.subcategories.length > 0 ? "mt-14 pt-10 border-t border-gray-200/80" : "pt-2"}`}>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">

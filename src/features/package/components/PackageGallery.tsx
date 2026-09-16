@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { FiMaximize2, FiChevronLeft, FiChevronRight, FiX } from "react-icons/fi";
-import { FALLBACK_IMAGES } from "../utils/packageDetailsNormalizer";
+import { FiMaximize2, FiX } from "react-icons/fi";
 
 interface PackageGalleryProps {
   mainBanner?: string;
@@ -11,19 +10,31 @@ interface PackageGalleryProps {
 }
 
 export const PackageGallery: React.FC<PackageGalleryProps> = ({
-  mainBanner = FALLBACK_IMAGES.mainBanner,
-  thumbnails = FALLBACK_IMAGES.thumbs,
+  mainBanner,
+  thumbnails = [],
   title,
 }) => {
-  const thumbList = thumbnails.length > 0 ? thumbnails : FALLBACK_IMAGES.thumbs;
-  const hasMoreThan5 = thumbList.length > 5;
-  const allImages = [mainBanner, ...thumbList];
+  // Collect all real unique images
+  const allImages = Array.from(
+    new Set([mainBanner, ...thumbnails].filter((img): img is string => Boolean(img && img.trim())))
+  );
 
-  const [activeImage, setActiveImage] = useState(mainBanner);
-  const [activeThumbIndex, setActiveThumbIndex] = useState<number | null>(null);
+  const heroImage = allImages[0] || "";
+  const [activeImage, setActiveImage] = useState(heroImage);
+  const [activeThumbIndex, setActiveThumbIndex] = useState<number>(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [itemHeight, setItemHeight] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (heroImage && (!activeImage || !allImages.includes(activeImage))) {
+      setActiveImage(heroImage);
+      setActiveThumbIndex(0);
+    }
+  }, [heroImage]);
+
+  const hasThumbnails = allImages.length > 1;
+  const hasMoreThan5 = allImages.length > 5;
 
   useEffect(() => {
     if (!hasMoreThan5) {
@@ -35,8 +46,6 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
       if (containerRef.current) {
         const ch = containerRef.current.clientHeight;
         if (ch > 0) {
-          // 4 full items + 0.5 of 5th item = 4.5 items
-          // 4 gaps between the 4.5 items (each gap-2 is 8px => 4 * 8px = 32px)
           const h = (ch - 32) / 4.5;
           setItemHeight(h);
         }
@@ -46,7 +55,7 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
     calcHeight();
     window.addEventListener("resize", calcHeight);
     return () => window.removeEventListener("resize", calcHeight);
-  }, [hasMoreThan5, thumbList.length]);
+  }, [hasMoreThan5, allImages.length]);
 
   const handleSelectThumb = (img: string, idx: number, e?: React.MouseEvent<HTMLButtonElement>) => {
     setActiveImage(img);
@@ -56,22 +65,28 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
     }
   };
 
+  if (allImages.length === 0) {
+    return (
+      <div className="w-full h-[280px] sm:h-[340px] rounded-2xl bg-gray-100 border border-gray-200 flex flex-col items-center justify-center text-gray-400 mb-8 p-6 text-center">
+        <span className="text-sm font-semibold">{title}</span>
+        <span className="text-xs text-gray-400 mt-1">No cover image uploaded</span>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full mb-8">
-      {/* Side-by-side Gallery: Main Display (left) + Stacked Thumbnails (right) */}
+      {/* Side-by-side Gallery when multiple images, or full-width hero when 1 image */}
       <div className="flex gap-2.5 sm:gap-3 h-[320px] sm:h-[380px] md:h-[420px]">
-        {/* Left: Large Main Hero Image */}
+        {/* Main Hero Image */}
         <div
           onClick={() => setIsLightboxOpen(true)}
-          className="flex-1 h-full rounded-2xl overflow-hidden bg-gray-900 border border-gray-100 relative group cursor-pointer shadow-xs"
+          className="flex-1 h-full rounded-2xl overflow-hidden bg-gray-950 border border-gray-100 relative group cursor-pointer shadow-xs"
         >
           <img
-            src={activeImage || FALLBACK_IMAGES.mainBanner}
+            src={activeImage || heroImage}
             alt={title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.01]"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = FALLBACK_IMAGES.mainBanner;
-            }}
           />
 
           {/* Expand Icon on Hover */}
@@ -80,55 +95,49 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
           </div>
         </div>
 
-        {/* Right: Stacked Thumbnails (Scrollable when > 5, 5th image half-hidden, hidden scrollbars) */}
-        <div
-          ref={containerRef}
-          className={`w-[80px] sm:w-[95px] md:w-[105px] flex flex-col gap-2 h-full shrink-0 ${
-            hasMoreThan5
-              ? "overflow-y-auto scroll-smooth scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden overscroll-y-contain"
-              : "justify-between"
-          }`}
-        >
-          {thumbList.map((img, idx) => {
-            const isSelected =
-              activeThumbIndex !== null
-                ? activeThumbIndex === idx
-                : activeImage === img && idx === 0;
+        {/* Stacked Thumbnails (only shown if seller uploaded multiple images) */}
+        {hasThumbnails && (
+          <div
+            ref={containerRef}
+            className={`w-[80px] sm:w-[95px] md:w-[105px] flex flex-col gap-2 h-full shrink-0 ${
+              hasMoreThan5
+                ? "overflow-y-auto scroll-smooth scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden overscroll-y-contain"
+                : "justify-start"
+            }`}
+          >
+            {allImages.map((img, idx) => {
+              const isSelected = activeImage === img;
 
-            return (
-              <button
-                key={idx}
-                type="button"
-                onClick={(e) => handleSelectThumb(img, idx, e)}
-                style={
-                  hasMoreThan5
-                    ? {
-                        height: itemHeight ? `${itemHeight}px` : "calc((100% - 32px) / 4.5)",
-                        minHeight: itemHeight ? `${itemHeight}px` : "calc((100% - 32px) / 4.5)",
-                        flexBasis: itemHeight ? `${itemHeight}px` : "calc((100% - 32px) / 4.5)",
-                      }
-                    : undefined
-                }
-                className={`relative w-full rounded-xl overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 shadow-2xs shrink-0 ${
-                  !hasMoreThan5 ? "flex-1 min-h-0" : ""
-                } ${
-                  isSelected
-                    ? "border-gray-900 ring-1 ring-gray-900 scale-[0.98]"
-                    : "border-transparent opacity-85 hover:opacity-100 hover:border-gray-300"
-                }`}
-              >
-                <img
-                  src={img}
-                  alt={`Thumbnail ${idx + 1}`}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = FALLBACK_IMAGES.fallbackPlaceholder;
-                  }}
-                />
-              </button>
-            );
-          })}
-        </div>
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={(e) => handleSelectThumb(img, idx, e)}
+                  style={
+                    hasMoreThan5
+                      ? {
+                          height: itemHeight ? `${itemHeight}px` : "calc((100% - 32px) / 4.5)",
+                          minHeight: itemHeight ? `${itemHeight}px` : "calc((100% - 32px) / 4.5)",
+                          flexBasis: itemHeight ? `${itemHeight}px` : "calc((100% - 32px) / 4.5)",
+                        }
+                      : { height: "76px", minHeight: "76px" }
+                  }
+                  className={`relative w-full rounded-xl overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 shadow-2xs shrink-0 ${
+                    isSelected
+                      ? "border-brand-green ring-1 ring-brand-green scale-[0.98]"
+                      : "border-transparent opacity-80 hover:opacity-100 hover:border-gray-300"
+                  }`}
+                >
+                  <img
+                    src={img}
+                    alt={`${title} thumbnail ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Fullscreen Lightbox Modal */}
@@ -140,7 +149,7 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
           {/* Top Bar */}
           <div className="w-full flex items-center justify-between text-white z-10" onClick={(e) => e.stopPropagation()}>
             <span className="text-sm font-semibold bg-white/10 px-3.5 py-1 rounded-full">
-              Preview
+              {title}
             </span>
             <button
               type="button"
@@ -154,27 +163,29 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
           {/* Main Large Image */}
           <div className="relative flex-1 w-full max-w-5xl flex items-center justify-center my-4" onClick={(e) => e.stopPropagation()}>
             <img
-              src={activeImage}
+              src={activeImage || heroImage}
               alt="Fullscreen Preview"
               className="max-w-full max-h-[80vh] object-contain rounded-xl shadow-2xl"
             />
           </div>
 
           {/* Bottom Thumbnails Strip */}
-          <div className="flex items-center gap-2.5 max-w-full overflow-x-auto p-2 no-scrollbar z-10" onClick={(e) => e.stopPropagation()}>
-            {allImages.map((img, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => setActiveImage(img)}
-                className={`w-14 h-14 rounded-lg overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
-                  activeImage === img ? "border-white scale-105" : "border-transparent opacity-50 hover:opacity-100"
-                }`}
-              >
-                <img src={img} alt="" className="w-full h-full object-cover" />
-              </button>
-            ))}
-          </div>
+          {hasThumbnails && (
+            <div className="flex items-center gap-2.5 max-w-full overflow-x-auto p-2 no-scrollbar z-10" onClick={(e) => e.stopPropagation()}>
+              {allImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setActiveImage(img)}
+                  className={`w-14 h-14 rounded-lg overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
+                    activeImage === img ? "border-white scale-105" : "border-transparent opacity-50 hover:opacity-100"
+                  }`}
+                >
+                  <img src={img} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

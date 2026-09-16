@@ -5,11 +5,15 @@ import { FiChevronDown } from "react-icons/fi";
 import { FaqItem } from "../utils/packageDetailsNormalizer";
 
 interface PackageFaqSectionProps {
-  faqs: FaqItem[];
+  faqs?: FaqItem[];
 }
 
 export const PackageFaqSection: React.FC<PackageFaqSectionProps> = ({ faqs = [] }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  if (!Array.isArray(faqs) || faqs.length === 0) {
+    return null;
+  }
 
   const toggleFaq = (index: number) => {
     setOpenIndex((prev) => (prev === index ? null : index));
@@ -20,10 +24,10 @@ export const PackageFaqSection: React.FC<PackageFaqSectionProps> = ({ faqs = [] 
       {/* Header */}
       <div className="flex items-center justify-between gap-4 mb-6">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
-          Frequently asked questions
+          Frequently Asked Questions
         </h2>
-        <span className="text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-md">
-          Blog, Business House
+        <span className="text-xs font-semibold text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-md">
+          {faqs.length} {faqs.length === 1 ? 'Question' : 'Questions'}
         </span>
       </div>
 
@@ -39,19 +43,19 @@ export const PackageFaqSection: React.FC<PackageFaqSectionProps> = ({ faqs = [] 
                 className="w-full flex items-center justify-between gap-4 text-left cursor-pointer group py-1"
               >
                 <span className={`text-[14.5px] sm:text-[15px] font-semibold transition-colors ${
-                  isOpen ? "text-teal-800" : "text-gray-900 group-hover:text-teal-700"
+                  isOpen ? "text-brand-green" : "text-gray-900 group-hover:text-brand-green"
                 }`}>
                   {faq.question}
                 </span>
                 <FiChevronDown
                   className={`w-4 h-4 text-gray-400 group-hover:text-gray-700 transition-transform duration-200 shrink-0 ${
-                    isOpen ? "rotate-180 text-teal-600" : ""
+                    isOpen ? "rotate-180 text-brand-green" : ""
                   }`}
                 />
               </button>
 
               {isOpen && (
-                <div className="mt-2.5 text-[14px] text-gray-600 leading-relaxed animate-fadeIn pr-6">
+                <div className="mt-2.5 text-[14px] text-gray-600 leading-relaxed animate-fadeIn pr-6 whitespace-pre-line">
                   {faq.answer}
                 </div>
               )}

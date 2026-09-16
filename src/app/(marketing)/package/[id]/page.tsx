@@ -19,7 +19,6 @@ import {
   PackageFaqSection,
   PackagePricingSidebar,
   normalizePackageData,
-  FALLBACK_IMAGES,
 } from "@/features/package";
 
 const PackageContent = () => {
@@ -47,17 +46,40 @@ const PackageContent = () => {
         const res = await axiosFetch.get(`/gigs/single/${_id}`);
         return res.data || null;
       } catch (err: any) {
-        console.warn("Could not load backend gig data, falling back to normalized preview data:", err?.message);
+        console.warn("Could not load backend gig data:", err?.message);
         return null;
       }
     },
     retry: 1,
   });
 
-  // Normalize API data with complete fallbacks matching design screenshots
+  // Normalize API data with real dynamic mapping
   const normalizedData = useMemo(() => {
     return normalizePackageData(rawApiData);
   }, [rawApiData]);
+
+  // Fetch seller's other real packages for the showcase section
+  const sellerUsername = normalizedData.seller.username;
+  const { data: sellerPackagesData } = useQuery({
+    queryKey: ['seller-packages', sellerUsername],
+    queryFn: async () => {
+      if (!sellerUsername || sellerUsername === 'Seller') return [];
+      try {
+        const res = await axiosFetch.get(`/gigs/seller/${sellerUsername}`);
+        const gigs = Array.isArray(res.data) ? res.data : res.data?.gigs || [];
+        // Filter out the currently viewed package
+        return gigs.filter(
+          (g: any) =>
+            (g._id || g.id) !== normalizedData.id &&
+            g.slug !== _id &&
+            (g._id || g.id) !== _id
+        );
+      } catch {
+        return [];
+      }
+    },
+    enabled: Boolean(sellerUsername && sellerUsername !== 'Seller'),
+  });
 
   useEffect(() => {
     if (rawApiData) {
@@ -104,7 +126,7 @@ const PackageContent = () => {
 
     const sellerObj = typeof rawApiData?.userID === 'object' ? rawApiData.userID : null;
     const sellerID = sellerObj?._id || sellerObj?.id || (typeof rawApiData?.userID === 'string' ? rawApiData.userID : null) || normalizedData.seller.id;
-    const sellerUsername = sellerObj?.username || normalizedData.seller.username;
+    const sellerUser = sellerObj?.username || normalizedData.seller.username;
 
     const buyerID = user?._id || user?.id;
     const buyerUsername = user?.username;
@@ -114,7 +136,7 @@ const PackageContent = () => {
       return;
     }
 
-    if (String(sellerID) === String(buyerID) || (sellerUsername && buyerUsername && sellerUsername.toLowerCase() === buyerUsername.toLowerCase())) {
+    if (String(sellerID) === String(buyerID) || (sellerUser && buyerUsername && sellerUser.toLowerCase() === buyerUsername.toLowerCase())) {
       toast.error('You cannot contact yourself.');
       return;
     }
@@ -125,7 +147,7 @@ const PackageContent = () => {
         buyerID,
         to: sellerID,
         from: buyerID,
-        seller_username: sellerUsername,
+        seller_username: sellerUser,
         buyer_username: buyerUsername,
       });
 
@@ -140,7 +162,7 @@ const PackageContent = () => {
         if (targetId) {
           router.push(`/message/${targetId}`);
         }
-      } catch (fallbackErr: any) {
+      } catch {
         toast.error(err?.response?.data?.message || 'Could not start conversation');
       }
     }
@@ -212,10 +234,10 @@ const PackageContent = () => {
               onShare={handleShare}
             />
 
-            {/* 2. Gallery (Hero Banner + 5 Stacked Thumbnails) */}
+            {/* 2. Gallery (Real images only) */}
             <PackageGallery
-              mainBanner={normalizedData.gallery[0] || FALLBACK_IMAGES.mainBanner}
-              thumbnails={FALLBACK_IMAGES.thumbs}
+              mainBanner={normalizedData.gallery[0]}
+              thumbnails={normalizedData.gallery.slice(1)}
               title={normalizedData.title}
             />
 
@@ -226,24 +248,30 @@ const PackageContent = () => {
               onNavigate={scrollToSection}
             />
 
-            {/* Section 1: About this packages */}
+            {/* Section 1: About this package */}
             <PackageAboutSection
               description={normalizedData.description}
+              categoryName={normalizedData.categoryName}
+              subcategoryName={normalizedData.subcategoryName}
+              basicPackage={normalizedData.packages.basic}
               areaCovered={normalizedData.areaCovered}
+              tools={normalizedData.tools}
               whyMe={normalizedData.whyMe}
             />
 
-            {/* Section 2: Meet your guy */}
+            {/* Section 2: About the Seller */}
             <PackageSellerSection
               seller={normalizedData.seller}
               onContact={handleContact}
             />
 
-            {/* Section 3: Packages Showcase Portfolio */}
-            <PackagePortfolioShowcase
-              projects={normalizedData.portfolioProjects}
-              totalPackagesCount={54}
-            />
+            {/* Section 3: More Services by Seller (only rendered if seller has other packages) */}
+            {sellerPackagesData && sellerPackagesData.length > 0 && (
+              <PackagePortfolioShowcase
+                sellerPackages={sellerPackagesData}
+                sellerName={normalizedData.seller.name}
+              />
+            )}
 
             {/* Section 4: Compare Packages Table */}
             <PackageComparisonTable
@@ -264,9 +292,11 @@ const PackageContent = () => {
             />
 
             {/* Section 6: Frequently asked questions */}
-            <PackageFaqSection
-              faqs={normalizedData.faqs}
-            />
+            {normalizedData.faqs.length > 0 && (
+              <PackageFaqSection
+                faqs={normalizedData.faqs}
+              />
+            )}
           </div>
 
           {/* RIGHT STICKY PRICING SIDEBAR */}
@@ -277,6 +307,7 @@ const PackageContent = () => {
               selectedTier={selectedTier}
               onSelectTier={setSelectedTier}
               onContact={handleContact}
+              onCheckout={handleCheckout}
               onViewSellerProfile={() => router.push(`/seller/${normalizedData.seller.username}`)}
             />
           </div>

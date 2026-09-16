@@ -4,13 +4,13 @@ import React from "react";
 import Link from "next/link";
 import { FiHome, FiHeart, FiShare2, FiMoreVertical, FiShield, FiClock, FiAward, FiRepeat } from "react-icons/fi";
 import { FaAward, FaStar } from "react-icons/fa";
-import { SellerDetails, FALLBACK_IMAGES } from "../utils/packageDetailsNormalizer";
+import { SellerDetails } from "../utils/packageDetailsNormalizer";
 import { BadgeCheck } from "lucide-react";
 
 interface PackageHeaderStatsProps {
   title: string;
   categoryName: string;
-  subcategoryName: string;
+  subcategoryName?: string;
   seller: SellerDetails;
   isFavorited?: boolean;
   favoriteCount?: number;
@@ -28,10 +28,14 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
   onToggleFavorite,
   onShare,
 }) => {
+  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+    seller.name || "Seller"
+  )}&background=0D9488&color=fff&bold=true`;
+
   return (
     <div className="w-full mb-6">
       {/* 1. Breadcrumbs */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] text-gray-500 mb-3.5">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] text-gray-500 mb-3.5 flex-wrap">
         <Link
           href="/"
           className="text-teal-600 hover:text-teal-700 transition-colors flex items-center"
@@ -46,14 +50,18 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
         >
           {categoryName}
         </Link>
-        <span className="text-gray-300">/</span>
-        <span className="text-gray-500 font-normal truncate">
-          {subcategoryName}
-        </span>
+        {subcategoryName && (
+          <>
+            <span className="text-gray-300">/</span>
+            <span className="text-gray-500 font-normal truncate">
+              {subcategoryName}
+            </span>
+          </>
+        )}
       </nav>
 
       {/* 2. Main Title */}
-      <h1 className="text-[26px] sm:text-[32px] md:text-[48px] font-[590] font-sf-pro text-[#292929]  leading-[50px] mb-4">
+      <h1 className="text-[26px] sm:text-[32px] md:text-[44px] font-[590] font-sf-pro text-[#292929] leading-tight mb-4">
         {title}
       </h1>
 
@@ -61,30 +69,34 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 mb-4 border-b border-gray-100">
         <div className="flex items-center gap-3">
           <img
-            src={seller.avatar || FALLBACK_IMAGES.sellerAvatar}
+            src={seller.avatar || defaultAvatar}
             alt={seller.name}
             className="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-xs shrink-0"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = FALLBACK_IMAGES.sellerAvatar;
+              (e.target as HTMLImageElement).src = defaultAvatar;
             }}
           />
-          <div className="flex items-start gap-2 flex-col">
+          <div className="flex items-start gap-1 flex-col">
             <div className="flex items-center gap-2">
-              <span className="font-[510] text-black font-sf-pro text-2xl">{seller.name}</span>
+              <span className="font-[510] text-black font-sf-pro text-xl sm:text-2xl">{seller.name}</span>
               {seller.isPro && (
-                <span className="bg-[#360083] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-[4px] tracking-wide uppercase">
+                <span className="bg-[#360083] text-white text-[10px] font-bold px-2 py-0.5 rounded-[4px] tracking-wide uppercase">
                   Pro
                 </span>
               )}
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-black  text-base font-sf-pro font-[510]">{seller.role}</span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-black text-sm sm:text-base font-sf-pro font-[510]">{seller.role}</span>
               <span className="text-gray-400 text-sm"> | </span>
               <div className="flex items-center gap-1 text-sm font-semibold text-gray-900">
-                <span className="text-xl font-sf-pro font-bold">{seller.rating.toFixed(1)}</span>
-                <FaStar className="w-6 h-6 text-[#F5B400] fill-[#F5B400]" />
-                <span className="text-[#868686] text-xl font-sf-pro font-normal">({seller.reviewCount})</span>
+                <span className="text-base sm:text-lg font-sf-pro font-bold">
+                  {seller.rating > 0 ? seller.rating.toFixed(1) : "New"}
+                </span>
+                <FaStar className="w-4 h-4 text-[#F5B400] fill-[#F5B400]" />
+                <span className="text-[#868686] text-sm sm:text-base font-sf-pro font-normal">
+                  ({seller.reviewCount})
+                </span>
               </div>
             </div>
 
@@ -93,8 +105,14 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
 
         {/* Right Actions */}
         <div className="flex items-center gap-4 text-sm text-gray-600">
-          <span className="text-[#4A4A4A] font-normal font-sf-pro text-2xl">
-            <strong className="text-[#222222] font-semibold text-2xl">{seller.ordersInQueue} </strong> orders in queue
+          <span className="text-[#4A4A4A] font-normal font-sf-pro text-base sm:text-xl">
+            {seller.ordersInQueue > 0 ? (
+              <>
+                <strong className="text-[#222222] font-semibold">{seller.ordersInQueue} </strong> orders in queue
+              </>
+            ) : (
+              <span className="text-emerald-700 font-medium">Available now</span>
+            )}
           </span>
 
           <div className="flex items-center gap-1.5">
@@ -116,14 +134,6 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
             >
               <FiShare2 className="w-4 h-4" />
             </button>
-
-            <button
-              type="button"
-              className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors cursor-pointer"
-              title="More options"
-            >
-              <FiMoreVertical className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </div>
@@ -140,8 +150,8 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
             <span className="text-base font-sf-pro  text-[#6E6E6E] block font-normal">
               Profile Status
             </span>
-            <span className="text-2xl font-sf-pro font-bold text-black">
-              Verified
+            <span className="text-xl sm:text-2xl font-sf-pro font-bold text-black">
+              {seller.verified ? "Verified" : "Active"}
             </span>
           </div>
         </div>
@@ -156,7 +166,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
             <span className="text-base font-sf-pro  text-[#6E6E6E] block font-normal">
               Response Time
             </span>
-            <span className="text-2xl font-sf-pro font-bold text-black">
+            <span className="text-xl sm:text-2xl font-sf-pro font-bold text-black">
               {seller.responseTime}
             </span>
           </div>
@@ -170,9 +180,9 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
 
           <div>
             <span className="text-base font-sf-pro  text-[#6E6E6E] block font-normal">
-              Top Rated In
+              Category
             </span>
-            <span className="text-2xl font-sf-pro font-bold text-black">
+            <span className="text-lg sm:text-xl font-sf-pro font-bold text-black truncate max-w-[150px]" title={seller.topRatedIn}>
               {seller.topRatedIn}
             </span>
           </div>
@@ -186,10 +196,10 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
 
           <div>
             <span className="text-base font-sf-pro  text-[#6E6E6E] block font-normal">
-              Return Rate
+              Completion
             </span>
-            <span className="text-2xl font-sf-pro font-bold text-black">
-              {seller.returnRate}
+            <span className="text-xl sm:text-2xl font-sf-pro font-bold text-black">
+              {seller.returnRate || seller.onTimeDelivery || "100%"}
             </span>
           </div>
         </div>

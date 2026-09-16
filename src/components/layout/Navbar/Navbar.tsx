@@ -24,10 +24,17 @@ const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { user, setUser } = useUserStore();
+  const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const isBuyer = Boolean(user && !user.isSeller);
-  const isSeller = Boolean(user?.isSeller);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const effectiveUser = isMounted ? user : null;
+  const isBuyer = Boolean(effectiveUser && !effectiveUser.isSeller);
+  const isSeller = Boolean(effectiveUser?.isSeller);
 
   // Fetch real categories from backend
   const { categoryList: rawCats } = useAdminCategories();
@@ -170,7 +177,7 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center gap-7 font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B]">
           {isLoading ? (
             <Loader size={35} />
-          ) : !user ? (
+          ) : !effectiveUser ? (
             <>
               {/* Explore Category Dropdown without extra icons */}
               <div className="relative category-dropdown-container">
@@ -253,13 +260,13 @@ const Navbar = () => {
               </Link>
 
               <HeaderInboxIcon
-                currentUser={user}
+                currentUser={effectiveUser}
                 className="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer"
                 iconClassName="text-[19px]"
               />
 
               <NotificationBell
-                currentUser={user}
+                currentUser={effectiveUser}
                 triggerClassName="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer"
                 iconClassName="text-[19px]"
               />
@@ -278,7 +285,7 @@ const Navbar = () => {
                   onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                 >
                   <Image
-                    src={user.image || "/media/noavatar.png"}
+                    src={effectiveUser.image || "/media/noavatar.png"}
                     width={40}
                     height={40}
                     alt="Profile"
@@ -290,8 +297,8 @@ const Navbar = () => {
                 {isProfileDropdownOpen && (
                   <div className="absolute right-0 mt-3 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-2 flex flex-col z-[60] text-[15px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                     <div className="px-5 py-3 border-b border-gray-100 mb-1">
-                      <p className="font-bold text-gray-900 truncate">@{user?.username}</p>
-                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                      <p className="font-bold text-gray-900 truncate">@{effectiveUser?.username}</p>
+                      <p className="text-xs text-gray-500 truncate">{effectiveUser?.email}</p>
                     </div>
                     <Link href="/profile" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
                       My Profile
@@ -331,13 +338,13 @@ const Navbar = () => {
               </Link>
 
               <HeaderInboxIcon
-                currentUser={user}
+                currentUser={effectiveUser}
                 className="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer"
                 iconClassName="text-[19px]"
               />
 
               <NotificationBell
-                currentUser={user}
+                currentUser={effectiveUser}
                 triggerClassName="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer"
                 iconClassName="text-[19px]"
               />
@@ -348,7 +355,7 @@ const Navbar = () => {
                   onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                 >
                   <Image
-                    src={user.image || "/media/noavatar.png"}
+                    src={effectiveUser.image || "/media/noavatar.png"}
                     width={40}
                     height={40}
                     alt="Profile"
@@ -360,8 +367,8 @@ const Navbar = () => {
                 {isProfileDropdownOpen && (
                   <div className="absolute right-0 mt-4 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-2 flex flex-col z-[60] text-[15px] text-gray-700 font-medium overflow-hidden">
                     <div className="px-5 py-3 border-b border-gray-100 mb-1">
-                      <p className="font-bold text-gray-900 truncate">@{user?.username}</p>
-                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                      <p className="font-bold text-gray-900 truncate">@{effectiveUser?.username}</p>
+                      <p className="text-xs text-gray-500 truncate">{effectiveUser?.email}</p>
                     </div>
                     <Link href="/profile" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
                       My Profile
@@ -384,7 +391,7 @@ const Navbar = () => {
                     </Link>
                     <Link href="/kyc" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center justify-between">
                       <span>ID Verification</span>
-                      {!user?.isKycVerified ? (
+                      {!effectiveUser?.isKycVerified ? (
                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Verify</span>
                       ) : (
                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">🛡️ Verified</span>
@@ -403,15 +410,15 @@ const Navbar = () => {
 
         {/* Mobile Hamburger Button & Pre-reserved Icons Container */}
         <div className="flex lg:hidden items-center gap-2.5 shrink-0 min-h-[36px]">
-          {user && !isLoading && (
+          {effectiveUser && !isLoading && (
             <div className="flex items-center gap-2 mr-1 shrink-0">
               <HeaderInboxIcon
-                currentUser={user}
+                currentUser={effectiveUser}
                 className="w-9 h-9 rounded-full bg-[#F5F5F7] flex items-center justify-center text-gray-700 relative"
                 iconClassName="text-[17px]"
               />
               <NotificationBell
-                currentUser={user}
+                currentUser={effectiveUser}
                 triggerClassName="w-9 h-9 rounded-full bg-[#F5F5F7] flex items-center justify-center text-gray-700 relative"
                 iconClassName="text-[17px]"
               />
@@ -471,7 +478,7 @@ const Navbar = () => {
             </div>
           )}
 
-          {!user ? (
+          {!effectiveUser ? (
             <>
               <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a Seller</Link>
               <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
@@ -488,17 +495,17 @@ const Navbar = () => {
                 className="flex items-center gap-4 pb-6 mb-2 border-b border-gray-100 cursor-pointer hover:opacity-80 transition-opacity"
                 onClick={() => { setIsMobileMenuOpen(false); router.push('/profile'); }}
               >
-                <img src={user.image || "/media/noavatar.png"} alt="" className="w-14 h-14 rounded-full object-cover shadow-sm border border-gray-200" />
+                <img src={effectiveUser.image || "/media/noavatar.png"} alt="" className="w-14 h-14 rounded-full object-cover shadow-sm border border-gray-200" />
                 <div className="flex flex-col overflow-hidden">
-                  <span className="text-gray-900 font-bold truncate">@{user.username || "User"}</span>
+                  <span className="text-gray-900 font-bold truncate">@{effectiveUser.username || "User"}</span>
                   <span className="text-sm text-brand-green font-medium">View Profile</span>
                 </div>
               </div>
 
               <Link href="/packages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Browse Packages</Link>
               <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
-              <Link href={user.isSeller ? "/dashboard/seller" : "/dashboard/buyer"} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Dashboard</Link>
-              {user.isSeller ? (
+              <Link href={effectiveUser.isSeller ? "/dashboard/seller" : "/dashboard/buyer"} onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Dashboard</Link>
+              {effectiveUser.isSeller ? (
                 <>
                   <Link href="/manage-orders" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Manage Orders</Link>
                   <Link href="/my-packages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Packages</Link>
@@ -506,7 +513,7 @@ const Navbar = () => {
                   <Link href="/earnings" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Earnings</Link>
                   <Link href="/kyc" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors flex items-center justify-between">
                     <span>ID Verification (KYC)</span>
-                    {!user?.isKycVerified ? (
+                    {!effectiveUser?.isKycVerified ? (
                       <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Unverified</span>
                     ) : (
                       <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">🛡️ Verified</span>
@@ -526,10 +533,10 @@ const Navbar = () => {
                   <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a Seller</Link>
                 </>
               )}
-              {!user.isSeller && (
+              {!effectiveUser.isSeller && (
                 <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Orders</Link>
               )}
-              {!user.isSeller && (
+              {!effectiveUser.isSeller && (
                 <Link href="/briefs/my-briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Projects</Link>
               )}
               <Link href="/messages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Messages</Link>

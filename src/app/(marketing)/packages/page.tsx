@@ -18,7 +18,7 @@ import { STATIC_SUBCATEGORY_GIGS, getStaticSubcategoryGigs } from '@/data/static
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
-import adminAxios from "@/utils/adminAxios";
+import useAdminCategories from "@/hooks/useAdminCategories";
 import { FiAlertCircle, FiRefreshCw, FiGrid, FiArrowRight, FiArrowLeft, FiHome } from "react-icons/fi";
 
 const DEFAULT_CATEGORIES = [
@@ -79,26 +79,17 @@ const Packages = () => {
     }
   };
 
-  // Fetch categories from backend
-  const { data: fetchedCategories = [] } = useQuery({
-    queryKey: ['admin-categories-packages-page'],
-    queryFn: () => adminAxios.get('/categories').then(({ data }: any) => data).catch(() => [])
-  });
-
-  const categoryList = Array.isArray(fetchedCategories)
-    ? fetchedCategories
-    : Array.isArray(fetchedCategories?.data)
-      ? fetchedCategories.data
-      : fetchedCategories?.categories || [];
+  // Centralized backend category hook
+  const { categoryList, parentCategories } = useAdminCategories();
 
   const categories = useMemo(() => {
-    if (categoryList.length === 0) {
+    if (parentCategories.length === 0) {
       return DEFAULT_CATEGORIES.map((c: string) => ({
         name: c,
         slug: c === "All services" ? "All services" : c.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
       }));
     }
-    const formatted = categoryList.map((cat: any) => {
+    const formatted = parentCategories.map((cat: any) => {
       if (typeof cat === 'string') {
         const slug = cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
         return { name: cat, slug };
@@ -121,7 +112,7 @@ const Packages = () => {
     );
 
     return [{ name: "All services", slug: "All services" }, ...regularCats, ...otherCats];
-  }, [categoryList]);
+  }, [parentCategories]);
 
   const getSlugFromCat = (catInput: string) => {
     if (!catInput || catInput === 'All services' || catInput === 'Results') return '';
@@ -177,6 +168,8 @@ const Packages = () => {
       searchVal,
       activeCategory,
       filterCategory,
+      activeSubcatId,
+      activeTag,
       minPrice,
       maxPrice,
       sortBy,
@@ -196,6 +189,13 @@ const Packages = () => {
       const catSlug = getSlugFromCat(selectedCat);
       if (catSlug) {
         queryParams.set('category', catSlug);
+      }
+
+      if (activeSubcatId) {
+        queryParams.set('subcat', activeSubcatId);
+      }
+      if (activeTag) {
+        queryParams.set('tag', activeTag);
       }
 
       if (minPrice) queryParams.set('min', minPrice);
@@ -270,10 +270,27 @@ const Packages = () => {
 
   const displayPackages = useMemo(() => {
     if (packagesList && packagesList.length > 0) {
+      if (activeSubcatId || activeTag) {
+        const queryTerm = (activeTag || activeSubcatId).toLowerCase().trim();
+        const filtered = packagesList.filter((pkg: any) => {
+          const titleMatch = pkg.title?.toLowerCase().includes(queryTerm);
+          const subcatMatch = pkg.subcategory?.toLowerCase().includes(queryTerm) ||
+                              queryTerm.includes(pkg.subcategory?.toLowerCase() || '');
+          const tagMatch = Array.isArray(pkg.tags) && pkg.tags.some((t: string) =>
+            t.toLowerCase().includes(queryTerm) || queryTerm.includes(t.toLowerCase())
+          );
+          const descMatch = pkg.description?.toLowerCase().includes(queryTerm);
+          return titleMatch || subcatMatch || tagMatch || descMatch;
+        });
+
+        if (filtered.length > 0) {
+          return filtered;
+        }
+      }
       return packagesList;
     }
     return getStaticSubcategoryGigs(activeTag);
-  }, [packagesList, activeTag]);
+  }, [packagesList, activeSubcatId, activeTag]);
 
   const isSubcategoryMode = Boolean(
     currentTaxonomy &&
@@ -596,8 +613,6 @@ const Packages = () => {
         <CategoryHeroBanner
           title={currentTaxonomy.heroTitle}
           categoryName={currentTaxonomy.name}
-          subtitle={currentTaxonomy.heroSubtitle}
-          bannerImage={currentTaxonomy.defaultBanner}
         />
       )}
 
@@ -618,6 +633,39 @@ const Packages = () => {
               />
             ))}
           </div>
+
+          {/* Popular Services in Category Preview - Fiverr Style */}
+          {packagesList && packagesList.length > 0 && (
+            <div className="mt-14 pt-10 border-t border-gray-200/80">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                    Popular Services in {currentTaxonomy.name}
+                  </h2>
+                  <p className="text-sm text-gray-500 mt-1 font-inter">
+                    Explore top-rated services delivered by verified professionals
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewTab('gigs');
+                    syncUrlWithFilters({ resetPage: true });
+                  }}
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-brand-green hover:underline cursor-pointer group self-start sm:self-auto"
+                >
+                  <span>View all {packagesList.length} services</span>
+                  <FiArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+                {packagesList.slice(0, 8).map((pkg: any, idx: number) => (
+                  <PackageCard key={pkg._id || pkg.id || idx} data={pkg} priority={idx < 4} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       ) : (currentTaxonomy && activeCategory !== 'All services' && viewTab === 'gigs' && activeSubcategory) ? (
         /* Subcategory Services View - Pixel Perfect Match for Image 2 */
@@ -667,7 +715,9 @@ const Packages = () => {
           {/* 3. Results Count */}
           <div className="mb-6">
             <p className="text-xl font-normal font-inter text-[#4A4A4A]">
-              {activeSubcategory.resultCount || "1,40,000+ Results"}
+              {displayPackages.length > 0
+                ? `${displayPackages.length} Available Services`
+                : (activeSubcategory.resultCount || "1,40,000+ Results")}
             </p>
           </div>
 

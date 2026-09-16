@@ -28,6 +28,11 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
     }
   };
 
+  const safeBanner =
+    banner && (banner.startsWith("http://") || banner.startsWith("https://") || banner.startsWith("/"))
+      ? banner
+      : "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80";
+
   return (
     <div className="bg-white border border-gray-100 rounded-[10px] overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col">
       {/* Inset Rounded Banner Image with Padding */}
@@ -38,7 +43,7 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
           title={title}
         >
           <Image
-            src={banner}
+            src={safeBanner}
             alt={title}
             width={385}
             height={190}

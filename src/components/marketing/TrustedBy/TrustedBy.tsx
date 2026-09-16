@@ -1,30 +1,100 @@
 import React from 'react';
-import { VscVerified } from "react-icons/vsc";
-import { RiGlobalLine } from "react-icons/ri";
-import { IoShieldCheckmarkOutline } from "react-icons/io5";
-import { AiOutlineDollarCircle } from "react-icons/ai";
 
 const TrustedBy = () => {
   const trustFeatures = [
     {
       title: "Escrow Protected",
       description: "Your payment stays secure until you approve.",
-      icon: <IoShieldCheckmarkOutline size={50} className="w-[50px] h-[50px]" />
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="37.5"
+          height="37.5"
+          viewBox="0 0 50 50"
+          fill="none"
+          className="w-[37.5px] h-[37.5px]"
+        >
+          <path
+            d="M16.9354 23.1904L25.2667 12.8975C25.9183 12.0925 27.1396 12.5936 27.1396 13.6659V21.6327C27.1396 22.275 27.6185 22.7959 28.2094 22.7959H32.2615C33.1821 22.7959 33.6727 23.9759 33.0646 24.7271L24.7333 35.02C24.0817 35.825 22.8604 35.324 22.8604 34.2517V26.285C22.8604 25.6425 22.3815 25.1219 21.7906 25.1219H17.7385C16.818 25.1219 16.3273 23.9417 16.9354 23.1904Z"
+            stroke="#0F0F1E"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M43.75 23.299V17.2509C43.75 13.8343 43.75 12.1259 42.9081 11.0113C42.0662 9.89678 40.1627 9.35566 36.3556 8.27345C33.7546 7.53408 31.4617 6.6433 29.6298 5.8301C27.1321 4.72137 25.8833 4.16699 25 4.16699C24.1167 4.16699 22.8679 4.72137 20.3702 5.8301C18.5383 6.6433 16.2455 7.53408 13.6444 8.27345C9.83735 9.35566 7.93379 9.89678 7.0919 11.0113C6.25 12.1259 6.25 13.8343 6.25 17.2509V23.299C6.25 35.018 16.7974 42.0492 22.0708 44.8324C23.3356 45.4999 23.9679 45.8336 25 45.8336C26.0321 45.8336 26.6644 45.4999 27.9292 44.8324C33.2025 42.0492 43.75 35.018 43.75 23.299Z"
+            stroke="#0F0F1E"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      )
     },
     {
       title: "Verified Sellers",
       description: "Every professional reviewed for quality.",
-      icon: <VscVerified size={50} className="w-[50px] h-[50px]" />
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="37.5"
+          height="37.5"
+          viewBox="0 0 40 40"
+          fill="none"
+          className="w-[37.5px] h-[37.5px]"
+        >
+          <path
+            d="M13.75 21.5625L18.4375 26.25L26.25 15.3125M38.75 20C38.75 22.6417 37.4375 24.9792 35.4313 26.3917C35.6474 27.6266 35.5628 28.8954 35.1845 30.0907C34.8063 31.286 34.1456 32.3726 33.2583 33.2583C32.3726 34.1456 31.286 34.8063 30.0907 35.1845C28.8954 35.5628 27.6266 35.6474 26.3917 35.4312C25.6713 36.4572 24.7143 37.2945 23.6017 37.8722C22.4891 38.4499 21.2536 38.751 20 38.75C17.3583 38.75 15.0208 37.4375 13.6083 35.4312C12.3734 35.6472 11.1046 35.5625 9.90935 35.1843C8.71409 34.806 7.62754 34.1454 6.74167 33.2583C5.85443 32.3726 5.19371 31.286 4.81546 30.0907C4.43722 28.8954 4.3526 27.6266 4.56875 26.3917C3.54276 25.6713 2.70546 24.7143 2.12776 23.6017C1.55007 22.4891 1.24898 21.2536 1.25 20C1.25 17.3583 2.5625 15.0208 4.56875 13.6083C4.3526 12.3734 4.43722 11.1046 4.81546 9.90927C5.19371 8.71398 5.85443 7.62744 6.74167 6.74167C7.62754 5.85457 8.71409 5.19395 9.90935 4.81572C11.1046 4.43748 12.3734 4.35277 13.6083 4.56875C14.3288 3.54288 15.2859 2.70568 16.3985 2.128C17.511 1.55032 18.7464 1.24916 20 1.25C22.6417 1.25 24.9792 2.5625 26.3917 4.56875C27.6266 4.35277 28.8954 4.43748 30.0907 4.81572C31.2859 5.19395 32.3725 5.85457 33.2583 6.74167C34.1454 7.62754 34.8061 8.71409 35.1843 9.90935C35.5625 11.1046 35.6472 12.3734 35.4313 13.6083C36.4572 14.3287 37.2945 15.2857 37.8722 16.3983C38.4499 17.5109 38.751 18.7464 38.75 20Z"
+            stroke="#0F0F1E"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )
     },
     {
       title: "Global Marketplace",
       description: "Work with top experts from 90+ countries.",
-      icon: <RiGlobalLine size={50} className="w-[50px] h-[50px]" />
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="37.5"
+          height="37.5"
+          viewBox="0 0 40 40"
+          fill="none"
+          className="w-[37.5px] h-[37.5px]"
+        >
+          <path
+            d="M36.3396 10.7958C37.9247 13.6041 38.7552 16.7752 38.75 20C38.75 21.6208 38.5438 23.1938 38.1583 24.6938C37.1165 28.7173 34.7679 32.2809 31.4813 34.825C28.1947 37.3692 24.1562 38.7498 20 38.75M3.66042 10.7958C2.12501 13.5146 1.25001 16.6563 1.25001 20C1.2486 21.5833 1.4474 23.1604 1.84167 24.6938C2.8835 28.7173 5.2321 32.2809 8.5187 34.825C11.8053 37.3692 15.8438 38.7498 20 38.75M20 38.75C25.1771 38.75 29.375 30.3542 29.375 20C29.375 9.64584 25.1771 1.25 20 1.25M20 38.75C14.8229 38.75 10.625 30.3542 10.625 20C10.625 9.64584 14.8229 1.25 20 1.25M38.1583 24.6938C32.6024 27.7737 26.3525 29.385 20 29.375C13.4125 29.375 7.22292 27.6771 1.84167 24.6938M20 1.25C23.3255 1.24861 26.5915 2.132 29.4629 3.80951C32.3343 5.48702 34.7077 7.89827 36.3396 10.7958M20 1.25C16.6745 1.24861 13.4085 2.132 10.5371 3.80951C7.66571 5.48702 5.29231 7.89827 3.66042 10.7958M36.3396 10.7958C31.8035 14.7249 26.0011 16.8836 20 16.875C13.7542 16.875 8.04167 14.5833 3.66042 10.7958"
+            stroke="#0F0F1E"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )
     },
     {
       title: "Secure Payments",
       description: "Reliable, safe international payouts.",
-      icon: <AiOutlineDollarCircle size={50} className="w-[50px] h-[50px]" />
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="37.5"
+          height="37.5"
+          viewBox="0 0 40 40"
+          fill="none"
+          className="w-[37.5px] h-[37.5px]"
+        >
+          <path
+            d="M20 7.5V32.5M13.75 26.6292L15.5812 28.0021C18.0208 29.8333 21.9771 29.8333 24.4187 28.0021C26.8604 26.1708 26.8604 23.2042 24.4187 21.3729C23.2 20.4563 21.6 20 20 20C18.4896 20 16.9792 19.5417 15.8271 18.6271C13.5229 16.7958 13.5229 13.8292 15.8271 11.9979C18.1312 10.1667 21.8687 10.1667 24.1729 11.9979L25.0375 12.6854M38.75 20C38.75 22.4623 38.265 24.9005 37.3227 27.1753C36.3805 29.4502 34.9993 31.5172 33.2582 33.2582C31.5172 34.9993 29.4502 36.3805 27.1753 37.3227C24.9005 38.265 22.4623 38.75 20 38.75C17.5377 38.75 15.0995 38.265 12.8247 37.3227C10.5498 36.3805 8.48285 34.9993 6.74175 33.2582C5.00065 31.5172 3.61953 29.4502 2.67726 27.1753C1.73498 24.9005 1.25 22.4623 1.25 20C1.25 15.0272 3.22544 10.2581 6.74175 6.74175C10.2581 3.22544 15.0272 1.25 20 1.25C24.9728 1.25 29.7419 3.22544 33.2582 6.74175C36.7746 10.2581 38.75 15.0272 38.75 20Z"
+            stroke="#0F0F1E"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )
     }
   ];
 
@@ -34,14 +104,14 @@ const TrustedBy = () => {
         <div className="w-full bg-white rounded-2xl border-r border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
             {trustFeatures.map((feature, index) => (
-              <div key={index} className="flex flex-col items-center text-center px-4 py-8 sm:py-9 lg:py-14">
-                <div className="w-[50px] h-[50px] flex items-center justify-center mb-4 text-[#1E293B]">
+              <div key={index} className="flex flex-col items-center text-center p-6 sm:p-8 lg:p-6 xl:p-10 2xl:p-[60px]">
+                <div className="w-[37.5px] h-[37.5px] flex items-center justify-center mb-4 sm:mb-5 2xl:mb-6 text-[#1E293B]">
                   {feature.icon}
                 </div>
-                <h3 className="font-sf-pro font-[500] mb-3 text-[24px] text-[#434343] leading-none mb-2 tracking-normal">
+                <h3 className="font-sf-pro font-bold text-[18px] sm:text-[20px] lg:text-[18px] xl:text-[21px] 2xl:text-[24px] text-[#434343] leading-normal mb-2 sm:mb-3 2xl:mb-4 text-center">
                   {feature.title}
                 </h3>
-                <p className="font-inter text-[20px] font-normal text-[#868686] leading-none">
+                <p className="font-inter font-normal text-[14px] sm:text-[15px] lg:text-[14px] xl:text-[17px] 2xl:text-[20px] text-[#868686] leading-normal text-center">
                   {feature.description}
                 </p>
               </div>

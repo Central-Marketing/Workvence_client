@@ -1190,6 +1190,35 @@ export const CATEGORY_TAXONOMIES: Record<string, CategoryTaxonomy> = {
   }
 };
 
+const isValidUrl = (url: unknown): boolean => {
+  if (typeof url !== 'string') return false;
+  const t = url.trim();
+  return t.startsWith('http://') || t.startsWith('https://') || t.startsWith('/');
+};
+
+const getFallbackSubcategoryBanner = (slugOrName: string = ''): string => {
+  const s = slugOrName.toLowerCase();
+  if (s.includes('artist') || s.includes('design') || s.includes('art') || s.includes('image')) {
+    return 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80';
+  }
+  if (s.includes('bot') || s.includes('chat') || s.includes('agent')) {
+    return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80';
+  }
+  if (s.includes('workflow') || s.includes('automation') || s.includes('n8n') || s.includes('zapier')) {
+    return 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=600&q=80';
+  }
+  if (s.includes('data') || s.includes('learning') || s.includes('science') || s.includes('analytics')) {
+    return 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80';
+  }
+  if (s.includes('consult') || s.includes('business') || s.includes('strategy')) {
+    return 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80';
+  }
+  if (s.includes('code') || s.includes('tech') || s.includes('dev') || s.includes('software')) {
+    return 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80';
+  }
+  return 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=600&q=80';
+};
+
 /**
  * Adapter helper to merge live API category data with our taxonomy fallback.
  */
@@ -1216,28 +1245,73 @@ export const getCategoryTaxonomy = (slug: string, apiCategories?: any[]): Catego
     return catSlug === normalizedSlug || cat?.id === slug || cat?._id === slug;
   });
 
+  const fallbackTitle = apiCategory?.name || slug.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+
+  // Extract live children/subcategories from API if available
+  const rawApiChildren = (Array.isArray(apiCategory?.children) && apiCategory.children.length > 0)
+    ? apiCategory.children
+    : (Array.isArray(apiCategory?.subcategories) && apiCategory.subcategories.length > 0)
+      ? apiCategory.subcategories
+      : Array.isArray(apiCategories)
+        ? apiCategories.filter((c: any) => c.parentId && (c.parentId === apiCategory?.id || c.parentId === apiCategory?._id || c.parentName?.toLowerCase() === apiCategory?.name?.toLowerCase()))
+        : [];
+
+  const dynamicSubcategories: SubcategoryItem[] = rawApiChildren.map((child: any) => {
+    const childTitle = child.name || child.title || String(child);
+    const childSlug = child.slug || childTitle.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    
+    // 2nd children of each 1st child directly from backend
+    let secondChildren: any[] = [];
+    if (Array.isArray(child.children) && child.children.length > 0) {
+      secondChildren = child.children;
+    } else if (Array.isArray(child.subcategories) && child.subcategories.length > 0) {
+      secondChildren = child.subcategories;
+    } else if (Array.isArray(apiCategories)) {
+      secondChildren = apiCategories.filter((c: any) =>
+        c.parentId && (c.parentId === child.id || c.parentId === child._id)
+      );
+    }
+
+    const items: string[] = secondChildren.map((c: any) => c.name || c.title || String(c));
+
+    const banner = isValidUrl(child.banner)
+      ? child.banner
+      : getFallbackSubcategoryBanner(childSlug || childTitle);
+
+    return {
+      id: childSlug,
+      title: childTitle,
+      subtitle: child.description || undefined,
+      resultCount: child.gigCount ? `${child.gigCount}+ Results` : undefined,
+      banner,
+      items,
+    };
+  });
+
+  // If no static taxonomy was pre-defined for this category, construct dynamic taxonomy
   if (!matchedTaxonomy) {
-    const fallbackTitle = apiCategory?.name || slug.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
     return {
       slug: normalizedSlug,
       name: fallbackTitle,
       heroTitle: fallbackTitle,
       heroSubtitle: apiCategory?.description || `Discover top quality ${fallbackTitle} services from verified experts`,
-      defaultBanner: apiCategory?.banner || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
-      subcategories: []
+      defaultBanner: isValidUrl(apiCategory?.banner) ? apiCategory.banner : "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
+      subcategories: dynamicSubcategories,
     };
   }
 
-  // Merge live API category fields (name, description, banner) over static taxonomy
+  // Show first children as subcategories directly when present
+  const finalSubcategories: SubcategoryItem[] =
+    dynamicSubcategories.length > 0
+      ? dynamicSubcategories
+      : matchedTaxonomy.subcategories || [];
+
   return {
     ...matchedTaxonomy,
     name: apiCategory?.name || matchedTaxonomy.name,
     heroTitle: apiCategory?.name || matchedTaxonomy.heroTitle,
-    heroSubtitle: apiCategory?.description || matchedTaxonomy.heroSubtitle,
-    defaultBanner: apiCategory?.banner || matchedTaxonomy.defaultBanner,
-    // If live API ever provides dynamic subcategories, prefer them!
-    subcategories: (apiCategory?.subcategories && Array.isArray(apiCategory.subcategories) && apiCategory.subcategories.length > 0)
-      ? apiCategory.subcategories
-      : matchedTaxonomy.subcategories
+    heroSubtitle: matchedTaxonomy.heroSubtitle || apiCategory?.description || `Discover top quality ${matchedTaxonomy.name} services from verified experts`,
+    defaultBanner: matchedTaxonomy.defaultBanner || (isValidUrl(apiCategory?.banner) ? apiCategory.banner : "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80"),
+    subcategories: finalSubcategories,
   };
 };

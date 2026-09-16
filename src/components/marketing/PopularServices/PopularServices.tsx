@@ -14,6 +14,23 @@ import 'swiper/css/navigation';
 import { CategoryCarouselSkeleton } from '@/components';
 import Image from 'next/image';
 
+const DEFAULT_SERVICE_IMAGE =
+  "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600";
+
+const isValidImageUrl = (url: unknown): boolean => {
+  if (typeof url !== 'string') return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  return trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/');
+};
+
+const getCategoryBanner = (card: any): string => {
+  if (isValidImageUrl(card?.banner)) return card.banner.trim();
+  if (isValidImageUrl(card?.image)) return card.image.trim();
+  if (isValidImageUrl(card?.img)) return card.img.trim();
+  return DEFAULT_SERVICE_IMAGE;
+};
+
 const PopularServices = () => {
   const swiperRef = useRef<any>(null);
 
@@ -24,14 +41,16 @@ const PopularServices = () => {
   }
 
   const regularCats = rawList.filter((c: any) =>
+    !c.parentId &&
     c.slug !== 'other-and-general' &&
     c.slug !== 'other' &&
     !(c.name || c.title || '').toLowerCase().includes('other')
   );
   const otherCats = rawList.filter((c: any) =>
-    c.slug === 'other-and-general' ||
+    !c.parentId &&
+    (c.slug === 'other-and-general' ||
     c.slug === 'other' ||
-    (c.name || c.title || '').toLowerCase().includes('other')
+    (c.name || c.title || '').toLowerCase().includes('other'))
   );
 
   const categoryList = [...regularCats, ...otherCats];
@@ -93,15 +112,16 @@ const PopularServices = () => {
         >
           {categoryList.map((card: any) => {
             const cardSlug = card.slug || (card.name || card.title || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-');
+            const imageUrl = getCategoryBanner(card);
+
             return (
               <SwiperSlide key={card._id || card.id || card.slug || card.name}>
                 <Link href={`/packages?category=${cardSlug}`}>
                   <div className="flex flex-col bg-[#EBFEC5] rounded-[10px] overflow-hidden group cursor-pointer border border-transparent hover:border-[#DAEFAF] transition-all duration-300">
-                    <div className="h-[160px] sm:h-[200px] md:h-[260px] overflow-hidden m-1.5 md:m-2 rounded-[5px] md:rounded-5px] bg-blue-100/50 flex items-center justify-center">
+                    <div className="h-[160px] sm:h-[200px] md:h-[260px] overflow-hidden m-1.5 md:m-2 rounded-[5px] md:rounded-[5px] bg-blue-100/50 flex items-center justify-center">
                       <Image
-                        src={card.banner || card.icon || card.image || card.img || "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600"}
-                        alt=""
-                        aria-hidden="true"
+                        src={imageUrl}
+                        alt={card.name || card.title || "Service"}
                         width={315}
                         height={300}
                         className="w-full h-full object-cover"

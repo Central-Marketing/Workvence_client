@@ -39,16 +39,18 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
   // Fetch categories from backend API
   const { categoryList: rawCats } = useAdminCategories();
 
-  const categoryList = rawCats.map((cat: any) => {
-    if (typeof cat === 'string') {
-      const slug = cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-      return { name: cat, slug };
-    }
-    return {
-      name: cat.name || cat.title || String(cat),
-      slug: cat.slug || (cat.name || cat.title || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-    };
-  });
+  const categoryList = rawCats
+    .filter((cat: any) => typeof cat === 'string' || !cat.parentId)
+    .map((cat: any) => {
+      if (typeof cat === 'string') {
+        const slug = cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        return { name: cat, slug };
+      }
+      return {
+        name: cat.name || cat.title || String(cat),
+        slug: cat.slug || (cat.name || cat.title || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+      };
+    });
 
   const checkScrollButtons = () => {
     if (categoryScrollRef.current) {

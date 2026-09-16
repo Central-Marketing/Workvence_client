@@ -64,14 +64,16 @@ const ExploreCategories = () => {
   const { categoryList: rawList } = useAdminCategories();
 
   const regularCats = rawList.filter((c: any) =>
+    !c.parentId &&
     c.slug !== 'other-and-general' &&
     c.slug !== 'other' &&
     !(c.name || c.title || '').toLowerCase().includes('other')
   );
   const otherCats = rawList.filter((c: any) =>
-    c.slug === 'other-and-general' ||
+    !c.parentId &&
+    (c.slug === 'other-and-general' ||
     c.slug === 'other' ||
-    (c.name || c.title || '').toLowerCase().includes('other')
+    (c.name || c.title || '').toLowerCase().includes('other'))
   );
 
   const categoryList = [...regularCats, ...otherCats];

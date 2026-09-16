@@ -8,6 +8,8 @@ interface CategoryHeroBannerProps {
   categoryName: string;
   subtitle?: string;
   bannerImage?: string;
+  onExploreGigs?: () => void;
+  gigCount?: number;
 }
 
 const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
@@ -53,6 +55,7 @@ const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   strokeLinecap="round"

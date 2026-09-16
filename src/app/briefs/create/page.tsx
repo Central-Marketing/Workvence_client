@@ -5,11 +5,19 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import {
+  FiHome,
+  FiArrowRight,
+  FiDollarSign,
+  FiCalendar,
+  FiCheckCircle,
+  FiFolder,
+} from "react-icons/fi";
 
 import { axiosFetch } from "@/utils";
 import useAdminCategories from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "@/components";
+
 
 const CATEGORIES = [
   "AI",
@@ -27,8 +35,6 @@ const CreateBrief = () => {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
 
-  const [step, setStep] = useState(1);
-  const [rawInput, setRawInput] = useState("");
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -37,282 +43,300 @@ const CreateBrief = () => {
     deliveryTime: "",
   });
 
+  const [isPublished, setIsPublished] = useState(false);
+
   const { categoryList } = useAdminCategories();
 
-  const rawFormatted = categoryList.length > 0
-    ? categoryList.map((cat: any) => typeof cat === 'string' ? { name: cat, slug: cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') } : { name: cat.name || cat.title || String(cat), slug: cat.slug || (cat.name || cat.title || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') })
-    : CATEGORIES.map((c) => ({ name: c, slug: c.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') }));
+  const rawFormatted =
+    categoryList.length > 0
+      ? categoryList.map((cat: any) =>
+          typeof cat === "string"
+            ? {
+                name: cat,
+                slug: cat
+                  .toLowerCase()
+                  .trim()
+                  .replace(/&/g, "and")
+                  .replace(/\s+/g, "-")
+                  .replace(/[^a-z0-9-]/g, ""),
+              }
+            : {
+                name: cat.name || cat.title || String(cat),
+                slug:
+                  cat.slug ||
+                  (cat.name || cat.title || "")
+                    .toLowerCase()
+                    .trim()
+                    .replace(/&/g, "and")
+                    .replace(/\s+/g, "-")
+                    .replace(/[^a-z0-9-]/g, ""),
+              }
+        )
+      : CATEGORIES.map((c) => ({
+          name: c,
+          slug: c
+            .toLowerCase()
+            .trim()
+            .replace(/&/g, "and")
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, ""),
+        }));
 
   const categories = [
-    ...rawFormatted.filter((c: any) => c.slug !== 'other-and-general' && c.slug !== 'other' && !c.name.toLowerCase().includes('other')),
-    ...rawFormatted.filter((c: any) => c.slug === 'other-and-general' || c.slug === 'other' || c.name.toLowerCase().includes('other'))
+    ...rawFormatted.filter(
+      (c: any) =>
+        c.slug !== "other-and-general" &&
+        c.slug !== "other" &&
+        !c.name.toLowerCase().includes("other")
+    ),
+    ...rawFormatted.filter(
+      (c: any) =>
+        c.slug === "other-and-general" ||
+        c.slug === "other" ||
+        c.name.toLowerCase().includes("other")
+    ),
   ];
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // AI Generate mutation
-  const aiGenerate = useMutation({
-    mutationFn: (prompt: string) =>
-      axiosFetch
-        .post("/briefs/ai-generate", { prompt })
-        .then(({ data }) => data),
-    onSuccess: (data: any) => {
-      const draft = data?.draft || data;
-      setForm({
-        title: draft?.title || "",
-        description: draft?.description || "",
-        category: draft?.category || "",
-        budget: draft?.budget || "",
-        deliveryTime: draft?.deliveryTime || "",
-      });
-      setStep(2);
-      toast.success("AI draft generated!");
-    },
-    onError: () => {
-      toast.error("Failed to generate draft. Try again.");
-    },
-  });
 
   // Post brief mutation
   const postBrief = useMutation({
     mutationFn: (briefData: any) =>
       axiosFetch.post("/briefs", briefData).then(({ data }) => data),
     onSuccess: () => {
-      setStep(3);
-      toast.success("Project posted successfully!");
+      setIsPublished(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      toast.success("Project published successfully!");
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message || "Failed to post project");
     },
   });
 
-  const handleAIGenerate = () => {
-    if (!rawInput.trim()) {
-      toast.error("Please describe your project requirements");
+
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!user) {
+      toast.error("Please login to post a project");
+      router.push(`/login?redirect=${encodeURIComponent("/briefs/create")}`);
       return;
     }
-    aiGenerate.mutate(rawInput);
-  };
 
-  const handleSkipAI = () => {
-    setStep(2);
-  };
-
-  const handleSubmit = () => {
-    if (!form.title.trim() || !form.description.trim()) {
-      toast.error("Title and description are required");
+    if (!form.title.trim()) {
+      toast.error("Please provide a project title");
       return;
     }
-    postBrief.mutate({
-      title: form.title,
-      description: form.description,
-      category: form.category || undefined,
-      budget: form.budget ? Number(form.budget) : undefined,
-      deliveryTime: form.deliveryTime ? Number(form.deliveryTime) : undefined,
-    });
+
+    if (!form.description.trim()) {
+      toast.error("Please provide a project description");
+      return;
+    }
+
+    const payload: Record<string, any> = {
+      title: form.title.trim(),
+      description: form.description.trim(),
+    };
+
+    if (form.category) payload.category = form.category;
+    if (form.budget && !isNaN(Number(form.budget))) {
+      payload.budget = Number(form.budget);
+    }
+    if (form.deliveryTime && !isNaN(Number(form.deliveryTime))) {
+      payload.deliveryTime = Number(form.deliveryTime);
+    }
+
+    postBrief.mutate(payload);
   };
 
   const updateField = (field: string, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Success State
+  if (isPublished) {
+    return (
+      <div className="min-h-[85vh] bg-[#FAFAFA] flex items-center justify-center px-4 py-16">
+        <div className="bg-white border border-slate-200/80 rounded-3xl shadow-sm p-8 sm:p-12 max-w-lg w-full text-center flex flex-col items-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#D8F5ED] text-[#0D6B5D] border border-[#BCE8DE] flex items-center justify-center text-3xl mb-5 shadow-2xs">
+            <FiCheckCircle />
+          </div>
+          <h1 className="text-2xl sm:text-[26px] font-bold text-slate-900 mb-2.5 font-sf-pro">
+            Project Published Successfully!
+          </h1>
+          <p className="text-slate-500 text-xs sm:text-sm leading-relaxed mb-8 max-w-sm">
+            Your project brief is now live. Freelancers can review your requirements
+            and submit proposals immediately.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
+            <Link
+              href="/briefs/my-briefs"
+              className="py-3 px-6 rounded-xl font-semibold text-xs sm:text-sm bg-black hover:bg-slate-800 text-white transition-all shadow-xs text-center"
+            >
+              View My Projects
+            </Link>
+            <Link
+              href="/briefs"
+              className="py-3 px-6 rounded-xl font-semibold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors text-center"
+            >
+              Browse All Projects
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex justify-center bg-slate-50 py-10 min-h-[80vh] px-4">
-      <div className="w-full max-w-[780px] flex flex-col gap-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl sm:text-[26px] font-bold text-slate-900 mb-1.5">Post a Job Project</h1>
-          <p className="text-slate-500 text-sm sm:text-[15px]">Describe what you need — AI can help structure it for you</p>
+    <div className="min-h-screen bg-[#FAFAFA] text-slate-800 pb-20 pt-6 sm:pt-8 font-sans">
+      <div className="container mx-auto px-4 max-w-4xl">
+        {/* Top Breadcrumb */}
+        <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-6 select-none">
+          <Link
+            href="/"
+            className="text-[#327C73] hover:text-[#256059] transition-colors flex items-center gap-1"
+          >
+            <FiHome className="text-sm text-[#327C73]" />
+          </Link>
+          <span className="text-slate-300">/</span>
+          <Link href="/briefs" className="hover:text-slate-800 transition-colors">
+            Briefs
+          </Link>
+          <span className="text-slate-300">/</span>
+          <span className="text-slate-700 font-normal">Post a Job</span>
         </div>
 
-        {/* Progress */}
-        <div className="flex items-center bg-white rounded-xl p-4 sm:px-6 border border-slate-200 shadow-xs">
-          <div className="flex items-center gap-2.5 flex-1 relative">
-            <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-all ${step >= 1 ? "bg-emerald-500 text-white border-2 border-emerald-500" : "bg-slate-100 text-slate-400 border-2 border-slate-200"}`}>
-              1
-            </span>
-            <span className={`hidden sm:inline text-sm font-semibold whitespace-nowrap ${step >= 1 ? "text-slate-900" : "text-slate-400"}`}>
-              Describe
-            </span>
-          </div>
-          <div className={`flex-1 sm:flex-[0_0_40px] h-0.5 mx-2 rounded-sm transition-colors ${step > 1 ? "bg-emerald-500" : "bg-slate-200"}`} />
-          <div className="flex items-center gap-2.5 flex-1 relative">
-            <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-all ${step >= 2 ? "bg-emerald-500 text-white border-2 border-emerald-500" : "bg-slate-100 text-slate-400 border-2 border-slate-200"}`}>
-              2
-            </span>
-            <span className={`hidden sm:inline text-sm font-semibold whitespace-nowrap ${step >= 2 ? "text-slate-900" : "text-slate-400"}`}>
-              Review & Edit
-            </span>
-          </div>
-          <div className={`flex-1 sm:flex-[0_0_40px] h-0.5 mx-2 rounded-sm transition-colors ${step > 2 ? "bg-emerald-500" : "bg-slate-200"}`} />
-          <div className="flex items-center gap-2.5 flex-1 relative">
-            <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-all ${step >= 3 ? "bg-emerald-500 text-white border-2 border-emerald-500" : "bg-slate-100 text-slate-400 border-2 border-slate-200"}`}>
-              3
-            </span>
-            <span className={`hidden sm:inline text-sm font-semibold whitespace-nowrap ${step >= 3 ? "text-slate-900" : "text-slate-400"}`}>
-              Published
-            </span>
-          </div>
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-slate-900 tracking-tight font-sf-pro leading-tight mb-2">
+            Post a Job Project
+          </h1>
+          <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-normal max-w-xl">
+            Describe your project specifications to receive competitive proposals from
+            vetted freelance professionals.
+          </p>
         </div>
 
-        {/* Step 1: Describe */}
-        {step === 1 && !aiGenerate.isPending && (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 sm:p-8 flex flex-col gap-6">
-            <div>
-              <h2 className="text-xl font-bold text-slate-900 mb-1">What do you need done?</h2>
-              <p className="text-sm text-slate-500 mb-5">
-                Describe your project in plain language. Be as specific as
-                possible — include goals, features, timeline, and budget if you
-                have them in mind.
-              </p>
-            </div>
-            <textarea
-              placeholder="e.g. I need a mobile app for my restaurant that lets customers browse the menu, place orders, and pay online. Budget is around $2,000 and I need it within 3 weeks..."
-              value={rawInput}
-              onChange={(e) => setRawInput(e.target.value)}
-              className="w-full min-h-[180px] p-4 border border-slate-200 rounded-xl text-[15px] leading-relaxed text-slate-800 resize-y outline-none transition-all placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 font-inherit"
+        {/* Main Unified Form Card */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-6 sm:p-10 shadow-2xs space-y-6 sm:space-y-8"
+        >
+          {/* Section 1: Project Title */}
+          <div>
+            <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2">
+              Project Title <span className="text-emerald-600">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Build a responsive SaaS web application for client invoicing"
+              value={form.title}
+              onChange={(e) => updateField("title", e.target.value)}
+              required
+              className="w-full px-4 py-3 sm:py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
             />
-            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-2">
-              <button type="button" className="py-3 px-6 rounded-lg font-semibold text-sm bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition-all cursor-pointer text-center" onClick={handleSkipAI}>
-                Skip AI — Write manually
-              </button>
-              <button
-                type="button"
-                className="py-3 px-6 rounded-lg font-semibold text-sm bg-gradient-to-r from-indigo-500 to-violet-600 hover:brightness-95 text-white border-none transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={handleAIGenerate}
-                disabled={!rawInput.trim()}
-              >
-                ✨ Generate with AI
-              </button>
-            </div>
           </div>
-        )}
 
-        {/* AI Loading */}
-        {step === 1 && aiGenerate.isPending && (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-10 sm:p-14 flex flex-col items-center justify-center gap-4 text-center">
-            <div className="text-4xl animate-pulse">✨</div>
-            <h3 className="text-lg font-bold text-slate-900">Workvence AI is crafting your project...</h3>
-            <p className="text-sm text-slate-500">This usually takes a few seconds</p>
-            <div className="flex gap-1.5 mt-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" />
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.16s]" />
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce [animation-delay:0.32s]" />
-            </div>
+          {/* Section 2: Category Selection */}
+          <div>
+            <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2">
+              Category <span className="text-slate-400 font-normal text-xs">(Optional)</span>
+            </label>
+            <select
+              value={form.category}
+              onChange={(e) => updateField("category", e.target.value)}
+              className="w-full px-4 py-3 sm:py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10 cursor-pointer"
+            >
+              <option value="">Select a category</option>
+              {categories.map((c: any) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
           </div>
-        )}
 
-        {/* Step 2: Review & Edit */}
-        {step === 2 && (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 sm:p-8 flex flex-col gap-6">
+          {/* Section 3: Description */}
+          <div className="space-y-2">
+            <label className="block text-xs sm:text-sm font-bold text-slate-900">
+              Project Description <span className="text-emerald-600">*</span>
+            </label>
+
+            <textarea
+              placeholder="Describe your project goals, required deliverables, preferences, and any technical specifications..."
+              value={form.description}
+              onChange={(e) => updateField("description", e.target.value)}
+              required
+              rows={6}
+              className="w-full p-4 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm leading-relaxed outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10 resize-y"
+            />
+          </div>
+
+          {/* Section 4: Budget & Delivery Time (2-Column Grid) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <h2 className="text-xl font-bold text-slate-900 mb-1">Review & Edit Your Project</h2>
-              <p className="text-sm text-slate-500 mb-5">
-                Fine-tune the details below before publishing
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-1.5 mb-2">
-              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Title</label>
-              <input
-                type="text"
-                placeholder="Give your project a clear title"
-                value={form.title}
-                onChange={(e) => updateField("title", e.target.value)}
-                className="w-full p-3 px-3.5 border border-slate-200 rounded-lg text-sm text-slate-800 bg-slate-50/50 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5 mb-2">
-              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Description</label>
-              <textarea
-                placeholder="Detailed description of the project..."
-                value={form.description}
-                onChange={(e) => updateField("description", e.target.value)}
-                className="w-full min-h-[120px] p-3 px-3.5 border border-slate-200 rounded-lg text-sm text-slate-800 bg-slate-50/50 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 resize-y leading-relaxed"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Category</label>
-                <select
-                  value={form.category}
-                  onChange={(e) => updateField("category", e.target.value)}
-                  className="w-full p-3 px-3.5 border border-slate-200 rounded-lg text-sm text-slate-800 bg-slate-50/50 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
-                >
-                  <option value="">Select a category</option>
-                  {categories.map((c: any) => (
-                    <option key={c.slug} value={c.slug}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Budget (USD)</label>
+              <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2">
+                Budget (USD) <span className="text-slate-400 font-normal text-xs">(Optional)</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm">
+                  <FiDollarSign />
+                </span>
                 <input
                   type="number"
-                  placeholder="e.g. 500"
+                  min="5"
+                  placeholder="e.g. 1500"
                   value={form.budget}
                   onChange={(e) => updateField("budget", e.target.value)}
-                  className="w-full p-3 px-3.5 border border-slate-200 rounded-lg text-sm text-slate-800 bg-slate-50/50 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
+                  className="w-full pl-9 pr-4 py-3 sm:py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Delivery Time (Days)</label>
+            <div>
+              <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2">
+                Estimated Timeline (Days) <span className="text-slate-400 font-normal text-xs">(Optional)</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm">
+                  <FiCalendar />
+                </span>
                 <input
                   type="number"
-                  placeholder="e.g. 7"
+                  min="1"
+                  placeholder="e.g. 14"
                   value={form.deliveryTime}
                   onChange={(e) => updateField("deliveryTime", e.target.value)}
-                  className="w-full p-3 px-3.5 border border-slate-200 rounded-lg text-sm text-slate-800 bg-slate-50/50 outline-none transition-all focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
+                  className="w-full pl-9 pr-4 py-3 sm:py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
                 />
               </div>
-              <div />
-            </div>
-
-            <div className="flex justify-between items-center gap-4 mt-2">
-              <button type="button" className="py-3 px-6 rounded-lg font-semibold text-sm bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition-all cursor-pointer" onClick={() => setStep(1)}>
-                ← Back
-              </button>
-              <button
-                type="button"
-                className="py-3 px-7 rounded-lg font-semibold text-sm bg-emerald-500 hover:bg-emerald-600 text-white transition-all cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={handleSubmit}
-                disabled={postBrief.isPending}
-              >
-                {postBrief.isPending ? "Publishing..." : "Publish Project"}
-              </button>
             </div>
           </div>
-        )}
 
-        {/* Step 3: Success */}
-        {step === 3 && (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-8 sm:p-12 text-center flex flex-col items-center">
-            <div className="text-5xl mb-4 animate-in zoom-in duration-300">🎉</div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Project Published Successfully!</h2>
-            <p className="text-slate-500 text-sm sm:text-base mb-6 max-w-md">
-              Your project is now live. Sellers can start submitting proposals
-              right away.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center w-full sm:w-auto">
-              <Link href="/briefs/my-briefs" className="py-3 px-6 rounded-lg font-semibold text-sm bg-emerald-500 hover:bg-emerald-600 text-white transition-all text-center shadow-xs">
-                View My Projects
-              </Link>
-              <Link href="/briefs" className="py-3 px-6 rounded-lg font-semibold text-sm bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition-all text-center">
-                Browse All Projects
-              </Link>
-            </div>
+
+          {/* Form Actions */}
+          <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-100">
+            <Link
+              href="/briefs"
+              className="py-3 px-6 rounded-xl font-semibold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer text-center"
+            >
+              Cancel
+            </Link>
+
+            <button
+              type="submit"
+              disabled={postBrief.isPending}
+              className="py-3.5 px-8 rounded-xl font-semibold text-xs sm:text-sm bg-black hover:bg-slate-800 text-white transition-all shadow-xs cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              <span>{postBrief.isPending ? "Publishing Project..." : "Publish Project"}</span>
+              {!postBrief.isPending && <FiArrowRight className="text-xs" />}
+            </button>
           </div>
-        )}
+        </form>
       </div>
     </div>
   );

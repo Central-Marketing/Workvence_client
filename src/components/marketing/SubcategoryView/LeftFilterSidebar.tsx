@@ -12,19 +12,16 @@ export interface LeftFilterSidebarProps {
   selectedCategory: string;
   onCategoryChange: (cat: string) => void;
 
-  experience: { entry: boolean; mid: boolean; senior: boolean };
-  onExperienceToggle: (level: "entry" | "mid" | "senior") => void;
+  sellerLevels: { [key: string]: boolean };
+  onSellerLevelToggle: (levelKey: string) => void;
+
+  deliveryDays: string;
+  onDeliveryDaysChange: (days: string) => void;
 
   minPrice: string;
   maxPrice: string;
   onMinPriceChange: (val: string) => void;
   onMaxPriceChange: (val: string) => void;
-
-  englishLevel: string;
-  onEnglishLevelChange: (val: string) => void;
-
-  clientLocation: string;
-  onClientLocationChange: (val: string) => void;
 
   onReset: () => void;
   className?: string;
@@ -37,16 +34,14 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
   categories = [],
   selectedCategory,
   onCategoryChange,
-  experience,
-  onExperienceToggle,
+  sellerLevels,
+  onSellerLevelToggle,
+  deliveryDays,
+  onDeliveryDaysChange,
   minPrice,
   maxPrice,
   onMinPriceChange,
   onMaxPriceChange,
-  englishLevel,
-  onEnglishLevelChange,
-  clientLocation,
-  onClientLocationChange,
   onReset,
   className = "",
 }) => {
@@ -114,7 +109,7 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
             onChange={(e) => onCategoryChange(e.target.value)}
             className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 pr-9 text-[13px] text-gray-700 font-medium focus:outline-none focus:border-gray-900 cursor-pointer transition-colors"
           >
-            <option value="">Seller Category</option>
+            <option value="">Select Category</option>
             {categories.map((cat) => (
               <option key={cat.slug} value={cat.slug}>
                 {cat.name}
@@ -125,16 +120,17 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
         </div>
       </div>
 
-      {/* 4. Experience Level Checkboxes */}
+      {/* 4. Seller Level Checkboxes */}
       <div>
-        <label className="block text-xs font-bold text-gray-900 mb-2.5">Experience Level</label>
+        <label className="block text-xs font-bold text-gray-900 mb-2.5">Seller Level</label>
         <div className="space-y-2.5">
           {[
-            { key: "entry", label: "Entry Level" },
-            { key: "mid", label: "Mid Level" },
-            { key: "senior", label: "Senior Level" },
+            { key: "top_rated", label: "Top Rated" },
+            { key: "level_two", label: "Level 2" },
+            { key: "level_one", label: "Level 1" },
+            { key: "new_seller", label: "New Seller" },
           ].map(({ key, label }) => {
-            const isChecked = experience[key as keyof typeof experience];
+            const isChecked = Boolean(sellerLevels[key]);
             return (
               <label
                 key={key}
@@ -143,7 +139,7 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
                 <input
                   type="checkbox"
                   checked={isChecked}
-                  onChange={() => onExperienceToggle(key as "entry" | "mid" | "senior")}
+                  onChange={() => onSellerLevelToggle(key)}
                   className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black accent-black cursor-pointer"
                 />
                 <span>{label}</span>
@@ -153,7 +149,35 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
         </div>
       </div>
 
-      {/* 5. Filter by Fixed Price (Dual Slider & Inputs) */}
+      {/* 5. Delivery Time Radio Buttons */}
+      <div>
+        <label className="block text-xs font-bold text-gray-900 mb-2.5">Delivery Time</label>
+        <div className="space-y-2">
+          {[
+            { value: "", label: "Any Time" },
+            { value: "1", label: "24 Hours (Express)" },
+            { value: "3", label: "Up to 3 Days" },
+            { value: "7", label: "Up to 7 Days" },
+          ].map(({ value, label }) => (
+            <label
+              key={value}
+              className="flex items-center gap-2.5 text-[13px] font-medium text-gray-700 hover:text-gray-900 cursor-pointer select-none"
+            >
+              <input
+                type="radio"
+                name="deliveryTime"
+                value={value}
+                checked={deliveryDays === value}
+                onChange={() => onDeliveryDaysChange(value)}
+                className="w-4 h-4 text-black focus:ring-black accent-black cursor-pointer"
+              />
+              <span>{label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* 6. Filter by Fixed Price (Dual Slider & Inputs) */}
       <div className="w-full">
         <label className="block text-sm font-bold text-[#2D3139] mb-1">Filter by Fixed Price</label>
 
@@ -165,7 +189,6 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
             style={{ left: `${clampMinPercent}%` }}
           >
             <span>${currentMin}</span>
-            {/* Downward triangle arrow */}
             <div className="absolute -bottom-[5px] left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45 border-r border-b border-[#E5E7EB]" />
           </div>
 
@@ -175,18 +198,15 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
             style={{ left: `${clampMaxPercent}%` }}
           >
             <span>${currentMax}</span>
-            {/* Downward triangle arrow */}
             <div className="absolute -bottom-[5px] left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45 border-r border-b border-[#E5E7EB]" />
           </div>
 
           {/* Visual Track */}
           <div className="h-[3.5px] bg-[#E5E7EB] rounded-full relative w-full my-2">
-            {/* Active connecting black bar */}
             <div
               className="absolute h-full bg-[#18181B] rounded-full"
               style={{ left: `${minPercent}%`, width: `${Math.max(0, maxPercent - minPercent)}%` }}
             />
-            {/* Visual Thumbs */}
             <div
               className="w-5 h-5 rounded-full bg-white border-[2.5px] border-[#18181B] shadow-[0_1px_3px_rgba(0,0,0,0.15)] absolute top-1/2 -translate-y-1/2 -translate-x-1/2 pointer-events-none z-10"
               style={{ left: `${minPercent}%` }}
@@ -245,47 +265,6 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
             />
             <span className="text-[11px] font-medium text-gray-400 ml-1">Max</span>
           </div>
-        </div>
-      </div>
-
-      {/* 6. English Level Dropdown */}
-      <div>
-        <label className="block text-xs font-bold text-gray-900 mb-1.5">English Level</label>
-        <div className="relative">
-          <select
-            value={englishLevel}
-            onChange={(e) => onEnglishLevelChange(e.target.value)}
-            className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 pr-9 text-[13px] text-gray-700 font-medium focus:outline-none focus:border-gray-900 cursor-pointer transition-colors"
-          >
-            <option value="">Select english level</option>
-            <option value="basic">Basic Level</option>
-            <option value="conversational">Conversational Level</option>
-            <option value="fluent">Fluent Level</option>
-            <option value="native">Native / Bilingual</option>
-          </select>
-          <FiChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-        </div>
-      </div>
-
-      {/* 7. Client Location Dropdown */}
-      <div>
-        <label className="block text-xs font-bold text-gray-900 mb-1.5">Client Location</label>
-        <div className="relative">
-          <select
-            value={clientLocation}
-            onChange={(e) => onClientLocationChange(e.target.value)}
-            className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 pr-9 text-[13px] text-gray-700 font-medium focus:outline-none focus:border-gray-900 cursor-pointer transition-colors"
-          >
-            <option value="">Select client location</option>
-            <option value="United States">United States</option>
-            <option value="United Kingdom">United Kingdom</option>
-            <option value="Canada">Canada</option>
-            <option value="Australia">Australia</option>
-            <option value="Germany">Germany</option>
-            <option value="Bangladesh">Bangladesh</option>
-            <option value="Worldwide">Worldwide</option>
-          </select>
-          <FiChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
       </div>
     </aside>

@@ -46,8 +46,9 @@ const Packages = () => {
   const initialCat = initialLegacyTag || initialLegacySubcat || initialParams.get('category') || initialParams.get('cat') || 'All services';
   const initialMin = initialParams.get('min') || '';
   const initialMax = initialParams.get('max') || '';
+  const initialDeliveryDays = initialParams.get('deliveryDays') || '';
 
-  const initialSort = initialParams.get('sort') || 'createdAt';
+  const initialSort = initialParams.get('sort') || 'newest';
   const initialPage = parseInt(initialParams.get('page') || '1', 10);
 
   const [sortBy, setSortBy] = useState(initialSort);
@@ -57,16 +58,24 @@ const Packages = () => {
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
   const [page, setPage] = useState(initialPage);
   const [viewTab, setViewTab] = useState<'hub' | 'gigs'>(
-    (initialSearch || initialMin || initialMax || initialLegacySubcat || initialLegacyTag) ? 'gigs' : 'hub'
+    (initialSearch || initialMin || initialMax || initialDeliveryDays || initialLegacySubcat || initialLegacyTag) ? 'gigs' : 'hub'
   );
 
   // Additional sidebar & tag filter states
   const [filterCategory, setFilterCategory] = useState(initialCat !== 'All services' && initialCat !== 'Results' ? initialCat : '');
-  const [experience, setExperience] = useState({ entry: false, intermediate: false, expert: false });
   const [minPrice, setMinPrice] = useState(initialMin);
   const [maxPrice, setMaxPrice] = useState(initialMax);
-  const [englishLevel, setEnglishLevel] = useState('');
-  const [clientLocation, setClientLocation] = useState('');
+  const [deliveryDays, setDeliveryDays] = useState(initialDeliveryDays);
+  const [sellerLevels, setSellerLevels] = useState<{ [key: string]: boolean }>({
+    top_rated: false,
+    level_two: false,
+    level_one: false,
+    new_seller: false,
+  });
+
+  const toggleSellerLevel = (key: string) => {
+    setSellerLevels((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const categoryScrollRef = useRef<HTMLDivElement>(null);
 
@@ -195,7 +204,8 @@ const Packages = () => {
       if (params.get('search')) cleanParams.set('search', params.get('search')!);
       if (params.get('min')) cleanParams.set('min', params.get('min')!);
       if (params.get('max')) cleanParams.set('max', params.get('max')!);
-      if (params.get('sort') && params.get('sort') !== 'createdAt') cleanParams.set('sort', params.get('sort')!);
+      if (params.get('deliveryDays')) cleanParams.set('deliveryDays', params.get('deliveryDays')!);
+      if (params.get('sort') && params.get('sort') !== 'newest') cleanParams.set('sort', params.get('sort')!);
       if (params.get('page') && params.get('page') !== '1') cleanParams.set('page', params.get('page')!);
       navigate.replace(`/packages?${cleanParams.toString()}`, { scroll: false });
       return;
@@ -209,7 +219,7 @@ const Packages = () => {
       const ancestry = getCategoryAncestry(cat);
       const isRoot = ancestry.length <= 1;
 
-      if (params.get('search') || params.get('min') || params.get('max') || params.get('view') === 'gigs' || !isRoot) {
+      if (params.get('search') || params.get('min') || params.get('max') || params.get('deliveryDays') || params.get('view') === 'gigs' || !isRoot) {
         setViewTab('gigs');
       } else {
         setViewTab('hub');
@@ -222,7 +232,8 @@ const Packages = () => {
     setSearchVal(params.get('search') || '');
     setMinPrice(params.get('min') || '');
     setMaxPrice(params.get('max') || '');
-    setSortBy(params.get('sort') || 'createdAt');
+    setDeliveryDays(params.get('deliveryDays') || '');
+    setSortBy(params.get('sort') || 'newest');
     setPage(parseInt(params.get('page') || '1', 10));
   }, [search, categories, categoryList]);
 
@@ -235,11 +246,10 @@ const Packages = () => {
       filterCategory,
       minPrice,
       maxPrice,
+      deliveryDays,
       sortBy,
       page,
-      JSON.stringify(experience),
-      englishLevel,
-      clientLocation
+      JSON.stringify(sellerLevels),
     ],
     queryFn: async () => {
       const queryParams = new URLSearchParams();
@@ -251,13 +261,17 @@ const Packages = () => {
       const selectedCat = filterCategory || (activeCategory !== 'All services' ? activeCategory : '');
       if (selectedCat && selectedCat !== 'All services' && selectedCat !== 'Results') {
         const matched = findCategoryInList(selectedCat);
+        if (matched?.id || matched?._id) {
+          queryParams.set('categoryId', matched.id || matched._id);
+        }
         // Direct category name sent to backend (e.g. "Automation" or "N8N")
         queryParams.set('category', matched?.name || selectedCat);
       }
 
       if (minPrice) queryParams.set('min', minPrice);
       if (maxPrice) queryParams.set('max', maxPrice);
-      queryParams.set('sort', sortBy || 'createdAt');
+      if (deliveryDays) queryParams.set('deliveryDays', deliveryDays);
+      queryParams.set('sort', sortBy || 'newest');
       queryParams.set('limit', '20');
       queryParams.set('page', page.toString());
 
@@ -312,11 +326,25 @@ const Packages = () => {
   }, [currentTaxonomy, searchVal]);
 
   const displayPackages = useMemo(() => {
-    if (packagesList && packagesList.length > 0) {
-      return packagesList;
+    if (!packagesList || packagesList.length === 0) return [];
+
+    const activeLevels = Object.entries(sellerLevels).filter(([_, v]) => v).map(([k]) => {
+      if (k === 'top_rated') return 'top';
+      if (k === 'level_two') return '2';
+      if (k === 'level_one') return '1';
+      return 'new';
+    });
+
+    if (activeLevels.length > 0) {
+      const filtered = packagesList.filter((pkg: any) => {
+        const userLevel = (pkg.user?.sellerLevel || pkg.sellerLevel || pkg.user?.level || pkg.level || '').toLowerCase();
+        return activeLevels.some((al) => userLevel.includes(al));
+      });
+      return filtered;
     }
-    return [];
-  }, [packagesList]);
+
+    return packagesList;
+  }, [packagesList, sellerLevels]);
 
   // Determine subcategory node and active tag from category ancestry:
   // Root: categoryAncestry[0]
@@ -377,6 +405,7 @@ const Packages = () => {
     const rawCat = overrides.category !== undefined ? overrides.category : (filterCategory || (activeCategory !== 'All services' ? activeCategory : ''));
     const currentMin = overrides.minPrice !== undefined ? overrides.minPrice : minPrice;
     const currentMax = overrides.maxPrice !== undefined ? overrides.maxPrice : maxPrice;
+    const currentDelivery = overrides.deliveryDays !== undefined ? overrides.deliveryDays : deliveryDays;
     const currentSort = overrides.sortBy !== undefined ? overrides.sortBy : sortBy;
     const currentPage = overrides.page !== undefined ? overrides.page : (overrides.resetPage ? 1 : page);
 
@@ -386,7 +415,8 @@ const Packages = () => {
     }
     if (currentMin) params.set('min', currentMin);
     if (currentMax) params.set('max', currentMax);
-    if (currentSort && currentSort !== 'createdAt') params.set('sort', currentSort);
+    if (currentDelivery) params.set('deliveryDays', currentDelivery);
+    if (currentSort && currentSort !== 'newest') params.set('sort', currentSort);
     if (currentPage > 1) params.set('page', currentPage.toString());
 
     navigate.push(`/packages?${params.toString()}`, { scroll: false });
@@ -448,15 +478,11 @@ const Packages = () => {
     setSearchVal('');
     setFilterCategory('');
     setActiveCategory('All services');
-    setExperience({ entry: false, intermediate: false, expert: false });
-    setEnglishLevel('');
-    setClientLocation('');
+    setDeliveryDays('');
+    setSortBy('newest');
+    setSellerLevels({ top_rated: false, level_two: false, level_one: false, new_seller: false });
     setShowFilterDrawer(false);
     navigate.push('/packages', { scroll: false });
-  };
-
-  const toggleExperience = (key: string) => {
-    setExperience((prev: any) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const hasActiveFilters = Boolean(
@@ -465,11 +491,11 @@ const Packages = () => {
     filterCategory ||
     minPrice ||
     maxPrice ||
-    experience.entry ||
-    experience.intermediate ||
-    experience.expert ||
-    englishLevel ||
-    clientLocation
+    deliveryDays ||
+    sellerLevels.top_rated ||
+    sellerLevels.level_two ||
+    sellerLevels.level_one ||
+    sellerLevels.new_seller
   );
 
   return (
@@ -558,20 +584,21 @@ const Packages = () => {
                 </select>
               </div>
 
-              {/* 3. Experience Level */}
+              {/* 3. Seller Level */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-3">Experience level</label>
+                <label className="block text-sm font-semibold text-gray-900 mb-3">Seller Level</label>
                 <div className="space-y-3">
                   {[
-                    { key: 'entry', label: 'Entry Level' },
-                    { key: 'intermediate', label: 'Intermediate' },
-                    { key: 'expert', label: 'Expert' }
+                    { key: 'top_rated', label: 'Top Rated' },
+                    { key: 'level_two', label: 'Level 2' },
+                    { key: 'level_one', label: 'Level 1' },
+                    { key: 'new_seller', label: 'New Seller' },
                   ].map(({ key, label }) => (
                     <label key={key} className="flex items-center gap-3 cursor-pointer select-none text-sm text-gray-700 hover:text-gray-900">
                       <input
                         type="checkbox"
-                        checked={experience[key as keyof typeof experience]}
-                        onChange={() => toggleExperience(key)}
+                        checked={Boolean(sellerLevels[key])}
+                        onChange={() => toggleSellerLevel(key)}
                         className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black cursor-pointer accent-black"
                       />
                       <span>{label}</span>
@@ -580,7 +607,32 @@ const Packages = () => {
                 </div>
               </div>
 
-              {/* 4. Filter by Fixed-Price */}
+              {/* 4. Delivery Time Radio Buttons */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-3">Delivery Time</label>
+                <div className="space-y-2.5">
+                  {[
+                    { value: '', label: 'Any Time' },
+                    { value: '1', label: '24 Hours (Express)' },
+                    { value: '3', label: 'Up to 3 Days' },
+                    { value: '7', label: 'Up to 7 Days' },
+                  ].map(({ value, label }) => (
+                    <label key={value} className="flex items-center gap-3 cursor-pointer select-none text-sm text-gray-700 hover:text-gray-900">
+                      <input
+                        type="radio"
+                        name="drawerDeliveryTime"
+                        value={value}
+                        checked={deliveryDays === value}
+                        onChange={() => setDeliveryDays(value)}
+                        className="w-4 h-4 text-black focus:ring-black cursor-pointer accent-black"
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* 5. Filter by Fixed-Price */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-4">Filter by Fixed-Price</label>
                 <div className="relative px-2 mb-6">
@@ -622,39 +674,6 @@ const Packages = () => {
                     <span className="absolute right-3 text-xs text-gray-400 select-none">max</span>
                   </div>
                 </div>
-              </div>
-
-              {/* 5. English Level */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">English Level</label>
-                <select
-                  value={englishLevel}
-                  onChange={(e) => setEnglishLevel(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
-                >
-                  <option value="">Select english level</option>
-                  <option value="basic">Basic / Conversational</option>
-                  <option value="fluent">Fluent</option>
-                  <option value="native">Native / Bilingual</option>
-                </select>
-              </div>
-
-              {/* 6. Client Location */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Client Location</label>
-                <select
-                  value={clientLocation}
-                  onChange={(e) => setClientLocation(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
-                >
-                  <option value="">Select client location</option>
-                  <option value="US">United States</option>
-                  <option value="UK">United Kingdom</option>
-                  <option value="CA">Canada</option>
-                  <option value="EU">Europe</option>
-                  <option value="Asia">Asia</option>
-                  <option value="Global">Worldwide</option>
-                </select>
               </div>
             </div>
 
@@ -757,37 +776,55 @@ const Packages = () => {
 
           {/* 2. Subcategory Filter Bar: Filter Toggle, Divider, Pills, View All */}
           {resolvedSubcategoryHeaderItem.items && resolvedSubcategoryHeaderItem.items.length > 0 && (
-            <SubcategoryFilterBar
-              items={resolvedSubcategoryHeaderItem.items}
-              activeTag={currentActiveTag}
-              isFilterOpen={showFilter}
-              onSelectTag={(tag) => {
-                handleSelectSubService(tag);
-              }}
-              onClearTag={() => {
-                if (headerSubcatNode) {
-                  handleCategoryClick(headerSubcatNode.name || headerSubcatNode.slug);
-                } else if (categoryAncestry.length > 1) {
-                  const parentNode = categoryAncestry[categoryAncestry.length - 2];
-                  handleCategoryClick(parentNode.name || parentNode.slug);
-                }
-              }}
-              onViewAll={() => {
-                if (categoryAncestry.length > 0) {
-                  handleCategoryClick(categoryAncestry[0].name || categoryAncestry[0].slug);
-                }
-              }}
-              onOpenFilter={() => setShowFilter(!showFilter)}
-            />
+            <div className="my-[30px]">
+              <SubcategoryFilterBar
+                items={resolvedSubcategoryHeaderItem.items}
+                activeTag={currentActiveTag}
+                isFilterOpen={showFilter}
+                onSelectTag={(tag) => {
+                  handleSelectSubService(tag);
+                }}
+                onClearTag={() => {
+                  if (headerSubcatNode) {
+                    handleCategoryClick(headerSubcatNode.name || headerSubcatNode.slug);
+                  } else if (categoryAncestry.length > 1) {
+                    const parentNode = categoryAncestry[categoryAncestry.length - 2];
+                    handleCategoryClick(parentNode.name || parentNode.slug);
+                  }
+                }}
+                onViewAll={() => {
+                  if (categoryAncestry.length > 0) {
+                    handleCategoryClick(categoryAncestry[0].name || categoryAncestry[0].slug);
+                  }
+                }}
+                onOpenFilter={() => setShowFilter(!showFilter)}
+              />
+            </div>
           )}
 
-          {/* 3. Results Count */}
-          <div className="mb-6">
-            <p className="text-xl font-normal font-inter text-[#4A4A4A]">
+          {/* 3. Results Count & Sort Dropdown */}
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <p className="text-[20px] font-normal font-inter text-[var(--Foundation-Grey-grey-500,#4A4A4A)] leading-[22px] not-italic">
               {displayPackages.length > 0
-                ? `${displayPackages.length} Available Services`
+                ? `${displayPackages.length} Results`
                 : (resolvedSubcategoryHeaderItem.resultCount || "1,40,000+ Results")}
             </p>
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Sort by:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  syncUrlWithFilters({ sortBy: e.target.value, resetPage: true });
+                }}
+                className="bg-white border border-gray-200 text-xs font-semibold text-gray-800 rounded-xl px-3.5 py-2 focus:outline-none focus:border-gray-900 cursor-pointer shadow-2xs"
+              >
+                <option value="newest">Newest</option>
+                <option value="rating">Best Rating</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+              </select>
+            </div>
           </div>
 
           {/* 4. Filter Sidebar (Left) + Package Cards Grid (Right) */}
@@ -809,14 +846,12 @@ const Packages = () => {
                   onCategoryChange={(cat) => {
                     handleCategoryClick(cat);
                   }}
-                  experience={{
-                    entry: experience.entry,
-                    mid: experience.intermediate,
-                    senior: experience.expert,
-                  }}
-                  onExperienceToggle={(lvl) => {
-                    const mappedKey = lvl === 'entry' ? 'entry' : lvl === 'mid' ? 'intermediate' : 'expert';
-                    toggleExperience(mappedKey);
+                  sellerLevels={sellerLevels}
+                  onSellerLevelToggle={toggleSellerLevel}
+                  deliveryDays={deliveryDays}
+                  onDeliveryDaysChange={(val) => {
+                    setDeliveryDays(val);
+                    syncUrlWithFilters({ deliveryDays: val, resetPage: true });
                   }}
                   minPrice={minPrice}
                   maxPrice={maxPrice}
@@ -827,16 +862,6 @@ const Packages = () => {
                   onMaxPriceChange={(val) => {
                     setMaxPrice(val);
                     syncUrlWithFilters({ maxPrice: val });
-                  }}
-                  englishLevel={englishLevel}
-                  onEnglishLevelChange={(val) => {
-                    setEnglishLevel(val);
-                    syncUrlWithFilters({ englishLevel: val });
-                  }}
-                  clientLocation={clientLocation}
-                  onClientLocationChange={(val) => {
-                    setClientLocation(val);
-                    syncUrlWithFilters({ clientLocation: val });
                   }}
                   onReset={handleReset}
                 />
@@ -948,109 +973,127 @@ const Packages = () => {
             </button>
           </div>
 
-          {/* Active Filter Tags & Results Count Bar */}
-          <div className="flex flex-wrap items-center gap-2.5 mb-8 pt-1">
-            <span className="text-[15px] font-bold text-gray-900 mr-2">
-              {data && Array.isArray(data) ? `${data.length} Results` : "0 Results"}
-            </span>
+          {/* Active Filter Tags & Results Count Bar & Sort */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pt-1">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="text-[15px] font-bold text-gray-900 mr-2">
+                {displayPackages.length > 0 ? `${displayPackages.length} Results` : "0 Results"}
+              </span>
 
-            {hasActiveFilters && (
-              <>
-                <div className="h-5 w-[1px] bg-gray-300 hidden sm:block mr-1"></div>
+              {hasActiveFilters && (
+                <>
+                  <div className="h-5 w-[1px] bg-gray-300 hidden sm:block mr-1"></div>
 
-                {/* Keyword Tag */}
-                {searchVal && (
-                  <button
-                    onClick={() => { setSearchVal(''); syncUrlWithFilters({ searchVal: '' }); }}
-                    className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
-                  >
-                    <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                    <span>{searchVal}</span>
-                  </button>
-                )}
+                  {/* Keyword Tag */}
+                  {searchVal && (
+                    <button
+                      onClick={() => { setSearchVal(''); syncUrlWithFilters({ searchVal: '' }); }}
+                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                    >
+                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
+                      <span>{searchVal}</span>
+                    </button>
+                  )}
 
-                {/* Active Category Tag */}
-                {(filterCategory || (activeCategory !== 'All services' && activeCategory !== 'Results')) && (
-                  <button
-                    onClick={() => { setFilterCategory(''); setActiveCategory('All services'); syncUrlWithFilters({ category: '' }); }}
-                    className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
-                  >
-                    <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                    <span>{filterCategory || activeCategory}</span>
-                  </button>
-                )}
+                  {/* Active Category Tag */}
+                  {(filterCategory || (activeCategory !== 'All services' && activeCategory !== 'Results')) && (
+                    <button
+                      onClick={() => { setFilterCategory(''); setActiveCategory('All services'); syncUrlWithFilters({ category: '' }); }}
+                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                    >
+                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
+                      <span>{filterCategory || activeCategory}</span>
+                    </button>
+                  )}
 
-                {/* Price Range Tag */}
-                {(minPrice || maxPrice) && (
-                  <button
-                    onClick={() => { setMinPrice(''); setMaxPrice(''); syncUrlWithFilters({ minPrice: '', maxPrice: '' }); }}
-                    className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
-                  >
-                    <span className="text-gray-400 font-bold group-hover:text-red-500 transition-colors">—</span>
-                    <span>${minPrice || '0'} - ${maxPrice || 'Any'}</span>
-                  </button>
-                )}
+                  {/* Price Range Tag */}
+                  {(minPrice || maxPrice) && (
+                    <button
+                      onClick={() => { setMinPrice(''); setMaxPrice(''); syncUrlWithFilters({ minPrice: '', maxPrice: '' }); }}
+                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                    >
+                      <span className="text-gray-400 font-bold group-hover:text-red-500 transition-colors">—</span>
+                      <span>${minPrice || '0'} - ${maxPrice || 'Any'}</span>
+                    </button>
+                  )}
 
-                {/* Experience Tags */}
-                {experience.entry && (
-                  <button
-                    onClick={() => { toggleExperience('entry'); }}
-                    className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
-                  >
-                    <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                    <span>Entry Level</span>
-                  </button>
-                )}
-                {experience.intermediate && (
-                  <button
-                    onClick={() => { toggleExperience('intermediate'); }}
-                    className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
-                  >
-                    <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                    <span>Intermediate</span>
-                  </button>
-                )}
-                {experience.expert && (
-                  <button
-                    onClick={() => { toggleExperience('expert'); }}
-                    className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
-                  >
-                    <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                    <span>Expert</span>
-                  </button>
-                )}
+                  {/* Delivery Days Tag */}
+                  {deliveryDays && (
+                    <button
+                      onClick={() => { setDeliveryDays(''); syncUrlWithFilters({ deliveryDays: '' }); }}
+                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                    >
+                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
+                      <span>Delivery: {deliveryDays === '1' ? '24 Hours' : `Up to ${deliveryDays} Days`}</span>
+                    </button>
+                  )}
 
-                {/* English Level Tag */}
-                {englishLevel && (
-                  <button
-                    onClick={() => { setEnglishLevel(''); }}
-                    className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
-                  >
-                    <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                    <span>{englishLevel === 'basic' ? 'Basic English' : englishLevel === 'fluent' ? 'Fluent English' : 'Native English'}</span>
-                  </button>
-                )}
+                  {/* Seller Level Tags */}
+                  {sellerLevels.top_rated && (
+                    <button
+                      onClick={() => toggleSellerLevel('top_rated')}
+                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                    >
+                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
+                      <span>Top Rated</span>
+                    </button>
+                  )}
+                  {sellerLevels.level_two && (
+                    <button
+                      onClick={() => toggleSellerLevel('level_two')}
+                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                    >
+                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
+                      <span>Level 2</span>
+                    </button>
+                  )}
+                  {sellerLevels.level_one && (
+                    <button
+                      onClick={() => toggleSellerLevel('level_one')}
+                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                    >
+                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
+                      <span>Level 1</span>
+                    </button>
+                  )}
+                  {sellerLevels.new_seller && (
+                    <button
+                      onClick={() => toggleSellerLevel('new_seller')}
+                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                    >
+                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
+                      <span>New Seller</span>
+                    </button>
+                  )}
 
-                {/* Location Tag */}
-                {clientLocation && (
+                  {/* Clear All Pill Button */}
                   <button
-                    onClick={() => { setClientLocation(''); }}
-                    className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                    onClick={handleReset}
+                    className="bg-black hover:bg-gray-800 text-white text-xs px-4 py-1.5 rounded-full flex items-center gap-1.5 font-semibold transition-colors shadow-sm ml-1"
                   >
-                    <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                    <span>{clientLocation}</span>
+                    <span>✕</span> Clear All
                   </button>
-                )}
+                </>
+              )}
+            </div>
 
-                {/* Clear All Pill Button */}
-                <button
-                  onClick={handleReset}
-                  className="bg-black hover:bg-gray-800 text-white text-xs px-4 py-1.5 rounded-full flex items-center gap-1.5 font-semibold transition-colors shadow-sm ml-1"
-                >
-                  <span>✕</span> Clear All
-                </button>
-              </>
-            )}
+            {/* Sort Dropdown */}
+            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Sort by:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  syncUrlWithFilters({ sortBy: e.target.value, resetPage: true });
+                }}
+                className="bg-white border border-gray-200 text-xs font-semibold text-gray-800 rounded-xl px-3.5 py-2 focus:outline-none focus:border-gray-900 cursor-pointer shadow-2xs"
+              >
+                <option value="newest">Newest</option>
+                <option value="rating">Best Rating</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+              </select>
+            </div>
           </div>
 
           {/* Results Grid / Loading / Error / Empty State */}

@@ -46,7 +46,7 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
   return (
     <Link
       href={packageUrl}
-      className="group flex flex-col w-full h-[450px] bg-white rounded-[10px] border border-[#DADADA] p-[10px] shadow-none hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-shadow duration-300"
+      className="group flex flex-col w-full h-full min-h-[450px] bg-white rounded-[10px] border border-[#DADADA] p-[10px] shadow-none hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-shadow duration-300"
     >
       {/* Top Image + Overlapping Avatar */}
       <div className="relative w-full h-[220px] shrink-0">
@@ -88,10 +88,10 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
         {/* Circular Avatar Overlapping Bottom Edge */}
         <div
           onClick={handleProfileClick}
-          className="absolute -bottom-4 left-3 z-10 cursor-pointer"
+          className="absolute -bottom-6 left-3 z-10 cursor-pointer"
           title={username}
         >
-          <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 hover:opacity-95 transition-opacity">
+          <div className="relative w-[48px] h-[48px] aspect-square rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 hover:opacity-95 transition-opacity">
             <Image
               src={userImg}
               alt={username}
@@ -104,12 +104,12 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
       </div>
 
       {/* Card Content Body */}
-      <div className="flex flex-col flex-1 pt-6 px-1">
+      <div className="flex flex-col flex-1 pt-7 px-1">
         {/* Row 1: Seller Name + Rating */}
         <div className="flex items-center justify-between gap-2">
           <span
             onClick={handleProfileClick}
-            className="font-bold text-gray-900 text-[15px] hover:underline cursor-pointer truncate max-w-[65%]"
+            className="font-sf-pro font-[590] text-black text-[15px] sm:text-[16px] leading-normal not-italic hover:underline cursor-pointer truncate max-w-[65%]"
           >
             {username}
           </span>
@@ -134,19 +134,19 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
         </div>
 
         {/* Row 2: Title / Description */}
-        <h3 className="mt-3 text-[14.5px] text-[#62646A] font-normal leading-[1.4] line-clamp-2 min-h-[42px] group-hover:text-gray-900 transition-colors">
+        <h3 className="mt-3 text-[16px] sm:text-[18px] md:text-[20px] text-[var(--Foundation-Grey-grey-400,#6E6E6E)] font-normal font-inter not-italic line-clamp-2 min-h-[44px] sm:min-h-[48px] md:min-h-[52px] group-hover:text-gray-900 transition-colors">
           {data.title ||
             data.desc ||
             "I will design,redesign business wordpress website as divi expert"}
         </h3>
 
         {/* Row 3: Starting from Price */}
-        <div className="flex items-baseline gap-2 mt-auto pt-6 pb-0.5">
-          <span className="text-[14px] text-[#62646A] font-normal">
+        <div className="flex items-baseline gap-2 mt-[65px] pb-0.5">
+          <span className="text-[14px] sm:text-[16px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] font-normal font-inter leading-[20px] sm:leading-[22px] not-italic">
             Starting from
           </span>
 
-          <span className="text-[18px] font-bold text-gray-900 leading-none">
+          <span className="text-[18px] sm:text-[20px] font-bold font-inter text-[var(--Foundation-Grey-grey-500,#4A4A4A)] leading-[22px] not-italic">
             {formattedPrice}
           </span>
         </div>

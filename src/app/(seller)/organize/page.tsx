@@ -96,7 +96,7 @@ const OrganizePage = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const { categoryList } = useAdminCategories();
+  const { categoryList, parentCategories, getSubcategories, getNiches } = useAdminCategories();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -170,6 +170,112 @@ const OrganizePage = () => {
     dispatch({
       type: "CHANGE_INPUT",
       payload: { name, value },
+    });
+  };
+
+  // Dedicated handler for main category selection (resets subcategory & niche)
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedVal = e.target.value;
+    const selectedParent = parentCategories.find(
+      (p: any) => (p.slug || p._id || p.id) === selectedVal || p.name === selectedVal
+    );
+    const parentId = selectedParent?._id || selectedParent?.id || "";
+
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "category", value: selectedVal },
+    });
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "categoryId", value: parentId },
+    });
+    // Reset subcategory & niche when parent changes
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "subcategory", value: "" },
+    });
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "subcategoryId", value: "" },
+    });
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "niche", value: "" },
+    });
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "nicheId", value: "" },
+    });
+  };
+
+  // Dedicated handler for subcategory selection (resets niche)
+  const handleSubcategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const subVal = e.target.value;
+    const currentSubs = getSubcategories(state.category);
+    const selectedSub = currentSubs.find(
+      (s: any) => (s.slug || s._id || s.id) === subVal || s.name === subVal
+    );
+    const subId = selectedSub?._id || selectedSub?.id || "";
+
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "subcategory", value: subVal },
+    });
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "subcategoryId", value: subId },
+    });
+    // Reset niche when subcategory changes
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "niche", value: "" },
+    });
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "nicheId", value: "" },
+    });
+
+    // If subcategory selected, categoryId points to the subcategory ID; otherwise falls back to parent category ID
+    const selectedParent = parentCategories.find(
+      (p: any) => (p.slug || p._id || p.id) === state.category || p.name === state.category
+    );
+    const finalCategoryId = subId || selectedParent?._id || selectedParent?.id || "";
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "categoryId", value: finalCategoryId },
+    });
+  };
+
+  // Dedicated handler for niche selection (2nd-level child)
+  const handleNicheChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const nicheVal = e.target.value;
+    const currentNiches = getNiches(state.subcategory);
+    const selectedNiche = currentNiches.find(
+      (n: any) => (n.slug || n._id || n.id) === nicheVal || n.name === nicheVal
+    );
+    const nicheId = selectedNiche?._id || selectedNiche?.id || "";
+
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "niche", value: nicheVal },
+    });
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "nicheId", value: nicheId },
+    });
+
+    // Deepest selected category ID takes priority for categoryId
+    const currentSubs = getSubcategories(state.category);
+    const selectedSub = currentSubs.find(
+      (s: any) => (s.slug || s._id || s.id) === state.subcategory || s.name === state.subcategory
+    );
+    const selectedParent = parentCategories.find(
+      (p: any) => (p.slug || p._id || p.id) === state.category || p.name === state.category
+    );
+    const finalCategoryId = nicheId || selectedSub?._id || selectedSub?.id || selectedParent?._id || selectedParent?.id || "";
+    dispatch({
+      type: "CHANGE_INPUT",
+      payload: { name: "categoryId", value: finalCategoryId },
     });
   };
 
@@ -377,9 +483,46 @@ const OrganizePage = () => {
 
   // Submit Handler
   const handleSubmit = (isDraft = false) => {
-    const { userID: _unused, ...stateWithoutUserId } = (state as any);
+    const {
+      userID: _unused,
+      subcategoryId: _unusedSubId,
+      niche: _unusedNiche,
+      nicheId: _unusedNicheId,
+      ...stateWithoutUserId
+    } = (state as any);
+
+    // Resolve hierarchical category, subcategory, and niche information
+    const selectedParent = parentCategories.find(
+      (p: any) => (p.slug || p._id || p.id) === state.category || p.name === state.category
+    );
+    const currentSubs = getSubcategories(state.category);
+    const selectedSub = currentSubs.find(
+      (s: any) => (s.slug || s._id || s.id) === state.subcategory || s.name === state.subcategory
+    );
+    const currentNiches = getNiches(state.subcategory);
+    const selectedNiche = currentNiches.find(
+      (n: any) => (n.slug || n._id || n.id) === state.niche || n.name === state.niche
+    );
+
+    // Deepest category level (Niche > Subcategory > Parent) sends its UUID as categoryId
+    const resolvedCategoryId =
+      selectedNiche?._id ||
+      selectedNiche?.id ||
+      selectedSub?._id ||
+      selectedSub?.id ||
+      selectedParent?._id ||
+      selectedParent?.id ||
+      state.categoryId ||
+      undefined;
+
+    const resolvedCategoryName = selectedParent?.name || state.category;
+    const resolvedSubcategoryName = selectedSub?.name || state.subcategory || undefined;
+
     const form = {
       ...stateWithoutUserId,
+      categoryId: resolvedCategoryId,
+      category: resolvedCategoryName,
+      subcategory: resolvedSubcategoryName,
       // userID: user?._id || user?.id,
       faqs: state.faqs || [],
       isDraft,
@@ -432,10 +575,24 @@ const OrganizePage = () => {
       features: [],
     };
 
-  const selectedCategoryObj = categoryList.find(
-    (c: any) => (c.slug || c.name || c._id) === state.category
+  const currentSubcategories = getSubcategories(state.category);
+  const currentNiches = getNiches(state.subcategory);
+
+  const selectedCategoryObj = parentCategories.find(
+    (c: any) => (c.slug || c.name || c._id || c.id) === state.category
   );
-  const categoryBadgeLabel = selectedCategoryObj?.name || "Blog, Business House";
+  const selectedSubcategoryObj = currentSubcategories.find(
+    (s: any) => (s.slug || s.name || s._id || s.id) === state.subcategory
+  );
+  const selectedNicheObj = currentNiches.find(
+    (n: any) => (n.slug || n.name || n._id || n.id) === state.niche
+  );
+
+  const categoryBadgeLabel = selectedCategoryObj
+    ? [selectedCategoryObj.name, selectedSubcategoryObj?.name, selectedNicheObj?.name]
+        .filter(Boolean)
+        .join(" › ")
+    : "Blog, Business House";
 
   // Real uploaded gallery items (cover banner + sub-images)
   const galleryItems = [
@@ -567,26 +724,95 @@ const OrganizePage = () => {
               </div>
             </div>
 
-            {/* Category */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-700 block">
-                Category
-              </label>
-              <div className="relative">
-                <select
-                  name="category"
-                  value={state.category || ""}
-                  onChange={handleInputChange}
-                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10"
-                >
-                  <option value="" disabled>Select Category</option>
-                  {categoryList.map((c: any) => (
-                    <option key={c._id || c.slug} value={c.slug || c.name || c._id}>
-                      {c.name || c.slug}
+            {/* Category, Subcategory & Niche */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {/* Main Category */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-gray-700 block">
+                  Category <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <select
+                    name="category"
+                    value={state.category || ""}
+                    onChange={handleCategoryChange}
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
+                  >
+                    <option value="" disabled>Select Category</option>
+                    {parentCategories.map((c: any) => (
+                      <option key={c._id || c.id || c.slug} value={c.slug || c.name || c._id}>
+                        {c.name || c.slug}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
+                </div>
+              </div>
+
+              {/* Subcategory */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-gray-700 block">
+                    Subcategory
+                  </label>
+                  <span className="text-[11px] text-gray-400 font-normal">Optional</span>
+                </div>
+                <div className="relative">
+                  <select
+                    name="subcategory"
+                    value={state.subcategory || ""}
+                    onChange={handleSubcategoryChange}
+                    disabled={!state.category || currentSubcategories.length === 0}
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
+                  >
+                    <option value="">
+                      {!state.category
+                        ? "Select category first"
+                        : currentSubcategories.length === 0
+                        ? "No subcategories available"
+                        : "Select Subcategory (Optional)"}
                     </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
+                    {currentSubcategories.map((sub: any) => (
+                      <option key={sub._id || sub.id || sub.slug} value={sub.slug || sub.name || sub._id}>
+                        {sub.name || sub.slug}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
+                </div>
+              </div>
+
+              {/* Niche (2nd-level Child) */}
+              <div className="space-y-1.5 sm:col-span-2 lg:col-span-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-gray-700 block">
+                    Niche
+                  </label>
+                  <span className="text-[11px] text-gray-400 font-normal">Optional</span>
+                </div>
+                <div className="relative">
+                  <select
+                    name="niche"
+                    value={state.niche || ""}
+                    onChange={handleNicheChange}
+                    disabled={!state.subcategory || currentNiches.length === 0}
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
+                  >
+                    <option value="">
+                      {!state.subcategory
+                        ? "Select subcategory first"
+                        : currentNiches.length === 0
+                        ? "No niches available"
+                        : "Select Niche (Optional)"}
+                    </option>
+                    {currentNiches.map((n: any) => (
+                      <option key={n._id || n.id || n.slug} value={n.slug || n.name || n._id}>
+                        {n.name || n.slug}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
+                </div>
               </div>
             </div>
 

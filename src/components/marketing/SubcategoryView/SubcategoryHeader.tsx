@@ -4,13 +4,21 @@ import React, { useState, useRef, useEffect } from "react";
 import { FiHome, FiChevronDown, FiCheck } from "react-icons/fi";
 import { SubcategoryItem } from "@/data/categoryTaxonomy";
 
+export interface BreadcrumbCrumb {
+  name: string;
+  slug?: string;
+  isRoot?: boolean;
+}
+
 interface SubcategoryHeaderProps {
   categoryName: string;
   categorySlug: string;
   subcategories?: SubcategoryItem[];
   activeSubcategory: SubcategoryItem;
+  breadcrumbTrail?: BreadcrumbCrumb[];
   onSelectCategory: () => void;
   onSelectSubcategory: (subcat: SubcategoryItem) => void;
+  onNavigateBreadcrumb?: (crumb: BreadcrumbCrumb) => void;
 }
 
 const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
@@ -18,8 +26,10 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
   categorySlug,
   subcategories = [],
   activeSubcategory,
+  breadcrumbTrail,
   onSelectCategory,
   onSelectSubcategory,
+  onNavigateBreadcrumb,
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -37,31 +47,54 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
   return (
     <div className="w-full mb-6">
       {/* Breadcrumb Navigation */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] text-gray-500 mb-3">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] text-gray-500 mb-3 flex-wrap">
         <button
           type="button"
           onClick={onSelectCategory}
           className="text-teal-600 hover:text-teal-700 transition-colors flex items-center cursor-pointer"
-          title="Home"
+          title="All services"
         >
           <FiHome className="w-4 h-4" />
         </button>
 
-        <span className="text-gray-300">/</span>
-
-        <button
-          type="button"
-          onClick={onSelectCategory}
-          className="text-gray-600 hover:text-gray-900 transition-colors font-normal cursor-pointer"
-        >
-          {categoryName.replace(" & Design", "") || categoryName}
-        </button>
-
-        <span className="text-gray-300">/</span>
-
-        <span className="text-gray-500 font-normal truncate">
-          {activeSubcategory.title}
-        </span>
+        {breadcrumbTrail && breadcrumbTrail.length > 0 ? (
+          breadcrumbTrail.map((crumb, idx) => {
+            const isLast = idx === breadcrumbTrail.length - 1;
+            return (
+              <React.Fragment key={idx}>
+                <span className="text-gray-300">/</span>
+                {isLast ? (
+                  <span className="text-gray-900 font-medium truncate">
+                    {crumb.name}
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => (onNavigateBreadcrumb ? onNavigateBreadcrumb(crumb) : onSelectCategory())}
+                    className="text-gray-600 hover:text-gray-900 hover:underline transition-colors font-normal cursor-pointer"
+                  >
+                    {crumb.name}
+                  </button>
+                )}
+              </React.Fragment>
+            );
+          })
+        ) : (
+          <>
+            <span className="text-gray-300">/</span>
+            <button
+              type="button"
+              onClick={onSelectCategory}
+              className="text-gray-600 hover:text-gray-900 transition-colors font-normal cursor-pointer"
+            >
+              {categoryName.replace(" & Design", "") || categoryName}
+            </button>
+            <span className="text-gray-300">/</span>
+            <span className="text-gray-500 font-normal truncate">
+              {activeSubcategory.title}
+            </span>
+          </>
+        )}
       </nav>
 
       {/* Main Subcategory Title + Chevron Dropdown */}

@@ -41,9 +41,9 @@ const Packages = () => {
   // Parse initial state from URL params
   const initialParams = new URLSearchParams(search);
   const initialSearch = initialParams.get('search') || '';
-  const initialCat = initialParams.get('category') || initialParams.get('cat') || 'All services';
-  const initialSubcat = initialParams.get('subcat') || initialParams.get('subcategory') || '';
-  const initialTag = initialParams.get('tag') || initialParams.get('service') || '';
+  const initialLegacyTag = initialParams.get('tag') || initialParams.get('service');
+  const initialLegacySubcat = initialParams.get('subcat') || initialParams.get('subcategory');
+  const initialCat = initialLegacyTag || initialLegacySubcat || initialParams.get('category') || initialParams.get('cat') || 'All services';
   const initialMin = initialParams.get('min') || '';
   const initialMax = initialParams.get('max') || '';
 
@@ -53,13 +53,11 @@ const Packages = () => {
   const [sortBy, setSortBy] = useState(initialSort);
   const [searchVal, setSearchVal] = useState(initialSearch);
   const [activeCategory, setActiveCategory] = useState(initialCat);
-  const [activeSubcatId, setActiveSubcatId] = useState(initialSubcat);
-  const [activeTag, setActiveTag] = useState(initialTag);
   const [showFilter, setShowFilter] = useState(true);
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
   const [page, setPage] = useState(initialPage);
   const [viewTab, setViewTab] = useState<'hub' | 'gigs'>(
-    (initialSearch || initialMin || initialMax || initialSubcat || initialTag) ? 'gigs' : 'hub'
+    (initialSearch || initialMin || initialMax || initialLegacySubcat || initialLegacyTag) ? 'gigs' : 'hub'
   );
 
   // Additional sidebar & tag filter states
@@ -114,15 +112,59 @@ const Packages = () => {
     return [{ name: "All services", slug: "All services" }, ...regularCats, ...otherCats];
   }, [parentCategories]);
 
-  const getSlugFromCat = (catInput: string) => {
-    if (!catInput || catInput === 'All services' || catInput === 'Results') return '';
-    const match = categories.find((c: any) =>
-      c.slug?.toLowerCase() === catInput.toLowerCase() ||
-      c.name?.toLowerCase() === catInput.toLowerCase()
+  const findCategoryInList = (catInput: string) => {
+    if (!catInput || catInput === 'All services' || catInput === 'Results' || !categoryList) return null;
+    const normalized = catInput.toLowerCase().trim();
+    return categoryList.find(
+      (c: any) =>
+        (c.name && c.name.toLowerCase() === normalized) ||
+        (c.slug && c.slug.toLowerCase() === normalized) ||
+        (c.id && c.id.toLowerCase() === normalized) ||
+        (c._id && c._id.toLowerCase() === normalized)
     );
-    if (match && match.slug && match.slug !== 'All services') return match.slug;
-    return catInput.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   };
+
+  // Helper to trace ancestor chain for any category (Root -> Subcategory -> Niche)
+  const getCategoryAncestry = (catIdentifier: string): Array<{ name: string; slug: string; id?: string; isRoot: boolean }> => {
+    if (!catIdentifier || catIdentifier === 'All services' || catIdentifier === 'Results' || !categoryList || categoryList.length === 0) return [];
+    const normalized = catIdentifier.toLowerCase().trim();
+
+    const current = categoryList.find((c: any) =>
+      (c.slug && c.slug.toLowerCase() === normalized) ||
+      (c.name && c.name.toLowerCase() === normalized) ||
+      (c._id && c._id.toLowerCase() === normalized) ||
+      (c.id && c.id.toLowerCase() === normalized)
+    );
+    if (!current) {
+      return [{ name: catIdentifier, slug: catIdentifier, isRoot: false }];
+    }
+
+    const trail: Array<{ name: string; slug: string; id?: string; isRoot: boolean }> = [];
+    let node: any = current;
+    const visited = new Set<string>();
+
+    while (node && !visited.has(node.id || node._id || node.slug)) {
+      visited.add(node.id || node._id || node.slug);
+      trail.unshift({
+        name: node.name || node.title || String(node),
+        slug: node.slug || (node.name || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-'),
+        id: node.id || node._id,
+        isRoot: !node.parentId,
+      });
+      if (node.parentId) {
+        node = categoryList.find((c: any) => c._id === node.parentId || c.id === node.parentId);
+      } else {
+        node = null;
+      }
+    }
+
+    return trail;
+  };
+
+  const categoryAncestry = useMemo(() => {
+    const current = filterCategory || (activeCategory !== 'All services' && activeCategory !== 'Results' ? activeCategory : '');
+    return getCategoryAncestry(current);
+  }, [filterCategory, activeCategory, categoryList]);
 
   const currentTaxonomy = useMemo(() => {
     const selected = filterCategory || (activeCategory !== 'All services' && activeCategory !== 'Results' ? activeCategory : '');
@@ -130,21 +172,44 @@ const Packages = () => {
     return getCategoryTaxonomy(selected, categoryList);
   }, [filterCategory, activeCategory, categoryList]);
 
-  // Sync state when URL params externally change
+  const rootTaxonomy = useMemo(() => {
+    if (categoryAncestry.length > 0) {
+      const rootItem = categoryAncestry[0];
+      return getCategoryTaxonomy(rootItem.slug || rootItem.name, categoryList);
+    }
+    return currentTaxonomy;
+  }, [categoryAncestry, categoryList, currentTaxonomy]);
+
+  // Sync state when URL params externally change, and sanitize legacy subcat/tag params immediately
   useEffect(() => {
     window.scrollTo(0, 0);
     const params = new URLSearchParams(search);
-    const cat = params.get('category') || params.get('cat');
-    const subcat = params.get('subcat') || params.get('subcategory') || '';
-    const tag = params.get('tag') || params.get('service') || '';
-    setActiveSubcatId(subcat);
-    setActiveTag(tag);
+    const legacyTag = params.get('tag') || params.get('service');
+    const legacySubcat = params.get('subcat') || params.get('subcategory');
 
+    // If legacy subcat or tag params exist in URL, sanitize immediately to clean ?category=<tag || subcat>
+    if (legacyTag || legacySubcat) {
+      const directCat = (legacyTag || legacySubcat) as string;
+      const cleanParams = new URLSearchParams();
+      cleanParams.set('category', directCat);
+      if (params.get('search')) cleanParams.set('search', params.get('search')!);
+      if (params.get('min')) cleanParams.set('min', params.get('min')!);
+      if (params.get('max')) cleanParams.set('max', params.get('max')!);
+      if (params.get('sort') && params.get('sort') !== 'createdAt') cleanParams.set('sort', params.get('sort')!);
+      if (params.get('page') && params.get('page') !== '1') cleanParams.set('page', params.get('page')!);
+      navigate.replace(`/packages?${cleanParams.toString()}`, { scroll: false });
+      return;
+    }
+
+    const cat = params.get('category') || params.get('cat');
     if (cat && cat !== 'All services' && cat !== 'Results') {
-      const slug = getSlugFromCat(cat);
-      setActiveCategory(slug);
-      setFilterCategory(slug);
-      if (params.get('search') || params.get('min') || params.get('max') || subcat || tag) {
+      setActiveCategory(cat);
+      setFilterCategory(cat);
+
+      const ancestry = getCategoryAncestry(cat);
+      const isRoot = ancestry.length <= 1;
+
+      if (params.get('search') || params.get('min') || params.get('max') || params.get('view') === 'gigs' || !isRoot) {
         setViewTab('gigs');
       } else {
         setViewTab('hub');
@@ -159,7 +224,7 @@ const Packages = () => {
     setMaxPrice(params.get('max') || '');
     setSortBy(params.get('sort') || 'createdAt');
     setPage(parseInt(params.get('page') || '1', 10));
-  }, [search, categories]);
+  }, [search, categories, categoryList]);
 
   // Reactive React Query key ensuring automatic re-fetching whenever any filter state changes
   const { isLoading, isError, error, data, refetch } = useQuery({
@@ -168,8 +233,6 @@ const Packages = () => {
       searchVal,
       activeCategory,
       filterCategory,
-      activeSubcatId,
-      activeTag,
       minPrice,
       maxPrice,
       sortBy,
@@ -186,21 +249,15 @@ const Packages = () => {
       }
 
       const selectedCat = filterCategory || (activeCategory !== 'All services' ? activeCategory : '');
-      const catSlug = getSlugFromCat(selectedCat);
-      if (catSlug) {
-        queryParams.set('category', catSlug);
-      }
-
-      if (activeSubcatId) {
-        queryParams.set('subcat', activeSubcatId);
-      }
-      if (activeTag) {
-        queryParams.set('tag', activeTag);
+      if (selectedCat && selectedCat !== 'All services' && selectedCat !== 'Results') {
+        const matched = findCategoryInList(selectedCat);
+        // Direct category name sent to backend (e.g. "Automation" or "N8N")
+        queryParams.set('category', matched?.name || selectedCat);
       }
 
       if (minPrice) queryParams.set('min', minPrice);
       if (maxPrice) queryParams.set('max', maxPrice);
-      if (sortBy) queryParams.set('sort', sortBy);
+      queryParams.set('sort', sortBy || 'createdAt');
       queryParams.set('limit', '20');
       queryParams.set('page', page.toString());
 
@@ -243,20 +300,6 @@ const Packages = () => {
     if (!currentTaxonomy || !currentTaxonomy.subcategories || currentTaxonomy.subcategories.length === 0) {
       return null;
     }
-    if (activeSubcatId) {
-      const found = currentTaxonomy.subcategories.find(
-        (s) =>
-          s.id.toLowerCase() === activeSubcatId.toLowerCase() ||
-          s.title.toLowerCase() === activeSubcatId.toLowerCase()
-      );
-      if (found) return found;
-    }
-    if (activeTag) {
-      const foundByTag = currentTaxonomy.subcategories.find(
-        (s) => s.items?.some((it) => it.toLowerCase() === activeTag.toLowerCase())
-      );
-      if (foundByTag) return foundByTag;
-    }
     if (searchVal) {
       const foundByItem = currentTaxonomy.subcategories.find(
         (s) =>
@@ -266,37 +309,65 @@ const Packages = () => {
       if (foundByItem) return foundByItem;
     }
     return currentTaxonomy.subcategories[0];
-  }, [currentTaxonomy, activeSubcatId, activeTag, searchVal]);
+  }, [currentTaxonomy, searchVal]);
 
   const displayPackages = useMemo(() => {
     if (packagesList && packagesList.length > 0) {
-      if (activeSubcatId || activeTag) {
-        const queryTerm = (activeTag || activeSubcatId).toLowerCase().trim();
-        const filtered = packagesList.filter((pkg: any) => {
-          const titleMatch = pkg.title?.toLowerCase().includes(queryTerm);
-          const subcatMatch = pkg.subcategory?.toLowerCase().includes(queryTerm) ||
-                              queryTerm.includes(pkg.subcategory?.toLowerCase() || '');
-          const tagMatch = Array.isArray(pkg.tags) && pkg.tags.some((t: string) =>
-            t.toLowerCase().includes(queryTerm) || queryTerm.includes(t.toLowerCase())
-          );
-          const descMatch = pkg.description?.toLowerCase().includes(queryTerm);
-          return titleMatch || subcatMatch || tagMatch || descMatch;
-        });
-
-        if (filtered.length > 0) {
-          return filtered;
-        }
-      }
       return packagesList;
     }
     return [];
-  }, [packagesList, activeSubcatId, activeTag]);
+  }, [packagesList]);
+
+  // Determine subcategory node and active tag from category ancestry:
+  // Root: categoryAncestry[0]
+  // Subcategory (depth 2): categoryAncestry[1]
+  // Leaf / Niche (depth >= 3): categoryAncestry[categoryAncestry.length - 1]
+  const { headerSubcatNode, currentActiveTag } = useMemo(() => {
+    if (categoryAncestry.length >= 3) {
+      return {
+        headerSubcatNode: categoryAncestry[1],
+        currentActiveTag: categoryAncestry[categoryAncestry.length - 1].name,
+      };
+    } else if (categoryAncestry.length === 2) {
+      return {
+        headerSubcatNode: categoryAncestry[1],
+        currentActiveTag: '',
+      };
+    }
+    return {
+      headerSubcatNode: null,
+      currentActiveTag: '',
+    };
+  }, [categoryAncestry]);
+
+  // Active subcategory / leaf node representation for header
+  const resolvedSubcategoryHeaderItem = useMemo(() => {
+    if (headerSubcatNode) {
+      const matchedInTaxonomy = rootTaxonomy?.subcategories?.find(
+        (s) =>
+          s.title.toLowerCase() === headerSubcatNode.name.toLowerCase() ||
+          s.id.toLowerCase() === headerSubcatNode.slug.toLowerCase()
+      );
+      if (matchedInTaxonomy) {
+        return matchedInTaxonomy;
+      }
+      return {
+        id: headerSubcatNode.slug || headerSubcatNode.name,
+        title: headerSubcatNode.name,
+        subtitle: `${categoryAncestry[0]?.name || 'Service'} category`,
+        banner: '',
+        items: [],
+      };
+    }
+    if (activeSubcategory) return activeSubcategory;
+    return null;
+  }, [headerSubcatNode, rootTaxonomy, categoryAncestry, activeSubcategory]);
 
   const isSubcategoryMode = Boolean(
-    currentTaxonomy &&
+    (currentTaxonomy || categoryAncestry.length > 1) &&
     activeCategory !== 'All services' &&
     viewTab === 'gigs' &&
-    activeSubcategory
+    resolvedSubcategoryHeaderItem
   );
 
   // Utility to update URL query params cleanly without full page reloads
@@ -304,18 +375,15 @@ const Packages = () => {
     const params = new URLSearchParams();
     const currentSearch = overrides.searchVal !== undefined ? overrides.searchVal : searchVal;
     const rawCat = overrides.category !== undefined ? overrides.category : (filterCategory || (activeCategory !== 'All services' ? activeCategory : ''));
-    const currentCatSlug = getSlugFromCat(rawCat);
-    const currentSubcat = overrides.subcat !== undefined ? overrides.subcat : activeSubcatId;
-    const currentTag = overrides.tag !== undefined ? overrides.tag : activeTag;
     const currentMin = overrides.minPrice !== undefined ? overrides.minPrice : minPrice;
     const currentMax = overrides.maxPrice !== undefined ? overrides.maxPrice : maxPrice;
     const currentSort = overrides.sortBy !== undefined ? overrides.sortBy : sortBy;
     const currentPage = overrides.page !== undefined ? overrides.page : (overrides.resetPage ? 1 : page);
 
     if (currentSearch && currentSearch.trim()) params.set('search', currentSearch.trim());
-    if (currentCatSlug) params.set('category', currentCatSlug);
-    if (currentSubcat) params.set('subcat', currentSubcat);
-    if (currentTag) params.set('tag', currentTag);
+    if (rawCat && rawCat !== 'All services' && rawCat !== 'Results') {
+      params.set('category', rawCat);
+    }
     if (currentMin) params.set('min', currentMin);
     if (currentMax) params.set('max', currentMax);
     if (currentSort && currentSort !== 'createdAt') params.set('sort', currentSort);
@@ -337,37 +405,40 @@ const Packages = () => {
     if (slug === 'All services' || name === 'All services') {
       setActiveCategory('All services');
       setFilterCategory('');
-      setActiveSubcatId('');
-      setActiveTag('');
       setViewTab('gigs');
-      syncUrlWithFilters({ category: '', searchVal: '', subcat: '', tag: '' });
+      syncUrlWithFilters({ category: '', searchVal: '' });
     } else {
-      setActiveCategory(slug);
-      setFilterCategory(slug);
-      setActiveSubcatId('');
-      setActiveTag('');
-      setViewTab('hub');
-      syncUrlWithFilters({ category: slug, searchVal: '', subcat: '', tag: '' });
+      const target = name || slug;
+      setActiveCategory(target);
+      setFilterCategory(target);
+
+      const ancestry = getCategoryAncestry(target);
+      if (ancestry.length <= 1) {
+        setViewTab('hub');
+      } else {
+        setViewTab('gigs');
+      }
+      syncUrlWithFilters({ category: target, searchVal: '', resetPage: true });
     }
   };
 
   const handleSelectSubcategory = (subcatId: string, subcatTitle: string) => {
-    setActiveSubcatId(subcatId);
-    setActiveTag('');
+    const target = subcatTitle || subcatId;
+    setActiveCategory(target);
+    setFilterCategory(target);
     setSearchVal('');
     setViewTab('gigs');
-    syncUrlWithFilters({ subcat: subcatId, tag: '', searchVal: '', resetPage: true });
+    syncUrlWithFilters({ category: target, searchVal: '', resetPage: true });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSelectSubService = (serviceName: string, subcatId?: string, subcatTitle?: string) => {
-    if (subcatId) {
-      setActiveSubcatId(subcatId);
-    }
-    setActiveTag(serviceName);
+  const handleSelectSubService = (serviceName: string, _subcatId?: string, _subcatTitle?: string) => {
+    const target = serviceName;
+    setActiveCategory(target);
+    setFilterCategory(target);
     setSearchVal('');
     setViewTab('gigs');
-    syncUrlWithFilters({ subcat: subcatId || activeSubcatId, tag: serviceName, searchVal: '', resetPage: true });
+    syncUrlWithFilters({ category: target, searchVal: '', resetPage: true });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -375,8 +446,6 @@ const Packages = () => {
     setMinPrice('');
     setMaxPrice('');
     setSearchVal('');
-    setActiveSubcatId('');
-    setActiveTag('');
     setFilterCategory('');
     setActiveCategory('All services');
     setExperience({ entry: false, intermediate: false, expert: false });
@@ -669,57 +738,55 @@ const Packages = () => {
             </div>
           )}
         </div>
-      ) : (currentTaxonomy && activeCategory !== 'All services' && viewTab === 'gigs' && activeSubcategory) ? (
-        /* Subcategory Services View - Pixel Perfect Match for Image 2 */
+      ) : ((currentTaxonomy || categoryAncestry.length > 1) && activeCategory !== 'All services' && viewTab === 'gigs' && resolvedSubcategoryHeaderItem) ? (
+        /* Subcategory / Niche Services View */
         <div className="container mx-auto py-6 sm:py-8 animate-fadeIn">
           {/* 1. Subcategory Header: Breadcrumbs, Title with Chevron Dropdown, Subtitle */}
           <SubcategoryHeader
-            categoryName={currentTaxonomy.name}
-            categorySlug={currentTaxonomy.slug}
-            subcategories={currentTaxonomy.subcategories}
-            activeSubcategory={activeSubcategory}
-            onSelectCategory={() => {
-              setViewTab('hub');
-              setActiveSubcatId('');
-              setActiveTag('');
-              setSearchVal('');
-              syncUrlWithFilters({ subcat: '', tag: '', searchVal: '' });
-            }}
+            categoryName={categoryAncestry.length > 0 ? categoryAncestry[0].name : (currentTaxonomy?.name || '')}
+            categorySlug={categoryAncestry.length > 0 ? categoryAncestry[0].slug : (currentTaxonomy?.slug || '')}
+            subcategories={rootTaxonomy?.subcategories || []}
+            activeSubcategory={resolvedSubcategoryHeaderItem}
+            breadcrumbTrail={categoryAncestry}
+            onSelectCategory={() => handleReset()}
+            onNavigateBreadcrumb={(crumb) => handleCategoryClick(crumb.name || crumb.slug)}
             onSelectSubcategory={(subcat) => {
               handleSelectSubcategory(subcat.id, subcat.title);
             }}
           />
 
           {/* 2. Subcategory Filter Bar: Filter Toggle, Divider, Pills, View All */}
-          <SubcategoryFilterBar
-            items={activeSubcategory.items || []}
-            activeTag={activeTag}
-            isFilterOpen={showFilter}
-            onSelectTag={(tag) => {
-              setActiveTag(tag);
-              syncUrlWithFilters({ tag, resetPage: true });
-            }}
-            onClearTag={() => {
-              setActiveTag('');
-              syncUrlWithFilters({ tag: '', resetPage: true });
-            }}
-            onViewAll={() => {
-              setViewTab('hub');
-              setActiveSubcatId('');
-              setActiveTag('');
-              setSearchVal('');
-              syncUrlWithFilters({ subcat: '', tag: '', searchVal: '' });
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onOpenFilter={() => setShowFilter(!showFilter)}
-          />
+          {resolvedSubcategoryHeaderItem.items && resolvedSubcategoryHeaderItem.items.length > 0 && (
+            <SubcategoryFilterBar
+              items={resolvedSubcategoryHeaderItem.items}
+              activeTag={currentActiveTag}
+              isFilterOpen={showFilter}
+              onSelectTag={(tag) => {
+                handleSelectSubService(tag);
+              }}
+              onClearTag={() => {
+                if (headerSubcatNode) {
+                  handleCategoryClick(headerSubcatNode.name || headerSubcatNode.slug);
+                } else if (categoryAncestry.length > 1) {
+                  const parentNode = categoryAncestry[categoryAncestry.length - 2];
+                  handleCategoryClick(parentNode.name || parentNode.slug);
+                }
+              }}
+              onViewAll={() => {
+                if (categoryAncestry.length > 0) {
+                  handleCategoryClick(categoryAncestry[0].name || categoryAncestry[0].slug);
+                }
+              }}
+              onOpenFilter={() => setShowFilter(!showFilter)}
+            />
+          )}
 
           {/* 3. Results Count */}
           <div className="mb-6">
             <p className="text-xl font-normal font-inter text-[#4A4A4A]">
               {displayPackages.length > 0
                 ? `${displayPackages.length} Available Services`
-                : (activeSubcategory.resultCount || "1,40,000+ Results")}
+                : (resolvedSubcategoryHeaderItem.resultCount || "1,40,000+ Results")}
             </p>
           </div>
 
@@ -738,10 +805,9 @@ const Packages = () => {
                     refetch();
                   }}
                   categories={categories.filter((c: any) => c.slug !== 'All services')}
-                  selectedCategory={filterCategory || (activeCategory !== 'All services' ? activeCategory : '')}
+                  selectedCategory={categoryAncestry.length > 0 ? categoryAncestry[0].slug : (filterCategory || (activeCategory !== 'All services' ? activeCategory : ''))}
                   onCategoryChange={(cat) => {
-                    setFilterCategory(cat);
-                    syncUrlWithFilters({ category: cat, resetPage: true });
+                    handleCategoryClick(cat);
                   }}
                   experience={{
                     entry: experience.entry,
@@ -821,15 +887,52 @@ const Packages = () => {
           <div className="flex items-center justify-between mb-5">
             <div>
               <p className="text-sm text-gray-500 flex items-center flex-wrap gap-2">
-                <span>Home / <span className="text-gray-800 font-medium">{currentTaxonomy?.name || 'Search Result'}</span></span>
-                {currentTaxonomy && activeCategory !== 'All services' && (
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="text-teal-600 hover:text-teal-700 transition-colors flex items-center cursor-pointer"
+                  title="All services"
+                >
+                  <FiHome className="w-4 h-4 mr-1" />
+                  <span>Home</span>
+                </button>
+                {categoryAncestry && categoryAncestry.length > 0 ? (
+                  categoryAncestry.map((crumb, idx) => {
+                    const isLast = idx === categoryAncestry.length - 1;
+                    return (
+                      <span key={idx} className="flex items-center gap-2">
+                        <span className="text-gray-300">/</span>
+                        {isLast ? (
+                          <span className="text-gray-800 font-medium">{crumb.name}</span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleCategoryClick(crumb.name || crumb.slug)}
+                            className="text-gray-600 hover:text-gray-900 hover:underline transition-colors cursor-pointer"
+                          >
+                            {crumb.name}
+                          </button>
+                        )}
+                      </span>
+                    );
+                  })
+                ) : (
+                  <>
+                    <span className="text-gray-300">/</span>
+                    <span className="text-gray-800 font-medium">All services</span>
+                  </>
+                )}
+                {categoryAncestry.length > 0 && categoryAncestry[0].isRoot && (
                   <button
                     type="button"
-                    onClick={() => { setSearchVal(''); setViewTab('hub'); syncUrlWithFilters({ searchVal: '' }); }}
+                    onClick={() => {
+                      setViewTab('hub');
+                      syncUrlWithFilters({ category: categoryAncestry[0].name || categoryAncestry[0].slug });
+                    }}
                     className="inline-flex items-center gap-1 text-xs text-brand-green hover:underline font-semibold ml-2 cursor-pointer"
                   >
                     <FiArrowLeft className="w-3.5 h-3.5" />
-                    <span>Explore {currentTaxonomy.name} Subcategories</span>
+                    <span>Explore {categoryAncestry[0].name} Hub</span>
                   </button>
                 )}
               </p>

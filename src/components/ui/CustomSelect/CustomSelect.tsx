@@ -14,9 +14,10 @@ interface CustomSelectProps {
   onChange: (value: string | number) => void;
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
 }
 
-const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, placeholder = "Select...", className = "" }) => {
+const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, placeholder = "Select...", className = "", disabled = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -38,8 +39,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, p
     <div className={`relative w-full ${className}`} ref={dropdownRef}>
       <button
         type="button"
-        className="w-full flex items-center justify-between p-3.5 border border-slate-200 rounded-lg text-slate-800 bg-slate-50 transition-all duration-300 hover:bg-slate-100 focus:outline-none focus:border-brand-green focus:bg-white focus:ring-4 focus:ring-brand-green/10"
-        onClick={() => setIsOpen(!isOpen)}
+        disabled={disabled}
+        className="w-full flex items-center justify-between p-3.5 border border-slate-200 rounded-lg text-slate-800 bg-slate-50 transition-all duration-300 hover:bg-slate-100 focus:outline-none focus:border-brand-green focus:bg-white focus:ring-4 focus:ring-brand-green/10 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-50"
+        onClick={() => !disabled && setIsOpen(!isOpen)}
       >
         <span className={`text-[15px] ${selectedOption ? "text-slate-800" : "text-slate-400"}`}>
           {selectedOption ? selectedOption.label : placeholder}

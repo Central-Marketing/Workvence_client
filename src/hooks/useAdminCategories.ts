@@ -93,17 +93,52 @@ export const useAdminCategories = () => {
       );
     }
 
-    // Format sub categories
+    // Format sub categories and attach their 2nd-level child niches
     const formattedSubCats = subCats.map((sub: any) => {
+      const subId = sub.id || sub._id;
       const subTitle = sub.name || sub.title || String(sub);
       const subSlug = sub.slug || subTitle.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+      // Resolve 2nd-level children (niches)
+      let rawNiches: any[] = [];
+      if (Array.isArray(sub.children) && sub.children.length > 0) {
+        rawNiches = sub.children;
+      } else if (Array.isArray(sub.subcategories) && sub.subcategories.length > 0) {
+        rawNiches = sub.subcategories;
+      } else if (Array.isArray(rawList)) {
+        rawNiches = rawList.filter((c: any) =>
+          c && typeof c !== 'string' && c.parentId &&
+          ((subId && (c.parentId === subId || c.parentId === sub._id)) ||
+           (subTitle && c.parentName?.toLowerCase() === subTitle.toLowerCase()))
+        );
+      }
+
+      const formattedNiches: AdminCategory[] = rawNiches.map((n: any) => {
+        const nId = n.id || n._id;
+        const nTitle = n.name || n.title || String(n);
+        const nSlug = n.slug || nTitle.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        return {
+          ...n,
+          id: nId || nSlug,
+          name: nTitle,
+          slug: nSlug,
+          parentId: n.parentId || subId,
+          parentName: n.parentName || subTitle,
+          children: n.children || [],
+        };
+      });
+
       return {
         ...sub,
-        id: sub.id || sub._id || subSlug,
+        id: subId || subSlug,
         name: subTitle,
         slug: subSlug,
         parentId: sub.parentId || catId,
         parentName: sub.parentName || catName,
+        children: formattedNiches,
+        subCategories: formattedNiches,
+        subcategories: formattedNiches,
+        niches: formattedNiches,
       };
     });
 
@@ -123,7 +158,7 @@ export const useAdminCategories = () => {
   const subCategories: AdminCategory[] = parentCategories.flatMap((p) => p.children || []);
 
   // Helper function to easily retrieve sub categories for a given parent by slug or id
-  const getSubcategories = (parentSlugOrId: string): AdminCategory[] => {
+  const getSubcategories = (parentSlugOrId?: string): AdminCategory[] => {
     if (!parentSlugOrId) return [];
     const normalized = parentSlugOrId.toLowerCase().trim();
     const parent = parentCategories.find(
@@ -136,6 +171,38 @@ export const useAdminCategories = () => {
     return parent?.children || [];
   };
 
+  // Helper function to retrieve 2nd child niches for a given subcategory by slug or id
+  const getNiches = (subSlugOrId?: string): AdminCategory[] => {
+    if (!subSlugOrId) return [];
+    const normalized = subSlugOrId.toLowerCase().trim();
+    const sub = subCategories.find(
+      (s) =>
+        s.slug?.toLowerCase() === normalized ||
+        s.id?.toLowerCase() === normalized ||
+        s._id?.toLowerCase() === normalized ||
+        s.name?.toLowerCase() === normalized
+    );
+    if (sub?.children && sub.children.length > 0) {
+      return sub.children;
+    }
+    // Fallback search across rawList for direct child nodes of this subcategory
+    const targetId = sub?.id || sub?._id || subSlugOrId;
+    return rawList
+      .filter((c: any) => c && typeof c !== 'string' && c.parentId && (c.parentId === targetId || (sub?._id && c.parentId === sub._id)))
+      .map((n: any) => {
+        const nId = n.id || n._id;
+        const nTitle = n.name || n.title || String(n);
+        const nSlug = n.slug || nTitle.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        return {
+          ...n,
+          id: nId || nSlug,
+          name: nTitle,
+          slug: nSlug,
+          parentId: n.parentId,
+        };
+      });
+  };
+
   return {
     ...query,
     data: query.data ?? [],
@@ -143,6 +210,7 @@ export const useAdminCategories = () => {
     parentCategories,
     subCategories,
     getSubcategories,
+    getNiches,
   };
 };
 

@@ -17,15 +17,29 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
   const currentCategory = searchParams?.get('category') || '';
   const user = useUserStore((state) => state.user);
 
+  // Fetch categories from backend API
+  const { categoryList: rawCats } = useAdminCategories();
+
+  // Check if currentCategory is a child subcategory or niche (has a parentId)
+  const isChildCategory = Boolean(
+    currentCategory &&
+    currentCategory !== 'All services' &&
+    rawCats.some((c: any) => {
+      const match =
+        (c.slug && c.slug.toLowerCase() === currentCategory.toLowerCase()) ||
+        (c.name && c.name.toLowerCase() === currentCategory.toLowerCase());
+      return match && Boolean(c.parentId);
+    })
+  );
+
   // Suppress CategoryBar on subcategory, specific service, or search filtered routes on /packages
   const isSubcategoryRoute =
     pathname === '/packages' &&
     Boolean(
       searchParams?.get('search') ||
       searchParams?.get('subcat') ||
-      searchParams?.get('subcategory') ||
       searchParams?.get('tag') ||
-      searchParams?.get('service')
+      isChildCategory
     );
 
   const isSeller = Boolean(user?.isSeller);
@@ -35,9 +49,6 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
-
-  // Fetch categories from backend API
-  const { categoryList: rawCats } = useAdminCategories();
 
   const categoryList = rawCats
     .filter((cat: any) => typeof cat === 'string' || !cat.parentId)

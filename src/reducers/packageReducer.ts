@@ -9,6 +9,11 @@ export interface PackageFormState {
   // userID?: string;
   title: string;
   category: string;
+  categoryId?: string;
+  subcategory?: string;
+  subcategoryId?: string;
+  niche?: string;
+  nicheId?: string;
   cover: string;
   images: string[];
   description: string;
@@ -31,6 +36,11 @@ export const initialState: PackageFormState = {
   // userID: '',
   title: '',
   category: '',
+  categoryId: '',
+  subcategory: '',
+  subcategoryId: '',
+  niche: '',
+  nicheId: '',
   cover: '',
   images: [],
   description: '',

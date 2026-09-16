@@ -71,7 +71,7 @@ const EditPackage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const { categoryList } = useAdminCategories();
+  const { categoryList, parentCategories, getSubcategories, getNiches } = useAdminCategories();
 
   // Fetch the existing package details
   const { isLoading, error, data: packageData } = useQuery({
@@ -85,6 +85,12 @@ const EditPackage = () => {
             payload: {
               ...initialState,
               ...data,
+              category: data.category || '',
+              categoryId: data.categoryId || '',
+              subcategory: data.subcategory || '',
+              subcategoryId: data.subcategoryId || '',
+              niche: data.niche || '',
+              nicheId: data.nicheId || '',
               faqs: data.faqs || [],
               packages: data.packages || {
                 basic: {
@@ -110,6 +116,39 @@ const EditPackage = () => {
     enabled: !!id,
   });
 
+  // Backward-compatibility: if existing package had a child category stored as category, resolve its parent & subcategory
+  useEffect(() => {
+    if (!categoryList || categoryList.length === 0 || !state.category) return;
+    const matchedChild = categoryList.find(
+      (c: any) =>
+        c.parentId &&
+        (c.slug === state.category || c.name === state.category || c._id === state.category || c.id === state.category)
+    );
+    if (matchedChild && !state.subcategory) {
+      const parent = parentCategories.find(
+        (p: any) => p._id === matchedChild.parentId || p.id === matchedChild.parentId
+      );
+      if (parent) {
+        dispatch({
+          type: 'CHANGE_INPUT',
+          payload: { name: 'category', value: parent.slug || parent.name }
+        });
+        dispatch({
+          type: 'CHANGE_INPUT',
+          payload: { name: 'subcategory', value: matchedChild.slug || matchedChild.name }
+        });
+        dispatch({
+          type: 'CHANGE_INPUT',
+          payload: { name: 'subcategoryId', value: matchedChild._id || matchedChild.id }
+        });
+        dispatch({
+          type: 'CHANGE_INPUT',
+          payload: { name: 'categoryId', value: matchedChild._id || matchedChild.id }
+        });
+      }
+    }
+  }, [categoryList, parentCategories, state.category, state.subcategory]);
+
   const mutation = useMutation({
     mutationFn: (pkg: any) =>
       axiosFetch.patch(`/gigs/${id}`, pkg)
@@ -131,6 +170,111 @@ const EditPackage = () => {
     dispatch({
       type: 'CHANGE_INPUT',
       payload: { name, value }
+    });
+  };
+
+  const currentSubcategories = getSubcategories(state.category);
+  const currentNiches = getNiches(state.subcategory);
+
+  // Dedicated handler for parent category selection (resets subcategory & niche)
+  const handleCategorySelect = (val: string | number) => {
+    const stringVal = String(val);
+    const selectedParent = parentCategories.find(
+      (p: any) => (p.slug || p._id || p.id) === stringVal || p.name === stringVal
+    );
+    const parentId = selectedParent?._id || selectedParent?.id || '';
+
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'category', value: stringVal }
+    });
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'categoryId', value: parentId }
+    });
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'subcategory', value: '' }
+    });
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'subcategoryId', value: '' }
+    });
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'niche', value: '' }
+    });
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'nicheId', value: '' }
+    });
+  };
+
+  // Dedicated handler for subcategory selection (resets niche)
+  const handleSubcategorySelect = (val: string | number) => {
+    const stringVal = String(val);
+    const subs = getSubcategories(state.category);
+    const selectedSub = subs.find(
+      (s: any) => (s.slug || s._id || s.id) === stringVal || s.name === stringVal
+    );
+    const subId = selectedSub?._id || selectedSub?.id || '';
+
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'subcategory', value: stringVal }
+    });
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'subcategoryId', value: subId }
+    });
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'niche', value: '' }
+    });
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'nicheId', value: '' }
+    });
+
+    const selectedParent = parentCategories.find(
+      (p: any) => (p.slug || p._id || p.id) === state.category || p.name === state.category
+    );
+    const finalId = subId || selectedParent?._id || selectedParent?.id || '';
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'categoryId', value: finalId }
+    });
+  };
+
+  // Dedicated handler for niche selection (2nd child)
+  const handleNicheSelect = (val: string | number) => {
+    const stringVal = String(val);
+    const niches = getNiches(state.subcategory);
+    const selectedNiche = niches.find(
+      (n: any) => (n.slug || n._id || n.id) === stringVal || n.name === stringVal
+    );
+    const nicheId = selectedNiche?._id || selectedNiche?.id || '';
+
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'niche', value: stringVal }
+    });
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'nicheId', value: nicheId }
+    });
+
+    const subs = getSubcategories(state.category);
+    const selectedSub = subs.find(
+      (s: any) => (s.slug || s._id || s.id) === state.subcategory || s.name === state.subcategory
+    );
+    const selectedParent = parentCategories.find(
+      (p: any) => (p.slug || p._id || p.id) === state.category || p.name === state.category
+    );
+    const finalId = nicheId || selectedSub?._id || selectedSub?.id || selectedParent?._id || selectedParent?.id || '';
+    dispatch({
+      type: 'CHANGE_INPUT',
+      payload: { name: 'categoryId', value: finalId }
     });
   };
 
@@ -345,8 +489,45 @@ const EditPackage = () => {
   const handleFormSubmit = (event: any) => {
     if (event) event.preventDefault();
 
+    // Resolve hierarchical category, subcategory, and niche information
+    const selectedParent = parentCategories.find(
+      (p: any) => (p.slug || p._id || p.id) === state.category || p.name === state.category
+    );
+    const currentSubs = getSubcategories(state.category);
+    const selectedSub = currentSubs.find(
+      (s: any) => (s.slug || s._id || s.id) === state.subcategory || s.name === state.subcategory
+    );
+    const currentNiches = getNiches(state.subcategory);
+    const selectedNiche = currentNiches.find(
+      (n: any) => (n.slug || n._id || n.id) === state.niche || n.name === state.niche
+    );
+
+    // Deepest chosen category ID is sent as categoryId (UUID): niche > subcategory > parent
+    const resolvedCategoryId =
+      selectedNiche?._id ||
+      selectedNiche?.id ||
+      selectedSub?._id ||
+      selectedSub?.id ||
+      selectedParent?._id ||
+      selectedParent?.id ||
+      state.categoryId ||
+      undefined;
+
+    const resolvedCategoryName = selectedParent?.name || state.category;
+    const resolvedSubcategoryName = selectedSub?.name || state.subcategory || undefined;
+
+    const {
+      subcategoryId: _unusedSubId,
+      niche: _unusedNiche,
+      nicheId: _unusedNicheId,
+      ...cleanState
+    } = (state as any);
+
     const form = {
-      ...state,
+      ...cleanState,
+      categoryId: resolvedCategoryId,
+      category: resolvedCategoryName,
+      subcategory: resolvedSubcategoryName,
       faqs: state.faqs || []
     };
     if (form.packages?.basic) {
@@ -421,16 +602,69 @@ const EditPackage = () => {
             <label className={labelClasses}>Gig Title</label>
             <input name='title' type="text" className={inputClasses} placeholder="e.g. I will do something I'm really good at" onChange={handleFormChange} value={state.title || ''} />
 
-            <label className={labelClasses}>Category</label>
-            <CustomSelect
-              options={categoryList.map((item: any) => ({
-                value: item.slug || item.name || item._id || String(item),
-                label: item.name || (item.slug ? item.slug[0].toUpperCase() + item.slug.slice(1) : String(item))
-              }))}
-              value={state.category || ''}
-              onChange={(val) => handleFormChange({ target: { name: 'category', value: val } })}
-              placeholder="Select Category"
-            />
+            {/* Category, Subcategory & Niche Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="flex flex-col gap-2">
+                <label className={labelClasses}>
+                  Category <span className="text-red-500">*</span>
+                </label>
+                <CustomSelect
+                  options={parentCategories.map((item: any) => ({
+                    value: item.slug || item.name || item._id || String(item),
+                    label: item.name || (item.slug ? item.slug[0].toUpperCase() + item.slug.slice(1) : String(item))
+                  }))}
+                  value={state.category || ''}
+                  onChange={handleCategorySelect}
+                  placeholder="Select Category"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <label className={labelClasses}>Subcategory</label>
+                  <span className="text-xs text-slate-400 font-normal">Optional</span>
+                </div>
+                <CustomSelect
+                  options={currentSubcategories.map((sub: any) => ({
+                    value: sub.slug || sub.name || sub._id || String(sub),
+                    label: sub.name || sub.slug
+                  }))}
+                  value={state.subcategory || ''}
+                  onChange={handleSubcategorySelect}
+                  disabled={!state.category || currentSubcategories.length === 0}
+                  placeholder={
+                    !state.category
+                      ? "Select category first"
+                      : currentSubcategories.length === 0
+                      ? "No subcategories"
+                      : "Select Subcategory"
+                  }
+                />
+              </div>
+
+              <div className="flex flex-col gap-2 sm:col-span-2 lg:col-span-1">
+                <div className="flex items-center justify-between">
+                  <label className={labelClasses}>Niche</label>
+                  <span className="text-xs text-slate-400 font-normal">Optional</span>
+                </div>
+                <CustomSelect
+                  options={currentNiches.map((n: any) => ({
+                    value: n.slug || n.name || n._id || String(n),
+                    label: n.name || n.slug
+                  }))}
+                  value={state.niche || ''}
+                  onChange={handleNicheSelect}
+                  disabled={!state.subcategory || currentNiches.length === 0}
+                  placeholder={
+                    !state.subcategory
+                      ? "Select subcategory first"
+                      : currentNiches.length === 0
+                      ? "No niches"
+                      : "Select Niche"
+                  }
+                />
+              </div>
+            </div>
 
             {/* Media & Attachment Section */}
             <div className="flex flex-col gap-5 p-5 bg-slate-50 border border-dashed border-slate-300 rounded-xl">

@@ -92,7 +92,7 @@ const PackageContent = () => {
   useEffect(() => {
     const handleScroll = () => {
       const sectionIds = ['section-about', 'section-seller', 'section-packages', 'section-reviews', 'section-faq'];
-      const scrollPos = window.scrollY + 180;
+      const scrollPos = window.scrollY + 225;
       for (let i = sectionIds.length - 1; i >= 0; i--) {
         const el = document.getElementById(sectionIds[i]);
         if (el && el.offsetTop <= scrollPos) {
@@ -109,7 +109,7 @@ const PackageContent = () => {
     setActiveSection(sectionId);
     const element = document.getElementById(sectionId);
     if (element) {
-      const offset = 120;
+      const offset = 215;
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = element.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
@@ -300,7 +300,7 @@ const PackageContent = () => {
           </div>
 
           {/* RIGHT STICKY PRICING SIDEBAR */}
-          <div className="lg:col-span-4 sticky top-6 lg:top-8 self-start">
+          <div className="lg:col-span-4 sticky top-[150px] self-start z-20">
             <PackagePricingSidebar
               packages={normalizedData.packages}
               seller={normalizedData.seller}

@@ -22,7 +22,7 @@ export const PackageSectionNav: React.FC<PackageSectionNavProps> = ({
   ];
 
   return (
-    <div className="w-full bg-[#F8F9FA] border border-gray-200/80 rounded-2xl p-1.5 mb-8 flex items-center gap-1.5 overflow-x-auto no-scrollbar sticky top-20 z-20 shadow-2xs">
+    <div className="w-full bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-2xl p-1.5 mb-8 flex items-center gap-1.5 overflow-x-auto no-scrollbar sticky top-[150px] z-30 shadow-xs">
       {sections.map((sec) => {
         const isActive = activeSection === sec.id;
         return (

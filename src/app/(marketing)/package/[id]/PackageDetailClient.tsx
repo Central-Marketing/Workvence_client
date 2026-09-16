@@ -906,8 +906,9 @@ const PackageContent = ({ initialPackage }: { initialPackage?: any }) => {
           </div>
 
           {/* RIGHT PRICING & TIER SWITCHER SIDEBAR */}
+          {/* Sticky Pricing Sidebar - Real Backend Data */}
           <div className="lg:col-span-4">
-            <div className="sticky top-28 space-y-4">
+            <div className="sticky top-[150px] space-y-4">
 
               {/* White Package Tier Card */}
               <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-xs transition-all">

@@ -22,8 +22,9 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
     setErrorMsg("");
 
     try {
+      const briefId = brief._id || brief.id;
       const response = await axiosFetch.post(
-        `/briefs/${brief._id}/proposals`,
+        `/briefs/${briefId}/proposals`,
         {
           price: Number(price),
           deliveryTime: Number(deliveryTime),

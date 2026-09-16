@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import moment from "moment";
 import toast from "react-hot-toast";
 import {
@@ -19,6 +20,7 @@ import {
   FiX,
   FiSend,
   FiStar,
+  FiHeart,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 
@@ -26,106 +28,43 @@ import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader, SubmitProposalModal } from "@/components";
 
-const DEFAULT_PROPOSAL_AVATARS = [
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80",
-];
-
-const getSkills = (brief: any) => {
-  if (Array.isArray(brief?.mandatorySkills) && brief.mandatorySkills.length > 0) {
-    return {
-      mandatory: brief.mandatorySkills,
-      niceToHave: Array.isArray(brief.niceToHaveSkills) ? brief.niceToHaveSkills : [],
-    };
+function formatCategoryName(cat?: string): string {
+  if (!cat) return "";
+  const cleaned = cat.trim();
+  if (cleaned.includes("&") || (cleaned.includes(" ") && !cleaned.includes("-"))) {
+    return cleaned;
   }
-  if (Array.isArray(brief?.skills) && brief.skills.length > 0) {
-    return {
-      mandatory: brief.skills.slice(0, 5),
-      niceToHave: brief.skills.slice(5),
-    };
-  }
-
-  // Intelligent contextual fallback based on category & title
-  const cat = (brief?.category || "").toLowerCase();
-  const title = (brief?.title || "").toLowerCase();
-
-  if (cat.includes("data") || title.includes("data") || title.includes("ai") || title.includes("analys")) {
-    return {
-      mandatory: ["Agentic Engineering", "Data Analytics", "Statistics Management", "Analytical Thinker", "PandasPy"],
-      niceToHave: ["Numpy", "Pytorch"],
-    };
-  }
-  if (cat.includes("design") || title.includes("design") || title.includes("graphic") || title.includes("illustrat")) {
-    return {
-      mandatory: ["UI/UX Design", "Figma", "Graphic Illustration", "Adobe Illustrator", "Visual Identity"],
-      niceToHave: ["Photoshop", "After Effects"],
-    };
-  }
-  if (cat.includes("mobile") || title.includes("mobile") || title.includes("app") || title.includes("flutter")) {
-    return {
-      mandatory: ["React Native", "Flutter", "Mobile UI", "TypeScript", "State Management"],
-      niceToHave: ["Swift", "Kotlin"],
-    };
-  }
-  if (cat.includes("security") || title.includes("security") || title.includes("cyber")) {
-    return {
-      mandatory: ["Network Security", "Penetration Testing", "Threat Analysis", "Firewall Configuration", "Encryption"],
-      niceToHave: ["Wireshark", "CISSP"],
-    };
-  }
-  if (cat.includes("web") || title.includes("web") || title.includes("software") || title.includes("full stack")) {
-    return {
-      mandatory: ["Next.js", "TypeScript", "Tailwind CSS", "REST APIs", "Node.js"],
-      niceToHave: ["PostgreSQL", "Docker"],
-    };
-  }
-
-  return {
-    mandatory: [brief?.category || "General", "Professional", "Quality Assurance"],
-    niceToHave: ["Problem Solving", "Communication"],
-  };
-};
+  return cleaned
+    .split("-")
+    .map((w) => {
+      const lower = w.toLowerCase();
+      if (lower === "and") return "&";
+      if (lower === "ai") return "AI";
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(" ");
+}
 
 const normalizeProposal = (p: any, idx: number) => {
-  const seller =
-    typeof p.sellerID === "object" && p.sellerID !== null
-      ? p.sellerID
-      : typeof p.sellerId === "object" && p.sellerId !== null
-      ? p.sellerId
-      : typeof p.seller === "object" && p.seller !== null
-      ? p.seller
-      : {};
-
+  const seller = p.seller || (typeof p.sellerID === "object" ? p.sellerID : null) || {};
   const id = p._id || p.id || `prop-${idx}`;
   const sellerId = seller._id || seller.id || p.sellerID || p.sellerId || "";
-  const name = seller.username || seller.name || `Freelancer #${idx + 1}`;
-  const avatar =
-    seller.image ||
-    seller.avatar ||
-    DEFAULT_PROPOSAL_AVATARS[idx % DEFAULT_PROPOSAL_AVATARS.length];
-  const role = seller.title || seller.role || "Specialist";
-  const badge =
-    seller.badge ||
-    (idx === 0 ? "Expert" : idx === 1 ? "Freelancer" : idx === 2 ? "Pro" : "Senior");
+  const name = seller.username || seller.name || "Freelancer";
+  const avatar = seller.image || seller.avatar || "";
+  const country = seller.country || "";
+  const badge = seller.sellerLevel || (seller.isTopRated ? "Top Rated" : "");
   const rating =
-    typeof seller.rating === "number"
+    typeof seller.starRating === "number"
+      ? seller.starRating
+      : typeof seller.rating === "number"
       ? seller.rating
-      : Number((4.9 - idx * 0.1).toFixed(1));
-  const reviewCount = seller.reviewCount || 200 + idx * 45;
-  const completedProjects =
-    seller.completedProjects || seller.projectsCount || 15 + idx * 8;
-  const memberSince = seller.createdAt ? moment(seller.createdAt).format("YYYY") : "2024";
-  const price = typeof p.price === "number" ? p.price : 2200;
-  const deliveryTime = p.deliveryTime || 3;
-  const coverLetter =
-    p.coverLetter ||
-    p.description ||
-    p.message ||
-    "I would love to help you build your custom responsive solution. With extensive experience in full-stack development, modern UI/UX design, and CMS integration, I can deliver a polished result meeting all specifications.";
-  const createdAt = p.createdAt || new Date().toISOString();
+      : null;
+  const reviewCount = seller.totalReviews ?? seller.reviewCount ?? null;
+  const price = typeof p.price === "number" ? p.price : Number(p.price) || 0;
+  const deliveryTime = p.deliveryTime || 0;
+  const coverLetter = p.coverLetter || p.description || p.message || "";
+  const attachments = Array.isArray(p.attachments) ? p.attachments : [];
+  const createdAt = p.createdAt || "";
 
   return {
     id,
@@ -133,15 +72,14 @@ const normalizeProposal = (p: any, idx: number) => {
     sellerId,
     name,
     avatar,
-    role,
+    country,
     badge,
     rating,
     reviewCount,
-    completedProjects,
-    memberSince,
     price,
     deliveryTime,
     coverLetter,
+    attachments,
     createdAt,
   };
 };
@@ -149,7 +87,7 @@ const normalizeProposal = (p: any, idx: number) => {
 const BriefDetail = () => {
   const router = useRouter();
   const params = useParams();
-  const briefId = params.id;
+  const briefId = params.id as string;
   const user = useUserStore((state) => state.user);
   const queryClient = useQueryClient();
 
@@ -166,6 +104,7 @@ const BriefDetail = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiRecommendedIds, setAiRecommendedIds] = useState<string[]>([]);
   const [messagingSellerId, setMessagingSellerId] = useState<string | null>(null);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -198,8 +137,8 @@ const BriefDetail = () => {
     enabled: !!briefId,
   });
 
-  // Fetch real proposals for this brief from backend API
-  const { data: briefProposals = [] } = useQuery<any[]>({
+  // Fetch real proposals for this brief if not included in brief payload
+  const { data: fetchedProposals = [] } = useQuery<any[]>({
     queryKey: ["brief-proposals", briefId],
     queryFn: () =>
       axiosFetch
@@ -211,14 +150,39 @@ const BriefDetail = () => {
           return [];
         })
         .catch(() => []),
-    enabled: !!briefId,
+    enabled: !!briefId && (!brief?.proposals || brief.proposals.length === 0),
   });
+
+  const rawProposals: any[] = useMemo(() => {
+    if (Array.isArray(brief?.proposals) && brief.proposals.length > 0) {
+      return brief.proposals;
+    }
+    if (Array.isArray(fetchedProposals) && fetchedProposals.length > 0) {
+      return fetchedProposals;
+    }
+    return [];
+  }, [brief?.proposals, fetchedProposals]);
+
+  const normalizedProposals = useMemo(() => {
+    return rawProposals.map((p, idx) => normalizeProposal(p, idx));
+  }, [rawProposals]);
+
+  const totalProposalsCount =
+    normalizedProposals.length ||
+    brief?.proposalCount ||
+    brief?._count?.proposals ||
+    brief?.proposalsCount ||
+    0;
 
   const isClosed = brief?.isClosed || brief?.status === "closed";
   const isOwner =
     brief &&
     user &&
-    (brief.userID?._id === user._id || brief.userID === user._id);
+    (brief.userID?._id === user._id ||
+      brief.userID === user._id ||
+      brief.userID === user.id ||
+      brief.user?.id === user._id ||
+      brief.user?.id === user.id);
   const isSeller = user?.isSeller;
 
   // Check if seller already submitted a proposal
@@ -234,17 +198,66 @@ const BriefDetail = () => {
           else if (Array.isArray(data?.data)) props = data.data;
 
           return props.filter(
-            (p: any) => p.briefID === briefId || p.briefID?._id === briefId
+            (p: any) =>
+              p.briefID === briefId ||
+              p.briefID?._id === briefId ||
+              p.briefID?.id === briefId ||
+              p.briefID === brief?._id ||
+              p.briefID === brief?.id
           );
         })
         .catch(() => []),
     enabled: !!briefId && !!user && isSeller && !isOwner,
   });
 
-  const myProposal = myProposals[0];
+  const sellerUserId = user?._id || user?.id;
+  const proposalFromBrief = useMemo(() => {
+    if (!sellerUserId || !rawProposals.length) return null;
+    return rawProposals.find((p: any) => {
+      const s = p.seller || (typeof p.sellerID === "object" ? p.sellerID : null);
+      const sid = s?._id || s?.id || p.sellerID || p.sellerId;
+      return sid === sellerUserId;
+    });
+  }, [sellerUserId, rawProposals]);
+
+  const myProposal = myProposals[0] || proposalFromBrief;
   const hasAlreadyProposed = !!myProposal;
   const activeProposal = submittedProposalData || myProposal;
   const showSubmittedUI = proposalSent || hasAlreadyProposed;
+
+  // Unified proposal action handler for guest user vs logged-in seller vs owner
+  const handleProposalAction = () => {
+    // 1. Guest user: redirect to login/register
+    if (!user) {
+      router.push(`/login?redirect=${encodeURIComponent(`/briefs/${briefId}`)}`);
+      return;
+    }
+
+    // 2. Project owner: view proposals
+    if (isOwner) {
+      setModalView("list");
+      setShowProposalsModal(true);
+      return;
+    }
+
+    // 3. Logged-in Seller: send or view proposal
+    if (isSeller) {
+      if (isClosed) {
+        toast.error("This project is closed and no longer accepting proposals");
+        return;
+      }
+      if (showSubmittedUI) {
+        setShowMyProposalModal(true);
+      } else {
+        setShowModal(true);
+      }
+      return;
+    }
+
+    // 4. Logged-in non-seller (buyer): prompt to become a seller
+    toast.error("Only registered sellers can send proposals. Please register as a seller to apply.");
+    router.push("/register?seller=true");
+  };
 
   // Close brief mutation (buyer)
   const closeMutation = useMutation({
@@ -265,29 +278,30 @@ const BriefDetail = () => {
     if (typeof window !== "undefined") {
       localStorage.setItem(`proposed_${briefId}`, "true");
     }
+    queryClient.invalidateQueries({ queryKey: ["brief", briefId] });
+    queryClient.invalidateQueries({ queryKey: ["brief-proposals", briefId] });
+    queryClient.invalidateQueries({ queryKey: ["my-proposals-for-brief", briefId] });
     if (!isAlreadySubmitted) {
       toast.success("Proposal submitted successfully!");
     }
   };
 
-  const skillsData = useMemo(() => getSkills(brief), [brief]);
-
-  const normalizedProposals = useMemo(() => {
-    return briefProposals.map((p, idx) => normalizeProposal(p, idx));
-  }, [briefProposals]);
-
-  const proposalAvatars = useMemo(() => {
-    if (normalizedProposals.length > 0) {
-      return normalizedProposals.map((p) => p.avatar).slice(0, 3);
+  const skills: string[] = useMemo(() => {
+    if (Array.isArray(brief?.requiredSkills) && brief.requiredSkills.length > 0) {
+      return brief.requiredSkills;
     }
-    return DEFAULT_PROPOSAL_AVATARS.slice(0, 3);
-  }, [normalizedProposals]);
+    if (Array.isArray(brief?.skills) && brief.skills.length > 0) {
+      return brief.skills;
+    }
+    return [];
+  }, [brief]);
 
-  const totalProposalsCount =
-    briefProposals.length ||
-    brief?.proposalCount ||
-    brief?.proposalsCount ||
-    (Array.isArray(brief?.proposals) ? brief.proposals.length : 0);
+  const attachments: string[] = useMemo(() => {
+    if (Array.isArray(brief?.attachments) && brief.attachments.length > 0) {
+      return brief.attachments;
+    }
+    return [];
+  }, [brief]);
 
   // Message seller handler
   const handleMessageSeller = async (sellerId: string, sellerName: string) => {
@@ -392,151 +406,115 @@ const BriefDetail = () => {
     );
   }
 
-  // Spec values
-  const locationValue = brief.location || brief.workType || "Remote";
-  const hoursLabel = brief.hoursPerWeek ? `${brief.hoursPerWeek} hours/week` : "Less than 30 hours/week";
-  const hourlyValue = brief.hoursPerWeek
-    ? "Hourly"
-    : brief.budget
-    ? typeof brief.budget === "number"
-      ? `$${brief.budget}`
-      : String(brief.budget)
-    : "Hourly";
-  const durationValue = brief.duration || (brief.deliveryTime ? `${brief.deliveryTime} Days` : "3 months");
+  // Spec values from real backend data with Fiverr-style fallbacks
+  const locationValue = brief.user?.country || brief.location || brief.workType || "Worldwide";
+  const budgetValue =
+    brief.budget !== undefined && brief.budget !== null
+      ? typeof brief.budget === "number"
+        ? `$${brief.budget.toLocaleString()}`
+        : String(brief.budget).startsWith("$")
+        ? brief.budget
+        : `$${brief.budget}`
+      : "Flexible";
+
+  const durationValue = brief.deliveryTime
+    ? `${brief.deliveryTime} Days`
+    : brief.duration || "Flexible";
   const experienceValue = brief.experienceLevel || "Intermediate";
-  const projectTypeValue = brief.projectType || "Ongoing";
-  const rateBadge = brief.hoursPerWeek
-    ? `${brief.hoursPerWeek} hrs/week`
-    : brief.budget
-    ? typeof brief.budget === "number"
-      ? `$${brief.budget}`
-      : String(brief.budget)
-    : "40 hrs/week";
+  const projectTypeValue = isClosed
+    ? "Closed"
+    : brief.projectType || (brief.budget ? "Fixed Project" : "Ongoing");
+  const rateBadge = budgetValue;
+  const categoryFormatted = formatCategoryName(brief.category);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-10 font-sans">
-      <div className="container mx-auto px-4 md:px-6">
+    <div className="min-h-screen bg-[#FAFAFA] text-slate-800 pb-20 pt-6 sm:pt-8 font-sans">
+      <div className="container mx-auto">
         {/* Top Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-4">
+        <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-5 select-none">
           <Link
             href="/"
-            className="text-teal-600 hover:text-teal-700 transition-colors flex items-center gap-1"
+            className="text-[#327C73] hover:text-[#256059] transition-colors flex items-center gap-1"
           >
-            <FiHome className="text-sm" />
+            <FiHome className="text-sm text-[#327C73]" />
           </Link>
           <span className="text-slate-300">/</span>
           <Link
-            href="/briefs/my-briefs"
+            href="/briefs"
             className="hover:text-slate-800 transition-colors"
           >
-            My Projects
+            Briefs
           </Link>
           <span className="text-slate-300">/</span>
-          <span className="text-slate-700 truncate max-w-[200px] sm:max-w-none">
-            {brief.title}
+          <span className="text-slate-700 truncate max-w-[200px] sm:max-w-none font-normal">
+            {categoryFormatted}
           </span>
         </div>
 
-        {/* Header Section */}
-        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-6">
+        {/* Main Title & Header */}
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-slate-900 tracking-tight leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-slate-900 tracking-tight font-sf-pro leading-tight">
               {brief.title}
             </h1>
-            <p className="text-slate-500 text-xs sm:text-sm mt-2 leading-relaxed">
+            <p className="text-slate-500 text-xs sm:text-sm mt-1.5 leading-relaxed font-normal">
               Explore briefs from clients looking for the right talent, skills, and expertise to bring their ideas to life.
             </p>
-
-            {/* Sub-bar: View All Proposals + Posted time */}
-            <div className="flex items-center gap-3 mt-4 text-xs sm:text-sm">
-              <button
-                type="button"
-                onClick={() => {
-                  setModalView("list");
-                  setShowProposalsModal(true);
-                }}
-                className="font-bold text-[#0D9488] hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                <span>View All Proposals</span>
-                <FiArrowRight className="text-sm" />
-              </button>
-              <span className="text-slate-300">•</span>
-              <span className="text-slate-400 text-xs">
-                Posted {moment(brief.createdAt).fromNow()}
-              </span>
-              {isClosed && (
-                <>
-                  <span className="text-slate-300">•</span>
-                  <span className="text-rose-600 font-semibold text-xs">Closed</span>
-                </>
-              )}
-            </div>
           </div>
 
-          {/* Right Badges & Action Buttons */}
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0 self-start">
-            {/* Purple Rate Badge */}
-            <span className="bg-[#F3E8FF] text-[#7E22CE] border border-[#E9D5FF] text-xs font-bold px-3.5 py-1 rounded-full whitespace-nowrap">
+          {/* Right Badges & Heart Icon */}
+          <div className="flex items-center gap-2.5 shrink-0 self-start">
+            {/* Purple Rate / Budget Badge */}
+            <span className="bg-[#ECEBFE] text-[#6B5AED] text-xs font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap tracking-tight">
               {rateBadge}
             </span>
 
             {/* Category Pill */}
-            <span className="bg-slate-50 border border-slate-200 text-slate-800 text-xs font-semibold px-3.5 py-1 rounded-full whitespace-nowrap">
-              {brief.category || "Business Intelligence"}
-            </span>
-
-            {/* Owner Actions */}
-            {isOwner && !isClosed && (
-              <button
-                type="button"
-                onClick={() => closeMutation.mutate()}
-                disabled={closeMutation.isPending}
-                className="px-4 py-1.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200 text-xs font-semibold hover:bg-rose-100 transition-colors cursor-pointer"
-              >
-                {closeMutation.isPending ? "Closing..." : "Close Project"}
-              </button>
+            {categoryFormatted && (
+              <span className="bg-white border border-slate-200 text-slate-800 text-xs font-medium px-4 py-1.5 rounded-full whitespace-nowrap shadow-2xs tracking-tight">
+                {categoryFormatted}
+              </span>
             )}
 
-            {/* Seller Proposal Button */}
-            {isSeller && !isOwner && !isClosed && (
-              showSubmittedUI ? (
-                <button
-                  type="button"
-                  onClick={() => setShowMyProposalModal(true)}
-                  className="px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold hover:bg-emerald-100 transition-colors cursor-pointer flex items-center gap-1.5"
-                >
-                  <FiCheck />
-                  <span>Proposal Submitted</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setShowModal(true)}
-                  className="px-4.5 py-1.5 rounded-full bg-[#0B0F19] hover:bg-black text-white text-xs font-semibold transition-colors cursor-pointer shadow-xs flex items-center gap-1.5"
-                >
-                  <FiSend className="text-xs" />
-                  <span>Submit Proposal</span>
-                </button>
-              )
+            {/* Closed Status Pill */}
+            {isClosed && (
+              <span className="bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold px-3 py-1.5 rounded-full whitespace-nowrap tracking-tight">
+                Closed
+              </span>
             )}
+
+            {/* Favorite Button */}
+            <button
+              type="button"
+              onClick={() => setIsFavorited(!isFavorited)}
+              className="w-9 h-9 rounded-full border border-slate-200/90 bg-white flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50/40 transition-colors cursor-pointer shrink-0 shadow-2xs"
+              title="Save project"
+            >
+              <FiHeart className={`w-4 h-4 transition-colors ${isFavorited ? "fill-red-500 text-red-500" : ""}`} />
+            </button>
           </div>
         </div>
 
-        {/* Divider */}
-        <hr className="border-slate-200/80 my-7" />
+        {/* Thin Divider Line */}
+        <hr className="border-slate-200/70 my-6" />
+
+        {/* Posted Time */}
+        <p className="text-xs text-slate-400 font-normal mb-6">
+          Posted {moment(brief.createdAt).fromNow()}
+        </p>
 
         {/* Overview Section */}
-        <div className="mb-7">
-          <h2 className="text-base sm:text-lg font-bold text-slate-900 mb-2.5">
+        <div className="mb-8">
+          <h2 className="text-base sm:text-[17px] font-bold text-slate-900 mb-2.5">
             Overview
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal whitespace-pre-wrap max-w-5xl">
+          <div className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal whitespace-pre-wrap max-w-5xl">
             {brief.description}
-          </p>
+          </div>
         </div>
 
         {/* 5-Column Specification Metric Card */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-4 sm:p-5 my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-4 sm:p-5 my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
           {/* Spec 1: Location */}
           <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-3 first:pl-0">
             <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0">
@@ -559,10 +537,10 @@ const BriefDetail = () => {
             </div>
             <div className="min-w-0">
               <span className="text-[11px] text-slate-400 font-medium block truncate">
-                {hoursLabel}
+                Budget
               </span>
               <p className="font-bold text-sm sm:text-[15px] text-slate-900 truncate">
-                {hourlyValue}
+                {budgetValue}
               </p>
             </div>
           </div>
@@ -597,16 +575,28 @@ const BriefDetail = () => {
             </div>
           </div>
 
-          {/* Spec 5: Project Type */}
+          {/* Spec 5: Project Type / Status */}
           <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
-              <FiFileText className="text-amber-500 text-base" />
+            <div
+              className={`w-10 h-10 rounded-xl ${
+                isClosed
+                  ? "bg-rose-50 border border-rose-100"
+                  : "bg-amber-50 border border-amber-100"
+              } flex items-center justify-center shrink-0`}
+            >
+              <FiFileText
+                className={`${isClosed ? "text-rose-500" : "text-amber-500"} text-base`}
+              />
             </div>
             <div className="min-w-0">
               <span className="text-[11px] text-slate-400 font-medium block">
                 Project type
               </span>
-              <p className="font-bold text-sm sm:text-[15px] text-slate-900 truncate">
+              <p
+                className={`font-bold text-sm sm:text-[15px] ${
+                  isClosed ? "text-rose-600" : "text-slate-900"
+                } truncate`}
+              >
                 {projectTypeValue}
               </p>
             </div>
@@ -615,75 +605,218 @@ const BriefDetail = () => {
 
         {/* Mandatory Skills Section */}
         <div className="mb-6">
-          <h2 className="text-base sm:text-lg font-bold text-slate-900 mb-3">
+          <h2 className="text-base sm:text-[17px] font-bold text-slate-900 mb-3">
             Mandatory Skills
           </h2>
-          <div className="flex flex-wrap items-center gap-2.5">
-            {skillsData.mandatory.map((skill: string, idx: number) => (
-              <span
-                key={idx}
-                className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3.5 py-1.5 rounded-lg border border-slate-200/60"
+          {skills.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2.5">
+              {skills.slice(0, 5).map((skill: string, idx: number) => (
+                <span
+                  key={idx}
+                  className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3.5 py-1.5 rounded-lg border border-slate-200/60"
+                >
+                  {skill}
+                </span>
+              ))}
+              {skills.length > 5 && (
+                <span className="bg-[#F1F3F5] text-slate-700 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200/60">
+                  +{skills.length - 5}
+                </span>
+              )}
+            </div>
+          ) : (
+            <p className="text-xs text-slate-400">
+              No specific mandatory skills listed for this project.
+            </p>
+          )}
+        </div>
+
+        {/* Nice to Skills Section */}
+        {attachments.length > 0 ? (
+          <div className="mb-8">
+            <h2 className="text-base sm:text-[17px] font-bold text-slate-900 mb-3">
+              Attachments ({attachments.length})
+            </h2>
+            <div className="flex flex-wrap gap-3">
+              {attachments.map((att: string, idx: number) => (
+                <a
+                  key={idx}
+                  href={att}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:border-teal-600 text-xs font-semibold text-slate-700 hover:text-teal-700 transition-colors shadow-2xs"
+                >
+                  <FiFileText className="text-teal-600 text-sm" />
+                  <span className="truncate max-w-[220px]">Attachment #{idx + 1}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {/* Proposal Activity Section */}
+        <div className="mb-10">
+          <h2 className="text-base sm:text-[17px] font-bold text-slate-900 mb-3">
+            Proposal Activity
+          </h2>
+
+          <div className="flex items-center gap-3">
+            {/* Real Seller Avatars Stack */}
+            <div className="flex items-center -space-x-2">
+              {normalizedProposals.slice(0, 3).map((item, aIdx) =>
+                item.avatar ? (
+                  <img
+                    key={aIdx}
+                    src={item.avatar}
+                    alt={item.name}
+                    className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-2xs"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLElement).style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <div
+                    key={aIdx}
+                    className="w-8 h-8 rounded-full bg-teal-50 border-2 border-white text-[11px] font-bold text-teal-800 flex items-center justify-center shadow-2xs uppercase"
+                  >
+                    {item.name.slice(0, 2)}
+                  </div>
+                )
+              )}
+              {totalProposalsCount > 3 ? (
+                <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white text-[11px] font-bold text-slate-700 flex items-center justify-center shadow-2xs">
+                  {totalProposalsCount}+
+                </div>
+              ) : totalProposalsCount === 0 ? (
+                <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white text-[11px] font-bold text-slate-400 flex items-center justify-center shadow-2xs">
+                  0
+                </div>
+              ) : null}
+            </div>
+
+            <div>
+              <p className="text-xs sm:text-[13px] font-bold text-slate-900 leading-tight">
+                {totalProposalsCount} {totalProposalsCount === 1 ? "proposal" : "proposals"}
+              </p>
+              <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
+                {totalProposalsCount > 0
+                  ? "Review candidate proposals"
+                  : "Be the first to submit a proposal"}
+              </p>
+            </div>
+          </div>
+
+          {/* Action Button: Guest ("Join Now") vs Logged-in Seller ("Send Proposal" / "Proposal Submitted") vs Owner ("View Proposals") */}
+          <div className="mt-4">
+            {!user ? (
+              <button
+                type="button"
+                onClick={handleProposalAction}
+                className="bg-black hover:bg-slate-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
               >
-                {skill}
-              </span>
-            ))}
-            {skillsData.mandatory.length >= 5 && (
-              <span className="bg-[#F1F3F5] text-slate-700 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200/60">
-                +2
-              </span>
+                <span>Join Now</span>
+                <FiArrowRight className="text-xs" />
+              </button>
+            ) : isOwner ? (
+              <button
+                type="button"
+                onClick={handleProposalAction}
+                className="bg-[#327C73] hover:bg-[#256059] text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+              >
+                <span>View Proposals ({totalProposalsCount})</span>
+                <FiArrowRight className="text-xs" />
+              </button>
+            ) : isSeller ? (
+              showSubmittedUI ? (
+                <button
+                  type="button"
+                  onClick={handleProposalAction}
+                  className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                >
+                  <FiCheck className="text-xs" />
+                  <span>Proposal Submitted</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleProposalAction}
+                  disabled={isClosed}
+                  className={`text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-xs transition-colors ${
+                    isClosed
+                      ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
+                      : "bg-black hover:bg-slate-800 text-white cursor-pointer"
+                  }`}
+                >
+                  <span>{isClosed ? "Project Closed" : "Send Proposal"}</span>
+                  {!isClosed && <FiArrowRight className="text-xs" />}
+                </button>
+              )
+            ) : (
+              <button
+                type="button"
+                onClick={handleProposalAction}
+                className="bg-black hover:bg-slate-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+              >
+                <span>Join as Seller</span>
+                <FiArrowRight className="text-xs" />
+              </button>
             )}
           </div>
         </div>
 
-        {/* Nice to Skills Section */}
-        <div className="mb-8">
-          <h2 className="text-base sm:text-lg font-bold text-slate-900 mb-3">
-            Nice to Skills
-          </h2>
-          <div className="flex flex-wrap items-center gap-2.5">
-            {skillsData.niceToHave.map((skill: string, idx: number) => (
-              <span
-                key={idx}
-                className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3.5 py-1.5 rounded-lg border border-slate-200/60"
-              >
-                {skill}
-              </span>
-            ))}
+        {/* Bottom Banner: "Find the Right Project" (Exact Match to Screenshot) */}
+        <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden mt-12 mb-6 bg-[#042823] min-h-[300px] sm:min-h-[360px] md:min-h-[420px] flex items-center shadow-lg">
+          {/* Background 3D Layered Cards Image */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/media/find_project_banner.jpg"
+              alt="Find the Right Project"
+              fill
+              className="object-cover object-right md:object-center"
+              priority
+            />
+            {/* Deep Green Gradient Overlay for readability on left */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#042823] via-[#042823]/85 to-transparent w-full md:w-3/5" />
           </div>
-        </div>
 
-        {/* Proposal Sender Section */}
-        <div className="pt-2">
-          <h2 className="text-base sm:text-lg font-bold text-slate-900 mb-3.5">
-            Proposal Sender ({totalProposalsCount})
-          </h2>
-
-          <div className="flex items-center gap-3">
-            {/* Avatar Stack */}
-            <div className="flex items-center -space-x-2">
-              {proposalAvatars.map((src: string, aIdx: number) => (
-                <img
-                  key={aIdx}
-                  src={src}
-                  alt="Applicant"
-                  className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-2xs"
-                />
-              ))}
-              <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white text-[11px] font-bold text-slate-700 flex items-center justify-center shadow-2xs">
-                {totalProposalsCount > 3 ? `${totalProposalsCount - 2}+` : "5+"}
-              </div>
-            </div>
-
-            {/* Clickable Modal Opener */}
+          {/* Banner Left Content */}
+          <div className="relative z-10 p-8 sm:p-12 md:p-16 max-w-lg">
+            <h2 className="text-2xl sm:text-3xl md:text-[38px] font-bold text-white tracking-tight leading-tight font-sf-pro mb-3">
+              Find the Right Project
+            </h2>
+            <p className="text-emerald-100/75 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
+              Explore real project opportunities from clients looking for the right skills and expertise.
+            </p>
             <button
               type="button"
-              onClick={() => {
-                setModalView("list");
-                setShowProposalsModal(true);
-              }}
-              className="text-xs sm:text-sm font-semibold text-slate-900 underline hover:text-teal-600 transition-colors cursor-pointer"
+              onClick={handleProposalAction}
+              disabled={isClosed}
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 ${
+                isClosed
+                  ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                  : "bg-white hover:bg-emerald-50 text-slate-900 cursor-pointer"
+              }`}
             >
-              View {totalProposalsCount > 0 ? totalProposalsCount : 14} proposals
+              <span>
+                {isClosed
+                  ? "Project Closed"
+                  : !user
+                  ? "Send Proposal"
+                  : isOwner
+                  ? `View Proposals (${totalProposalsCount})`
+                  : isSeller && showSubmittedUI
+                  ? "View My Proposal"
+                  : isSeller
+                  ? "Send Proposal"
+                  : "Join as Seller"}
+              </span>
+              {!isClosed && (
+                isSeller && showSubmittedUI ? (
+                  <FiCheck className="text-emerald-700 text-xs" />
+                ) : (
+                  <FiArrowRight className="text-xs" />
+                )
+              )}
             </button>
           </div>
         </div>
@@ -720,7 +853,7 @@ const BriefDetail = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                {modalView === "list" && (
+                {modalView === "list" && normalizedProposals.length > 0 && (
                   <button
                     type="button"
                     onClick={handleGetAiRecommendation}
@@ -732,7 +865,7 @@ const BriefDetail = () => {
                   </button>
                 )}
 
-                {/* Red Close Button */}
+                {/* Close Button */}
                 <button
                   type="button"
                   onClick={() => setShowProposalsModal(false)}
@@ -773,47 +906,72 @@ const BriefDetail = () => {
                         {/* Sender Profile Header */}
                         <div className="flex items-start justify-between gap-3 mb-2">
                           <div className="flex items-center gap-3 min-w-0">
-                            <img
-                              src={item.avatar}
-                              alt={item.name}
-                              className="w-11 h-11 rounded-full object-cover border border-slate-200 shrink-0"
-                            />
+                            {item.avatar ? (
+                              <img
+                                src={item.avatar}
+                                alt={item.name}
+                                className="w-11 h-11 rounded-full object-cover border border-slate-200 shrink-0"
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLElement).style.display = "none";
+                                }}
+                              />
+                            ) : (
+                              <div className="w-11 h-11 rounded-full bg-teal-50 text-teal-800 font-bold text-sm flex items-center justify-center border border-teal-200 shrink-0 uppercase">
+                                {item.name.slice(0, 2)}
+                              </div>
+                            )}
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
                                 <span className="font-bold text-sm text-slate-900 truncate">
                                   {item.name}
                                 </span>
-                                <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
-                                  {item.badge}
-                                </span>
+                                {item.badge && (
+                                  <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
+                                    {item.badge}
+                                  </span>
+                                )}
                               </div>
-                              <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-                                <span>{item.role}</span>
-                                <span className="font-bold text-slate-800 flex items-center gap-0.5 ml-1">
-                                  <FiStar className="fill-amber-400 text-amber-400 text-xs" />
-                                  {item.rating}
-                                </span>
-                                <span>({item.reviewCount})</span>
+                              <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                                {item.rating !== null && (
+                                  <span className="font-bold text-slate-800 flex items-center gap-0.5">
+                                    <FiStar className="fill-amber-400 text-amber-400 text-xs" />
+                                    {item.rating}
+                                  </span>
+                                )}
+                                {item.reviewCount !== null && (
+                                  <span>({item.reviewCount} reviews)</span>
+                                )}
+                                {item.country && (
+                                  <span>• {item.country}</span>
+                                )}
                               </div>
-                              <p className="text-[11px] text-slate-400 mt-0.5">
-                                {item.completedProjects} Projects Completed | Submitted{" "}
-                                {moment(item.createdAt).fromNow()}
-                              </p>
+                              {item.createdAt && (
+                                <p className="text-[11px] text-slate-400 mt-0.5">
+                                  Submitted {moment(item.createdAt).fromNow()}
+                                </p>
+                              )}
                             </div>
                           </div>
 
-                          {/* Price */}
+                          {/* Price & Delivery */}
                           <div className="text-right shrink-0">
                             <span className="font-bold text-sm sm:text-base text-[#0D9488]">
                               ${item.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </span>
+                            {item.deliveryTime > 0 && (
+                              <p className="text-[11px] text-slate-400 mt-0.5">
+                                {item.deliveryTime}d delivery
+                              </p>
+                            )}
                           </div>
                         </div>
 
                         {/* Proposal Cover Letter Pitch */}
-                        <p className="text-xs text-slate-600 line-clamp-2 my-3.5 leading-relaxed font-normal">
-                          {item.coverLetter}
-                        </p>
+                        {item.coverLetter && (
+                          <p className="text-xs text-slate-600 line-clamp-2 my-3.5 leading-relaxed font-normal">
+                            {item.coverLetter}
+                          </p>
+                        )}
 
                         {/* Action Buttons */}
                         <div className="flex items-center gap-2.5 pt-1">
@@ -827,17 +985,19 @@ const BriefDetail = () => {
                           >
                             View Proposal
                           </button>
-                          <button
-                            type="button"
-                            disabled={messagingSellerId === item.sellerId}
-                            onClick={() => handleMessageSeller(item.sellerId, item.name)}
-                            className="flex-1 py-2.5 rounded-xl bg-black hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
-                          >
-                            <span>
-                              {messagingSellerId === item.sellerId ? "Connecting..." : "Message"}
-                            </span>
-                            <FiArrowRight className="text-xs" />
-                          </button>
+                          {item.sellerId && (
+                            <button
+                              type="button"
+                              disabled={messagingSellerId === item.sellerId}
+                              onClick={() => handleMessageSeller(item.sellerId, item.name)}
+                              className="flex-1 py-2.5 rounded-xl bg-black hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
+                            >
+                              <span>
+                                {messagingSellerId === item.sellerId ? "Connecting..." : "Message"}
+                              </span>
+                              <FiArrowRight className="text-xs" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
@@ -852,84 +1012,102 @@ const BriefDetail = () => {
                 {/* Sender Profile Card */}
                 <div className="flex items-start justify-between gap-3 pb-4 border-b border-slate-100">
                   <div className="flex items-center gap-3.5 min-w-0">
-                    <img
-                      src={selectedProposal.avatar}
-                      alt={selectedProposal.name}
-                      className="w-14 h-14 rounded-full object-cover border border-slate-200 shrink-0"
-                    />
+                    {selectedProposal.avatar ? (
+                      <img
+                        src={selectedProposal.avatar}
+                        alt={selectedProposal.name}
+                        className="w-14 h-14 rounded-full object-cover border border-slate-200 shrink-0"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLElement).style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-teal-50 text-teal-800 font-bold text-base flex items-center justify-center border border-teal-200 shrink-0 uppercase">
+                        {selectedProposal.name.slice(0, 2)}
+                      </div>
+                    )}
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-base text-slate-900 truncate">
                           {selectedProposal.name}
                         </span>
-                        <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
-                          {selectedProposal.badge}
-                        </span>
+                        {selectedProposal.badge && (
+                          <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
+                            {selectedProposal.badge}
+                          </span>
+                        )}
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-                        <span>{selectedProposal.role}</span>
-                        <span className="font-bold text-slate-800 flex items-center gap-0.5 ml-1">
-                          <FiStar className="fill-amber-400 text-amber-400 text-xs" />
-                          {selectedProposal.rating}
-                        </span>
-                        <span>({selectedProposal.reviewCount})</span>
+                      <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                        {selectedProposal.rating !== null && (
+                          <span className="font-bold text-slate-800 flex items-center gap-0.5">
+                            <FiStar className="fill-amber-400 text-amber-400 text-xs" />
+                            {selectedProposal.rating}
+                          </span>
+                        )}
+                        {selectedProposal.reviewCount !== null && (
+                          <span>({selectedProposal.reviewCount} reviews)</span>
+                        )}
+                        {selectedProposal.country && (
+                          <span>• {selectedProposal.country}</span>
+                        )}
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-1">
-                        {selectedProposal.completedProjects} Projects Completed | 98% Success Rate
-                      </p>
+                      {selectedProposal.createdAt && (
+                        <p className="text-[11px] text-slate-400 mt-1">
+                          Submitted {moment(selectedProposal.createdAt).fromNow()}
+                        </p>
+                      )}
                     </div>
                   </div>
-
-                  <span className="text-[11px] font-semibold text-slate-500 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-md shrink-0">
-                    Member since {selectedProposal.memberSince}
-                  </span>
                 </div>
 
                 {/* Description */}
                 <div>
-                  <h3 className="font-bold text-sm text-slate-900 mb-1.5">Description</h3>
+                  <h3 className="font-bold text-sm text-slate-900 mb-1.5">Cover Letter</h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal whitespace-pre-wrap">
-                    {selectedProposal.coverLetter}
+                    {selectedProposal.coverLetter || "No cover letter provided."}
                   </p>
                 </div>
 
-                {/* Budget */}
-                <div>
-                  <span className="text-xs font-semibold text-slate-400 block">Budget</span>
-                  <p className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-0.5">
-                    ${selectedProposal.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </p>
-                </div>
-
-                {/* Skills */}
-                <div>
-                  <h3 className="font-bold text-sm text-slate-900 mb-2">Skills</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {["Problem solver", "UI Designer", "User Experience Designer", "Analytical Thinker", "Product management"].map(
-                      (skill, sIdx) => (
-                        <span
-                          key={sIdx}
-                          className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3 py-1 rounded-md border border-slate-200/60"
-                        >
-                          {skill}
-                        </span>
-                      )
-                    )}
-                    <span className="bg-[#F1F3F5] text-slate-700 text-xs font-bold px-2.5 py-1 rounded-md border border-slate-200/60">
-                      +2
-                    </span>
+                {/* Budget & Timeline */}
+                <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                  <div>
+                    <span className="text-xs font-semibold text-slate-400 block">Proposed Price</span>
+                    <p className="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">
+                      ${selectedProposal.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold text-slate-400 block">Delivery Time</span>
+                    <p className="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">
+                      {selectedProposal.deliveryTime} Days
+                    </p>
                   </div>
                 </div>
 
-                {/* Contact Box */}
-                <div>
-                  <h3 className="font-bold text-sm text-slate-900 mb-2">Contact</h3>
-                  <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
-                    <div>
-                      <p className="font-bold text-sm text-slate-900">{selectedProposal.name}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">Online • 10:45 AM local time</p>
+                {/* Attachments if any */}
+                {selectedProposal.attachments && selectedProposal.attachments.length > 0 && (
+                  <div>
+                    <h3 className="font-bold text-sm text-slate-900 mb-2">Attachments</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProposal.attachments.map((att: string, aIdx: number) => (
+                        <a
+                          key={aIdx}
+                          href={att}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 transition-colors"
+                        >
+                          <FiFileText className="text-teal-600" />
+                          <span>Attachment #{aIdx + 1}</span>
+                        </a>
+                      ))}
                     </div>
+                  </div>
+                )}
 
+                {/* Contact Box */}
+                {selectedProposal.sellerId && (
+                  <div>
                     <button
                       type="button"
                       disabled={messagingSellerId === selectedProposal.sellerId}
@@ -939,29 +1117,12 @@ const BriefDetail = () => {
                       <span>
                         {messagingSellerId === selectedProposal.sellerId
                           ? "Connecting..."
-                          : "Message"}
+                          : `Message ${selectedProposal.name}`}
                       </span>
                       <FiArrowRight className="text-sm" />
                     </button>
                   </div>
-                </div>
-
-                {/* Work Sample placeholder */}
-                <div>
-                  <h3 className="font-bold text-sm text-slate-900 mb-2">Work Sample</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <img
-                      src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=300&auto=format&fit=crop&q=80"
-                      alt="Sample 1"
-                      className="w-full h-24 rounded-xl object-cover border border-slate-200"
-                    />
-                    <img
-                      src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&auto=format&fit=crop&q=80"
-                      alt="Sample 2"
-                      className="w-full h-24 rounded-xl object-cover border border-slate-200"
-                    />
-                  </div>
-                </div>
+                )}
               </div>
             )}
           </div>

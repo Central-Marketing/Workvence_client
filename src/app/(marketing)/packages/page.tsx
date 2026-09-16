@@ -603,7 +603,7 @@ const Packages = () => {
 
       {/* Main Content Area: Subcategory Hub, Subcategory Services, or General Gigs Listing */}
       {currentTaxonomy && activeCategory !== 'All services' && viewTab === 'hub' ? (
-        <div className="container mx-auto px-4 md:px-6 pb-16 animate-fadeIn">
+        <div className="container mx-auto pb-16 animate-fadeIn">
           {/* 8-Card Subcategory Grid - Pixel Perfect Match */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
             {currentTaxonomy.subcategories.map((subcat) => (
@@ -621,7 +621,7 @@ const Packages = () => {
         </div>
       ) : (currentTaxonomy && activeCategory !== 'All services' && viewTab === 'gigs' && activeSubcategory) ? (
         /* Subcategory Services View - Pixel Perfect Match for Image 2 */
-        <div className="container mx-auto px-4 md:px-6 py-6 sm:py-8 animate-fadeIn">
+        <div className="container mx-auto py-6 sm:py-8 animate-fadeIn">
           {/* 1. Subcategory Header: Breadcrumbs, Title with Chevron Dropdown, Subtitle */}
           <SubcategoryHeader
             categoryName={currentTaxonomy.name}
@@ -764,7 +764,7 @@ const Packages = () => {
         </div>
       ) : (
         /* Main Content - Gigs Listing View */
-        <div className="container mx-auto px-4 md:px-6 py-8">
+        <div className="container mx-auto py-8">
           {/* Breadcrumb + Filter Button Row */}
           <div className="flex items-center justify-between mb-5">
             <div>

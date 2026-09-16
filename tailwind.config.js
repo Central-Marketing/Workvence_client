@@ -3,8 +3,14 @@ module.exports = {
   content: [
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  corePlugins: {
+    container: false, // Disables Tailwind's rigid max-width container in favor of fluid responsive container
+  },
   theme: {
     extend: {
+      screens: {
+        'macbook': '1440px',
+      },
       fontFamily: {
         sans: ["var(--font-sf-pro)", "SF Pro Display", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
         "sf-pro": ["var(--font-sf-pro)", "SF Pro Display", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
@@ -18,5 +24,37 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addComponents }) {
+      addComponents({
+        '.container': {
+          width: '100%',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          paddingLeft: '1rem',
+          paddingRight: '1rem',
+          '@screen sm': {
+            paddingLeft: '1.5rem',
+            paddingRight: '1.5rem',
+          },
+          '@screen md': {
+            paddingLeft: '2rem',
+            paddingRight: '2rem',
+          },
+          '@screen lg': {
+            paddingLeft: '3rem',
+            paddingRight: '3rem',
+          },
+          '@screen xl': {
+            paddingLeft: '80px',
+            paddingRight: '80px',
+          },
+          '@screen 2xl': {
+            paddingLeft: '80px',
+            paddingRight: '80px',
+          },
+        },
+      });
+    },
+  ],
 }

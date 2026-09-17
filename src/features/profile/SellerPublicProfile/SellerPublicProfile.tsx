@@ -26,6 +26,7 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
   const [isLoading, setIsLoading] = useState(true);
   const [rawUserData, setRawUserData] = useState<any>(null);
   const [rawGigsData, setRawGigsData] = useState<any[]>([]);
+  const [rawReviewsData, setRawReviewsData] = useState<any[]>([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -49,8 +50,10 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
 
         const sellerId = userObj?._id || userObj?.id;
         if (sellerId) {
+          // 1. Fetch real gigs/packages for the seller
           axiosFetch
-            .get(`/gigs?userID=${sellerId}`)
+            .get(`/gigs/seller/${username}`)
+            .catch(() => axiosFetch.get(`/gigs?userID=${sellerId}`))
             .catch(() => axiosFetch.get(`/packages?userID=${sellerId}`))
             .then(({ data: gigsRes }) => {
               if (!isMounted) return;
@@ -61,6 +64,23 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
             })
             .catch(() => {
               if (isMounted) setRawGigsData([]);
+            });
+
+          // 2. Fetch real client reviews for the seller
+          axiosFetch
+            .get(`/reviews/seller/${sellerId}`)
+            .catch(() => axiosFetch.get(`/reviews?sellerID=${sellerId}`))
+            .catch(() => axiosFetch.get(`/reviews?sellerId=${sellerId}`))
+            .catch(() => axiosFetch.get("/reviews"))
+            .then(({ data: revRes }) => {
+              if (!isMounted) return;
+              const revList = Array.isArray(revRes)
+                ? revRes
+                : revRes?.reviews || revRes?.data || [];
+              setRawReviewsData(revList);
+            })
+            .catch(() => {
+              if (isMounted) setRawReviewsData([]);
             });
         }
       })
@@ -76,10 +96,10 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
     };
   }, [username]);
 
-  // Normalize data with complete pixel-perfect fallbacks matching design
+  // Normalize data with complete dynamic mapping
   const profileData = useMemo(() => {
-    return normalizeSellerProfile(rawUserData, rawGigsData, username);
-  }, [rawUserData, rawGigsData, username]);
+    return normalizeSellerProfile(rawUserData, rawGigsData, rawReviewsData, username);
+  }, [rawUserData, rawGigsData, rawReviewsData, username]);
 
   const handleContact = async () => {
     if (!user) {
@@ -149,6 +169,8 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
           role={profileData.role}
           rating={profileData.rating}
           reviewCount={profileData.reviewCount}
+          categoryName={profileData.categoryName}
+          subcategoryName={profileData.subcategoryName}
         />
 
         {/* 2. Main Two-Column Grid: Left (About & Contact) + Right (Gigs Grid) */}

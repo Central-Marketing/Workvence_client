@@ -43,7 +43,7 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
         <div className="flex items-center gap-1.5 text-sm font-sf-pro">
           <span className="font-bold text-gray-900 text-base">{averageRating.toFixed(1)}</span>
           <FaStar className="w-4 h-4 text-[#F5B400] fill-[#F5B400]" />
-          <span className="text-gray-400 font-normal">({totalReviews} reviews for this package)</span>
+          <span className="text-gray-400 font-normal">({totalReviews} review{totalReviews === 1 ? '' : 's'})</span>
         </div>
       </div>
 
@@ -100,7 +100,14 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
       </div>
 
       {/* 3. Client Reviews List */}
-      <div className="space-y-4">
+      {reviews.length === 0 ? (
+        <div className="bg-[#FBFBFB] border border-gray-100 rounded-xl p-8 sm:p-10 text-center">
+          <p className="text-sm font-sf-pro text-gray-500 max-w-md mx-auto">
+            No client reviews yet. Reviews and ratings will appear here once orders are completed.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
         {displayedReviews.map((rev) => {
           const isRespOpen = expandedResponses[rev.id] ?? false;
 
@@ -134,7 +141,11 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
                     </div>
 
                     <div className="flex items-center gap-1.5 text-xs text-gray-500 font-sf-pro">
-                      <span>{rev.countryFlag}</span>
+                      {rev.countryFlag?.startsWith("http") || rev.countryFlag?.startsWith("/") ? (
+                        <img src={rev.countryFlag} alt="" className="w-4 h-2.5 object-contain inline-block" />
+                      ) : (
+                        <span>{rev.countryFlag}</span>
+                      )}
                       <span>{rev.country}</span>
                     </div>
 
@@ -210,7 +221,8 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
             </div>
           );
         })}
-      </div>
+        </div>
+      )}
 
       {/* 4. Show More Reviews Button */}
       {reviews.length > visibleCount && (

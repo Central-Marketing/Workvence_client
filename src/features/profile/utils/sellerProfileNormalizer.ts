@@ -1,12 +1,17 @@
+import moment from "moment";
+import { getCountryFlag } from "@/utils";
+
 export interface SellerGigItem {
   id: string;
   slug?: string;
   category: string;
+  subcategory?: string;
   rating: number;
   reviewCount: number;
   title: string;
   image: string;
   startingPrice: number;
+  [key: string]: any;
 }
 
 export interface SellerReviewItem {
@@ -47,7 +52,9 @@ export interface NormalizedSellerProfile {
   onTimeDelivery: string;
   skills: string[];
   localTimeText: string;
-  gigs: SellerGigItem[];
+  categoryName?: string;
+  subcategoryName?: string;
+  gigs: any[];
   reviewsData: {
     averageRating: number;
     totalReviews: number;
@@ -205,8 +212,15 @@ export const DEFAULT_SELLER_FAQS: SellerFaqItem[] = [
 export function normalizeSellerProfile(
   rawUser: any,
   rawGigs: any[] = [],
+  rawReviews: any = [],
   usernameParam?: string
 ): NormalizedSellerProfile {
+  // Handle backwards compatibility if 3rd argument is username string
+  if (typeof rawReviews === "string") {
+    usernameParam = rawReviews;
+    rawReviews = [];
+  }
+
   const sellerObj = rawUser?.user || rawUser || {};
   const isFallback = !rawUser || Object.keys(rawUser).length === 0;
 
@@ -216,44 +230,183 @@ export function normalizeSellerProfile(
   const avatar = sellerObj.image || sellerObj.avatar || SELLER_FALLBACK_IMAGES.avatar;
   const banner = sellerObj.cover || sellerObj.banner || SELLER_FALLBACK_IMAGES.banner;
   const isPro = Boolean(sellerObj.isPro ?? true);
-  const role = sellerObj.role || sellerObj.shortTitle || 'Web Designer';
-  const rating = Number(sellerObj.rating || sellerObj.starRating || sellerObj.starNumber || 4.8);
-  const reviewCount = Number(sellerObj.reviewCount || sellerObj.totalStars || sellerObj.completedOrdersCount || 226);
-  const memberSince = sellerObj.createdAt ? String(new Date(sellerObj.createdAt).getFullYear()) : '2009';
+  const role = sellerObj.role || sellerObj.headline || sellerObj.shortTitle || 'Web Designer';
+
+  const memberSince = sellerObj.createdAt
+    ? String(new Date(sellerObj.createdAt).getFullYear())
+    : (isFallback ? '2009' : String(new Date().getFullYear()));
 
   const bio =
     sellerObj.description ||
     sellerObj.bio ||
-    'We are an end-to-end digital team with 15+ years of experience creating high-impact web solutions. Our expertise includes Figma UI/UX design, React.js, Next.js, Vue.js, Tailwind CSS, Bootstrap, Webflow, WordPress, Shopify, and Framer. We also provide branding, logo design, Lottie animations, and social media creatives. Trusted by teams at Microsoft, Amazon, and clients across 47+ countries, we deliver scalable, conversion-focused digital experiences that drive results.';
+    (isFallback
+      ? 'We are an end-to-end digital team with 15+ years of experience creating high-impact web solutions. Our expertise includes Figma UI/UX design, React.js, Next.js, Vue.js, Tailwind CSS, Bootstrap, Webflow, WordPress, Shopify, and Framer. We also provide branding, logo design, Lottie animations, and social media creatives. Trusted by teams at Microsoft, Amazon, and clients across 47+ countries, we deliver scalable, conversion-focused digital experiences that drive results.'
+      : '');
 
-  const country = sellerObj.country || 'Bangladesh';
-  const responseTime = sellerObj.responseTimeHours ? `${sellerObj.responseTimeHours} Hour` : '1 Hour';
-  const onTimeDelivery = sellerObj.onTimeDeliveryRate ? `${sellerObj.onTimeDeliveryRate}%` : '98%';
+  const country = sellerObj.country || (isFallback ? 'Bangladesh' : 'Global');
+  const responseTime = sellerObj.responseTimeHours
+    ? `${sellerObj.responseTimeHours} Hour${sellerObj.responseTimeHours > 1 ? 's' : ''}`
+    : '1 Hour';
+  const onTimeDelivery = sellerObj.onTimeDeliveryRate
+    ? `${sellerObj.onTimeDeliveryRate}%`
+    : (sellerObj.metrics?.overall?.onTimeDeliveryRate ? `${sellerObj.metrics.overall.onTimeDeliveryRate}%` : '100%');
 
   const skills = Array.isArray(sellerObj.skills) && sellerObj.skills.length > 0
     ? sellerObj.skills
-    : ['Problem solver', 'UI Designer', 'User Experience Designer', 'Analytical Thinker', 'Product management', '+2'];
+    : (isFallback
+      ? ['Problem solver', 'UI Designer', 'User Experience Designer', 'Analytical Thinker', 'Product management', '+2']
+      : []);
 
-  // Map or fallback gigs
-  let gigs: SellerGigItem[] = [];
+  // Map gigs with seller details attached so PackageCard renders properly
+  let gigs: any[] = [];
   if (Array.isArray(rawGigs) && rawGigs.length > 0) {
     gigs = rawGigs.map((g: any, idx: number) => {
       const gId = g._id || g.id || `gig-${idx}`;
       return {
+        _id: gId,
         id: gId,
         slug: g.slug || g._id || g.id,
         category: g.category || g.cat || 'Web Design',
-        rating: Number(g.starNumber || g.rating || 4.8),
-        reviewCount: Number(g.totalStars || g.reviewCount || 50),
+        subcategory: g.subcategory || (Array.isArray(g.tags) && g.tags[0]) || '',
+        rating: Number(g.starNumber ? (g.totalStars / g.starNumber) : (g.rating || g.star || 5.0)),
+        reviewCount: Number(g.starNumber || g.reviews || g.reviewCount || 0),
         title: g.title || 'I will design,redesign business wordpress website as divi expert',
-        image: g.cover || (Array.isArray(g.images) && g.images[0]) || SELLER_FALLBACK_IMAGES.gigCover,
+        cover: g.cover || (Array.isArray(g.images) && g.images[0]) || g.img || SELLER_FALLBACK_IMAGES.gigCover,
+        img: g.cover || (Array.isArray(g.images) && g.images[0]) || g.img || SELLER_FALLBACK_IMAGES.gigCover,
+        price: Number(g.price || g.startingPrice || 100),
         startingPrice: Number(g.price || g.startingPrice || 100),
+        sales: Number(g.sales || 0),
+        user: {
+          name,
+          username,
+          image: avatar,
+          sellerLevel: sellerObj.sellerLevel || 'Level 1',
+        },
+        ...g,
       };
+    });
+  } else if (isFallback) {
+    gigs = DEFAULT_SELLER_GIGS.map((g) => ({
+      ...g,
+      _id: g.id,
+      cover: g.image,
+      img: g.image,
+      price: g.startingPrice,
+      star: g.rating,
+      starNumber: g.reviewCount,
+      gigRating: g.rating.toFixed(1),
+      user: {
+        name,
+        username,
+        image: avatar,
+        sellerLevel: 'Level 1',
+      },
+    }));
+  }
+
+  // Derive primary categories for breadcrumbs
+  const categoryName = gigs[0]?.category || sellerObj.category || 'Services';
+  const subcategoryName = gigs[0]?.subcategory || '';
+
+  // Process dynamic reviews
+  const reviewsList: SellerReviewItem[] = [];
+  const starCounts: { [star: number]: number } = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+  let validReviewCount = 0;
+  let totalScore = 0;
+  let commTotal = 0;
+  let commCount = 0;
+  let qualTotal = 0;
+  let qualCount = 0;
+  let valTotal = 0;
+  let valCount = 0;
+
+  const reviewsInput = Array.isArray(rawReviews)
+    ? rawReviews
+    : (Array.isArray(rawReviews?.reviews) ? rawReviews.reviews : (Array.isArray(rawReviews?.data) ? rawReviews.data : []));
+
+  if (reviewsInput.length > 0) {
+    reviewsInput.forEach((r: any, idx: number) => {
+      const buyerObj = r.userID || r.user || {};
+      const star = typeof r.star === 'number' && r.star > 0 && r.star <= 5 ? r.star : 5;
+      const roundedStar = Math.min(5, Math.max(1, Math.round(star)));
+      starCounts[roundedStar] = (starCounts[roundedStar] || 0) + 1;
+      validReviewCount++;
+      totalScore += star;
+
+      const comm = Number(r.communicationRating || r.communication || 0);
+      if (comm > 0) {
+        commTotal += comm;
+        commCount++;
+      }
+      const qual = Number(r.qualityRating || r.quality || 0);
+      if (qual > 0) {
+        qualTotal += qual;
+        qualCount++;
+      }
+      const val = Number(r.valueRating || r.service || r.value || 0);
+      if (val > 0) {
+        valTotal += val;
+        valCount++;
+      }
+
+      const buyerCountry = buyerObj.country || 'Client';
+      const flagObj = getCountryFlag(buyerCountry);
+      const flag = flagObj?.normal || flagObj?.mini || '🌐';
+
+      const priceVal = r.price || r.gigID?.price || r.orderID?.price;
+      const formattedPrice = priceVal ? (String(priceVal).startsWith('$') ? String(priceVal) : `$${priceVal}`) : '$150';
+
+      reviewsList.push({
+        id: r._id || r.id || `rev-${idx}`,
+        buyerName: buyerObj.name || buyerObj.username || 'Verified Client',
+        buyerAvatar: buyerObj.image || buyerObj.avatar || buyerObj.img || SELLER_FALLBACK_IMAGES.reviewerAvatar,
+        country: buyerCountry,
+        countryFlag: flag,
+        projectStatus: r.orderStatus || 'Completed Order',
+        rating: star,
+        dateText: r.createdAt ? moment(r.createdAt).fromNow() : 'Recent',
+        reviewText: r.desc || r.description || 'Great experience working with this seller. Excellent communication and quality delivery.',
+        projectImage: r.gigID?.cover || (Array.isArray(r.gigID?.images) && r.gigID?.images[0]) || SELLER_FALLBACK_IMAGES.reviewLunar,
+        projectPrice: formattedPrice,
+        projectDuration: r.duration ? `${r.duration} Days` : '7 Days',
+        sellerResponse: r.sellerResponse || undefined,
+      });
     });
   }
 
-  if (gigs.length === 0) {
-    gigs = DEFAULT_SELLER_GIGS;
+  // Calculate review metrics
+  let finalReviews: SellerReviewItem[] = reviewsList;
+  let finalTotalReviews = validReviewCount > 0 ? validReviewCount : Number(sellerObj.reviewCount || sellerObj.totalReviews || sellerObj.totalStars || 0);
+  let finalAverageRating = validReviewCount > 0
+    ? (totalScore / validReviewCount)
+    : Number(sellerObj.rating || sellerObj.starRating || sellerObj.starNumber || (isFallback ? 4.8 : 0));
+
+  const starDistribution: { [star: number]: number } = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+  if (validReviewCount > 0) {
+    for (let s = 1; s <= 5; s++) {
+      starDistribution[s] = Math.round(((starCounts[s] || 0) / validReviewCount) * 100);
+    }
+  }
+
+  const categoryScores = {
+    communication: commCount > 0 ? `${(commTotal / commCount).toFixed(1)}/5` : '5.0/5',
+    quality: qualCount > 0 ? `${(qualTotal / qualCount).toFixed(1)}/5` : '5.0/5',
+    value: valCount > 0 ? `${(valTotal / valCount).toFixed(1)}/5` : '5.0/5',
+  };
+
+  // Only use mock reviews if isFallback (no user data passed at all)
+  if (isFallback && reviewsList.length === 0) {
+    finalReviews = DEFAULT_SELLER_REVIEWS;
+    finalTotalReviews = 226;
+    finalAverageRating = 4.8;
+    starDistribution[5] = 88;
+    starDistribution[4] = 70;
+    starDistribution[3] = 50;
+    starDistribution[2] = 30;
+    starDistribution[1] = 15;
+    categoryScores.communication = '5/5';
+    categoryScores.quality = '4/5';
+    categoryScores.value = '3/5';
   }
 
   // Format local time
@@ -269,8 +422,8 @@ export function normalizeSellerProfile(
     banner,
     isPro,
     role,
-    rating,
-    reviewCount,
+    rating: finalAverageRating,
+    reviewCount: finalTotalReviews,
     memberSince,
     bio,
     country,
@@ -278,23 +431,15 @@ export function normalizeSellerProfile(
     onTimeDelivery,
     skills,
     localTimeText,
+    categoryName,
+    subcategoryName,
     gigs,
     reviewsData: {
-      averageRating: rating,
-      totalReviews: reviewCount,
-      starDistribution: {
-        5: 88,
-        4: 70,
-        3: 50,
-        2: 30,
-        1: 15,
-      },
-      categoryScores: {
-        communication: '5/5',
-        quality: '4/5',
-        value: '3/5',
-      },
-      list: DEFAULT_SELLER_REVIEWS,
+      averageRating: finalAverageRating,
+      totalReviews: finalTotalReviews,
+      starDistribution,
+      categoryScores,
+      list: finalReviews,
     },
     faqs: DEFAULT_SELLER_FAQS,
   };

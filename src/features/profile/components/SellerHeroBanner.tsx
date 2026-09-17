@@ -26,8 +26,8 @@ export const SellerHeroBanner: React.FC<SellerHeroBannerProps> = ({
   role,
   rating,
   reviewCount,
-  categoryName = "Graphics",
-  subcategoryName = "Logo & Brand Identity",
+  categoryName = "Services",
+  subcategoryName,
 }) => {
   return (
     <div className="w-full mb-8">
@@ -47,10 +47,14 @@ export const SellerHeroBanner: React.FC<SellerHeroBannerProps> = ({
         >
           {categoryName}
         </Link>
-        <span className="text-gray-300">/</span>
-        <span className="text-gray-600 font-normal truncate">
-          {subcategoryName}
-        </span>
+        {subcategoryName && (
+          <>
+            <span className="text-gray-300">/</span>
+            <span className="text-gray-600 font-normal truncate">
+              {subcategoryName}
+            </span>
+          </>
+        )}
         <span className="text-gray-300">/</span>
         <span className="text-gray-900 font-medium truncate">
           {name}

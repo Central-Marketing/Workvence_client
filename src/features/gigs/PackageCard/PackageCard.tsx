@@ -46,7 +46,7 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
   return (
     <Link
       href={packageUrl}
-      className="group flex flex-col w-full h-full min-h-[450px] bg-white rounded-[10px] border border-[#DADADA] p-[10px] shadow-none hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-shadow duration-300"
+      className="group flex flex-col w-full h-full min-h-[400px] bg-white rounded-[10px] border border-[#DADADA] p-[10px] shadow-none hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-shadow duration-300"
     >
       {/* Top Image + Overlapping Avatar */}
       <div className="relative w-full h-[220px] shrink-0">
@@ -134,14 +134,14 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
         </div>
 
         {/* Row 2: Title / Description */}
-        <h3 className="mt-3 text-[16px] sm:text-[18px] md:text-[20px] text-[var(--Foundation-Grey-grey-400,#6E6E6E)] font-normal font-inter not-italic line-clamp-2 min-h-[44px] sm:min-h-[48px] md:min-h-[52px] group-hover:text-gray-900 transition-colors">
+        <h3 className="mt-3 text-[16px] text-slate-900 font-normal font-inter not-italic line-clamp-2 min-h-[44px] sm:min-h-[48px] md:min-h-[52px] group-hover:text-gray-900 transition-colors">
           {data.title ||
             data.desc ||
             "I will design,redesign business wordpress website as divi expert"}
         </h3>
 
         {/* Row 3: Starting from Price */}
-        <div className="flex items-baseline gap-2 mt-[65px] pb-0.5">
+        <div className="flex items-baseline gap-2 mt-[15px] pb-0.5">
           <span className="text-[14px] sm:text-[16px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] font-normal font-inter leading-[20px] sm:leading-[22px] not-italic">
             Starting from
           </span>

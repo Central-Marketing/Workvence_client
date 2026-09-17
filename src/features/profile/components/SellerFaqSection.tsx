@@ -24,7 +24,7 @@ export const SellerFaqSection: React.FC<SellerFaqSectionProps> = ({ faqs }) => {
           Frequently asked questions
         </h2>
         <span className="text-xs font-medium text-gray-500 bg-gray-100/80 border border-gray-200/60 px-3 py-1 rounded-md">
-          Blog, Business House
+          General Information
         </span>
       </div>
 

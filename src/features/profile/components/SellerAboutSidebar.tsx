@@ -38,7 +38,7 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between gap-4 mb-4">
           <h2 className="text-xl sm:text-2xl font-bold font-sf-pro text-gray-900 tracking-tight">
-            About this seler
+            About this seller
           </h2>
           <span className="text-xs font-medium font-sf-pro text-gray-600 bg-white/90 border border-gray-200/90 px-3 py-1 rounded-md shadow-2xs shrink-0">
             Member since <strong className="font-semibold text-gray-900">{memberSince}</strong>
@@ -49,7 +49,7 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
 
         {/* Bio Paragraph */}
         <p className="text-[13.5px] sm:text-sm text-gray-600 leading-relaxed font-normal mb-6">
-          {bio}
+          {bio || "This seller hasn't added a bio yet."}
         </p>
 
         {/* 3 Metric / Stat Boxes */}
@@ -113,16 +113,20 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
           <h3 className="text-sm font-bold font-sf-pro text-gray-900 mb-2.5">
             Skills:
           </h3>
-          <div className="flex flex-wrap gap-2">
-            {skills.map((skill, idx) => (
-              <span
-                key={idx}
-                className="text-xs text-gray-700 bg-white border border-gray-200 px-3 py-1.5 rounded-lg shadow-2xs font-normal"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
+          {skills && skills.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {skills.map((skill, idx) => (
+                <span
+                  key={idx}
+                  className="text-xs text-gray-700 bg-white border border-gray-200 px-3 py-1.5 rounded-lg shadow-2xs font-normal"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-gray-400 italic">No skills listed yet.</p>
+          )}
         </div>
 
         {/* Contact Section Header */}

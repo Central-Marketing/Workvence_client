@@ -105,6 +105,7 @@ export default function ProfilePage() {
   const [previewUrl, setPreviewUrl] = useState(user?.image || "/media/noavatar.png");
   const [coverImageUrl, setCoverImageUrl] = useState(
     user?.coverImage ||
+    (typeof window !== "undefined" ? localStorage.getItem("user_cover_image") : null) ||
     "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80"
   );
   const [isUpdating, setIsUpdating] = useState(false);
@@ -123,7 +124,12 @@ export default function ProfilePage() {
       if (user.shortTitle !== undefined) setShortTitle(user.shortTitle || "");
       if (user.description !== undefined) setDescription(user.description || "");
       if (user.image) setPreviewUrl(user.image);
-      if (user.coverImage) setCoverImageUrl(user.coverImage);
+      if (user.coverImage) {
+        setCoverImageUrl(user.coverImage);
+      } else if (typeof window !== "undefined") {
+        const savedCover = localStorage.getItem("user_cover_image");
+        if (savedCover) setCoverImageUrl(savedCover);
+      }
       if (Array.isArray(user.languages)) setLanguages(user.languages);
       if (Array.isArray(user.experience)) setExperience(user.experience);
       if (Array.isArray(user.education)) setEducation(user.education);
@@ -149,13 +155,17 @@ export default function ProfilePage() {
       try {
         toast.loading("Uploading cover image...", { id: "cover-upload" });
         const uploaded = await supportService.uploadFileToCloudinary(file, "profile_covers");
-        const cdnUrl = uploaded.secure_url || uploaded.url;
+        const cdnUrl = uploaded?.secure_url || uploaded?.url;
         if (cdnUrl) {
           setCoverImageUrl(cdnUrl);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("user_cover_image", cdnUrl);
+          }
           toast.success("Cover image updated!", { id: "cover-upload" });
         }
       } catch {
-        setCoverImageUrl(URL.createObjectURL(file));
+        const localUrl = URL.createObjectURL(file);
+        setCoverImageUrl(localUrl);
         toast.success("Cover image preview updated!", { id: "cover-upload" });
       }
     }
@@ -343,7 +353,6 @@ export default function ProfilePage() {
 
       const payload: any = {
         image: imageUrl,
-        coverImage: coverImageUrl,
         phone,
         country,
         shortTitle,
@@ -358,9 +367,13 @@ export default function ProfilePage() {
       const { data } = await axiosFetch.patch("/users", payload);
 
       if (!data.error) {
-        setUser(data.user);
+        const updatedUser = { ...data.user, coverImage: coverImageUrl };
+        setUser(updatedUser);
         if (typeof window !== "undefined") {
-          localStorage.setItem("user", JSON.stringify(data.user));
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+          if (coverImageUrl) {
+            localStorage.setItem("user_cover_image", coverImageUrl);
+          }
         }
         toast.success("Profile updated successfully!");
       } else {

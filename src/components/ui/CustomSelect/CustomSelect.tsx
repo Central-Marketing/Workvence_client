@@ -21,7 +21,29 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, p
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const selectedOption = options.find((opt) => opt.value === value);
+  const normalizeStr = (v: any) =>
+    v !== undefined && v !== null
+      ? String(v).trim().toLowerCase().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+      : '';
+
+  const rawStr = (v: any) =>
+    v !== undefined && v !== null ? String(v).trim().toLowerCase() : '';
+
+  const targetVal = rawStr(value);
+  const targetNorm = normalizeStr(value);
+
+  const selectedOption = options.find((opt) => {
+    if (opt.value === value || opt.label === value) return true;
+    const optValRaw = rawStr(opt.value);
+    const optLabelRaw = rawStr(opt.label);
+    if (targetVal && (optValRaw === targetVal || optLabelRaw === targetVal)) return true;
+
+    const optValNorm = normalizeStr(opt.value);
+    const optLabelNorm = normalizeStr(opt.label);
+    return (
+      Boolean(targetNorm) && (optValNorm === targetNorm || optLabelNorm === targetNorm)
+    );
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -52,24 +74,29 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, p
       {isOpen && (
         <div className="absolute z-50 w-full mt-2 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
           <ul className="max-h-60 overflow-y-auto">
-            {options.map((option) => (
-              <li key={option.value}>
-                <button
-                  type="button"
-                  className={`w-full text-left px-4 py-3 text-sm transition-colors duration-150 ${
-                    option.value === value
-                      ? "bg-green-50 text-brand-green font-semibold"
-                      : "text-slate-700 hover:bg-slate-50"
-                  }`}
-                  onClick={() => {
-                    onChange(option.value);
-                    setIsOpen(false);
-                  }}
-                >
-                  {option.label}
-                </button>
-              </li>
-            ))}
+            {options.map((option) => {
+              const isSelected = selectedOption
+                ? option.value === selectedOption.value || option.label === selectedOption.label
+                : option.value === value;
+              return (
+                <li key={option.value}>
+                  <button
+                    type="button"
+                    className={`w-full text-left px-4 py-3 text-sm transition-colors duration-150 ${
+                      isSelected
+                        ? "bg-green-50 text-brand-green font-semibold"
+                        : "text-slate-700 hover:bg-slate-50"
+                    }`}
+                    onClick={() => {
+                      onChange(option.value);
+                      setIsOpen(false);
+                    }}
+                  >
+                    {option.label}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

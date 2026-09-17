@@ -207,8 +207,10 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
           reviews={profileData.reviewsData.list}
         />
 
-        {/* 4. Section: Frequently asked questions */}
-        <SellerFaqSection faqs={profileData.faqs} />
+        {/* 4. Section: Frequently asked questions (Real seller/package FAQs only) */}
+        {profileData.faqs && profileData.faqs.length > 0 && (
+          <SellerFaqSection faqs={profileData.faqs} />
+        )}
       </div>
     </div>
   );

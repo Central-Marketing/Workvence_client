@@ -230,7 +230,7 @@ const RegisterContent = () => {
         <div className="w-full flex justify-start">
           <Link href="/" className="inline-flex items-center">
             <Image
-              src="/Workvence-logo-Horizontal 1.png"
+              src="/Workvence-logo-Horizontal3.png"
               alt="Workvence"
               width={145}
               height={36}
@@ -255,14 +255,14 @@ const RegisterContent = () => {
             </h1>
 
             <div className="flex flex-col gap-3.5 w-full">
-              <button
+              {/* <button
                 data-testid="continue-google-btn"
                 type="button"
                 className="flex items-center justify-center gap-3 w-full py-3.5 px-4 rounded-xl text-[14px] font-medium text-[#1f2937] bg-white border border-[#e5e7eb] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80 transition-all cursor-pointer"
               >
                 <FcGoogle className="text-[20px]" />
                 <span>Continue with Google</span>
-              </button>
+              </button> */}
 
               <button
                 data-testid="continue-email-btn"
@@ -405,13 +405,12 @@ const RegisterContent = () => {
                       placeholder="***********"
                       value={formInput.confirmPassword}
                       onChange={handleChange}
-                      className={`w-full py-3 px-3.5 pr-11 border rounded-xl text-sm bg-white transition-colors focus:outline-none ${
-                        formInput.confirmPassword && formInput.password !== formInput.confirmPassword
-                          ? 'border-red-500 focus:border-red-500'
-                          : formInput.confirmPassword && formInput.password === formInput.confirmPassword
+                      className={`w-full py-3 px-3.5 pr-11 border rounded-xl text-sm bg-white transition-colors focus:outline-none ${formInput.confirmPassword && formInput.password !== formInput.confirmPassword
+                        ? 'border-red-500 focus:border-red-500'
+                        : formInput.confirmPassword && formInput.password === formInput.confirmPassword
                           ? 'border-emerald-500 focus:border-emerald-500'
                           : 'border-gray-200 focus:border-emerald-500'
-                      }`}
+                        }`}
                     />
                     <button
                       type="button"

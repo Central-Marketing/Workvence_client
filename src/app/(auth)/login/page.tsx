@@ -95,7 +95,7 @@ const LoginForm = () => {
           <div className="flex flex-col h-full overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <div className="mb-7 flex justify-center md:justify-start">
               <Link href="/">
-                <img src="/Workvence-logo-Horizontal 1.png" alt="Workvence" className="h-10 object-contain" />
+                <img src="/Workvence-logo-Horizontal3.png" alt="Workvence" className="h-10 object-contain" />
               </Link>
             </div>
 

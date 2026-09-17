@@ -452,8 +452,8 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           </div>
         </div>
 
-        {/* 3. Section 2: Packages (Shown on length: when packages exist) */}
-        {hasPackages && (
+        {/* 3. Section 2: Packages (List when exist, Empty state card when 0) */}
+        {hasPackages ? (
           <div className="space-y-4 pt-1">
             <div className="flex items-center justify-between">
               <h2 className="text-xl sm:text-[24px] font-bold text-[#111827] tracking-tight">
@@ -504,6 +504,34 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4 pt-1">
+            <h2 className="text-xl sm:text-[24px] font-bold text-[#111827] tracking-tight">
+              Packages
+            </h2>
+
+            <div className="bg-white rounded-[18px] sm:rounded-[22px] border border-[#EBECEF] p-8 sm:py-14 sm:px-12 flex flex-col items-center justify-center text-center shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+              <div className="w-[160px] sm:w-[195px] h-auto mb-4 flex items-center justify-center">
+                <img
+                  src="/images/dashboard/seller_skills_exact.png"
+                  alt="Turn Your Skills Into Services"
+                  className="w-full h-auto object-contain"
+                />
+              </div>
+              <h3 className="text-lg sm:text-[22px] font-bold text-[#111827] mb-2 tracking-tight">
+                Turn Your Skills Into Services
+              </h3>
+              <p className="text-[#6B7280] text-xs sm:text-[13px] max-w-[480px] mx-auto leading-relaxed mb-6">
+                Create packages that showcase your expertise, set clear deliverables, and make it easy for clients to hire you.
+              </p>
+              <Link
+                href="/organize"
+                className="px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-[#74F2C7] to-[#70B2F8] hover:opacity-95 text-[#111827] text-xs sm:text-[13.5px] font-semibold transition-all shadow-xs"
+              >
+                Create Your First Package
+              </Link>
             </div>
           </div>
         )}

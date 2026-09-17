@@ -460,7 +460,7 @@ const Navbar = () => {
       {/* Mobile Menu Sidebar */}
       <div className={`fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] shadow-2xl transform transition-transform duration-300 ease-in-out lg:hidden flex flex-col ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <Image src="/Workvence-logo-Horizontal 1.png" width={140} height={32} alt="Workvence" className="h-8 w-auto object-contain" style={{ width: "auto", height: "auto" }} />
+          <Image src="/Workvence-logo-Horizontal3.png" width={140} height={32} alt="Workvence" className="h-8 w-auto object-contain" style={{ width: "auto", height: "auto" }} />
           <button onClick={() => setIsMobileMenuOpen(false)} className="text-2xl text-gray-600 focus:outline-none hover:text-red-500 transition-colors">
             <FiX />
           </button>

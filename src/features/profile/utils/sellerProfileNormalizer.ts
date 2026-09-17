@@ -186,28 +186,7 @@ export const DEFAULT_SELLER_REVIEWS: SellerReviewItem[] = [
   },
 ];
 
-export const DEFAULT_SELLER_FAQS: SellerFaqItem[] = [
-  {
-    question: 'How does escrow payment protection work?',
-    answer: 'Your payment is held securely while the seller completes the order. It is released after you review and approve the agreed delivery. This ensures both parties are protected throughout the transaction lifecycle.',
-  },
-  {
-    question: 'How are sellers verified?',
-    answer: 'Sellers undergo government ID verification, portfolio assessments, and continuous quality checks on completed orders to maintain verified status.',
-  },
-  {
-    question: 'What happens if a seller does not deliver?',
-    answer: 'If the agreed milestones or deliverables are not met within the timeframe, Workvence dispute resolution guarantees a full refund under buyer protection.',
-  },
-  {
-    question: 'Can I buy a fixed-price service and also post a project?',
-    answer: 'Yes, you can purchase any fixed-price package instantly or create custom project briefs with specific timelines and custom milestone budgets.',
-  },
-  {
-    question: 'How do sellers receive payments?',
-    answer: 'Payments are transferred to the seller\'s balance once the buyer approves delivery, and can be withdrawn via bank transfer, Payoneer, or PayPal.',
-  },
-];
+export const DEFAULT_SELLER_FAQS: SellerFaqItem[] = [];
 
 export function normalizeSellerProfile(
   rawUser: any,
@@ -414,6 +393,38 @@ export function normalizeSellerProfile(
   const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
   const localTimeText = `Online • ${timeStr} local time`;
 
+  // Extract real FAQs from user object and from seller packages
+  const realFaqs: SellerFaqItem[] = [];
+  const seenFaqQuestions = new Set<string>();
+
+  // 1. Direct seller FAQs from user model if present
+  if (Array.isArray(sellerObj.faqs)) {
+    sellerObj.faqs.forEach((f: any) => {
+      const q = (f.question || f.q || '').trim();
+      const a = (f.answer || f.a || '').trim();
+      if (q && a && !seenFaqQuestions.has(q.toLowerCase())) {
+        seenFaqQuestions.add(q.toLowerCase());
+        realFaqs.push({ question: q, answer: a });
+      }
+    });
+  }
+
+  // 2. Aggregate FAQs from seller packages/gigs
+  if (Array.isArray(rawGigs)) {
+    rawGigs.forEach((gig: any) => {
+      if (Array.isArray(gig.faqs)) {
+        gig.faqs.forEach((f: any) => {
+          const q = (f.question || f.q || '').trim();
+          const a = (f.answer || f.a || '').trim();
+          if (q && a && !seenFaqQuestions.has(q.toLowerCase())) {
+            seenFaqQuestions.add(q.toLowerCase());
+            realFaqs.push({ question: q, answer: a });
+          }
+        });
+      }
+    });
+  }
+
   return {
     id,
     username,
@@ -441,6 +452,6 @@ export function normalizeSellerProfile(
       categoryScores,
       list: finalReviews,
     },
-    faqs: DEFAULT_SELLER_FAQS,
+    faqs: realFaqs,
   };
 }

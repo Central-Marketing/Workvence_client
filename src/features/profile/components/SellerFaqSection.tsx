@@ -5,11 +5,15 @@ import { FiChevronDown } from "react-icons/fi";
 import { SellerFaqItem } from "../utils/sellerProfileNormalizer";
 
 interface SellerFaqSectionProps {
-  faqs: SellerFaqItem[];
+  faqs?: SellerFaqItem[];
 }
 
-export const SellerFaqSection: React.FC<SellerFaqSectionProps> = ({ faqs }) => {
-  // First item open by default matching screenshot
+export const SellerFaqSection: React.FC<SellerFaqSectionProps> = ({ faqs = [] }) => {
+  if (!Array.isArray(faqs) || faqs.length === 0) {
+    return null;
+  }
+
+  // First item open by default
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggleFaq = (idx: number) => {
@@ -24,7 +28,7 @@ export const SellerFaqSection: React.FC<SellerFaqSectionProps> = ({ faqs }) => {
           Frequently asked questions
         </h2>
         <span className="text-xs font-medium text-gray-500 bg-gray-100/80 border border-gray-200/60 px-3 py-1 rounded-md">
-          General Information
+          {faqs.length} {faqs.length === 1 ? "Question" : "Questions"}
         </span>
       </div>
 

@@ -540,6 +540,8 @@ const OrganizePage = () => {
       form.packages.basic.price = Number(form.packages.basic.price || form.price || 0);
       form.packages.basic.deliveryTime =
         form.packages.basic.deliveryTime || form.deliveryTime || "7";
+      form.packages.basic.revisionNumber =
+        form.packages.basic.revisionNumber || form.revisionNumber || "1";
     }
 
     if (!isDraft) {
@@ -572,6 +574,7 @@ const OrganizePage = () => {
       shortDesc: "",
       price: "",
       deliveryTime: "",
+      revisionNumber: "",
       features: [],
     };
 
@@ -1014,26 +1017,60 @@ const OrganizePage = () => {
               />
             </div>
 
-            {/* Add Delivery Time */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-700 block">
-                Add delivery time
-              </label>
-              <div className="relative">
-                <select
-                  value={currentTierData.deliveryTime || ""}
-                  onChange={(e) => handleTierInputChange("deliveryTime", e.target.value)}
-                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
-                >
-                  <option value="" disabled>e.g 12 days</option>
-                  <option value="1">1 day</option>
-                  <option value="3">3 days</option>
-                  <option value="7">7 days</option>
-                  <option value="12">12 days</option>
-                  <option value="14">14 days</option>
-                  <option value="30">30 days</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-3.5 h-3.5" />
+            {/* Add Delivery Time & Revisions in responsive 2-column grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Add Delivery Time */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-gray-700 block">
+                  Add delivery time
+                </label>
+                <div className="relative">
+                  <select
+                    value={currentTierData.deliveryTime || ""}
+                    onChange={(e) => handleTierInputChange("deliveryTime", e.target.value)}
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
+                  >
+                    <option value="" disabled>e.g 12 days</option>
+                    <option value="1">1 day</option>
+                    <option value="2">2 days</option>
+                    <option value="3">3 days</option>
+                    <option value="5">5 days</option>
+                    <option value="7">7 days</option>
+                    <option value="10">10 days</option>
+                    <option value="12">12 days</option>
+                    <option value="14">14 days</option>
+                    <option value="21">21 days</option>
+                    <option value="30">30 days</option>
+                    <option value="45">45 days</option>
+                    <option value="60">60 days</option>
+                    <option value="90">90 days</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-3.5 h-3.5" />
+                </div>
+              </div>
+
+              {/* Revisions */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-gray-700 block">
+                  Revisions
+                </label>
+                <div className="relative">
+                  <select
+                    value={currentTierData.revisionNumber !== undefined ? String(currentTierData.revisionNumber) : ""}
+                    onChange={(e) => handleTierInputChange("revisionNumber", e.target.value)}
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
+                  >
+                    <option value="">Select Revisions</option>
+                    <option value="0">0 Revisions</option>
+                    <option value="1">1 Revision</option>
+                    <option value="2">2 Revisions</option>
+                    <option value="3">3 Revisions</option>
+                    <option value="5">5 Revisions</option>
+                    <option value="10">10 Revisions</option>
+                    <option value="Unlimited">Unlimited Revisions</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-3.5 h-3.5" />
+                </div>
               </div>
             </div>
 

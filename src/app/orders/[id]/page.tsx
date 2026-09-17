@@ -155,11 +155,19 @@ export default function OrderDetailPage() {
 
     // Extension request
     const extReq = o.extensionRequest || o.extension;
-    const extensionRequest = extReq
+    const extStatus = String(extReq?.status || "").toLowerCase().trim();
+    const isExtPending = Boolean(
+      extReq &&
+      (extStatus === "pending" || (!extStatus && (extReq.extraDays || extReq.days))) &&
+      extStatus !== "accepted" &&
+      extStatus !== "approved" &&
+      extStatus !== "rejected"
+    );
+    const extensionRequest = (extReq && isExtPending)
       ? {
           days: extReq.days || extReq.extraDays || 1,
           reason: extReq.reason || "Time extension requested.",
-          status: extReq.status,
+          status: extReq.status || "pending",
         }
       : null;
 

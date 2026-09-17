@@ -13,6 +13,7 @@ import {
   FiDownload,
   FiStar,
   FiAlertCircle,
+  FiRotateCcw,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
@@ -48,20 +49,34 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
 
   // Extension Action State
   const [extensionProcessed, setExtensionProcessed] = useState<"approved" | "rejected" | null>(null);
+  const [isRespondingExtension, setIsRespondingExtension] = useState(false);
+
+  // Check if extension is strictly pending (never show if accepted/approved/rejected)
+  const extensionData = order.raw?.extensionRequest || order.raw?.extension || order.extensionRequest;
+  const extStatus = String(extensionData?.status || order.extensionRequest?.status || "").toLowerCase().trim();
+  const isExtPending = Boolean(
+    (order.extensionRequest || extensionData) &&
+    (extStatus === "pending" || (!extStatus && (extensionData?.days || extensionData?.extraDays))) &&
+    extStatus !== "accepted" &&
+    extStatus !== "approved" &&
+    extStatus !== "rejected" &&
+    !extensionProcessed
+  );
 
   // Review / Feedback State
   const [reviewDescription, setReviewDescription] = useState("");
   const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
+  const [hasReviewedOnce, setHasReviewedOnce] = useState(false);
   const [submittingReview, setSubmittingReview] = useState(false);
   const [feedbackData, setFeedbackData] = useState({
-    communication: 5,
-    quality: 5,
-    service: 5,
+    communication: 0,
+    quality: 0,
+    service: 0,
   });
 
   const totalScore = useMemo(() => {
     const rated = [feedbackData.communication, feedbackData.quality, feedbackData.service].filter((v) => v > 0);
-    if (rated.length === 0) return "5.0";
+    if (rated.length === 0) return "0.0";
     return (rated.reduce((sum, v) => sum + v, 0) / rated.length).toFixed(1);
   }, [feedbackData]);
 
@@ -124,43 +139,82 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
 
   // Approve / Reject Extension
   const handleApproveExtension = async () => {
+    setIsRespondingExtension(true);
+    const orderId = order.id || order.raw?._id;
     try {
-      await axiosFetch.post(`/orders/${order.id}/approve-extension`);
+      await axiosFetch.patch(`/orders/${orderId}/respond-extension`, { action: "accept" });
       toast.success("Time extension request approved!");
       setExtensionProcessed("approved");
       refetch();
-    } catch {
-      toast.success("Time extension request approved!");
-      setExtensionProcessed("approved");
+    } catch (err: any) {
+      const errMsg = err?.response?.data?.message || "";
+      if (errMsg.toLowerCase().includes("no pending extension")) {
+        setExtensionProcessed("approved");
+        refetch();
+        toast.success("Time extension was already accepted.");
+        return;
+      }
+      // Fallback if backend expects "approve"
+      try {
+        await axiosFetch.patch(`/orders/${orderId}/respond-extension`, { action: "approve" });
+        toast.success("Time extension request approved!");
+        setExtensionProcessed("approved");
+        refetch();
+      } catch (fallbackErr: any) {
+        const fallbackMsg = fallbackErr?.response?.data?.message || "";
+        if (fallbackMsg.toLowerCase().includes("no pending extension")) {
+          setExtensionProcessed("approved");
+          refetch();
+          toast.success("Time extension was already accepted.");
+          return;
+        }
+        toast.error(err?.response?.data?.message || fallbackErr?.response?.data?.message || "Failed to approve extension request.");
+      }
+    } finally {
+      setIsRespondingExtension(false);
     }
   };
 
   const handleRejectExtension = async () => {
+    setIsRespondingExtension(true);
+    const orderId = order.id || order.raw?._id;
     try {
-      await axiosFetch.post(`/orders/${order.id}/reject-extension`);
+      await axiosFetch.patch(`/orders/${orderId}/respond-extension`, { action: "reject" });
       toast.success("Time extension request rejected.");
       setExtensionProcessed("rejected");
       refetch();
-    } catch {
-      toast.success("Time extension request rejected.");
-      setExtensionProcessed("rejected");
+    } catch (err: any) {
+      const errMsg = err?.response?.data?.message || "";
+      if (errMsg.toLowerCase().includes("no pending extension")) {
+        setExtensionProcessed("rejected");
+        refetch();
+        toast.error("No pending extension request found.");
+        return;
+      }
+      toast.error(err?.response?.data?.message || "Failed to reject extension request.");
+    } finally {
+      setIsRespondingExtension(false);
     }
   };
 
   // Submit Review
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (Number(totalScore) === 0) {
+      toast.error("Please select a star rating before submitting.");
+      return;
+    }
     if (!reviewDescription.trim()) {
       toast.error("Please write a few words about your experience.");
       return;
     }
     setSubmittingReview(true);
     try {
-      const avgRating = Math.round(Number(totalScore) || 5);
+      const avgRating = Math.max(1, Math.round(Number(totalScore)));
       await axiosFetch.post("/reviews", {
         gigId: order.raw?.gigID?._id || order.raw?.gigID,
         star: avgRating,
-        desc: reviewDescription,
+        desc: reviewDescription.trim(),
         orderId: order.id,
         communication: feedbackData.communication,
         quality: feedbackData.quality,
@@ -168,10 +222,17 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
       });
       toast.success("Thank you for your review!");
       setHasSubmittedReview(true);
+      setHasReviewedOnce(true);
       refetch();
-    } catch {
-      toast.success("Review submitted!");
-      setHasSubmittedReview(true);
+    } catch (err: any) {
+      const errMsg = err?.response?.data?.message;
+      if (errMsg && !errMsg.toLowerCase().includes("already")) {
+        toast.error(errMsg);
+      } else {
+        toast.success("Review submitted!");
+        setHasSubmittedReview(true);
+        setHasReviewedOnce(true);
+      }
     } finally {
       setSubmittingReview(false);
     }
@@ -247,34 +308,36 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
         )}
 
         {/* Pending Extension Request from Seller */}
-        {order.extensionRequest && !extensionProcessed && (
+        {isExtPending && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3">
                 <FiClock className="text-amber-600 text-xl shrink-0 mt-1" />
                 <div>
                   <h4 className="font-bold text-sm text-amber-900">
-                    Seller Requested a Delivery Extension ({order.extensionRequest.days} extra days)
+                    Seller Requested a Delivery Extension ({order.extensionRequest?.days || extensionData?.days || extensionData?.extraDays || 1} extra days)
                   </h4>
                   <p className="text-xs sm:text-sm text-amber-800 mt-1">
-                    &ldquo;{order.extensionRequest.reason}&rdquo;
+                    &ldquo;{order.extensionRequest?.reason || extensionData?.reason || "Additional time requested to deliver quality work."}&rdquo;
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
+                  disabled={isRespondingExtension}
                   onClick={handleRejectExtension}
-                  className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 cursor-pointer disabled:opacity-50"
                 >
                   Reject
                 </button>
                 <button
                   type="button"
+                  disabled={isRespondingExtension}
                   onClick={handleApproveExtension}
-                  className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-black cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-black cursor-pointer disabled:opacity-50"
                 >
-                  Approve Extension
+                  {isRespondingExtension ? "Processing..." : "Approve Extension"}
                 </button>
               </div>
             </div>
@@ -333,20 +396,51 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                   <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200/80 rounded-lg text-xs font-semibold text-slate-700">
                     <span className="text-slate-500 font-medium">Rating</span>
                     <span className="font-bold text-slate-900">{totalScore}</span>
-                    <span className="text-amber-500">★</span>
+                    <span className={Number(totalScore) > 0 ? "text-amber-500" : "text-slate-300"}>★</span>
                   </div>
                 </div>
 
                 {hasSubmittedReview ? (
-                  <div className="p-6 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-2">
-                    <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-lg">
+                  <div className="p-6 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
+                    <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-lg shadow-xs">
                       <FiCheck />
                     </div>
-                    <p className="text-sm font-bold text-emerald-900">Review Submitted</p>
-                    <p className="text-xs text-emerald-700">Thank you for sharing your feedback with the community!</p>
+                    <div>
+                      <p className="text-sm font-bold text-emerald-900">Review Submitted</p>
+                      <p className="text-xs text-emerald-700 mt-0.5">Thank you for sharing your feedback with the community!</p>
+                    </div>
+                    <div className="pt-1 flex items-center justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setHasSubmittedReview(false)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                      >
+                        <FiRotateCcw className="text-xs" />
+                        <span>Submit Again</span>
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <form onSubmit={handleReviewSubmit} className="space-y-5">
+                    {hasReviewedOnce && (
+                      <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800">
+                          <FiCheck className="text-emerald-600 text-sm shrink-0" />
+                          <span>Review submitted. You can update your feedback and submit again.</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFeedbackData({ communication: 0, quality: 0, service: 0 });
+                            setReviewDescription("");
+                          }}
+                          className="text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 underline cursor-pointer shrink-0"
+                        >
+                          Reset
+                        </button>
+                      </div>
+                    )}
+
                     {/* Star Criteria */}
                     <div className="space-y-3">
                       {[
@@ -361,9 +455,15 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                               <button
                                 key={starVal}
                                 type="button"
-                                onClick={() => setFeedbackData({ ...feedbackData, [crit.key]: starVal })}
-                                className={`text-base transition-colors ${starVal <= feedbackData[crit.key] ? "text-amber-400" : "text-slate-300"
-                                  }`}
+                                onClick={() =>
+                                  setFeedbackData((prev) => ({
+                                    ...prev,
+                                    [crit.key]: prev[crit.key] === starVal ? 0 : starVal,
+                                  }))
+                                }
+                                className={`text-base sm:text-lg transition-transform hover:scale-110 cursor-pointer p-0.5 ${
+                                  starVal <= feedbackData[crit.key] ? "text-amber-400" : "text-slate-200 hover:text-amber-200"
+                                }`}
                               >
                                 ★
                               </button>
@@ -391,7 +491,11 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                       disabled={submittingReview}
                       className="w-full py-3 rounded-xl bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-bold transition-all disabled:opacity-50 cursor-pointer shadow-xs"
                     >
-                      {submittingReview ? "Submitting Review..." : "Submit Review"}
+                      {submittingReview
+                        ? "Submitting Review..."
+                        : hasReviewedOnce
+                        ? "Submit Review Again"
+                        : "Submit Review"}
                     </button>
                   </form>
                 )}
@@ -473,7 +577,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
 
             {/* Seller Profile Card */}
             <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6">
-              <h3 className="font-bold text-base text-slate-900 mb-4">About the Freelancer</h3>
+              <h3 className="font-bold text-base text-slate-900 mb-4">About the Seller</h3>
 
               <div className="flex items-center gap-3.5 pb-4 border-b border-slate-100">
                 <img
@@ -491,7 +595,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     )}
                   </div>
                   <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-                    <span className="text-amber-500 font-bold">★ {order.seller.rating?.toFixed(1) || "5.0"}</span>
+                    <span className="text-amber-500 font-bold">★ {order.seller.rating?.toFixed(1) || "0"}</span>
                     <span>({order.seller.reviewCount || 0} reviews)</span>
                   </div>
                 </div>

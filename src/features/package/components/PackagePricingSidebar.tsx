@@ -138,11 +138,11 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
 
         {/* Feature Checklist with rounded pill rows (only if features exist) */}
         {checklistItems.length > 0 && (
-          <div className="mb-6 bg-[var(--Foundation-White-white-300,#F5F5F5)] rounded-[20px] border border-[rgba(0,0,0,0.10)] overflow-hidden divide-y divide-[rgba(0,0,0,0.10)]">
+          <div className="mb-6 bg-[#F5F5F5] rounded-[20px] border border-[rgba(0,0,0,0.10)] overflow-hidden divide-y divide-[rgba(0,0,0,0.10)]">
             {checklistItems.map((item, idx) => (
               <div
                 key={idx}
-                className="p-[12px] px-[16px] flex items-center gap-3"
+                className="px-[20px] py-[24px] flex items-center gap-3"
               >
                 <svg
                   className="w-5 h-5 sm:w-6 sm:h-6 shrink-0"
@@ -163,7 +163,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
                     strokeLinejoin="round"
                   />
                 </svg>
-                <span className="font-sf-pro font-[510] not-italic text-[15px] sm:text-[17px] lg:text-[18px] xl:text-[20px] text-[var(--Foundation-Grey-grey-400,#6E6E6E)] leading-normal">
+                <span className="font-sf-pro font-[510] not-italic text-[15px] sm:text-[17px] text-[#6E6E6E] leading-normal">
                   {item}
                 </span>
               </div>

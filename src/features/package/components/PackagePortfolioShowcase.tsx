@@ -45,11 +45,19 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
     setIsDragging(false);
   };
 
-  // Keep the active thumbnail scrolled into view
+  // Keep the active thumbnail scrolled horizontally into view without scrolling the entire window
+  const isInitialMount = useRef(true);
   useEffect(() => {
-    if (scrollContainerRef.current && scrollContainerRef.current.children[activeIndex]) {
-      const activeEl = scrollContainerRef.current.children[activeIndex] as HTMLElement;
-      activeEl.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    const container = scrollContainerRef.current;
+    if (container && container.children[activeIndex]) {
+      const activeEl = container.children[activeIndex] as HTMLElement;
+      const scrollTarget =
+        activeEl.offsetLeft - container.offsetWidth / 2 + activeEl.offsetWidth / 2;
+      container.scrollTo({ left: scrollTarget, behavior: "smooth" });
     }
   }, [activeIndex]);
 
@@ -71,7 +79,7 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
   const pkgUrl = `/package/${currentPkg.slug || currentPkg._id || currentPkg.id}`;
 
   return (
-    <div id="section-packages" className="scroll-mt-36 bg-[#F5F5F5] border border-gray-100 rounded-2xl p-4 sm:p-6 lg:p-8 mb-10 shadow-2xs">
+    <div id="section-seller-packages" className="scroll-mt-36 bg-[#F5F5F5] border border-gray-100 rounded-2xl p-4 sm:p-6 lg:p-8 mb-10 shadow-2xs">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap min-w-0">

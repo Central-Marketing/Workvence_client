@@ -6,7 +6,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { RiSearchLine } from "react-icons/ri";
 import { FiMenu, FiX, FiMessageSquare, FiBell, FiChevronDown, FiGrid, FiArrowRight } from "react-icons/fi";
-import useAdminCategories from "@/hooks/useAdminCategories";
+import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
 
 import toast from 'react-hot-toast';
 import { axiosFetch, socket, handleAuthExpired, isAccessTokenExpiringSoon, refreshAccessToken, getCookie } from '@/utils';
@@ -38,10 +38,11 @@ const Navbar = () => {
   const isSeller = Boolean(effectiveUser?.isSeller);
 
   // Fetch real categories from backend
-  const { categoryList: rawCats } = useAdminCategories();
+  const { categoryList: rawCats, parentCategories } = useAdminCategories();
 
-  const categoryList = rawCats
-    .filter((cat: any) => typeof cat === 'string' || !cat.parentId)
+  // Strictly filter to ensure only root categories are displayed in Navbar dropdowns
+  const categoryList = (parentCategories && parentCategories.length > 0 ? parentCategories : rawCats)
+    .filter((cat: any) => isCategoryRoot(cat, rawCats))
     .map((cat: any) => {
       if (typeof cat === 'string') {
         const slug = cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');

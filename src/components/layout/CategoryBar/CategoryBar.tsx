@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useRef, useState, useEffect, Suspense } from 'react';
+import React, { useRef, useState, useEffect, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useUserStore } from '@/store/userStore';
-import useAdminCategories from '@/hooks/useAdminCategories';
+import useAdminCategories, { isCategoryRoot } from '@/hooks/useAdminCategories';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 interface CategoryBarProps {
@@ -18,50 +18,73 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
   const user = useUserStore((state) => state.user);
 
   // Fetch categories from backend API
-  const { categoryList: rawCats } = useAdminCategories();
+  const { categoryList: rawCats, parentCategories } = useAdminCategories();
 
-  // Check if currentCategory is a child subcategory or niche (has a parentId)
-  const isChildCategory = Boolean(
-    currentCategory &&
-    currentCategory !== 'All services' &&
-    rawCats.some((c: any) => {
-      const match =
-        (c.slug && c.slug.toLowerCase() === currentCategory.toLowerCase()) ||
-        (c.name && c.name.toLowerCase() === currentCategory.toLowerCase());
-      return match && Boolean(c.parentId);
-    })
-  );
+  // Strictly filter to ensure only root categories are displayed in the bottom CategoryBar
+  const rootCategories = useMemo(() => {
+    const sourceList = parentCategories && parentCategories.length > 0 ? parentCategories : rawCats;
+    return sourceList
+      .filter((cat: any) => isCategoryRoot(cat, rawCats))
+      .map((cat: any) => {
+        if (typeof cat === 'string') {
+          const slug = cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+          return { name: cat, slug };
+        }
+        return {
+          name: cat.name || cat.title || String(cat),
+          slug: cat.slug || (cat.name || cat.title || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+        };
+      });
+  }, [parentCategories, rawCats]);
 
-  // Suppress CategoryBar on subcategory, specific service, or search filtered routes on /packages
-  const isSubcategoryRoute =
-    pathname === '/packages' &&
-    Boolean(
-      searchParams?.get('search') ||
-      searchParams?.get('subcat') ||
-      searchParams?.get('tag') ||
-      isChildCategory
+  // Determine active root category (if URL category is a subcategory/niche, resolve its root parent)
+  const activeRootCategory = useMemo(() => {
+    if (!currentCategory || currentCategory === 'All services') return '';
+    const normalized = currentCategory.toLowerCase().trim();
+
+    // 1. Direct match with a root category
+    const directRoot = rootCategories.find(
+      (rc) => rc.slug.toLowerCase() === normalized || rc.name.toLowerCase() === normalized
     );
+    if (directRoot) return directRoot.slug;
+
+    // 2. Trace child up ancestry tree to find root parent
+    let node: any = rawCats.find(
+      (c: any) =>
+        (c.slug && c.slug.toLowerCase() === normalized) ||
+        (c.name && c.name.toLowerCase() === normalized) ||
+        (c.id && c.id.toLowerCase() === normalized) ||
+        (c._id && c._id.toLowerCase() === normalized)
+    );
+
+    const visited = new Set<string>();
+    while (node && !visited.has(node.id || node._id || node.slug)) {
+      visited.add(node.id || node._id || node.slug);
+      if (isCategoryRoot(node, rawCats)) {
+        return node.slug || (node.name || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      }
+      const pId = node.parentId || node.parent_id;
+      const pName = node.parentName;
+      if (pId) {
+        node = rawCats.find((c: any) => c._id === pId || c.id === pId);
+      } else if (pName) {
+        node = rawCats.find((c: any) => (c.name && c.name.toLowerCase() === pName.toLowerCase()) || (c.title && c.title.toLowerCase() === pName.toLowerCase()));
+      } else {
+        node = undefined;
+      }
+    }
+
+    return '';
+  }, [currentCategory, rootCategories, rawCats]);
 
   const isSeller = Boolean(user?.isSeller);
 
-  const isBarVisible = visible && !isSubcategoryRoute && !isSeller;
+  // CategoryBar is visible for buyers/guests across pages
+  const isBarVisible = visible && !isSeller;
 
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
-
-  const categoryList = rawCats
-    .filter((cat: any) => typeof cat === 'string' || !cat.parentId)
-    .map((cat: any) => {
-      if (typeof cat === 'string') {
-        const slug = cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        return { name: cat, slug };
-      }
-      return {
-        name: cat.name || cat.title || String(cat),
-        slug: cat.slug || (cat.name || cat.title || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-      };
-    });
 
   const checkScrollButtons = () => {
     if (categoryScrollRef.current) {
@@ -75,7 +98,7 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
     checkScrollButtons();
     window.addEventListener('resize', checkScrollButtons);
     return () => window.removeEventListener('resize', checkScrollButtons);
-  }, [categoryList]);
+  }, [rootCategories]);
 
   const scrollCategories = (direction: 'left' | 'right') => {
     if (categoryScrollRef.current) {
@@ -120,7 +143,7 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
           <Link
             href="/packages"
             className={`px-4 py-1.5 rounded-full font-sf-pro font-medium text-[13px] sm:text-[14px] whitespace-nowrap transition-colors shrink-0 ${
-              pathname === '/packages' && !currentCategory
+              pathname === '/packages' && !activeRootCategory
                 ? 'border border-[#327C73] bg-[#E8F8F5] text-[#1E293B]'
                 : 'bg-[#F4F4F6] text-[#4A4A4A] hover:bg-[#EAEAEF] hover:text-[#111111]'
             }`}
@@ -128,9 +151,9 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
             All Services
           </Link>
 
-          {/* Dynamic Category Pills */}
-          {categoryList.map((cat: any) => {
-            const isActive = currentCategory === cat.slug;
+          {/* Dynamic Root Category Pills */}
+          {rootCategories.map((cat: any) => {
+            const isActive = activeRootCategory === cat.slug;
             return (
               <Link
                 key={cat.slug}

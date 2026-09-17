@@ -43,6 +43,68 @@ export const extractCategoriesList = (fetchedData: any): AdminCategory[] => {
   return [];
 };
 
+export const isCategoryRoot = (cat: any, allCategories?: any[]): boolean => {
+  if (!cat) return false;
+  if (typeof cat === 'string') return true;
+
+  // Check parentId
+  if (cat.parentId !== undefined && cat.parentId !== null) {
+    const pId = String(cat.parentId).trim().toLowerCase();
+    if (pId !== "" && pId !== "null" && pId !== "undefined") {
+      return false;
+    }
+  }
+
+  // Check parent_id
+  if (cat.parent_id !== undefined && cat.parent_id !== null) {
+    const pId = String(cat.parent_id).trim().toLowerCase();
+    if (pId !== "" && pId !== "null" && pId !== "undefined") {
+      return false;
+    }
+  }
+
+  // Check parentName
+  if (cat.parentName !== undefined && cat.parentName !== null) {
+    const pName = String(cat.parentName).trim().toLowerCase();
+    if (pName !== "" && pName !== "null" && pName !== "undefined") {
+      return false;
+    }
+  }
+
+  // Check parent object
+  if (cat.parent && typeof cat.parent === 'object' && Object.keys(cat.parent).length > 0) {
+    return false;
+  }
+
+  // Check level
+  if (cat.level !== undefined && Number(cat.level) > 0) {
+    return false;
+  }
+
+  // Check boolean flags
+  if (cat.isSubcategory === true || cat.isChild === true) {
+    return false;
+  }
+
+  // Cross-reference if this category is marked as a child of any other category in allCategories
+  if (Array.isArray(allCategories) && allCategories.length > 0) {
+    const catId = cat.id || cat._id;
+    const catSlug = cat.slug;
+    const isContainedAsChild = allCategories.some((other: any) => {
+      if (!other || typeof other === 'string' || other === cat) return false;
+      const childArr = Array.isArray(other.children) ? other.children : Array.isArray(other.subcategories) ? other.subcategories : [];
+      return childArr.some((ch: any) => {
+        if (!ch) return false;
+        if (typeof ch === 'string') return ch === catId || ch === catSlug;
+        return (ch.id && ch.id === catId) || (ch._id && ch._id === catId) || (ch.slug && ch.slug === catSlug);
+      });
+    });
+    if (isContainedAsChild) return false;
+  }
+
+  return true;
+};
+
 export const useAdminCategories = () => {
   const query = useQuery({
     queryKey: ADMIN_CATEGORIES_QUERY_KEY,
@@ -59,9 +121,9 @@ export const useAdminCategories = () => {
 
   const rawList = extractCategoriesList(query.data);
 
-  // Separate parent categories from child subcategories
-  const rawParents = rawList.filter((c: any) => typeof c === 'string' || !c.parentId);
-  const rawChildren = rawList.filter((c: any) => typeof c !== 'string' && Boolean(c.parentId));
+  // Separate parent categories from child subcategories strictly
+  const rawParents = rawList.filter((c: any) => isCategoryRoot(c, rawList));
+  const rawChildren = rawList.filter((c: any) => !isCategoryRoot(c, rawList));
 
   // Build parent categories with children as their sub categories
   const parentCategories: AdminCategory[] = rawParents.map((cat: any) => {

@@ -28,6 +28,7 @@ const PackageContent = () => {
   const _id = typeof rawId === "string" ? rawId : Array.isArray(rawId) ? rawId[0] : undefined;
 
   const { user } = useUserStore((state: any) => state);
+  const isSeller = Boolean(user?.isSeller);
   const [selectedTier, setSelectedTier] = useState<'basic' | 'standard' | 'premium'>('basic');
   const [activeSection, setActiveSection] = useState("section-about");
   const [isFavorited, setIsFavorited] = useState(false);
@@ -88,11 +89,20 @@ const PackageContent = () => {
     }
   }, [rawApiData]);
 
+  const getNavCombinedOffset = () => {
+    if (typeof window === "undefined") return 190;
+    const navEl = document.querySelector('nav');
+    const sectionNavEl = document.getElementById('package-section-nav');
+    const navHeight = navEl ? navEl.offsetHeight : (isSeller ? (window.innerWidth >= 768 ? 82 : 68) : (window.innerWidth >= 768 ? 136 : 121));
+    const sectionNavHeight = sectionNavEl ? sectionNavEl.offsetHeight : 54;
+    return navHeight + sectionNavHeight;
+  };
+
   // Active section tracker on scroll
   useEffect(() => {
     const handleScroll = () => {
       const sectionIds = ['section-about', 'section-seller', 'section-packages', 'section-reviews', 'section-faq'];
-      const scrollPos = window.scrollY + 225;
+      const scrollPos = window.scrollY + getNavCombinedOffset() + 24;
       for (let i = sectionIds.length - 1; i >= 0; i--) {
         const el = document.getElementById(sectionIds[i]);
         if (el && el.offsetTop <= scrollPos) {
@@ -103,13 +113,13 @@ const PackageContent = () => {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isSeller]);
 
   const scrollToSection = (sectionId: string) => {
     setActiveSection(sectionId);
     const element = document.getElementById(sectionId);
     if (element) {
-      const offset = 215;
+      const offset = getNavCombinedOffset() + 16;
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = element.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
@@ -246,6 +256,7 @@ const PackageContent = () => {
               activeSection={activeSection}
               reviewCount={normalizedData.reviewsData.totalReviews}
               onNavigate={scrollToSection}
+              isSeller={isSeller}
             />
 
             {/* Section 1: About this package */}
@@ -300,7 +311,14 @@ const PackageContent = () => {
           </div>
 
           {/* RIGHT STICKY PRICING SIDEBAR */}
-          <div className="w-full sticky top-[150px] self-start z-20">
+          <div
+            style={{
+              top: `calc(var(--navbar-height, ${isSeller ? "82px" : "136px"}) + 10px)`,
+            }}
+            className={`w-full sticky self-start z-20 transition-[top] duration-200 ${
+              isSeller ? "top-[74px] md:top-[92px]" : "top-[128px] md:top-[146px]"
+            }`}
+          >
             <PackagePricingSidebar
               packages={normalizedData.packages}
               seller={normalizedData.seller}

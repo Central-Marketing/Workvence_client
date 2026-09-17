@@ -1,18 +1,24 @@
 "use client";
 
 import React from "react";
+import { useUserStore } from "@/store/userStore";
 
 interface PackageSectionNavProps {
   activeSection: string;
   reviewCount?: number;
   onNavigate: (sectionId: string) => void;
+  isSeller?: boolean;
 }
 
 export const PackageSectionNav: React.FC<PackageSectionNavProps> = ({
   activeSection,
   reviewCount = 20,
   onNavigate,
+  isSeller,
 }) => {
+  const storeUser = useUserStore((state) => state.user);
+  const isUserSeller = isSeller !== undefined ? isSeller : Boolean(storeUser?.isSeller);
+
   const sections = [
     { id: "section-about", label: "About" },
     { id: "section-seller", label: "Seller Info" },
@@ -21,8 +27,19 @@ export const PackageSectionNav: React.FC<PackageSectionNavProps> = ({
     { id: "section-faq", label: "FAQ" },
   ];
 
+  // Responsive fallback values if CSS custom property is pending hydration
+  const fallbackTopClass = isUserSeller
+    ? "top-[74px] md:top-[92px]"
+    : "top-[128px] md:top-[146px]";
+
   return (
-    <div className="w-full bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-2xl p-1.5 mb-8 flex items-center gap-1.5 overflow-x-auto no-scrollbar sticky top-[150px] z-30 shadow-xs">
+    <div
+      id="package-section-nav"
+      style={{
+        top: `calc(var(--navbar-height, ${isUserSeller ? "82px" : "136px"}) + 10px)`,
+      }}
+      className={`w-full bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-2xl p-1.5 mb-8 flex items-center gap-1.5 overflow-x-auto no-scrollbar sticky z-30 shadow-xs transition-[top] duration-200 ${fallbackTopClass}`}
+    >
       {sections.map((sec) => {
         const isActive = activeSection === sec.id;
         return (

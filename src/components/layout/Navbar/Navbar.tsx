@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -15,6 +15,7 @@ import { Loader, NotificationBell, HeaderInboxIcon, AiGradientButton } from '@/c
 import CategoryBar from "../CategoryBar/CategoryBar";
 
 const Navbar = () => {
+  const navRef = useRef<HTMLElement>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showCategoryBar, setShowCategoryBar] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -137,6 +138,35 @@ const Navbar = () => {
     };
   }, [pathname, user]);
 
+  // Keep --navbar-height CSS variable on :root dynamically synced across all devices and roles
+  useEffect(() => {
+    if (!navRef.current) return;
+
+    const updateNavbarHeight = () => {
+      if (navRef.current) {
+        const height = navRef.current.offsetHeight;
+        if (height > 0) {
+          document.documentElement.style.setProperty('--navbar-height', `${height}px`);
+        }
+      }
+    };
+
+    updateNavbarHeight();
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(updateNavbarHeight);
+      resizeObserver.observe(navRef.current);
+    }
+
+    window.addEventListener('resize', updateNavbarHeight);
+
+    return () => {
+      if (resizeObserver) resizeObserver.disconnect();
+      window.removeEventListener('resize', updateNavbarHeight);
+    };
+  }, [isSeller, showCategoryBar, pathname]);
+
   const handleLogout = async () => {
     try {
       await axiosFetch.post("/auth/logout");
@@ -153,7 +183,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`w-full sticky top-0 z-50 transition-all duration-300 ${showMenu || pathname !== "/" || isBuyer ? "bg-white border-b border-gray-100 shadow-sm text-gray-600" : "bg-white text-gray-600"}`}>
+    <nav ref={navRef} className={`w-full sticky top-0 z-50 transition-all duration-300 ${showMenu || pathname !== "/" || isBuyer ? "bg-white border-b border-gray-100 shadow-sm text-gray-600" : "bg-white text-gray-600"}`}>
       <div className="w-full container mx-auto flex justify-between items-center px-4 sm:px-6 md:px-10 py-4 md:py-5">
 
         <div className="flex items-center gap-6 lg:gap-8 flex-1">

@@ -75,9 +75,10 @@ export const isTargetConversation = (conversation: any, targetId: string) => {
   if (cId && cId === tid) return true;
   if (cGenId && cGenId === tid) return true;
 
-  const sId = String(conversation.sellerID?._id || conversation.sellerID || '');
-  const bId = String(conversation.buyerID?._id || conversation.buyerID || '');
+  const sId = String(conversation.sellerID?._id || conversation.sellerID?.id || conversation.sellerID || '');
+  const bId = String(conversation.buyerID?._id || conversation.buyerID?.id || conversation.buyerID || '');
   if (sId && bId && (`${sId}${bId}` === tid || `${bId}${sId}` === tid)) return true;
+  if (sId === tid || bId === tid) return true;
 
   return false;
 };

@@ -165,7 +165,22 @@ const MyBriefs = () => {
           {!user?.isSeller && (
             <Link
               href="/briefs/create"
-              className="inline-flex items-center justify-center gap-2 px-4.5 py-2.5 rounded-xl bg-[#0B0F19] hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs shrink-0 self-start sm:self-center"
+              className="
+    inline-flex items-center justify-center
+    gap-2
+    px-3 sm:px-4.5
+    py-2 sm:py-2.5
+    rounded-xl
+    bg-[#0B0F19]
+    hover:bg-black
+    text-white
+    text-xs sm:text-sm
+    font-semibold
+    transition-colors
+    shadow-xs
+    shrink-0
+    self-start sm:self-center
+  "
             >
               <FiPlus className="text-sm" />
               <span>Post New Project</span>
@@ -178,33 +193,30 @@ const MyBriefs = () => {
           <button
             type="button"
             onClick={() => setFilter("all")}
-            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-              filter === "all"
+            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${filter === "all"
                 ? "bg-white text-slate-900 border border-slate-400 shadow-2xs"
                 : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-700"
-            }`}
+              }`}
           >
             All Projects
           </button>
           <button
             type="button"
             onClick={() => setFilter("open")}
-            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-              filter === "open"
+            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${filter === "open"
                 ? "bg-white text-slate-900 border border-slate-400 shadow-2xs"
                 : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-700"
-            }`}
+              }`}
           >
             Open
           </button>
           <button
             type="button"
             onClick={() => setFilter("closed")}
-            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-              filter === "closed"
+            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${filter === "closed"
                 ? "bg-white text-slate-900 border border-slate-400 shadow-2xs"
                 : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-700"
-            }`}
+              }`}
           >
             Closed
           </button>
@@ -523,13 +535,12 @@ const MyProposals = () => {
                             <>
                               <span>•</span>
                               <span
-                                className={`font-semibold capitalize ${
-                                  proposal.status === "accepted"
+                                className={`font-semibold capitalize ${proposal.status === "accepted"
                                     ? "text-emerald-600"
                                     : proposal.status === "rejected"
-                                    ? "text-rose-600"
-                                    : "text-amber-600"
-                                }`}
+                                      ? "text-rose-600"
+                                      : "text-amber-600"
+                                  }`}
                               >
                                 {proposal.status}
                               </span>

@@ -24,11 +24,23 @@ const options = {
   path: '/socket.io/'
 };
 
+const getAuthToken = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|;\s*)accessToken=([^;]*)/);
+  if (match && match[1]) return decodeURIComponent(match[1]);
+  return localStorage.getItem('token') || localStorage.getItem('accessToken') || null;
+};
+
 let realSocket: Socket | null = null;
 
 const getSocket = (): Socket | null => {
   if (!realSocket && typeof window !== 'undefined') {
-    realSocket = io(getSocketURL(), options);
+    const token = getAuthToken();
+    realSocket = io(getSocketURL(), {
+      ...options,
+      auth: token ? { token } : undefined,
+      query: token ? { token } : undefined,
+    });
   }
   return realSocket;
 };
@@ -56,6 +68,7 @@ export const socket: SocketClient = {
         realSocket.emit('leave_conversation');
       }
       realSocket.disconnect();
+      realSocket = null;
     }
   },
   emit(event: string, ...args: any[]) {

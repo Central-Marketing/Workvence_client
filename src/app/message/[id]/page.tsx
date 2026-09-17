@@ -214,7 +214,7 @@ const Message = () => {
             const isCurrentlyViewingThisChat = window.location.pathname.includes(`/message/${incomingCid}`);
             return {
               ...c,
-              lastMessage: newMsg.description,
+              lastMessage: newMsg.description || newMsg.desc || newMsg.text || newMsg.message || c.lastMessage,
               updatedAt: new Date().toISOString(),
               readBySeller: user?.isSeller ? isCurrentlyViewingThisChat : c.readBySeller,
               readByBuyer: !user?.isSeller ? isCurrentlyViewingThisChat : c.readByBuyer
@@ -236,20 +236,69 @@ const Message = () => {
     };
   }, [user?._id, queryClient]);
 
-  // Fetch messages history for active conversation (1-time initial fetch, 0 polling)
+  // Fetch messages history for active conversation with dual endpoint fallbacks
   const { isLoading: msgsLoading, isError: msgsError, error: msgsQueryError, data: messages = [] } = useQuery({
     queryKey: ['messages', conversationID],
     queryFn: async () => {
-      const { data } = await axiosFetch.get(`/conversations/${conversationID}/messages`);
-      if (Array.isArray(data)) return data;
-      if (data?.data?.messages) return data.data.messages;
-      if (data?.messages) return data.messages;
+      const candidateIds = Array.from(
+        new Set(
+          [
+            activeConvRef.current?._id,
+            activeConvRef.current?.uuid,
+            activeConvRef.current?.conversationID,
+            conversationID,
+          ]
+            .filter(Boolean)
+            .map((id) => String(id).trim())
+        )
+      );
+
+      const extractMessages = (data: any): any[] | null => {
+        if (!data) return null;
+        if (Array.isArray(data) && data.length > 0) return data;
+        if (Array.isArray(data?.data) && data.data.length > 0) return data.data;
+        if (Array.isArray(data?.messages) && data.messages.length > 0) return data.messages;
+        if (Array.isArray(data?.data?.messages) && data.data.messages.length > 0) return data.data.messages;
+        if (Array.isArray(data?.result) && data.result.length > 0) return data.result;
+        return null;
+      };
+
+      for (const id of candidateIds) {
+        // 1. Try /conversations/:id/messages
+        try {
+          const { data } = await axiosFetch.get(`/conversations/${id}/messages`);
+          const extracted = extractMessages(data);
+          if (extracted) return extracted;
+        } catch {
+          // fallback to next route
+        }
+
+        // 2. Try /messages/:id
+        try {
+          const { data } = await axiosFetch.get(`/messages/${id}`);
+          const extracted = extractMessages(data);
+          if (extracted) return extracted;
+        } catch {
+          // fallback to next route
+        }
+
+        // 3. Try /messages/history/:id
+        try {
+          const { data } = await axiosFetch.get(`/messages/history/${id}`);
+          const extracted = extractMessages(data);
+          if (extracted) return extracted;
+        } catch {
+          // fallback
+        }
+      }
+
       return [];
     },
     enabled: isValidId,
     retry: false,
-    staleTime: 60000,
-    refetchInterval: false
+    staleTime: 5000,
+    refetchInterval: 5000,
+    refetchIntervalInBackground: false
   });
 
   // Manage room subscription & realtime events for active conversation
@@ -257,9 +306,23 @@ const Message = () => {
     if (!isValidId) return;
 
     const joinRoom = () => {
-      socket.emit('join_conversation', conversationID);
-      socket.emit('join_room', conversationID);
-      socket.emit('join', conversationID);
+      const convDoc = activeConvRef.current;
+      const idsToJoin = new Set(
+        [
+          conversationID,
+          convDoc?._id,
+          convDoc?.uuid,
+          convDoc?.conversationID,
+        ]
+          .filter(Boolean)
+          .map((id) => String(id).trim())
+      );
+
+      idsToJoin.forEach((id) => {
+        socket.emit('join_conversation', id);
+        socket.emit('join_room', id);
+        socket.emit('join', id);
+      });
       if (user?._id) socket.emit('user_connected', user._id);
     };
 
@@ -281,7 +344,20 @@ const Message = () => {
         return false; // Ignore typing events from self
       }
 
-      const incomingId = String(data?.conversationUUID || data?.conversationID || data?.uuid || data?.id || data?.conversation || '').trim();
+      const convFieldId = typeof data?.conversation === 'object'
+        ? (data.conversation?._id || data.conversation?.id || data.conversation?.uuid)
+        : data?.conversation;
+
+      const incomingId = String(
+        data?.conversationUUID ||
+        data?.conversationID ||
+        data?.conversationId ||
+        data?.uuid ||
+        data?.id ||
+        convFieldId ||
+        ''
+      ).trim();
+
       if (!incomingId || incomingId === 'undefined') return false;
 
       const currentParamId = String(convIdRef.current || '').trim();
@@ -292,6 +368,13 @@ const Message = () => {
         if (convDoc.uuid && incomingId === String(convDoc.uuid).trim()) return true;
         if (convDoc.conversationID && incomingId === String(convDoc.conversationID).trim()) return true;
         if (convDoc._id && incomingId === String(convDoc._id).trim()) return true;
+        if (convDoc.id && incomingId === String(convDoc.id).trim()) return true;
+
+        const sId = String(convDoc.sellerID?._id || convDoc.sellerID?.id || convDoc.sellerID || '');
+        const bId = String(convDoc.buyerID?._id || convDoc.buyerID?.id || convDoc.buyerID || '');
+        if (sId && bId && (`${sId}${bId}` === incomingId || `${bId}${sId}` === incomingId)) return true;
+        if (sId && incomingId === sId) return true;
+        if (bId && incomingId === bId) return true;
       }
       return false;
     };
@@ -306,9 +389,11 @@ const Message = () => {
           if (arr.some((m: any) => String(m._id) === String(newMsg._id))) return arr;
 
           // Replace matching temp message or remove temp- messages
+          const incomingText = newMsg.description || newMsg.desc || newMsg.text || newMsg.message || '';
           const withoutTemp = arr.filter((m: any) => {
             if (typeof m._id === 'string' && m._id.startsWith('temp-')) {
-              return m.description !== newMsg.description;
+              const tempText = m.description || m.desc || m.text || m.message || '';
+              return tempText !== incomingText;
             }
             return true;
           });
@@ -321,11 +406,12 @@ const Message = () => {
         if (!Array.isArray(oldConvs)) return oldConvs;
         const incomingCid = String(newMsg?.conversationUUID || newMsg?.conversationID || newMsg?.uuid || newMsg?.id || '').trim();
         if (!incomingCid) return oldConvs;
+        const incomingText = newMsg.description || newMsg.desc || newMsg.text || newMsg.message || '';
         return oldConvs.map((c: any) => {
           if (isTargetConversation(c, incomingCid)) {
             return {
               ...c,
-              lastMessage: newMsg.description,
+              lastMessage: incomingText || c.lastMessage,
               updatedAt: new Date().toISOString(),
               readBySeller: user?.isSeller ? isForCurrent : c.readBySeller,
               readByBuyer: !user?.isSeller ? isForCurrent : c.readByBuyer
@@ -464,6 +550,24 @@ const Message = () => {
 
   useEffect(() => {
     activeConvRef.current = activeConversation;
+    if (activeConversation && socket) {
+      if (!socket.connected) {
+        socket.connect();
+      }
+      const extraIds = [
+        activeConversation._id,
+        activeConversation.uuid,
+        activeConversation.conversationID,
+      ]
+        .filter(Boolean)
+        .map((id) => String(id).trim());
+
+      extraIds.forEach((id) => {
+        socket.emit("join_conversation", id);
+        socket.emit("join_room", id);
+        socket.emit("join", id);
+      });
+    }
   }, [activeConversation]);
 
 
@@ -479,18 +583,37 @@ const Message = () => {
     );
   });
 
+  const activeRoomID =
+    activeConversation?._id ||
+    activeConversation?.conversationID ||
+    activeConversation?.uuid ||
+    activeConversation?.id ||
+    (conversationID !== 'undefined' ? conversationID : null);
+
   const mutation = useMutation({
-    mutationFn: (msg: any) => axiosFetch.post(`/conversations/${conversationID}/messages`, msg),
+    mutationFn: async (msg: any) => {
+      const targetId = activeRoomID || conversationID;
+      try {
+        return await axiosFetch.post(`/conversations/${targetId}/messages`, msg);
+      } catch (err) {
+        return await axiosFetch.post('/messages', {
+          ...msg,
+          conversationID: targetId,
+          conversationId: targetId
+        });
+      }
+    },
     onMutate: async (newMsg: any) => {
       // Optimistically update the conversations list with the new lastMessage and correct read status
       queryClient.setQueryData(['conversations'], (oldConvs: any) => {
         if (!Array.isArray(oldConvs)) return oldConvs;
         const incomingCid = String(newMsg?.conversationUUID || newMsg?.conversationID || newMsg?.uuid || newMsg?.id || conversationID || '').trim();
+        const incomingText = newMsg.description || newMsg.desc || newMsg.text || newMsg.message || '';
         return oldConvs.map((c: any) => {
           if (isTargetConversation(c, incomingCid)) {
             return {
               ...c,
-              lastMessage: newMsg.description,
+              lastMessage: incomingText,
               updatedAt: new Date().toISOString(),
               readBySeller: user?.isSeller ? true : false,
               readByBuyer: user?.isSeller ? false : true
@@ -501,19 +624,21 @@ const Message = () => {
       });
     },
     onSuccess: (res: any) => {
-      const savedMsg = res?.data?.data || res?.data;
+      const savedMsg = res?.data?.data || res?.data?.message || res?.data;
       if (savedMsg && savedMsg._id) {
-        queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
+        const updateMsgCache = (oldData: any = []) => {
           const arr = Array.isArray(oldData) ? oldData : [];
           if (arr.some((m: any) => m._id === savedMsg._id)) return arr;
           const withoutTemp = arr.filter((m: any) => typeof m._id === 'string' && !m._id.startsWith('temp-'));
           return [...withoutTemp, savedMsg];
-        });
+        };
+        queryClient.setQueryData(['messages', conversationID], updateMsgCache);
+        if (activeRoomID && activeRoomID !== conversationID) {
+          queryClient.setQueryData(['messages', activeRoomID], updateMsgCache);
+        }
       }
     }
   });
-
-  const activeRoomID = activeConversation?.uuid || activeConversation?.conversationID || activeConversation?._id || (conversationID !== 'undefined' ? conversationID : null);
 
   const stopTypingIndicator = () => {
     if (isTypingRef.current && activeRoomID && activeRoomID !== 'undefined' && user?.username) {
@@ -550,38 +675,62 @@ const Message = () => {
     const tempId = `temp-${Date.now()}`;
     const tempMessage = {
       _id: tempId,
-      conversationID,
+      conversationID: activeRoomID || conversationID,
       userID: {
         _id: user?._id || user?.id,
         username: user?.username || 'User',
         image: getAvatarUrl(user?.image, user?.username || 'User')
       },
       description: currentText,
+      desc: currentText,
+      text: currentText,
+      message: currentText,
       file: currentAttachment?.url || null,
       attachments: currentAttachment?.url ? [currentAttachment.url] : [],
       createdAt: new Date().toISOString()
     };
 
-    queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
+    const appendTempMessage = (oldData: any = []) => {
       const arr = Array.isArray(oldData) ? oldData : [];
       return [...arr, tempMessage];
-    });
+    };
+
+    queryClient.setQueryData(['messages', conversationID], appendTempMessage);
+    if (activeRoomID && activeRoomID !== conversationID) {
+      queryClient.setQueryData(['messages', activeRoomID], appendTempMessage);
+    }
 
     const msgPayload = {
-      conversationID,
+      conversationID: activeRoomID || conversationID,
+      conversationUUID: activeRoomID || conversationID,
+      conversationId: activeRoomID || conversationID,
       description: currentText,
+      desc: currentText,
+      text: currentText,
+      message: currentText,
       file: currentAttachment?.url || null,
       attachments: currentAttachment?.url ? [currentAttachment.url] : [],
       userID: user?._id || user?.id,
+      from: user?._id || user?.id,
+      to: targetOtherUserId || undefined,
       isSeller: Boolean(user?.isSeller)
     };
 
-    // 2. Perform DB save & single automatic WebSocket broadcast via HTTP mutation
+    // 2. Perform DB save via authenticated HTTP mutation
     mutation.mutate(msgPayload, {
       onSettled: () => {
         isSendingRef.current = false;
       }
     });
+
+    // 3. Emit message directly via WebSocket for instant real-time broadcast
+    if (socket) {
+      if (!socket.connected) {
+        socket.connect();
+      }
+      socket.emit("send_message", msgPayload);
+      socket.emit("sendMessage", msgPayload);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -814,12 +963,15 @@ const Message = () => {
 
   const filteredMessages = messages.filter((msg: any) => {
     if (!msgSearchQuery) return true;
-    return msg.description?.toLowerCase().includes(msgSearchQuery.toLowerCase());
+    const text = (msg.description || msg.desc || msg.text || msg.message || '').toLowerCase();
+    return text.includes(msgSearchQuery.toLowerCase());
   });
 
   const renderMessageAttachment = (msg: any) => {
     const fileUrl = msg.file || (Array.isArray(msg.attachments) && msg.attachments[0]) || null;
     if (!fileUrl) return null;
+
+    const hasMsgText = Boolean(msg.description || msg.desc || msg.text || msg.message);
 
     const isImage =
       /\.(png|jpe?g|gif|webp|svg|bmp|avif)/i.test(fileUrl) ||
@@ -829,7 +981,7 @@ const Message = () => {
 
     if (isImage) {
       return (
-        <div className={`mt-1 overflow-hidden rounded-lg border border-slate-200 shadow-sm max-w-[280px] ${!msg.description ? 'mb-5' : 'mb-1.5'}`}>
+        <div className={`mt-1 overflow-hidden rounded-lg border border-slate-200 shadow-sm max-w-[280px] ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}>
           <img
             src={fileUrl}
             alt="Attachment"
@@ -848,7 +1000,7 @@ const Message = () => {
 
     if (isVideo) {
       return (
-        <div className={`mt-1 overflow-hidden rounded-xl border border-slate-200 shadow-sm max-w-[340px] bg-black ${!msg.description ? 'mb-5' : 'mb-1.5'}`}>
+        <div className={`mt-1 overflow-hidden rounded-xl border border-slate-200 shadow-sm max-w-[340px] bg-black ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}>
           <video
             src={fileUrl}
             controls
@@ -867,7 +1019,7 @@ const Message = () => {
         target="_blank"
         rel="noopener noreferrer"
         download
-        className={`flex items-center gap-2 px-3 py-2 mt-1 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-lg hover:bg-slate-200 transition-colors border text-xs font-medium ${!msg.description ? 'mb-5' : 'mb-1.5'}`}
+        className={`flex items-center gap-2 px-3 py-2 mt-1 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-lg hover:bg-slate-200 transition-colors border text-xs font-medium ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}
       >
         <span className="text-base">📄</span>
         <span className="truncate max-w-[180px]">{fileName}</span>
@@ -877,7 +1029,7 @@ const Message = () => {
   };
 
   const renderMessageContent = (msg: any) => {
-    const text = msg.description || '';
+    const text = msg.description || msg.desc || msg.text || msg.message || '';
     if (!text) return null;
 
     const matchedWord = msg.moderation?.matchedWord || '';
@@ -1374,7 +1526,15 @@ const Message = () => {
                 ) : filteredMessages.length === 0 ? (
                   <div className="py-12 m-auto text-center text-sm text-slate-400 font-medium">{msgSearchQuery ? "No messages found" : "Send the first message!"}</div>
                 ) : filteredMessages.map((msg: any, index: number) => {
-                  const senderObj = msg.senderID || msg.userID;
+                  const senderObj =
+                    (typeof msg.sender === 'object' && msg.sender) ||
+                    (typeof msg.user === 'object' && msg.user) ||
+                    (typeof msg.userID === 'object' && msg.userID) ||
+                    (typeof msg.senderID === 'object' && msg.senderID) ||
+                    msg.sender ||
+                    msg.user ||
+                    msg.senderID ||
+                    msg.userID;
                   const senderIdStr = String(senderObj?._id || senderObj?.id || senderObj || '');
                   const currentUserIdStr = String(user?._id || user?.id || '');
                   const currentUsername = String(user?.username || '').toLowerCase();
@@ -1383,8 +1543,9 @@ const Message = () => {
                     (currentUserIdStr && senderIdStr && currentUserIdStr === senderIdStr) ||
                     (currentUsername && senderUsername && currentUsername === senderUsername)
                   );
-                  const offer = msg.isCustomOffer || msg.description?.startsWith('[CUSTOM_OFFER]') ? parseOffer(msg.description) : null;
-                  const meeting = msg.description?.startsWith('[MEETING_INVITE]') ? parseMeeting(msg.description) : null;
+                  const msgRawText = msg.description || msg.desc || msg.text || msg.message || '';
+                  const offer = msg.isCustomOffer || msgRawText.startsWith('[CUSTOM_OFFER]') ? parseOffer(msgRawText) : null;
+                  const meeting = msgRawText.startsWith('[MEETING_INVITE]') ? parseMeeting(msgRawText) : null;
                   const isOfferAccepted = Boolean(msg.isOfferAccepted || msg.offerStatus === 'accepted');
                   const isWithdrawn = Boolean(msg.withdrawn || msg.offerStatus === 'withdrawn');
                   const acceptedOrder = offer ? contactOrders.find((o: any) => (msg.orderID && (o._id === msg.orderID || o.id === msg.orderID)) || (o.title === offer.desc && Number(o.price) === Number(offer.price))) : null;

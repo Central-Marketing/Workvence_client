@@ -44,7 +44,7 @@ export default function ProfilePage() {
   const [country, setCountry] = useState(user?.country || "Bangladesh");
   const [shortTitle, setShortTitle] = useState(user?.shortTitle || "");
   const [description, setDescription] = useState(user?.description || "");
-  
+
   // Skills as an array
   const [skillsList, setSkillsList] = useState<string[]>(() => {
     if (Array.isArray(user?.skills)) return user.skills;
@@ -101,7 +101,7 @@ export default function ProfilePage() {
   const [previewUrl, setPreviewUrl] = useState(user?.image || "/media/noavatar.png");
   const [coverImageUrl, setCoverImageUrl] = useState(
     user?.coverImage ||
-      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80"
+    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80"
   );
   const [isUpdating, setIsUpdating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -340,11 +340,10 @@ export default function ProfilePage() {
                 setActiveSection("personal");
                 scrollToSection("section-personal");
               }}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-                activeSection === "personal"
+              className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${activeSection === "personal"
                   ? "bg-[#0D3B34] text-white shadow-2xs"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              }`}
+                }`}
             >
               Personal Info
             </button>
@@ -354,11 +353,10 @@ export default function ProfilePage() {
                 setActiveSection("professional");
                 scrollToSection("section-professional");
               }}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-                activeSection === "professional"
+              className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${activeSection === "professional"
                   ? "bg-[#0D3B34] text-white shadow-2xs"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              }`}
+                }`}
             >
               Professional Details
             </button>
@@ -368,11 +366,10 @@ export default function ProfilePage() {
                 setActiveSection("experience");
                 scrollToSection("section-experience");
               }}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-                activeSection === "experience"
+              className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${activeSection === "experience"
                   ? "bg-[#0D3B34] text-white shadow-2xs"
                   : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              }`}
+                }`}
             >
               Experience &amp; Education
             </button>
@@ -383,11 +380,10 @@ export default function ProfilePage() {
                   setActiveSection("portfolio");
                   scrollToSection("section-portfolio");
                 }}
-                className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-                  activeSection === "portfolio"
+                className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${activeSection === "portfolio"
                     ? "bg-[#0D3B34] text-white shadow-2xs"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                }`}
+                  }`}
               >
                 Portfolio
               </button>
@@ -399,11 +395,10 @@ export default function ProfilePage() {
                   setActiveSection("verification");
                   scrollToSection("section-verification");
                 }}
-                className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-                  activeSection === "verification"
+                className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${activeSection === "verification"
                     ? "bg-[#0D3B34] text-white shadow-2xs"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                }`}
+                  }`}
               >
                 Verification
               </button>
@@ -490,7 +485,7 @@ export default function ProfilePage() {
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  {shortTitle || user?.shortTitle || (isSeller ? "Web Designer" : "Project Manager")}
+                  {shortTitle || user?.shortTitle}
                 </p>
               </div>
             </div>

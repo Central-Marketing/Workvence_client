@@ -120,16 +120,16 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
 
         {/* Revisions & Delivery Meta Row */}
         {(Boolean(activePkg.revisions) || activePkg.deliveryTime > 0) && (
-          <div className="flex items-center gap-4 text-xs font-semibold text-gray-700 mb-5">
+          <div className="flex items-center gap-5 sm:gap-6 font-sf-pro font-normal not-italic text-[20px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] leading-normal mb-5 flex-wrap">
             {activePkg.revisions ? (
-              <div className="flex items-center gap-1.5">
-                <FiRepeat className="w-3.5 h-3.5 text-gray-500" />
+              <div className="flex items-center gap-2">
+                <FiRepeat className="w-[24px] h-[24px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] shrink-0" />
                 <span>{activePkg.revisions}</span>
               </div>
             ) : null}
             {activePkg.deliveryTime > 0 ? (
-              <div className="flex items-center gap-1.5">
-                <FiClock className="w-3.5 h-3.5 text-gray-500" />
+              <div className="flex items-center gap-2">
+                <FiClock className="w-[24px] h-[24px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] shrink-0" />
                 <span>{activePkg.deliveryTime} Day{activePkg.deliveryTime > 1 ? 's' : ''} Delivery</span>
               </div>
             ) : null}

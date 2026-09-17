@@ -104,14 +104,26 @@ export default function OrderDetailPage() {
 
     // Seller normalization
     const sObj = typeof o.sellerID === "object" && o.sellerID !== null ? o.sellerID : {};
+    const sellerRating = Number(
+      sObj.rating ??
+      sObj.starRating ??
+      (sObj.starNumber && sObj.totalStars ? sObj.totalStars / sObj.starNumber : undefined) ??
+      0
+    );
+    const sellerReviewCount = Number(
+      sObj.reviewCount ??
+      sObj.starNumber ??
+      sObj.totalReviews ??
+      0
+    );
     const seller = {
       id: String(sObj._id || sObj.id || (typeof o.sellerID === "string" ? o.sellerID : "")),
       name: sObj.username || sObj.name || "Seller",
       avatar: sObj.image || sObj.avatar || "/media/noavatar.png",
       role: sObj.title || sObj.shortTitle || sObj.role || "--",
       badge: sObj.badge,
-      rating: sObj.rating || 5.0,
-      reviewCount: sObj.reviewCount || 0,
+      rating: sellerRating,
+      reviewCount: sellerReviewCount,
     };
 
     // Buyer normalization

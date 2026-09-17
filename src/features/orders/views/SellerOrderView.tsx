@@ -585,7 +585,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                     <span className="text-sm font-extrabold text-amber-900">
                       {typeof buyerReview.star === "number" && buyerReview.star > 0
                         ? Number(buyerReview.star).toFixed(1)
-                        : "5.0"}
+                        : "0.0"}
                     </span>
                   </div>
                 </div>

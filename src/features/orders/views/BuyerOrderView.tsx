@@ -442,7 +442,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     <span className="text-slate-500 font-medium">Rating</span>
                     <span className="font-bold text-slate-900">
                       {isAlreadyReviewed
-                        ? Number(existingReview?.star || totalScore || 5).toFixed(1)
+                        ? Number(existingReview?.star ?? totalScore ?? 0).toFixed(1)
                         : totalScore}
                     </span>
                     <span
@@ -476,7 +476,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                             <span
                               key={s}
                               className={
-                                s <= Number(existingReview?.star || totalScore || 5)
+                                s <= Number(existingReview?.star ?? totalScore ?? 0)
                                   ? "text-amber-400"
                                   : "text-slate-200"
                               }
@@ -485,7 +485,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                             </span>
                           ))}
                           <span className="ml-1.5 font-bold text-slate-700 text-xs">
-                            {Number(existingReview?.star || totalScore || 5).toFixed(1)}
+                            {Number(existingReview?.star ?? totalScore ?? 0).toFixed(1)}
                           </span>
                         </div>
                         <p className="text-xs sm:text-sm text-slate-700 italic">
@@ -651,8 +651,14 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     )}
                   </div>
                   <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-                    <span className="text-amber-500 font-bold">★ {order.seller.rating?.toFixed(1) || "0"}</span>
-                    <span>({order.seller.reviewCount || 0} reviews)</span>
+                    {(order.seller.reviewCount ?? 0) > 0 && (order.seller.rating ?? 0) > 0 ? (
+                      <>
+                        <span className="text-amber-500 font-bold">★ {(order.seller.rating ?? 0).toFixed(1)}</span>
+                        <span>({order.seller.reviewCount} {order.seller.reviewCount === 1 ? "review" : "reviews"})</span>
+                      </>
+                    ) : (
+                      <span className="text-slate-400 font-medium">No reviews yet</span>
+                    )}
                   </div>
                 </div>
               </div>

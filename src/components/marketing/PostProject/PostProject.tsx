@@ -14,10 +14,10 @@ const PostProject = () => {
                             <Image
                                 src="/media/postproject.png"
                                 alt="Describe What You Need. Our AI Finds The Right Talent."
-                                width={680}
-                                height={460}
+                                width={1017}
+                                height={750}
                                 priority
-                                className="w-full h-auto object-cover rounded-[20px] sm:rounded-[24px]"
+                                className="w-full h-[380px] sm:h-[500px] md:h-[580px] lg:h-[750px] object-cover rounded-[20px] sm:rounded-[24px]"
                             />
                         </div>
                     </div>
@@ -26,7 +26,7 @@ const PostProject = () => {
                     <div className="w-full flex flex-col justify-between self-stretch py-2 lg:py-4">
                         {/* Main Headline */}
                         <div>
-                            <h2 className="font-sf-pro font-[510] text-[32px] sm:text-[38px] md:text-[48px] text-[#292929] leading-normal tracking-normal">
+                            <h2 className="font-sf-pro font-[510] not-italic text-[30px] sm:text-[36px] md:text-[42px] lg:text-[48px] text-[var(--Foundation-Grey-grey-800,#292929)] leading-normal tracking-normal">
                                 Describe What You Need.
                                 <br />
                                 Our AI Finds The Right Talent.
@@ -35,7 +35,7 @@ const PostProject = () => {
 
                         {/* Description & CTA */}
                         <div className="mt-8 sm:mt-10 lg:mt-14 space-y-6 sm:space-y-7">
-                            <p className="font-inter font-normal text-base sm:text-[15px] text-[#6E6E6E] mt-2.5">
+                            <p className="font-inter font-normal not-italic text-[16px] sm:text-[18px] lg:text-[20px] leading-[26px] sm:leading-[28px] lg:leading-[30px] text-[var(--Foundation-Grey-grey-400,#6E6E6E)] mt-2.5">
                                 Search the way you&apos;d actually explain it &ldquo;someone to redesign my
                                 Shopify store&rdquo; or &ldquo;edit a 3-minute YouTube video.&rdquo; Our AI understands
                                 what you mean, not just the words you type, and matches you to the
@@ -48,6 +48,12 @@ const PostProject = () => {
                                     href="/briefs/create"
                                     className="w-[282px] h-[48px]"
                                     text="Post a Project with AI"
+                                    icon={
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <path d="M19.5 3.9375V5.5M19.5 5.5V7.0625M19.5 5.5H18.25M19.5 5.5H20.75M22 5.5L20.9156 5.13852C20.4179 4.97263 20.0274 4.58211 19.8615 4.08443L19.5 3L19.1385 4.08443C18.9726 4.58211 18.5821 4.97263 18.0844 5.13852L17 5.5L18.0844 5.86148C18.5821 6.02737 18.9726 6.41789 19.1385 6.91557L19.5 8L19.8615 6.91557C20.0274 6.41789 20.4179 6.02737 20.9156 5.86148L22 5.5Z" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M2 12.8598C4.81875 10.0939 11.44 4.44198 13.275 6.40609C15.5938 8.888 3.40937 15.1646 5.28854 17.93C7.2734 20.851 14.2146 10.5543 16.5635 12.3982C18.9125 14.2422 10.926 18.391 12.8052 20.696C13.5569 21.6179 15.6239 20.235 16.5635 19.313" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    }
                                 />
                             </div>
                         </div>

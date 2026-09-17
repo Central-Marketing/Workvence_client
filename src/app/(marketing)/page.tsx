@@ -19,7 +19,7 @@ const Home = () => {
     window.scrollTo(0, 0)
   }, []);
   return (
-    <div className="w-full min-h-screen bg-white">
+    <div className="w-full min-h-screen bg-[#FAFAFA]">
       <Featured />
       <TrustedBy />
       <ExploreCategories />

@@ -216,12 +216,12 @@ const PackageContent = () => {
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-gray-800 pb-28 pt-4 sm:pt-6">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Main Two-Column Layout (Left Content + Right Sticky Sidebar) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_500px] gap-8 lg:gap-10 items-start">
 
           {/* LEFT CONTENT COLUMN */}
-          <div className="lg:col-span-8">
+          <div className="w-full min-w-0">
             {/* 1. Header: Breadcrumbs, Title, Seller Bar, 4 Stat Cards */}
             <PackageHeaderStats
               title={normalizedData.title}
@@ -300,7 +300,7 @@ const PackageContent = () => {
           </div>
 
           {/* RIGHT STICKY PRICING SIDEBAR */}
-          <div className="lg:col-span-4 sticky top-[150px] self-start z-20">
+          <div className="w-full sticky top-[150px] self-start z-20">
             <PackagePricingSidebar
               packages={normalizedData.packages}
               seller={normalizedData.seller}

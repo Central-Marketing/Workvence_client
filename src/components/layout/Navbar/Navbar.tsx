@@ -256,14 +256,14 @@ const Navbar = () => {
               <div className="flex items-center gap-[10px]">
                 <Link
                   href="/login"
-                  className="px-6 py-3 rounded-xl bg-[#F1F3F5] hover:bg-[#E5E7EB] text-[#292929] font-sf-pro font-[510] text-[20px] leading-normal transition-colors"
+                  className="px-6 py-3 rounded-xl bg-[#F1F3F5] hover:bg-[#E5E7EB] text-[#292929] font-sf-pro font-[510] text-[20px] leading-none transition-colors"
                 >
                   Sign in
                 </Link>
 
                 <Link
                   href="/register"
-                  className="px-6 py-3 rounded-xl bg-[#0B0F19] hover:bg-black text-[#E8F5F5] font-sf-pro font-[510] text-[20px] leading-normal transition-colors flex items-center gap-1.5 shadow-sm"
+                  className="px-6 py-3 rounded-xl bg-[#0B0F19] hover:bg-black text-[#E8F5F5] font-sf-pro font-[510] text-[20px] leading-none transition-colors flex items-center gap-1.5 shadow-sm"
                 >
                   <span>Join Now</span>
                   <FiArrowRight className="text-[18px]" />

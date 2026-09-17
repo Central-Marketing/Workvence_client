@@ -362,9 +362,8 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                                 key={starVal}
                                 type="button"
                                 onClick={() => setFeedbackData({ ...feedbackData, [crit.key]: starVal })}
-                                className={`text-base transition-colors ${
-                                  starVal <= feedbackData[crit.key] ? "text-amber-400" : "text-slate-300"
-                                }`}
+                                className={`text-base transition-colors ${starVal <= feedbackData[crit.key] ? "text-amber-400" : "text-slate-300"
+                                  }`}
                               >
                                 ★
                               </button>
@@ -400,7 +399,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
             )}
 
             {/* CARD 3: Project Requirements */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-7">
+            {/* <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-7">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
                 <h3 className="font-bold text-base text-slate-900">Project Requirements</h3>
                 <span className="text-xs text-slate-400">For {order.seller.name}</span>
@@ -462,7 +461,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                   </button>
                 </form>
               )}
-            </div>
+            </div> */}
 
             {/* CARD 4: Order Activity Timeline */}
             <OrderTimelineStepper order={order} />

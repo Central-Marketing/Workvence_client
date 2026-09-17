@@ -339,19 +339,18 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             <div className="space-y-2">
               <div className="flex items-center gap-2.5">
                 <span
-                  className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${
-                    isDisputed
+                  className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${isDisputed
                       ? "bg-amber-100 text-amber-900 border border-amber-300"
                       : isCancelled
-                      ? "bg-rose-100 text-rose-800 border border-rose-200"
-                      : isCompleted
-                      ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                      : isDelivered
-                      ? "bg-teal-100 text-teal-800 border border-teal-200"
-                      : isLate
-                      ? "bg-rose-100 text-rose-800 border border-rose-200"
-                      : "bg-blue-100 text-blue-800 border border-blue-200"
-                  }`}
+                        ? "bg-rose-100 text-rose-800 border border-rose-200"
+                        : isCompleted
+                          ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                          : isDelivered
+                            ? "bg-teal-100 text-teal-800 border border-teal-200"
+                            : isLate
+                              ? "bg-rose-100 text-rose-800 border border-rose-200"
+                              : "bg-blue-100 text-blue-800 border border-blue-200"
+                    }`}
                 >
                   {isDisputed ? "Disputed" : isCancelled ? "Cancelled" : order.status}
                 </span>
@@ -389,8 +388,8 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                     {isCleared
                       ? "have cleared to your balance."
                       : clearsAt
-                      ? `will clear ${moment(clearsAt).fromNow()} (${moment(clearsAt).format("MMM DD, YYYY")}).`
-                      : "are currently pending clearance."}
+                        ? `will clear ${moment(clearsAt).fromNow()} (${moment(clearsAt).format("MMM DD, YYYY")}).`
+                        : "are currently pending clearance."}
                   </p>
                 </div>
               ) : isDelivered ? (
@@ -632,7 +631,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             )}
 
             {/* CARD 1: Buyer Project Requirements */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-7">
+            {/* <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-7">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -690,7 +689,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   </button>
                 </div>
               )}
-            </div>
+            </div> */}
 
             {/* CARD 2: Submitted Work Deliverables */}
             <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-7">

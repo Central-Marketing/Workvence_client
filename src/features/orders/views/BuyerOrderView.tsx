@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
 import {
   FiCheck,
   FiClock,
@@ -66,7 +67,6 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
   // Review / Feedback State
   const [reviewDescription, setReviewDescription] = useState("");
   const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
-  const [hasReviewedOnce, setHasReviewedOnce] = useState(false);
   const [submittingReview, setSubmittingReview] = useState(false);
   const [feedbackData, setFeedbackData] = useState({
     communication: 0,
@@ -74,11 +74,49 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
     service: 0,
   });
 
+  // Fetch existing reviews for completed order
+  const { data: reviews = [], refetch: refetchReviews } = useQuery({
+    queryKey: ["reviews"],
+    queryFn: () =>
+      axiosFetch
+        .get("/reviews")
+        .then(({ data }) => {
+          if (Array.isArray(data)) return data;
+          if (Array.isArray(data?.reviews)) return data.reviews;
+          if (Array.isArray(data?.data)) return data.data;
+          return [];
+        })
+        .catch(() => []),
+    enabled: order.status === "completed" || order.raw?.status === "completed",
+  });
+
+  const existingReview =
+    reviews.find(
+      (r: any) =>
+        r.orderID === order.id ||
+        r.orderID?._id === order.id ||
+        r.orderID === order.raw?._id ||
+        r.orderID?._id === order.raw?._id ||
+        order.raw?.reviewID === r._id ||
+        order.raw?.review?._id === r._id
+    ) || order.raw?.review;
+
+  const isAlreadyReviewed = Boolean(
+    order.hasReviewed ||
+    order.raw?.hasReviewed ||
+    order.raw?.isReviewed ||
+    existingReview ||
+    hasSubmittedReview
+  );
+
   const totalScore = useMemo(() => {
+    if (existingReview?.star && typeof existingReview.star === "number") {
+      return Number(existingReview.star).toFixed(1);
+    }
     const rated = [feedbackData.communication, feedbackData.quality, feedbackData.service].filter((v) => v > 0);
     if (rated.length === 0) return "0.0";
     return (rated.reduce((sum, v) => sum + v, 0) / rated.length).toFixed(1);
-  }, [feedbackData]);
+  }, [feedbackData, existingReview]);
 
   // Complete Order
   const handleCompleteOrder = async () => {
@@ -200,6 +238,10 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
   // Submit Review
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isAlreadyReviewed) {
+      toast.error("A review has already been submitted for this order.");
+      return;
+    }
     if (Number(totalScore) === 0) {
       toast.error("Please select a star rating before submitting.");
       return;
@@ -211,27 +253,28 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
     setSubmittingReview(true);
     try {
       const avgRating = Math.max(1, Math.round(Number(totalScore)));
+      const targetOrderId = String(order.id || order.raw?._id || "");
+      if (!targetOrderId) {
+        toast.error("Invalid order ID.");
+        return;
+      }
+
       await axiosFetch.post("/reviews", {
-        gigId: order.raw?.gigID?._id || order.raw?.gigID,
+        orderID: targetOrderId,
+        description: reviewDescription.trim(),
         star: avgRating,
-        desc: reviewDescription.trim(),
-        orderId: order.id,
-        communication: feedbackData.communication,
-        quality: feedbackData.quality,
-        service: feedbackData.service,
       });
       toast.success("Thank you for your review!");
       setHasSubmittedReview(true);
-      setHasReviewedOnce(true);
+      refetchReviews();
       refetch();
     } catch (err: any) {
-      const errMsg = err?.response?.data?.message;
-      if (errMsg && !errMsg.toLowerCase().includes("already")) {
+      const rawMsg = err?.response?.data?.message;
+      const errMsg = Array.isArray(rawMsg) ? rawMsg.join(", ") : rawMsg;
+      if (errMsg) {
         toast.error(errMsg);
       } else {
-        toast.success("Review submitted!");
-        setHasSubmittedReview(true);
-        setHasReviewedOnce(true);
+        toast.error("Failed to submit review.");
       }
     } finally {
       setSubmittingReview(false);
@@ -392,55 +435,67 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
             {isCompleted && (
               <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-7">
                 <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-                  <h3 className="font-bold text-base text-slate-900">Share Feedback &amp; Review</h3>
+                  <h3 className="font-bold text-base text-slate-900">
+                    {isAlreadyReviewed ? "Your Feedback & Review" : "Share Feedback & Review"}
+                  </h3>
                   <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200/80 rounded-lg text-xs font-semibold text-slate-700">
                     <span className="text-slate-500 font-medium">Rating</span>
-                    <span className="font-bold text-slate-900">{totalScore}</span>
-                    <span className={Number(totalScore) > 0 ? "text-amber-500" : "text-slate-300"}>★</span>
+                    <span className="font-bold text-slate-900">
+                      {isAlreadyReviewed
+                        ? Number(existingReview?.star || totalScore || 5).toFixed(1)
+                        : totalScore}
+                    </span>
+                    <span
+                      className={
+                        Number(isAlreadyReviewed ? existingReview?.star || totalScore : totalScore) > 0
+                          ? "text-amber-500"
+                          : "text-slate-300"
+                      }
+                    >
+                      ★
+                    </span>
                   </div>
                 </div>
 
-                {hasSubmittedReview ? (
+                {isAlreadyReviewed ? (
                   <div className="p-6 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
                     <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-lg shadow-xs">
                       <FiCheck />
                     </div>
                     <div>
                       <p className="text-sm font-bold text-emerald-900">Review Submitted</p>
-                      <p className="text-xs text-emerald-700 mt-0.5">Thank you for sharing your feedback with the community!</p>
+                      <p className="text-xs text-emerald-700 mt-0.5">
+                        Thank you for sharing your feedback with the community!
+                      </p>
                     </div>
-                    <div className="pt-1 flex items-center justify-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setHasSubmittedReview(false)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
-                      >
-                        <FiRotateCcw className="text-xs" />
-                        <span>Submit Again</span>
-                      </button>
-                    </div>
+
+                    {(existingReview?.description || reviewDescription) && (
+                      <div className="bg-white/90 border border-emerald-200/80 rounded-xl p-4 mt-3 max-w-lg mx-auto text-left shadow-2xs">
+                        <div className="flex items-center gap-1 text-xs mb-1.5">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <span
+                              key={s}
+                              className={
+                                s <= Number(existingReview?.star || totalScore || 5)
+                                  ? "text-amber-400"
+                                  : "text-slate-200"
+                              }
+                            >
+                              ★
+                            </span>
+                          ))}
+                          <span className="ml-1.5 font-bold text-slate-700 text-xs">
+                            {Number(existingReview?.star || totalScore || 5).toFixed(1)}
+                          </span>
+                        </div>
+                        <p className="text-xs sm:text-sm text-slate-700 italic">
+                          "{existingReview?.description || reviewDescription}"
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <form onSubmit={handleReviewSubmit} className="space-y-5">
-                    {hasReviewedOnce && (
-                      <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800">
-                          <FiCheck className="text-emerald-600 text-sm shrink-0" />
-                          <span>Review submitted. You can update your feedback and submit again.</span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setFeedbackData({ communication: 0, quality: 0, service: 0 });
-                            setReviewDescription("");
-                          }}
-                          className="text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 underline cursor-pointer shrink-0"
-                        >
-                          Reset
-                        </button>
-                      </div>
-                    )}
-
                     {/* Star Criteria */}
                     <div className="space-y-3">
                       {[
@@ -448,7 +503,10 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                         { key: "quality" as const, label: "Quality of Delivery" },
                         { key: "service" as const, label: "Service as Described" },
                       ].map((crit) => (
-                        <div key={crit.key} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                        <div
+                          key={crit.key}
+                          className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100"
+                        >
                           <span className="text-xs font-semibold text-slate-800">{crit.label}</span>
                           <div className="flex items-center gap-1">
                             {[1, 2, 3, 4, 5].map((starVal) => (
@@ -462,7 +520,9 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                                   }))
                                 }
                                 className={`text-base sm:text-lg transition-transform hover:scale-110 cursor-pointer p-0.5 ${
-                                  starVal <= feedbackData[crit.key] ? "text-amber-400" : "text-slate-200 hover:text-amber-200"
+                                  starVal <= feedbackData[crit.key]
+                                    ? "text-amber-400"
+                                    : "text-slate-200 hover:text-amber-200"
                                 }`}
                               >
                                 ★
@@ -491,11 +551,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                       disabled={submittingReview}
                       className="w-full py-3 rounded-xl bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-bold transition-all disabled:opacity-50 cursor-pointer shadow-xs"
                     >
-                      {submittingReview
-                        ? "Submitting Review..."
-                        : hasReviewedOnce
-                        ? "Submit Review Again"
-                        : "Submit Review"}
+                      {submittingReview ? "Submitting Review..." : "Submit Review"}
                     </button>
                   </form>
                 )}

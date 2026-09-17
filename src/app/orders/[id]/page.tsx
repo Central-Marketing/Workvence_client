@@ -193,6 +193,7 @@ export default function OrderDetailPage() {
       deliveryMessage: o.deliveryMessage || o.deliveryText,
       extensionRequest,
       revisionReason: o.revisionReason || o.revision?.reason,
+      hasReviewed: Boolean(o.hasReviewed || o.isReviewed || o.review || o.reviewID),
       isUserSeller,
       isUserBuyer,
       raw: o,

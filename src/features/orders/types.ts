@@ -51,6 +51,7 @@ export interface NormalizedOrder {
   deliveryMessage?: string;
   extensionRequest: ExtensionRequestData | null;
   revisionReason?: string;
+  hasReviewed?: boolean;
   isUserSeller: boolean;
   isUserBuyer: boolean;
   raw: any;

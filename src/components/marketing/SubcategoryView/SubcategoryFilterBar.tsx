@@ -33,12 +33,12 @@ const SubcategoryFilterBar: React.FC<SubcategoryFilterBarProps> = ({
         className="order-1 flex items-center gap-1.5 hover:opacity-80 transition-opacity px-2 py-1.5 rounded-lg hover:bg-gray-100/70 cursor-pointer shrink-0"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M5.8335 17.5V15" stroke="#868686" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M14.1665 17.5V12.5" stroke="#868686" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M14.1665 5V2.5" stroke="#868686" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M5.8335 7.5V2.5" stroke="#868686" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M5.8335 15C5.05693 15 4.66865 15 4.36235 14.8732C3.95398 14.704 3.62952 14.3795 3.46036 13.9712C3.3335 13.6648 3.3335 13.2766 3.3335 12.5C3.3335 11.7234 3.3335 11.3352 3.46036 11.0288C3.62952 10.6205 3.95398 10.296 4.36235 10.1268C4.66865 10 5.05693 10 5.8335 10C6.61006 10 6.99835 10 7.30464 10.1268C7.71301 10.296 8.03747 10.6205 8.20663 11.0288C8.3335 11.3352 8.3335 11.7234 8.3335 12.5C8.3335 13.2766 8.3335 13.6648 8.20663 13.9712C8.03747 14.3795 7.71301 14.704 7.30464 14.8732C6.99835 15 6.61006 15 5.8335 15Z" stroke="#868686" stroke-width="1.5" />
-          <path d="M14.1665 10C13.3899 10 13.0017 10 12.6953 9.87317C12.287 9.704 11.9625 9.3795 11.7933 8.97117C11.6665 8.66483 11.6665 8.27657 11.6665 7.5C11.6665 6.72343 11.6665 6.33515 11.7933 6.02886C11.9625 5.62048 12.287 5.29602 12.6953 5.12687C13.0017 5 13.3899 5 14.1665 5C14.9431 5 15.3313 5 15.6377 5.12687C16.046 5.29602 16.3705 5.62048 16.5397 6.02886C16.6665 6.33515 16.6665 6.72343 16.6665 7.5C16.6665 8.27657 16.6665 8.66483 16.5397 8.97117C16.3705 9.3795 16.046 9.704 15.6377 9.87317C15.3313 10 14.9431 10 14.1665 10Z" stroke="#868686" stroke-width="1.5" />
+          <path d="M5.8335 17.5V15" stroke="#868686" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M14.1665 17.5V12.5" stroke="#868686" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M14.1665 5V2.5" stroke="#868686" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M5.8335 7.5V2.5" stroke="#868686" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M5.8335 15C5.05693 15 4.66865 15 4.36235 14.8732C3.95398 14.704 3.62952 14.3795 3.46036 13.9712C3.3335 13.6648 3.3335 13.2766 3.3335 12.5C3.3335 11.7234 3.3335 11.3352 3.46036 11.0288C3.62952 10.6205 3.95398 10.296 4.36235 10.1268C4.66865 10 5.05693 10 5.8335 10C6.61006 10 6.99835 10 7.30464 10.1268C7.71301 10.296 8.03747 10.6205 8.20663 11.0288C8.3335 11.3352 8.3335 11.7234 8.3335 12.5C8.3335 13.2766 8.3335 13.6648 8.20663 13.9712C8.03747 14.3795 7.71301 14.704 7.30464 14.8732C6.99835 15 6.61006 15 5.8335 15Z" stroke="#868686" strokeWidth="1.5" />
+          <path d="M14.1665 10C13.3899 10 13.0017 10 12.6953 9.87317C12.287 9.704 11.9625 9.3795 11.7933 8.97117C11.6665 8.66483 11.6665 8.27657 11.6665 7.5C11.6665 6.72343 11.6665 6.33515 11.7933 6.02886C11.9625 5.62048 12.287 5.29602 12.6953 5.12687C13.0017 5 13.3899 5 14.1665 5C14.9431 5 15.3313 5 15.6377 5.12687C16.046 5.29602 16.3705 5.62048 16.5397 6.02886C16.6665 6.33515 16.6665 6.72343 16.6665 7.5C16.6665 8.27657 16.6665 8.66483 16.5397 8.97117C16.3705 9.3795 16.046 9.704 15.6377 9.87317C15.3313 10 14.9431 10 14.1665 10Z" stroke="#868686" strokeWidth="1.5" />
         </svg>
         <span className="text-[var(--Foundation-Grey-grey-300,#868686)] font-sf-pro text-[16px] font-[510] not-italic leading-normal">
           Filter
@@ -46,7 +46,7 @@ const SubcategoryFilterBar: React.FC<SubcategoryFilterBarProps> = ({
         {isFilterOpen && (
           <span className="flex items-center justify-center text-red-500 hover:text-red-600 ml-0.5">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M15 5L5.00068 14.9993M14.9993 15L5 5.00071" stroke="#F00000" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M15 5L5.00068 14.9993M14.9993 15L5 5.00071" stroke="#F00000" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </span>
         )}

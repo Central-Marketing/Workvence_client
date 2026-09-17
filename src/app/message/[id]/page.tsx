@@ -386,12 +386,14 @@ const Message = () => {
       if (isForCurrent) {
         queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
           const arr = Array.isArray(oldData) ? oldData : [];
-          if (arr.some((m: any) => String(m._id) === String(newMsg._id))) return arr;
+          const newMsgId = newMsg?._id || newMsg?.id;
+          if (newMsgId && arr.some((m: any) => String(m._id || m.id) === String(newMsgId))) return arr;
 
           // Replace matching temp message or remove temp- messages
           const incomingText = newMsg.description || newMsg.desc || newMsg.text || newMsg.message || '';
           const withoutTemp = arr.filter((m: any) => {
-            if (typeof m._id === 'string' && m._id.startsWith('temp-')) {
+            const mId = m._id || m.id;
+            if (typeof mId === 'string' && mId.startsWith('temp-')) {
               const tempText = m.description || m.desc || m.text || m.message || '';
               return tempText !== incomingText;
             }
@@ -593,13 +595,13 @@ const Message = () => {
   const mutation = useMutation({
     mutationFn: async (msg: any) => {
       const targetId = activeRoomID || conversationID;
+      const { isSeller, conversationUUID, conversationId, ...cleanMsg } = msg;
       try {
-        return await axiosFetch.post(`/conversations/${targetId}/messages`, msg);
+        return await axiosFetch.post(`/conversations/${targetId}/messages`, cleanMsg);
       } catch (err) {
         return await axiosFetch.post('/messages', {
-          ...msg,
+          ...cleanMsg,
           conversationID: targetId,
-          conversationId: targetId
         });
       }
     },
@@ -625,11 +627,15 @@ const Message = () => {
     },
     onSuccess: (res: any) => {
       const savedMsg = res?.data?.data || res?.data?.message || res?.data;
-      if (savedMsg && savedMsg._id) {
+      const msgId = savedMsg?._id || savedMsg?.id;
+      if (savedMsg && msgId) {
         const updateMsgCache = (oldData: any = []) => {
           const arr = Array.isArray(oldData) ? oldData : [];
-          if (arr.some((m: any) => m._id === savedMsg._id)) return arr;
-          const withoutTemp = arr.filter((m: any) => typeof m._id === 'string' && !m._id.startsWith('temp-'));
+          if (arr.some((m: any) => (m._id || m.id) === msgId)) return arr;
+          const withoutTemp = arr.filter((m: any) => {
+            const mId = m._id || m.id;
+            return typeof mId === 'string' && !mId.startsWith('temp-');
+          });
           return [...withoutTemp, savedMsg];
         };
         queryClient.setQueryData(['messages', conversationID], updateMsgCache);
@@ -637,6 +643,7 @@ const Message = () => {
           queryClient.setQueryData(['messages', activeRoomID], updateMsgCache);
         }
       }
+      queryClient.invalidateQueries({ queryKey: ['messages', conversationID] });
     }
   });
 
@@ -803,7 +810,73 @@ const Message = () => {
       if (brief?.title) payload.title = brief.title;
     }
 
-    mutation.mutate({ conversationID, description: `[CUSTOM_OFFER]${JSON.stringify(payload)}` });
+    const offerText = `[CUSTOM_OFFER]${JSON.stringify(payload)}`;
+    const targetRoomId = activeRoomID || conversationID;
+
+    // 1. Optimistic temp message for 0ms UI latency
+    const tempId = `temp-${Date.now()}`;
+    const tempMessage = {
+      _id: tempId,
+      id: tempId,
+      conversationID: targetRoomId,
+      conversationUUID: targetRoomId,
+      userID: {
+        _id: user?._id || user?.id,
+        username: user?.username || 'User',
+        image: getAvatarUrl(user?.image, user?.username || 'User')
+      },
+      senderID: user?._id || user?.id,
+      sender: user,
+      user: user,
+      description: offerText,
+      desc: offerText,
+      text: offerText,
+      message: offerText,
+      isCustomOffer: true,
+      file: null,
+      attachments: [],
+      isSeller: true,
+      createdAt: new Date().toISOString()
+    };
+
+    const appendTempMessage = (oldData: any = []) => {
+      const arr = Array.isArray(oldData) ? oldData : [];
+      return [...arr, tempMessage];
+    };
+
+    queryClient.setQueryData(['messages', conversationID], appendTempMessage);
+    if (activeRoomID && activeRoomID !== conversationID) {
+      queryClient.setQueryData(['messages', activeRoomID], appendTempMessage);
+    }
+
+    // 2. Transmit to backend
+    const msgPayload = {
+      conversationID: targetRoomId,
+      conversationUUID: targetRoomId,
+      conversationId: targetRoomId,
+      description: offerText,
+      desc: offerText,
+      text: offerText,
+      message: offerText,
+      isCustomOffer: true,
+      file: null,
+      attachments: [],
+      userID: user?._id || user?.id,
+      from: user?._id || user?.id,
+      to: targetOtherUserId || undefined,
+    };
+
+    mutation.mutate(msgPayload);
+
+    // 3. Emit via socket
+    if (socket) {
+      if (!socket.connected) {
+        socket.connect();
+      }
+      socket.emit("send_message", msgPayload);
+      socket.emit("sendMessage", msgPayload);
+    }
+
     setSelectedPackageId(""); setSelectedBriefId(""); setOfferDesc(""); setOfferPrice(""); setOfferDelivery(""); setOfferRevisions("Unlimited Revision");
     setShowOfferModal(false);
     toast.success("Custom offer sent!");
@@ -831,16 +904,40 @@ const Message = () => {
     } catch { toast.error("Failed to withdraw."); }
   };
 
-  const parseOffer = (desc?: string) => {
-    if (desc?.startsWith('[CUSTOM_OFFER]')) {
-      try { return JSON.parse(desc.replace('[CUSTOM_OFFER]', '')); } catch { return null; }
+  const parseOffer = (desc?: any) => {
+    if (!desc) return null;
+    if (typeof desc === 'object' && (desc.price !== undefined || desc.packageID || desc.delivery)) {
+      return desc;
+    }
+    if (typeof desc !== 'string') return null;
+    const str = desc.trim();
+    if (str.includes('[CUSTOM_OFFER]')) {
+      try {
+        const jsonPart = str.substring(str.indexOf('[CUSTOM_OFFER]') + '[CUSTOM_OFFER]'.length).trim();
+        return JSON.parse(jsonPart);
+      } catch (err) {
+        console.error("Failed to parse custom offer json:", err);
+        return null;
+      }
     }
     return null;
   };
 
-  const parseMeeting = (desc?: string) => {
-    if (desc?.startsWith('[MEETING_INVITE]')) {
-      try { return JSON.parse(desc.replace('[MEETING_INVITE]', '')); } catch { return null; }
+  const parseMeeting = (desc?: any) => {
+    if (!desc) return null;
+    if (typeof desc === 'object' && (desc.roomUrl || desc.meetingId || desc.joinUrl)) {
+      return desc;
+    }
+    if (typeof desc !== 'string') return null;
+    const str = desc.trim();
+    if (str.includes('[MEETING_INVITE]')) {
+      try {
+        const jsonPart = str.substring(str.indexOf('[MEETING_INVITE]') + '[MEETING_INVITE]'.length).trim();
+        return JSON.parse(jsonPart);
+      } catch (err) {
+        console.error("Failed to parse meeting invite json:", err);
+        return null;
+      }
     }
     return null;
   };
@@ -856,11 +953,12 @@ const Message = () => {
     const toastId = toast.loading("Generating video meeting link...");
 
     try {
+      const targetRoomId = activeRoomID || conversationID;
       const { data } = await axiosFetch.post(
         '/meetings',
         {
           title,
-          conversationId: conversationID,
+          conversationId: targetRoomId,
         },
         {
           headers: { 'Content-Type': 'application/json' },
@@ -868,24 +966,85 @@ const Message = () => {
         }
       );
 
-      if (data && (data.roomUrl || data.joinUrl || data.meeting || data.meetingId)) {
+      const resData = data?.data || data;
+      if (resData && (resData.roomUrl || resData.joinUrl || resData.meeting || resData.meetingId)) {
         const meetingPayload = {
-          meetingId: data.meetingId || '',
-          roomUrl: data.joinUrl || data.roomUrl || data.meeting || '',
-          title: data.title || title,
-          hostEmail: data.hostEmail || '',
-          password: data.password || '',
-          isPrivate: Boolean(data.isPrivate),
-          autoRecording: data.autoRecording || '',
-          createdAt: data.createdAt || new Date().toISOString(),
-          status: data.status || 'success'
+          meetingId: resData.meetingId || '',
+          roomUrl: resData.joinUrl || resData.roomUrl || resData.meeting || '',
+          title: resData.title || title,
+          hostEmail: resData.hostEmail || '',
+          password: resData.password || '',
+          isPrivate: Boolean(resData.isPrivate),
+          autoRecording: resData.autoRecording || '',
+          createdAt: resData.createdAt || new Date().toISOString(),
+          status: resData.status || 'success'
         };
 
-        mutation.mutate({
-          conversationID,
-          description: `[MEETING_INVITE]${JSON.stringify(meetingPayload)}`,
-          isSeller: Boolean(user?.isSeller)
-        });
+        const meetingText = `[MEETING_INVITE]${JSON.stringify(meetingPayload)}`;
+
+        // Optimistically append temp message to local UI (0ms latency)
+        const tempId = `temp-${Date.now()}`;
+        const tempMessage = {
+          _id: tempId,
+          id: tempId,
+          conversationID: targetRoomId,
+          userID: {
+            _id: user?._id || user?.id,
+            username: user?.username || 'User',
+            image: getAvatarUrl(user?.image, user?.username || 'User')
+          },
+          senderID: user?._id || user?.id,
+          sender: user,
+          user: user,
+          description: meetingText,
+          isSeller: Boolean(user?.isSeller),
+          createdAt: new Date().toISOString()
+        };
+
+        const appendTempMessage = (oldData: any = []) => {
+          const arr = Array.isArray(oldData) ? oldData : [];
+          return [...arr, tempMessage];
+        };
+
+        queryClient.setQueryData(['messages', conversationID], appendTempMessage);
+        if (activeRoomID && activeRoomID !== conversationID) {
+          queryClient.setQueryData(['messages', activeRoomID], appendTempMessage);
+        }
+
+        // Send meeting message via WebSocket (or fallback to HTTP if socket unavailable)
+        if (socket && socket.connected) {
+          const socketPayload = {
+            conversationID: targetRoomId,
+            conversationUUID: targetRoomId,
+            conversationId: targetRoomId,
+            description: meetingText,
+            desc: meetingText,
+            text: meetingText,
+            message: meetingText,
+            meeting: meetingPayload,
+            meetingPayload,
+            userID: user?._id || user?.id,
+            from: user?._id || user?.id,
+            to: targetOtherUserId || undefined,
+            user: {
+              _id: user?._id || user?.id,
+              username: user?.username || 'User',
+              image: getAvatarUrl(user?.image, user?.username || 'User')
+            },
+            sender: {
+              _id: user?._id || user?.id,
+              username: user?.username || 'User',
+              image: getAvatarUrl(user?.image, user?.username || 'User')
+            },
+            createdAt: new Date().toISOString()
+          };
+          socket.emit("send_message", socketPayload);
+        } else {
+          mutation.mutate({
+            conversationID: targetRoomId,
+            description: meetingText,
+          });
+        }
 
         toast.success("Meeting room created and sent to chat!", { id: toastId });
         setShowMeetingModal(false);
@@ -961,11 +1120,34 @@ const Message = () => {
     return username.includes(searchLower) || lastMsg.includes(searchLower);
   });
 
-  const filteredMessages = messages.filter((msg: any) => {
-    if (!msgSearchQuery) return true;
-    const text = (msg.description || msg.desc || msg.text || msg.message || '').toLowerCase();
-    return text.includes(msgSearchQuery.toLowerCase());
-  });
+  const filteredMessages = messages
+    .filter((msg: any, index: number, self: any[]) => {
+      // 1. Deduplicate by unique message ID
+      const msgId = msg._id || msg.id;
+      if (msgId) {
+        const firstIdx = self.findIndex((m: any) => (m._id || m.id) === msgId);
+        if (firstIdx !== index) return false;
+      }
+
+      // 2. Collapse duplicate meeting invites for the same meetingId
+      const text = msg.description || msg.desc || msg.text || msg.message || '';
+      const meeting = parseMeeting(msg.meeting || msg.meetingPayload || text);
+      if (meeting?.meetingId) {
+        const firstMeetingIdx = self.findIndex((m: any) => {
+          const mText = m.description || m.desc || m.text || m.message || '';
+          const mMeeting = parseMeeting(m.meeting || m.meetingPayload || mText);
+          return mMeeting?.meetingId && String(mMeeting.meetingId) === String(meeting.meetingId);
+        });
+        if (firstMeetingIdx !== index) return false;
+      }
+
+      return true;
+    })
+    .filter((msg: any) => {
+      if (!msgSearchQuery) return true;
+      const text = (msg.description || msg.desc || msg.text || msg.message || '').toLowerCase();
+      return text.includes(msgSearchQuery.toLowerCase());
+    });
 
   const renderMessageAttachment = (msg: any) => {
     const fileUrl = msg.file || (Array.isArray(msg.attachments) && msg.attachments[0]) || null;
@@ -1544,8 +1726,12 @@ const Message = () => {
                     (currentUsername && senderUsername && currentUsername === senderUsername)
                   );
                   const msgRawText = msg.description || msg.desc || msg.text || msg.message || '';
-                  const offer = msg.isCustomOffer || msgRawText.startsWith('[CUSTOM_OFFER]') ? parseOffer(msgRawText) : null;
-                  const meeting = msgRawText.startsWith('[MEETING_INVITE]') ? parseMeeting(msgRawText) : null;
+                  const offer = msg.isCustomOffer || (typeof msgRawText === 'string' && msgRawText.includes('[CUSTOM_OFFER]'))
+                    ? parseOffer(msg.offer || msg.customOffer || msgRawText)
+                    : (msg.offer ? parseOffer(msg.offer) : null);
+                  const meeting = (typeof msgRawText === 'string' && msgRawText.includes('[MEETING_INVITE]')) || msg.meeting || msg.meetingPayload
+                    ? parseMeeting(msg.meeting || msg.meetingPayload || msgRawText)
+                    : null;
                   const isOfferAccepted = Boolean(msg.isOfferAccepted || msg.offerStatus === 'accepted');
                   const isWithdrawn = Boolean(msg.withdrawn || msg.offerStatus === 'withdrawn');
                   const acceptedOrder = offer ? contactOrders.find((o: any) => (msg.orderID && (o._id === msg.orderID || o.id === msg.orderID)) || (o.title === offer.desc && Number(o.price) === Number(offer.price))) : null;
@@ -1734,9 +1920,9 @@ const Message = () => {
                             <div className="w-full flex items-center justify-between">
                               <div className="flex items-center gap-2.5">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                  <path d="M2 11C2 7.70017 2 6.05025 3.02513 5.02513C4.05025 4 5.70017 4 9 4H10C13.2998 4 14.9497 4 15.9749 5.02513C17 6.05025 17 7.70017 17 11V13C17 16.2998 17 17.9497 15.9749 18.9749C14.9497 20 13.2998 20 10 20H9C5.70017 20 4.05025 20 3.02513 18.9749C2 17.9497 2 16.2998 2 13V11Z" stroke="#354B9A" stroke-width="1.5" />
-                                  <path d="M17 8.90585L17.1259 8.80196C19.2417 7.05623 20.2996 6.18336 21.1498 6.60482C22 7.02628 22 8.42355 22 11.2181V12.7819C22 15.5765 22 16.9737 21.1498 17.3952C20.2996 17.8166 19.2417 16.9438 17.1259 15.198L17 15.0941" stroke="#354B9A" stroke-width="1.5" stroke-linecap="round" />
-                                  <path d="M11.5 11C12.3284 11 13 10.3284 13 9.5C13 8.67157 12.3284 8 11.5 8C10.6716 8 10 8.67157 10 9.5C10 10.3284 10.6716 11 11.5 11Z" stroke="#354B9A" stroke-width="1.5" />
+                                  <path d="M2 11C2 7.70017 2 6.05025 3.02513 5.02513C4.05025 4 5.70017 4 9 4H10C13.2998 4 14.9497 4 15.9749 5.02513C17 6.05025 17 7.70017 17 11V13C17 16.2998 17 17.9497 15.9749 18.9749C14.9497 20 13.2998 20 10 20H9C5.70017 20 4.05025 20 3.02513 18.9749C2 17.9497 2 16.2998 2 13V11Z" stroke="#354B9A" strokeWidth="1.5" />
+                                  <path d="M17 8.90585L17.1259 8.80196C19.2417 7.05623 20.2996 6.18336 21.1498 6.60482C22 7.02628 22 8.42355 22 11.2181V12.7819C22 15.5765 22 16.9737 21.1498 17.3952C20.2996 17.8166 19.2417 16.9438 17.1259 15.198L17 15.0941" stroke="#354B9A" strokeWidth="1.5" strokeLinecap="round" />
+                                  <path d="M11.5 11C12.3284 11 13 10.3284 13 9.5C13 8.67157 12.3284 8 11.5 8C10.6716 8 10 8.67157 10 9.5C10 10.3284 10.6716 11 11.5 11Z" stroke="#354B9A" strokeWidth="1.5" />
                                 </svg>
                                 <span className="text-[16px] font-bold text-slate-900 leading-none">Video Meeting Invitation</span>
                               </div>
@@ -1840,7 +2026,7 @@ const Message = () => {
                                 title={msg.moderation?.flagReason || "Flagged content"}
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                  <path d="M5.0249 21C5.04385 19.2643 5.04366 17.5541 5.0366 15.9209M5.0366 15.9209C5.01301 10.4614 4.91276 5.86186 5.19475 4.04271C5.5611 1.67939 9.39301 3.82993 13.9703 5.59842L16.0328 6.48729C17.5508 7.1415 19.7187 8.30352 18.7662 9.66084C18.3738 10.22 17.56 10.8596 16.0575 11.567L5.0366 15.9209Z" stroke="#DA0000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                  <path d="M5.0249 21C5.04385 19.2643 5.04366 17.5541 5.0366 15.9209M5.0366 15.9209C5.01301 10.4614 4.91276 5.86186 5.19475 4.04271C5.5611 1.67939 9.39301 3.82993 13.9703 5.59842L16.0328 6.48729C17.5508 7.1415 19.7187 8.30352 18.7662 9.66084C18.3738 10.22 17.56 10.8596 16.0575 11.567L5.0366 15.9209Z" stroke="#DA0000" strokeWidth="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                               </div>
                             )}

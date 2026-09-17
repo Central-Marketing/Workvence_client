@@ -22,6 +22,10 @@ import {
   FolderDot,
   ShieldCheck,
   User as UserIcon,
+  UploadCloud,
+  Folder,
+  ArrowLeft,
+  Image as ImageIcon,
 } from "lucide-react";
 
 import { useUserStore } from "@/store/userStore";
@@ -213,6 +217,79 @@ export default function ProfilePage() {
 
   const handleRemoveEducation = (idx: number) => {
     setEducation(education.filter((_, i) => i !== idx));
+  };
+
+  // Portfolio handlers
+  const handleAddPortfolio = () => {
+    const newPort = [...portfolio, { title: "", description: "", image: "", link: "" }];
+    setPortfolio(newPort);
+    setEditingProjectIdx(newPort.length - 1);
+  };
+
+  const handleUpdatePortfolio = (index: number, field: string, value: string) => {
+    const newPort = [...portfolio];
+    if (newPort[index]) {
+      newPort[index] = { ...newPort[index], [field]: value };
+      setPortfolio(newPort);
+    }
+  };
+
+  const handleRemovePortfolio = (index: number) => {
+    setPortfolio(portfolio.filter((_, i) => i !== index));
+    if (editingProjectIdx === index) {
+      setEditingProjectIdx(null);
+    } else if (editingProjectIdx !== null && editingProjectIdx > index) {
+      setEditingProjectIdx(editingProjectIdx - 1);
+    }
+    toast.success("Project removed from list");
+  };
+
+  const handleSaveProject = (index: number) => {
+    const item = portfolio[index];
+    if (!item || !item.title || !item.title.trim()) {
+      toast.error("Please enter a project title");
+      return;
+    }
+    if (!item.image || !item.image.trim()) {
+      toast.error("Please upload a project cover image");
+      return;
+    }
+    setEditingProjectIdx(null);
+    toast.success("Project saved! Click 'Save Changes' to update your profile.");
+  };
+
+  const handleCancelEditProject = (index: number) => {
+    const item = portfolio[index];
+    if (!item?.title?.trim() && !item?.image?.trim() && !item?.description?.trim()) {
+      setPortfolio(portfolio.filter((_, i) => i !== index));
+    }
+    setEditingProjectIdx(null);
+  };
+
+  const handlePortfolioImageUpload = async (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingPortfolioIdx(index);
+    try {
+      toast.loading("Uploading portfolio image...", { id: `port-up-${index}` });
+      const uploaded = await supportService.uploadFileToCloudinary(file, "portfolio_images");
+      const cdnUrl = uploaded?.secure_url || uploaded?.url;
+      if (cdnUrl) {
+        handleUpdatePortfolio(index, "image", cdnUrl);
+        toast.success("Portfolio image uploaded!", { id: `port-up-${index}` });
+      } else {
+        throw new Error("Upload succeeded but no URL returned");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Portfolio image upload failed", { id: `port-up-${index}` });
+    } finally {
+      setUploadingPortfolioIdx(null);
+      e.target.value = "";
+    }
   };
 
   // Profile completion calculation
@@ -1012,55 +1089,266 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
                 <div>
                   <h2 className="text-base sm:text-lg font-bold text-slate-900">Portfolio Projects</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">Showcase your completed works to clients.</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Showcase your completed works, case studies, and live links to clients.</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newPort = [...portfolio, { title: "", description: "", image: "", link: "" }];
-                    setPortfolio(newPort);
-                    setEditingProjectIdx(newPort.length - 1);
-                  }}
-                  className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-800"
-                >
-                  <FiPlus />
-                  <span>Add Project</span>
-                </button>
+                {editingProjectIdx === null && (
+                  <button
+                    type="button"
+                    onClick={handleAddPortfolio}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-black hover:bg-slate-800 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
+                  >
+                    <FiPlus />
+                    <span>Add Project</span>
+                  </button>
+                )}
               </div>
 
-              {portfolio.length === 0 ? (
-                <div className="text-center py-10 border border-dashed border-slate-200 rounded-xl">
-                  <p className="text-xs text-slate-400 mb-2">No portfolio items added yet.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {portfolio.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs group relative"
+              {editingProjectIdx !== null ? (
+                /* Interactive Project Form Editor */
+                <div className="bg-slate-50/70 border border-slate-200/90 rounded-2xl p-5 sm:p-6 space-y-5">
+                  <div className="flex justify-between items-center pb-3 border-b border-slate-200/70">
+                    <h3 className="text-sm font-bold text-slate-900">
+                      {portfolio[editingProjectIdx]?.title
+                        ? `Edit Project: ${portfolio[editingProjectIdx].title}`
+                        : "New Portfolio Project"}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => handleCancelEditProject(editingProjectIdx)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors cursor-pointer"
                     >
-                      <img
-                        src={item.image || "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=400&auto=format&fit=crop&q=80"}
-                        alt={item.title || "Project"}
-                        className="w-full h-32 object-cover bg-slate-100"
+                      <ArrowLeft size={13} />
+                      <span>Back to Projects</span>
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {/* Project Title */}
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-700">
+                        Project Title <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. E-Commerce Web & Mobile App Redesign"
+                        value={portfolio[editingProjectIdx]?.title || ""}
+                        onChange={(e) => handleUpdatePortfolio(editingProjectIdx, "title", e.target.value)}
+                        className="w-full px-3.5 py-2.5 bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-teal-600 outline-none transition-colors"
                       />
-                      <div className="p-3">
-                        <h4 className="font-bold text-xs text-slate-900 truncate">
-                          {item.title || "Untitled Project"}
-                        </h4>
-                        <p className="text-[11px] text-slate-500 line-clamp-2 mt-0.5">
-                          {item.description || "No description provided"}
-                        </p>
+                    </div>
+
+                    {/* Description */}
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-700">Description</label>
+                      <textarea
+                        placeholder="Describe your role, technologies used, deliverables, and impact..."
+                        rows={3}
+                        value={portfolio[editingProjectIdx]?.description || ""}
+                        onChange={(e) => handleUpdatePortfolio(editingProjectIdx, "description", e.target.value)}
+                        className="w-full px-3.5 py-2.5 bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-teal-600 outline-none transition-colors resize-none"
+                      />
+                    </div>
+
+                    {/* Project Cover Image */}
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-700">
+                        Project Cover Image <span className="text-rose-500">*</span>
+                      </label>
+                      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                        {portfolio[editingProjectIdx]?.image ? (
+                          <div className="relative w-32 h-20 rounded-xl overflow-hidden border border-slate-200 group shrink-0 bg-slate-100 shadow-xs">
+                            <img
+                              src={portfolio[editingProjectIdx].image}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleUpdatePortfolio(editingProjectIdx, "image", "")}
+                              className="absolute inset-0 bg-black/60 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center font-bold text-xs transition-opacity cursor-pointer"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ) : null}
+
+                        <div className="flex-1 w-full">
+                          <label className="flex-1 cursor-pointer">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => handlePortfolioImageUpload(editingProjectIdx, e)}
+                              disabled={uploadingPortfolioIdx === editingProjectIdx}
+                            />
+                            <div className="flex items-center justify-center gap-2 px-4 py-3 bg-white hover:bg-teal-50/60 text-teal-800 border border-teal-200 rounded-xl text-xs font-bold transition-colors shadow-2xs">
+                              {uploadingPortfolioIdx === editingProjectIdx ? (
+                                <>
+                                  <Loader size={16} />
+                                  <span>Uploading Image...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <UploadCloud size={16} />
+                                  <span>
+                                    {portfolio[editingProjectIdx]?.image
+                                      ? "Change Image File"
+                                      : "Upload Project Image"}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </label>
+                        </div>
                       </div>
+                    </div>
+
+                    {/* Project Live Link */}
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-700">Project Link (Optional)</label>
+                      <input
+                        type="url"
+                        placeholder="e.g. https://myproject-demo.com or Behance/Dribbble URL"
+                        value={portfolio[editingProjectIdx]?.link || ""}
+                        onChange={(e) => handleUpdatePortfolio(editingProjectIdx, "link", e.target.value)}
+                        className="w-full px-3.5 py-2.5 bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-teal-600 outline-none transition-colors"
+                      />
+                    </div>
+
+                    {/* Editor Action Buttons */}
+                    <div className="pt-2 flex justify-end items-center gap-2.5">
                       <button
                         type="button"
-                        onClick={() => setPortfolio(portfolio.filter((_, i) => i !== idx))}
-                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 hover:bg-rose-50 hover:text-rose-600 text-slate-600 shadow-sm flex items-center justify-center transition-colors"
+                        onClick={() => handleCancelEditProject(editingProjectIdx)}
+                        className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200/70 rounded-xl transition-colors cursor-pointer"
                       >
-                        <FiTrash2 className="text-xs" />
+                        Cancel
+                      </button>
+
+                      {(() => {
+                        const currentProject = editingProjectIdx !== null ? portfolio[editingProjectIdx] : null;
+                        const isProjectFormValid = Boolean(
+                          currentProject?.title?.trim() && currentProject?.image?.trim()
+                        );
+                        return (
+                          <button
+                            type="button"
+                            disabled={!isProjectFormValid}
+                            onClick={() => handleSaveProject(editingProjectIdx)}
+                            className={`px-5 py-2 text-xs font-bold rounded-xl transition-all shadow-xs ${
+                              isProjectFormValid
+                                ? "bg-black hover:bg-slate-800 text-white cursor-pointer"
+                                : "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300"
+                            }`}
+                          >
+                            Save Project
+                          </button>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Portfolio Projects Cards Grid or Empty State */
+                <div>
+                  {portfolio.length === 0 ? (
+                    <div className="text-center py-12 px-4 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50 space-y-3">
+                      <Folder className="w-10 h-10 text-teal-700/70 mx-auto" />
+                      <h4 className="text-sm font-bold text-slate-800">No Portfolio Projects Added Yet</h4>
+                      <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                        Showcase your best work, case studies, and live project links to attract more clients.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleAddPortfolio}
+                        className="px-4 py-2 bg-black text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition-colors shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <FiPlus className="text-sm" />
+                        <span>Add First Project</span>
                       </button>
                     </div>
-                  ))}
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                      {portfolio.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="group relative bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-2xs hover:shadow-md hover:border-teal-500/40 transition-all flex flex-col"
+                        >
+                          {/* Card Cover Image */}
+                          <div className="relative h-44 w-full bg-slate-100 overflow-hidden border-b border-slate-100">
+                            {item.image ? (
+                              <img
+                                src={item.image}
+                                alt={item.title || "Project"}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex flex-col items-center justify-center bg-teal-50/40 text-teal-700 font-bold text-xs gap-1">
+                                <ImageIcon className="w-7 h-7 text-teal-700 mb-0.5" />
+                                <span>No Image Uploaded</span>
+                              </div>
+                            )}
+
+                            {/* Quick Action Badges */}
+                            <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => setEditingProjectIdx(idx)}
+                                className="p-2 bg-white/95 hover:bg-white text-slate-700 hover:text-teal-700 rounded-lg shadow-xs backdrop-blur-xs transition-colors cursor-pointer"
+                                title="Edit Project"
+                              >
+                                <FiEdit2 className="text-xs" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRemovePortfolio(idx)}
+                                className="p-2 bg-white/95 hover:bg-white text-slate-700 hover:text-rose-600 rounded-lg shadow-xs backdrop-blur-xs transition-colors cursor-pointer"
+                                title="Delete Project"
+                              >
+                                <FiTrash2 className="text-xs" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Card Body */}
+                          <div className="p-4 flex-1 flex flex-col justify-between">
+                            <div>
+                              <h4 className="font-bold text-slate-900 text-sm line-clamp-1 mb-1">
+                                {item.title || "Untitled Project"}
+                              </h4>
+                              <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-3">
+                                {item.description || "No description provided."}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 text-xs">
+                              {item.link ? (
+                                <a
+                                  href={item.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-teal-700 hover:text-teal-800 font-semibold text-xs"
+                                >
+                                  <FiExternalLink className="text-xs" />
+                                  <span>View Live</span>
+                                </a>
+                              ) : (
+                                <span className="text-slate-400 text-[11px]">No link attached</span>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={() => setEditingProjectIdx(idx)}
+                                className="text-xs font-bold text-slate-600 hover:text-teal-700 transition-colors cursor-pointer"
+                              >
+                                Edit Project
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

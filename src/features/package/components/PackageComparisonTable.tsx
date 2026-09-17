@@ -56,17 +56,20 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
             <h2 className="text-[22px] sm:text-[25px] font-semibold text-gray-900 tracking-tight">
               Compare packages
             </h2>
-            <p className="mt-1 text-sm text-gray-500">
-              Compare what&apos;s included in each package
-            </p>
           </div>
 
           <button
             type="button"
+            role="switch"
+            aria-checked={showComparisonTable}
+            aria-label="Toggle compare packages table"
             onClick={() => setShowComparisonTable(!showComparisonTable)}
-            className="inline-flex items-center justify-center border border-gray-300 hover:border-gray-900 hover:bg-gray-50 text-gray-700 font-semibold text-sm px-4 py-2.5 rounded-lg transition-colors cursor-pointer bg-white"
+            className={`w-[60px] h-[34px] p-[4px] rounded-[40px] flex items-center transition-colors duration-200 cursor-pointer shrink-0 ${showComparisonTable
+                ? "bg-[var(--success-500,#008000)] justify-end"
+                : "bg-[#D1D5DB] justify-start"
+              }`}
           >
-            {showComparisonTable ? "Hide Comparison" : "See Comparison"}
+            <span className="w-[26px] h-[26px] bg-white rounded-full shadow-sm pointer-events-none block transition-transform duration-200" />
           </button>
         </div>
 
@@ -78,14 +81,14 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
               <div className="grid grid-cols-3 border-b border-gray-200">
                 {/* Basic */}
                 {basicPkg ? (
-                  <div className="px-4 py-5 xl:px-6 xl:py-6 bg-white border-r border-gray-200">
-                    <div className="mb-3 sm:mb-4">
-                      <span className="text-[11px] font-bold uppercase tracking-wide text-gray-500">
+                  <div className="px-2.5 sm:px-4 py-4 sm:py-5 xl:px-6 xl:py-6 bg-white border-r border-gray-200">
+                    <div className="mb-2.5 sm:mb-4">
+                      <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-gray-500">
                         Basic
                       </span>
                     </div>
 
-                    <div className="text-2xl xl:text-[30px] font-bold text-gray-900 leading-none">
+                    <div className="text-xl sm:text-2xl xl:text-[30px] font-bold text-gray-900 leading-none">
                       $ {basicPkg.price}
                     </div>
 
@@ -111,7 +114,7 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="px-4 py-6 sm:px-6 sm:py-8 bg-gray-50 border-r border-gray-200 text-center flex items-center justify-center">
+                  <div className="px-2.5 sm:px-4 py-6 sm:px-6 sm:py-8 bg-gray-50 border-r border-gray-200 text-center flex items-center justify-center">
                     <span className="text-xs sm:text-sm text-gray-400">
                       Basic package not offered
                     </span>
@@ -120,21 +123,21 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
 
                 {/* Standard */}
                 {standardPkg ? (
-                  <div className="relative px-4 py-5 xl:px-6 xl:py-6 bg-[#f7fffc] border-r border-gray-200">
+                  <div className="relative px-2.5 sm:px-4 py-4 sm:py-5 xl:px-6 xl:py-6 bg-[#f7fffc] border-r border-gray-200">
                     {/* Recommended Bar */}
                     <div className="absolute top-0 left-0 right-0 h-1 bg-brand-green" />
 
-                    <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
-                      <span className="text-[11px] font-bold uppercase tracking-wide text-brand-green">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1 sm:gap-2 mb-2.5 sm:mb-4">
+                      <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-brand-green">
                         Standard
                       </span>
 
-                      <span className="rounded-full bg-brand-green px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wide text-white shrink-0">
+                      <span className="rounded-full bg-brand-green px-1.5 sm:px-2 py-0.5 text-[8px] min-[400px]:text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-wide text-white shrink-0">
                         Recommended
                       </span>
                     </div>
 
-                    <div className="text-2xl xl:text-[30px] font-bold text-gray-900 leading-none">
+                    <div className="text-xl sm:text-2xl xl:text-[30px] font-bold text-gray-900 leading-none">
                       $ {standardPkg.price}
                     </div>
 
@@ -160,7 +163,7 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="px-4 py-6 sm:px-6 sm:py-8 bg-gray-50 border-r border-gray-200 text-center flex items-center justify-center">
+                  <div className="px-2.5 sm:px-4 py-6 sm:px-6 sm:py-8 bg-gray-50 border-r border-gray-200 text-center flex items-center justify-center">
                     <span className="text-xs sm:text-sm text-gray-400">
                       Standard package not offered
                     </span>
@@ -169,14 +172,14 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
 
                 {/* Premium */}
                 {premiumPkg ? (
-                  <div className="px-4 py-5 xl:px-6 xl:py-6 bg-white">
-                    <div className="mb-3 sm:mb-4">
-                      <span className="text-[11px] font-bold uppercase tracking-wide text-[#ff6b4a]">
+                  <div className="px-2.5 sm:px-4 py-4 sm:py-5 xl:px-6 xl:py-6 bg-white">
+                    <div className="mb-2.5 sm:mb-4">
+                      <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-[#ff6b4a]">
                         Premium
                       </span>
                     </div>
 
-                    <div className="text-2xl xl:text-[30px] font-bold text-gray-900 leading-none">
+                    <div className="text-xl sm:text-2xl xl:text-[30px] font-bold text-gray-900 leading-none">
                       $ {premiumPkg.price}
                     </div>
 
@@ -328,9 +331,9 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
                         onSelectTier('basic');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="w-full py-2.5 px-2 sm:px-3 bg-white border border-gray-300 hover:border-gray-900 text-gray-800 font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer text-center truncate"
+                      className="w-full py-2.5 px-2 sm:px-3 bg-white border border-gray-300 hover:border-gray-900 text-gray-800 font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer text-center"
                     >
-                      Select Basic (${basicPkg.price})
+                      Select Basic
                     </button>
                   )}
                 </div>
@@ -342,9 +345,9 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
                         onSelectTier('standard');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="w-full py-2.5 px-2 sm:px-3 bg-brand-green text-white font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer shadow-xs text-center truncate"
+                      className="w-full py-2.5 px-2 sm:px-3 bg-brand-green text-white font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer shadow-xs text-center"
                     >
-                      Select Standard (${standardPkg.price})
+                      Select Standard
                     </button>
                   )}
                 </div>
@@ -356,9 +359,9 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
                         onSelectTier('premium');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="w-full py-2.5 px-2 sm:px-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer text-center truncate"
+                      className="w-full py-2.5 px-2 sm:px-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer text-center"
                     >
-                      Select Premium (${premiumPkg.price})
+                      Select Premium
                     </button>
                   )}
                 </div>

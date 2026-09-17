@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { FiHome, FiChevronDown, FiCheck } from "react-icons/fi";
+import { FiHome, FiCheck } from "react-icons/fi";
 import { SubcategoryItem } from "@/data/categoryTaxonomy";
 
 export interface BreadcrumbCrumb {
@@ -109,13 +109,26 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
             type="button"
             onClick={() => setDropdownOpen((prev) => !prev)}
             aria-label="Switch Subcategory"
-            className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-teal-50/80 border border-teal-200/70 text-teal-600 hover:bg-teal-100 flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
+            className="w-7 h-7 sm:w-8 sm:h-8 aspect-square rounded-[60px] border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-50,#FFF)] hover:bg-gray-50 flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
           >
-            <FiChevronDown
-              className={`w-3.5 h-3.5 transition-transform duration-200 ${
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              className={`transition-transform duration-200 ${
                 dropdownOpen ? "rotate-180" : ""
               }`}
-            />
+            >
+              <path
+                d="M12 6.00003C12 6.00003 9.05407 10 8 10C6.94587 10 4 6 4 6"
+                stroke="#126D6B"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
         </div>
 

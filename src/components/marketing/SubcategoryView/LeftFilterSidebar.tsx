@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FiSearch, FiRotateCcw, FiChevronDown } from "react-icons/fi";
+import useDebounce from "@/hooks/useDebounce";
 
 export interface LeftFilterSidebarProps {
   searchVal: string;
@@ -45,8 +46,37 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
   onReset,
   className = "",
 }) => {
-  const currentMin = parseInt(minPrice || "100", 10);
-  const currentMax = parseInt(maxPrice || "1000", 10);
+  // Local state for smooth real-time slider and input responsiveness
+  const [localMin, setLocalMin] = useState(minPrice);
+  const [localMax, setLocalMax] = useState(maxPrice);
+
+  // Sync with incoming props (e.g. on reset or URL query change)
+  useEffect(() => {
+    setLocalMin(minPrice);
+  }, [minPrice]);
+
+  useEffect(() => {
+    setLocalMax(maxPrice);
+  }, [maxPrice]);
+
+  // Debounce price changes to prevent excessive re-renders, URL pushes, and API request floods
+  const debouncedMin = useDebounce(localMin, 400);
+  const debouncedMax = useDebounce(localMax, 400);
+
+  useEffect(() => {
+    if (debouncedMin !== minPrice) {
+      onMinPriceChange(debouncedMin);
+    }
+  }, [debouncedMin, minPrice, onMinPriceChange]);
+
+  useEffect(() => {
+    if (debouncedMax !== maxPrice) {
+      onMaxPriceChange(debouncedMax);
+    }
+  }, [debouncedMax, maxPrice, onMaxPriceChange]);
+
+  const currentMin = parseInt(localMin || "100", 10);
+  const currentMax = parseInt(localMax || "1000", 10);
 
   // Range Slider boundaries
   const sliderMin = 0;
@@ -59,14 +89,14 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
   const handleMinSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value, 10);
     if (val <= currentMax) {
-      onMinPriceChange(String(val));
+      setLocalMin(String(val));
     }
   };
 
   const handleMaxSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value, 10);
     if (val >= currentMin) {
-      onMaxPriceChange(String(val));
+      setLocalMax(String(val));
     }
   };
 
@@ -243,8 +273,8 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
             <span className="text-gray-400 text-xs font-semibold mr-1">$</span>
             <input
               type="number"
-              value={minPrice}
-              onChange={(e) => onMinPriceChange(e.target.value)}
+              value={localMin}
+              onChange={(e) => setLocalMin(e.target.value)}
               placeholder="100"
               className="w-full text-xs font-bold text-gray-900 outline-none bg-transparent"
             />
@@ -258,8 +288,8 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
             <span className="text-gray-400 text-xs font-semibold mr-1">$</span>
             <input
               type="number"
-              value={maxPrice}
-              onChange={(e) => onMaxPriceChange(e.target.value)}
+              value={localMax}
+              onChange={(e) => setLocalMax(e.target.value)}
               placeholder="1000"
               className="w-full text-xs font-bold text-gray-900 outline-none bg-transparent"
             />

@@ -262,7 +262,7 @@ const Packages = () => {
       if (selectedCat && selectedCat !== 'All services' && selectedCat !== 'Results') {
         const matched = findCategoryInList(selectedCat);
         if (matched?.id || matched?._id) {
-          queryParams.set('categoryId', matched.id || matched._id);
+          queryParams.set('categoryId', String(matched.id || matched._id));
         }
         // Direct category name sent to backend (e.g. "Automation" or "N8N")
         queryParams.set('category', matched?.name || selectedCat);
@@ -776,7 +776,7 @@ const Packages = () => {
 
           {/* 2. Subcategory Filter Bar: Filter Toggle, Divider, Pills, View All */}
           {resolvedSubcategoryHeaderItem.items && resolvedSubcategoryHeaderItem.items.length > 0 && (
-            <div className="my-[30px]">
+            <div className="my-4 sm:my-[30px]">
               <SubcategoryFilterBar
                 items={resolvedSubcategoryHeaderItem.items}
                 activeTag={currentActiveTag}
@@ -809,7 +809,7 @@ const Packages = () => {
                 ? `${displayPackages.length} Results`
                 : (resolvedSubcategoryHeaderItem.resultCount || "1,40,000+ Results")}
             </p>
-            <div className="flex items-center gap-2 self-start sm:self-auto">
+            {/* <div className="flex items-center gap-2 self-start sm:self-auto">
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Sort by:</span>
               <select
                 value={sortBy}
@@ -824,7 +824,7 @@ const Packages = () => {
                 <option value="price_asc">Price: Low to High</option>
                 <option value="price_desc">Price: High to Low</option>
               </select>
-            </div>
+            </div> */}
           </div>
 
           {/* 4. Filter Sidebar (Left) + Package Cards Grid (Right) */}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
 
@@ -14,6 +14,44 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
   sellerName = "Seller",
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Mouse Drag-to-Scroll state
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [hasMoved, setHasMoved] = useState(false);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollContainerRef.current) return;
+    setIsDragging(true);
+    setHasMoved(false);
+    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
+    setScrollLeft(scrollContainerRef.current.scrollLeft);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    if (Math.abs(walk) > 4) {
+      setHasMoved(true);
+    }
+    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUpOrLeave = () => {
+    setIsDragging(false);
+  };
+
+  // Keep the active thumbnail scrolled into view
+  useEffect(() => {
+    if (scrollContainerRef.current && scrollContainerRef.current.children[activeIndex]) {
+      const activeEl = scrollContainerRef.current.children[activeIndex] as HTMLElement;
+      activeEl.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  }, [activeIndex]);
 
   if (!Array.isArray(sellerPackages) || sellerPackages.length === 0) {
     return null;
@@ -33,15 +71,20 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
   const pkgUrl = `/package/${currentPkg.slug || currentPkg._id || currentPkg.id}`;
 
   return (
-    <div id="section-packages" className="scroll-mt-36 bg-[#F5F5F5] border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
+    <div id="section-packages" className="scroll-mt-36 bg-[#F5F5F5] border border-gray-100 rounded-2xl p-4 sm:p-6 lg:p-8 mb-10 shadow-2xs">
       {/* Header */}
-      <div className="flex items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
-            More Services by {sellerName}
+      <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap min-w-0">
+          <h2 className="text-[20px] min-[400px]:text-[24px] sm:text-[28px] md:text-[32px] lg:text-[36px] font-[590] font-sf-pro text-[var(--Foundation-Grey-grey-800,#292929)] not-italic leading-tight tracking-tight">
+            Packages
           </h2>
-          <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-md">
-            {sellerPackages.length} {sellerPackages.length === 1 ? 'Package' : 'Packages'}
+          <span className="inline-flex items-center gap-1 rounded-[4px] border border-[var(--Foundation-Grey-grey-100,#C7C7C7)] bg-[var(--Foundation-Grey-grey-50,#EDEDED)] px-2 sm:px-[10px] py-0.5 sm:py-[4px] text-xs sm:text-sm md:text-[16px] font-[510] font-sf-pro text-[var(--Foundation-Grey-grey-400,#6E6E6E)] not-italic leading-normal shrink-0">
+            <span className="font-bold text-[var(--Foundation-Grey-grey-700,#353535)] font-sf-pro not-italic leading-normal">
+              {sellerPackages.length}
+            </span>
+            <span>
+              {sellerPackages.length === 1 ? 'Package' : 'Packages'}
+            </span>
           </span>
         </div>
 
@@ -125,9 +168,18 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
         </div>
       </Link>
 
-      {/* Thumbnails of other packages if more than 1 */}
+      {/* Thumbnails of other packages in single scrollable row with drag-to-scroll */}
       {sellerPackages.length > 1 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+        <div
+          ref={scrollContainerRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUpOrLeave}
+          onMouseLeave={handleMouseUpOrLeave}
+          className={`flex items-center gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar scroll-smooth flex-nowrap py-1 select-none ${
+            isDragging ? "cursor-grabbing" : "cursor-grab"
+          }`}
+        >
           {sellerPackages.map((pkg, idx) => {
             const isSelected = activeIndex === idx;
             const thumbImg = pkg.cover || (Array.isArray(pkg.images) && pkg.images[0]) || "";
@@ -135,18 +187,20 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
               <button
                 key={idx}
                 type="button"
-                onClick={() => setActiveIndex(idx)}
-                className={`relative aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 ${
-                  isSelected
+                onClick={() => {
+                  if (!hasMoved) setActiveIndex(idx);
+                }}
+                className={`relative w-[130px] sm:w-[160px] md:w-[180px] shrink-0 aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 active:scale-95 ${isSelected
                     ? "border-brand-green ring-1 ring-brand-green shadow-xs scale-98"
                     : "border-transparent opacity-75 hover:opacity-100 hover:border-gray-300"
-                }`}
+                  }`}
               >
                 {thumbImg && (
                   <img
                     src={thumbImg}
                     alt={pkg.title || ""}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover pointer-events-none select-none"
+                    draggable={false}
                   />
                 )}
               </button>

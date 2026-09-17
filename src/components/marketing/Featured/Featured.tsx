@@ -6,6 +6,11 @@ import { useRouter } from 'next/navigation';
 import useAdminCategories from '@/hooks/useAdminCategories';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 import {
   Search,
   Palette,
@@ -126,6 +131,34 @@ const Featured = () => {
             '-=0.5'
           );
         }
+      }
+
+      // 5. ScrollTrigger: Smooth lift of gallery columns on scroll with enhanced parabolic depth
+      if (galleryRef.current && containerRef.current) {
+        const liftCols = galleryRef.current.querySelectorAll('.hero-gallery-lift');
+        // Enhanced parabolic lift values for prominent, clearly visible organic motion
+        const liftValues = [-90, -135, -170, -135, -90];
+
+        liftCols.forEach((col, idx) => {
+          gsap.to(col, {
+            y: liftValues[idx] ?? -120,
+            ease: 'none',
+            force3D: true,
+            scrollTrigger: {
+              trigger: containerRef.current,
+              // Start immediately from initial page scroll (accounting for sticky navbar offset)
+              start: () => `top ${containerRef.current ? Math.round(containerRef.current.getBoundingClientRect().top + window.scrollY) : 80}px`,
+              end: '+=400',
+              scrub: 1.2,
+              invalidateOnRefresh: true,
+            },
+          });
+        });
+
+        // Ensure ScrollTrigger refreshes after initial entrance finishes
+        tl.eventCallback('onComplete', () => {
+          ScrollTrigger.refresh();
+        });
       }
     },
     { scope: containerRef }
@@ -300,104 +333,114 @@ const Featured = () => {
 
         {/* COLUMN 1: LEFTMOST - 2 VERTICAL IMAGES */}
         <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
-          <div className="w-full flex flex-col gap-4 sm:gap-5 md:gap-6 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-            {/* Top image: Blue head silhouette (shows full 339x429 card) */}
-            <div className="relative w-full aspect-[339/429] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
-              <Image
-                src="/media/hero_images/img4.png"
-                alt="Creative Art"
-                fill
-                priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                className="object-cover object-center"
-              />
-            </div>
-            {/* Bottom image: Laptop code editor (showing 15% from top: ~65px of 429px) */}
-            <div className="relative w-full h-[45px] sm:h-[52px] md:h-[58px] lg:h-[65px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-slate-900">
-              <Image
-                src="/media/hero_images/img7.png"
-                alt="Code Development"
-                fill
-                priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                className="object-cover object-top"
-              />
+          <div className="hero-gallery-lift w-full will-change-transform">
+            <div className="w-full flex flex-col gap-4 sm:gap-5 md:gap-6 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
+              {/* Top image: Blue head silhouette (shows full 339x429 card) */}
+              <div className="relative w-full aspect-[339/429] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
+                <Image
+                  src="/media/hero_images/img4.png"
+                  alt="Creative Art"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
+                  className="object-cover object-center"
+                />
+              </div>
+              {/* Bottom image: Laptop code editor (showing 15% from top: ~65px of 429px) */}
+              <div className="relative w-full h-[45px] sm:h-[52px] md:h-[58px] lg:h-[65px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-slate-900">
+                <Image
+                  src="/media/hero_images/img7.png"
+                  alt="Code Development"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
+                  className="object-cover object-top"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* COLUMN 2: SECOND - TALL ADOBE BOUQUET CARD */}
         <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
-          <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-            <div className="relative w-full h-[160px] sm:h-[180px] md:h-[200px] lg:h-[240px] xl:h-[255px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-white">
-              <Image
-                src="/media/hero_images/img1.png"
-                alt="Design Forever"
-                fill
-                priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                className="object-cover object-top"
-              />
+          <div className="hero-gallery-lift w-full will-change-transform">
+            <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
+              <div className="relative w-full h-[160px] sm:h-[180px] md:h-[200px] lg:h-[240px] xl:h-[255px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-white">
+                <Image
+                  src="/media/hero_images/img1.png"
+                  alt="Design Forever"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
+                  className="object-cover object-top"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* COLUMN 3: CENTER - VIBE CODING PHONE (LOWER POSITION) */}
         <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
-          <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-            <div className="relative w-full h-[110px] sm:h-[155px] md:h-[200px] lg:h-[160px] xl:h-[180px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#a81e55]">
-              <Image
-                src="/media/hero_images/img3.png"
-                alt="Vibe Coding"
-                fill
-                priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                className="object-cover object-top"
-              />
+          <div className="hero-gallery-lift w-full will-change-transform">
+            <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
+              <div className="relative w-full h-[110px] sm:h-[155px] md:h-[200px] lg:h-[160px] xl:h-[180px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#a81e55]">
+                <Image
+                  src="/media/hero_images/img3.png"
+                  alt="Vibe Coding"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
+                  className="object-cover object-top"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* COLUMN 4: FOURTH - TALL VIOLIN POSTER */}
         <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
-          <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-            <div className="relative w-full h-[160px] sm:h-[220px] md:h-[290px] lg:h-[340px] xl:h-[305px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#fafafa]">
-              <Image
-                src="/media/hero_images/img5.png"
-                alt="Violin Night"
-                fill
-                priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                className="object-cover object-top"
-              />
+          <div className="hero-gallery-lift w-full will-change-transform">
+            <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
+              <div className="relative w-full h-[160px] sm:h-[220px] md:h-[290px] lg:h-[340px] xl:h-[305px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#fafafa]">
+                <Image
+                  src="/media/hero_images/img5.png"
+                  alt="Violin Night"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
+                  className="object-cover object-top"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* COLUMN 5: RIGHTMOST - 2 VERTICAL IMAGES */}
         <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
-          <div className="w-full flex flex-col gap-4 sm:gap-5 md:gap-6 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-            {/* Top image: The Link (robots / clarity meets creativity) */}
-            <div className="relative w-full aspect-[339/429] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
-              <Image
-                src="/media/hero_images/img6.png"
-                alt="Clarity Meets Creativity"
-                fill
-                priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                className="object-cover object-center"
-              />
-            </div>
-            {/* Bottom image: 3D Chrome Icon */}
-            <div className="relative w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#112236]">
-              <Image
-                src="/media/hero_images/img2.png"
-                alt="3D Icon"
-                fill
-                priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                className="object-cover object-top"
-              />
+          <div className="hero-gallery-lift w-full will-change-transform">
+            <div className="w-full flex flex-col gap-4 sm:gap-5 md:gap-6 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
+              {/* Top image: The Link (robots / clarity meets creativity) */}
+              <div className="relative w-full aspect-[339/429] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
+                <Image
+                  src="/media/hero_images/img6.png"
+                  alt="Clarity Meets Creativity"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
+                  className="object-cover object-center"
+                />
+              </div>
+              {/* Bottom image: 3D Chrome Icon */}
+              <div className="relative w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#112236]">
+                <Image
+                  src="/media/hero_images/img2.png"
+                  alt="3D Icon"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
+                  className="object-cover object-top"
+                />
+              </div>
             </div>
           </div>
         </div>

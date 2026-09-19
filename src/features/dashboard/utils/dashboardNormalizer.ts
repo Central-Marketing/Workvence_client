@@ -89,25 +89,86 @@ export function normalizeDashboardPackageList(
 }
 
 /**
- * Computes profile completion percentage for the current user
+ * Computes profile completion percentage for the user dynamically
+ * based on whether the user is a Seller or a Buyer and their respective necessary input fields.
  */
 export function calculateProfileCompletion(user: any): number {
-  if (!user) return 50;
+  if (!user) return 0;
 
-  const checks = [
-    Boolean(user.username || user.name),
-    Boolean(user.email),
-    Boolean(user.image && user.image !== "/media/noavatar.png"),
-    Boolean(user.desc || user.bio || user.description || user.shortTitle),
-    Boolean(user.country || user.location),
-    Boolean(user.phone),
-    Boolean(Array.isArray(user.skills) && user.skills.length > 0),
-    Boolean(Array.isArray(user.languages) && user.languages.length > 0),
+  const isSeller = Boolean(user.isSeller || user.role === "seller");
+
+  // Common identity & contact fields
+  const hasName = Boolean(
+    (user.username && String(user.username).trim().length > 0) ||
+      (user.name && String(user.name).trim().length > 0)
+  );
+  const hasEmail = Boolean(user.email && String(user.email).trim().length > 0);
+  const avatarUrl = user.image || user.img || user.avatar || user.pp;
+  const hasAvatar = Boolean(
+    avatarUrl &&
+      String(avatarUrl).trim().length > 0 &&
+      avatarUrl !== "/media/noavatar.png" &&
+      avatarUrl !== "noavatar.png" &&
+      !String(avatarUrl).includes("noavatar")
+  );
+  const hasPhone = Boolean(user.phone && String(user.phone).trim().length > 0);
+  const hasCountry = Boolean(
+    (user.country || user.location) && String(user.country || user.location).trim().length > 0
+  );
+  const rawDesc = String(user.description || user.desc || user.bio || "");
+  const strippedDesc = rawDesc.replace(/<[^>]*>/g, "").trim();
+  const hasDescription = Boolean(strippedDesc.length > 0);
+
+  // 1. BUYER PROFILE: Evaluated strictly against buyer-relevant fields (6 fields)
+  if (!isSeller) {
+    const buyerChecks = [
+      hasName,
+      hasEmail,
+      hasAvatar,
+      hasPhone,
+      hasCountry,
+      hasDescription,
+    ];
+
+    const completed = buyerChecks.filter(Boolean).length;
+    const percentage = Math.round((completed / buyerChecks.length) * 100);
+    return Math.min(100, Math.max(0, percentage));
+  }
+
+  // 2. SELLER PROFILE: Evaluated against professional freelancer requirements (10 fields)
+  const hasShortTitle = Boolean(
+    (user.shortTitle || user.title) &&
+      String(user.shortTitle || user.title).trim().length > 0
+  );
+  const hasSkills = Boolean(
+    Array.isArray(user.skills)
+      ? user.skills.filter((s: any) => (typeof s === "string" ? s.trim().length > 0 : Boolean(s))).length > 0
+      : typeof user.skills === "string" && user.skills.trim().length > 0
+  );
+  const hasLanguages = Boolean(
+    Array.isArray(user.languages) && user.languages.length > 0
+  );
+  const hasExperienceOrEducation = Boolean(
+    (Array.isArray(user.experience) && user.experience.length > 0) ||
+      (Array.isArray(user.education) && user.education.length > 0)
+  );
+
+  const sellerChecks = [
+    hasName,
+    hasEmail,
+    hasAvatar,
+    hasShortTitle,
+    hasDescription,
+    hasPhone,
+    hasCountry,
+    hasSkills,
+    hasLanguages,
+    hasExperienceOrEducation,
   ];
 
-  const completed = checks.filter(Boolean).length;
-  const percentage = Math.round((completed / checks.length) * 100);
-  return Math.max(25, Math.min(100, percentage));
+  const completed = sellerChecks.filter(Boolean).length;
+  const percentage = Math.round((completed / sellerChecks.length) * 100);
+  return Math.min(100, Math.max(0, percentage));
 }
 
 /**

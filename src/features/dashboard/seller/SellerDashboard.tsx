@@ -50,7 +50,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
     enabled: !!user,
   });
 
-  const completionPercentage = calculateProfileCompletion(user) || 50;
+  const completionPercentage = calculateProfileCompletion(user);
   const isProfileCompleted = completionPercentage >= 100;
   const packagesList = Array.isArray(packages) ? packages : [];
   const hasPackages = packagesList.length > 0;

@@ -32,6 +32,7 @@ import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
 import supportService from "@/utils/supportService";
 import { Loader, KycVerificationForm } from "@/components";
+import { calculateProfileCompletion } from "@/features/dashboard";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -302,18 +303,34 @@ export default function ProfilePage() {
     }
   };
 
-  // Profile completion calculation
+  // Profile completion calculation based on role-specific necessary fields
   const profileCompletion = useMemo(() => {
-    let score = 30; // base account
-    if (previewUrl && !previewUrl.includes("noavatar")) score += 15;
-    if (phone?.trim()) score += 10;
-    if (country?.trim()) score += 10;
-    if (shortTitle?.trim()) score += 10;
-    if (description?.trim()) score += 10;
-    if (skillsList.length > 0) score += 10;
-    if (experience.length > 0 || education.length > 0) score += 5;
-    return Math.min(100, Math.max(score, 90));
-  }, [previewUrl, phone, country, shortTitle, description, skillsList, experience, education]);
+    return calculateProfileCompletion({
+      ...user,
+      image: previewUrl,
+      phone,
+      country,
+      shortTitle,
+      description,
+      skills: skillsList,
+      languages,
+      experience,
+      education,
+      portfolio,
+    });
+  }, [
+    user,
+    previewUrl,
+    phone,
+    country,
+    shortTitle,
+    description,
+    skillsList,
+    languages,
+    experience,
+    education,
+    portfolio,
+  ]);
 
   // Submit profile updates to real backend API
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -394,7 +411,7 @@ export default function ProfilePage() {
     }
   };
 
-  const isSeller = Boolean(user?.isSeller);
+  const isSeller = Boolean(user?.isSeller || user?.role === "seller");
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-10 font-sans">

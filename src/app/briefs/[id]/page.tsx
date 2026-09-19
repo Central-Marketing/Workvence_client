@@ -605,14 +605,14 @@ const BriefDetail = () => {
             )}
 
             {/* Favorite Button */}
-            <button
+            {/* <button
               type="button"
               onClick={() => setIsFavorited(!isFavorited)}
               className="w-9 h-9 rounded-full border border-slate-200/90 bg-white flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50/40 transition-colors cursor-pointer shrink-0 shadow-2xs"
               title="Save project"
             >
               <FiHeart className={`w-4 h-4 transition-colors ${isFavorited ? "fill-red-500 text-red-500" : ""}`} />
-            </button>
+            </button> */}
           </div>
         </div>
 

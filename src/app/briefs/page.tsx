@@ -245,11 +245,10 @@ function BriefsContent() {
                     setActivePill(pill.id);
                     setCurrentPage(1);
                   }}
-                  className={`px-4 py-1.5 rounded-full text-xs sm:text-[13px] font-medium transition-all duration-200 whitespace-nowrap shrink-0 cursor-pointer ${
-                    isActive
+                  className={`px-4 py-1.5 rounded-full text-xs sm:text-[13px] font-medium transition-all duration-200 whitespace-nowrap shrink-0 cursor-pointer ${isActive
                       ? "bg-gray-900 text-white border border-gray-900 shadow-xs"
                       : "bg-white text-gray-700 border border-gray-200 hover:border-gray-900 hover:text-black"
-                  }`}
+                    }`}
                 >
                   {pill.title}
                 </button>
@@ -398,8 +397,8 @@ function BriefsContent() {
                     ? typeof brief.budget === "number"
                       ? `$${brief.budget.toLocaleString()}`
                       : String(brief.budget).startsWith("$")
-                      ? brief.budget
-                      : `$${brief.budget}`
+                        ? brief.budget
+                        : `$${brief.budget}`
                     : null;
 
                 const categoryFormatted = formatCategoryName(brief.category);
@@ -408,8 +407,8 @@ function BriefsContent() {
                   Array.isArray(brief.requiredSkills) && brief.requiredSkills.length > 0
                     ? brief.requiredSkills
                     : Array.isArray(brief.skills) && brief.skills.length > 0
-                    ? brief.skills
-                    : [];
+                      ? brief.skills
+                      : [];
 
                 const isFav = favoritedIds.has(briefId);
 
@@ -451,7 +450,7 @@ function BriefsContent() {
                           )}
 
                           {/* Favorite Button */}
-                          <button
+                          {/* <button
                             type="button"
                             onClick={(e) => toggleFavorite(e, briefId)}
                             className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-gray-50 transition-colors cursor-pointer shrink-0"
@@ -462,7 +461,7 @@ function BriefsContent() {
                                 isFav ? "text-red-500 fill-red-500" : "text-gray-400"
                               }`}
                             />
-                          </button>
+                          </button> */}
                         </div>
                       </div>
 
@@ -541,11 +540,10 @@ function BriefsContent() {
                     key={pageNum}
                     type="button"
                     onClick={() => handlePageChange(pageNum)}
-                    className={`w-9 h-9 text-xs font-semibold rounded-xl transition shadow-2xs ${
-                      currentPage === pageNum
+                    className={`w-9 h-9 text-xs font-semibold rounded-xl transition shadow-2xs ${currentPage === pageNum
                         ? "bg-[#327C73] text-white"
                         : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     {pageNum}
                   </button>

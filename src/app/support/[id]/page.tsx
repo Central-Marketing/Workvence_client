@@ -517,20 +517,34 @@ export default function TicketDetailsPage() {
               </div>
             )}
 
-            <form onSubmit={handleSendReply} className="flex gap-2 items-end">
-              <div className="flex-1 space-y-2">
-                <textarea
-                  rows={2}
-                  placeholder="Type your message reply to support..."
-                  value={replyText}
-                  onChange={(e) => {
-                    setReplyText(e.target.value);
-                    startTyping();
-                  }}
-                  onBlur={stopTyping}
-                  className="w-full px-4 py-3 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] text-xs text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none resize-none transition font-inter"
-                />
+            <form
+              onSubmit={handleSendReply}
+              className="bg-[#f8fafc] border border-[#e2e8f0] focus-within:border-[#327C73] focus-within:ring-2 focus-within:ring-[#327C73]/10 rounded-2xl p-3 sm:p-4 transition-all space-y-3"
+            >
+              {/* Textarea */}
+              <textarea
+                rows={3}
+                placeholder="Type your message reply to support..."
+                value={replyText}
+                onChange={(e) => {
+                  setReplyText(e.target.value);
+                  startTyping();
+                }}
+                onKeyDown={(e) => {
+                  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                    e.preventDefault();
+                    if (!sending && !uploadingFile && replyText.trim()) {
+                      handleSendReply(e);
+                    }
+                  }
+                }}
+                onBlur={stopTyping}
+                className="w-full bg-transparent border-0 text-xs sm:text-sm text-[#0f172a] placeholder-[#94a3b8] focus:outline-none focus:ring-0 resize-none font-inter leading-relaxed"
+              />
 
+              {/* Actions Bottom Bar */}
+              <div className="flex items-center justify-between gap-3 pt-2.5 border-t border-[#e2e8f0]">
+                {/* Left: Upload file attachment */}
                 <div className="flex items-center gap-2">
                   <input
                     ref={fileInputRef}
@@ -543,32 +557,45 @@ export default function TicketDetailsPage() {
                     type="button"
                     disabled={uploadingFile}
                     onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#327C73]/10 text-[#327C73] border border-[#327C73]/30 text-xs font-bold hover:bg-[#327C73]/20 transition cursor-pointer disabled:opacity-50 font-sf-pro"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#e2e8f0] hover:border-[#327C73]/40 text-[#475569] hover:text-[#327C73] text-xs font-semibold shadow-2xs transition active:scale-95 cursor-pointer disabled:opacity-50 font-sf-pro"
                   >
                     {uploadingFile ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-[#327C73]" />
+                        <span>Uploading...</span>
+                      </>
                     ) : (
-                      <Upload className="w-3.5 h-3.5" />
+                      <>
+                        <Upload className="w-3.5 h-3.5 text-[#327C73]" />
+                        <span>Upload File</span>
+                      </>
                     )}
-                    <span>Upload File</span>
                   </button>
-                </div>
-              </div>
 
-              <button
-                type="submit"
-                disabled={sending || uploadingFile || !replyText.trim()}
-                className="px-6 py-3 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 disabled:opacity-50 flex items-center gap-2 cursor-pointer h-[46px] font-sf-pro"
-              >
-                {sending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    <span className="hidden sm:inline">Send</span>
-                  </>
-                )}
-              </button>
+                  <span className="text-[11px] text-[#94a3b8] hidden md:inline">
+                    Press Ctrl + Enter to send
+                  </span>
+                </div>
+
+                {/* Right: Send Button */}
+                <button
+                  type="submit"
+                  disabled={sending || uploadingFile || !replyText.trim()}
+                  className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer font-sf-pro shrink-0"
+                >
+                  {sending ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Send Reply</span>
+                      <Send className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
 

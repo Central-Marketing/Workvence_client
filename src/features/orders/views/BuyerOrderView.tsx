@@ -303,9 +303,9 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
             <span className="text-slate-800 font-semibold font-mono">Order #{order.orderCode}</span>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+          {/* <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
             Buyer Order Room
-          </span>
+          </span> */}
         </div>
 
         {/* Order Title */}
@@ -519,11 +519,10 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                                     [crit.key]: prev[crit.key] === starVal ? 0 : starVal,
                                   }))
                                 }
-                                className={`text-base sm:text-lg transition-transform hover:scale-110 cursor-pointer p-0.5 ${
-                                  starVal <= feedbackData[crit.key]
-                                    ? "text-amber-400"
-                                    : "text-slate-200 hover:text-amber-200"
-                                }`}
+                                className={`text-base sm:text-lg transition-transform hover:scale-110 cursor-pointer p-0.5 ${starVal <= feedbackData[crit.key]
+                                  ? "text-amber-400"
+                                  : "text-slate-200 hover:text-amber-200"
+                                  }`}
                               >
                                 ★
                               </button>

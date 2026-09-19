@@ -24,6 +24,9 @@ import {
 
 type EarningsTab = "payout" | "clearance";
 
+// Minimum payout request threshold ($25 USD)
+const MIN_PAYOUT_AMOUNT = 25;
+
 const Earnings = () => {
   const user = useUserStore((state) => state.user);
   const router = useRouter();
@@ -92,12 +95,32 @@ const Earnings = () => {
     refetchOnMount: "always",
   });
 
-  // Readiness states
-  const isStripeReady = Boolean(
-    payoutStatus?.stripe?.payoutsEnabled && payoutStatus?.stripe?.isConnected
+  // Readiness & Connection states
+  const isStripeConnected = Boolean(
+    payoutStatus?.stripe?.isConnected ||
+    payoutStatus?.stripe?.connected ||
+    Boolean(payoutStatus?.stripe?.accountId) ||
+    payoutStatus?.availableMethods?.includes("stripe")
   );
+
+  const isStripeReady = Boolean(
+    isStripeConnected &&
+    (payoutStatus?.stripe?.payoutsEnabled !== false)
+  );
+
+  const isPayoneerConnected = Boolean(
+    payoutStatus?.payoneer?.isConnected ||
+    payoutStatus?.payoneer?.connected ||
+    payoutStatus?.payoneer?.canPayout ||
+    payoutStatus?.payoneer?.status === "ACTIVE" ||
+    payoutStatus?.availableMethods?.includes("payoneer") ||
+    Boolean(payoutStatus?.payoneer?.payeeId)
+  );
+
   const isPayoneerReady = Boolean(
-    payoutStatus?.payoneer?.canPayout && payoutStatus?.payoneer?.isConnected
+    isPayoneerConnected &&
+    (payoutStatus?.payoneer?.canPayout !== false) &&
+    (payoutStatus?.payoneer?.status !== "INACTIVE")
   );
 
   const availableMethods: string[] = Array.from(
@@ -108,20 +131,20 @@ const Earnings = () => {
     ])
   );
 
-  const hasAnyConnected = isStripeReady || isPayoneerReady;
+  const hasAnyConnected = isStripeConnected || isPayoneerConnected;
 
   // Auto-set selected method when opening modal
   useEffect(() => {
-    if (availableMethods.includes("stripe") && !availableMethods.includes("payoneer")) {
+    if (isStripeReady && !isPayoneerReady) {
       setSelectedMethod("stripe");
-    } else if (availableMethods.includes("payoneer") && !availableMethods.includes("stripe")) {
+    } else if (isPayoneerReady && !isStripeReady) {
       setSelectedMethod("payoneer");
-    } else if (availableMethods.includes("stripe")) {
+    } else if (isStripeReady) {
       setSelectedMethod("stripe");
-    } else if (availableMethods.includes("payoneer")) {
+    } else if (isPayoneerReady) {
       setSelectedMethod("payoneer");
     }
-  }, [payoutStatus, showPayoutModal]);
+  }, [payoutStatus, showPayoutModal, isStripeReady, isPayoneerReady]);
 
   // Handle returning redirects back from Stripe or Payoneer onboarding
   useEffect(() => {
@@ -321,8 +344,8 @@ const Earnings = () => {
   const handlePayoutSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const amt = Number(payoutAmount);
-    if (!amt || amt <= 0) {
-      toast.error("Enter a valid amount.");
+    if (!amt || isNaN(amt) || amt < MIN_PAYOUT_AMOUNT) {
+      toast.error(`Minimum payout request amount is $${MIN_PAYOUT_AMOUNT}.00.`);
       return;
     }
     if (amt > availableBalance) {
@@ -503,12 +526,33 @@ const Earnings = () => {
                 </span>
               )}
             </button>
+            {isStripeConnected && (
+              <button
+                type="button"
+                onClick={() => connectDashboardMutation.mutate()}
+                disabled={connectDashboardMutation.isPending}
+                className="bg-[#635BFF]/10 hover:bg-[#635BFF]/15 text-[#635bff] border border-[#635bff]/20 font-semibold text-xs sm:text-[13px] px-3.5 sm:px-4 py-2.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                title="Open Stripe Express Dashboard"
+              >
+                {connectDashboardMutation.isPending ? (
+                  <span className="w-3.5 h-3.5 border-2 border-[#635bff] border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <FaStripe size={28} className="text-[#635bff] shrink-0" />
+                )}
+                <span>Stripe Dashboard</span>
+                <ArrowUpRight className="w-3.5 h-3.5 text-[#635bff]" />
+              </button>
+            )}
+
             <button
               type="button"
               onClick={() => setShowWalletModal(true)}
-              className="bg-[#F1F3F5] hover:bg-gray-200 text-gray-800 font-semibold text-xs sm:text-[13px] px-5 py-2.5 rounded-lg transition-colors cursor-pointer"
+              className="bg-[#F1F3F5] hover:bg-gray-200 text-gray-800 font-semibold text-xs sm:text-[13px] px-4 sm:px-5 py-2.5 rounded-lg transition-colors cursor-pointer flex items-center gap-2"
             >
-              Connect Wallet
+              {hasAnyConnected && (
+                <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200" />
+              )}
+              <span>{hasAnyConnected ? "Payout Channels" : "Connect Wallet"}</span>
             </button>
 
             <button
@@ -517,6 +561,8 @@ const Earnings = () => {
                 if (!hasAnyConnected) {
                   setShowWalletModal(true);
                   toast("Please connect Stripe or Payoneer before withdrawing funds.", { icon: "💳" });
+                } else if (availableBalance < MIN_PAYOUT_AMOUNT) {
+                  toast.error(`Minimum payout request amount is $${MIN_PAYOUT_AMOUNT}.00. Your available balance is $${availableBalance.toFixed(2)}.`);
                 } else {
                   setShowPayoutModal(true);
                 }
@@ -827,49 +873,117 @@ const Earnings = () => {
 
             {/* Channels List */}
             <div className="space-y-3.5">
-              {/* Stripe Connect Option */}
-              <div
-                onClick={() => {
-                  if (isStripeReady) {
-                    connectDashboardMutation.mutate();
-                  } else {
-                    connectOnboardMutation.mutate();
-                  }
-                }}
-                className="bg-[#F7F4FF] hover:bg-[#F2EDFF] border border-purple-100 rounded-2xl p-4 sm:p-5 flex items-start justify-between cursor-pointer transition-all group"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center">
-                    <FaStripe size={36} className="text-[#635bff]" />
+              {/* Stripe Option */}
+              {isStripeConnected ? (
+                <div
+                  onClick={() => connectDashboardMutation.mutate()}
+                  className="bg-[#F7F4FF] hover:bg-[#F2EDFF] border border-purple-200/90 rounded-2xl p-4 sm:p-5 flex items-start justify-between cursor-pointer transition-all group shadow-2xs"
+                >
+                  <div className="space-y-1.5 flex-1 pr-3">
+                    <div className="flex items-center gap-2.5">
+                      <FaStripe size={38} className="text-[#635bff]" />
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                        Connected
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-gray-950">
+                        Stripe Dashboard
+                      </h4>
+                      {payoutStatus?.stripe?.accountId && (
+                        <p className="text-[11px] font-mono text-gray-500 mt-0.5">
+                          Account: {payoutStatus.stripe.accountId}
+                        </p>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                      Access your Stripe Express dashboard to manage payouts, bank accounts, and view transfer history.
+                    </p>
                   </div>
-                  <h4 className="text-sm font-bold text-gray-950 pt-0.5">Stripe Connect</h4>
-                  <p className="text-xs text-gray-500 leading-relaxed">
-                    Direct automated bank account deposits & card payouts
-                  </p>
+                  <div className="shrink-0 flex items-center gap-1 text-xs font-semibold text-[#635bff] group-hover:translate-x-0.5 transition-transform pt-1">
+                    <span>{connectDashboardMutation.isPending ? "Opening..." : "Open"}</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </div>
                 </div>
-                <div className="shrink-0 text-[#635bff] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform pt-1">
-                  <ArrowUpRight className="w-5 h-5" />
+              ) : (
+                <div
+                  onClick={() => connectOnboardMutation.mutate()}
+                  className="bg-[#F7F4FF] hover:bg-[#F2EDFF] border border-purple-100 rounded-2xl p-4 sm:p-5 flex items-start justify-between cursor-pointer transition-all group"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center">
+                      <FaStripe size={36} className="text-[#635bff]" />
+                    </div>
+                    <h4 className="text-sm font-bold text-gray-950 pt-0.5">Stripe Connect</h4>
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                      Direct automated bank account deposits & card payouts
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-[#635bff] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform pt-1">
+                    <ArrowUpRight className="w-5 h-5" />
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Payoneer Option */}
-              <div
-                onClick={() => payoneerOnboardMutation.mutate()}
-                className="bg-[#FAFCFB] hover:bg-[#F4F9F7] border border-gray-100 rounded-2xl p-4 sm:p-5 flex items-start justify-between cursor-pointer transition-all group"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center">
-                    <PayoneerLogo className="h-6" />
+              {isPayoneerConnected ? (
+                <div
+                  onClick={() => {
+                    toast.success("Payoneer is connected and ready for payouts!");
+                  }}
+                  className="bg-[#FAFCFB] border border-emerald-200/90 rounded-2xl p-4 sm:p-5 flex items-start justify-between transition-all shadow-2xs cursor-default"
+                >
+                  <div className="space-y-1.5 flex-1 pr-3">
+                    <div className="flex items-center gap-2.5">
+                      <PayoneerLogo className="h-6" />
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                        Connected
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-gray-950">
+                        Payoneer Connected
+                      </h4>
+                      {payoutStatus?.payoneer?.email && (
+                        <p className="text-[11px] text-gray-500 mt-0.5">
+                          Linked email: {payoutStatus.payoneer.email}
+                        </p>
+                      )}
+                      {payoutStatus?.payoneer?.payeeId && (
+                        <p className="text-[11px] font-mono text-gray-500 mt-0.5">
+                          Payee ID: {payoutStatus.payoneer.payeeId}
+                        </p>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                      Your Payoneer account is linked and ready to receive withdrawals.
+                    </p>
                   </div>
-                  <h4 className="text-sm font-bold text-gray-950 pt-0.5">Payoneer</h4>
-                  <p className="text-xs text-gray-500 leading-relaxed">
-                    Global bank transfer and payoneer balance transfer
-                  </p>
+                  <div className="shrink-0 text-emerald-600 pt-1">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
                 </div>
-                <div className="shrink-0 text-teal-700 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform pt-1">
-                  <ArrowUpRight className="w-5 h-5" />
+              ) : (
+                <div
+                  onClick={() => payoneerOnboardMutation.mutate()}
+                  className="bg-[#FAFCFB] hover:bg-[#F4F9F7] border border-gray-100 rounded-2xl p-4 sm:p-5 flex items-start justify-between cursor-pointer transition-all group"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center">
+                      <PayoneerLogo className="h-6" />
+                    </div>
+                    <h4 className="text-sm font-bold text-gray-950 pt-0.5">Payoneer</h4>
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                      Global bank transfer and payoneer balance transfer
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-teal-700 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform pt-1">
+                    <ArrowUpRight className="w-5 h-5" />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -912,24 +1026,42 @@ const Earnings = () => {
             <div className="space-y-3">
               {/* Stripe Option */}
               <div
-                onClick={() => isStripeReady && setSelectedMethod("stripe")}
-                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${selectedMethod === "stripe"
-                  ? "bg-[#F7F4FF] border-2 border-purple-300 shadow-2xs"
-                  : "bg-white border border-gray-200 hover:border-gray-300"
-                  } ${!isStripeReady ? "opacity-60" : ""}`}
+                onClick={() => {
+                  if (isStripeReady) {
+                    setSelectedMethod("stripe");
+                  } else {
+                    toast.error("Please connect Stripe in Payout Channels first.");
+                  }
+                }}
+                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${
+                  selectedMethod === "stripe"
+                    ? "bg-[#F7F4FF] border-2 border-[#635bff] shadow-2xs"
+                    : "bg-white border border-gray-200 hover:border-gray-300"
+                } ${!isStripeReady ? "opacity-60" : ""}`}
               >
-                <div className="space-y-1">
-                  <div className="flex items-center">
+                <div className="space-y-1 flex-1 pr-2">
+                  <div className="flex items-center gap-2">
                     <FaStripe size={36} className="text-[#635bff]" />
+                    {isStripeConnected ? (
+                      <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
+                        Connected
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-medium bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                        Not Connected
+                      </span>
+                    )}
                   </div>
-                  <h4 className="text-xs sm:text-sm font-bold text-gray-950">Stripe Connect</h4>
+                  <h4 className="text-xs sm:text-sm font-bold text-gray-950">
+                    {isStripeConnected ? "Stripe Dashboard" : "Stripe Connect"}
+                  </h4>
                   <p className="text-[11px] text-gray-500">
                     Direct automated bank account deposits & card payouts
                   </p>
                 </div>
                 <div className="shrink-0 pl-3">
                   {selectedMethod === "stripe" ? (
-                    <CheckCircle2 className="w-5 h-5 text-teal-700" />
+                    <CheckCircle2 className="w-5 h-5 text-[#635bff]" />
                   ) : (
                     <div className="w-5 h-5 rounded-full border-2 border-gray-300" />
                   )}
@@ -938,24 +1070,42 @@ const Earnings = () => {
 
               {/* Payoneer Option */}
               <div
-                onClick={() => isPayoneerReady && setSelectedMethod("payoneer")}
-                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${selectedMethod === "payoneer"
-                  ? "bg-[#F7F4FF] border-2 border-purple-300 shadow-2xs"
-                  : "bg-white border border-gray-200 hover:border-gray-300"
-                  } ${!isPayoneerReady ? "opacity-60" : ""}`}
+                onClick={() => {
+                  if (isPayoneerReady) {
+                    setSelectedMethod("payoneer");
+                  } else {
+                    toast.error("Please connect Payoneer in Payout Channels first.");
+                  }
+                }}
+                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${
+                  selectedMethod === "payoneer"
+                    ? "bg-[#F4F9F7] border-2 border-[#327C73] shadow-2xs"
+                    : "bg-white border border-gray-200 hover:border-gray-300"
+                } ${!isPayoneerReady ? "opacity-60" : ""}`}
               >
-                <div className="space-y-1">
-                  <div className="flex items-center">
+                <div className="space-y-1 flex-1 pr-2">
+                  <div className="flex items-center gap-2">
                     <PayoneerLogo className="h-6" />
+                    {isPayoneerConnected ? (
+                      <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
+                        Connected
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-medium bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                        Not Connected
+                      </span>
+                    )}
                   </div>
-                  <h4 className="text-xs sm:text-sm font-bold text-gray-950">Payoneer</h4>
+                  <h4 className="text-xs sm:text-sm font-bold text-gray-950">
+                    {isPayoneerConnected ? "Payoneer Connected" : "Payoneer"}
+                  </h4>
                   <p className="text-[11px] text-gray-500">
                     Global bank transfer and payoneer balance transfer
                   </p>
                 </div>
                 <div className="shrink-0 pl-3">
                   {selectedMethod === "payoneer" ? (
-                    <CheckCircle2 className="w-5 h-5 text-teal-700" />
+                    <CheckCircle2 className="w-5 h-5 text-[#327C73]" />
                   ) : (
                     <div className="w-5 h-5 rounded-full border-2 border-gray-300" />
                   )}
@@ -964,22 +1114,61 @@ const Earnings = () => {
             </div>
 
             {/* Amount to withdraw Input */}
-            <form onSubmit={handlePayoutSubmit} className="space-y-5 pt-1">
+            <form onSubmit={handlePayoutSubmit} className="space-y-4 pt-1">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-700 block">
-                  Amount to withdraw in <strong className="text-gray-900">USD</strong>
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max={availableBalance}
-                  step="0.01"
-                  value={payoutAmount}
-                  onChange={(e) => setPayoutAmount(e.target.value)}
-                  placeholder="e.g $200"
-                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-sm text-gray-800 placeholder-gray-400 outline-none transition-all"
-                  required
-                />
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-gray-700 block">
+                    Amount to withdraw in <strong className="text-gray-900">USD</strong>
+                  </label>
+                  <div className="flex items-center gap-1.5 text-[11px]">
+                    <button
+                      type="button"
+                      onClick={() => setPayoutAmount(String(MIN_PAYOUT_AMOUNT))}
+                      className="px-2 py-0.5 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition cursor-pointer"
+                    >
+                      Min (${MIN_PAYOUT_AMOUNT})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPayoutAmount(availableBalance.toFixed(2))}
+                      className="px-2 py-0.5 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-medium transition cursor-pointer"
+                    >
+                      All (${availableBalance.toFixed(2)})
+                    </button>
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xs sm:text-sm">$</span>
+                  <input
+                    type="number"
+                    min={MIN_PAYOUT_AMOUNT}
+                    max={availableBalance}
+                    step="0.01"
+                    value={payoutAmount}
+                    onChange={(e) => setPayoutAmount(e.target.value)}
+                    placeholder={`Min $${MIN_PAYOUT_AMOUNT}.00`}
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-[#327C73] focus:bg-white rounded-xl pl-7 pr-4 py-3 text-xs sm:text-sm text-gray-800 placeholder-gray-400 outline-none transition-all font-medium"
+                    required
+                  />
+                </div>
+
+                {/* Validation message and min requirement note */}
+                <div className="flex items-center justify-between text-[11px] pt-0.5">
+                  <span className="text-gray-500">
+                    Minimum request: <strong className="text-gray-800 font-semibold">${MIN_PAYOUT_AMOUNT}.00</strong>
+                  </span>
+                  {payoutAmount && Number(payoutAmount) > 0 && Number(payoutAmount) < MIN_PAYOUT_AMOUNT && (
+                    <span className="text-rose-600 font-medium">
+                      Must be at least ${MIN_PAYOUT_AMOUNT}.00
+                    </span>
+                  )}
+                  {payoutAmount && Number(payoutAmount) > availableBalance && (
+                    <span className="text-rose-600 font-medium">
+                      Exceeds available balance
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Action Buttons: Cancel Request, Submit Payout Request */}
@@ -993,8 +1182,13 @@ const Earnings = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={payoutMutation.isPending || !payoutAmount || Number(payoutAmount) <= 0}
-                  className="flex-1 bg-black hover:bg-gray-900 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold text-xs sm:text-[13px] py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer text-center"
+                  disabled={
+                    payoutMutation.isPending ||
+                    !payoutAmount ||
+                    Number(payoutAmount) < MIN_PAYOUT_AMOUNT ||
+                    Number(payoutAmount) > availableBalance
+                  }
+                  className="flex-1 bg-[#327C73] hover:bg-[#28635c] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold text-xs sm:text-[13px] py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer text-center font-sf-pro"
                 >
                   {payoutMutation.isPending ? (
                     "Processing..."

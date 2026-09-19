@@ -11,44 +11,7 @@ import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 
-// High-fidelity fallback packages matching the user's reference mockup image
-const MOCK_PACKAGES_IMAGE = [
-  {
-    _id: "mock-pkg-1",
-    title: "I will create a stunning portfolio website using Elementor.",
-    cover: "/images/dashboard/orders/order_1.png",
-    price: 200,
-    sales: 2,
-  },
-  {
-    _id: "mock-pkg-2",
-    title: "I will develop a custom e-commerce platform tailored to your needs.",
-    cover: "/images/dashboard/orders/order_2.png",
-    price: 110,
-    sales: 2,
-  },
-  {
-    _id: "mock-pkg-3",
-    title: "Design engaging mobile app interfaces with Sketch and InVision.",
-    cover: "/images/dashboard/orders/order_3.png",
-    price: 500,
-    sales: 5,
-  },
-  {
-    _id: "mock-pkg-4",
-    title: "Build a dynamic blog site with WordPress and SEO optimization.",
-    cover: "/images/dashboard/orders/order_4.png",
-    price: 300,
-    sales: 3,
-  },
-  {
-    _id: "mock-pkg-5",
-    title: "Enhance website visibility with targeted SEO and content strategies.",
-    cover: "/images/dashboard/orders/order_5.png",
-    price: 80,
-    sales: 24,
-  },
-];
+
 
 const MyPackages = () => {
   const user = useUserStore((state: any) => state.user);
@@ -94,7 +57,9 @@ const MyPackages = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const packagesList = Array.isArray(data) && data.length > 0 ? data : MOCK_PACKAGES_IMAGE;
+  const packagesList = Array.isArray(data)
+    ? data
+    : (data?.packages || data?.gigs || data?.data || []);
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
@@ -160,8 +125,26 @@ const MyPackages = () => {
                 <tbody className="divide-y divide-gray-100">
                   {packagesList.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="py-16 text-center text-gray-400 text-xs sm:text-sm font-medium">
-                        No packages found. Click &quot;Create New Package&quot; to publish your first offering!
+                      <td colSpan={4} className="py-16 text-center">
+                        <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
+                          <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
+                            <FiEdit2 />
+                          </div>
+                          <p className="text-slate-800 font-semibold text-sm sm:text-base mb-1">
+                            No packages created yet
+                          </p>
+                          <p className="text-slate-400 text-xs sm:text-[13px] mb-4">
+                            You haven&apos;t published any packages yet. Click &quot;Create New Package&quot; to publish your first offering!
+                          </p>
+                          <Link href="/organize">
+                            <button
+                              type="button"
+                              className="bg-black hover:bg-slate-800 text-white font-semibold text-xs px-5 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer"
+                            >
+                              Create New Package
+                            </button>
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ) : (
@@ -173,15 +156,12 @@ const MyPackages = () => {
                         (Array.isArray(pkg.images) && pkg.images[0]) ||
                         "/images/dashboard/orders/order_1.png";
                       const salesCount = pkg.sales || pkg.salesCount || pkg.ordersCount || 0;
-                      const isMock = pkg._id && pkg._id.startsWith("mock-");
 
                       return (
                         <tr
                           key={pkg._id}
                           onClick={() => {
-                            if (!isMock) {
-                              router.push(`/package/${pkg._id}`);
-                            }
+                            router.push(`/package/${pkg._id}`);
                           }}
                           className="hover:bg-slate-50/70 cursor-pointer transition-colors"
                         >
@@ -224,11 +204,7 @@ const MyPackages = () => {
                                 title="Edit package"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (!isMock) {
-                                    router.push(`/organize/${pkg._id}`);
-                                  } else {
-                                    router.push("/organize");
-                                  }
+                                  router.push(`/organize/${pkg._id}`);
                                 }}
                                 className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:text-gray-950 hover:bg-gray-50 transition-colors cursor-pointer shadow-2xs"
                               >

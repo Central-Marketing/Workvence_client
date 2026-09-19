@@ -38,6 +38,165 @@ import { Loader, ChatSkeleton, Skeleton, AiGradientButton } from "@/components";
 import { MessageModerationBadge } from "@/features/chat";
 import { formatFileSize } from "@/lib";
 import moment from 'moment';
+// Subcomponent to reliably render attachments without broken images and open in a new tab
+const ChatMessageAttachmentItem = ({ msg }: { msg: any }) => {
+  const rawUrl = msg.file || (Array.isArray(msg.attachments) && msg.attachments[0]) || null;
+  const [resolvedUrl, setResolvedUrl] = useState<string>(rawUrl || '');
+  const [imgError, setImgError] = useState<boolean>(false);
+  const [isResolving, setIsResolving] = useState<boolean>(false);
+
+  const isAuthenticated = Boolean(
+    rawUrl &&
+    typeof rawUrl === 'string' &&
+    rawUrl.includes('cloudinary.com') &&
+    rawUrl.includes('/authenticated/')
+  );
+
+  // Background auto-resolve for private/authenticated Cloudinary attachments
+  useEffect(() => {
+    let isMounted = true;
+    if (isAuthenticated && rawUrl) {
+      setIsResolving(true);
+      const publicId = supportService.extractPublicId(rawUrl);
+      const withoutExt = publicId.replace(/\.[^/.]+$/, '');
+
+      (async () => {
+        try {
+          let signed = await supportService.getSignedAssetUrl(publicId);
+          if (!signed && withoutExt !== publicId) {
+            signed = await supportService.getSignedAssetUrl(withoutExt);
+          }
+          if (isMounted && signed) {
+            setResolvedUrl(signed);
+          }
+        } catch (err) {
+          console.warn('Failed to auto-resolve signed asset URL:', err);
+        } finally {
+          if (isMounted) setIsResolving(false);
+        }
+      })();
+    } else {
+      setResolvedUrl(rawUrl || '');
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [rawUrl, isAuthenticated]);
+
+  if (!rawUrl || typeof rawUrl !== 'string') return null;
+
+  const currentUrl = resolvedUrl || rawUrl;
+  const hasMsgText = Boolean(msg.description || msg.desc || msg.text || msg.message);
+
+  // Determine file type
+  const isPdf = /\.pdf($|\?)/i.test(rawUrl) || rawUrl.toLowerCase().includes('.pdf') || msg.fileType?.includes('pdf');
+  const isVideo =
+    /\.(mp4|webm|ogg|mov|mkv|avi|m4v|3gp)($|\?)/i.test(rawUrl) ||
+    rawUrl.includes('/video/upload/') ||
+    (rawUrl.includes('cloudinary.com') && rawUrl.includes('/video/')) ||
+    msg.fileType?.includes('video');
+
+  const isDoc =
+    isPdf ||
+    /\.(docx?|xlsx?|pptx?|txt|csv|zip|rar|tar|gz)($|\?)/i.test(rawUrl) ||
+    msg.fileType?.includes('document');
+
+  const isImage =
+    !isDoc &&
+    !isVideo &&
+    !imgError &&
+    (/\.(png|jpe?g|gif|webp|svg|bmp|avif)($|\?)/i.test(rawUrl) ||
+      (rawUrl.includes('cloudinary.com') && rawUrl.includes('/image/') && !isPdf && !isDoc) ||
+      msg.fileType?.includes('image'));
+
+  const fileName = rawUrl.split('/').pop()?.split('?')[0] || 'Attachment';
+
+  // Always open in a new tab when clicked
+  const handleOpenInNewTab = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // If authenticated Cloudinary asset and signed URL hasn't arrived or doesn't have signature query params
+    if (isAuthenticated && (!resolvedUrl || resolvedUrl === rawUrl || !resolvedUrl.includes('?'))) {
+      const toastId = toast.loading('Opening secure attachment in new tab...');
+      const publicId = supportService.extractPublicId(rawUrl);
+      const withoutExt = publicId.replace(/\.[^/.]+$/, '');
+      try {
+        let signed = await supportService.getSignedAssetUrl(publicId);
+        if (!signed && withoutExt !== publicId) {
+          signed = await supportService.getSignedAssetUrl(withoutExt);
+        }
+        if (signed) {
+          toast.dismiss(toastId);
+          window.open(signed, '_blank', 'noopener,noreferrer');
+          return;
+        }
+      } catch (err) {
+        console.warn('Could not retrieve signed URL:', err);
+      }
+      toast.dismiss(toastId);
+    }
+
+    window.open(currentUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  // Image attachment view
+  if (isImage && !imgError) {
+    return (
+      <div
+        onClick={handleOpenInNewTab}
+        className={`mt-1 overflow-hidden rounded-xl border border-slate-200/90 shadow-sm max-w-[280px] bg-slate-50 cursor-pointer group hover:border-[#327C73]/50 transition-all ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}
+        title="Click to open image in a new tab"
+      >
+        <img
+          src={currentUrl}
+          alt={fileName}
+          onError={() => setImgError(true)}
+          className="w-full max-h-[220px] object-cover group-hover:scale-[1.02] transition-transform duration-200"
+        />
+      </div>
+    );
+  }
+
+  // Video attachment view
+  if (isVideo) {
+    return (
+      <div className={`mt-1 overflow-hidden rounded-xl border border-slate-200 shadow-sm max-w-[340px] bg-black ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}>
+        <video
+          src={currentUrl}
+          controls
+          preload="metadata"
+          className="w-full max-h-[280px] rounded-xl object-contain"
+        />
+      </div>
+    );
+  }
+
+  // Document, PDF, or Fallback view (Clickable -> Opens in new tab)
+  return (
+    <div
+      onClick={handleOpenInNewTab}
+      className={`flex items-center gap-2.5 px-3.5 py-2.5 mt-1 bg-slate-100 hover:bg-slate-200/80 text-slate-800 rounded-xl transition-all border border-slate-200/90 text-xs font-semibold cursor-pointer select-none max-w-[280px] group shadow-2xs ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}
+      title="Click to open file in a new tab"
+    >
+      <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-base shadow-2xs shrink-0 group-hover:scale-105 transition-transform">
+        {isPdf ? '📕' : '📄'}
+      </div>
+      <div className="flex flex-col min-w-0 flex-1">
+        <span className="truncate text-slate-900 text-[12.5px] font-medium leading-tight group-hover:text-[#327C73] transition-colors">
+          {fileName}
+        </span>
+        <span className="text-[10.5px] text-slate-400 font-normal mt-0.5 flex items-center gap-1">
+          <span>Click to open in new tab</span>
+
+        </span>
+      </div>
+      <span className="text-slate-400 group-hover:text-slate-700 text-sm shrink-0">
+        {isResolving ? '⏳' : '↗'}
+      </span>
+    </div>
+  );
+};
 
 const ChatView = () => {
   const user = useUserStore((state: any) => state.user);
@@ -388,14 +547,29 @@ const ChatView = () => {
         queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
           const arr = Array.isArray(oldData) ? oldData : [];
           const newMsgId = newMsg?._id || newMsg?.id;
-          if (newMsgId && arr.some((m: any) => String(m._id || m.id) === String(newMsgId))) return arr;
+          const incomingText = (newMsg.description || newMsg.desc || newMsg.text || newMsg.message || '').trim();
+          const incomingFile = newMsg.file || (Array.isArray(newMsg.attachments) && newMsg.attachments[0]) || '';
 
-          // Replace matching temp message or remove temp- messages
-          const incomingText = newMsg.description || newMsg.desc || newMsg.text || newMsg.message || '';
+          // 1. If already in cache by ID, skip
+          if (newMsgId && arr.some((m: any) => String(m._id || m.id) === String(newMsgId))) {
+            return arr;
+          }
+
+          // 2. If a non-temp message with identical text and file already exists, skip duplicate socket echo
+          const alreadyHasReal = arr.some((m: any) => {
+            const mId = String(m._id || m.id || '');
+            if (!mId || mId.startsWith('temp-')) return false;
+            const mText = (m.description || m.desc || m.text || m.message || '').trim();
+            const mFile = m.file || (Array.isArray(m.attachments) && m.attachments[0]) || '';
+            return mText === incomingText && mFile === incomingFile;
+          });
+          if (alreadyHasReal) return arr;
+
+          // 3. Replace matching temp message or remove matching temp- messages
           const withoutTemp = arr.filter((m: any) => {
-            const mId = m._id || m.id;
-            if (typeof mId === 'string' && mId.startsWith('temp-')) {
-              const tempText = m.description || m.desc || m.text || m.message || '';
+            const mId = String(m._id || m.id || '');
+            if (mId.startsWith('temp-')) {
+              const tempText = (m.description || m.desc || m.text || m.message || '').trim();
               return tempText !== incomingText;
             }
             return true;
@@ -596,12 +770,21 @@ const ChatView = () => {
   const mutation = useMutation({
     mutationFn: async (msg: any) => {
       const targetId = activeRoomID || conversationID;
-      const { isSeller, conversationUUID, conversationId, ...cleanMsg } = msg;
+      const httpPayload: Record<string, any> = {
+        description: msg.description || msg.desc || msg.text || msg.message || "",
+      };
+      if (msg.file) {
+        httpPayload.file = msg.file;
+      }
+      if (Array.isArray(msg.attachments) && msg.attachments.length > 0) {
+        httpPayload.attachments = msg.attachments;
+      }
+
       try {
-        return await axiosFetch.post(`/conversations/${targetId}/messages`, cleanMsg);
+        return await axiosFetch.post(`/conversations/${targetId}/messages`, httpPayload);
       } catch (err) {
         return await axiosFetch.post('/messages', {
-          ...cleanMsg,
+          ...httpPayload,
           conversationID: targetId,
         });
       }
@@ -629,15 +812,20 @@ const ChatView = () => {
     onSuccess: (res: any) => {
       const savedMsg = res?.data?.data || res?.data?.message || res?.data;
       const msgId = savedMsg?._id || savedMsg?.id;
-      if (savedMsg && msgId) {
+      if (savedMsg && typeof savedMsg === 'object' && msgId) {
+        const savedText = (savedMsg.description || savedMsg.desc || savedMsg.text || savedMsg.message || '').trim();
         const updateMsgCache = (oldData: any = []) => {
           const arr = Array.isArray(oldData) ? oldData : [];
-          if (arr.some((m: any) => (m._id || m.id) === msgId)) return arr;
-          const withoutTemp = arr.filter((m: any) => {
-            const mId = m._id || m.id;
-            return typeof mId === 'string' && !mId.startsWith('temp-');
+          const filtered = arr.filter((m: any) => {
+            const mId = String(m._id || m.id || '');
+            if (mId === String(msgId)) return false;
+            if (mId.startsWith('temp-')) {
+              const tempText = (m.description || m.desc || m.text || m.message || '').trim();
+              return tempText !== savedText;
+            }
+            return true;
           });
-          return [...withoutTemp, savedMsg];
+          return [...filtered, savedMsg];
         };
         queryClient.setQueryData(['messages', conversationID], updateMsgCache);
         if (activeRoomID && activeRoomID !== conversationID) {
@@ -737,7 +925,6 @@ const ChatView = () => {
         socket.connect();
       }
       socket.emit("send_message", msgPayload);
-      socket.emit("sendMessage", msgPayload);
     }
   };
 
@@ -1123,19 +1310,82 @@ const ChatView = () => {
 
   const filteredMessages = messages
     .filter((msg: any, index: number, self: any[]) => {
-      // 1. Deduplicate by unique message ID
-      const msgId = msg._id || msg.id;
-      if (msgId) {
-        const firstIdx = self.findIndex((m: any) => (m._id || m.id) === msgId);
+      // 1. Deduplicate by unique real message ID
+      const msgId = String(msg._id || msg.id || '');
+      if (msgId && !msgId.startsWith('temp-')) {
+        const firstIdx = self.findIndex((m: any) => String(m._id || m.id || '') === msgId);
         if (firstIdx !== index) return false;
       }
 
-      // 2. Collapse duplicate meeting invites for the same meetingId
-      const text = msg.description || msg.desc || msg.text || msg.message || '';
+      const text = (msg.description || msg.desc || msg.text || msg.message || '').trim();
+      const fileUrl = msg.file || (Array.isArray(msg.attachments) && msg.attachments[0]) || '';
+      const isTemp = !msgId || msgId.startsWith('temp-');
+
+      // 2. If this is a temp message, discard if a confirmed real message with the same content exists
+      if (isTemp) {
+        const hasRealDuplicate = self.some((m: any, mIdx: number) => {
+          if (mIdx === index) return false;
+          const otherId = String(m._id || m.id || '');
+          if (!otherId || otherId.startsWith('temp-')) return false;
+          const otherText = (m.description || m.desc || m.text || m.message || '').trim();
+          const otherFile = m.file || (Array.isArray(m.attachments) && m.attachments[0]) || '';
+          return otherText === text && otherFile === fileUrl;
+        });
+        if (hasRealDuplicate) return false;
+      }
+
+      // 3. Deduplicate messages with identical text/file and matching sender created within 15 seconds
+      const senderId = String(
+        (typeof msg.sender === 'object' && (msg.sender?._id || msg.sender?.id)) ||
+        (typeof msg.user === 'object' && (msg.user?._id || msg.user?.id)) ||
+        (typeof msg.userID === 'object' && (msg.userID?._id || msg.userID?.id)) ||
+        msg.sender ||
+        msg.user ||
+        msg.senderID ||
+        msg.userID ||
+        msg.from ||
+        ''
+      );
+
+      const firstDuplicateIdx = self.findIndex((m: any) => {
+        const otherText = (m.description || m.desc || m.text || m.message || '').trim();
+        const otherFile = m.file || (Array.isArray(m.attachments) && m.attachments[0]) || '';
+        if (otherText !== text || otherFile !== fileUrl) return false;
+
+        const otherSenderId = String(
+          (typeof m.sender === 'object' && (m.sender?._id || m.sender?.id)) ||
+          (typeof m.user === 'object' && (m.user?._id || m.user?.id)) ||
+          (typeof m.userID === 'object' && (m.userID?._id || m.userID?.id)) ||
+          m.sender ||
+          m.user ||
+          m.senderID ||
+          m.userID ||
+          m.from ||
+          ''
+        );
+        if (senderId && otherSenderId && senderId !== otherSenderId) return false;
+
+        const t1 = msg.createdAt ? new Date(msg.createdAt).getTime() : 0;
+        const t2 = m.createdAt ? new Date(m.createdAt).getTime() : 0;
+        if (t1 && t2 && Math.abs(t1 - t2) > 15000) return false;
+
+        return true;
+      });
+
+      if (firstDuplicateIdx !== index) {
+        const otherMsg = self[firstDuplicateIdx];
+        const otherId = String(otherMsg?._id || otherMsg?.id || '');
+        // If current is temp and other is real, drop current
+        if (isTemp && otherId && !otherId.startsWith('temp-')) return false;
+        // Keep the earlier one
+        if (firstDuplicateIdx < index) return false;
+      }
+
+      // 4. Collapse duplicate meeting invites for the same meetingId
       const meeting = parseMeeting(msg.meeting || msg.meetingPayload || text);
       if (meeting?.meetingId) {
         const firstMeetingIdx = self.findIndex((m: any) => {
-          const mText = m.description || m.desc || m.text || m.message || '';
+          const mText = (m.description || m.desc || m.text || m.message || '').trim();
           const mMeeting = parseMeeting(m.meeting || m.meetingPayload || mText);
           return mMeeting?.meetingId && String(mMeeting.meetingId) === String(meeting.meetingId);
         });
@@ -1151,64 +1401,7 @@ const ChatView = () => {
     });
 
   const renderMessageAttachment = (msg: any) => {
-    const fileUrl = msg.file || (Array.isArray(msg.attachments) && msg.attachments[0]) || null;
-    if (!fileUrl) return null;
-
-    const hasMsgText = Boolean(msg.description || msg.desc || msg.text || msg.message);
-
-    const isImage =
-      /\.(png|jpe?g|gif|webp|svg|bmp|avif)/i.test(fileUrl) ||
-      fileUrl.includes('/image/upload/') ||
-      (fileUrl.includes('cloudinary.com') && fileUrl.includes('/image/')) ||
-      msg.fileType?.includes('image');
-
-    if (isImage) {
-      return (
-        <div className={`mt-1 overflow-hidden rounded-lg border border-slate-200 shadow-sm max-w-[280px] ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}>
-          <img
-            src={fileUrl}
-            alt="Attachment"
-            className="w-full max-h-[220px] object-cover cursor-pointer hover:opacity-95 transition-opacity"
-            onClick={() => setLightboxImage(fileUrl)}
-          />
-        </div>
-      );
-    }
-
-    const isVideo =
-      /\.(mp4|webm|ogg|mov|mkv|avi|m4v|3gp)/i.test(fileUrl) ||
-      fileUrl.includes('/video/upload/') ||
-      (fileUrl.includes('cloudinary.com') && fileUrl.includes('/video/')) ||
-      msg.fileType?.includes('video');
-
-    if (isVideo) {
-      return (
-        <div className={`mt-1 overflow-hidden rounded-xl border border-slate-200 shadow-sm max-w-[340px] bg-black ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}>
-          <video
-            src={fileUrl}
-            controls
-            preload="metadata"
-            className="w-full max-h-[280px] rounded-xl object-contain"
-          />
-        </div>
-      );
-    }
-
-    const fileName = fileUrl.split('/').pop()?.split('?')[0] || 'Attachment';
-
-    return (
-      <a
-        href={fileUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        download
-        className={`flex items-center gap-2 px-3 py-2 mt-1 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-lg hover:bg-slate-200 transition-colors border text-xs font-medium ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}
-      >
-        <span className="text-base">📄</span>
-        <span className="truncate max-w-[180px]">{fileName}</span>
-        <span className="ml-auto text-slate-400">⬇️</span>
-      </a>
-    );
+    return <ChatMessageAttachmentItem msg={msg} />;
   };
 
   const renderMessageContent = (msg: any) => {

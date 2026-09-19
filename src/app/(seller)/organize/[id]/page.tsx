@@ -162,12 +162,23 @@ const EditPackagePage = () => {
       setKeywordsList(raw.keywords);
     }
 
+    // Ensure sub-images exclude rawCover and deduplicate
+    const subImagesOnly = Array.from(
+      new Set(rawImages.filter((img: string) => Boolean(img) && img !== rawCover))
+    );
+
     dispatch({
       type: "INITIALIZE_STATE",
       payload: {
         ...initialState,
-        ...raw,
+        // Explicitly populate ONLY editable fields to avoid leaking read-only/computed properties (id, totalStars, sales, etc.)
         title: gigTitle,
+        shortTitle: raw.shortTitle || gigTitle,
+        description: raw.description || raw.desc || "",
+        shortDesc: raw.shortDesc || "",
+        deliveryTime: raw.deliveryTime || basicPkg.deliveryTime || "7",
+        revisionNumber: raw.revisionNumber || basicPkg.revisionNumber || "1",
+        price: Number(raw.price || basicPkg.price || 0),
         category: raw.category || "",
         categoryId: raw.categoryId || "",
         subcategory: raw.subcategory || "",
@@ -175,13 +186,41 @@ const EditPackagePage = () => {
         niche: raw.niche || "",
         nicheId: raw.nicheId || "",
         cover: rawCover,
-        images: rawImages,
+        images: subImagesOnly,
         faqs: Array.isArray(raw.faqs) ? raw.faqs : [],
         packages: {
-          ...existingPackages,
-          basic: basicPkg,
-          standard: existingPackages.standard || null,
-          premium: existingPackages.premium || null,
+          basic: {
+            title: basicPkg.title || gigTitle,
+            shortDesc: basicPkg.shortDesc || raw.shortDesc || "",
+            price: Number(basicPkg.price || raw.price || 0),
+            deliveryTime: basicPkg.deliveryTime || raw.deliveryTime || "7",
+            revisionNumber: basicPkg.revisionNumber || raw.revisionNumber || "1",
+            features: Array.isArray(basicPkg.features) ? basicPkg.features : [],
+          },
+          standard: existingPackages.standard
+            ? {
+                title: existingPackages.standard.title || "",
+                shortDesc: existingPackages.standard.shortDesc || "",
+                price: Number(existingPackages.standard.price || 0),
+                deliveryTime: existingPackages.standard.deliveryTime || "7",
+                revisionNumber: existingPackages.standard.revisionNumber || "1",
+                features: Array.isArray(existingPackages.standard.features)
+                  ? existingPackages.standard.features
+                  : [],
+              }
+            : null,
+          premium: existingPackages.premium
+            ? {
+                title: existingPackages.premium.title || "",
+                shortDesc: existingPackages.premium.shortDesc || "",
+                price: Number(existingPackages.premium.price || 0),
+                deliveryTime: existingPackages.premium.deliveryTime || "7",
+                revisionNumber: existingPackages.premium.revisionNumber || "1",
+                features: Array.isArray(existingPackages.premium.features)
+                  ? existingPackages.premium.features
+                  : [],
+              }
+            : null,
         },
         features: Array.isArray(raw.features) ? raw.features : [],
       },
@@ -265,8 +304,17 @@ const EditPackagePage = () => {
 
   const mutation = useMutation({
     mutationFn: async (pkg: any) => {
-      const { userID: _unused, ...payload } = pkg;
-      const { data } = await axiosFetch.patch(`/gigs/${id}`, payload);
+      // Strip any non-whitelisted/read-only backend fields before sending PATCH
+      const sanitized = { ...pkg };
+      const FORBIDDEN = [
+        "id", "_id", "totalStars", "starNumber", "sales", "favoriteCount", "slug",
+        "reviewedAt", "createdAt", "updatedAt", "publishedAt", "user", "userID", "userId",
+        "reviews", "gigRating", "starRating", "ratingBreakdown", "starCounts",
+        "subcategoryId", "niche", "nicheId", "totalReviews", "__v", "orders", "seller",
+        "status", "views", "clicks", "impressions"
+      ];
+      FORBIDDEN.forEach((key) => delete sanitized[key]);
+      const { data } = await axiosFetch.patch(`/gigs/${id}`, sanitized);
       return data;
     },
     onSuccess: () => {
@@ -302,8 +350,8 @@ const EditPackagePage = () => {
     }
   };
 
-  const currentSubcategories = getSubcategories(state.category || packageData?.category);
-  const currentNiches = getNiches(state.subcategory || packageData?.subcategory);
+  const currentSubcategories = getSubcategories(state.category);
+  const currentNiches = getNiches(state.subcategory);
 
   // Dedicated handler for main category selection (resets subcategory & niche)
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -348,7 +396,7 @@ const EditPackagePage = () => {
   // Dedicated handler for subcategory selection (resets niche)
   const handleSubcategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const subVal = e.target.value;
-    const currentSubs = getSubcategories(state.category || packageData?.category);
+    const currentSubs = getSubcategories(state.category);
     const selectedSub = currentSubs.find(
       (s: any) =>
         (s.slug || s._id || s.id) === subVal ||
@@ -393,7 +441,7 @@ const EditPackagePage = () => {
   // Dedicated handler for niche selection (2nd-level child)
   const handleNicheChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const nicheVal = e.target.value;
-    const currentNichesList = getNiches(state.subcategory || packageData?.subcategory);
+    const currentNichesList = getNiches(state.subcategory);
     const selectedNiche = currentNichesList.find(
       (n: any) =>
         (n.slug || n._id || n.id) === nicheVal ||
@@ -414,7 +462,7 @@ const EditPackagePage = () => {
     });
 
     // Deepest selected category ID takes priority for categoryId
-    const currentSubs = getSubcategories(state.category || packageData?.category);
+    const currentSubs = getSubcategories(state.category);
     const selectedSub = currentSubs.find(
       (s: any) =>
         (s.slug || s._id || s.id) === state.subcategory ||
@@ -586,7 +634,7 @@ const EditPackagePage = () => {
         type: "ADD_IMAGES",
         payload: {
           cover: url,
-          images: state.images || [],
+          images: (state.images || []).filter((img: string) => img !== url),
         },
       });
       toast.success("Banner uploaded successfully!", { id: "upload-cover" });
@@ -594,6 +642,7 @@ const EditPackagePage = () => {
       toast.error("Failed to upload banner", { id: "upload-cover" });
     } finally {
       setUploading(false);
+      if (coverInputRef.current) coverInputRef.current.value = "";
     }
   };
 
@@ -605,11 +654,22 @@ const EditPackagePage = () => {
       toast.loading(`Uploading ${files.length} images...`, { id: "upload-subs" });
       const uploadedUrls = await Promise.all(files.map((f) => uploadToCDN(f)));
       const validUrls = uploadedUrls.filter(Boolean);
+
+      let newCover = state.cover;
+      const combinedSubImages = [...(state.images || [])];
+
+      if (!newCover && validUrls.length > 0) {
+        newCover = validUrls[0];
+        combinedSubImages.push(...validUrls.slice(1));
+      } else {
+        combinedSubImages.push(...validUrls);
+      }
+
       dispatch({
         type: "ADD_IMAGES",
         payload: {
-          cover: state.cover,
-          images: [...(state.images || []), ...validUrls],
+          cover: newCover,
+          images: Array.from(new Set(combinedSubImages.filter((img: string) => img !== newCover))),
         },
       });
       toast.success("Sub images added successfully!", { id: "upload-subs" });
@@ -617,40 +677,38 @@ const EditPackagePage = () => {
       toast.error("Failed uploading images", { id: "upload-subs" });
     } finally {
       setUploading(false);
+      if (subImagesInputRef.current) subImagesInputRef.current.value = "";
     }
   };
 
   const handleRemoveImage = (urlToRemove: string) => {
-    if (urlToRemove === state.cover) {
-      dispatch({
-        type: "ADD_IMAGES",
-        payload: {
-          cover: "",
-          images: state.images || [],
-        },
-      });
-    } else {
-      dispatch({
-        type: "ADD_IMAGES",
-        payload: {
-          cover: state.cover,
-          images: (state.images || []).filter((img: string) => img !== urlToRemove),
-        },
-      });
+    // 1. Remove from sub-images
+    const updatedImages = (state.images || []).filter((img: string) => img !== urlToRemove);
+
+    let updatedCover = state.cover;
+    // 2. If removing the current cover:
+    if (state.cover === urlToRemove) {
+      if (updatedImages.length > 0) {
+        // Promote the next available sub-image to be the cover banner
+        updatedCover = updatedImages[0];
+        updatedImages.shift();
+      } else {
+        updatedCover = "";
+      }
     }
+
+    dispatch({
+      type: "ADD_IMAGES",
+      payload: {
+        cover: updatedCover,
+        images: updatedImages,
+      },
+    });
     toast.success("Image removed");
   };
 
   // Submit Handler
   const handleSubmit = (isDraft = false) => {
-    const {
-      userID: _unused,
-      subcategoryId: _unusedSubId,
-      niche: _unusedNiche,
-      nicheId: _unusedNicheId,
-      ...stateWithoutUserId
-    } = (state as any);
-
     // Resolve hierarchical category, subcategory, and niche information
     const selectedParent = parentCategories.find(
       (p: any) =>
@@ -659,7 +717,7 @@ const EditPackagePage = () => {
         p.name?.toLowerCase() === String(state.category).toLowerCase() ||
         p.slug?.toLowerCase() === String(state.category).toLowerCase()
     );
-    const currentSubs = getSubcategories(state.category || packageData?.category);
+    const currentSubs = getSubcategories(state.category);
     const selectedSub = currentSubs.find(
       (s: any) =>
         (s.slug || s._id || s.id) === state.subcategory ||
@@ -667,7 +725,7 @@ const EditPackagePage = () => {
         s.name?.toLowerCase() === String(state.subcategory).toLowerCase() ||
         s.slug?.toLowerCase() === String(state.subcategory).toLowerCase()
     );
-    const currentNichesList = getNiches(state.subcategory || packageData?.subcategory);
+    const currentNichesList = getNiches(state.subcategory);
     const selectedNiche = currentNichesList.find(
       (n: any) =>
         (n.slug || n._id || n.id) === state.niche ||
@@ -690,58 +748,132 @@ const EditPackagePage = () => {
     const resolvedCategoryName = selectedParent?.name || state.category;
     const resolvedSubcategoryName = selectedSub?.name || state.subcategory || undefined;
 
-    const finalCover = state.cover || packageData?.cover || packageData?.coverImage || "";
-    const finalImages = (state.images && state.images.length > 0)
-      ? state.images
-      : (Array.isArray(packageData?.images) ? packageData.images : []);
+    const finalCover = state.cover || "";
+    const finalImages = Array.isArray(state.images)
+      ? state.images.filter((img: string) => Boolean(img) && img !== finalCover)
+      : [];
 
-    const form = {
-      ...stateWithoutUserId,
-      cover: finalCover,
-      images: finalImages,
-      categoryId: resolvedCategoryId,
-      category: resolvedCategoryName,
-      subcategory: resolvedSubcategoryName,
-      faqs: state.faqs || [],
-      isDraft,
-      tools_use: toolsList,
-      tags: keywordsList,
+    // Clean package tier details
+    const cleanTier = (tier: any) => {
+      if (!tier) return null;
+      const { _id, id, ...rest } = tier;
+      return {
+        title: rest.title || "",
+        shortDesc: rest.shortDesc || "",
+        price: Number(rest.price || 0),
+        deliveryTime: rest.deliveryTime || "7",
+        revisionNumber: rest.revisionNumber || "1",
+        features: Array.isArray(rest.features) ? rest.features : [],
+      };
     };
 
-    // Ensure basic tier sync
-    if (form.packages?.basic) {
-      form.packages.basic.title =
-        form.packages.basic.title || form.packages.basic.shortTitle || form.shortTitle || form.title || "";
-      form.packages.basic.shortDesc =
-        form.packages.basic.shortDesc || form.shortDesc || form.description || "";
-      form.packages.basic.price = Number(form.packages.basic.price || form.price || 0);
-      form.packages.basic.deliveryTime =
-        form.packages.basic.deliveryTime || form.deliveryTime || "7";
-      form.packages.basic.revisionNumber =
-        form.packages.basic.revisionNumber || form.revisionNumber || "1";
+    const basicTier = cleanTier(state.packages?.basic) || {
+      title: state.title || "",
+      shortDesc: state.shortDesc || "",
+      price: Number(state.price || 0),
+      deliveryTime: state.deliveryTime || "7",
+      revisionNumber: state.revisionNumber || "1",
+      features: state.features || [],
+    };
+    basicTier.title = basicTier.title || state.title || "";
+    basicTier.shortDesc = basicTier.shortDesc || state.shortDesc || state.description || "";
+    basicTier.price = Number(basicTier.price || state.price || 0);
+    basicTier.deliveryTime = basicTier.deliveryTime || state.deliveryTime || "7";
+    basicTier.revisionNumber = basicTier.revisionNumber || state.revisionNumber || "1";
+
+    const standardTier = cleanTier(state.packages?.standard);
+    const premiumTier = cleanTier(state.packages?.premium);
+
+    const sanitizedPackages: Record<string, any> = {
+      basic: basicTier,
+    };
+    if (standardTier) sanitizedPackages.standard = standardTier;
+    if (premiumTier) sanitizedPackages.premium = premiumTier;
+
+    const payload: Record<string, any> = {
+      title: state.title,
+      shortTitle: state.shortTitle || state.title,
+      description: state.description,
+      shortDesc: state.shortDesc || "",
+      category: resolvedCategoryName,
+      cover: finalCover,
+      images: finalImages,
+      price: basicTier.price,
+      deliveryTime: basicTier.deliveryTime,
+      revisionNumber: basicTier.revisionNumber,
+      features: state.features || [],
+      faqs: state.faqs || [],
+      packages: sanitizedPackages,
+      tools_use: toolsList,
+      tags: keywordsList,
+      isDraft,
+    };
+
+    if (resolvedCategoryId) {
+      payload.categoryId = resolvedCategoryId;
+    }
+    if (resolvedSubcategoryName) {
+      payload.subcategory = resolvedSubcategoryName;
     }
 
+    // Explicitly delete any read-only/database/non-whitelisted properties
+    const FORBIDDEN_PROPERTIES = [
+      "id",
+      "_id",
+      "totalStars",
+      "starNumber",
+      "sales",
+      "favoriteCount",
+      "slug",
+      "reviewedAt",
+      "createdAt",
+      "updatedAt",
+      "publishedAt",
+      "user",
+      "userID",
+      "userId",
+      "reviews",
+      "gigRating",
+      "starRating",
+      "ratingBreakdown",
+      "starCounts",
+      "subcategoryId",
+      "niche",
+      "nicheId",
+      "totalReviews",
+      "__v",
+      "orders",
+      "seller",
+      "status",
+      "views",
+      "clicks",
+      "impressions",
+    ];
+    FORBIDDEN_PROPERTIES.forEach((prop) => {
+      delete payload[prop];
+    });
+
     if (!isDraft) {
-      if (!form.title) {
+      if (!payload.title) {
         toast.error("Please enter a package title");
         return;
       }
-      if (!form.category) {
+      if (!payload.category) {
         toast.error("Please select a category");
         return;
       }
-      if (!form.description || form.description === "<p><br></p>") {
+      if (!payload.description || payload.description === "<p><br></p>") {
         toast.error("Please provide a package description");
         return;
       }
-      const basicPrice = Number(form.packages?.basic?.price);
+      const basicPrice = Number(basicTier.price);
       if (isNaN(basicPrice) || basicPrice <= 0) {
         toast.error("Please enter a valid price for the Basic package");
         return;
       }
     }
 
-    mutation.mutate(form);
+    mutation.mutate(payload);
   };
 
   // Current active tier object (or default empty tier)
@@ -758,33 +890,33 @@ const EditPackagePage = () => {
   // Resilient category value resolution so that options accurately reflect selection
   const matchedCategoryVal = parentCategories.find(
     (c: any) =>
-      c.name === (state.category || packageData?.category) ||
-      c.slug === (state.category || packageData?.category) ||
-      c._id === (state.category || packageData?.category) ||
-      c.id === (state.category || packageData?.category) ||
-      c.name?.toLowerCase() === String(state.category || packageData?.category).toLowerCase() ||
-      c.slug?.toLowerCase() === String(state.category || packageData?.category).toLowerCase()
-  )?.name || state.category || packageData?.category || "";
+      c.name === state.category ||
+      c.slug === state.category ||
+      c._id === state.category ||
+      c.id === state.category ||
+      c.name?.toLowerCase() === String(state.category).toLowerCase() ||
+      c.slug?.toLowerCase() === String(state.category).toLowerCase()
+  )?.name || state.category || "";
 
   const matchedSubcategoryVal = currentSubcategories.find(
     (s: any) =>
-      s.name === (state.subcategory || packageData?.subcategory) ||
-      s.slug === (state.subcategory || packageData?.subcategory) ||
-      s._id === (state.subcategory || packageData?.subcategory) ||
-      s.id === (state.subcategory || packageData?.subcategory) ||
-      s.name?.toLowerCase() === String(state.subcategory || packageData?.subcategory).toLowerCase() ||
-      s.slug?.toLowerCase() === String(state.subcategory || packageData?.subcategory).toLowerCase()
-  )?.name || state.subcategory || packageData?.subcategory || "";
+      s.name === state.subcategory ||
+      s.slug === state.subcategory ||
+      s._id === state.subcategory ||
+      s.id === state.subcategory ||
+      s.name?.toLowerCase() === String(state.subcategory).toLowerCase() ||
+      s.slug?.toLowerCase() === String(state.subcategory).toLowerCase()
+  )?.name || state.subcategory || "";
 
   const matchedNicheVal = currentNiches.find(
     (n: any) =>
-      n.name === (state.niche || packageData?.niche) ||
-      n.slug === (state.niche || packageData?.niche) ||
-      n._id === (state.niche || packageData?.niche) ||
-      n.id === (state.niche || packageData?.niche) ||
-      n.name?.toLowerCase() === String(state.niche || packageData?.niche).toLowerCase() ||
-      n.slug?.toLowerCase() === String(state.niche || packageData?.niche).toLowerCase()
-  )?.name || state.niche || packageData?.niche || "";
+      n.name === state.niche ||
+      n.slug === state.niche ||
+      n._id === state.niche ||
+      n.id === state.niche ||
+      n.name?.toLowerCase() === String(state.niche).toLowerCase() ||
+      n.slug?.toLowerCase() === String(state.niche).toLowerCase()
+  )?.name || state.niche || "";
 
   const selectedCategoryObj = parentCategories.find(
     (c: any) => (c.slug || c.name || c._id || c.id) === (matchedCategoryVal || state.category)
@@ -803,15 +935,12 @@ const EditPackagePage = () => {
     : (matchedCategoryVal || "Category");
 
   // Real uploaded gallery items (cover banner + sub-images)
-  const currentCover = state.cover || packageData?.cover || "";
-  const currentSubImages: string[] = (state.images && state.images.length > 0)
-    ? state.images
-    : (Array.isArray(packageData?.images) ? packageData.images : []);
-
-  const galleryItems = Array.from(new Set([
-    ...(currentCover ? [currentCover] : []),
-    ...currentSubImages,
-  ])).filter(Boolean);
+  const galleryItems = Array.from(
+    new Set([
+      ...(state.cover ? [state.cover] : []),
+      ...(state.images || []),
+    ])
+  ).filter(Boolean);
 
   if (isLoading) {
     return (
@@ -841,9 +970,9 @@ const EditPackagePage = () => {
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <h1 className="text-2xl sm:text-[32px] font-bold tracking-tight text-gray-950">
-                Edit Package: {state.title || packageData?.title || ""}
-              </h1>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-950 truncate max-w-xl">
+              Edit Package: {state.title || ""}
+            </h1>
             </div>
             <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-2xl leading-relaxed">
               Update your package details, pricing tiers, deliverables, and attachments so clients know exactly what you provide.
@@ -930,7 +1059,7 @@ const EditPackagePage = () => {
               <input
                 type="text"
                 name="title"
-                value={state.title || (state.packages as any)?.basic?.title || packageData?.title || ""}
+                value={state.title || ""}
                 onChange={handleInputChange}
                 placeholder="e.g I will do something i am really good at"
                 className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all"
@@ -945,7 +1074,7 @@ const EditPackagePage = () => {
               <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
                 <ReactQuill
                   theme="snow"
-                  value={state.description || packageData?.description || ""}
+                  value={state.description || ""}
                   onChange={(html) =>
                     dispatch({
                       type: "CHANGE_INPUT",
@@ -1476,7 +1605,7 @@ const EditPackagePage = () => {
               onClick={() => coverInputRef.current?.click()}
               className="border border-dashed border-gray-300 hover:border-[#0D6D5F] rounded-xl py-6 text-center cursor-pointer transition-all bg-white hover:bg-gray-50/70 flex items-center justify-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0D6D5F]"
             >
-              <span>{state.cover || packageData?.cover ? "Change Banner Image" : "Add Banner"}</span>
+              <span>{state.cover ? "Change Banner Image" : "Add Banner"}</span>
               <Plus className="w-4 h-4" />
             </div>
 
@@ -1497,7 +1626,7 @@ const EditPackagePage = () => {
               className="flex items-center gap-3.5 pt-1 overflow-x-auto scrollbar-none scroll-smooth"
             >
               {galleryItems.map((imgUrl, idx) => {
-                const isBanner = imgUrl === (state.cover || packageData?.cover);
+                const isBanner = imgUrl === state.cover;
                 return (
                   <div
                     key={idx}
@@ -1524,11 +1653,12 @@ const EditPackagePage = () => {
                       <button
                         type="button"
                         onClick={() => {
+                          const remainingImages = galleryItems.filter((i: string) => i !== imgUrl);
                           dispatch({
                             type: "ADD_IMAGES",
                             payload: {
                               cover: imgUrl,
-                              images: galleryItems.filter((i: string) => i !== imgUrl),
+                              images: remainingImages,
                             },
                           });
                           toast.success("Set as banner!");

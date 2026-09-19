@@ -23,7 +23,33 @@ const LoginForm = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+
+    // If user is already authenticated, immediately navigate to safe redirect target
+    const currentUser = useUserStore.getState().user || (() => {
+      try {
+        const stored = localStorage.getItem("user");
+        if (stored) return JSON.parse(stored);
+        const match = document.cookie.match(/(?:^|;\s*)user=([^;]*)/);
+        if (match && match[1]) return JSON.parse(decodeURIComponent(match[1]));
+      } catch {}
+      return null;
+    })();
+
+    if (currentUser) {
+      let rawRedirect = searchParams?.get('redirect');
+      let target = rawRedirect || '/dashboard';
+      if (target) {
+        try { target = decodeURIComponent(target); } catch {}
+        if (target.includes('%')) {
+          try { target = decodeURIComponent(target); } catch {}
+        }
+      }
+      const safe = (target && target.startsWith('/') && !target.startsWith('/login') && !target.startsWith('/register'))
+        ? target
+        : '/dashboard';
+      window.location.href = safe;
+    }
+  }, [searchParams]);
 
   const handleFormInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = event.target;
@@ -56,13 +82,37 @@ const LoginForm = () => {
       const userKey = user.id || user._id || user.username || "default";
       sessionStorage.removeItem(`kyc_prompt_dismissed_${userKey}`);
       sessionStorage.removeItem("kyc_prompt_dismissed_session");
+
+      // Save session tokens into cookies and localStorage
+      const token = data?.accessToken || data?.token || user?.token || user?.accessToken;
+      const refreshToken = data?.refreshToken || user?.refreshToken;
+      if (token) {
+        document.cookie = `accessToken=${encodeURIComponent(token)}; path=/; max-age=2592000; SameSite=Lax`;
+        try { localStorage.setItem('accessToken', token); } catch {}
+        try { localStorage.setItem('token', token); } catch {}
+      }
+      if (refreshToken) {
+        document.cookie = `refreshToken=${encodeURIComponent(refreshToken)}; path=/; max-age=2592000; SameSite=Lax`;
+        try { localStorage.setItem('refreshToken', refreshToken); } catch {}
+      }
+
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
-      const redirectTarget = searchParams?.get('redirect');
-      const safeTarget = (redirectTarget && redirectTarget.startsWith('/') && !redirectTarget.startsWith('/login') && !redirectTarget.startsWith('/register'))
-        ? redirectTarget
+
+      // Properly decode redirect parameter (handles %2Fsupport%2Fnew)
+      let rawRedirect = searchParams?.get('redirect');
+      let target = rawRedirect || '/dashboard';
+      if (target) {
+        try { target = decodeURIComponent(target); } catch {}
+        if (target.includes('%')) {
+          try { target = decodeURIComponent(target); } catch {}
+        }
+      }
+      const safeTarget = (target && target.startsWith('/') && !target.startsWith('/login') && !target.startsWith('/register'))
+        ? target
         : '/dashboard';
-      router.push(safeTarget);
+
+      window.location.href = safeTarget;
       setLoading(false);
       return;
     } catch (apiErr: any) {
@@ -161,17 +211,17 @@ const LoginForm = () => {
 
                 <button
                   type="submit"
-                  className="mt-5 bg-emerald-500 text-white p-4 border-none rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-[#71cfb2] disabled:cursor-not-allowed"
+                  className="mt-5 bg-black text-white p-4 border-none rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-brand-green disabled:bg-[#71cfb2] disabled:cursor-not-allowed"
                   disabled={loading}
                 >
-                  {loading ? 'Loading...' : 'Continue'}
+                  {loading ? 'Loading...' : 'Sign In'}
                 </button>
               </div>
             </form>
 
             <div className="mt-auto pt-10 text-left w-full">
               <p className="mb-4 text-sm text-gray-600 text-center md:text-left">
-                Don't have an account? <Link href="/register" prefetch={false} className="text-emerald-500 font-semibold hover:underline">Sign up</Link>
+                Don't have an account? <Link href="/register" prefetch={false} className="text-brand-green font-semibold hover:underline">Sign up</Link>
               </p>
               <p className="text-[13px] text-[#aaa] text-center md:text-left">©2026 workvence All right reserved</p>
             </div>

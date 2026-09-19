@@ -160,8 +160,8 @@ export async function proxy(req: NextRequest) {
     ))
   );
 
-  // Authenticated requires either a verified unexpired JWT with user identity OR a verified user cookie paired with an active session token
-  const isAuthenticated = !refreshFailed && (hasValidJwtUser || (isParsedUserValid && hasSessionToken));
+  // Authenticated requires either a verified unexpired JWT with user identity OR a verified user cookie OR an active session token
+  const isAuthenticated = !refreshFailed && (hasValidJwtUser || isParsedUserValid || hasSessionToken);
 
   const isSellerCookie = req.cookies.get("isSeller")?.value;
   const roleCookie = req.cookies.get("role")?.value?.toLowerCase();
@@ -228,7 +228,16 @@ export async function proxy(req: NextRequest) {
       return applyRefreshedCookie(NextResponse.next());
     }
 
-    const redirectTarget = searchParams.get("redirect") || "/dashboard";
+    const rawRedirect = searchParams.get("redirect");
+    let redirectTarget = rawRedirect;
+    if (redirectTarget) {
+      try { redirectTarget = decodeURIComponent(redirectTarget); } catch {}
+      if (redirectTarget.includes("%")) {
+        try { redirectTarget = decodeURIComponent(redirectTarget); } catch {}
+      }
+    }
+    redirectTarget = redirectTarget || "/dashboard";
+
     // Prevent open redirect loops to auth pages
     const safeTarget = (redirectTarget.startsWith("/") && !redirectTarget.startsWith("/login") && !redirectTarget.startsWith("/register"))
       ? redirectTarget

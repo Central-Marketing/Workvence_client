@@ -36,9 +36,23 @@ export const useUserStore = create<UserState>((set) => ({
         if (user.role) {
           document.cookie = `role=${user.role}; path=/; max-age=2592000; SameSite=Lax`;
         }
+        const userToken = (user as any)?.accessToken || (user as any)?.token;
+        if (userToken) {
+          document.cookie = `accessToken=${encodeURIComponent(userToken)}; path=/; max-age=2592000; SameSite=Lax`;
+          try { localStorage.setItem("accessToken", userToken); } catch {}
+          try { localStorage.setItem("token", userToken); } catch {}
+        }
+        const userRefreshToken = (user as any)?.refreshToken;
+        if (userRefreshToken) {
+          document.cookie = `refreshToken=${encodeURIComponent(userRefreshToken)}; path=/; max-age=2592000; SameSite=Lax`;
+          try { localStorage.setItem("refreshToken", userRefreshToken); } catch {}
+        }
       } else {
         try {
           localStorage.removeItem("user");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
         } catch {}
         document.cookie = `accessToken=; path=/; max-age=0; SameSite=Lax`;
         document.cookie = `refreshToken=; path=/; max-age=0; SameSite=Lax`;

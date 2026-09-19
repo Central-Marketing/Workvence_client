@@ -2,11 +2,12 @@
 
 import React, { useState } from "react";
 import { axiosFetch } from "@/utils";
-import { RiCloseLine } from "react-icons/ri";
+import { X } from "lucide-react";
+import toast from "react-hot-toast";
 
 const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
-  const [price, setPrice] = useState(brief.budget || "");
-  const [deliveryTime, setDeliveryTime] = useState(brief.deliveryTime || "");
+  const [price, setPrice] = useState(brief?.budget || "");
+  const [deliveryTime, setDeliveryTime] = useState(brief?.deliveryTime || "");
   const [coverLetter, setCoverLetter] = useState("");
   const [attachmentUrl, setAttachmentUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,7 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
     setErrorMsg("");
 
     try {
-      const briefId = brief._id || brief.id;
+      const briefId = brief?._id || brief?.id;
       const response = await axiosFetch.post(
         `/briefs/${briefId}/proposals`,
         {
@@ -33,13 +34,14 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
         }
       );
       if (!response.data.error) {
+        toast.success("Proposal submitted successfully!");
         onSuccess(response.data.proposal || response.data);
         onClose();
       }
     } catch (err: any) {
       const msg = err.response?.data?.message || "Proposal submission failed.";
       setErrorMsg(msg);
-      
+
       if (msg.toLowerCase().includes("already submitted")) {
         setTimeout(() => {
           onSuccess(null, true);
@@ -52,67 +54,132 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
   };
 
   return (
-    <div className="fixed inset-0 w-screen h-screen bg-black/50 flex items-center justify-center z-[1000] backdrop-blur-xs p-4">
-      <div className="bg-white w-full max-w-[520px] max-h-[calc(100vh-40px)] rounded-2xl p-0 shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex justify-between items-center py-4 px-6 border-b border-slate-100 bg-white shrink-0">
-          <h3 className="text-lg font-bold text-slate-900 m-0 truncate pr-2">Submit Proposal for: {brief.title}</h3>
-          <button type="button" className="bg-transparent border-none text-slate-400 cursor-pointer p-1.5 flex items-center justify-center rounded-lg transition-colors hover:bg-slate-100 hover:text-slate-900" onClick={onClose}>
-            <RiCloseLine size={24} />
+    <div
+      className="fixed inset-0 w-screen h-screen bg-black/60 backdrop-blur-xs flex items-center justify-center z-[1000] p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white w-full max-w-[620px] max-h-[calc(100vh-40px)] rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal Header */}
+        <div className="flex justify-between items-center py-4 px-6 border-b border-gray-100 bg-white shrink-0">
+          <div className="min-w-0 pr-3">
+            <h3 className="text-base sm:text-lg font-bold text-gray-950 truncate font-sf-pro">
+              Submit Proposal
+            </h3>
+            {brief?.title && (
+              <p className="text-xs text-gray-400 truncate mt-0.5 font-normal">
+                For: {brief.title}
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
+            onClick={onClose}
+            title="Close"
+          >
+            <X className="w-4 h-4" />
           </button>
         </div>
-        
-        {errorMsg && <div className="mx-6 mt-4 bg-red-50 text-red-500 p-3 rounded-lg text-sm border border-red-200">{errorMsg}</div>}
-        
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-6 overflow-y-auto">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-slate-600">Your Price ($)</label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="e.g. 250"
-              required
-              className="p-2.5 px-3 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none transition-colors focus:border-emerald-500 placeholder:text-slate-400"
-            />
+
+        {errorMsg && (
+          <div className="mx-6 mt-4 bg-red-50 text-red-600 p-3 rounded-xl text-xs sm:text-[13px] border border-red-200 font-medium">
+            {errorMsg}
           </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-slate-600">Delivery Time (Days)</label>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-6 overflow-y-auto">
+          {/* Offer Price */}
+          <div className="space-y-1.5">
+            <label className="text-xs sm:text-[13px] font-semibold text-gray-700 block">
+              Your Offer Price ($)
+            </label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-semibold text-sm">
+                $
+              </span>
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="e.g. 250"
+                required
+                min={1}
+                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl pl-8 pr-4 py-2.5 sm:py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-medium"
+              />
+            </div>
+          </div>
+
+          {/* Delivery Time */}
+          <div className="space-y-1.5">
+            <label className="text-xs sm:text-[13px] font-semibold text-gray-700 block">
+              Delivery Time (Days)
+            </label>
             <input
               type="number"
               value={deliveryTime}
               onChange={(e) => setDeliveryTime(e.target.value)}
               placeholder="e.g. 4"
               required
-              className="p-2.5 px-3 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none transition-colors focus:border-emerald-500 placeholder:text-slate-400"
+              min={1}
+              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-2.5 sm:py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-medium"
             />
           </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-slate-600">Cover Letter</label>
+
+          {/* Cover Letter */}
+          <div className="space-y-1.5">
+            <label className="text-xs sm:text-[13px] font-semibold text-gray-700 block">
+              Cover Letter & Proposal Pitch
+            </label>
             <textarea
-              rows={5}
+              rows={8}
               value={coverLetter}
               onChange={(e) => setCoverLetter(e.target.value)}
-              placeholder="Explain why you are the best fit for this project..."
+              placeholder="Explain why you are the best fit for this project, your approach, and experience..."
               required
-              className="p-2.5 px-3 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none transition-colors focus:border-emerald-500 placeholder:text-slate-400 resize-y min-h-[100px]"
+              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-normal resize-y min-h-[110px]"
             />
           </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-slate-600">Attachment URL (Optional)</label>
+
+          {/* Attachment URL */}
+          <div className="space-y-1.5">
+            <label className="text-xs sm:text-[13px] font-semibold text-gray-700 block">
+              Work Sample / Attachment URL <span className="text-gray-400 font-normal">(Optional)</span>
+            </label>
             <input
               type="url"
               value={attachmentUrl}
               onChange={(e) => setAttachmentUrl(e.target.value)}
               placeholder="https://example.com/portfolio.pdf"
-              className="p-2.5 px-3 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none transition-colors focus:border-emerald-500 placeholder:text-slate-400"
+              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-2.5 sm:py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-normal"
             />
           </div>
-          <div className="flex justify-end gap-3 mt-2">
-            <button type="button" className="py-2.5 px-5 rounded-lg text-sm font-medium cursor-pointer transition-colors bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200" onClick={onClose}>
+
+          {/* Action Buttons */}
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100 mt-1">
+            <button
+              type="button"
+              className="py-2.5 px-5 rounded-xl text-xs sm:text-[13px] font-semibold cursor-pointer transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200/80"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </button>
-            <button type="submit" className="py-2.5 px-5 rounded-lg text-sm font-medium cursor-pointer transition-colors bg-emerald-500 text-white border-none hover:bg-emerald-600 disabled:opacity-70 disabled:cursor-not-allowed" disabled={loading}>
-              {loading ? "Submitting..." : "Submit Proposal"}
+            <button
+              type="submit"
+              className="py-2.5 px-6 rounded-[10px] text-xs sm:text-[13px] font-semibold cursor-pointer transition-all bg-black hover:bg-gray-900 text-white shadow-xs disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-[10px] animate-spin" />
+                  <span>Submitting...</span>
+                </>
+              ) : (
+                "Submit Proposal"
+              )}
             </button>
           </div>
         </form>

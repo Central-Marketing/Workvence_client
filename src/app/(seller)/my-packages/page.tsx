@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -11,12 +11,11 @@ import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
 
-
-
 const MyPackages = () => {
   const user = useUserStore((state: any) => state.user);
   const router = useRouter();
   const [packageToDelete, setPackageToDelete] = useState<any | null>(null);
+  const [activeTab, setActiveTab] = useState<"published" | "draft">("published");
 
   const queryClient = useQueryClient();
 
@@ -60,6 +59,19 @@ const MyPackages = () => {
   const packagesList = Array.isArray(data)
     ? data
     : (data?.packages || data?.gigs || data?.data || []);
+
+  const isPackageDraft = (pkg: any) =>
+    Boolean(pkg.isDraft) === true || pkg.isDraft === "true" || pkg.status === "draft";
+
+  const publishedPackages = useMemo(() => {
+    return packagesList.filter((pkg: any) => !isPackageDraft(pkg));
+  }, [packagesList]);
+
+  const draftPackages = useMemo(() => {
+    return packagesList.filter((pkg: any) => isPackageDraft(pkg));
+  }, [packagesList]);
+
+  const currentPackages = activeTab === "published" ? publishedPackages : draftPackages;
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
@@ -107,6 +119,51 @@ const MyPackages = () => {
             </Link>
           </div>
 
+          {/* Tab Filter: Published and Draft */}
+          <div className="bg-[#F1F3F5] rounded-xl p-1 inline-flex items-center gap-1 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setActiveTab("published")}
+              className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+                activeTab === "published"
+                  ? "bg-[#0B3A33] text-white shadow-2xs"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              <span>Published</span>
+              <span
+                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                  activeTab === "published"
+                    ? "bg-white/20 text-white"
+                    : "bg-gray-200/80 text-gray-700"
+                }`}
+              >
+                {publishedPackages.length}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("draft")}
+              className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+                activeTab === "draft"
+                  ? "bg-[#0B3A33] text-white shadow-2xs"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              <span>Draft</span>
+              <span
+                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                  activeTab === "draft"
+                    ? "bg-white/20 text-white"
+                    : "bg-amber-100 text-amber-800"
+                }`}
+              >
+                {draftPackages.length}
+              </span>
+            </button>
+          </div>
+
           {/* Main Card Container */}
           <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
 
@@ -123,7 +180,7 @@ const MyPackages = () => {
                 </thead>
 
                 <tbody className="divide-y divide-gray-100">
-                  {packagesList.length === 0 ? (
+                  {currentPackages.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="py-16 text-center">
                         <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
@@ -131,10 +188,12 @@ const MyPackages = () => {
                             <FiEdit2 />
                           </div>
                           <p className="text-slate-800 font-semibold text-sm sm:text-base mb-1">
-                            No packages created yet
+                            {activeTab === "draft" ? "No draft packages" : "No published packages yet"}
                           </p>
                           <p className="text-slate-400 text-xs sm:text-[13px] mb-4">
-                            You haven&apos;t published any packages yet. Click &quot;Create New Package&quot; to publish your first offering!
+                            {activeTab === "draft"
+                              ? "You don't have any packages saved as drafts."
+                              : "You haven't published any packages yet. Click \"Create New Package\" to publish your first offering!"}
                           </p>
                           <Link href="/organize">
                             <button
@@ -148,7 +207,7 @@ const MyPackages = () => {
                       </td>
                     </tr>
                   ) : (
-                    packagesList.map((pkg: any) => {
+                    currentPackages.map((pkg: any) => {
                       const coverImage =
                         pkg.cover ||
                         pkg.image ||
@@ -161,7 +220,11 @@ const MyPackages = () => {
                         <tr
                           key={pkg._id}
                           onClick={() => {
-                            router.push(`/package/${pkg._id}`);
+                            if (isPackageDraft(pkg)) {
+                              router.push(`/organize/${pkg._id}`);
+                            } else {
+                              router.push(`/package/${pkg._id}`);
+                            }
                           }}
                           className="hover:bg-slate-50/70 cursor-pointer transition-colors"
                         >
@@ -173,12 +236,25 @@ const MyPackages = () => {
                                 alt={pkg.title || "Package Cover"}
                                 className="w-24 sm:w-28 h-14 sm:h-16 rounded-lg object-cover bg-gray-100 border border-gray-200/80 shrink-0"
                               />
-                              <span
-                                className="text-xs sm:text-[13.5px] font-normal text-gray-800 line-clamp-2 leading-relaxed"
-                                title={pkg.title}
-                              >
-                                {pkg.title}
-                              </span>
+                              <div className="flex flex-col gap-1 min-w-0">
+                                <span
+                                  className="text-xs sm:text-[13.5px] font-normal text-gray-800 line-clamp-2 leading-relaxed"
+                                  title={pkg.title}
+                                >
+                                  {pkg.title}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  {isPackageDraft(pkg) ? (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80 w-fit">
+                                      Draft
+                                    </span>
+                                  ) : (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 w-fit">
+                                      Published
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </td>
 

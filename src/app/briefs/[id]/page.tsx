@@ -21,6 +21,8 @@ import {
   FiSend,
   FiStar,
   FiHeart,
+  FiAlertTriangle,
+  FiCheckCircle,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 
@@ -148,11 +150,26 @@ const BriefDetail = () => {
   // Proposals modal states
   const [showProposalsModal, setShowProposalsModal] = useState(false);
   const [modalView, setModalView] = useState<"list" | "detail" | "ai">("list");
+  const [previousModalView, setPreviousModalView] = useState<"list" | "ai">("list");
   const [selectedProposal, setSelectedProposal] = useState<any>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiRecommendedIds, setAiRecommendedIds] = useState<string[]>([]);
+  const [aiResult, setAiResult] = useState<any>(null);
   const [messagingSellerId, setMessagingSellerId] = useState<string | null>(null);
   const [isFavorited, setIsFavorited] = useState(false);
+
+  const aiRecommendationsList = useMemo(() => {
+    if (!aiResult) return [];
+    return (
+      (Array.isArray(aiResult.top3Recommendations) && aiResult.top3Recommendations) ||
+      (Array.isArray(aiResult.recommendation?.top3) && aiResult.recommendation.top3) ||
+      (Array.isArray(aiResult.topProposals) && aiResult.topProposals) ||
+      (Array.isArray(aiResult.rankedProposals) && aiResult.rankedProposals) ||
+      (Array.isArray(aiResult.recommendations) && aiResult.recommendations) ||
+      (Array.isArray(aiResult) && aiResult) ||
+      []
+    );
+  }, [aiResult]);
 
   // Fetch full seller profile on demand for genuine database details
   const { data: selectedSellerProfile } = useQuery({
@@ -402,9 +419,6 @@ const BriefDetail = () => {
     queryClient.invalidateQueries({ queryKey: ["brief", briefId] });
     queryClient.invalidateQueries({ queryKey: ["brief-proposals", briefId] });
     queryClient.invalidateQueries({ queryKey: ["my-proposals-for-brief", briefId] });
-    if (!isAlreadySubmitted) {
-      toast.success("Proposal submitted successfully!");
-    }
   };
 
   const skills: string[] = useMemo(() => {
@@ -485,16 +499,27 @@ const BriefDetail = () => {
     try {
       const res = await axiosFetch.get(`/briefs/${briefId}/ai-recommendation`);
       const data = res.data;
-      if (Array.isArray(data?.rankedProposals)) {
-        setAiRecommendedIds(data.rankedProposals.map((p: any) => p._id || p.id));
-      } else if (Array.isArray(data)) {
-        setAiRecommendedIds(data.map((p: any) => p._id || p.id));
+      setAiResult(data);
+      const recList =
+        (Array.isArray(data?.top3Recommendations) && data.top3Recommendations) ||
+        (Array.isArray(data?.recommendation?.top3) && data.recommendation.top3) ||
+        (Array.isArray(data?.rankedProposals) && data.rankedProposals) ||
+        (Array.isArray(data?.topProposals) && data.topProposals) ||
+        (Array.isArray(data?.recommendations) && data.recommendations) ||
+        (Array.isArray(data) && data) ||
+        [];
+      if (recList.length > 0) {
+        setAiRecommendedIds(
+          recList
+            .map((r: any) => r.proposalID || r.proposal?.id || r.proposal?._id || r._id || r.id)
+            .filter(Boolean)
+        );
       }
       setModalView("ai");
       toast.success("AI recommendations ready!");
-    } catch {
+    } catch (err: any) {
       setModalView("ai");
-      toast.success("AI evaluated and ranked top proposals!");
+      toast.error(err?.response?.data?.message || "Failed to get AI recommendations");
     } finally {
       setAiLoading(false);
     }
@@ -1003,10 +1028,13 @@ const BriefDetail = () => {
           onClick={() => setShowProposalsModal(false)}
         >
           <div
-            className={`bg-white rounded-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden relative transition-all ${modalView === "ai"
-              ? "border-2 border-[#14B8A6] ring-4 ring-teal-500/10 shadow-2xl"
-              : "border border-slate-100 shadow-2xl"
-              }`}
+            className={`bg-white rounded-2xl w-full ${
+              modalView === "ai" ? "max-w-2xl" : "max-w-xl"
+            } max-h-[90vh] flex flex-col overflow-hidden relative transition-all ${
+              modalView === "ai"
+                ? "border-2 border-[#0D6D5F]/30 ring-4 ring-[#0D6D5F]/10 shadow-2xl"
+                : "border border-slate-100 shadow-2xl"
+            }`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* MODAL HEADER */}
@@ -1015,20 +1043,26 @@ const BriefDetail = () => {
                 {modalView !== "list" && (
                   <button
                     type="button"
-                    onClick={() => setModalView("list")}
+                    onClick={() => {
+                      if (modalView === "detail") {
+                        setModalView(previousModalView);
+                      } else {
+                        setModalView("list");
+                      }
+                    }}
                     className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-600 transition-colors cursor-pointer mr-1"
-                    title="Back to proposals"
+                    title={modalView === "detail" ? "Back" : "Back to proposals"}
                   >
                     <FiArrowLeft className="text-base" />
                   </button>
                 )}
-                <h2 className={`${modalView === "ai" ? "text-2xl sm:text-[36px]" : "text-lg sm:text-xl"} font-bold text-slate-900 font-sf-pro`}>
+                <h2 className={`${modalView === "ai" ? "text-xl sm:text-2xl" : "text-lg sm:text-xl"} font-bold text-slate-900 font-sf-pro`}>
                   {modalView === "list" && `Proposals (${totalProposalsCount})`}
                   {modalView === "detail" && "Proposal Details"}
                   {modalView === "ai" && (
-                    <span className="inline-flex items-center gap-2 text-2xl sm:text-[36px] font-[590] leading-normal">
-                      <span className="text-slate-900">Recommend by</span>
-                      <span className="bg-[linear-gradient(90deg,#8A38F5_57.88%,#9AFFDA_42.5%,#82C2FD_20%)] bg-clip-text text-transparent [-webkit-text-fill-color:transparent] font-sf-pro text-[36px] font-[590] leading-normal">
+                    <span className="inline-flex items-center gap-2 text-xl sm:text-2xl font-bold leading-normal">
+                      <span className="text-slate-900">Recommended by</span>
+                      <span className="bg-gradient-to-r from-[#0D6D5F] to-[#10b981] bg-clip-text text-transparent [-webkit-text-fill-color:transparent] font-sf-pro font-extrabold text-xl sm:text-2xl">
                         AI
                       </span>
                     </span>
@@ -1061,8 +1095,8 @@ const BriefDetail = () => {
               </div>
             </div>
 
-            {/* MODAL CONTENT: VIEW 1 & VIEW 3 (List / AI Recommendation) */}
-            {(modalView === "list" || modalView === "ai") && (
+            {/* MODAL CONTENT: VIEW 1 (List Proposals) */}
+            {modalView === "list" && (
               <div className="p-5 sm:p-6 overflow-y-auto space-y-4">
                 {displayedProposals.length === 0 ? (
                   <div className="text-center py-16 px-4">
@@ -1079,10 +1113,7 @@ const BriefDetail = () => {
                     return (
                       <div
                         key={item.id}
-                        className={`bg-white border rounded-2xl p-4 sm:p-5 transition-all shadow-2xs ${modalView === "ai"
-                          ? "border-teal-300 ring-2 ring-teal-50 hover:border-teal-400"
-                          : "border-slate-200/90 hover:border-slate-300"
-                          }`}
+                        className="bg-white border rounded-2xl p-4 sm:p-5 transition-all shadow-2xs border-slate-200/90 hover:border-slate-300"
                       >
                         {/* Sender Profile Header */}
                         <div className="flex items-start justify-between gap-3 mb-2">
@@ -1171,6 +1202,7 @@ const BriefDetail = () => {
                           <button
                             type="button"
                             onClick={() => {
+                              setPreviousModalView("list");
                               setSelectedProposal(item);
                               setModalView("detail");
                             }}
@@ -1193,6 +1225,279 @@ const BriefDetail = () => {
                       </div>
                     );
                   })
+                )}
+              </div>
+            )}
+
+            {/* MODAL CONTENT: VIEW 3 (AI Recommendations with Pros & Cons in Current Theme) */}
+            {modalView === "ai" && (
+              <div className="p-5 sm:p-6 overflow-y-auto space-y-4">
+                {aiLoading ? (
+                  <div className="py-16 px-6 text-center flex flex-col items-center justify-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-[#0D6D5F]/10 text-[#0D6D5F] flex items-center justify-center text-2xl animate-pulse">
+                      <HiSparkles />
+                    </div>
+                    <h3 className="text-base font-bold text-slate-900">Workvence AI is evaluating proposals...</h3>
+                    <p className="text-xs text-slate-500 max-w-sm">
+                      Analyzing seller credentials, past performance, proposal details, pricing, and project fit.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Analysis Summary Banner */}
+                    {(aiResult?.summary || aiResult?.recommendation?.summary) && (
+                      <div className="bg-gradient-to-br from-[#0D6D5F]/5 via-[#0D6D5F]/10 to-slate-50/50 border border-[#0D6D5F]/20 rounded-2xl p-4 sm:p-5 shadow-2xs">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F]">
+                              <HiSparkles className="text-base" />
+                            </div>
+                            <h3 className="font-bold text-sm text-slate-900">
+                              AI Evaluation Summary
+                            </h3>
+                          </div>
+                          {(aiResult?.totalProposalsEvaluated || aiRecommendationsList.length > 0) && (
+                            <span className="text-[11px] font-semibold bg-white text-[#0D6D5F] border border-[#0D6D5F]/20 px-2.5 py-0.5 rounded-full shadow-2xs">
+                              {aiResult?.totalProposalsEvaluated || aiRecommendationsList.length} Evaluated
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed font-normal">
+                          {aiResult?.summary || aiResult?.recommendation?.summary}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* AI Recommendations List */}
+                    {aiRecommendationsList.length > 0 ? (
+                      aiRecommendationsList.map((rec: any, index: number) => {
+                        const recProposal = rec.proposal || rec;
+                        const recId = rec.proposalID || recProposal?._id || recProposal?.id || rec.id;
+                        const matched = normalizedProposals.find(
+                          (np: any) => np.id === recId || np.proposal?._id === recId || np.proposal?.id === recId
+                        );
+                        const displayItem = matched || normalizeProposal(recProposal, index, null);
+                        const rank = rec.rank || index + 1;
+                        const score = rec.score !== undefined && rec.score !== null ? rec.score : null;
+                        const pros: string[] = Array.isArray(rec.pros) ? rec.pros : [];
+                        const cons: string[] = Array.isArray(rec.cons) ? rec.cons : [];
+                        const summaryRationale = rec.summaryRationale || "";
+
+                        return (
+                          <div
+                            key={displayItem.id || `ai-rec-${index}`}
+                            className={`bg-white border rounded-2xl p-4 sm:p-5 transition-all shadow-2xs ${
+                              rank === 1
+                                ? "border-[#0D6D5F]/40 ring-2 ring-[#0D6D5F]/10 hover:border-[#0D6D5F]/60"
+                                : "border-slate-200/90 hover:border-slate-300"
+                            }`}
+                          >
+                            {/* Card Top Bar: Rank, Score & Price */}
+                            <div className="flex items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-100">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                {rank === 1 ? (
+                                  <span className="inline-flex items-center gap-1.5 bg-[#0D6D5F] text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-2xs tracking-wide">
+                                    <HiSparkles className="text-xs text-amber-300" />
+                                    #1 Top Match
+                                  </span>
+                                ) : rank === 2 ? (
+                                  <span className="inline-flex items-center gap-1 bg-slate-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">
+                                    #2 Recommendation
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 bg-slate-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">
+                                    #{rank} Recommendation
+                                  </span>
+                                )}
+
+                                {score !== null && (
+                                  <span className="inline-flex items-center gap-1 bg-emerald-50 text-[#0D6D5F] border border-[#0D6D5F]/20 text-[11px] font-bold px-2 py-0.5 rounded-lg">
+                                    Score: {score}/100
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="text-right shrink-0">
+                                <span className="font-bold text-lg sm:text-xl text-[#0D6D5F] font-sf-pro">
+                                  ${displayItem.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Sender Profile Header */}
+                            <div className="flex items-start justify-between gap-3 mb-3">
+                              <div className="flex items-center gap-3 min-w-0">
+                                {displayItem.avatar ? (
+                                  <img
+                                    src={displayItem.avatar}
+                                    alt={displayItem.name}
+                                    className="w-11 h-11 rounded-full object-cover border border-slate-200 shrink-0"
+                                    onError={(e) => {
+                                      (e.currentTarget as HTMLElement).style.display = "none";
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="w-11 h-11 rounded-full bg-[#0D6D5F]/10 text-[#0D6D5F] font-bold text-sm flex items-center justify-center border border-[#0D6D5F]/20 shrink-0 uppercase">
+                                    {displayItem.name.slice(0, 2)}
+                                  </div>
+                                )}
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-bold text-sm text-slate-900 truncate">
+                                      {displayItem.name}
+                                    </span>
+                                    {displayItem.badge && (
+                                      <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
+                                        {displayItem.badge}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                                    {displayItem.tagline && (
+                                      <span className="font-medium text-slate-600 truncate max-w-[180px]">
+                                        {displayItem.tagline}
+                                      </span>
+                                    )}
+                                    {typeof displayItem.rating === "number" && displayItem.rating > 0 && (
+                                      <span className="font-bold text-slate-800 flex items-center gap-0.5">
+                                        <FiStar className="fill-amber-400 text-amber-400 text-xs" />
+                                        {displayItem.rating}
+                                      </span>
+                                    )}
+                                    {typeof displayItem.reviewCount === "number" && displayItem.reviewCount > 0 && (
+                                      <span>({displayItem.reviewCount})</span>
+                                    )}
+                                  </div>
+                                  <p className="text-[11px] text-slate-400 mt-0.5">
+                                    {displayItem.deliveryTime > 0 && (
+                                      <span>{displayItem.deliveryTime} Days Delivery · </span>
+                                    )}
+                                    {displayItem.completedProjects !== null && (
+                                      <span>{displayItem.completedProjects} Projects Completed</span>
+                                    )}
+                                    {displayItem.createdAt && (
+                                      <span>
+                                        {displayItem.completedProjects !== null ? " · " : ""}Submitted {moment(displayItem.createdAt).fromNow()}
+                                      </span>
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* AI Summary Rationale */}
+                            {summaryRationale && (
+                              <div className="mb-3 bg-slate-50 border border-slate-200/80 rounded-xl p-3 text-xs text-slate-700 leading-relaxed">
+                                <span className="font-semibold text-slate-900 block mb-0.5">
+                                  AI Match Analysis:
+                                </span>
+                                {summaryRationale}
+                              </div>
+                            )}
+
+                            {/* PROS AND CONS SECTION (Current Theme) */}
+                            {(pros.length > 0 || cons.length > 0) && (
+                              <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {/* PROS */}
+                                <div className="bg-[#0D6D5F]/5 border border-[#0D6D5F]/20 rounded-xl p-3 sm:p-3.5 flex flex-col">
+                                  <div className="flex items-center gap-1.5 mb-2">
+                                    <div className="w-5 h-5 rounded-full bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F] shrink-0">
+                                      <FiCheck className="text-xs stroke-[2.5]" />
+                                    </div>
+                                    <span className="font-bold text-xs text-[#0D6D5F] tracking-wide uppercase">
+                                      Key Pros
+                                    </span>
+                                  </div>
+                                  {pros.length > 0 ? (
+                                    <ul className="space-y-1.5 text-xs text-slate-700">
+                                      {pros.map((pro: string, pIdx: number) => (
+                                        <li key={pIdx} className="flex items-start gap-2 leading-relaxed">
+                                          <span className="text-[#0D6D5F] font-bold text-xs mt-0.5 shrink-0">✓</span>
+                                          <span>{pro}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="text-xs text-slate-400 italic">No specific pros listed.</p>
+                                  )}
+                                </div>
+
+                                {/* CONS */}
+                                <div className="bg-rose-50/70 border border-rose-200/70 rounded-xl p-3 sm:p-3.5 flex flex-col">
+                                  <div className="flex items-center gap-1.5 mb-2">
+                                    <div className="w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 shrink-0">
+                                      <FiAlertTriangle className="text-xs stroke-[2.5]" />
+                                    </div>
+                                    <span className="font-bold text-xs text-rose-700 tracking-wide uppercase">
+                                      Considerations / Cons
+                                    </span>
+                                  </div>
+                                  {cons.length > 0 ? (
+                                    <ul className="space-y-1.5 text-xs text-slate-700">
+                                      {cons.map((con: string, cIdx: number) => (
+                                        <li key={cIdx} className="flex items-start gap-2 leading-relaxed">
+                                          <span className="text-rose-500 font-bold text-xs mt-0.5 shrink-0">✕</span>
+                                          <span>{con}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="text-xs text-slate-400 italic">No significant risks identified.</p>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Cover Letter Pitch */}
+                            {displayItem.coverLetter && (
+                              <div className="mt-3 pt-2.5 border-t border-slate-100">
+                                <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed font-normal">
+                                  <span className="font-semibold text-slate-800">Cover Letter: </span>
+                                  {displayItem.coverLetter}
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Action Buttons */}
+                            <div className="flex items-center gap-2.5 pt-3 mt-1">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setPreviousModalView("ai");
+                                  setSelectedProposal(displayItem);
+                                  setModalView("detail");
+                                }}
+                                className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors cursor-pointer text-center"
+                              >
+                                View Proposal
+                              </button>
+                              <button
+                                type="button"
+                                disabled={messagingSellerId === displayItem.sellerId}
+                                onClick={() => handleMessageSeller(displayItem.sellerId, displayItem.name)}
+                                className="flex-1 py-2.5 rounded-xl bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs font-semibold transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
+                              >
+                                <span>
+                                  {messagingSellerId === displayItem.sellerId ? "Connecting..." : "Message"}
+                                </span>
+                                <FiArrowRight className="text-xs" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="text-center py-12 px-4">
+                        <div className="w-12 h-12 rounded-full bg-[#0D6D5F]/10 text-[#0D6D5F] flex items-center justify-center text-xl mx-auto mb-3">
+                          <HiSparkles />
+                        </div>
+                        <h3 className="font-bold text-base text-slate-800">No recommendations available</h3>
+                        <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
+                          We could not generate specific recommendations for this project yet.
+                        </p>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )}

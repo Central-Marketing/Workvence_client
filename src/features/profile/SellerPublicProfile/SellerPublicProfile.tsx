@@ -52,9 +52,9 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
         if (sellerId) {
           // 1. Fetch real gigs/packages for the seller
           axiosFetch
-            .get(`/gigs/seller/${username}`)
-            .catch(() => axiosFetch.get(`/gigs?userID=${sellerId}`))
-            .catch(() => axiosFetch.get(`/packages?userID=${sellerId}`))
+            .get(`/gigs/seller/${username}?limit=100`)
+            .catch(() => axiosFetch.get(`/gigs?userID=${sellerId}&limit=100`))
+            .catch(() => axiosFetch.get(`/packages?userID=${sellerId}&limit=100`))
             .then(({ data: gigsRes }) => {
               if (!isMounted) return;
               const gigList = Array.isArray(gigsRes)
@@ -71,7 +71,6 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
             .get(`/reviews/seller/${sellerId}`)
             .catch(() => axiosFetch.get(`/reviews?sellerID=${sellerId}`))
             .catch(() => axiosFetch.get(`/reviews?sellerId=${sellerId}`))
-            .catch(() => axiosFetch.get("/reviews"))
             .then(({ data: revRes }) => {
               if (!isMounted) return;
               const revList = Array.isArray(revRes)
@@ -198,14 +197,16 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
           </div>
         </div>
 
-        {/* 3. Section: Review from the client */}
-        <SellerReviewsSection
-          averageRating={profileData.reviewsData.averageRating}
-          totalReviews={profileData.reviewsData.totalReviews}
-          starDistribution={profileData.reviewsData.starDistribution}
-          categoryScores={profileData.reviewsData.categoryScores}
-          reviews={profileData.reviewsData.list}
-        />
+        {/* 3. Section: Review from the client (Real reviews only) */}
+        {profileData.reviewsData?.list && profileData.reviewsData.list.length > 0 && (
+          <SellerReviewsSection
+            averageRating={profileData.reviewsData.averageRating}
+            totalReviews={profileData.reviewsData.totalReviews}
+            starDistribution={profileData.reviewsData.starDistribution}
+            categoryScores={profileData.reviewsData.categoryScores}
+            reviews={profileData.reviewsData.list}
+          />
+        )}
 
         {/* 4. Section: Frequently asked questions (Real seller/package FAQs only) */}
         {profileData.faqs && profileData.faqs.length > 0 && (

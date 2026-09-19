@@ -34,7 +34,7 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
         }
       );
       if (!response.data.error) {
-        toast.success("Proposal submitted successfully!");
+        toast.success("Proposal submitted successfully!", { id: "proposal-submitted" });
         onSuccess(response.data.proposal || response.data);
         onClose();
       }

@@ -27,11 +27,16 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
   const [expandedResponses, setExpandedResponses] = useState<{ [id: string]: boolean }>({});
   const [visibleCount, setVisibleCount] = useState(2);
 
+  if (!reviews || reviews.length === 0) {
+    return null;
+  }
+
   const toggleResponse = (id: string) => {
     setExpandedResponses((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const displayedReviews = reviews.slice(0, visibleCount);
+  const hasCategoryScores = Boolean(categoryScores?.communication || categoryScores?.quality || categoryScores?.value);
 
   return (
     <div id="section-reviews" className="scroll-mt-36 bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
@@ -50,7 +55,7 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
       {/* 2. Rating Breakdown Summary Grid */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center mb-8 pb-8 border-b border-gray-100">
         {/* Left: Star Distribution Progress Bars */}
-        <div className="md:col-span-7 space-y-2.5">
+        <div className={`${hasCategoryScores ? 'md:col-span-7' : 'md:col-span-12'} space-y-2.5`}>
           {[5, 4, 3, 2, 1].map((star) => {
             const percentage = starDistribution[star] || 0;
             return (
@@ -68,46 +73,47 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
         </div>
 
         {/* Right: Sub-scores Breakdown */}
-        <div className="md:col-span-5 md:border-l md:border-gray-100 md:pl-8 space-y-3 font-sf-pro">
-          <h3 className="text-sm font-bold text-gray-900 mb-3">
-            Rating Breakdown
-          </h3>
+        {hasCategoryScores && (
+          <div className="md:col-span-5 md:border-l md:border-gray-100 md:pl-8 space-y-3 font-sf-pro">
+            <h3 className="text-sm font-bold text-gray-900 mb-3">
+              Rating Breakdown
+            </h3>
 
-          <div className="flex items-center justify-between text-xs text-gray-600">
-            <span>Seller communication level</span>
-            <div className="flex items-center gap-1 font-bold text-gray-900">
-              <span>{categoryScores.communication}</span>
-              <FaStar className="w-3 h-3 text-[#F5B400] fill-[#F5B400]" />
-            </div>
-          </div>
+            {categoryScores.communication && (
+              <div className="flex items-center justify-between text-xs text-gray-600">
+                <span>Seller communication level</span>
+                <div className="flex items-center gap-1 font-bold text-gray-900">
+                  <span>{categoryScores.communication}</span>
+                  <FaStar className="w-3 h-3 text-[#F5B400] fill-[#F5B400]" />
+                </div>
+              </div>
+            )}
 
-          <div className="flex items-center justify-between text-xs text-gray-600">
-            <span>Quality of delivery</span>
-            <div className="flex items-center gap-1 font-bold text-gray-900">
-              <span>{categoryScores.quality}</span>
-              <FaStar className="w-3 h-3 text-[#F5B400] fill-[#F5B400]" />
-            </div>
-          </div>
+            {categoryScores.quality && (
+              <div className="flex items-center justify-between text-xs text-gray-600">
+                <span>Quality of delivery</span>
+                <div className="flex items-center gap-1 font-bold text-gray-900">
+                  <span>{categoryScores.quality}</span>
+                  <FaStar className="w-3 h-3 text-[#F5B400] fill-[#F5B400]" />
+                </div>
+              </div>
+            )}
 
-          <div className="flex items-center justify-between text-xs text-gray-600">
-            <span>Value of delivery</span>
-            <div className="flex items-center gap-1 font-bold text-gray-900">
-              <span>{categoryScores.value}</span>
-              <FaStar className="w-3 h-3 text-[#F5B400] fill-[#F5B400]" />
-            </div>
+            {categoryScores.value && (
+              <div className="flex items-center justify-between text-xs text-gray-600">
+                <span>Value of delivery</span>
+                <div className="flex items-center gap-1 font-bold text-gray-900">
+                  <span>{categoryScores.value}</span>
+                  <FaStar className="w-3 h-3 text-[#F5B400] fill-[#F5B400]" />
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+        )}
       </div>
 
       {/* 3. Client Reviews List */}
-      {reviews.length === 0 ? (
-        <div className="bg-[#FBFBFB] border border-gray-100 rounded-xl p-8 sm:p-10 text-center">
-          <p className="text-sm font-sf-pro text-gray-500 max-w-md mx-auto">
-            No client reviews yet. Reviews and ratings will appear here once orders are completed.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
+      <div className="space-y-4">
         {displayedReviews.map((rev) => {
           const isRespOpen = expandedResponses[rev.id] ?? false;
 
@@ -120,11 +126,11 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
                 {/* Reviewer Details */}
                 <div className="flex items-start gap-3.5 flex-1">
                   <img
-                    src={rev.buyerAvatar || SELLER_FALLBACK_IMAGES.reviewerAvatar}
+                    src={rev.buyerAvatar || "/images/mock-package/avatar-seller.png"}
                     alt={rev.buyerName}
-                    className="w-10 h-10 rounded-full object-cover border border-gray-200 shrink-0"
+                    className="w-10 h-10 rounded-full object-cover border border-gray-200 shrink-0 bg-gray-100"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = SELLER_FALLBACK_IMAGES.reviewerAvatar;
+                      (e.target as HTMLImageElement).src = "/images/mock-package/avatar-seller.png";
                     }}
                   />
 
@@ -140,25 +146,33 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500 font-sf-pro">
-                      {rev.countryFlag?.startsWith("http") || rev.countryFlag?.startsWith("/") ? (
-                        <img src={rev.countryFlag} alt="" className="w-4 h-2.5 object-contain inline-block" />
-                      ) : (
-                        <span>{rev.countryFlag}</span>
-                      )}
-                      <span>{rev.country}</span>
-                    </div>
+                    {rev.country && (
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 font-sf-pro">
+                        {rev.countryFlag && (
+                          rev.countryFlag.startsWith("http") || rev.countryFlag.startsWith("/") ? (
+                            <img src={rev.countryFlag} alt="" className="w-4 h-2.5 object-contain inline-block" />
+                          ) : (
+                            <span>{rev.countryFlag}</span>
+                          )
+                        )}
+                        <span>{rev.country}</span>
+                      </div>
+                    )}
 
                     <div className="flex items-center gap-1.5 text-xs text-gray-500 font-sf-pro">
                       <span className="font-bold text-gray-900">{rev.rating.toFixed(1)}</span>
                       <FaStar className="w-3 h-3 text-[#F5B400] fill-[#F5B400]" />
-                      <span className="text-gray-400">·</span>
-                      <span className="text-gray-400">{rev.dateText}</span>
+                      {rev.dateText && (
+                        <>
+                          <span className="text-gray-400">·</span>
+                          <span className="text-gray-400">{rev.dateText}</span>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
 
-                {/* Right Project Thumbnail (LUNAR) */}
+                {/* Right Project Thumbnail */}
                 {rev.projectImage && (
                   <div className="w-24 sm:w-28 aspect-[16/10] rounded-lg overflow-hidden border border-gray-200 shrink-0 bg-gray-950 shadow-2xs">
                     <img
@@ -166,7 +180,8 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
                       alt="Reviewed project"
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = SELLER_FALLBACK_IMAGES.reviewLunar;
+                        const parent = (e.target as HTMLElement).parentElement;
+                        if (parent) parent.style.display = "none";
                       }}
                     />
                   </div>
@@ -174,24 +189,32 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
               </div>
 
               {/* Review Text */}
-              <p className="text-sm text-gray-700 leading-relaxed font-normal my-4 font-sf-pro">
-                {rev.reviewText}
-              </p>
+              {rev.reviewText && (
+                <p className="text-sm text-gray-700 leading-relaxed font-normal my-4 font-sf-pro">
+                  {rev.reviewText}
+                </p>
+              )}
 
               {/* Price & Duration Chips */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-white border border-gray-200/80 rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs shadow-2xs">
-                  <FiTag className="w-3.5 h-3.5 text-teal-600" />
-                  <span className="text-gray-400">Price</span>
-                  <span className="font-bold text-gray-900">{rev.projectPrice}</span>
-                </div>
+              {(rev.projectPrice || rev.projectDuration) && (
+                <div className="flex items-center gap-3 mb-4">
+                  {rev.projectPrice && (
+                    <div className="bg-white border border-gray-200/80 rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs shadow-2xs">
+                      <FiTag className="w-3.5 h-3.5 text-teal-600" />
+                      <span className="text-gray-400">Price</span>
+                      <span className="font-bold text-gray-900">{rev.projectPrice}</span>
+                    </div>
+                  )}
 
-                <div className="bg-white border border-gray-200/80 rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs shadow-2xs">
-                  <FiCalendar className="w-3.5 h-3.5 text-purple-600" />
-                  <span className="text-gray-400">Duration</span>
-                  <span className="font-bold text-gray-900">{rev.projectDuration}</span>
+                  {rev.projectDuration && (
+                    <div className="bg-white border border-gray-200/80 rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs shadow-2xs">
+                      <FiCalendar className="w-3.5 h-3.5 text-purple-600" />
+                      <span className="text-gray-400">Duration</span>
+                      <span className="font-bold text-gray-900">{rev.projectDuration}</span>
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
 
               {/* Collapsible Seller Response */}
               {rev.sellerResponse && (
@@ -221,8 +244,7 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
             </div>
           );
         })}
-        </div>
-      )}
+      </div>
 
       {/* 4. Show More Reviews Button */}
       {reviews.length > visibleCount && (

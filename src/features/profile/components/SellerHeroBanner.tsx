@@ -101,13 +101,15 @@ export const SellerHeroBanner: React.FC<SellerHeroBannerProps> = ({
           </div>
 
           <div className="flex items-center gap-2 text-sm text-gray-500 mt-1 font-sf-pro">
-            <span className="text-gray-700 font-medium">{role}</span>
-            <span className="text-gray-300">·</span>
-            <div className="flex items-center gap-1 font-semibold text-gray-900">
-              <span>{rating.toFixed(1)}</span>
-              <FaStar className="w-3.5 h-3.5 text-[#F5B400] fill-[#F5B400]" />
-              <span className="text-gray-400 font-normal">({reviewCount})</span>
-            </div>
+            {role && <span className="text-gray-700 font-medium">{role}</span>}
+            {role && reviewCount > 0 && <span className="text-gray-300">·</span>}
+            {reviewCount > 0 && (
+              <div className="flex items-center gap-1 font-semibold text-gray-900">
+                <span>{rating.toFixed(1)}</span>
+                <FaStar className="w-3.5 h-3.5 text-[#F5B400] fill-[#F5B400]" />
+                <span className="text-gray-400 font-normal">({reviewCount})</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

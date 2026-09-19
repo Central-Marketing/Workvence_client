@@ -10,6 +10,8 @@ import toast from "react-hot-toast";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader } from "@/components";
+import { FiCheck, FiAlertTriangle, FiStar } from "react-icons/fi";
+import { HiSparkles } from "react-icons/hi2";
 
 const Proposals = () => {
   const router = useRouter();
@@ -95,10 +97,10 @@ const Proposals = () => {
   });
 
   const getRankBadgeClasses = (index: number) => {
-    if (index === 0) return "bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-xs";
-    if (index === 1) return "bg-gradient-to-br from-slate-400 to-slate-500 text-white shadow-xs";
-    if (index === 2) return "bg-gradient-to-br from-amber-700 to-amber-800 text-white shadow-xs";
-    return "bg-slate-200 text-slate-600";
+    if (index === 0) return "bg-[#0D6D5F] text-white shadow-xs";
+    if (index === 1) return "bg-slate-700 text-white shadow-xs";
+    if (index === 2) return "bg-slate-500 text-white shadow-xs";
+    return "bg-slate-200 text-slate-700";
   };
 
   return (
@@ -118,44 +120,53 @@ const Proposals = () => {
           {proposals.length >= 1 && (
             <button
               type="button"
-              className="py-2.5 px-5 rounded-lg font-semibold text-sm bg-gradient-to-r from-indigo-500 to-violet-600 hover:brightness-95 text-white border-none transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+              className="py-2.5 px-5 rounded-xl font-semibold text-sm bg-[#0D6D5F] hover:bg-[#0b5c50] text-white border-none transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => aiMutation.mutate()}
               disabled={aiMutation.isPending}
             >
-              ✨{" "}
-              {aiMutation.isPending
-                ? "Analyzing..."
-                : "Get AI Recommendations"}
+              <HiSparkles className="text-base text-amber-300" />
+              <span>{aiMutation.isPending ? "Analyzing..." : "Get AI Recommendations"}</span>
             </button>
           )}
         </div>
 
         {/* AI Loading */}
         {aiMutation.isPending && (
-          <div className="bg-white border-2 border-indigo-100 rounded-xl p-10 sm:p-12 text-center flex flex-col items-center gap-4 shadow-xs">
-            <div className="text-4xl animate-pulse">✨</div>
+          <div className="bg-white border-2 border-[#0D6D5F]/20 rounded-xl p-10 sm:p-12 text-center flex flex-col items-center gap-4 shadow-xs">
+            <div className="w-12 h-12 rounded-full bg-[#0D6D5F]/10 text-[#0D6D5F] flex items-center justify-center text-2xl animate-pulse">
+              <HiSparkles />
+            </div>
             <h3 className="text-lg font-bold text-slate-900">Workvence AI is evaluating proposals...</h3>
             <p className="text-slate-500 text-sm">Ranking sellers based on skills, experience, and fit</p>
             <div className="flex gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce" />
-              <span className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce [animation-delay:0.16s]" />
-              <span className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce [animation-delay:0.32s]" />
+              <span className="w-2 h-2 rounded-full bg-[#0D6D5F] animate-bounce" />
+              <span className="w-2 h-2 rounded-full bg-[#0D6D5F] animate-bounce [animation-delay:0.16s]" />
+              <span className="w-2 h-2 rounded-full bg-[#0D6D5F] animate-bounce [animation-delay:0.32s]" />
             </div>
           </div>
         )}
 
         {/* AI Recommendation Results */}
         {aiResult && !aiMutation.isPending && (
-          <div className="bg-white border-2 border-indigo-200 rounded-xl shadow-xs overflow-hidden">
-            <div className="bg-gradient-to-r from-indigo-50/60 to-violet-50/60 p-5 px-6 sm:px-8 border-b border-indigo-100 flex items-center gap-2.5">
-              <span className="text-2xl">🤖</span>
-              <h2 className="text-lg font-bold text-slate-900">AI Top 3 Recommendations</h2>
+          <div className="bg-white border border-[#0D6D5F]/25 rounded-2xl shadow-xs overflow-hidden">
+            <div className="bg-gradient-to-r from-[#0D6D5F]/10 via-[#0D6D5F]/5 to-transparent p-5 px-6 sm:px-8 border-b border-[#0D6D5F]/15 flex items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F]">
+                  <HiSparkles className="text-lg" />
+                </div>
+                <h2 className="text-lg font-bold text-slate-900">AI Top Recommendations</h2>
+              </div>
+              {(aiResult.totalProposalsEvaluated || (Array.isArray(aiResult?.top3Recommendations) && aiResult.top3Recommendations.length > 0)) && (
+                <span className="text-xs font-semibold bg-white text-[#0D6D5F] border border-[#0D6D5F]/20 px-3 py-1 rounded-full shadow-2xs">
+                  {aiResult.totalProposalsEvaluated || aiResult.top3Recommendations?.length} Proposals Evaluated
+                </span>
+              )}
             </div>
 
-            {aiResult.summary && (
-              <div className="p-5 px-6 sm:px-8 border-b border-slate-100">
-                <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Analysis Summary</h4>
-                <p className="text-sm text-slate-700 leading-relaxed">{aiResult.summary}</p>
+            {(aiResult.summary || aiResult.recommendation?.summary) && (
+              <div className="p-5 px-6 sm:px-8 border-b border-slate-100 bg-[#0D6D5F]/[0.02]">
+                <h4 className="text-xs font-bold text-[#0D6D5F] uppercase tracking-wider mb-2">Analysis Summary</h4>
+                <p className="text-sm text-slate-700 leading-relaxed font-normal">{aiResult.summary || aiResult.recommendation?.summary}</p>
               </div>
             )}
 
@@ -163,7 +174,7 @@ const Proposals = () => {
               <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ranked Proposals</h4>
               {(Array.isArray(aiResult)
                 ? aiResult
-                : (aiResult?.top3Recommendations || aiResult?.topProposals || aiResult?.recommendations || aiResult?.data || [])
+                : (aiResult?.top3Recommendations || aiResult?.recommendation?.top3 || aiResult?.topProposals || aiResult?.recommendations || aiResult?.data || [])
               ).map((item: any, index: number) => {
                   const proposal = item.proposal || item;
                   const seller = typeof proposal.sellerID === 'object' && proposal.sellerID !== null 
@@ -175,8 +186,8 @@ const Proposals = () => {
                   return (
                     <div
                       key={proposal._id || index}
-                      className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border transition-all ${
-                        index === 0 ? "border-indigo-200 bg-indigo-50/30 hover:border-indigo-300" : "border-slate-200 bg-slate-50 hover:border-indigo-300"
+                      className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 rounded-2xl border transition-all ${
+                        index === 0 ? "border-[#0D6D5F]/40 ring-2 ring-[#0D6D5F]/10 bg-white" : "border-slate-200 bg-white hover:border-slate-300"
                       }`}
                     >
                       <div
@@ -187,34 +198,54 @@ const Proposals = () => {
                       <div className="flex-1 min-w-0">
                         <div className="text-[15px] font-bold text-slate-900 mb-0.5 flex items-center gap-2">
                           <span>{seller.username || "Seller"}</span>
-                          {item.score && (
-                            <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[11px] font-bold tracking-wide">
+                          {item.score !== undefined && item.score !== null && (
+                            <span className="bg-emerald-50 text-[#0D6D5F] border border-[#0D6D5F]/20 px-2 py-0.5 rounded text-[11px] font-bold tracking-wide">
                               Score: {item.score}/100
                             </span>
                           )}
                         </div>
                         <div className="text-xs text-slate-500">
-                          {proposal.price && `$${proposal.price}`}
+                          {proposal.price && `$${Number(proposal.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}`}
                           {proposal.deliveryTime &&
                             ` · ${proposal.deliveryTime} days`}
                           {item.summaryRationale && ` — ${item.summaryRationale}`}
                         </div>
                         
-                        {(item.pros || item.cons) && (
-                          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        {(item.pros?.length > 0 || item.cons?.length > 0) && (
+                          <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                             {item.pros && item.pros.length > 0 && (
-                              <div className="bg-emerald-50 p-2.5 rounded-lg border border-emerald-100">
-                                <span className="font-bold text-emerald-700 block mb-1 text-xs">✅ Pros</span>
-                                <ul className="list-disc pl-4 text-emerald-800 text-xs space-y-1">
-                                  {item.pros.map((pro: string, i: number) => <li key={i}>{pro}</li>)}
+                              <div className="bg-[#0D6D5F]/5 p-3 rounded-xl border border-[#0D6D5F]/20">
+                                <div className="flex items-center gap-1.5 mb-1.5">
+                                  <div className="w-4 h-4 rounded-full bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F] shrink-0">
+                                    <FiCheck className="text-[10px] stroke-[2.5]" />
+                                  </div>
+                                  <span className="font-bold text-[#0D6D5F] text-xs uppercase tracking-wide">Pros</span>
+                                </div>
+                                <ul className="space-y-1 text-slate-700 text-xs">
+                                  {item.pros.map((pro: string, i: number) => (
+                                    <li key={i} className="flex items-start gap-1.5 leading-relaxed">
+                                      <span className="text-[#0D6D5F] font-bold text-xs shrink-0">✓</span>
+                                      <span>{pro}</span>
+                                    </li>
+                                  ))}
                                 </ul>
                               </div>
                             )}
                             {item.cons && item.cons.length > 0 && (
-                              <div className="bg-rose-50 p-2.5 rounded-lg border border-rose-100">
-                                <span className="font-bold text-rose-700 block mb-1 text-xs">⚠️ Cons</span>
-                                <ul className="list-disc pl-4 text-rose-800 text-xs space-y-1">
-                                  {item.cons.map((con: string, i: number) => <li key={i}>{con}</li>)}
+                              <div className="bg-rose-50/70 p-3 rounded-xl border border-rose-200/70">
+                                <div className="flex items-center gap-1.5 mb-1.5">
+                                  <div className="w-4 h-4 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 shrink-0">
+                                    <FiAlertTriangle className="text-[10px] stroke-[2.5]" />
+                                  </div>
+                                  <span className="font-bold text-rose-700 text-xs uppercase tracking-wide">Cons</span>
+                                </div>
+                                <ul className="space-y-1 text-slate-700 text-xs">
+                                  {item.cons.map((con: string, i: number) => (
+                                    <li key={i} className="flex items-start gap-1.5 leading-relaxed">
+                                      <span className="text-rose-500 font-bold text-xs shrink-0">✕</span>
+                                      <span>{con}</span>
+                                    </li>
+                                  ))}
                                 </ul>
                               </div>
                             )}
@@ -223,7 +254,7 @@ const Proposals = () => {
                       </div>
                       <button
                         type="button"
-                        className="py-2 px-4.5 rounded-lg text-xs font-semibold bg-emerald-500 hover:bg-emerald-600 text-white transition-colors cursor-pointer whitespace-nowrap shadow-xs disabled:opacity-50 disabled:cursor-not-allowed self-end sm:self-center"
+                        className="py-2.5 px-5 rounded-xl text-xs font-semibold bg-[#0D6D5F] hover:bg-[#0b5c50] text-white transition-colors cursor-pointer whitespace-nowrap shadow-xs disabled:opacity-50 disabled:cursor-not-allowed self-end sm:self-center"
                         onClick={() =>
                           chatMutation.mutate({ proposalId: proposal._id, sellerId: targetSellerId, sellerUsername: seller.username })
                         }

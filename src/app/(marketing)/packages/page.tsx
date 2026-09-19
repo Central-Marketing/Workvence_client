@@ -126,7 +126,7 @@ const Packages = () => {
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
   const [page, setPage] = useState(initialPage);
   const [viewTab, setViewTab] = useState<'hub' | 'gigs'>(
-    (initialSearch || initialMin || initialMax || initialDeliveryDays || initialLegacySubcat || initialLegacyTag) ? 'gigs' : 'hub'
+    (initialSearch || initialMin || initialMax || initialDeliveryDays || initialLegacySubcat || initialLegacyTag || initialParams.get('view') === 'gigs') ? 'gigs' : 'hub'
   );
 
   // Additional sidebar & tag filter states
@@ -468,7 +468,7 @@ const Packages = () => {
   }, [headerSubcatNode, rootTaxonomy, categoryAncestry, activeSubcategory]);
 
   const isSubcategoryMode = Boolean(
-    (currentTaxonomy || categoryAncestry.length > 1) &&
+    categoryAncestry.length > 1 &&
     activeCategory !== 'All services' &&
     viewTab === 'gigs' &&
     resolvedSubcategoryHeaderItem
@@ -484,6 +484,7 @@ const Packages = () => {
     const currentDelivery = overrides.deliveryDays !== undefined ? overrides.deliveryDays : deliveryDays;
     const currentSort = overrides.sortBy !== undefined ? overrides.sortBy : sortBy;
     const currentPage = overrides.page !== undefined ? overrides.page : (overrides.resetPage ? 1 : page);
+    const targetView = overrides.view !== undefined ? overrides.view : (overrides.viewTab !== undefined ? overrides.viewTab : viewTab);
 
     if (currentSearch && currentSearch.trim()) params.set('search', currentSearch.trim());
     if (rawCat && rawCat !== 'All services' && rawCat !== 'Results') {
@@ -493,6 +494,7 @@ const Packages = () => {
     if (currentMax) params.set('max', currentMax);
     if (currentDelivery) params.set('deliveryDays', currentDelivery);
     if (currentSort && currentSort !== 'recommended') params.set('sort', currentSort);
+    if (targetView === 'gigs') params.set('view', 'gigs');
     if (currentPage > 1) params.set('page', currentPage.toString());
 
     navigate.push(`/packages?${params.toString()}`, { scroll: false });
@@ -512,7 +514,7 @@ const Packages = () => {
       setActiveCategory('AI Services');
       setFilterCategory('ai-services');
       setViewTab('gigs');
-      syncUrlWithFilters({ category: 'ai-services', searchVal: '' });
+      syncUrlWithFilters({ category: 'ai-services', searchVal: '', view: 'gigs' });
     } else {
       const target = name || slug;
       setActiveCategory(target);
@@ -521,10 +523,11 @@ const Packages = () => {
       const ancestry = getCategoryAncestry(target);
       if (ancestry.length <= 1) {
         setViewTab('hub');
+        syncUrlWithFilters({ category: target, searchVal: '', resetPage: true, view: 'hub' });
       } else {
         setViewTab('gigs');
+        syncUrlWithFilters({ category: target, searchVal: '', resetPage: true, view: 'gigs' });
       }
-      syncUrlWithFilters({ category: target, searchVal: '', resetPage: true });
     }
   };
 
@@ -534,7 +537,7 @@ const Packages = () => {
     setFilterCategory(target);
     setSearchVal('');
     setViewTab('gigs');
-    syncUrlWithFilters({ category: target, searchVal: '', resetPage: true });
+    syncUrlWithFilters({ category: target, searchVal: '', resetPage: true, view: 'gigs' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -544,7 +547,7 @@ const Packages = () => {
     setFilterCategory(target);
     setSearchVal('');
     setViewTab('gigs');
-    syncUrlWithFilters({ category: target, searchVal: '', resetPage: true });
+    syncUrlWithFilters({ category: target, searchVal: '', resetPage: true, view: 'gigs' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -820,7 +823,7 @@ const Packages = () => {
                   type="button"
                   onClick={() => {
                     setViewTab('gigs');
-                    syncUrlWithFilters({ resetPage: true });
+                    syncUrlWithFilters({ view: 'gigs', resetPage: true });
                   }}
                   className="inline-flex items-center gap-2 text-sm font-semibold text-brand-green hover:underline cursor-pointer group self-start sm:self-auto"
                 >
@@ -830,7 +833,7 @@ const Packages = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-                {packagesList.slice(0, 8).map((pkg: any, idx: number) => (
+                {packagesList.map((pkg: any, idx: number) => (
                   <PackageCard key={pkg._id || pkg.id || idx} data={pkg} priority={idx < 4} />
                 ))}
               </div>
@@ -846,7 +849,7 @@ const Packages = () => {
             </div>
           )}
         </div>
-      ) : ((currentTaxonomy || categoryAncestry.length > 1) && activeCategory !== 'All services' && viewTab === 'gigs' && resolvedSubcategoryHeaderItem) ? (
+      ) : (categoryAncestry.length > 1 && activeCategory !== 'All services' && viewTab === 'gigs' && resolvedSubcategoryHeaderItem) ? (
         /* Subcategory / Niche Services View */
         <div className="container mx-auto py-6 sm:py-8 animate-fadeIn">
           {/* 1. Subcategory Header: Breadcrumbs, Title with Chevron Dropdown, Subtitle */}
@@ -1058,7 +1061,7 @@ const Packages = () => {
                     type="button"
                     onClick={() => {
                       setViewTab('hub');
-                      syncUrlWithFilters({ category: categoryAncestry[0].name || categoryAncestry[0].slug });
+                      syncUrlWithFilters({ category: categoryAncestry[0].name || categoryAncestry[0].slug, view: 'hub' });
                     }}
                     className="inline-flex items-center gap-1 text-xs text-brand-green hover:underline font-semibold ml-2 cursor-pointer"
                   >

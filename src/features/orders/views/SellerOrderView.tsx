@@ -20,6 +20,7 @@ import {
   FiStar,
   FiShield,
   FiCheckCircle,
+  FiArrowRight,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
@@ -28,6 +29,7 @@ import { ExtensionModal } from "@/components";
 import { NormalizedOrder } from "../types";
 import { OrderTimelineStepper } from "../components/OrderTimelineStepper";
 import { OrderDeliverablesList } from "../components/OrderDeliverablesList";
+import { OrderActivityLedgerDrawer } from "../components/OrderActivityLedgerDrawer";
 
 interface SellerOrderViewProps {
   order: NormalizedOrder;
@@ -42,6 +44,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
   const [isExtensionLoading, setIsExtensionLoading] = useState(false);
   const [isRespondingExtension, setIsRespondingExtension] = useState(false);
   const [showDeliverModal, setShowDeliverModal] = useState(false);
+  const [isLedgerOpen, setIsLedgerOpen] = useState(false);
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState<Array<{ name: string; size: string; url: string }>>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -51,6 +54,29 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
 
   // Dynamic countdown
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, seconds: 0 });
+
+  // Lock body scroll when ledger drawer is open
+  useEffect(() => {
+    if (isLedgerOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isLedgerOpen]);
+
+  // Handle ESC key to close drawer
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isLedgerOpen) {
+        setIsLedgerOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isLedgerOpen]);
 
   useEffect(() => {
     let targetTime: number | null = null;
@@ -326,10 +352,20 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             <span className="text-slate-800 font-semibold font-mono">Order #{order.orderCode}</span>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Seller Workspace
-          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsLedgerOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors cursor-pointer"
+            >
+              <FiClock className="text-emerald-600 text-xs" />
+              <span>Escrow Ledger</span>
+            </button>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Seller Workspace
+            </span>
+          </div>
         </div>
 
         {/* Order Main Title */}
@@ -346,16 +382,16 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
               <div className="flex items-center gap-2.5">
                 <span
                   className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${isDisputed
-                      ? "bg-amber-100 text-amber-900 border border-amber-300"
-                      : isCancelled
-                        ? "bg-rose-100 text-rose-800 border border-rose-200"
-                        : isCompleted
-                          ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                          : isDelivered
-                            ? "bg-teal-100 text-teal-800 border border-teal-200"
-                            : isLate
-                              ? "bg-rose-100 text-rose-800 border border-rose-200"
-                              : "bg-blue-100 text-blue-800 border border-blue-200"
+                    ? "bg-amber-100 text-amber-900 border border-amber-300"
+                    : isCancelled
+                      ? "bg-rose-100 text-rose-800 border border-rose-200"
+                      : isCompleted
+                        ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                        : isDelivered
+                          ? "bg-teal-100 text-teal-800 border border-teal-200"
+                          : isLate
+                            ? "bg-rose-100 text-rose-800 border border-rose-200"
+                            : "bg-blue-100 text-blue-800 border border-blue-200"
                     }`}
                 >
                   {isDisputed ? "Disputed" : isCancelled ? "Cancelled" : order.status}
@@ -748,133 +784,32 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             {/* CARD 3: Order Activity Timeline Stepper */}
             <OrderTimelineStepper order={order} />
 
-            {/* CARD 4: Order Activity & Escrow Ledger */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-7">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                    <FiClock />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-base text-slate-900">Order Activity &amp; Escrow Ledger</h3>
-                    <p className="text-xs text-slate-400">Chronological statement of escrow events and order status updates</p>
-                  </div>
+            {/* CARD 4: Order Activity & Escrow Ledger Trigger Card */}
+            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start sm:items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100 shadow-2xs">
+                  <FiClock className="text-xl" />
                 </div>
-                <span className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
-                  Escrow Protected
-                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-base text-slate-900">Order Activity &amp; Escrow Ledger</h3>
+                    <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
+                      Escrow Protected
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Chronological statement of escrow events, payment milestones, and order status updates
+                  </p>
+                </div>
               </div>
-
-              <div className="space-y-3">
-                {order.raw?.history && order.raw.history.length > 0 ? (
-                  order.raw.history.map((item: any, index: number) => {
-                    let icon = "📌";
-                    if (item.action === "ORDER_CREATED") icon = "💰";
-                    if (item.action === "EXTENSION_REQUESTED" || item.action === "EXTENSION_RESPONDED") icon = "⏳";
-                    if (item.action === "WORK_DELIVERED" || item.action === "DELIVERY_SUBMITTED") icon = "📦";
-                    if (item.action === "REVISION_REQUESTED") icon = "⚠️";
-                    if (item.action === "ORDER_COMPLETED" || item.action === "ORDER_ACCEPTED") icon = "✓";
-
-                    return (
-                      <div
-                        key={item._id || index}
-                        className="p-4 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col sm:flex-row sm:items-start justify-between gap-2"
-                      >
-                        <div className="flex items-start gap-2.5">
-                          <span className="text-base mt-0.5">{icon}</span>
-                          <div>
-                            <p className="font-bold text-xs sm:text-sm text-slate-900">{item.note || item.action}</p>
-                            {item.details && <p className="text-xs text-slate-500 mt-0.5">{item.details}</p>}
-                          </div>
-                        </div>
-                        <span className="text-[11px] text-slate-400 font-mono shrink-0">
-                          {moment(item.timestamp).format("MMM DD, YYYY · hh:mm A")}
-                        </span>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <>
-                    {/* Event 1: Escrow payment secured */}
-                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/70 flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                      <div className="flex items-start gap-2.5">
-                        <span className="text-base mt-0.5">💰</span>
-                        <div>
-                          <p className="font-bold text-xs sm:text-sm text-slate-900">
-                            Escrow Payment Secured
-                          </p>
-                          <p className="text-xs text-slate-500 mt-0.5">
-                            Stripe confirmed gross payment of <strong className="text-slate-800">${order.price.toFixed(2)}</strong> secured in Workvence Escrow.
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-[11px] text-slate-400 font-mono shrink-0">
-                        {order.raw?.createdAt ? moment(order.raw.createdAt).format("MMM DD, YYYY · hh:mm A") : order.startedOn}
-                      </span>
-                    </div>
-
-                    {/* Event 2: Work Delivered */}
-                    {(order.deliveryFiles.length > 0 || isDelivered || isCompleted || Boolean(order.revisionReason)) && (
-                      <div className="p-4 rounded-xl bg-teal-50/50 border border-teal-200/70 flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                        <div className="flex items-start gap-2.5">
-                          <span className="text-base mt-0.5">📦</span>
-                          <div>
-                            <p className="font-bold text-xs sm:text-sm text-teal-950">
-                              Work Delivered
-                            </p>
-                            <p className="text-xs text-teal-800 mt-0.5">
-                              Seller submitted delivery statement and work files for client inspection.
-                            </p>
-                          </div>
-                        </div>
-                        <span className="text-[11px] text-teal-700 font-mono shrink-0">
-                          {order.raw?.updatedAt ? moment(order.raw.updatedAt).format("MMM DD, YYYY · hh:mm A") : "Delivered"}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Event 3: Revision Requested */}
-                    {order.revisionReason && (
-                      <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200/80 flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                        <div className="flex items-start gap-2.5">
-                          <span className="text-base mt-0.5">⚠️</span>
-                          <div>
-                            <p className="font-bold text-xs sm:text-sm text-amber-950">
-                              Revision Requested
-                            </p>
-                            <p className="text-xs text-amber-800 mt-0.5">
-                              Buyer requested modifications: "{order.revisionReason}"
-                            </p>
-                          </div>
-                        </div>
-                        <span className="text-[11px] text-amber-700 font-mono shrink-0">
-                          {order.raw?.updatedAt ? moment(order.raw.updatedAt).format("MMM DD, YYYY · hh:mm A") : "In Revision"}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Event 4: Escrow Cleared / Order Completed */}
-                    {isCompleted && (
-                      <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200/80 flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                        <div className="flex items-start gap-2.5">
-                          <span className="text-base mt-0.5">✓</span>
-                          <div>
-                            <p className="font-bold text-xs sm:text-sm text-emerald-950">
-                              Escrow Cleared · Order Accepted
-                            </p>
-                            <p className="text-xs text-emerald-800 mt-0.5">
-                              Buyer accepted deliverables. Net funds of <strong className="text-emerald-900">${netEarnings}</strong> released to seller's balance statement.
-                            </p>
-                          </div>
-                        </div>
-                        <span className="text-[11px] text-emerald-700 font-mono shrink-0">
-                          {order.raw?.updatedAt ? moment(order.raw.updatedAt).format("MMM DD, YYYY · hh:mm A") : "Completed"}
-                        </span>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+              <button
+                type="button"
+                onClick={() => setIsLedgerOpen(true)}
+                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer shrink-0"
+              >
+                <span>View Full Ledger</span>
+                <FiArrowRight className="text-sm" />
+              </button>
             </div>
 
           </div>
@@ -997,6 +932,15 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   )}
                 </div>
               </div>
+
+              <button
+                type="button"
+                onClick={() => setIsLedgerOpen(true)}
+                className="mt-4 w-full py-2.5 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <FiClock className="text-emerald-600 text-sm" />
+                <span>View Escrow Ledger</span>
+              </button>
 
               {/* Delivery Duration & Dates */}
               <div className="pt-4 space-y-2 text-xs text-slate-600">
@@ -1146,6 +1090,13 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
         isLoading={isExtensionLoading}
         onClose={() => setIsExtensionModalOpen(false)}
         onSubmit={handleRequestExtension}
+      />
+
+      {/* ORDER ACTIVITY & ESCROW LEDGER SLIDE-OVER DRAWER */}
+      <OrderActivityLedgerDrawer
+        isOpen={isLedgerOpen}
+        onClose={() => setIsLedgerOpen(false)}
+        order={order}
       />
     </div>
   );

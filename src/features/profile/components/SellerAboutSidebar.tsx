@@ -20,7 +20,7 @@ interface SellerAboutSidebarProps {
 
 export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
   name,
-  memberSince = "2009",
+  memberSince,
   bio,
   country,
   responseTime,
@@ -40,9 +40,11 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
           <h2 className="text-xl sm:text-2xl font-bold font-sf-pro text-gray-900 tracking-tight">
             About this seller
           </h2>
-          <span className="text-xs font-medium font-sf-pro text-gray-600 bg-white/90 border border-gray-200/90 px-3 py-1 rounded-md shadow-2xs shrink-0">
-            Member since <strong className="font-semibold text-gray-900">{memberSince}</strong>
-          </span>
+          {memberSince && (
+            <span className="text-xs font-medium font-sf-pro text-gray-600 bg-white/90 border border-gray-200/90 px-3 py-1 rounded-md shadow-2xs shrink-0">
+              Member since <strong className="font-semibold text-gray-900">{memberSince}</strong>
+            </span>
+          )}
         </div>
 
         <hr className="my-2" />

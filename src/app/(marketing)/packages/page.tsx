@@ -33,6 +33,73 @@ const DEFAULT_CATEGORIES = [
   "Social Media",
 ];
 
+interface EmptyGigsStateProps {
+  hasActiveFilters?: boolean;
+  onReset?: () => void;
+  recommendedList?: any[];
+  categoryName?: string;
+}
+
+const EmptyGigsState: React.FC<EmptyGigsStateProps> = ({
+  hasActiveFilters,
+  onReset,
+  recommendedList,
+  categoryName,
+}) => {
+  return (
+    <div className="py-6 w-full animate-fadeIn">
+      {/* Coral-900 Empty State Banner */}
+      <div className="w-full rounded-[10px] bg-[var(--coral-900,#683733)] py-16 sm:py-24 md:py-32 px-6 text-center flex flex-col items-center justify-center shadow-md mb-12">
+        {/* Breadcrumb */}
+        <div className="flex items-center justify-center gap-2 text-white/60 text-xs sm:text-[13px] font-light mb-3 select-none">
+          <FiHome className="w-3.5 h-3.5 text-white/70" />
+          <span>/</span>
+          <span>{categoryName ? `${categoryName}` : "Search result"}</span>
+        </div>
+
+        {/* Main Heading */}
+        <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-[54px] font-normal italic text-white tracking-tight leading-tight my-3 select-none">
+          Oops! This Gig Doesn&apos;t Exist.
+        </h2>
+
+        {/* Subtitle */}
+        <p className="text-xs sm:text-sm md:text-[15px] text-white/70 font-light max-w-lg mx-auto leading-relaxed text-center">
+          {categoryName
+            ? `There are no gigs available in ${categoryName} right now. Please explore other categories or check back soon.`
+            : "The package you're looking for may have been removed, changed, or is temporarily unavailable."}
+        </p>
+
+        {hasActiveFilters && onReset && (
+          <button
+            type="button"
+            onClick={onReset}
+            className="mt-6 px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/25 rounded-full text-xs sm:text-sm font-medium transition-all backdrop-blur-sm cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+          >
+            Clear all filters
+          </button>
+        )}
+      </div>
+
+      {/* Real Recommended Section (only shown if real items exist) */}
+      {recommendedList && recommendedList.length > 0 && (
+        <div className="w-full pt-8 border-t border-gray-100">
+          <h3 className="text-5xl sm:text-[42px] font-normal font-sf-pro text-[#292929] text-left mb-2.5">
+            You May Also Like
+          </h3>
+          <p className="text-base font-normal font-inter text-[#6E6E6E] text-left mb-12">
+            Explore the recommended packages by our AI system Worka
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+            {recommendedList.slice(0, 4).map((pkg: any) => (
+              <PackageCard key={pkg._id || pkg.id} data={pkg} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Packages = () => {
   const searchParams = useSearchParams();
   const search = searchParams?.toString() || "";
@@ -725,7 +792,11 @@ const Packages = () => {
           )}
 
           {/* Popular Services in Category Preview - Fiverr Style */}
-          {packagesList && packagesList.length > 0 && (
+          {isLoading ? (
+            <div className="pt-8">
+              <GigsGridSkeleton count={4} />
+            </div>
+          ) : packagesList && packagesList.length > 0 ? (
             <div className={`${currentTaxonomy.subcategories && currentTaxonomy.subcategories.length > 0 ? "mt-14 pt-10 border-t border-gray-200/80" : "pt-2"}`}>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
@@ -754,6 +825,15 @@ const Packages = () => {
                   <PackageCard key={pkg._id || pkg.id || idx} data={pkg} priority={idx < 4} />
                 ))}
               </div>
+            </div>
+          ) : (
+            <div className={currentTaxonomy.subcategories && currentTaxonomy.subcategories.length > 0 ? "mt-12 pt-8 border-t border-gray-100" : "pt-2"}>
+              <EmptyGigsState
+                hasActiveFilters={hasActiveFilters}
+                onReset={handleReset}
+                recommendedList={recommendedList}
+                categoryName={currentTaxonomy.name}
+              />
             </div>
           )}
         </div>
@@ -870,37 +950,52 @@ const Packages = () => {
 
             {/* Right side: Cards Grid (3 columns when showFilter is true, 4 columns when false) */}
             <div className="flex-1 min-w-0 w-full">
-              <div className={`grid grid-cols-1 sm:grid-cols-2 ${showFilter ? 'xl:grid-cols-3' : 'lg:grid-cols-4'} gap-4 md:gap-5`}>
-                {displayPackages.map((pkg: any, idx: number) => (
-                  <PackageCard key={pkg._id || pkg.id || idx} data={pkg} priority={idx < 4} />
-                ))}
-              </div>
-
-              {/* Pagination Controls */}
-              {displayPackages.length > 0 && (
-                <div className="flex justify-center items-center gap-4 mt-12 mb-4">
-                  <button
-                    onClick={() => {
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                      syncUrlWithFilters({ page: page - 1 });
-                    }}
-                    disabled={page === 1}
-                    className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
-                  >
-                    Previous
-                  </button>
-                  <span className="font-semibold text-gray-800 bg-gray-100 px-4 py-2 rounded-lg">Page {page}</span>
-                  <button
-                    onClick={() => {
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                      syncUrlWithFilters({ page: page + 1 });
-                    }}
-                    disabled={displayPackages.length < 8}
-                    className="px-6 py-2.5 bg-brand-green text-white font-semibold rounded-xl hover:bg-[#3ea917] disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
-                  >
-                    Next
-                  </button>
+              {isLoading ? (
+                <div className="py-6">
+                  <GigsGridSkeleton count={8} />
                 </div>
+              ) : (!displayPackages || displayPackages.length === 0) ? (
+                <EmptyGigsState
+                  hasActiveFilters={hasActiveFilters}
+                  onReset={handleReset}
+                  recommendedList={recommendedList}
+                  categoryName={resolvedSubcategoryHeaderItem?.title || currentTaxonomy?.name}
+                />
+              ) : (
+                <>
+                  <div className={`grid grid-cols-1 sm:grid-cols-2 ${showFilter ? 'xl:grid-cols-3' : 'lg:grid-cols-4'} gap-4 md:gap-5`}>
+                    {displayPackages.map((pkg: any, idx: number) => (
+                      <PackageCard key={pkg._id || pkg.id || idx} data={pkg} priority={idx < 4} />
+                    ))}
+                  </div>
+
+                  {/* Pagination Controls */}
+                  {displayPackages.length > 0 && (
+                    <div className="flex justify-center items-center gap-4 mt-12 mb-4">
+                      <button
+                        onClick={() => {
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                          syncUrlWithFilters({ page: page - 1 });
+                        }}
+                        disabled={page === 1}
+                        className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+                      >
+                        Previous
+                      </button>
+                      <span className="font-semibold text-gray-800 bg-gray-100 px-4 py-2 rounded-lg">Page {page}</span>
+                      <button
+                        onClick={() => {
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                          syncUrlWithFilters({ page: page + 1 });
+                        }}
+                        disabled={displayPackages.length < 8}
+                        className="px-6 py-2.5 bg-brand-green text-white font-semibold rounded-xl hover:bg-[#3ea917] disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -1121,51 +1216,12 @@ const Packages = () => {
               </button>
             </div>
           ) : (!packagesList || packagesList.length === 0) ? (
-            <div className="py-6 w-full animate-fadeIn">
-              {/* Coral-900 Empty State Banner */}
-              <div className="w-full rounded-[10px] bg-[var(--coral-900,#683733)] py-16 sm:py-24 md:py-32 px-6 text-center flex flex-col items-center justify-center shadow-md mb-12">
-                {/* Breadcrumb */}
-                <div className="flex items-center justify-center gap-2 text-white/60 text-xs sm:text-[13px] font-light mb-3 select-none">
-                  <FiHome className="w-3.5 h-3.5 text-white/70" />
-                  <span>/</span>
-                  <span>Search result</span>
-                </div>
-
-                {/* Main Heading */}
-                <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-[54px] font-normal italic text-white tracking-tight leading-tight my-3 select-none">
-                  Oops! This Gig Doesn&apos;t Exist.
-                </h2>
-
-                {/* Subtitle */}
-                <p className="text-xs sm:text-sm md:text-[15px] text-white/70 font-light max-w-lg mx-auto leading-relaxed text-center">
-                  The package you&apos;re looking for may have been removed, changed, or is temporarily unavailable.
-                </p>
-
-                {hasActiveFilters && (
-                  <button
-                    onClick={handleReset}
-                    className="mt-6 px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/25 rounded-full text-xs sm:text-sm font-medium transition-all backdrop-blur-sm cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    Clear all filters
-                  </button>
-                )}
-              </div>
-
-              {/* Real Recommended Section (only shown if real items exist) */}
-              {recommendedList && recommendedList.length > 0 && (
-                <div className="w-full pt-8 border-t border-gray-100">
-                  <h3 className="text-5xl sm:text-[42px] font-normal font-sf-pro text-[#292929] text-left mb-2.5">
-                    You May Also Like
-                  </h3>
-                  <p className="text-base font-normal font-inter text-[#6E6E6E] text-left mb-12">Explore the recommended packages by our AI system Worka</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-                    {recommendedList.slice(0, 4).map((pkg: any) => (
-                      <PackageCard key={pkg._id || pkg.id} data={pkg} />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            <EmptyGigsState
+              hasActiveFilters={hasActiveFilters}
+              onReset={handleReset}
+              recommendedList={recommendedList}
+              categoryName={categoryAncestry.length > 0 ? categoryAncestry[categoryAncestry.length - 1].name : undefined}
+            />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
               {packagesList.map((pkg: any, idx: number) => <PackageCard key={pkg._id || pkg.id} data={pkg} priority={idx < 2} />)}

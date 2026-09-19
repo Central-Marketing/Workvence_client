@@ -140,7 +140,7 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
           className="flex items-center gap-2.5 overflow-x-auto scrollbar-none scroll-smooth flex-1 py-0.5"
         >
           {/* All Services Pill */}
-          <Link
+          {/* <Link
             href="/packages"
             className={`px-4 py-1.5 rounded-full font-sf-pro font-medium text-[13px] sm:text-[14px] whitespace-nowrap transition-colors shrink-0 ${
               pathname === '/packages' && !activeRootCategory
@@ -149,7 +149,7 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
             }`}
           >
             All Services
-          </Link>
+          </Link> */}
 
           {/* Dynamic Root Category Pills */}
           {rootCategories.map((cat: any) => {

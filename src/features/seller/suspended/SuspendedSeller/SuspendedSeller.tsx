@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 
 const categories = [
-  "All services",
+  // "All services",
   "Technology & Programming",
   "Writing & Translation",
   "Design",

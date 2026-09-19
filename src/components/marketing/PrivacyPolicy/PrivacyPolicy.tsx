@@ -7,7 +7,7 @@ import adminAxios from '@/utils/adminAxios';
 import { Loader } from '@/components';
 
 const categories = [
-  "All services",
+  // "All services",
   "Technology & Programming",
   "Writing & Translation",
   "Design",

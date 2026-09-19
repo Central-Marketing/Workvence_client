@@ -10,7 +10,7 @@ import useDebounce from "@/hooks/useDebounce";
 import { FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 
 const DEFAULT_CATEGORIES = [
-  "All services",
+  // "All services",
   "Technology & Programming",
   "Writing & Translation",
   "Design",
@@ -100,7 +100,7 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
       c.name.toLowerCase().includes('other')
     );
 
-    return [{ name: "All services", slug: "All services" }, ...regularCats, ...otherCats];
+    return [/* { name: "All services", slug: "All services" }, */ ...regularCats, ...otherCats];
   }, [categoryList]);
 
   const getSlugFromCat = (catInput: string) => {

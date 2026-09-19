@@ -234,7 +234,7 @@ const Navbar = () => {
 
                   {isCategoryDropdownOpen && (
                     <div className="absolute left-0 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl py-2 flex flex-col z-[60] text-[14px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-                      <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-400">
+                      {/* <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-400">
                         <span>Categories</span>
                         <Link
                           href="/packages"
@@ -243,7 +243,7 @@ const Navbar = () => {
                         >
                           view all
                         </Link>
-                      </div>
+                      </div> */}
 
                       <div className="max-h-[320px] overflow-y-auto py-1">
                         {categoryList.length > 0 ? (

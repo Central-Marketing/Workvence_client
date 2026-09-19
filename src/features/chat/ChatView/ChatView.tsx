@@ -1758,9 +1758,7 @@ const ChatView = () => {
                           <span className="hidden xs:inline sm:inline">
                             Create Offer
                           </span>
-                          <span className="xs:hidden">
-                            Offer
-                          </span>
+
                         </button>
                       )}
 

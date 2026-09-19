@@ -23,7 +23,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
     queryKey: ["my-packages"],
     queryFn: () =>
       axiosFetch(`/gigs?userID=${user?._id || user?.id}`)
-        .then(({ data }) => (Array.isArray(data) ? data : []))
+        .then(({ data }) => (Array.isArray(data) ? data : data?.packages || data?.gigs || []))
         .catch(() => []),
     enabled: !!user,
   });
@@ -55,6 +55,26 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
   const packagesList = Array.isArray(packages) ? packages : [];
   const hasPackages = packagesList.length > 0;
   const displayName = user?.name ? user.name.split(" ")[0] : (user?.username || "Tomas");
+
+  // Filter draft packages (isDraft === true or "true" or status === "draft")
+  const draftPackages = packagesList.filter(
+    (pkg: any) => Boolean(pkg.isDraft) === true || pkg.isDraft === "true" || pkg.status === "draft"
+  );
+
+  // Find the last uploaded / created draft gig
+  const latestDraftPackage = draftPackages.length > 0
+    ? [...draftPackages].sort((a: any, b: any) => {
+        const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
+        const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
+        return timeB - timeA;
+      })[0]
+    : null;
+
+  const draftEditUrl = latestDraftPackage?._id
+    ? `/organize/${latestDraftPackage._id}`
+    : latestDraftPackage?.id
+    ? `/organize/${latestDraftPackage.id}`
+    : "/organize";
 
   // Condition specified by user:
   // "this image ui will be for seller dashboard when profile is complete 100% and package length is >0"
@@ -111,41 +131,45 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
         <div className="container mx-auto px-4 md:px-6 space-y-7">
 
           {/* Top Hero Banner: Draft Package Notification */}
-          <div className="relative overflow-hidden rounded-[10px] bg-[#0F0F12] bg-[radial-gradient(ellipse_65%_130%_at_82%_50%,_#7C3AED_0%,_#531A85_38%,_#1D0933_68%,_#0F0F12_100%)] p-7 sm:p-[22px] text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
-            {/* Ellipse 15017 ambient glow */}
-            <div
-              className="absolute -right-16 -top-24 w-[620px] h-[440px] rounded-full pointer-events-none blur-[80px] opacity-80"
-              style={{
-                background: "radial-gradient(ellipse at center, #8B5CF6 0%, #7C3AED 35%, #581C87 65%, transparent 85%)",
-              }}
-            />
+          {latestDraftPackage && (
+            <div className="relative overflow-hidden rounded-[10px] bg-[#0F0F12] bg-[radial-gradient(ellipse_65%_130%_at_82%_50%,_#7C3AED_0%,_#531A85_38%,_#1D0933_68%,_#0F0F12_100%)] p-7 sm:p-[22px] text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+              {/* Ellipse 15017 ambient glow */}
+              <div
+                className="absolute -right-16 -top-24 w-[620px] h-[440px] rounded-full pointer-events-none blur-[80px] opacity-80"
+                style={{
+                  background: "radial-gradient(ellipse at center, #8B5CF6 0%, #7C3AED 35%, #581C87 65%, transparent 85%)",
+                }}
+              />
 
-            <div className="relative z-10 max-w-2xl">
-              <h2 className="text-2xl sm:text-[28px] font-normal tracking-tight text-white">
-                Your <span className="font-bold">package</span> is currently in draft
-              </h2>
-              <p className="text-white/75 text-xs sm:text-[13px] mt-2 mb-5 leading-relaxed font-normal">
-                Your package isn&apos;t published yet. Complete the details and publish it when you&apos;re ready to start attracting clients.
-              </p>
-              <Link
-                href="/organize"
-                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white hover:text-emerald-300 transition-colors group cursor-pointer"
-              >
-                Continue Editing <span className="group-hover:translate-x-1 transition-transform">→</span>
-              </Link>
+              <div className="relative z-10 max-w-2xl">
+                <h2 className="text-2xl sm:text-[28px] font-normal tracking-tight text-white">
+                  Your <span className="font-bold">package</span> is currently in draft
+                </h2>
+                <p className="text-white/75 text-xs sm:text-[13px] mt-2 mb-5 leading-relaxed font-normal">
+                  {latestDraftPackage.title
+                    ? `"${latestDraftPackage.title}" isn't published yet. Complete the details and publish it when you're ready to start attracting clients.`
+                    : "Your package isn't published yet. Complete the details and publish it when you're ready to start attracting clients."}
+                </p>
+                <Link
+                  href={draftEditUrl}
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white hover:text-emerald-300 transition-colors group cursor-pointer"
+                >
+                  Continue Editing <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </Link>
+              </div>
+
+              <div
+                className="relative w-[180px] sm:w-[215px] h-[172px] sm:h-[206px] shrink-0 self-center md:self-auto z-10 drop-shadow-[0_0_24px_rgba(168,85,247,0.5)]"
+                style={{
+                  aspectRatio: "215/206",
+                  backgroundImage: "url('/images/dashboard/c43d084049b88664dd8666ff65abaa314387feea.png')",
+                  backgroundPosition: "-17.2px -16.448px",
+                  backgroundSize: "116% 115.969%",
+                  backgroundRepeat: "no-repeat",
+                }}
+              />
             </div>
-
-            <div
-              className="relative w-[180px] sm:w-[215px] h-[172px] sm:h-[206px] shrink-0 self-center md:self-auto z-10 drop-shadow-[0_0_24px_rgba(168,85,247,0.5)]"
-              style={{
-                aspectRatio: "215/206",
-                backgroundImage: "url('/images/dashboard/c43d084049b88664dd8666ff65abaa314387feea.png')",
-                backgroundPosition: "-17.2px -16.448px",
-                backgroundSize: "116% 115.969%",
-                backgroundRepeat: "no-repeat",
-              }}
-            />
-          </div>
+          )}
 
           {/* 4-Metric Stats Bar */}
           <div className="bg-white rounded-xl border border-gray-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 gap-y-5 sm:gap-y-0">
@@ -421,6 +445,46 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           </Link>
         </div>
 
+        {/* Draft Package Notification (if draft exists during onboarding) */}
+        {latestDraftPackage && (
+          <div className="relative overflow-hidden rounded-[10px] bg-[#0F0F12] bg-[radial-gradient(ellipse_65%_130%_at_82%_50%,_#7C3AED_0%,_#531A85_38%,_#1D0933_68%,_#0F0F12_100%)] p-7 sm:p-[22px] text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+            <div
+              className="absolute -right-16 -top-24 w-[620px] h-[440px] rounded-full pointer-events-none blur-[80px] opacity-80"
+              style={{
+                background: "radial-gradient(ellipse at center, #8B5CF6 0%, #7C3AED 35%, #581C87 65%, transparent 85%)",
+              }}
+            />
+
+            <div className="relative z-10 max-w-2xl">
+              <h2 className="text-2xl sm:text-[28px] font-normal tracking-tight text-white">
+                Your <span className="font-bold">package</span> is currently in draft
+              </h2>
+              <p className="text-white/75 text-xs sm:text-[13px] mt-2 mb-5 leading-relaxed font-normal">
+                {latestDraftPackage.title
+                  ? `"${latestDraftPackage.title}" isn't published yet. Complete the details and publish it when you're ready to start attracting clients.`
+                  : "Your package isn't published yet. Complete the details and publish it when you're ready to start attracting clients."}
+              </p>
+              <Link
+                href={draftEditUrl}
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white hover:text-emerald-300 transition-colors group cursor-pointer"
+              >
+                Continue Editing <span className="group-hover:translate-x-1 transition-transform">→</span>
+              </Link>
+            </div>
+
+            <div
+              className="relative w-[180px] sm:w-[215px] h-[172px] sm:h-[206px] shrink-0 self-center md:self-auto z-10 drop-shadow-[0_0_24px_rgba(168,85,247,0.5)]"
+              style={{
+                aspectRatio: "215/206",
+                backgroundImage: "url('/images/dashboard/c43d084049b88664dd8666ff65abaa314387feea.png')",
+                backgroundPosition: "-17.2px -16.448px",
+                backgroundSize: "116% 115.969%",
+                backgroundRepeat: "no-repeat",
+              }}
+            />
+          </div>
+        )}
+
         {/* 2. Card 1: Ready to Grow Your Business? */}
         <div className="bg-white rounded-[18px] sm:rounded-[22px] border border-[#EBECEF] p-8 sm:py-12 sm:px-12 flex flex-col items-center justify-center text-center shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
           <div className="w-[140px] sm:w-[165px] h-auto mb-3.5 flex items-center justify-center">
@@ -479,7 +543,13 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
               {packagesList.map((pkg: any) => (
                 <div
                   key={pkg._id}
-                  onClick={() => router.push(`/package/${pkg._id}`)}
+                  onClick={() => {
+                    if (pkg.isDraft === true || pkg.isDraft === "true" || pkg.status === "draft") {
+                      router.push(`/organize/${pkg._id}`);
+                    } else {
+                      router.push(`/package/${pkg._id}`);
+                    }
+                  }}
                   className="bg-white rounded-xl border border-slate-100 shadow-xs hover:shadow-md transition-all overflow-hidden cursor-pointer group flex flex-col"
                 >
                   <div className="relative aspect-[16/10] w-full bg-slate-100 overflow-hidden">
@@ -488,6 +558,11 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                       alt={pkg.title || "Package"}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
+                    {(pkg.isDraft === true || pkg.isDraft === "true" || pkg.status === "draft") && (
+                      <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-xs">
+                        Draft
+                      </span>
+                    )}
                   </div>
                   <div className="p-4 flex flex-col flex-1 justify-between gap-3">
                     <h3 className="font-semibold text-sm text-slate-800 line-clamp-2 group-hover:text-teal-700 transition-colors">

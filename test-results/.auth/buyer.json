@@ -1,0 +1,67 @@
+{
+  "cookies": [
+    {
+      "name": "accessToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsIl9pZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsInVzZXJJRCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsInVzZXJJZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsImVtYWlsIjoibmFpbS5jb2RlckBnbWFpbC5jb20iLCJ1c2VybmFtZSI6Im5haW0iLCJpc1NlbGxlciI6ZmFsc2UsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODk4MDEwNDMsImV4cCI6MTc4OTgwNDY0M30.0tlzgQiDlGBvhJDQxdAMtWKj2zJmjSCMC7r-O2BEtR0",
+      "domain": "dev.workvence.com",
+      "path": "/",
+      "expires": 1790405843.196867,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "refreshToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsIl9pZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsInVzZXJJRCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsInVzZXJJZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsImlhdCI6MTc4OTgwMTA0MywiZXhwIjoxNzkwNDA1ODQzfQ.DVSP93_rA7Om2V7WTlzkNQF_lSXBkWTdLoC-7DQu-z4",
+      "domain": "dev.workvence.com",
+      "path": "/",
+      "expires": 1790405843.197479,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "isSeller",
+      "value": "false",
+      "domain": "dev.workvence.com",
+      "path": "/",
+      "expires": 1792394315.905481,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "user",
+      "value": "%7B%22id%22%3A%22a488427a-bfb3-4670-8f2f-6dcc71bc63f1%22%2C%22username%22%3A%22naim%22%2C%22email%22%3A%22naim.coder%40gmail.com%22%2C%22image%22%3A%22https%3A%2F%2Fui-avatars.com%2Fapi%2F%3Fname%3Dnaim%26background%3D0D9488%26color%3Dfff%26bold%3Dtrue%26length%3D2%22%2C%22country%22%3A%22Bangladesh%22%2C%22phone%22%3A%22%22%2C%22description%22%3A%22Hello!%20I%20am%20a%20passionate%20and%20results-driven%20Full-Stack%20Developer%20with%20extensive%20experience%20in%20designing%2C%20developing%2C%20and%20deploying%20robust%2C%20high-performance%20web%20applications%20from%20scratch.%20I%20bridge%20the%20gap%20between%20stunning%2C%20intuitive%20user%20interfaces%20and%20powerful%2C%20secure%20backend%20systems.%5Cn%5CnWhether%20you%20are%20launching%20an%20early-stage%20startup%2C%20scaling%20an%20existing%20platform%2C%20or%20integrating%20cutting-edge%20AI%20features%2C%20I%20transform%20complex%20requirements%20into%20clean%2C%20maintainable%2C%20and%20lightning-fast%20software.%20I%20pride%20myself%20on%20writing%20clean%20code%2C%20maintaining%20clear%20communication%2C%20and%20delivering%20projects%20on%20time%20and%20within%20budget.%22%2C%22isSeller%22%3Afalse%2C%22isAdmin%22%3Afalse%2C%22isVerified%22%3Atrue%2C%22otpExpiresAt%22%3Anull%2C%22resetPasswordExpiresAt%22%3A%222026-09-02T03%3A03%3A14.618Z%22%2C%22shortTitle%22%3A%22Full%20stack%20Developer%22%2C%22skills%22%3A%5B%22React%20js%22%2C%22Next%20js%22%2C%22Javascript%22%2C%22Node%20js%22%2C%22Ai%22%5D%2C%22languages%22%3A%5B%7B%22level%22%3A%22Conversational%22%2C%22language%22%3A%22English%22%7D%5D%2C%22education%22%3A%5B%5D%2C%22experience%22%3A%5B%7B%22title%22%3A%22Executive%20Fullstack%20developer%22%2C%22company%22%3A%22Google%22%2C%22endDate%22%3A%222026-08-06%22%2C%22startDate%22%3A%222025-01-15%22%2C%22description%22%3A%22Frontend%20Development%3A%20React%2C%20Next.js%2C%20TypeScript%2C%20Tailwind%20CSS%2C%20HTML5%2C%20CSS3%2C%20JavaScript%20(ES6%2B)%5Cn%5CnBackend%20%26%20APIs%3A%20Node.js%2C%20Express%2C%20Python%2C%20Django%2C%20RESTful%20APIs%2C%20GraphQL%5Cn%5CnDatabase%20%26%20Cloud%3A%20MongoDB%2C%20PostgreSQL%2C%20Firebase%2C%20MySQL%2C%20AWS%2C%20Vercel%2C%20Docker%5Cn%5CnAI%20%26%20Advanced%20Tech%3A%20OpenAI%20API%2C%20LangChain%2C%20LLM%20Integrations%2C%20Automation%20Workflows%20(Zapier)%5Cn%5CnTools%20%26%20Practices%3A%20Git%2FGitHub%2C%20Agile%20Workflow%2C%20CI%2FCD%2C%20Performance%20Optimization%2C%20SEO%20Best%20Practices%22%2C%22currentlyWorking%22%3Afalse%7D%5D%2C%22portfolio%22%3A%5B%5D%2C%22starRating%22%3A0%2C%22totalReviews%22%3A0%2C%22responseTimeHours%22%3A1%2C%22completedOrdersCount%22%3A0%2C%22jobSuccessRate%22%3A0%2C%22onTimeDeliveryRate%22%3A0%2C%22lastDeliveryDate%22%3Anull%2C%22hourlyRate%22%3Anull%2C%22sellerLevel%22%3A%22Level%201%20Seller%22%2C%22earningsBalance%22%3A%220%22%2C%22stripeConnectAccountId%22%3Anull%2C%22payoutsEnabled%22%3Afalse%2C%22payoneerPayeeId%22%3Anull%2C%22payoneerEmail%22%3Anull%2C%22payoneerStatus%22%3A%22INACTIVE%22%2C%22createdAt%22%3A%222026-08-15T08%3A26%3A22.935Z%22%2C%22updatedAt%22%3A%222026-09-19T07%3A00%3A31.385Z%22%2C%22lastActiveAt%22%3A%222026-09-19T07%3A00%3A31.382Z%22%2C%22isKycVerified%22%3Afalse%2C%22_id%22%3A%22a488427a-bfb3-4670-8f2f-6dcc71bc63f1%22%7D",
+      "domain": "dev.workvence.com",
+      "path": "/",
+      "expires": 1792394315.905697,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://dev.workvence.com",
+      "localStorage": [
+        {
+          "name": "accessToken",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsIl9pZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsInVzZXJJRCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsInVzZXJJZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsImVtYWlsIjoibmFpbS5jb2RlckBnbWFpbC5jb20iLCJ1c2VybmFtZSI6Im5haW0iLCJpc1NlbGxlciI6ZmFsc2UsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODk4MDEwNDMsImV4cCI6MTc4OTgwNDY0M30.0tlzgQiDlGBvhJDQxdAMtWKj2zJmjSCMC7r-O2BEtR0"
+        },
+        {
+          "name": "token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsIl9pZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsInVzZXJJRCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsInVzZXJJZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsImVtYWlsIjoibmFpbS5jb2RlckBnbWFpbC5jb20iLCJ1c2VybmFtZSI6Im5haW0iLCJpc1NlbGxlciI6ZmFsc2UsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODk4MDEwNDMsImV4cCI6MTc4OTgwNDY0M30.0tlzgQiDlGBvhJDQxdAMtWKj2zJmjSCMC7r-O2BEtR0"
+        },
+        {
+          "name": "refreshToken",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsIl9pZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsInVzZXJJRCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsInVzZXJJZCI6ImE0ODg0MjdhLWJmYjMtNDY3MC04ZjJmLTZkY2M3MWJjNjNmMSIsImlhdCI6MTc4OTgwMTA0MywiZXhwIjoxNzkwNDA1ODQzfQ.DVSP93_rA7Om2V7WTlzkNQF_lSXBkWTdLoC-7DQu-z4"
+        },
+        {
+          "name": "user",
+          "value": "{\"id\":\"a488427a-bfb3-4670-8f2f-6dcc71bc63f1\",\"username\":\"naim\",\"email\":\"naim.coder@gmail.com\",\"image\":\"https://ui-avatars.com/api/?name=naim&background=0D9488&color=fff&bold=true&length=2\",\"country\":\"Bangladesh\",\"phone\":\"\",\"description\":\"Hello! I am a passionate and results-driven Full-Stack Developer with extensive experience in designing, developing, and deploying robust, high-performance web applications from scratch. I bridge the gap between stunning, intuitive user interfaces and powerful, secure backend systems.\\n\\nWhether you are launching an early-stage startup, scaling an existing platform, or integrating cutting-edge AI features, I transform complex requirements into clean, maintainable, and lightning-fast software. I pride myself on writing clean code, maintaining clear communication, and delivering projects on time and within budget.\",\"isSeller\":false,\"isAdmin\":false,\"isVerified\":true,\"otpExpiresAt\":null,\"resetPasswordExpiresAt\":\"2026-09-02T03:03:14.618Z\",\"shortTitle\":\"Full stack Developer\",\"skills\":[\"React js\",\"Next js\",\"Javascript\",\"Node js\",\"Ai\"],\"languages\":[{\"level\":\"Conversational\",\"language\":\"English\"}],\"education\":[],\"experience\":[{\"title\":\"Executive Fullstack developer\",\"company\":\"Google\",\"endDate\":\"2026-08-06\",\"startDate\":\"2025-01-15\",\"description\":\"Frontend Development: React, Next.js, TypeScript, Tailwind CSS, HTML5, CSS3, JavaScript (ES6+)\\n\\nBackend & APIs: Node.js, Express, Python, Django, RESTful APIs, GraphQL\\n\\nDatabase & Cloud: MongoDB, PostgreSQL, Firebase, MySQL, AWS, Vercel, Docker\\n\\nAI & Advanced Tech: OpenAI API, LangChain, LLM Integrations, Automation Workflows (Zapier)\\n\\nTools & Practices: Git/GitHub, Agile Workflow, CI/CD, Performance Optimization, SEO Best Practices\",\"currentlyWorking\":false}],\"portfolio\":[],\"starRating\":0,\"totalReviews\":0,\"responseTimeHours\":1,\"completedOrdersCount\":0,\"jobSuccessRate\":0,\"onTimeDeliveryRate\":0,\"lastDeliveryDate\":null,\"hourlyRate\":null,\"sellerLevel\":\"Level 1 Seller\",\"earningsBalance\":\"0\",\"stripeConnectAccountId\":null,\"payoutsEnabled\":false,\"payoneerPayeeId\":null,\"payoneerEmail\":null,\"payoneerStatus\":\"INACTIVE\",\"createdAt\":\"2026-08-15T08:26:22.935Z\",\"updatedAt\":\"2026-09-19T07:00:31.385Z\",\"lastActiveAt\":\"2026-09-19T07:00:31.382Z\",\"isKycVerified\":false,\"_id\":\"a488427a-bfb3-4670-8f2f-6dcc71bc63f1\"}"
+        }
+      ]
+    }
+  ]
+}

@@ -157,7 +157,7 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
           </button>
 
           {/* Secondary Action Row: Message + Analysis Seller Profile */}
-          <div className="grid grid-cols-2 gap-2.5">
+          {/* <div className="grid grid-cols-2 gap-2.5">
             <button
               type="button"
               onClick={onMessage || onContact}
@@ -198,7 +198,7 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
                 </svg>
               }
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

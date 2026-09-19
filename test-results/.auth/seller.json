@@ -1,0 +1,57 @@
+{
+  "cookies": [
+    {
+      "name": "accessToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsIl9pZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsInVzZXJJRCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsInVzZXJJZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsImVtYWlsIjoibmFpbWVrYXR0b3JAZ21haWwuY29tIiwidXNlcm5hbWUiOiJuYWltZGV2IiwiaXNTZWxsZXIiOnRydWUsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODk4MDEwNDksImV4cCI6MTc4OTgwNDY0OX0.u3eQflBtpM9-rpNJ6_Fid_Pjh14xKCJC-wo4gR-MBTw",
+      "domain": "dev.workvence.com",
+      "path": "/",
+      "expires": 1790405849.169779,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "refreshToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsIl9pZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsInVzZXJJRCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsInVzZXJJZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsImlhdCI6MTc4OTgwMTA0OSwiZXhwIjoxNzkwNDA1ODQ5fQ.H8AopAvfSx6vKBxq9B6Fvax40OxBMmIZwuROx88zCrw",
+      "domain": "dev.workvence.com",
+      "path": "/",
+      "expires": 1790405849.169856,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "isSeller",
+      "value": "true",
+      "domain": "dev.workvence.com",
+      "path": "/",
+      "expires": 1792394319.319307,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://dev.workvence.com",
+      "localStorage": [
+        {
+          "name": "accessToken",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsIl9pZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsInVzZXJJRCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsInVzZXJJZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsImVtYWlsIjoibmFpbWVrYXR0b3JAZ21haWwuY29tIiwidXNlcm5hbWUiOiJuYWltZGV2IiwiaXNTZWxsZXIiOnRydWUsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODk4MDEwNDksImV4cCI6MTc4OTgwNDY0OX0.u3eQflBtpM9-rpNJ6_Fid_Pjh14xKCJC-wo4gR-MBTw"
+        },
+        {
+          "name": "token",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsIl9pZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsInVzZXJJRCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsInVzZXJJZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsImVtYWlsIjoibmFpbWVrYXR0b3JAZ21haWwuY29tIiwidXNlcm5hbWUiOiJuYWltZGV2IiwiaXNTZWxsZXIiOnRydWUsImlzQWRtaW4iOmZhbHNlLCJpYXQiOjE3ODk4MDEwNDksImV4cCI6MTc4OTgwNDY0OX0.u3eQflBtpM9-rpNJ6_Fid_Pjh14xKCJC-wo4gR-MBTw"
+        },
+        {
+          "name": "refreshToken",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsIl9pZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsInVzZXJJRCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsInVzZXJJZCI6IjFhZDcyYjAwLWU1NGUtNDgzNC1iMzc5LTc0MDdiMmZjM2FjMiIsImlhdCI6MTc4OTgwMTA0OSwiZXhwIjoxNzkwNDA1ODQ5fQ.H8AopAvfSx6vKBxq9B6Fvax40OxBMmIZwuROx88zCrw"
+        },
+        {
+          "name": "user",
+          "value": "{\"id\":\"1ad72b00-e54e-4834-b379-7407b2fc3ac2\",\"username\":\"naimdev\",\"email\":\"naimekattor@gmail.com\",\"image\":\"https://i.pravatar.cc/300?img=6\",\"country\":\"Germany\",\"phone\":\"+1555019\",\"description\":\"Hello! I am a passionate and results-driven Full-Stack Developer with extensive experience in designing, developing, and deploying robust, high-performance web applications from scratch. I bridge the gap between stunning, intuitive user interfaces and powerful, secure backend systems.\\\\n\\\\nWhether you are launching an early-stage startup, scaling an existing platform, or integrating cutting-edge AI features, I transform complex requirements into clean, maintainable, and lightning-fast software. I pride myself on writing clean code, maintaining clear communication, and delivering projects on time and within budget.\",\"isSeller\":true,\"isAdmin\":false,\"isVerified\":true,\"otpExpiresAt\":null,\"resetPasswordExpiresAt\":null,\"shortTitle\":\"Full Stack Developer\",\"skills\":[\"React\",\"Next\",\"Node\",\"Php\",\"Ai integration\"],\"languages\":[{\"level\":\"Conversational\",\"language\":\"English\"}],\"education\":[],\"experience\":[{\"title\":\"Senior Web Developer\",\"company\":\"Emart\",\"endDate\":\"2026-07-26\",\"startDate\":\"2025-06-03\",\"description\":\"Frontend Development: React, Next.js, TypeScript, Tailwind CSS, HTML5, CSS3, JavaScript (ES6+)\\n\\nBackend & APIs: Node.js, Express, Python, Django, RESTful APIs, GraphQL\\n\\nDatabase & Cloud: MongoDB, PostgreSQL, Firebase, MySQL, AWS, Vercel, Docker\\n\\nAI & Advanced Tech: OpenAI API, LangChain, LLM Integrations, Automation Workflows (Zapier)\\n\\nTools & Practices: Git/GitHub, Agile Workflow, CI/CD, Performance Optimization, SEO Best Practices\",\"currentlyWorking\":false}],\"portfolio\":[{\"link\":\"\",\"image\":\"https://i.ibb.co/zWL9nX8L/ecomm.jpg\",\"title\":\"E-commerce Website\",\"description\":\"Mobile-First Responsive Design: Over 65% of online shopping happens on mobile devices; the site must look and function flawlessly on all screens.  Advanced Product Search & Smart Filters: Live autocomplete search, alongside filtering options by category, price, brand, size, color, and ratings.  Rich Product Pages: High-resolution multi-angle photos, zoom features, clear stock availability, variations (sizes/colors), and detailed specifications.  Customer Reviews & Ratings: Social proof elements (star ratings, user-submitted photos, and text reviews) to build instant trust. \"}],\"starRating\":4,\"totalReviews\":5,\"responseTimeHours\":1,\"completedOrdersCount\":7,\"jobSuccessRate\":100,\"onTimeDeliveryRate\":100,\"lastDeliveryDate\":\"2026-08-22T07:45:20.706Z\",\"hourlyRate\":null,\"sellerLevel\":\"Level 1 Seller\",\"earningsBalance\":\"2693.5\",\"stripeConnectAccountId\":\"acct_1U78ekAbTOQj57Yz\",\"payoutsEnabled\":true,\"payoneerPayeeId\":\"1ad72b00-e54e-4834-b379-7407b2fc3ac2\",\"payoneerEmail\":\"naimekattor@gmail.com\",\"payoneerStatus\":\"ACTIVE\",\"createdAt\":\"2026-08-15T09:18:40.163Z\",\"updatedAt\":\"2026-09-19T06:57:29.120Z\",\"lastActiveAt\":\"2026-09-19T06:57:29.117Z\",\"isKycVerified\":true,\"_id\":\"1ad72b00-e54e-4834-b379-7407b2fc3ac2\"}"
+        }
+      ]
+    }
+  ]
+}

@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test:journey": "node tests/run-full-journey.js",
-    "test:dual": "node tests/comprehensive-dual-journey.js"
+    "test:dual": "node tests/comprehensive-dual-journey.js",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -36,6 +38,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

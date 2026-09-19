@@ -11,13 +11,12 @@ import {
   FiDollarSign,
   FiCalendar,
   FiCheckCircle,
-  FiFolder,
 } from "react-icons/fi";
+import { HiSparkles } from "react-icons/hi2";
 
 import { axiosFetch } from "@/utils";
 import useAdminCategories from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
-
 
 const CATEGORIES = [
   "AI",
@@ -101,6 +100,52 @@ const CreateBrief = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  // AI Generation Mutation connected directly to Backend /briefs/ai-generate
+  const aiGenerate = useMutation({
+    mutationFn: async (promptText: string) => {
+      const response = await axiosFetch.post("/briefs/ai-generate", { prompt: promptText });
+      return response.data;
+    },
+    onSuccess: (data: any) => {
+      const draft = data?.draft || data;
+      const matchedCat = categories.find(
+        (c: any) =>
+          c.slug === draft?.categorySlug ||
+          c.slug === draft?.category ||
+          c.name?.toLowerCase() === (draft?.categoryName || draft?.category || "").toLowerCase()
+      );
+      const resolvedCategory = matchedCat ? matchedCat.slug : draft?.categorySlug || draft?.category || "";
+
+      setForm({
+        title: draft?.title || form.title,
+        description: draft?.description || form.description,
+        category: resolvedCategory || form.category,
+        budget: draft?.budget !== undefined && draft?.budget !== null ? String(draft.budget) : form.budget,
+        deliveryTime: draft?.deliveryTime !== undefined && draft?.deliveryTime !== null ? String(draft.deliveryTime) : form.deliveryTime,
+      });
+
+      toast.success("Project fields auto-filled!");
+    },
+    onError: (err: any) => {
+      console.error("AI generation failed:", err);
+      toast.error(err?.response?.data?.message || "Failed to generate project with AI. Try again.");
+    },
+  });
+
+  const handleAutoFillWithAI = () => {
+    if (!user) {
+      toast.error("Please sign in to use Workvence AI auto-fill");
+      router.push(`/login?redirect=${encodeURIComponent("/briefs/create")}`);
+      return;
+    }
+
+    const promptText =
+      form.title.trim() ||
+      form.description.trim() ||
+      "Modern full-stack web application development with responsive design and secure API integration";
+
+    aiGenerate.mutate(promptText);
+  };
 
   // Post brief mutation
   const postBrief = useMutation({
@@ -115,8 +160,6 @@ const CreateBrief = () => {
       toast.error(err?.response?.data?.message || "Failed to post project");
     },
   });
-
-
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -210,18 +253,40 @@ const CreateBrief = () => {
           <span className="text-slate-700 font-normal">Post a Job</span>
         </div>
 
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-slate-900 tracking-tight font-sf-pro leading-tight mb-2">
-            Post a Job Project
-          </h1>
-          <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-normal max-w-xl">
-            Describe your project specifications to receive competitive proposals from
-            vetted freelance professionals.
-          </p>
+        {/* Page Header with 'Create with AI' Auto-Fill Button */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-slate-900 tracking-tight font-sf-pro leading-tight mb-2">
+              Post a Job Project
+            </h1>
+            <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-normal max-w-xl">
+              Describe your project specifications to receive competitive proposals from
+              vetted freelance professionals.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleAutoFillWithAI}
+            disabled={aiGenerate.isPending}
+            className="bg-[#042823] hover:bg-[#073932] text-white font-semibold text-xs sm:text-sm px-5 py-3 rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-2 self-start sm:self-auto shrink-0 border border-emerald-600/30 disabled:opacity-60"
+            title="Auto-fill project fields with AI"
+          >
+            {aiGenerate.isPending ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Auto-filling...</span>
+              </>
+            ) : (
+              <>
+                <HiSparkles className="text-emerald-400 text-base" />
+                <span>Create with AI</span>
+              </>
+            )}
+          </button>
         </div>
 
-        {/* Main Unified Form Card */}
+        {/* Main Form Card */}
         <form
           onSubmit={handleSubmit}
           className="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-6 sm:p-10 shadow-2xs space-y-6 sm:space-y-8"
@@ -262,10 +327,9 @@ const CreateBrief = () => {
 
           {/* Section 3: Description */}
           <div className="space-y-2">
-            <label className="block text-xs sm:text-sm font-bold text-slate-900">
+            <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2">
               Project Description <span className="text-emerald-600">*</span>
             </label>
-
             <textarea
               placeholder="Describe your project goals, required deliverables, preferences, and any technical specifications..."
               value={form.description}

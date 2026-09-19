@@ -526,7 +526,7 @@ const Earnings = () => {
                 </span>
               )}
             </button>
-            {isStripeConnected && (
+            {/* {isStripeConnected && (
               <button
                 type="button"
                 onClick={() => connectDashboardMutation.mutate()}
@@ -542,7 +542,7 @@ const Earnings = () => {
                 <span>Stripe Dashboard</span>
                 <ArrowUpRight className="w-3.5 h-3.5 text-[#635bff] shrink-0" />
               </button>
-            )}
+            )} */}
 
             <button
               type="button"

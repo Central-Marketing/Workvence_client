@@ -110,9 +110,18 @@ const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser, classNam
     return conversations.filter((c: any) => isConversationUnread(c, currentUser)).length;
   }, [conversations, currentUser]);
 
+  // Compute direct chat target URL
+  const targetHref = useMemo(() => {
+    if (!conversations || conversations.length === 0) return "/message";
+    const unreadConv = conversations.find((c: any) => isConversationUnread(c, currentUser));
+    const target = unreadConv || conversations[0];
+    const targetId = target?.uuid || target?.conversationID || target?._id;
+    return targetId ? `/message/${targetId}` : "/message";
+  }, [conversations, currentUser]);
+
   return (
     <Link
-      href="/messages"
+      href={targetHref}
       prefetch={false}
       className={className || "text-gray-500 hover:text-brand-green transition-colors relative"}
       title="Messages"

@@ -591,7 +591,7 @@ const Navbar = () => {
               {!effectiveUser.isSeller && (
                 <Link href="/briefs/my-briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Projects</Link>
               )}
-              <Link href="/messages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Messages</Link>
+              <Link href="/message" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Messages</Link>
               <hr className="my-2 border-gray-100" />
               <span className="text-red-500 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>Logout</span>
             </>

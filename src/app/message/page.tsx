@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { ChatView } from "@/features/chat";
 import { Loader } from "@/components";
 
-export default function MessageDetailPage() {
+export default function MessagePage() {
   return (
     <Suspense
       fallback={

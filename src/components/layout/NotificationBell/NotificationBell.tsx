@@ -6,7 +6,6 @@ import { socket } from "@/utils/socket";
 import toast from "react-hot-toast";
 import { FiBell } from "react-icons/fi";
 import { playNotificationSound } from "@/utils/soundUtil";
-import "./NotificationBell.scss";
 
 interface NotificationBellProps {
   currentUser: any;
@@ -83,15 +82,15 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
 
       const notifId = newNotif._id || newNotif.id || `${newNotif.title}-${newNotif.createdAt || Date.now()}`;
       toast.custom((t) => (
-        <div className={`toast-notification relative ${t.visible ? 'animate-enter' : 'animate-leave'}`}>
+        <div className={`relative bg-white border-l-4 border-[#6ad724] shadow-xl p-4 rounded-lg max-w-[350px] flex flex-col gap-1 transition-all duration-300 ${t.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}>
           <button 
-            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 font-bold px-1"
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 font-bold px-1 text-base leading-none cursor-pointer"
             onClick={(e) => { e.stopPropagation(); toast.dismiss(t.id); }}
           >
             ×
           </button>
-          <strong>🔔 {newNotif.title}</strong>
-          <p>{newNotif.message}</p>
+          <strong className="text-[#333] text-sm font-bold">🔔 {newNotif.title}</strong>
+          <p className="text-[#666] text-[13px] m-0 leading-snug">{newNotif.message}</p>
         </div>
       ), { id: `sys-notif-${notifId}`, duration: 5000 });
       
@@ -133,21 +132,20 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
       // Show toast for incoming message with 5s duration and unique ID
       toast.custom((t) => (
         <div 
-          className={`toast-notification relative ${t.visible ? 'animate-enter' : 'animate-leave'}`}
-          style={{ cursor: 'pointer', paddingRight: '24px' }}
+          className={`relative bg-white border-l-4 border-[#6ad724] shadow-xl p-4 rounded-lg max-w-[350px] flex flex-col gap-1 transition-all duration-300 cursor-pointer pr-6 ${t.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}
           onClick={() => {
             toast.dismiss(t.id);
             window.location.href = `/message/${newMsg.conversationID}`;
           }}
         >
           <button 
-            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 font-bold px-1"
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 font-bold px-1 text-base leading-none cursor-pointer"
             onClick={(e) => { e.stopPropagation(); toast.dismiss(t.id); }}
           >
             ×
           </button>
-          <strong>💬 {senderName}</strong>
-          <p>{msgPreview}</p>
+          <strong className="text-[#333] text-sm font-bold">💬 {senderName}</strong>
+          <p className="text-[#666] text-[13px] m-0 leading-snug">{msgPreview}</p>
         </div>
       ), { id: `chat-toast-${msgKey}`, duration: 5000 });
 
@@ -255,6 +253,24 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
                 </div>
               ))
             )}
+          </div>
+          <div className="dropdown-footer p-2.5 border-t border-gray-100 bg-gray-50/90 rounded-b-lg text-center flex items-center justify-between px-3">
+            <span className="text-[11px] text-gray-400 font-medium">
+              {notifications.length} {notifications.length === 1 ? 'notification' : 'notifications'}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                router.push('/notifications');
+              }}
+              className="text-xs font-bold text-[#0E3834] hover:text-[#092724] hover:underline cursor-pointer flex items-center gap-1 transition-colors"
+            >
+              <span>View all</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
           </div>
         </div>
       )}

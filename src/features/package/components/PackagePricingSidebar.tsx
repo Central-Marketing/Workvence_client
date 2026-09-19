@@ -309,7 +309,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
           <AiGradientButton
             onClick={onViewSellerProfile}
             className="w-full py-3 text-xs sm:text-sm font-bold"
-            text="Analysis Seller Profile"
+            text="Seller Profile"
             icon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -1022,10 +1022,17 @@ const BriefDetail = () => {
                     <FiArrowLeft className="text-base" />
                   </button>
                 )}
-                <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+                <h2 className={`${modalView === "ai" ? "text-2xl sm:text-[36px]" : "text-lg sm:text-xl"} font-bold text-slate-900 font-sf-pro`}>
                   {modalView === "list" && `Proposals (${totalProposalsCount})`}
                   {modalView === "detail" && "Proposal Details"}
-                  {modalView === "ai" && "Recommend by AI"}
+                  {modalView === "ai" && (
+                    <span className="inline-flex items-center gap-2 text-2xl sm:text-[36px] font-[590] leading-normal">
+                      <span className="text-slate-900">Recommend by</span>
+                      <span className="bg-[linear-gradient(90deg,#8A38F5_57.88%,#9AFFDA_42.5%,#82C2FD_20%)] bg-clip-text text-transparent [-webkit-text-fill-color:transparent] font-sf-pro text-[36px] font-[590] leading-normal">
+                        AI
+                      </span>
+                    </span>
+                  )}
                 </h2>
               </div>
 
@@ -1136,7 +1143,17 @@ const BriefDetail = () => {
 
                           {/* Price */}
                           <div className="text-right shrink-0">
-                            <span className="font-bold text-sm sm:text-base text-emerald-600">
+                            <span
+                              className="font-bold text-[24px] leading-normal font-sf-pro"
+                              style={{
+                                color: "var(--Foundation-Green-green-500, #1A9997)",
+                                fontFamily: '"SF Pro", sans-serif',
+                                fontSize: "24px",
+                                fontStyle: "normal",
+                                fontWeight: 700,
+                                lineHeight: "normal",
+                              }}
+                            >
                               ${item.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </span>
                           </div>

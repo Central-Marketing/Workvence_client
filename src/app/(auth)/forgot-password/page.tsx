@@ -31,9 +31,11 @@ const ForgotPassword = () => {
 
       toast.success("Password reset OTP sent to your email!");
       router.push(`/reset-password?email=${encodeURIComponent(email)}`);
-    } catch (error: any) {
-      setError(error.response?.data?.message || "Failed to send reset link");
-      toast.error(error.response?.data?.message || "Failed to send reset link");
+    } catch (err: unknown) {
+      const errorObj = err as { response?: { data?: { message?: string } } };
+      const errorMessage = errorObj.response?.data?.message || "Failed to send reset link";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -47,7 +49,7 @@ const ForgotPassword = () => {
           <div className="flex flex-col h-full">
             <div className="flex justify-center md:justify-start mb-7">
               <Link href="/">
-                <img src="/Workvence-logo-Horizontal3.png" alt="Workvence" className="h-10 object-contain" />
+                <Image src="/Workvence-logo-Horizontal3.png" alt="Workvence" width={160} height={40} className="h-10 w-auto object-contain" priority />
               </Link>
             </div>
             <div className="flex justify-center md:justify-start w-full">
@@ -57,7 +59,7 @@ const ForgotPassword = () => {
             <form onSubmit={handleSubmit} className="flex flex-col items-start w-full max-w-[450px]">
               <div className="w-full flex flex-col gap-4">
                 <h1 className="text-[24px] md:text-[28px] font-bold text-[#1a1a1a]">Forgot Password</h1>
-                <p className="text-sm text-[#666] leading-relaxed">Enter the email address associated with your account and we'll send you a verification code to reset your password.</p>
+                <p className="text-sm text-[#666] leading-relaxed">Enter the email address associated with your account and we&apos;ll send you a verification code to reset your password.</p>
 
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-semibold text-[#333]">Email Address</label>
@@ -66,7 +68,7 @@ const ForgotPassword = () => {
                     type="email"
                     placeholder="Enter your email address"
                     value={email}
-                    onChange={(e: any) => setEmail(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                     className="py-3 px-3 border border-gray-200 rounded-lg text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full"
                   />
                 </div>
@@ -90,7 +92,7 @@ const ForgotPassword = () => {
         <div className="hidden md:flex flex-1 relative bg-black">
           <Image fill src="/loginImg.jpg" alt="Workvence user" className="w-full h-full object-cover opacity-80" />
           <div className="absolute bottom-10 left-10 right-10">
-            <p className="text-white text-lg leading-relaxed font-medium drop-shadow-lg">"Workvence has revolutionized how I outsource my business tasks. It's incredibly efficient, and the talent pool is unmatched. A game-changer for my startup!"</p>
+            <p className="text-white text-lg leading-relaxed font-medium drop-shadow-lg">&ldquo;Workvence has revolutionized how I outsource my business tasks. It&apos;s incredibly efficient, and the talent pool is unmatched. A game-changer for my startup!&rdquo;</p>
           </div>
         </div>
       </div>

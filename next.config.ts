@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // output: "standalone",
+  output: "standalone",
   images: {
     formats: ['image/avif', 'image/webp'],
     qualities: [75, 85],
@@ -42,7 +42,7 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
-    let rawMainUrl = (
+    const rawMainUrl = (
       process.env.NEXT_PUBLIC_SERVER_API_URL ||
       process.env.NEXT_PUBLIC_API_URL ||
       'http://localhost:8080/api'
@@ -51,7 +51,7 @@ const nextConfig: NextConfig = {
     // Ensure mainApiUrl always ends with /api
     const mainApiUrl = rawMainUrl.endsWith('/api') ? rawMainUrl : `${rawMainUrl}/api`;
 
-    let rawAdminUrl = (
+    const rawAdminUrl = (
       process.env.NEXT_PUBLIC_ADMIN_API_URL ||
       process.env.NEXT_PUBLIC_ADMIN_BACKEND_URL ||
       'http://localhost:8082/api/admin'

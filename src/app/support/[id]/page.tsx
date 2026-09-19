@@ -69,7 +69,7 @@ function AttachmentDisplayItem({ att, ticketId }: { att: any; ticketId: string }
         >
           {loadingUrl ? (
             <div className="p-6 text-center text-xs text-gray-500 flex items-center justify-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-[#1dbf73]" />
+              <Loader2 className="w-4 h-4 animate-spin text-[#327C73]" />
               <span>Loading image...</span>
             </div>
           ) : (
@@ -95,9 +95,9 @@ function AttachmentDisplayItem({ att, ticketId }: { att: any; ticketId: string }
       href={url}
       target="_blank"
       rel="noreferrer"
-      className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-black/5 hover:bg-black/10 text-xs font-semibold underline truncate max-w-xs transition"
+      className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-black/5 hover:bg-black/10 text-xs font-semibold underline truncate max-w-xs transition font-inter"
     >
-      <FileText className="w-4 h-4 flex-shrink-0 text-[#1dbf73]" />
+      <FileText className="w-4 h-4 flex-shrink-0 text-[#327C73]" />
       <span className="truncate">{name}</span>
     </a>
   );
@@ -307,7 +307,7 @@ export default function TicketDetailsPage() {
     return (
       <div className="min-h-screen bg-[#f8fafc] py-16 px-4 flex items-center justify-center">
         <div className="text-center space-y-3">
-          <Loader2 className="w-9 h-9 mx-auto animate-spin text-[#1dbf73]" />
+          <Loader2 className="w-9 h-9 mx-auto animate-spin text-[#327C73]" />
           <p className="text-xs font-semibold text-[#64748b]">Loading support conversation...</p>
         </div>
       </div>
@@ -319,18 +319,18 @@ export default function TicketDetailsPage() {
       <div className="min-h-screen bg-[#f8fafc] py-16 px-4">
         <div className="max-w-xl mx-auto bg-white p-8 rounded-2xl border border-[#e2e8f0] text-center space-y-4 shadow-xs">
           <AlertCircle className="w-10 h-10 mx-auto text-rose-600" />
-          <h2 className="text-lg font-bold text-[#0f172a]">Ticket Not Found</h2>
-          <p className="text-xs text-[#64748b]">{error || "The requested support ticket could not be found."}</p>
+          <h2 className="text-lg font-bold text-[#0f172a] font-sf-pro">Ticket Not Found</h2>
+          <p className="text-xs text-[#64748b] font-inter">{error || "The requested support ticket could not be found."}</p>
           <div className="flex items-center justify-center gap-3 pt-2">
             <Link
               href="/support"
-              className="px-5 py-2.5 rounded-lg bg-[#f1f5f9] text-[#334155] font-semibold text-xs hover:bg-[#e2e8f0] transition"
+              className="px-5 py-2.5 rounded-lg bg-[#f1f5f9] text-[#334155] font-semibold text-xs hover:bg-[#e2e8f0] transition font-sf-pro"
             >
               Back to Dashboard
             </Link>
             <button
               onClick={fetchTicketDetails}
-              className="px-5 py-2.5 rounded-lg bg-[#1dbf73] text-white font-semibold text-xs hover:bg-[#19a463] transition cursor-pointer"
+              className="px-5 py-2.5 rounded-lg bg-[#327C73] text-white font-semibold text-xs hover:bg-[#28635c] transition cursor-pointer font-sf-pro"
             >
               Retry
             </button>
@@ -348,15 +348,15 @@ export default function TicketDetailsPage() {
         <div className="flex items-center justify-between">
           <Link
             href="/support"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-[#64748b] hover:text-[#1dbf73] transition"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-[#64748b] hover:text-[#327C73] transition font-sf-pro"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Support Dashboard</span>
           </Link>
 
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#1dbf73] animate-pulse" />
-            <span className="text-xs font-semibold text-[#1dbf73]">
+          <div className="flex items-center gap-2 font-inter">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#327C73] animate-pulse" />
+            <span className="text-xs font-semibold text-[#327C73]">
               {isConnected ? "Real-time Support Connected" : "Connected"}
             </span>
           </div>
@@ -375,14 +375,14 @@ export default function TicketDetailsPage() {
                   {ticket.category || "General Support"}
                 </span>
               </div>
-              <h1 className="text-xl md:text-2xl font-bold text-[#0f172a]">
+              <h1 className="text-xl md:text-2xl font-bold text-[#0f172a] font-sf-pro">
                 {ticket.subject}
               </h1>
             </div>
 
             <button
               onClick={fetchTicketDetails}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#f1f5f9] text-[#334155] hover:bg-[#e2e8f0] text-xs font-semibold transition cursor-pointer self-start md:self-auto"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#f1f5f9] text-[#334155] hover:bg-[#e2e8f0] text-xs font-semibold transition cursor-pointer self-start md:self-auto font-sf-pro"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Refresh</span>
@@ -391,8 +391,8 @@ export default function TicketDetailsPage() {
 
           {/* Linked Order Banner */}
           {ticket.order && (
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-[#1dbf73]/5 border border-[#1dbf73]/20 text-xs">
-              <ShoppingBag className="w-5 h-5 text-[#1dbf73] flex-shrink-0" />
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-[#327C73]/5 border border-[#327C73]/20 text-xs font-inter">
+              <ShoppingBag className="w-5 h-5 text-[#327C73] flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <span className="font-bold text-[#0f172a] block truncate">
                   Linked Order: {ticket.order.title || ticket.order.code}
@@ -440,7 +440,7 @@ export default function TicketDetailsPage() {
                     className={`flex items-start gap-3 ${isAdmin ? "justify-start" : "justify-end"}`}
                   >
                     {isAdmin && (
-                      <div className="w-8 h-8 rounded-full bg-[#1dbf73] text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-2xs">
+                      <div className="w-8 h-8 rounded-full bg-[#327C73] text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-2xs">
                         S
                       </div>
                     )}
@@ -454,7 +454,7 @@ export default function TicketDetailsPage() {
                       <div
                         className={`p-4 rounded-2xl text-xs leading-relaxed ${isAdmin
                             ? "bg-white text-[#0f172a] rounded-tl-none border border-[#e2e8f0] shadow-2xs"
-                            : "bg-[#1dbf73] text-white rounded-tr-none shadow-2xs"
+                            : "bg-[#327C73] text-white rounded-tr-none shadow-2xs"
                           }`}
                       >
                         <p className="whitespace-pre-wrap">{msg.message}</p>
@@ -485,7 +485,7 @@ export default function TicketDetailsPage() {
 
             {/* Typing Indicator */}
             {typingUser && (
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#1dbf73] animate-pulse">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#327C73] animate-pulse font-inter">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 <span>{typingUser} is typing a response...</span>
               </div>
@@ -501,7 +501,7 @@ export default function TicketDetailsPage() {
                 {attachments.map((att, idx) => (
                   <span
                     key={idx}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#1dbf73]/10 border border-[#1dbf73]/20 text-[#1dbf73] text-xs font-semibold"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#327C73]/10 border border-[#327C73]/20 text-[#327C73] text-xs font-semibold font-inter"
                   >
                     <FileText className="w-3.5 h-3.5" />
                     <span>{att.name}</span>
@@ -528,7 +528,7 @@ export default function TicketDetailsPage() {
                     startTyping();
                   }}
                   onBlur={stopTyping}
-                  className="w-full px-4 py-3 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] text-xs text-[#0f172a] focus:bg-white focus:border-[#1dbf73] focus:ring-2 focus:ring-[#1dbf73]/10 outline-none resize-none transition"
+                  className="w-full px-4 py-3 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] text-xs text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none resize-none transition font-inter"
                 />
 
                 <div className="flex items-center gap-2">
@@ -543,7 +543,7 @@ export default function TicketDetailsPage() {
                     type="button"
                     disabled={uploadingFile}
                     onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1dbf73]/10 text-[#1dbf73] border border-[#1dbf73]/30 text-xs font-bold hover:bg-[#1dbf73]/20 transition cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#327C73]/10 text-[#327C73] border border-[#327C73]/30 text-xs font-bold hover:bg-[#327C73]/20 transition cursor-pointer disabled:opacity-50 font-sf-pro"
                   >
                     {uploadingFile ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -558,7 +558,7 @@ export default function TicketDetailsPage() {
               <button
                 type="submit"
                 disabled={sending || uploadingFile || !replyText.trim()}
-                className="px-6 py-3 rounded-xl bg-[#1dbf73] hover:bg-[#19a463] text-white font-semibold text-xs shadow-xs transition active:scale-95 disabled:opacity-50 flex items-center gap-2 cursor-pointer h-[46px]"
+                className="px-6 py-3 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 disabled:opacity-50 flex items-center gap-2 cursor-pointer h-[46px] font-sf-pro"
               >
                 {sending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

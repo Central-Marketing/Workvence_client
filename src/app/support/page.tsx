@@ -137,21 +137,21 @@ export default function SupportDashboardPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 md:p-8 rounded-2xl border border-[#e2e8f0] shadow-xs">
           <div className="space-y-1.5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#1dbf73]/10 text-[#1dbf73] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-[#327C73]/10 text-[#327C73] flex items-center justify-center">
                 <LifeBuoy className="w-5 h-5" />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-[#0f172a] tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-bold text-[#0f172a] tracking-tight font-sf-pro">
                 Support & Help Desk
               </h1>
             </div>
-            <p className="text-sm text-[#64748b] max-w-2xl">
+            <p className="text-sm text-[#64748b] max-w-2xl font-inter">
               Track your open support inquiries, submit new help requests, and communicate directly with platform administrators.
             </p>
           </div>
 
           <Link
             href="/support/new"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-[#1dbf73] hover:bg-[#19a463] text-white font-semibold text-xs shadow-xs transition active:scale-95 cursor-pointer whitespace-nowrap"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 cursor-pointer whitespace-nowrap font-sf-pro"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Create Support Ticket</span>
@@ -197,12 +197,12 @@ export default function SupportDashboardPage() {
           </div>
 
           <div className="bg-emerald-50/50 p-5 rounded-2xl border border-emerald-200 shadow-xs space-y-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#1dbf73]">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#327C73]">
               Resolved / Closed
             </span>
             <div className="flex items-center justify-between">
-              <span className="text-3xl font-bold text-[#1dbf73]">{stats.resolvedClosed}</span>
-              <div className="p-2.5 rounded-lg bg-[#1dbf73]/10 text-[#1dbf73]">
+              <span className="text-3xl font-bold text-[#327C73]">{stats.resolvedClosed}</span>
+              <div className="p-2.5 rounded-lg bg-[#327C73]/10 text-[#327C73]">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
             </div>
@@ -222,7 +222,7 @@ export default function SupportDashboardPage() {
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition cursor-pointer ${isSelected
-                      ? "bg-[#1dbf73] text-white shadow-xs"
+                      ? "bg-[#327C73] text-white shadow-xs"
                       : "bg-[#f1f5f9] text-[#475569] hover:bg-[#e2e8f0]"
                     }`}
                 >
@@ -261,7 +261,7 @@ export default function SupportDashboardPage() {
                 placeholder="Search ticket subject or #ID..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg text-xs border border-[#e2e8f0] bg-[#f8fafc] text-[#0f172a] focus:bg-white focus:border-[#1dbf73] focus:ring-2 focus:ring-[#1dbf73]/10 outline-none"
+                className="w-full pl-10 pr-4 py-2 rounded-lg text-xs border border-[#e2e8f0] bg-[#f8fafc] text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none font-inter"
               />
             </div>
 
@@ -272,7 +272,7 @@ export default function SupportDashboardPage() {
         <div className="space-y-4">
           {loading ? (
             <div className="bg-white p-12 rounded-2xl border border-[#e2e8f0] text-center space-y-3">
-              <Loader2 className="w-8 h-8 mx-auto animate-spin text-[#1dbf73]" />
+              <Loader2 className="w-8 h-8 mx-auto animate-spin text-[#327C73]" />
               <p className="text-xs font-semibold text-[#64748b]">Loading your support tickets...</p>
             </div>
           ) : error ? (
@@ -294,8 +294,8 @@ export default function SupportDashboardPage() {
             <div className="bg-white p-12 rounded-2xl border border-[#e2e8f0] text-center space-y-4">
               <MessageSquare className="w-12 h-12 mx-auto text-[#cbd5e1]" />
               <div className="space-y-1">
-                <h3 className="text-base font-bold text-[#0f172a]">No support tickets found</h3>
-                <p className="text-xs text-[#64748b] max-w-md mx-auto">
+                <h3 className="text-base font-bold text-[#0f172a] font-sf-pro">No support tickets found</h3>
+                <p className="text-xs text-[#64748b] max-w-md mx-auto font-inter">
                   {searchQuery || selectedCategory !== "All" || selectedStatus !== "All"
                     ? "No tickets match your search or filter selection."
                     : "You haven't submitted any support tickets yet. Need help? Create a ticket to reach out to our team."}
@@ -303,7 +303,7 @@ export default function SupportDashboardPage() {
               </div>
               <Link
                 href="/support/new"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#1dbf73] hover:bg-[#19a463] text-white font-semibold text-xs transition cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs transition cursor-pointer font-sf-pro shadow-xs active:scale-95"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>Submit New Request</span>
@@ -314,7 +314,7 @@ export default function SupportDashboardPage() {
               {filteredTickets.map((ticket) => (
                 <div
                   key={ticket.id}
-                  className="bg-white p-6 rounded-2xl border border-[#e2e8f0] shadow-xs hover:border-[#1dbf73] hover:shadow-md transition-all duration-200 space-y-4 group"
+                  className="bg-white p-6 rounded-2xl border border-[#e2e8f0] shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-200 space-y-4 group"
                 >
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="space-y-1.5">
@@ -327,20 +327,20 @@ export default function SupportDashboardPage() {
                           {ticket.category || "General Support"}
                         </span>
                         {ticket.adminResponded && (
-                          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-[#1dbf73]/10 text-[#1dbf73]">
+                          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-[#327C73]/10 text-[#327C73]">
                             Admin Responded
                           </span>
                         )}
                       </div>
 
-                      <h3 className="text-base font-bold text-[#0f172a] group-hover:text-[#1dbf73] transition-colors">
+                      <h3 className="text-base font-bold text-[#0f172a] group-hover:text-[#327C73] transition-colors font-sf-pro">
                         {ticket.subject}
                       </h3>
                     </div>
 
                     <Link
                       href={`/support/${ticket.id}`}
-                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#f1f5f9] hover:bg-[#1dbf73] hover:text-white text-[#334155] font-semibold text-xs transition cursor-pointer"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#f1f5f9] hover:bg-[#327C73] hover:text-white text-[#334155] font-semibold text-xs transition cursor-pointer font-sf-pro"
                     >
                       <span>View Ticket</span>
                       <ArrowRight className="w-4 h-4" />

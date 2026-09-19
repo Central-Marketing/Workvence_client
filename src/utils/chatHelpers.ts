@@ -108,3 +108,6 @@ export const renderMessageTextWithLinks = (text: string) => {
     return part;
   });
 };
+
+export { formatFileSize } from '@/lib/formatters';
+

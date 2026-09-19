@@ -3,7 +3,7 @@
 import toast from 'react-hot-toast';
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, Flag, ArrowRight } from "lucide-react";
+import { ArrowLeft, Flag, ArrowRight, Download } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   RiSearchLine,
@@ -36,6 +36,7 @@ import { getOtherUser, isConversationUnread, isTargetConversation, renderMessage
 import { useUserStore } from "@/store/userStore";
 import { Loader, ChatSkeleton, Skeleton, AiGradientButton } from "@/components";
 import { MessageModerationBadge } from "@/features/chat";
+import { formatFileSize } from "@/lib";
 import moment from 'moment';
 
 const ChatView = () => {
@@ -2243,14 +2244,52 @@ const ChatView = () => {
                 .join(', ')
               : '';
 
-          const conversationMedia = (messages || [])
+
+          const conversationMediaFiles: Array<{ name: string; sizeText: string | null; url: string }> = (messages || [])
             .flatMap((m: any) => {
-              const list: string[] = [];
-              if (m.file && typeof m.file === 'string') list.push(m.file);
-              if (Array.isArray(m.attachments)) list.push(...m.attachments);
-              return list;
-            })
-            .filter((url: string) => typeof url === 'string' && url.length > 0);
+              const items: Array<{ name: string; sizeText: string | null; url: string }> = [];
+              const parseItem = (item: any) => {
+                if (!item) return;
+                if (typeof item === 'string' && item.trim().length > 0) {
+                  const fileName = item.split('/').pop()?.split('?')[0] || 'Attachment';
+                  const rawSize = m.fileSize || m.size || m.bytes;
+                  items.push({
+                    name: fileName,
+                    sizeText: formatFileSize(rawSize),
+                    url: item,
+                  });
+                } else if (typeof item === 'object' && (item.url || item.file || item.secure_url)) {
+                  const url = item.url || item.file || item.secure_url;
+                  if (typeof url === 'string' && url.trim().length > 0) {
+                    const name = item.name || item.fileName || item.original_filename || url.split('/').pop()?.split('?')[0] || 'Attachment';
+                    const rawSize = item.sizeText || item.size || item.bytes || m.fileSize || m.size;
+                    items.push({
+                      name,
+                      sizeText: formatFileSize(rawSize),
+                      url,
+                    });
+                  }
+                }
+              };
+              if (m.file) parseItem(m.file);
+              if (Array.isArray(m.attachments)) m.attachments.forEach(parseItem);
+              return items;
+            });
+
+          const handleDownloadMedia = (file: { name: string; url: string }) => {
+            if (file.url && file.url !== '#') {
+              const link = document.createElement('a');
+              link.href = file.url;
+              link.download = file.name;
+              link.target = '_blank';
+              link.rel = 'noopener noreferrer';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            } else {
+              toast.success(`Downloading ${file.name}`);
+            }
+          };
 
           const renderOrderStatusBadge = (status: string) => {
             const normalized = (status || '').toLowerCase().replace(/[\s_-]/g, '');
@@ -2477,25 +2516,40 @@ const ChatView = () => {
                   </>
                 ) : (
                   /* ── MEDIA TAB ── */
-                  <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col gap-3">
-                    <h3 className="text-base font-bold text-slate-800">Shared Media</h3>
-                    {conversationMedia.length > 0 ? (
-                      <div className="grid grid-cols-3 gap-2 pt-1">
-                        {conversationMedia.map((mediaUrl: string, idx: number) => (
-                          <a
-                            key={idx}
-                            href={mediaUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="aspect-square rounded-lg overflow-hidden border border-slate-200 hover:opacity-90 transition-opacity block bg-slate-100"
+                  <div className="flex flex-col gap-2.5 pt-0.5">
+                    {conversationMediaFiles.length > 0 ? (
+                      conversationMediaFiles.map((file, idx) => (
+                        <div
+                          key={idx}
+                          className="bg-white rounded-[16px] px-4 py-3.5 flex items-center justify-between border border-slate-100/90 shadow-2xs hover:border-slate-200 transition-all group"
+                        >
+                          <div className="min-w-0 flex-1 pr-3">
+                            <h4
+                              className="font-bold text-gray-950 text-[13.5px] leading-tight truncate font-sf-pro group-hover:text-[#0E3834] transition-colors"
+                              title={file.name}
+                            >
+                              {file.name}
+                            </h4>
+                            {file.sizeText ? (
+                              <span className="text-xs text-gray-400 font-normal mt-1 block">
+                                {file.sizeText}
+                              </span>
+                            ) : null}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadMedia(file)}
+                            className="w-10 h-10 rounded-[12px] border border-[#E5E7EB] hover:border-[#0E3834] hover:bg-slate-50 flex items-center justify-center text-[#5F71B0] hover:text-[#0E3834] transition-all shrink-0 cursor-pointer shadow-2xs active:scale-95"
+                            title={`Download ${file.name}`}
+                            aria-label={`Download ${file.name}`}
                           >
-                            <img src={mediaUrl} alt="" className="w-full h-full object-cover" />
-                          </a>
-                        ))}
-                      </div>
+                            <Download className="w-[18px] h-[18px]" strokeWidth={1.8} />
+                          </button>
+                        </div>
+                      ))
                     ) : (
-                      <div className="py-8 text-center text-xs text-slate-400">
-                        No media shared yet
+                      <div className="bg-white rounded-[16px] p-6 text-center border border-slate-100/90 shadow-2xs">
+                        <p className="text-xs text-slate-400 font-normal m-0">No media shared yet</p>
                       </div>
                     )}
                   </div>

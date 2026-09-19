@@ -241,7 +241,9 @@ export function normalizeSellerProfile(
   if (Array.isArray(rawGigs) && rawGigs.length > 0) {
     gigs = rawGigs.map((g: any, idx: number) => {
       const gId = g._id || g.id || `gig-${idx}`;
+      const resolvedCover = g.cover || (Array.isArray(g.images) && g.images[0]) || g.img || g.image || SELLER_FALLBACK_IMAGES.gigCover;
       return {
+        ...g,
         _id: gId,
         id: gId,
         slug: g.slug || g._id || g.id,
@@ -250,8 +252,9 @@ export function normalizeSellerProfile(
         rating: Number(g.starNumber ? (g.totalStars / g.starNumber) : (g.rating || g.star || 5.0)),
         reviewCount: Number(g.starNumber || g.reviews || g.reviewCount || 0),
         title: g.title || 'I will design,redesign business wordpress website as divi expert',
-        cover: g.cover || (Array.isArray(g.images) && g.images[0]) || g.img || SELLER_FALLBACK_IMAGES.gigCover,
-        img: g.cover || (Array.isArray(g.images) && g.images[0]) || g.img || SELLER_FALLBACK_IMAGES.gigCover,
+        cover: resolvedCover,
+        img: resolvedCover,
+        image: resolvedCover,
         price: Number(g.price || g.startingPrice || 100),
         startingPrice: Number(g.price || g.startingPrice || 100),
         sales: Number(g.sales || 0),
@@ -261,7 +264,6 @@ export function normalizeSellerProfile(
           image: avatar,
           sellerLevel: sellerObj.sellerLevel || 'Level 1',
         },
-        ...g,
       };
     });
   } else if (isFallback) {

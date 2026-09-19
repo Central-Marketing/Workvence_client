@@ -119,11 +119,13 @@ export default function OrderDetailPage() {
     const seller = {
       id: String(sObj._id || sObj.id || (typeof o.sellerID === "string" ? o.sellerID : "")),
       name: sObj.username || sObj.name || "Seller",
+      username: sObj.username || sObj.name,
       avatar: sObj.image || sObj.avatar || "/media/noavatar.png",
       role: sObj.title || sObj.shortTitle || sObj.role || "--",
       badge: sObj.badge,
       rating: sellerRating,
       reviewCount: sellerReviewCount,
+      country: sObj.country || sObj.location
     };
 
     // Buyer normalization
@@ -149,10 +151,10 @@ export default function OrderDetailPage() {
     const rawFiles = o.deliveryFiles || o.deliverables || [];
     const deliveryFiles = Array.isArray(rawFiles)
       ? rawFiles.map((f: any, idx: number) => ({
-          name: typeof f === "string" ? f.split("/").pop() || `Deliverable_${idx + 1}` : f.name || `Deliverable_${idx + 1}`,
-          size: typeof f === "object" && f.size ? f.size : "-",
-          url: typeof f === "string" ? f : f.url || "#",
-        }))
+        name: typeof f === "string" ? f.split("/").pop() || `Deliverable_${idx + 1}` : f.name || `Deliverable_${idx + 1}`,
+        size: typeof f === "object" && f.size ? f.size : "-",
+        url: typeof f === "string" ? f : f.url || "#",
+      }))
       : [];
 
     // Requirements
@@ -177,10 +179,10 @@ export default function OrderDetailPage() {
     );
     const extensionRequest = (extReq && isExtPending)
       ? {
-          days: extReq.days || extReq.extraDays || 1,
-          reason: extReq.reason || "Time extension requested.",
-          status: extReq.status || "pending",
-        }
+        days: extReq.days || extReq.extraDays || 1,
+        reason: extReq.reason || "Time extension requested.",
+        status: extReq.status || "pending",
+      }
       : null;
 
     return {

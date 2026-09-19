@@ -1,6 +1,7 @@
 export interface OrderUser {
   id: string;
   name: string;
+  username?: string;
   avatar: string;
   role?: string;
   badge?: string;

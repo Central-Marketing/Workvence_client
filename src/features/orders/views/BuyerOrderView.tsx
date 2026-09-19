@@ -635,21 +635,31 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
               <h3 className="font-bold text-base text-slate-900 mb-4">About the Seller</h3>
 
               <div className="flex items-center gap-3.5 pb-4 border-b border-slate-100">
-                <img
-                  src={order.seller.avatar || "/media/noavatar.png"}
-                  alt={order.seller.name}
-                  className="w-12 h-12 rounded-full object-cover border border-slate-200 shrink-0"
-                />
+                <Link
+                  href={`/seller/${order.seller.username || order.seller.name}`}
+                  className="shrink-0 group/avatar"
+                >
+                  <img
+                    src={order.seller.avatar || "/media/noavatar.png"}
+                    alt={order.seller.name}
+                    className="w-12 h-12 rounded-full object-cover border border-slate-200 group-hover/avatar:opacity-90 group-hover/avatar:border-slate-300 transition-all"
+                  />
+                </Link>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="font-bold text-sm text-slate-900">{order.seller.name}</p>
+                    <Link
+                      href={`/seller/${order.seller.username || order.seller.name}`}
+                      className="font-bold text-sm text-slate-900 hover:text-[#0E3834] transition-colors"
+                    >
+                      {order.seller.name}
+                    </Link>
                     {order.seller.badge && (
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                         {order.seller.badge}
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
+                  {/* <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
                     {(order.seller.reviewCount ?? 0) > 0 && (order.seller.rating ?? 0) > 0 ? (
                       <>
                         <span className="text-amber-500 font-bold">★ {(order.seller.rating ?? 0).toFixed(1)}</span>
@@ -658,7 +668,12 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     ) : (
                       <span className="text-slate-400 font-medium">No reviews yet</span>
                     )}
-                  </div>
+                  </div> */}
+                  {order.seller.country && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <span className="text-xs text-slate-500">{order.seller.country}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 

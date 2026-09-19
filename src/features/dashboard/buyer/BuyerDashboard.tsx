@@ -139,10 +139,10 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
               Explore Projects
             </Link>
             <Link
-              href="/seller"
+              href="/packages"
               className="bg-black hover:bg-gray-800 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors shadow-sm"
             >
-              Browse Freelancers
+              Browse Packages
             </Link>
           </div>
         </div>

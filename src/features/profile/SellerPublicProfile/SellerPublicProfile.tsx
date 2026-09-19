@@ -176,7 +176,7 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
         {/* 2. Main Two-Column Grid: Left (About & Contact) + Right (Gigs Grid) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start mb-12">
           {/* Left Column (lg:col-span-4) */}
-          <div className="lg:col-span-4 sticky top-6 lg:top-8 self-start">
+          <div className="lg:col-span-4 lg:sticky lg:top-8 self-start">
             <SellerAboutSidebar
               name={profileData.name}
               memberSince={profileData.memberSince}

@@ -15,7 +15,12 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
   const userObj = data.user || data.userId || data.userID || {};
   const userImg = userObj.image || data.pp || "/media/noavatar.png";
   const username = userObj.username || data.username || "Seller";
-  const coverImg = data.cover || data.img || "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80";
+  const coverImg =
+    data.cover ||
+    data.img ||
+    data.image ||
+    (Array.isArray(data.images) && data.images[0]) ||
+    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80";
 
   // Rating calculation
   const rawRating = data.starNumber > 0 ? (data.totalStars / data.starNumber).toFixed(1) : (data.star || 4.9);
@@ -58,6 +63,7 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 405px"
             priority={priority}
+            unoptimized
             className="object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
           />
 

@@ -485,7 +485,7 @@ const Earnings = () => {
               type="button"
               onClick={() => syncClearanceMutation.mutate()}
               disabled={syncClearanceMutation.isPending}
-              className="bg-[rgb(239_252_250_/_50%)] hover:bg-gray-50 border border-black/10 text-gray-800 font-semibold text-xs sm:text-[13px] px-4 py-2.5 rounded-lg transition-colors cursor-pointer flex items-center gap-2 shadow-2xs"
+              className="bg-[rgb(239_252_250_/_50%)] hover:bg-gray-50 border border-black/10 text-gray-800 font-semibold text-xs sm:text-[13px] py-[12px] px-[24px] rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-2xs"
               title="Sync mature completed orders into your available balance"
             >
               <svg
@@ -494,7 +494,7 @@ const Earnings = () => {
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
-                className={`w-3.5 h-3.5 ${syncClearanceMutation.isPending ? "animate-spin text-gray-500" : "text-[#292929]"
+                className={`w-3.5 h-3.5 shrink-0 ${syncClearanceMutation.isPending ? "animate-spin text-gray-500" : "text-[#292929]"
                   }`}
               >
                 <path
@@ -531,26 +531,26 @@ const Earnings = () => {
                 type="button"
                 onClick={() => connectDashboardMutation.mutate()}
                 disabled={connectDashboardMutation.isPending}
-                className="bg-[#635BFF]/10 hover:bg-[#635BFF]/15 text-[#635bff] border border-[#635bff]/20 font-semibold text-xs sm:text-[13px] px-3.5 sm:px-4 py-2.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                className="bg-[#635BFF]/10 hover:bg-[#635BFF]/15 text-[#635bff] border border-[#635bff]/20 font-semibold text-xs sm:text-[13px] py-[12px] px-[24px] rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
                 title="Open Stripe Express Dashboard"
               >
                 {connectDashboardMutation.isPending ? (
                   <span className="w-3.5 h-3.5 border-2 border-[#635bff] border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <FaStripe size={28} className="text-[#635bff] shrink-0" />
+                  <FaStripe size={18} className="text-[#635bff] shrink-0" />
                 )}
                 <span>Stripe Dashboard</span>
-                <ArrowUpRight className="w-3.5 h-3.5 text-[#635bff]" />
+                <ArrowUpRight className="w-3.5 h-3.5 text-[#635bff] shrink-0" />
               </button>
             )}
 
             <button
               type="button"
               onClick={() => setShowWalletModal(true)}
-              className="bg-[#F1F3F5] hover:bg-gray-200 text-gray-800 font-semibold text-xs sm:text-[13px] px-4 sm:px-5 py-2.5 rounded-lg transition-colors cursor-pointer flex items-center gap-2"
+              className="bg-[#F1F3F5] hover:bg-gray-200 border border-transparent text-gray-800 font-semibold text-xs sm:text-[13px] py-[12px] px-[24px] rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-2xs"
             >
               {hasAnyConnected && (
-                <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200 shrink-0" />
               )}
               <span>{hasAnyConnected ? "Payout Channels" : "Connect Wallet"}</span>
             </button>
@@ -568,7 +568,7 @@ const Earnings = () => {
                 }
               }}
               disabled={availableBalance <= 0}
-              className="bg-black hover:bg-gray-900 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold text-xs sm:text-[13px] px-5 py-2.5 rounded-lg transition-colors shadow-2xs cursor-pointer"
+              className="bg-black hover:bg-gray-900 border border-transparent disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold text-xs sm:text-[13px] py-[12px] px-[24px] rounded-lg transition-colors shadow-2xs cursor-pointer flex items-center justify-center text-center"
             >
               Request Payout
             </button>
@@ -1033,11 +1033,10 @@ const Earnings = () => {
                     toast.error("Please connect Stripe in Payout Channels first.");
                   }
                 }}
-                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${
-                  selectedMethod === "stripe"
-                    ? "bg-[#F7F4FF] border-2 border-[#635bff] shadow-2xs"
-                    : "bg-white border border-gray-200 hover:border-gray-300"
-                } ${!isStripeReady ? "opacity-60" : ""}`}
+                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${selectedMethod === "stripe"
+                  ? "bg-[#F7F4FF] border-2 border-[#635bff] shadow-2xs"
+                  : "bg-white border border-gray-200 hover:border-gray-300"
+                  } ${!isStripeReady ? "opacity-60" : ""}`}
               >
                 <div className="space-y-1 flex-1 pr-2">
                   <div className="flex items-center gap-2">
@@ -1077,11 +1076,10 @@ const Earnings = () => {
                     toast.error("Please connect Payoneer in Payout Channels first.");
                   }
                 }}
-                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${
-                  selectedMethod === "payoneer"
-                    ? "bg-[#F4F9F7] border-2 border-[#327C73] shadow-2xs"
-                    : "bg-white border border-gray-200 hover:border-gray-300"
-                } ${!isPayoneerReady ? "opacity-60" : ""}`}
+                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${selectedMethod === "payoneer"
+                  ? "bg-[#F4F9F7] border-2 border-[#327C73] shadow-2xs"
+                  : "bg-white border border-gray-200 hover:border-gray-300"
+                  } ${!isPayoneerReady ? "opacity-60" : ""}`}
               >
                 <div className="space-y-1 flex-1 pr-2">
                   <div className="flex items-center gap-2">

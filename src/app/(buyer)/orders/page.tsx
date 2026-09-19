@@ -309,9 +309,19 @@ export default function BuyerOrdersPage() {
             </div>
 
             {/* 4. My Favorites */}
-            <div className="p-5 sm:p-6 flex items-center justify-between">
+            <Link
+              href="/favorites"
+              className="p-5 sm:p-6 flex items-center justify-between hover:bg-slate-50/80 transition-all group cursor-pointer block"
+            >
               <div>
-                <p className="text-xs text-slate-500 font-medium">My Favorites</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-xs text-slate-500 font-medium group-hover:text-[#0D6D5F] transition-colors">
+                    My Favorites
+                  </p>
+                  <span className="text-slate-400 group-hover:text-[#0D6D5F] text-xs transition-transform group-hover:translate-x-0.5">
+                    →
+                  </span>
+                </div>
                 <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1 tracking-tight">
                   {totalFavoritesCount}
                 </p>
@@ -319,10 +329,10 @@ export default function BuyerOrdersPage() {
                   {favGigsCount} packages and {favSellersCount} sellers saved
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-2xl border border-[#FFE0E0] bg-[#FFF5F5] flex items-center justify-center text-[#EF4444] shrink-0">
+              <div className="w-12 h-12 rounded-2xl border border-[#FFE0E0] bg-[#FFF5F5] group-hover:bg-[#FFEBEB] flex items-center justify-center text-[#EF4444] shrink-0 transition-colors">
                 <FiHeart className="text-2xl" />
               </div>
-            </div>
+            </Link>
 
           </div>
         </div>

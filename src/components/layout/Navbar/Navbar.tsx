@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { RiSearchLine } from "react-icons/ri";
-import { FiMenu, FiX, FiMessageSquare, FiBell, FiChevronDown, FiGrid, FiArrowRight } from "react-icons/fi";
+import { FiMenu, FiX, FiMessageSquare, FiBell, FiChevronDown, FiGrid, FiArrowRight, FiHeart } from "react-icons/fi";
 import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
 
 import toast from 'react-hot-toast';
@@ -311,6 +311,14 @@ const Navbar = () => {
                 Order
               </Link>
 
+              <Link
+                href="/favorites"
+                title="My Favorites"
+                className="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 hover:text-red-500 transition-colors relative cursor-pointer"
+              >
+                <FiHeart className="text-[19px]" />
+              </Link>
+
               <HeaderInboxIcon
                 currentUser={effectiveUser}
                 className="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer"
@@ -360,6 +368,9 @@ const Navbar = () => {
                     </Link>
                     <Link href="/orders" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
                       Orders
+                    </Link>
+                    <Link href="/favorites" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                      My Favorites
                     </Link>
                     <Link href="/briefs/my-briefs" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
                       My Projects
@@ -587,6 +598,9 @@ const Navbar = () => {
               )}
               {!effectiveUser.isSeller && (
                 <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Orders</Link>
+              )}
+              {!effectiveUser.isSeller && (
+                <Link href="/favorites" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Favorites</Link>
               )}
               {!effectiveUser.isSeller && (
                 <Link href="/briefs/my-briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Projects</Link>

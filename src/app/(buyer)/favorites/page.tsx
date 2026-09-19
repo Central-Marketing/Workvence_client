@@ -6,6 +6,7 @@ import { PackageCard, Loader, FavoriteSellerButton } from "@/components";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { FiHome } from "react-icons/fi";
 import toast from "react-hot-toast";
 
 const FavoritesPage = () => {
@@ -17,40 +18,89 @@ const FavoritesPage = () => {
   const router = useRouter();
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchAllFavorites = async () => {
       try {
+        setLoading(true);
         // 1. Fetch favorite gigs
         const gigsRes = await axiosFetch.get("/gigs/favorites").catch(() => null);
-        if (gigsRes?.data && !gigsRes.data.error) {
-          setFavoriteGigs(gigsRes.data.favorites || []);
+        if (isMounted && gigsRes?.data && !gigsRes.data.error) {
+          const list = Array.isArray(gigsRes.data)
+            ? gigsRes.data
+            : gigsRes.data.favorites || gigsRes.data.gigs || [];
+          const normalizedGigs = list.map((item: any) => {
+            const rawGig =
+              item.gig && typeof item.gig === "object"
+                ? item.gig
+                : item.package && typeof item.package === "object"
+                ? item.package
+                : item.gigId && typeof item.gigId === "object"
+                ? item.gigId
+                : item;
+            return {
+              ...rawGig,
+              isFavorited: true,
+            };
+          });
+          setFavoriteGigs(normalizedGigs);
         }
 
         // 2. Fetch favorite sellers from API
         const sellersRes = await axiosFetch.get("/users/favorite-sellers").catch(() => null);
-        if (sellersRes?.data && !sellersRes.data.error) {
-          setFavoriteSellers(sellersRes.data.sellers || []);
+        if (isMounted && sellersRes?.data && !sellersRes.data.error) {
+          const list = Array.isArray(sellersRes.data)
+            ? sellersRes.data
+            : sellersRes.data.sellers || sellersRes.data.favoriteSellers || [];
+          const normalizedSellers = list.map((seller: any) => {
+            return seller.seller && typeof seller.seller === "object"
+              ? seller.seller
+              : seller.sellerId && typeof seller.sellerId === "object"
+              ? seller.sellerId
+              : seller.user && typeof seller.user === "object"
+              ? seller.user
+              : seller;
+          });
+          setFavoriteSellers(normalizedSellers);
         }
       } catch (err) {
         console.error("Failed to fetch favorites:", err);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    if (user?._id && !user.isSeller) {
+    if (user && !user.isSeller) {
       fetchAllFavorites();
     } else if (user?.isSeller) {
       setLoading(false);
+    } else if (!user) {
+      // Check if session exists in storage
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("user") || localStorage.getItem("accessToken");
+        if (stored) {
+          fetchAllFavorites();
+        } else {
+          setLoading(false);
+          router.push("/login?redirect=/favorites");
+        }
+      }
     }
-  }, [user]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user, router]);
 
   const handleContactSeller = async (seller: any) => {
-    if (!user?._id) {
+    const buyerID = user?._id || user?.id;
+    if (!buyerID) {
       router.push("/login");
       return;
     }
     const sellerID = seller._id || seller.id;
-    const buyerID = user._id;
 
     if (!sellerID || !buyerID) return;
 
@@ -72,7 +122,7 @@ const FavoritesPage = () => {
         sellerID,
         buyerID,
         seller_username: seller.username || null,
-        buyer_username: user.username || null
+        buyer_username: user.username || null,
       });
       const targetId = res.data?.uuid || res.data?.conversationID || res.data?._id;
       if (targetId) {
@@ -106,7 +156,7 @@ const FavoritesPage = () => {
           Only buyers have access to the Favorites list. Please switch to a buyer account to manage saved services and sellers.
         </p>
         <button
-          onClick={() => router.push('/')}
+          onClick={() => router.push("/")}
           className="px-6 py-2.5 bg-brand-green hover:bg-brand-green text-white font-semibold rounded-xl transition-all shadow-sm cursor-pointer"
         >
           Return to Home
@@ -118,11 +168,23 @@ const FavoritesPage = () => {
   return (
     <div className="min-h-screen bg-gray-50/30 py-10 md:py-12">
       <div className="container mx-auto px-4 md:px-6">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mb-6">
+          <Link href="/" className="text-slate-500 hover:text-slate-800 transition-colors flex items-center">
+            <FiHome className="text-sm" />
+          </Link>
+          <span className="text-slate-400">/</span>
+          <Link href="/orders" className="text-slate-500 hover:text-slate-800 transition-colors">
+            Orders
+          </Link>
+          <span className="text-slate-400">/</span>
+          <span className="text-slate-700 font-medium">Favorites</span>
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-[28px] md:text-[32px] font-bold text-gray-900 tracking-tight flex items-center gap-3">
             My Favorites
-
           </h1>
           <p className="text-gray-500 mt-1.5 text-[15px]">
             Manage your saved services and favorite freelancers in one place.
@@ -173,7 +235,7 @@ const FavoritesPage = () => {
                   You haven't saved any services to your favorites yet. Explore the marketplace to bookmark top offerings!
                 </p>
                 <Link href="/packages">
-                  <button className="px-8 py-3 bg-brand-green hover:bg-brand-green text-white font-semibold rounded-xl transition-all shadow-sm cursor-pointer">
+                  <button className="px-8 py-3 bg-black hover:bg-gray-900 text-white font-semibold rounded-xl transition-all shadow-sm cursor-pointer">
                     Browse Marketplace
                   </button>
                 </Link>
@@ -201,7 +263,7 @@ const FavoritesPage = () => {
                   You haven't added any freelancers to your favorite sellers list. Visit seller profiles and click the heart icon to save them here!
                 </p>
                 <Link href="/packages">
-                  <button className="px-8 py-3 bg-brand-green hover:bg-brand-green text-white font-semibold rounded-xl transition-all shadow-sm cursor-pointer">
+                  <button className="px-8 py-3 bg-black hover:bg-gray-900 text-white font-semibold rounded-xl transition-all shadow-sm cursor-pointer">
                     Explore Freelancers
                   </button>
                 </Link>
@@ -262,7 +324,7 @@ const FavoritesPage = () => {
                         </button>
                         <button
                           onClick={() => handleContactSeller(seller)}
-                          className="w-full px-3 py-2 text-xs font-semibold text-white bg-brand-green hover:bg-brand-green rounded-xl transition-colors shadow-2xs cursor-pointer"
+                          className="w-full px-3 py-2 text-xs font-semibold text-white bg-[#0D6D5F] hover:bg-[#0b5c50] rounded-xl transition-colors shadow-2xs cursor-pointer"
                         >
                           Chat Now
                         </button>

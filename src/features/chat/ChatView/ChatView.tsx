@@ -1445,7 +1445,53 @@ const ChatView = () => {
           ) : (
             <>
               {/* Header */}
-              <div className="min-h-[64px] px-4 sm:px-5 py-2.5 sm:py-3.5 border-b border-[rgba(0,0,0,0.10)] flex items-center bg-[#F8F8F8]">
+              <div className="min-h-[64px] px-4 sm:px-5 py-2.5 sm:py-3.5 border-b border-[rgba(0,0,0,0.10)] flex items-center bg-[#F8F8F8] relative overflow-hidden">
+                {/* Mobile Full-Width Search Takeover */}
+                {isMsgSearchActive && (
+                  <div className="md:hidden absolute inset-0 z-20 bg-white px-3 flex items-center gap-2 animate-in fade-in duration-150">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMsgSearchActive(false);
+                        setMsgSearchQuery('');
+                      }}
+                      className="w-9 h-9 flex items-center justify-center text-slate-700 hover:bg-slate-100 rounded-full shrink-0 cursor-pointer"
+                      aria-label="Close search"
+                    >
+                      <ArrowLeft className="w-5 h-5" />
+                    </button>
+                    <div className="flex-1 flex items-center bg-slate-100 rounded-xl px-3 py-1.5 min-w-0">
+                      <input
+                        type="text"
+                        placeholder="Search in chat..."
+                        value={msgSearchQuery}
+                        onChange={(e) => setMsgSearchQuery(e.target.value)}
+                        className="w-full bg-transparent border-none outline-none text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 py-0.5"
+                        autoFocus
+                      />
+                      {msgSearchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => setMsgSearchQuery('')}
+                          className="text-slate-400 hover:text-slate-700 shrink-0 ml-1 p-0.5 cursor-pointer text-xs"
+                          aria-label="Clear search"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMsgSearchActive(false);
+                        setMsgSearchQuery('');
+                      }}
+                      className="text-xs font-semibold text-teal-800 hover:text-teal-900 shrink-0 px-1 py-1 cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
 
                 {/* Mobile Menu */}
                 <button
@@ -1577,9 +1623,9 @@ const ChatView = () => {
                       {isMsgSearchActive ? (
                         <div
                           className="
-              flex items-center
+              hidden md:flex items-center
               h-8 sm:h-9
-              w-[130px] xs:w-[160px] sm:w-[200px]
+              w-[160px] lg:w-[200px]
               bg-slate-100
               rounded-md sm:rounded-lg
               px-2

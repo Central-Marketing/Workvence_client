@@ -249,13 +249,13 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
     setMinPrice('');
     setMaxPrice('');
     setSearchVal('');
-    setFilterCategory('');
-    setActiveCategory('All services');
+    setFilterCategory('ai-services');
+    setActiveCategory('AI Services');
     setExperience({ entry: false, intermediate: false, expert: false });
     setEnglishLevel('');
     setClientLocation('');
     setSortBy('');
-    navigate.push('/packages', { scroll: false });
+    navigate.push('/packages?category=ai-services', { scroll: false });
   };
 
   const toggleExperience = (key: string) => {

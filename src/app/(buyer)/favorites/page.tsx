@@ -234,7 +234,7 @@ const FavoritesPage = () => {
                 <p className="text-gray-500 mb-8 max-w-md text-sm">
                   You haven't saved any services to your favorites yet. Explore the marketplace to bookmark top offerings!
                 </p>
-                <Link href="/packages">
+                <Link href="/packages?category=ai-services">
                   <button className="px-8 py-3 bg-black hover:bg-gray-900 text-white font-semibold rounded-xl transition-all shadow-sm cursor-pointer">
                     Browse Marketplace
                   </button>
@@ -262,7 +262,7 @@ const FavoritesPage = () => {
                 <p className="text-gray-500 mb-8 max-w-md text-sm">
                   You haven't added any freelancers to your favorite sellers list. Visit seller profiles and click the heart icon to save them here!
                 </p>
-                <Link href="/packages">
+                <Link href="/packages?category=ai-services">
                   <button className="px-8 py-3 bg-black hover:bg-gray-900 text-white font-semibold rounded-xl transition-all shadow-sm cursor-pointer">
                     Explore Freelancers
                   </button>

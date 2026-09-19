@@ -140,16 +140,16 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
           className="flex items-center gap-2.5 overflow-x-auto scrollbar-none scroll-smooth flex-1 py-0.5"
         >
           {/* All Services Pill */}
-          {/* <Link
-            href="/packages"
+          <Link
+            href="/packages?category=ai-services"
             className={`px-4 py-1.5 rounded-full font-sf-pro font-medium text-[13px] sm:text-[14px] whitespace-nowrap transition-colors shrink-0 ${
-              pathname === '/packages' && !activeRootCategory
+              pathname === '/packages' && (!activeRootCategory || activeRootCategory === 'ai-services')
                 ? 'border border-[#327C73] bg-[#E8F8F5] text-[#1E293B]'
                 : 'bg-[#F4F4F6] text-[#4A4A4A] hover:bg-[#EAEAEF] hover:text-[#111111]'
             }`}
           >
             All Services
-          </Link> */}
+          </Link>
 
           {/* Dynamic Root Category Pills */}
           {rootCategories.map((cat: any) => {

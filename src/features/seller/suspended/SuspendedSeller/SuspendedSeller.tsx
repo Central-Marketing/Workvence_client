@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 
 const categories = [
-  // "All services",
+  "All services",
   "Technology & Programming",
   "Writing & Translation",
   "Design",
@@ -73,7 +73,7 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
             {categories.map((cat) => (
               <Link
                 key={cat}
-                href={`/packages?category=${cat === 'All services' ? '' : encodeURIComponent(cat)}`}
+                href={`/packages?category=${cat === 'All services' ? 'ai-services' : encodeURIComponent(cat)}`}
                 className="flex-shrink-0 px-4 py-4 text-[13.5px] font-semibold text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap border-b-2 border-transparent hover:border-gray-300"
               >
                 {cat}

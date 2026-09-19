@@ -205,6 +205,7 @@ export default function OrderDetailPage() {
       requirements,
       deliveryFiles,
       deliveryMessage: o.deliveryMessage || o.deliveryText,
+      deliveryText: o.deliveryText || o.deliveryMessage,
       extensionRequest,
       revisionReason: o.revisionReason || o.revision?.reason,
       hasReviewed: Boolean(o.hasReviewed || o.isReviewed || o.review || o.reviewID),

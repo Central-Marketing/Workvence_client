@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/package',
-        destination: '/packages',
+        destination: '/packages?category=ai-services',
         permanent: true,
       },
     ];

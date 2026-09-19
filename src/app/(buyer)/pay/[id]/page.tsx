@@ -34,7 +34,7 @@ const PayContent: React.FC = () => {
           toast.error(data.message || 'Payment creation failed.');
           setTimeout(() => {
             activePaymentIntents.delete(requestKey);
-            navigate.push('/packages');
+            navigate.push('/packages?category=ai-services');
           }, 2000);
         }
       } catch (error: any) {
@@ -42,7 +42,7 @@ const PayContent: React.FC = () => {
         toast.error(error.response?.data?.message || 'Package not found or payment failed.');
         setTimeout(() => {
           activePaymentIntents.delete(requestKey);
-          navigate.push('/packages');
+          navigate.push('/packages?category=ai-services');
         }, 2000);
       }
     })();

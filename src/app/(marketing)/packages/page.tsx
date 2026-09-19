@@ -280,6 +280,13 @@ const Packages = () => {
     }
 
     const cat = params.get('category') || params.get('cat');
+    if ((!cat && !params.get('search')) || cat === 'All services') {
+      const cleanParams = new URLSearchParams(params.toString());
+      cleanParams.set('category', 'ai-services');
+      navigate.replace(`/packages?${cleanParams.toString()}`, { scroll: false });
+      return;
+    }
+
     if (cat && cat !== 'All services' && cat !== 'Results') {
       setActiveCategory(cat);
       setFilterCategory(cat);
@@ -502,10 +509,10 @@ const Packages = () => {
     const name = typeof cat === 'string' ? cat : cat.name;
 
     if (slug === 'All services' || name === 'All services') {
-      setActiveCategory('All services');
-      setFilterCategory('');
+      setActiveCategory('AI Services');
+      setFilterCategory('ai-services');
       setViewTab('gigs');
-      syncUrlWithFilters({ category: '', searchVal: '' });
+      syncUrlWithFilters({ category: 'ai-services', searchVal: '' });
     } else {
       const target = name || slug;
       setActiveCategory(target);
@@ -545,13 +552,13 @@ const Packages = () => {
     setMinPrice('');
     setMaxPrice('');
     setSearchVal('');
-    setFilterCategory('');
-    setActiveCategory('All services');
+    setFilterCategory('ai-services');
+    setActiveCategory('AI Services');
     setDeliveryDays('');
     setSortBy('');
     setSellerLevels({ top_rated: false, level_two: false, level_one: false, new_seller: false });
     setShowFilterDrawer(false);
-    navigate.push('/packages', { scroll: false });
+    navigate.push('/packages?category=ai-services', { scroll: false });
   };
 
   const hasActiveFilters = Boolean(

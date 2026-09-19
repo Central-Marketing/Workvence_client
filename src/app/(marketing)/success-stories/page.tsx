@@ -186,7 +186,7 @@ export default function SuccessStoriesPage() {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
-                href="/packages"
+                href="/packages?category=ai-services"
                 className="px-6 py-3 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs shadow-md transition active:scale-95"
               >
                 Hire Top Talent

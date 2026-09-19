@@ -107,7 +107,7 @@ export default function HowToBuyPage() {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <Link
-                href="/packages"
+                href="/packages?category=ai-services"
                 className="px-7 py-3.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Explore Packages</span>
@@ -197,7 +197,7 @@ export default function HowToBuyPage() {
 
           <div className="mt-12 text-center">
             <Link
-              href="/packages"
+              href="/packages?category=ai-services"
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-md transition active:scale-95 cursor-pointer"
             >
               <span>Explore Marketplace Packages</span>

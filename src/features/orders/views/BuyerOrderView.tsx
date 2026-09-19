@@ -15,6 +15,7 @@ import {
   FiStar,
   FiAlertCircle,
   FiRotateCcw,
+  FiFileText,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
@@ -284,6 +285,12 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
   const isCompleted = order.status === "completed";
   const isDelivered = order.status === "delivered";
   const isLate = order.status === "late";
+  const deliveryText =
+    order.deliveryText ||
+    order.deliveryMessage ||
+    order.raw?.deliveryText ||
+    order.raw?.deliveryMessage ||
+    "";
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-8 font-sans">
@@ -406,6 +413,19 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                   </span>
                 )}
               </div>
+
+              {/* Delivery Note from Freelancer */}
+              {deliveryText && (
+                <div className="mb-5 p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <div className="flex items-center gap-2 mb-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    <FiFileText className="text-emerald-600 text-sm" />
+                    <span>Delivery Note from Freelancer</span>
+                  </div>
+                  <p className="text-xs sm:text-[13.5px] text-slate-700 leading-relaxed whitespace-pre-wrap">
+                    {deliveryText}
+                  </p>
+                </div>
+              )}
 
               <OrderDeliverablesList files={order.deliveryFiles} />
 

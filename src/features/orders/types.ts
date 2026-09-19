@@ -50,6 +50,7 @@ export interface NormalizedOrder {
   };
   deliveryFiles: DeliverableFile[];
   deliveryMessage?: string;
+  deliveryText?: string;
   extensionRequest: ExtensionRequestData | null;
   revisionReason?: string;
   hasReviewed?: boolean;

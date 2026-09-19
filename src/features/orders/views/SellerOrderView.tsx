@@ -301,6 +301,12 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
   const isCleared = Boolean(rawOrder.isCleared);
   const clearsAt = rawOrder.clearsAt;
   const clearedAt = rawOrder.clearedAt;
+  const deliveryText =
+    order.deliveryText ||
+    order.deliveryMessage ||
+    rawOrder.deliveryText ||
+    rawOrder.deliveryMessage ||
+    "";
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-8 font-sans">
@@ -417,21 +423,30 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             {/* Right: Primary CTAs (Deliver Now / Extend) */}
             {!isCompleted && !isCancelled && !isDisputed && (
               <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsExtensionModalOpen(true)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs sm:text-sm transition-colors cursor-pointer"
-                >
-                  Extend Delivery Date
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowDeliverModal(true)}
-                  className="px-6 py-2.5 rounded-xl bg-[#10B981] hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer"
-                >
-                  <FiUploadCloud className="text-lg" />
-                  <span>{isDelivered ? "Deliver Again" : "Deliver Completed Work"}</span>
-                </button>
+                {!isDelivered ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setIsExtensionModalOpen(true)}
+                      className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs sm:text-sm transition-colors cursor-pointer"
+                    >
+                      Extend Delivery Date
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowDeliverModal(true)}
+                      className="px-6 py-2.5 rounded-xl bg-[#10B981] hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+                    >
+                      <FiUploadCloud className="text-lg" />
+                      <span>Deliver Completed Work</span>
+                    </button>
+                  </>
+                ) : (
+                  <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 text-xs sm:text-sm font-semibold">
+                    <FiCheckCircle className="text-teal-600 text-base" />
+                    <span>Work Delivered — In Review</span>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -542,7 +557,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
         )}
 
         {/* Revision alert banner if buyer requested changes */}
-        {order.revisionReason && (
+        {!isDelivered && order.revisionReason && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-6 flex items-start gap-3">
             <FiAlertCircle className="text-amber-600 text-xl shrink-0 mt-0.5" />
             <div>
@@ -698,7 +713,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   <h3 className="font-bold text-base text-slate-900">Work Deliverables</h3>
                   <p className="text-xs text-slate-400">Files and notes you provided for this order</p>
                 </div>
-                {!isCompleted && !isCancelled && (
+                {!isCompleted && !isCancelled && !isDelivered && (
                   <button
                     type="button"
                     onClick={() => setShowDeliverModal(true)}
@@ -707,7 +722,25 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                     + Deliver Work
                   </button>
                 )}
+                {isDelivered && (
+                  <span className="bg-teal-50 text-teal-700 border border-teal-200 text-xs font-semibold px-3 py-1 rounded-full">
+                    Delivered
+                  </span>
+                )}
               </div>
+
+              {/* Delivery Note / Message */}
+              {deliveryText && (
+                <div className="mb-5 p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <div className="flex items-center gap-2 mb-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    <FiFileText className="text-emerald-600 text-sm" />
+                    <span>Delivery Note</span>
+                  </div>
+                  <p className="text-xs sm:text-[13.5px] text-slate-700 leading-relaxed whitespace-pre-wrap">
+                    {deliveryText}
+                  </p>
+                </div>
+              )}
 
               <OrderDeliverablesList files={order.deliveryFiles} />
             </div>

@@ -26,7 +26,7 @@ const TwoWays = () => {
               Browse curated package packages with clear scopes and set timelines. Perfect for defined tasks like logos, articles, or bug fixes.
             </p>
             <Link
-              href="/packages"
+              href="/packages?category=ai-services"
               className="inline-flex items-center justify-center h-[46px] px-8 rounded-lg text-sm font-semibold bg-black hover:bg-black/90 text-white transition-colors"
             >
               Browse packages

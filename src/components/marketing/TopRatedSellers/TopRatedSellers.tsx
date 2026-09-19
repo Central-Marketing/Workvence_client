@@ -53,7 +53,7 @@ const TopRatedSellers = () => {
           </div>
           <div className="hidden md:flex w-full md:w-auto justify-end gap-4 items-center mt-4 md:mt-0">
             <Link
-              href="/packages"
+              href="/packages?category=ai-services"
               className="px-6 py-2.5 md:px-8 md:py-3 bg-brand-green text-white rounded-[8px] font-semibold hover:bg-[#389115] transition-colors whitespace-nowrap shadow-sm hover:shadow-md"
             >
               View all

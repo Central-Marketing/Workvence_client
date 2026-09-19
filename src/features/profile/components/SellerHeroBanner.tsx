@@ -11,6 +11,8 @@ interface SellerHeroBannerProps {
   avatar: string;
   banner?: string;
   isPro?: boolean;
+  isSeller?: boolean;
+  sellerLevel?: string;
   role: string;
   rating: number;
   reviewCount: number;
@@ -22,7 +24,9 @@ export const SellerHeroBanner: React.FC<SellerHeroBannerProps> = ({
   name,
   avatar,
   banner = SELLER_FALLBACK_IMAGES.banner,
-  isPro = true,
+  isPro = false,
+  isSeller = true,
+  sellerLevel = "Level 1 Seller",
   role,
   rating,
   reviewCount,
@@ -89,10 +93,15 @@ export const SellerHeroBanner: React.FC<SellerHeroBannerProps> = ({
 
         {/* Name, Pro Badge, Role & Rating (at the bottom of the avatar) */}
         <div className="mb-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-xl sm:text-2xl font-bold font-sf-pro text-gray-900 tracking-tight">
               {name}
             </h1>
+            {isSeller && sellerLevel && (
+              <span className="bg-[#360083] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-[4px] tracking-wide">
+                {sellerLevel}
+              </span>
+            )}
             {isPro && (
               <span className="bg-[#360083] text-white text-[10px] font-bold px-2 py-0.5 rounded-[4px] tracking-wide uppercase">
                 Pro

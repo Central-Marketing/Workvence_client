@@ -42,6 +42,8 @@ export interface NormalizedSellerProfile {
   avatar: string;
   banner: string;
   isPro: boolean;
+  isSeller?: boolean;
+  sellerLevel?: string;
   role: string;
   rating: number;
   reviewCount: number;
@@ -104,6 +106,11 @@ export function normalizeSellerProfile(
   const avatar = sellerObj.image || sellerObj.avatar || SELLER_FALLBACK_IMAGES.avatar;
   const banner = sellerObj.cover || sellerObj.banner || SELLER_FALLBACK_IMAGES.banner;
   const isPro = Boolean(sellerObj.isPro ?? false);
+  const isSeller = Boolean(
+    sellerObj.isSeller ??
+    (sellerObj.role === 'seller' || (Array.isArray(rawGigs) && rawGigs.length > 0) || true)
+  );
+  const sellerLevel = sellerObj.sellerLevel || (isSeller ? 'Level 1 Seller' : '');
   const role = sellerObj.role || sellerObj.headline || sellerObj.shortTitle || '';
 
   const memberSince = sellerObj.createdAt
@@ -290,6 +297,8 @@ export function normalizeSellerProfile(
     avatar,
     banner,
     isPro,
+    isSeller,
+    sellerLevel,
     role,
     rating: finalAverageRating,
     reviewCount: finalTotalReviews,

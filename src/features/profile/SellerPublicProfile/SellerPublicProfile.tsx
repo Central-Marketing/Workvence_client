@@ -165,6 +165,8 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
           avatar={profileData.avatar}
           banner={profileData.banner}
           isPro={profileData.isPro}
+          isSeller={profileData.isSeller}
+          sellerLevel={profileData.sellerLevel}
           role={profileData.role}
           rating={profileData.rating}
           reviewCount={profileData.reviewCount}

@@ -2642,7 +2642,7 @@ const ChatView = () => {
                             }
                           }}
                           className="w-full text-xs font-bold py-3 rounded-xl shadow-xs"
-                          text="Seller Profile"
+                          text="View Profile"
                           icon={
                             <svg
                               xmlns="http://www.w3.org/2000/svg"

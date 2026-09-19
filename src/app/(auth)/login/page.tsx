@@ -36,7 +36,7 @@ const LoginForm = () => {
     })();
 
     if (currentUser) {
-      let rawRedirect = searchParams?.get('redirect');
+      const rawRedirect = searchParams?.get('redirect');
       let target = rawRedirect || '/dashboard';
       if (target) {
         try { target = decodeURIComponent(target); } catch {}
@@ -100,7 +100,7 @@ const LoginForm = () => {
       setUser(user);
 
       // Properly decode redirect parameter (handles %2Fsupport%2Fnew)
-      let rawRedirect = searchParams?.get('redirect');
+      const rawRedirect = searchParams?.get('redirect');
       let target = rawRedirect || '/dashboard';
       if (target) {
         try { target = decodeURIComponent(target); } catch {}

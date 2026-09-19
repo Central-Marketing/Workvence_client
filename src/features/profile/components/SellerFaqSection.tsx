@@ -9,12 +9,12 @@ interface SellerFaqSectionProps {
 }
 
 export const SellerFaqSection: React.FC<SellerFaqSectionProps> = ({ faqs = [] }) => {
+  // First item open by default
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
   if (!Array.isArray(faqs) || faqs.length === 0) {
     return null;
   }
-
-  // First item open by default
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggleFaq = (idx: number) => {
     setOpenIndex((prev) => (prev === idx ? null : idx));

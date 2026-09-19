@@ -152,7 +152,7 @@ const RegisterContent = () => {
     event.preventDefault();
 
     const requiredFields = ['username', 'email', 'password', 'confirmPassword'];
-    for (let key of requiredFields) {
+    for (const key of requiredFields) {
       if ((formInput as any)[key] === '') {
         toast.error('Please fill all input field: ' + key);
         return;

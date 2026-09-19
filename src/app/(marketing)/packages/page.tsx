@@ -115,7 +115,8 @@ const Packages = () => {
   const initialMax = initialParams.get('max') || '';
   const initialDeliveryDays = initialParams.get('deliveryDays') || '';
 
-  const initialSort = initialParams.get('sort') || 'newest';
+  const rawSort = initialParams.get('sort') || '';
+  const initialSort = rawSort === 'recommended' ? '' : rawSort;
   const initialPage = parseInt(initialParams.get('page') || '1', 10);
 
   const [sortBy, setSortBy] = useState(initialSort);
@@ -272,7 +273,7 @@ const Packages = () => {
       if (params.get('min')) cleanParams.set('min', params.get('min')!);
       if (params.get('max')) cleanParams.set('max', params.get('max')!);
       if (params.get('deliveryDays')) cleanParams.set('deliveryDays', params.get('deliveryDays')!);
-      if (params.get('sort') && params.get('sort') !== 'newest') cleanParams.set('sort', params.get('sort')!);
+      if (params.get('sort')) cleanParams.set('sort', params.get('sort')!);
       if (params.get('page') && params.get('page') !== '1') cleanParams.set('page', params.get('page')!);
       navigate.replace(`/packages?${cleanParams.toString()}`, { scroll: false });
       return;
@@ -300,7 +301,8 @@ const Packages = () => {
     setMinPrice(params.get('min') || '');
     setMaxPrice(params.get('max') || '');
     setDeliveryDays(params.get('deliveryDays') || '');
-    setSortBy(params.get('sort') || 'newest');
+    const pSort = params.get('sort') || '';
+    setSortBy(pSort === 'recommended' ? '' : pSort);
     setPage(parseInt(params.get('page') || '1', 10));
   }, [search, categories, categoryList]);
 
@@ -338,7 +340,7 @@ const Packages = () => {
       if (minPrice) queryParams.set('min', minPrice);
       if (maxPrice) queryParams.set('max', maxPrice);
       if (deliveryDays) queryParams.set('deliveryDays', deliveryDays);
-      queryParams.set('sort', sortBy || 'newest');
+      if (sortBy) queryParams.set('sort', sortBy);
       queryParams.set('limit', '20');
       queryParams.set('page', page.toString());
 
@@ -483,7 +485,7 @@ const Packages = () => {
     if (currentMin) params.set('min', currentMin);
     if (currentMax) params.set('max', currentMax);
     if (currentDelivery) params.set('deliveryDays', currentDelivery);
-    if (currentSort && currentSort !== 'newest') params.set('sort', currentSort);
+    if (currentSort && currentSort !== 'recommended') params.set('sort', currentSort);
     if (currentPage > 1) params.set('page', currentPage.toString());
 
     navigate.push(`/packages?${params.toString()}`, { scroll: false });
@@ -546,7 +548,7 @@ const Packages = () => {
     setFilterCategory('');
     setActiveCategory('All services');
     setDeliveryDays('');
-    setSortBy('newest');
+    setSortBy('');
     setSellerLevels({ top_rated: false, level_two: false, level_one: false, new_seller: false });
     setShowFilterDrawer(false);
     navigate.push('/packages', { scroll: false });
@@ -899,8 +901,10 @@ const Packages = () => {
                 }}
                 className="bg-white border border-gray-200 text-xs font-semibold text-gray-800 rounded-xl px-3.5 py-2 focus:outline-none focus:border-gray-900 cursor-pointer shadow-2xs"
               >
-                <option value="newest">Newest</option>
-                <option value="rating">Best Rating</option>
+                <option value="">Recommended (Default)</option>
+                <option value="best-selling">Best Selling</option>
+                <option value="rating">Top Rated</option>
+                <option value="newest">Newest Arrivals</option>
                 <option value="price_asc">Price: Low to High</option>
                 <option value="price_desc">Price: High to Low</option>
               </select>
@@ -1183,8 +1187,10 @@ const Packages = () => {
                 }}
                 className="bg-white border border-gray-200 text-xs font-semibold text-gray-800 rounded-xl px-3.5 py-2 focus:outline-none focus:border-gray-900 cursor-pointer shadow-2xs"
               >
-                <option value="newest">Newest</option>
-                <option value="rating">Best Rating</option>
+                <option value="">Recommended (Default)</option>
+                <option value="best-selling">Best Selling</option>
+                <option value="rating">Top Rated</option>
+                <option value="newest">Newest Arrivals</option>
                 <option value="price_asc">Price: Low to High</option>
                 <option value="price_desc">Price: High to Low</option>
               </select>

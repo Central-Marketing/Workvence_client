@@ -25,6 +25,7 @@ export interface ClientBrief {
   budget: number | string;
   deliveryTime?: number | string;
   deadline?: string;
+  requiredSkills?: string[];
   status?: 'open' | 'in_progress' | 'closed' | string;
   proposalsCount?: number;
   proposalCount?: number;

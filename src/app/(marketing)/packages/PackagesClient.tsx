@@ -37,7 +37,7 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
   const initialMin = initialParams.get('min') || '';
   const initialMax = initialParams.get('max') || '';
 
-  const initialSort = initialParams.get('sort') || 'createdAt';
+  const initialSort = initialParams.get('sort') || '';
   const initialPage = parseInt(initialParams.get('page') || '1', 10);
 
   const [sortBy, setSortBy] = useState(initialSort);
@@ -129,7 +129,7 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
     setSearchVal(params.get('search') || '');
     setMinPrice(params.get('min') || '');
     setMaxPrice(params.get('max') || '');
-    setSortBy(params.get('sort') || 'createdAt');
+    setSortBy(params.get('sort') || '');
     setPage(parseInt(params.get('page') || '1', 10));
   }, [search, categories]);
 
@@ -254,6 +254,7 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
     setExperience({ entry: false, intermediate: false, expert: false });
     setEnglishLevel('');
     setClientLocation('');
+    setSortBy('');
     navigate.push('/packages', { scroll: false });
   };
 

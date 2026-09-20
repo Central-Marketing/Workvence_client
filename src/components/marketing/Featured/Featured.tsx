@@ -370,7 +370,7 @@ const Featured = () => {
         <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
           <div className="hero-gallery-lift w-full will-change-transform">
             <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-              <div className="relative w-full h-[160px] sm:h-[180px] md:h-[200px] lg:h-[240px] xl:h-[255px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-white">
+              <div className="relative w-full h-[160px] sm:h-[220px] md:h-[290px] lg:h-[340px] xl:h-[305px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-white">
                 <Image
                   src="/media/hero_images/img1.png"
                   alt="Design Forever"

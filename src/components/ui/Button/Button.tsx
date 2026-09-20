@@ -60,6 +60,23 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
     const rawSize = buttonSizeStyles[resolvedSize] || buttonSizeStyles.md;
     const rawRadius = buttonRadiusStyles[radius] || buttonRadiusStyles.fiverr;
 
+    const isFixed40Variant = !isIconOnly && ["dark", "black", "soft", "secondary"].includes(variant);
+    let effectiveSizeClasses = rawSize;
+    if (isFixed40Variant) {
+      effectiveSizeClasses = rawSize
+        .split(/\s+/)
+        .filter(
+          (t) =>
+            !t.startsWith("min-h-") &&
+            !t.startsWith("h-") &&
+            !/text-(xs|sm|base|lg|xl|\[\d+px\])/.test(t) &&
+            t !== "font-semibold" &&
+            t !== "font-medium"
+        )
+        .concat(["h-[40px]", "text-[16px]", "font-semibold"])
+        .join(" ");
+    }
+
     let variantClasses = rawVariant;
     if (className) {
       const userTokens = className.trim().split(/\s+/);
@@ -95,7 +112,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       "transition-all duration-150 ease-in-out cursor-pointer",
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/30 focus-visible:ring-offset-1",
       variantClasses,
-      rawSize,
+      effectiveSizeClasses,
       rawRadius,
       fullWidth ? "w-full" : "",
       isLoading || disabled ? "opacity-60 cursor-not-allowed pointer-events-none" : "",

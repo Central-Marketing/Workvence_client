@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import { Button } from '@/components';
 
 const MoneyIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
@@ -60,13 +61,15 @@ const CTA = () => {
 
               {/* CTA Button */}
               <div>
-                <Link
+                <Button
                   href="/register?seller=true"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 sm:px-7 sm:py-3.5 rounded-[10px] bg-white text-[#112131] font-sf-pro font-medium text-[14px] sm:text-[15px] hover:bg-gray-100 hover:shadow-lg active:scale-[0.98] transition-all duration-200"
+                  size="md"
+                  radius="fiverr"
+                  rightIcon={<ArrowRight size={16} strokeWidth={2} />}
+                  className="bg-white hover:bg-gray-100 text-[#112131] border-transparent font-semibold h-[40px] text-[16px] px-6 shadow-sm"
                 >
-                  <span>Become A Seller</span>
-                  <ArrowRight size={16} strokeWidth={2} />
-                </Link>
+                  Become A Seller
+                </Button>
               </div>
 
             </div>

@@ -51,10 +51,10 @@ const TrustProtection = () => {
                 <Button
                   href="/faq"
                   variant="dark"
-                  size="lg"
+                  size="md"
                   radius="fiverr"
                   rightIcon={<ArrowRight size={16} strokeWidth={2} />}
-                  className="w-fit"
+                  className="w-fit h-[40px] text-[16px] font-semibold px-5"
                 >
                   How Escrow Works
                 </Button>

@@ -34,15 +34,15 @@ export const buttonVariantStyles: Record<ButtonVariant, string> = {
   emerald:
     "bg-[#10B981] hover:bg-emerald-600 text-white shadow-xs active:scale-[0.99] border border-transparent",
   dark:
-    "bg-black hover:bg-gray-900 text-white shadow-sm active:scale-[0.99] border border-transparent",
+    "bg-black hover:bg-gray-900 text-white shadow-sm active:scale-[0.99] border border-transparent h-[40px] text-[16px] font-semibold",
   black:
-    "bg-black hover:bg-gray-900 text-white shadow-sm active:scale-[0.99] border border-transparent",
+    "bg-black hover:bg-gray-900 text-white shadow-sm active:scale-[0.99] border border-transparent h-[40px] text-[16px] font-semibold",
   outline:
     "border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 shadow-2xs active:scale-[0.99]",
   soft:
-    "bg-[#EDEDED] hover:bg-[#E0E0E0] text-[#292929] hover:text-gray-950 shadow-2xs active:scale-[0.99] border border-transparent",
+    "bg-[#EDEDED] hover:bg-[#E0E0E0] text-[#292929] hover:text-gray-950 shadow-2xs active:scale-[0.99] border border-transparent h-[40px] text-[16px] font-semibold",
   secondary:
-    "bg-[#EDEDED] hover:bg-[#E0E0E0] text-[#292929] hover:text-gray-950 shadow-2xs active:scale-[0.99] border border-transparent",
+    "bg-[#EDEDED] hover:bg-[#E0E0E0] text-[#292929] hover:text-gray-950 shadow-2xs active:scale-[0.99] border border-transparent h-[40px] text-[16px] font-semibold",
   danger:
     "bg-red-600 hover:bg-red-700 text-white shadow-xs active:scale-[0.99] border border-transparent",
   "danger-soft":

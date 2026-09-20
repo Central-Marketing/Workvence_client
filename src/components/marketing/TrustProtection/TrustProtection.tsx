@@ -29,7 +29,7 @@ const TrustProtection = () => {
           <div className="w-full flex flex-col justify-between self-stretch py-2 lg:py-4">
             {/* Main Headline */}
             <div>
-              <h2 className="font-sf-pro font-[510] text-[32px] sm:text-[38px] md:text-[48px] text-[#292929] leading-normal tracking-normal">
+              <h2 className="font-sf-pro font-[510] text-[26px] min-[400px]:text-[28px] sm:text-[34px] md:text-[38px] lg:text-[42px] macbook:text-[46px] 2xl:text-[48px] text-[#292929] leading-tight sm:leading-[1.18] tracking-tight sm:tracking-normal">
                 Your Money Stays Yours Until
                 <br />
                 The Work Is Right.

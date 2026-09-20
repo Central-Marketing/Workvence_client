@@ -826,7 +826,7 @@ const Packages = () => {
                   }}
                   className="inline-flex items-center gap-2 text-sm font-semibold text-brand-green hover:underline cursor-pointer group self-start sm:self-auto"
                 >
-                  <span>View all {packagesList.length} services</span>
+                  <span>View all</span>
                   <FiArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </button>
               </div>
@@ -1002,7 +1002,7 @@ const Packages = () => {
                           syncUrlWithFilters({ page: page + 1 });
                         }}
                         disabled={displayPackages.length < 8}
-                        className="px-6 py-2.5 bg-brand-green text-white font-semibold rounded-xl hover:bg-[#3ea917] disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+                        className="px-6 py-2.5 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
                       >
                         Next
                       </button>
@@ -1263,7 +1263,7 @@ const Packages = () => {
                   syncUrlWithFilters({ page: page + 1 });
                 }}
                 disabled={packagesList.length < 20}
-                className="px-6 py-2.5 bg-brand-green text-white font-semibold rounded-xl hover:bg-[#3ea917] disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+                className="px-6 py-2.5 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
               >
                 Next
               </button>

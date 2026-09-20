@@ -137,7 +137,7 @@ const Featured = () => {
       if (galleryRef.current && containerRef.current) {
         const liftCols = galleryRef.current.querySelectorAll('.hero-gallery-lift');
         // Enhanced parabolic lift values for prominent, clearly visible organic motion
-        const liftValues = [-90, -135, -170, -135, -90];
+        const liftValues = [-10, -135, -170, -135, -10];
 
         liftCols.forEach((col, idx) => {
           gsap.to(col, {
@@ -239,11 +239,14 @@ const Featured = () => {
         {/* Headline */}
         <h1
           ref={headlineRef}
-          className="font-sf-pro font-[510] text-3xl sm:text-5xl md:text-6xl lg:text-[84px] text-[#1E293B] tracking-[0px] leading-[100%] text-center mb-4 sm:mb-5"
+          className="font-sf-pro font-[510] text-[28px] sm:text-[40px] md:text-[54px] lg:text-[64px] macbook:text-[74px] 2xl:text-[84px] text-[#1E293B] tracking-[0px] leading-[1.08] text-center mb-4 sm:mb-5"
         >
-          Find the right <span className="text-[#327C73]">freelancer</span>
-          <br />
-          and get to work in minutes.
+          <span className="block">
+            Find the right <span className="text-[#327C73]">freelancer</span>
+          </span>
+          <span className="block ">
+            and get to work in minutes.
+          </span>
         </h1>
 
         {/* Subtitle */}
@@ -332,10 +335,10 @@ const Featured = () => {
       >
 
         {/* COLUMN 1: LEFTMOST - 2 VERTICAL IMAGES */}
-        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
+        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0 flex flex-col justify-end gap-4 sm:gap-5 md:gap-6">
+          {/* Top image: Blue head silhouette (lifts on scroll) */}
           <div className="hero-gallery-lift w-full will-change-transform">
-            <div className="w-full flex flex-col gap-4 sm:gap-5 md:gap-6 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-              {/* Top image: Blue head silhouette (shows full 339x429 card) */}
+            <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
               <div className="relative w-full aspect-[339/429] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
                 <Image
                   src="/media/hero_images/img4.png"
@@ -346,17 +349,19 @@ const Featured = () => {
                   className="object-cover object-center"
                 />
               </div>
-              {/* Bottom image: Laptop code editor (showing 15% from top: ~65px of 429px) */}
-              <div className="relative w-full h-[45px] sm:h-[52px] md:h-[58px] lg:h-[65px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-slate-900">
-                <Image
-                  src="/media/hero_images/img7.png"
-                  alt="Code Development"
-                  fill
-                  priority
-                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                  className="object-cover object-top"
-                />
-              </div>
+            </div>
+          </div>
+          {/* Bottom image: Laptop code editor (anchored flush to section bottom edge) */}
+          <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-[1.01] cursor-pointer pointer-events-auto">
+            <div className="relative w-full h-[55px] sm:h-[65px] md:h-[75px] lg:h-[85px] xl:h-[95px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-slate-900">
+              <Image
+                src="/media/hero_images/img7.png"
+                alt="Code Development"
+                fill
+                priority
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
+                className="object-cover object-top"
+              />
             </div>
           </div>
         </div>
@@ -416,10 +421,10 @@ const Featured = () => {
         </div>
 
         {/* COLUMN 5: RIGHTMOST - 2 VERTICAL IMAGES */}
-        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
+        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0 flex flex-col justify-end gap-4 sm:gap-5 md:gap-6">
+          {/* Top image: The Link (robots / clarity meets creativity) (lifts on scroll) */}
           <div className="hero-gallery-lift w-full will-change-transform">
-            <div className="w-full flex flex-col gap-4 sm:gap-5 md:gap-6 transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-              {/* Top image: The Link (robots / clarity meets creativity) */}
+            <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
               <div className="relative w-full aspect-[339/429] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
                 <Image
                   src="/media/hero_images/img6.png"
@@ -430,17 +435,19 @@ const Featured = () => {
                   className="object-cover object-center"
                 />
               </div>
-              {/* Bottom image: 3D Chrome Icon */}
-              <div className="relative w-full h-[70px] sm:h-[100px] md:h-[130px] lg:h-[80px] xl:h-[100px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#112236]">
-                <Image
-                  src="/media/hero_images/img2.png"
-                  alt="3D Icon"
-                  fill
-                  priority
-                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                  className="object-cover object-top"
-                />
-              </div>
+            </div>
+          </div>
+          {/* Bottom image: 3D Chrome Icon (anchored flush to section bottom edge) */}
+          <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-[1.01] cursor-pointer pointer-events-auto">
+            <div className="relative w-full h-[55px] sm:h-[65px] md:h-[75px] lg:h-[85px] xl:h-[95px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#112236]">
+              <Image
+                src="/media/hero_images/img2.png"
+                alt="3D Icon"
+                fill
+                priority
+                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
+                className="object-cover object-top"
+              />
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['10.10.30.41'],
   output: "standalone",
   images: {
     formats: ['image/avif', 'image/webp'],

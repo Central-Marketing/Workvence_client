@@ -1469,16 +1469,7 @@ const ChatView = () => {
                   >
                     <ArrowLeft className="w-4 h-4 text-slate-700" />
                   </button>
-                  <h2 className="text-[32px]
-  sm:text-[36px]
-  md:text-[40px]
-  lg:text-[44px]
-  xl:text-[48px]
-  font-normal
-  leading-normal
-  tracking-normal
-  text-[#292929]
-  font-sf-pro">
+                  <h2 className="text-[24px] sm:text-[26px] md:text-[28px] lg:text-[30px] macbook:text-[32px] 2xl:text-[36px] font-normal leading-tight tracking-tight text-[#292929] font-sf-pro">
                     Messages
                   </h2>
                 </div>
@@ -1639,10 +1630,10 @@ const ChatView = () => {
           ) : (
             <>
               {/* Header */}
-              <div className="min-h-[64px] px-4 sm:px-5 py-2.5 sm:py-3.5 border-b border-[rgba(0,0,0,0.10)] flex items-center bg-[#F8F8F8] relative overflow-hidden">
+              <div className="sticky top-0 z-30 shrink-0 min-h-[64px] px-4 sm:px-5 py-2.5 sm:py-3.5 border-b border-[rgba(0,0,0,0.10)] flex items-center bg-[#F8F8F8]">
                 {/* Mobile Full-Width Search Takeover */}
                 {isMsgSearchActive && (
-                  <div className="md:hidden absolute inset-0 z-20 bg-white px-3 flex items-center gap-2 animate-in fade-in duration-150">
+                  <div className="md:hidden fixed top-0 left-0 right-0 z-50 h-[64px] bg-white px-3 flex items-center gap-2 border-b border-slate-200 shadow-xs animate-in fade-in duration-150">
                     <button
                       type="button"
                       onClick={() => {
@@ -1726,39 +1717,36 @@ const ChatView = () => {
                               typing...
                             </span>
                           ) : (
-                            'Active Contact'
+                            'Contact'
                           )}
                         </span>
                       </div>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-2">
+                    <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-1 sm:ml-2">
 
                       {/* Create Offer */}
                       {user?.isSeller && (
                         <button
                           type="button"
                           className="
-              h-8 sm:h-9
-              px-2.5 sm:px-3
-              text-[11px] sm:text-xs
-              font-medium
-              rounded-md sm:rounded-lg
-              bg-black
-              text-white
-              hover:bg-gray-800
-              transition-colors
-              whitespace-nowrap
-              shrink-0
-              cursor-pointer
-            "
+        h-8 sm:h-9
+        px-2 sm:px-3
+        text-[11px] sm:text-xs
+        font-medium
+        rounded-md sm:rounded-lg
+        bg-black
+        text-white
+        hover:bg-gray-800
+        transition-colors
+        whitespace-nowrap
+        shrink-0
+        cursor-pointer
+      "
                           onClick={() => setShowOfferModal(true)}
                         >
-                          <span className="hidden xs:inline sm:inline">
-                            Create Offer
-                          </span>
-
+                          Create Offer
                         </button>
                       )}
 
@@ -1766,15 +1754,15 @@ const ChatView = () => {
                       <button
                         type="button"
                         className="
-            w-8 h-8 sm:w-9 sm:h-9
-            rounded-md sm:rounded-lg
-            hover:bg-emerald-50
-            text-emerald-600
-            transition-colors
-            flex items-center justify-center
-            shrink-0
-            cursor-pointer
-          "
+      w-8 h-8 sm:w-9 sm:h-9
+      rounded-md sm:rounded-lg
+      hover:bg-emerald-50
+      text-emerald-600
+      transition-colors
+      flex items-center justify-center
+      shrink-0
+      cursor-pointer
+    "
                         onClick={() => {
                           setMeetingTitle(
                             `Job Discussion with @${finalRecipientUser?.username || 'Client'}`
@@ -1815,14 +1803,14 @@ const ChatView = () => {
                       {isMsgSearchActive ? (
                         <div
                           className="
-              hidden md:flex items-center
-              h-8 sm:h-9
-              w-[160px] lg:w-[200px]
-              bg-slate-100
-              rounded-md sm:rounded-lg
-              px-2
-              shrink-0
-            "
+        hidden md:flex items-center
+        h-8 sm:h-9
+        w-[160px] lg:w-[200px]
+        bg-slate-100
+        rounded-md sm:rounded-lg
+        px-2
+        shrink-0
+      "
                         >
                           <input
                             type="text"
@@ -1868,15 +1856,15 @@ const ChatView = () => {
                         <button
                           type="button"
                           className="
-              w-8 h-8 sm:w-9 sm:h-9
-              rounded-md sm:rounded-lg
-              hover:bg-slate-100
-              text-slate-600
-              transition-colors
-              flex items-center justify-center
-              shrink-0
-              cursor-pointer
-            "
+        w-8 h-8 sm:w-9 sm:h-9
+        rounded-md sm:rounded-lg
+        hover:bg-slate-100
+        text-slate-600
+        transition-colors
+        flex items-center justify-center
+        shrink-0
+        cursor-pointer
+      "
                           onClick={() => setIsMsgSearchActive(true)}
                           aria-label="Search messages"
                         >
@@ -1910,16 +1898,16 @@ const ChatView = () => {
                       <button
                         type="button"
                         className="
-            lg:hidden
-            w-8 h-8 sm:w-9 sm:h-9
-            rounded-md sm:rounded-lg
-            hover:bg-slate-100
-            text-slate-600
-            transition-colors
-            flex items-center justify-center
-            shrink-0
-            cursor-pointer
-          "
+      lg:hidden
+      w-8 h-8 sm:w-9 sm:h-9
+      rounded-md sm:rounded-lg
+      hover:bg-slate-100
+      text-slate-600
+      transition-colors
+      flex items-center justify-center
+      shrink-0
+      cursor-pointer
+    "
                         onClick={() => setIsRightSideOpen(true)}
                         aria-label="Open contact information"
                       >
@@ -1935,7 +1923,7 @@ const ChatView = () => {
                 )}
               </div>
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-5 flex flex-col gap-4 bg-[#F0F0F0] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full">
+              <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 flex flex-col gap-4 bg-[#F0F0F0] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full">
                 {msgsError ? (
                   <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-red-50/50 dark:bg-red-950/20 m-6 rounded-2xl border border-red-200 dark:border-red-900/50 shadow-sm">
                     <div className="w-16 h-16 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center text-3xl mb-4 font-bold">🚫</div>

@@ -24,7 +24,7 @@ const PromoSection = () => {
 
         {/* Header Row */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10 sm:mb-14">
-          <h2 className="font-sf-pro font-[510] text-[32px] sm:text-[38px] md:text-[48px] text-[#292929] leading-normal tracking-normal">
+          <h2 className="font-sf-pro font-[510] text-[26px] min-[400px]:text-[28px] sm:text-[34px] md:text-[38px] lg:text-[42px] macbook:text-[46px] 2xl:text-[48px] text-[#292929] leading-tight sm:leading-[1.18] tracking-tight sm:tracking-normal">
             Build Amazing Projects
             <br />
             With Trusted Professionals

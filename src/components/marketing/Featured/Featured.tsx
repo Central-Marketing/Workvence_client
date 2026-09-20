@@ -219,6 +219,7 @@ const Featured = () => {
   return (
     <section
       ref={containerRef}
+      id="featured-section"
       className="relative w-full h-[620px] sm:h-[700px] md:h-[780px] lg:h-[840px] xl:h-[900px] bg-[#E8F5F5] overflow-hidden flex flex-col justify-between pt-8 sm:pt-12 md:pt-14 pb-0 select-none"
     >
       {/* Background ambient radial glow at top */}

@@ -2,62 +2,103 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { icons, LucideIcon } from 'lucide-react';
+import {
+  Palette,
+  Megaphone,
+  Pencil,
+  Music,
+  Box,
+  Film,
+  Video,
+  Database,
+  Code,
+  Briefcase,
+  Layers,
+  Cpu,
+  icons,
+  LucideIcon,
+} from 'lucide-react';
 import useAdminCategories from '@/hooks/useAdminCategories';
+
+// Fallback categories matching design screenshot
+const FALLBACK_CATEGORIES = [
+  { name: 'Graphic & Design', slug: 'graphics-and-design', icon: 'palette' },
+  { name: 'Digital Marketing', slug: 'digital-marketing', icon: 'megaphone' },
+  { name: 'Writing & Translation', slug: 'writing-and-translation', icon: 'pencil' },
+  { name: 'Music Production', slug: 'music-and-audio', icon: 'music' },
+  { name: 'Animation & 3D', slug: 'animation-and-3d', icon: 'box' },
+  { name: 'Videos & Editing', slug: 'videos-and-editing', icon: 'film' },
+  { name: 'Videos & Animation', slug: 'video-and-animation', icon: 'video' },
+  { name: 'Data & Intelligence', slug: 'data', icon: 'database' },
+];
 
 // Common aliases mapping backend terms to Lucide icon names
 const ICON_ALIASES: Record<string, string> = {
   bullhorn: 'Megaphone',
   'file-text': 'FileText',
   filetext: 'FileText',
+  music: 'Music',
+  palette: 'Palette',
+  pencil: 'Pencil',
+  database: 'Database',
+  video: 'Video',
+  film: 'Film',
+  box: 'Box',
 };
 
 // Converts 'file-text' or 'palette' into PascalCase ('FileText', 'Palette')
 const toPascalCase = (str: string): string =>
   str.replace(/[-_](\w)/g, (_, c) => c.toUpperCase()).replace(/^\w/, (c) => c.toUpperCase());
 
-const getCategoryIconComponent = (icon?: string): LucideIcon | null => {
-  if (!icon) return null;
-  const raw = icon.trim();
+const getCategoryIconComponent = (icon?: string, name?: string): LucideIcon => {
+  const iconStr = (icon || '').trim();
+  const nameStr = (name || '').toLowerCase();
 
-  // 1. Check known aliases (e.g. 'bullhorn' -> 'Megaphone')
-  const aliasName = ICON_ALIASES[raw.toLowerCase()];
-  if (aliasName && icons[aliasName as keyof typeof icons]) {
-    return icons[aliasName as keyof typeof icons];
+  // 1. Direct Lucide icon check
+  if (iconStr) {
+    const aliasName = ICON_ALIASES[iconStr.toLowerCase()];
+    if (aliasName && icons[aliasName as keyof typeof icons]) {
+      return icons[aliasName as keyof typeof icons];
+    }
+
+    const pascalName = toPascalCase(iconStr);
+    if (icons[pascalName as keyof typeof icons]) {
+      return icons[pascalName as keyof typeof icons];
+    }
+
+    const normalized = iconStr.replace(/[-_\s]/g, '').toLowerCase();
+    const matchedKey = Object.keys(icons).find(
+      (k) => k.toLowerCase() === normalized
+    );
+    if (matchedKey && icons[matchedKey as keyof typeof icons]) {
+      return icons[matchedKey as keyof typeof icons];
+    }
   }
 
-  // 2. Direct check with PascalCase (e.g. 'Brain', 'ShoppingCart', 'Video', 'FileText')
-  const pascalName = toPascalCase(raw);
-  if (icons[pascalName as keyof typeof icons]) {
-    return icons[pascalName as keyof typeof icons];
-  }
+  // 2. Intelligent keyword fallback based on category name
+  if (nameStr.includes('graphic') || nameStr.includes('design')) return Palette;
+  if (nameStr.includes('market') || nameStr.includes('digital') || nameStr.includes('seo')) return Megaphone;
+  if (nameStr.includes('writ') || nameStr.includes('translat')) return Pencil;
+  if (nameStr.includes('music') || nameStr.includes('audio') || nameStr.includes('sound')) return Music;
+  if (nameStr.includes('3d') || nameStr.includes('model')) return Box;
+  if (nameStr.includes('edit')) return Film;
+  if (nameStr.includes('video') || nameStr.includes('animat')) return Video;
+  if (nameStr.includes('data') || nameStr.includes('intelligence') || nameStr.includes('analytic')) return Database;
+  if (nameStr.includes('code') || nameStr.includes('program') || nameStr.includes('tech') || nameStr.includes('dev')) return Code;
+  if (nameStr.includes('business') || nameStr.includes('consult')) return Briefcase;
+  if (nameStr.includes('ai')) return Cpu;
 
-  // 3. Fallback normalized search across all available Lucide icons
-  const normalized = raw.replace(/[-_\s]/g, '').toLowerCase();
-  const matchedKey = Object.keys(icons).find(
-    (k) => k.toLowerCase() === normalized
-  );
-  if (matchedKey && icons[matchedKey as keyof typeof icons]) {
-    return icons[matchedKey as keyof typeof icons];
-  }
-
-  return null;
+  return Layers;
 };
 
-const renderCategoryIcon = (icon?: string, className: string = "w-6 h-6 sm:w-7 sm:h-7") => {
-  if (!icon) return null;
-
+const renderCategoryIcon = (icon?: string, name?: string, className: string = "w-5 h-5") => {
   // Supports remote or local image URLs
-  if (icon.startsWith('http://') || icon.startsWith('https://') || icon.startsWith('/') || icon.startsWith('data:')) {
-    return <img src={icon} alt="Category Icon" className={`${className} object-contain`} />;
+  if (icon && (icon.startsWith('http://') || icon.startsWith('https://') || icon.startsWith('/') || icon.startsWith('data:'))) {
+    return <img src={icon} alt={name || "Category Icon"} className={`${className} object-contain`} />;
   }
 
-  const IconComp = getCategoryIconComponent(icon);
-  if (IconComp) {
-    return <IconComp className={className} strokeWidth={1.75} />;
-  }
-
-  return null;
+  const IconComp = getCategoryIconComponent(icon, name);
+  return <IconComp className={className} strokeWidth={1.75} />;
 };
 
 const ExploreCategories = () => {
@@ -76,7 +117,8 @@ const ExploreCategories = () => {
       (c.name || c.title || '').toLowerCase().includes('other'))
   );
 
-  const categoryList = [...regularCats, ...otherCats];
+  const dynamicCategories = [...regularCats, ...otherCats];
+  const displayCategories = dynamicCategories.length > 0 ? dynamicCategories.slice(0, 8) : FALLBACK_CATEGORIES;
 
   return (
     <section className="relative w-full pb-12 sm:pb-16 md:pb-24 pt-8 sm:pt-12 md:pt-14 lg:pt-16 bg-[#fafafa] overflow-hidden">
@@ -84,7 +126,7 @@ const ExploreCategories = () => {
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[808px] h-[808px] rounded-[608px] pointer-events-none"
         style={{
-          background: "#EBFEC5",
+          background: "#E8F5F5",
           filter: "blur(250px)",
           mixBlendMode: "multiply",
         }}
@@ -93,18 +135,18 @@ const ExploreCategories = () => {
 
       <div className="relative z-10 w-full container mx-auto px-4 md:px-6">
         {/* Centered Heading and Subtitle */}
-        <div className="text-center mb-12 sm:mb-16 md:mb-20">
+        <div className="text-center mb-10 sm:mb-12 md:mb-14">
           <h2 className="font-sf-pro font-[510] text-[32px] sm:text-[38px] md:text-[48px] text-[#292929] leading-normal tracking-normal">
             Explore Top Categories
           </h2>
-          <p className="font-inter font-normal text-base sm:text-[15px] text-[#6E6E6E] mt-2.5">
+          <p className="font-inter font-normal text-base sm:text-[15px] text-[#6E6E6E] mt-2">
             Explore a wide range of services organized by category
           </p>
         </div>
 
-        {/* Categories Grid with Clean Internal Dividers */}
-        <div className="w-full mx-auto grid grid-cols-2 md:grid-cols-4 bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-xs">
-          {categoryList.map((category: any, index: number) => {
+        {/* Categories Single Row Layout */}
+        <div className="w-full flex items-stretch gap-3 sm:gap-3.5 lg:gap-4 overflow-x-auto scrollbar-none pb-3 pt-1 lg:overflow-x-visible">
+          {displayCategories.map((category: any, index: number) => {
             const title =
               category.name ||
               category.title ||
@@ -115,29 +157,23 @@ const ExploreCategories = () => {
               category.slug ||
               title.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-');
 
-            // Responsive border dividers
-            const isRightBorderMobile = index % 2 === 0;
-            const isRightBorderDesktop = (index + 1) % 4 !== 0;
-            const isBottomBorderMobile = index < categoryList.length - (categoryList.length % 2 === 0 ? 2 : 1);
-            const isBottomBorderDesktop = index < categoryList.length - (categoryList.length % 4 === 0 ? 4 : categoryList.length % 4);
-
             return (
               <Link
                 href={`/packages?category=${encodeURIComponent(path)}`}
                 key={category._id || category.id || index}
-                className={`group flex flex-col items-center justify-center text-center p-5 sm:p-7 md:p-8 lg:p-[40px] bg-white hover:bg-gray-50/60 transition-all duration-200 cursor-pointer ${isRightBorderMobile ? "border-r border-gray-100" : ""
-                  } ${isRightBorderDesktop ? "md:border-r md:border-gray-100" : "md:border-r-0"
-                  } ${isBottomBorderMobile ? "border-b border-gray-100" : ""
-                  } ${isBottomBorderDesktop ? "md:border-b md:border-gray-100" : "md:border-b-0"
-                  }`}
+                className="group flex-1 min-w-[130px] sm:min-w-[145px] lg:min-w-0 bg-white hover:bg-[#004316] border border-gray-100 hover:border-brand-green rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-[0_1px_4px_rgba(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer min-h-[140px] sm:min-h-[150px]"
               >
-                {/* Circular Icon Bubble */}
-                <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-full bg-[#F5F5F5] border border-gray-100/80 flex items-center justify-center mb-3 sm:mb-4 lg:mb-5 group-hover:scale-110 group-hover:bg-emerald-50/80 transition-all duration-300 shrink-0">
-                  {renderCategoryIcon(category.icon, "w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-[#222427] group-hover:text-brand-green transition-colors duration-300")}
+                {/* Icon Container: Inverts from #F5F5F7 to white on card hover */}
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#F5F5F7] group-hover:bg-white flex items-center justify-center mb-3 sm:mb-4 transition-all duration-300 shrink-0">
+                  {renderCategoryIcon(
+                    category.icon,
+                    title,
+                    "w-5 h-5 text-[#222427] group-hover:text-brand-green transition-colors duration-300"
+                  )}
                 </div>
 
-                {/* Category Title */}
-                <h3 className="font-sf-pro font-bold not-italic text-[15px] sm:text-[18px] md:text-[21px] lg:text-[24px] text-[var(--Foundation-Grey-grey-600,#434343)] leading-normal group-hover:text-brand-green transition-colors duration-300">
+                {/* Category Title: Turns white on card hover */}
+                <h3 className="font-sf-pro font-bold text-[13px] sm:text-[14px] lg:text-[15px] text-[#292929] group-hover:text-white leading-[1.25] transition-colors duration-300 text-left line-clamp-2">
                   {title}
                 </h3>
               </Link>

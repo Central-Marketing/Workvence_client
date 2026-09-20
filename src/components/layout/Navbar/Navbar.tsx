@@ -18,6 +18,7 @@ const Navbar = () => {
   const navRef = useRef<HTMLElement>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showCategoryBar, setShowCategoryBar] = useState(false);
+  const [showSearchBar, setShowSearchBar] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
@@ -109,18 +110,39 @@ const Navbar = () => {
   const isActive = () => {
     const scrollPos = window.scrollY;
     setShowMenu(scrollPos > 0);
+
+    // Dynamic crossing check for the Featured component on the homepage
+    let hasCrossedFeatured = false;
+    if (pathname === "/") {
+      const featuredEl = document.getElementById("featured-section");
+      if (featuredEl) {
+        const rect = featuredEl.getBoundingClientRect();
+        const navHeight = navRef.current ? navRef.current.offsetHeight : 80;
+        hasCrossedFeatured = rect.bottom <= navHeight;
+      } else {
+        hasCrossedFeatured = scrollPos > 650;
+      }
+    } else {
+      // Subpages always show search bar as they have no hero featured search
+      hasCrossedFeatured = true;
+    }
+
+    setShowSearchBar(hasCrossedFeatured);
+
     // Suppress category bar completely for seller on all pages
     if (user?.isSeller) {
       setShowCategoryBar(false);
       return;
     }
-    // Show category bar when scrolled past featured section (~500px) on home page, or always on subpages
-    setShowCategoryBar(scrollPos > 520 || pathname !== "/");
+    // Show category bar when scrolled past featured section on home page, or always on subpages
+    setShowCategoryBar(hasCrossedFeatured || pathname !== "/");
   };
 
   useEffect(() => {
     isActive();
-    window.addEventListener("scroll", isActive);
+    const timer = setTimeout(isActive, 100);
+    window.addEventListener("scroll", isActive, { passive: true });
+    window.addEventListener("resize", isActive);
 
     // Close dropdowns if clicked outside
     const handleClickOutside = (e: any) => {
@@ -134,7 +156,9 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
+      clearTimeout(timer);
       window.removeEventListener("scroll", isActive);
+      window.removeEventListener("resize", isActive);
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [pathname, user]);
@@ -185,9 +209,10 @@ const Navbar = () => {
 
   return (
     <nav ref={navRef} className={`w-full sticky top-0 z-50 transition-all duration-300 ${showMenu || pathname !== "/" || isBuyer ? "bg-white border-b border-gray-100 shadow-sm text-gray-600" : "bg-white text-gray-600"}`}>
-      <div className="w-full container mx-auto flex justify-between items-center px-4 sm:px-6 md:px-10 py-4 md:py-5">
+      <div className="w-full container mx-auto flex justify-between items-center px-4 sm:px-6 md:px-8 xl:px-10 py-3.5 sm:py-4 md:py-5">
 
-        <div className="flex items-center gap-6 lg:gap-8 flex-1">
+        {/* Left Section: Logo + Fluid Responsive Search Box */}
+        <div className="flex items-center gap-3 sm:gap-4 lg:gap-6 xl:gap-8 flex-1 min-w-0 mr-3 sm:mr-4 lg:mr-6">
           <Link href="/" className="flex items-center shrink-0">
             <Image
               src="/Workvence-logo-Horizontal3.png"
@@ -195,17 +220,24 @@ const Navbar = () => {
               height={44}
               alt="Workvence"
               priority
-              className="h-7 sm:h-8 md:h-9 lg:h-10 xl:h-[44px] w-auto aspect-[19/4] object-contain"
+              className="h-7 sm:h-8 md:h-9 lg:h-9 xl:h-10 2xl:h-[44px] w-auto aspect-[19/4] object-contain shrink-0"
             />
           </Link>
 
-          <div className={`hidden lg:flex items-center overflow-hidden transition-all duration-300 ${showMenu || pathname !== '/' || isBuyer ? 'opacity-100 max-w-[540px] xl:max-w-[720px] 2xl:max-w-[800px] flex-1' : 'opacity-0 max-w-0 pointer-events-none'}`}>
-            <div className="flex items-center rounded-xl px-4 py-2.5 w-full max-w-[520px] bg-[#F4F4F6] border border-transparent focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-sm transition-all group">
-              <RiSearchLine className="text-gray-400 text-lg mr-2.5 group-focus-within:text-brand-green transition-colors shrink-0" />
+          <div className={`flex items-center overflow-hidden transition-all duration-300 ${showSearchBar ? 'opacity-100 flex-1 min-w-0 max-w-full' : 'opacity-0 max-w-0 pointer-events-none w-0'}`}>
+            <div className="flex items-center rounded-xl px-3 sm:px-3.5 xl:px-4 py-2 sm:py-2.5 w-full max-w-full lg:max-w-[340px] xl:max-w-[460px] macbook:max-w-[540px] 2xl:max-w-[620px] bg-[#F4F4F6] border border-transparent focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-sm transition-all group">
+              <RiSearchLine
+                className="text-gray-400 text-base sm:text-lg mr-2 sm:mr-2.5 group-focus-within:text-brand-green transition-colors shrink-0 cursor-pointer"
+                onClick={() => {
+                  if (searchQuery.trim()) {
+                    router.push(`/packages?search=${encodeURIComponent(searchQuery.trim())}`);
+                  }
+                }}
+              />
               <input
                 type="text"
                 placeholder="What you are looking for"
-                className="bg-transparent border-none outline-none w-full text-[14px] font-medium text-gray-800 placeholder-gray-400"
+                className="bg-transparent border-none outline-none w-full text-xs sm:text-[13px] xl:text-[14px] font-medium text-gray-800 placeholder-gray-400 min-w-0 truncate"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleSearch}
@@ -214,13 +246,14 @@ const Navbar = () => {
           </div>
         </div>
 
-        <div className="hidden lg:flex items-center gap-[20px] font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B]">
+        {/* Right Section: Desktop Nav Links (Protected from shrinking or wrapping) */}
+        <div className="hidden lg:flex items-center gap-1.5 xl:gap-3 2xl:gap-4 font-sf-pro font-medium text-[14px] xl:text-[15px] 2xl:text-[16px] text-[#1E293B] shrink-0">
           {isLoading ? (
             <Loader size={35} />
           ) : !effectiveUser ? (
             <>
               {/* Navlinks Group */}
-              <div className="flex items-center gap-1 font-sf-pro font-[510] text-[16px] leading-normal">
+              <div className="flex items-center font-sf-pro font-[510] text-[14px] xl:text-[15px] 2xl:text-[16px] leading-normal shrink-0">
                 {/* Explore Category Dropdown without extra icons */}
                 <div className="relative category-dropdown-container">
                   <Button
@@ -229,12 +262,12 @@ const Navbar = () => {
                     size="md"
                     radius="lg"
                     onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                    className={`flex items-center gap-1.5 px-4 py-[10px] font-sf-pro font-[510] text-[16px] leading-normal ${
+                    className={`flex items-center gap-1 xl:gap-1.5 px-2.5 xl:px-4 py-[8px] xl:py-[10px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal whitespace-nowrap ${
                       isCategoryDropdownOpen ? "!text-[#327C73]" : "text-black hover:!text-[#327C73]"
                     }`}
                     rightIcon={
                       <FiChevronDown
-                        className={`text-base text-[#327C73] transition-transform duration-200 ${
+                        className={`text-sm xl:text-base text-[#327C73] transition-transform duration-200 ${
                           isCategoryDropdownOpen ? "rotate-180" : ""
                         }`}
                       />
@@ -247,13 +280,6 @@ const Navbar = () => {
                     <div className="absolute left-0 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl py-2 flex flex-col z-[60] text-[14px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                       <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-400">
                         <span>Categories</span>
-                        {/* <Link
-                          href="/packages?category=ai-services"
-                          onClick={() => setIsCategoryDropdownOpen(false)}
-                          className="text-[#327C73] font-medium hover:underline lowercase tracking-normal"
-                        >
-                          view all
-                        </Link> */}
                       </div>
 
                       <div className="max-h-[320px] overflow-y-auto py-1">
@@ -281,27 +307,27 @@ const Navbar = () => {
 
                 <Link
                   href="/register?seller=true"
-                  className="px-4 py-[10px] rounded-lg font-sf-pro font-[510] text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors"
+                  className="px-2.5 xl:px-4 py-[8px] xl:py-[10px] rounded-lg font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
                 >
                   Become a Seller
                 </Link>
 
                 <Link
                   href="/briefs"
-                  className="px-4 py-[10px] rounded-lg font-sf-pro font-[510] text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors"
+                  className="px-2.5 xl:px-4 py-[8px] xl:py-[10px] rounded-lg font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
                 >
                   Projects
                 </Link>
               </div>
 
               {/* Auth Buttons Group */}
-              <div className="flex items-center gap-[10px]">
+              <div className="flex items-center gap-2 xl:gap-[10px] shrink-0">
                 <Button
                   href="/login"
                   variant="soft"
                   size="md"
                   radius="fiverr"
-                  className="bg-[#EDEDED] hover:bg-[#E0E0E0] h-[40px] text-[16px] px-5 font-sf-pro font-semibold text-[#292929]"
+                  className="bg-[#EDEDED] hover:bg-[#E0E0E0] h-[38px] xl:h-[40px] text-[14px] xl:text-[16px] px-3.5 xl:px-5 font-sf-pro font-semibold text-[#292929] whitespace-nowrap shrink-0"
                 >
                   Sign in
                 </Button>
@@ -311,8 +337,8 @@ const Navbar = () => {
                   variant="dark"
                   size="md"
                   radius="fiverr"
-                  rightIcon={<FiArrowRight className="text-[16px]" />}
-                  className="h-[40px] text-[16px] px-5 font-sf-pro font-semibold bg-[#0B0F19] hover:bg-black text-[#E8F5F5] shadow-sm"
+                  rightIcon={<FiArrowRight className="text-[14px] xl:text-[16px]" />}
+                  className="h-[38px] xl:h-[40px] text-[14px] xl:text-[16px] px-3.5 xl:px-5 font-sf-pro font-semibold bg-[#0B0F19] hover:bg-black text-[#E8F5F5] shadow-sm whitespace-nowrap shrink-0"
                 >
                   Join Now
                 </Button>
@@ -320,10 +346,10 @@ const Navbar = () => {
             </>
           ) : isBuyer ? (
             /* Logged-in Buyer Navbar - Pixel-perfect to design */
-            <div className="flex items-center gap-5 xl:gap-6 font-sf-pro font-medium text-[16px] text-[#1E293B]">
+            <div className="flex items-center gap-3 xl:gap-5 2xl:gap-6 font-sf-pro font-medium text-[14px] xl:text-[16px] text-[#1E293B] shrink-0 whitespace-nowrap">
               <Link
                 href="/orders"
-                className="font-semibold text-[15px] text-[#18181B] hover:text-[#327C73] transition-colors"
+                className="font-semibold text-[14px] xl:text-[15px] text-[#18181B] hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
               >
                 Order
               </Link>
@@ -331,29 +357,29 @@ const Navbar = () => {
               <Link
                 href="/favorites"
                 title="My Favorites"
-                className="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 hover:text-red-500 transition-colors relative cursor-pointer"
+                className="w-9 h-9 xl:w-10 xl:h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 hover:text-red-500 transition-colors relative cursor-pointer shrink-0"
               >
-                <FiHeart className="text-[19px]" />
+                <FiHeart className="text-[17px] xl:text-[19px]" />
               </Link>
 
               <HeaderInboxIcon
                 currentUser={effectiveUser}
-                className="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer"
-                iconClassName="text-[19px]"
+                className="w-9 h-9 xl:w-10 xl:h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer shrink-0"
+                iconClassName="text-[17px] xl:text-[19px]"
               />
 
               <NotificationBell
                 currentUser={effectiveUser}
-                triggerClassName="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer"
-                iconClassName="text-[19px]"
+                triggerClassName="w-9 h-9 xl:w-10 xl:h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer shrink-0"
+                iconClassName="text-[17px] xl:text-[19px]"
               />
 
               <AiGradientButton
                 href="/briefs/create"
                 text="Post a Project with AI"
-                px="px-4"
+                px="px-3 xl:px-4"
                 py="py-2"
-                className="h-10 rounded-xl text-[14px] font-medium text-[#112131] shadow-none shrink-0"
+                className="h-9 xl:h-10 rounded-xl text-[13px] xl:text-[14px] font-medium text-[#112131] shadow-none shrink-0 whitespace-nowrap"
               />
 
               <div className="relative profile-dropdown-container">
@@ -402,24 +428,24 @@ const Navbar = () => {
             </div>
           ) : (
             /* Logged-in Seller Navbar - Pixel-perfect to design */
-            <div className="flex items-center gap-5 xl:gap-6 font-sf-pro font-medium text-[16px] text-[#1E293B]">
+            <div className="flex items-center gap-3 xl:gap-5 2xl:gap-6 font-sf-pro font-medium text-[14px] xl:text-[16px] text-[#1E293B] shrink-0 whitespace-nowrap">
               <Link
                 href="/dashboard/seller"
-                className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors"
+                className="font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
               >
                 Dashboard
               </Link>
 
               <Link
                 href="/briefs"
-                className="font-sf-pro font-medium text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors"
+                className="font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
               >
                 Find Project
               </Link>
 
               <HeaderInboxIcon
                 currentUser={effectiveUser}
-                className="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer"
+                className="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer shrink-0"
                 iconClassName="text-[19px]"
               />
 
@@ -551,9 +577,8 @@ const Navbar = () => {
                 className="w-full flex items-center justify-between py-2 text-gray-800 hover:text-brand-green hover:!bg-transparent !px-0 !min-h-0 !h-auto font-semibold text-[16px]"
                 rightIcon={
                   <FiChevronDown
-                    className={`transition-transform duration-200 ${
-                      isMobileCategoryOpen ? "rotate-180 text-brand-green" : "text-gray-400"
-                    }`}
+                    className={`transition-transform duration-200 ${isMobileCategoryOpen ? "rotate-180 text-brand-green" : "text-gray-400"
+                      }`}
                   />
                 }
               >

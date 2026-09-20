@@ -18,7 +18,7 @@ import {
 import { HiSparkles } from "react-icons/hi2";
 
 import { axiosFetch } from "@/utils";
-import useAdminCategories from "@/hooks/useAdminCategories";
+import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
 
 const CATEGORIES = [
@@ -65,11 +65,15 @@ const CreateBrief = () => {
   const modalPromptRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const { categoryList } = useAdminCategories();
+  const { categoryList: rawCats, parentCategories } = useAdminCategories();
+
+  // Strictly root categories only
+  const rootCategoriesList = (parentCategories && parentCategories.length > 0 ? parentCategories : rawCats)
+    .filter((cat: any) => isCategoryRoot(cat, rawCats));
 
   const rawFormatted =
-    categoryList.length > 0
-      ? categoryList.map((cat: any) =>
+    rootCategoriesList.length > 0
+      ? rootCategoriesList.map((cat: any) =>
           typeof cat === "string"
             ? {
                 name: cat,
@@ -156,13 +160,41 @@ const CreateBrief = () => {
           c.slug === draft?.category ||
           c.name?.toLowerCase() === (draft?.categoryName || draft?.category || "").toLowerCase()
       );
-      const resolvedCategory = matchedCat ? matchedCat.slug : draft?.categorySlug || draft?.category || "";
+      let resolvedCategory = matchedCat ? matchedCat.slug : "";
+      let resolvedCategoryName = matchedCat ? matchedCat.name : "";
+
+      // If draft category is a subcategory or niche, resolve to its parent root category
+      if (!resolvedCategory && (draft?.categorySlug || draft?.category || draft?.categoryName)) {
+        const rawTarget = String(draft?.categorySlug || draft?.category || draft?.categoryName || "").toLowerCase();
+        const parentOfChild = (parentCategories || []).find((parent: any) => {
+          const children = Array.isArray(parent.children) ? parent.children : [];
+          return children.some((child: any) => {
+            const childSlug = String(child.slug || child.name || "").toLowerCase();
+            const childId = String(child.id || child._id || "").toLowerCase();
+            if (childSlug === rawTarget || childId === rawTarget) return true;
+            const niches = Array.isArray(child.children) ? child.children : [];
+            return niches.some((n: any) => {
+              const nSlug = String(n.slug || n.name || "").toLowerCase();
+              const nId = String(n.id || n._id || "").toLowerCase();
+              return nSlug === rawTarget || nId === rawTarget;
+            });
+          });
+        });
+
+        if (parentOfChild) {
+          const foundRoot = categories.find((c: any) => c.slug === parentOfChild.slug || c.name === parentOfChild.name);
+          if (foundRoot) {
+            resolvedCategory = foundRoot.slug;
+            resolvedCategoryName = foundRoot.name;
+          }
+        }
+      }
 
       setForm({
         title: draft?.title || form.title,
         description: draft?.description || form.description,
         category: resolvedCategory || form.category,
-        categoryName: draft?.categoryName || matchedCat?.name || form.categoryName,
+        categoryName: resolvedCategoryName || draft?.categoryName || matchedCat?.name || form.categoryName,
         budget:
           draft?.budget !== undefined && draft?.budget !== null
             ? String(draft.budget)
@@ -435,15 +467,18 @@ const CreateBrief = () => {
             </label>
             <select
               value={form.category}
-              onChange={(e) => updateField("category", e.target.value)}
+              onChange={(e) => {
+                const selectedSlug = e.target.value;
+                const found = categories.find((c: any) => c.slug === selectedSlug);
+                setForm((prev) => ({
+                  ...prev,
+                  category: selectedSlug,
+                  categoryName: found?.name || selectedSlug,
+                }));
+              }}
               className="w-full px-4 py-3 sm:py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10 cursor-pointer"
             >
               <option value="">Select a category</option>
-              {form.category && !categories.some((c: any) => c.slug === form.category) && (
-                <option value={form.category}>
-                  {form.categoryName || form.category}
-                </option>
-              )}
               {categories.map((c: any) => (
                 <option key={c.slug} value={c.slug}>
                   {c.name}

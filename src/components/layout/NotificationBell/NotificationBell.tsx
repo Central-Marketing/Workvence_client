@@ -6,6 +6,7 @@ import { socket } from "@/utils/socket";
 import toast from "react-hot-toast";
 import { FiBell } from "react-icons/fi";
 import { playNotificationSound } from "@/utils/soundUtil";
+import { useUserStore } from "@/store/userStore";
 
 interface NotificationBellProps {
   currentUser: any;
@@ -13,9 +14,12 @@ interface NotificationBellProps {
   iconClassName?: string;
 }
 
+const processedNotifIds = new Set<string>();
 const processedNotifMessageIds = new Set<string>();
 
 const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, triggerClassName, iconClassName }) => {
+  const storeUser = useUserStore((state) => state.user);
+  const activeUser = currentUser || storeUser;
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -53,34 +57,116 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
       }
     };
 
-    if (currentUser?._id) {
+    if (currentUser?._id || currentUser?.id) {
       fetchNotifications();
     }
   }, [currentUser]);
 
-  // 2. Connect Socket.io & listen for real-time 'new_notification'
+  // 2. Connect Socket.io & listen for real-time 'new_notification' and 'receive_message'
   useEffect(() => {
-    if (!currentUser?._id) return;
+    const currentUserId = String(activeUser?._id || activeUser?.id || '').trim();
+    const currentUsername = String(activeUser?.username || '').trim().toLowerCase();
+    if (!currentUserId) return;
 
     // Join personal socket room
     if (!socket.connected) {
       socket.connect();
     }
-    socket.emit("user_connected", currentUser._id);
+    socket.emit("user_connected", currentUserId);
+
+    const isCurrentChatPage = () => {
+      if (typeof window === 'undefined') return false;
+      const path = window.location.pathname;
+      return path.startsWith('/message') || path.startsWith('/messages');
+    };
+
+    const isSenderCurrentUser = (idOrObj?: any, username?: string) => {
+      if (!idOrObj && !username) return false;
+      const idStr = String(typeof idOrObj === 'object' ? (idOrObj?._id || idOrObj?.id || '') : (idOrObj || '')).trim();
+      if (idStr && currentUserId && idStr === currentUserId) return true;
+      const uStr = String(typeof idOrObj === 'object' ? (idOrObj?.username || '') : (username || '')).trim().toLowerCase();
+      if (uStr && currentUsername && uStr === currentUsername) return true;
+      return false;
+    };
+
+    const isChatMessageNotif = (notif: any) => {
+      if (!notif) return false;
+      const type = String(notif.type || '').toLowerCase();
+      const title = String(notif.title || '').toLowerCase();
+      const msg = String(notif.message || notif.desc || notif.description || '').toLowerCase();
+      const link = String(notif.link || notif.url || '').toLowerCase();
+
+      return (
+        type === 'message' ||
+        type === 'chat' ||
+        type === 'conversation' ||
+        type === 'new_message' ||
+        type === 'custom_offer' ||
+        Boolean(notif.conversationID || notif.conversationId || notif.conversationUUID || notif.conversation) ||
+        link.includes('/message') ||
+        link.includes('/messages') ||
+        /message|chat|conversation|custom proposal|custom offer/i.test(title) ||
+        /sent you a message|sent a message|new message|sent you a custom proposal|sent you an offer/i.test(msg)
+      );
+    };
 
     // Listen for real-time notification broadcast from server
     const handleNewNotification = (newNotif: any) => {
-      // Add new notification to top of list
+      if (!newNotif) return;
+
+      // Robust check: don't notify if user is the sender / creator of this notification
+      const notifSenderId =
+        newNotif.senderId ||
+        newNotif.senderID ||
+        newNotif.sender?._id ||
+        newNotif.sender?.id ||
+        newNotif.sender ||
+        newNotif.from?._id ||
+        newNotif.from?.id ||
+        newNotif.from ||
+        newNotif.creatorId ||
+        newNotif.creator?._id;
+
+      const notifSenderName =
+        newNotif.senderUsername ||
+        newNotif.sender_username ||
+        newNotif.sender?.username ||
+        newNotif.from?.username;
+
+      if (isSenderCurrentUser(notifSenderId, notifSenderName)) return;
+
+      // Add new notification to top of list for all instances
       setNotifications((prev) => [newNotif, ...prev]);
-      
-      // Increment unread badge count
       setUnreadCount((prev) => prev + 1);
 
       // Trigger subtle animation on the icon
       setIsAnimating(true);
-      setTimeout(() => setIsAnimating(false), 2000); // 2 seconds of bounce
+      setTimeout(() => setIsAnimating(false), 2000);
 
-      const notifId = newNotif._id || newNotif.id || `${newNotif.title}-${newNotif.createdAt || Date.now()}`;
+      // ALWAYS skip toast for chat messages (handled exclusively by handleReceiveMessage)
+      if (isChatMessageNotif(newNotif)) {
+        return;
+      }
+
+      // If user is currently on the notifications page or chat page, skip toast
+      if (typeof window !== 'undefined' && (window.location.pathname.startsWith('/notifications') || isCurrentChatPage())) {
+        return;
+      }
+
+      const notifId = String(
+        newNotif._id ||
+        newNotif.id ||
+        `${newNotif.title || ''}-${newNotif.message || ''}`
+      ).trim();
+
+      // Deduplicate across simultaneously mounted desktop & mobile instances
+      if (processedNotifIds.has(notifId)) return;
+      processedNotifIds.add(notifId);
+      setTimeout(() => processedNotifIds.delete(notifId), 8000);
+
+      // Play notification sound once
+      playNotificationSound('notification');
+
       toast.custom((t) => (
         <div className={`relative bg-white border-l-4 border-[#6ad724] shadow-xl p-4 rounded-lg max-w-[350px] flex flex-col gap-1 transition-all duration-300 ${t.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}>
           <button 
@@ -93,41 +179,69 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
           <p className="text-[#666] text-[13px] m-0 leading-snug">{newNotif.message}</p>
         </div>
       ), { id: `sys-notif-${notifId}`, duration: 5000 });
-      
-      // Play notification sound for all non-chat notifications
-      playNotificationSound('notification');
     };
 
     // Listen for real-time incoming messages (chat messages from other users)
     const handleReceiveMessage = (newMsg: any) => {
       if (!newMsg) return;
 
-      // Robust check: Don't notify for messages sent by the current user
-      const senderId = String(newMsg.userID?._id || newMsg.userID?.id || (typeof newMsg.userID === 'string' ? newMsg.userID : '') || '');
-      const currentUserId = String(currentUser?._id || currentUser?.id || '');
+      // Extract sender ID and sender username from all common fields
+      const senderId =
+        newMsg.userID?._id ||
+        newMsg.userID?.id ||
+        newMsg.senderID?._id ||
+        newMsg.senderID?.id ||
+        newMsg.senderID ||
+        newMsg.senderId ||
+        newMsg.sender?._id ||
+        newMsg.sender?.id ||
+        newMsg.sender ||
+        newMsg.from?._id ||
+        newMsg.from?.id ||
+        newMsg.from ||
+        (typeof newMsg.userID === 'string' ? newMsg.userID : '');
 
-      if (senderId && currentUserId && senderId === currentUserId) return;
+      const senderName =
+        newMsg.userID?.username ||
+        newMsg.senderName ||
+        newMsg.sender_username ||
+        newMsg.senderUsername ||
+        newMsg.sender?.username ||
+        newMsg.from?.username ||
+        newMsg.user?.username ||
+        '';
+
+      // Robust check: NEVER notify for messages sent by the current user
+      if (isSenderCurrentUser(senderId, senderName)) return;
 
       // Play message sound and show toast ONLY if user is NOT on the chat page
-      const isViewingCurrentChat = typeof window !== 'undefined' && window.location.pathname.includes(`/message/${newMsg.conversationID}`);
-      const isAnyChatPage = typeof window !== 'undefined' && window.location.pathname.startsWith('/message');
+      if (isCurrentChatPage()) return;
 
-      if (isViewingCurrentChat || isAnyChatPage) return;
+      const conversationId = String(
+        newMsg.conversationID ||
+        newMsg.conversationId ||
+        newMsg.conversationUUID ||
+        newMsg.uuid ||
+        ''
+      );
 
       const msgId = newMsg._id || newMsg.id || newMsg.uuid;
-      const msgKey = msgId ? String(msgId) : `${senderId}-${newMsg.description || ''}`;
+      const msgKey = String(msgId || `${String(senderId || '')}-${newMsg.description || newMsg.text || newMsg.message || ''}`).trim();
 
+      // Deduplicate across simultaneously mounted desktop & mobile instances
       if (processedNotifMessageIds.has(msgKey)) return;
       processedNotifMessageIds.add(msgKey);
-      setTimeout(() => processedNotifMessageIds.delete(msgKey), 10000);
+      setTimeout(() => processedNotifMessageIds.delete(msgKey), 8000);
 
-      // Play message notification sound
+      // Play message notification sound once
       playNotificationSound('message');
 
-      const senderName = newMsg.userID?.username || 'Someone';
+      const displayName = senderName || 'Someone';
       const msgPreview = newMsg.description?.startsWith('[CUSTOM_OFFER]') 
         ? 'sent you a custom proposal' 
-        : newMsg.description?.slice(0, 60) || 'sent a message';
+        : newMsg.description?.slice(0, 60) || newMsg.text?.slice(0, 60) || newMsg.message?.slice(0, 60) || 'sent a message';
+
+      const targetConvId = conversationId || newMsg.conversationID;
 
       // Show toast for incoming message with 5s duration and unique ID
       toast.custom((t) => (
@@ -135,7 +249,9 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
           className={`relative bg-white border-l-4 border-[#6ad724] shadow-xl p-4 rounded-lg max-w-[350px] flex flex-col gap-1 transition-all duration-300 cursor-pointer pr-6 ${t.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}
           onClick={() => {
             toast.dismiss(t.id);
-            window.location.href = `/message/${newMsg.conversationID}`;
+            if (targetConvId) {
+              window.location.href = `/message/${targetConvId}`;
+            }
           }}
         >
           <button 
@@ -144,7 +260,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
           >
             ×
           </button>
-          <strong className="text-[#333] text-sm font-bold">💬 {senderName}</strong>
+          <strong className="text-[#333] text-sm font-bold">💬 {displayName}</strong>
           <p className="text-[#666] text-[13px] m-0 leading-snug">{msgPreview}</p>
         </div>
       ), { id: `chat-toast-${msgKey}`, duration: 5000 });
@@ -160,7 +276,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
       socket.off("new_notification", handleNewNotification);
       socket.off("receive_message", handleReceiveMessage);
     };
-  }, [currentUser]);
+  }, [currentUser, storeUser]);
 
   // 3. Mark Single Notification as Read and Navigate
   const handleNotificationClick = async (n: any) => {

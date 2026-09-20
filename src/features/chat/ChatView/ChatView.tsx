@@ -215,7 +215,7 @@ const ChatView = () => {
   const [offerDesc, setOfferDesc] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
   const [offerDelivery, setOfferDelivery] = useState("");
-  const [offerRevisions, setOfferRevisions] = useState("Unlimited Revision");
+  const [offerRevisions, setOfferRevisions] = useState("0 revision");
   const [messageText, setMessageText] = useState("");
   const [isRecipientTyping, setIsRecipientTyping] = useState(false);
   const [partnerUsername, setPartnerUsername] = useState("");
@@ -984,7 +984,7 @@ const ChatView = () => {
       price: Number(offerPrice),
       desc: offerDesc,
       delivery: Number(offerDelivery),
-      revisions: offerRevisions || "Unlimited Revision",
+      revisions: offerRevisions?.trim() ? offerRevisions : "0 revision",
       sellerID: user._id
     };
     if (selectedPackageId) {
@@ -1065,7 +1065,7 @@ const ChatView = () => {
       socket.emit("sendMessage", msgPayload);
     }
 
-    setSelectedPackageId(""); setSelectedBriefId(""); setOfferDesc(""); setOfferPrice(""); setOfferDelivery(""); setOfferRevisions("Unlimited Revision");
+    setSelectedPackageId(""); setSelectedBriefId(""); setOfferDesc(""); setOfferPrice(""); setOfferDelivery(""); setOfferRevisions("0 revision");
     setShowOfferModal(false);
     toast.success("Custom offer sent!");
   };
@@ -2099,7 +2099,7 @@ const ChatView = () => {
                                     <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
                                     <path d="M21 21v-5h-5" />
                                   </svg>
-                                  <span>{offer.revision || offer.revisions || "Unlimited Revision"}</span>
+                                  <span>{offer.revision || offer.revisions || "0 revision"}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#292929" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -2841,7 +2841,7 @@ const ChatView = () => {
                   <label className="text-xs font-bold text-slate-600">Revisions</label>
                   <input
                     type="text"
-                    placeholder="Unlimited Revision"
+                    placeholder="0 revision"
                     value={offerRevisions}
                     onChange={e => setOfferRevisions(e.target.value)}
                     className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
@@ -2965,6 +2965,10 @@ const ChatView = () => {
               <div>
                 <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Price</span>
                 <span className="text-2xl font-bold text-emerald-700">${viewingOfferDetails.offer?.price}</span>
+              </div>
+              <div className="text-center">
+                <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Revisions</span>
+                <span className="text-base font-bold text-slate-800">{viewingOfferDetails.offer?.revision || viewingOfferDetails.offer?.revisions || "0 revision"}</span>
               </div>
               <div className="text-right">
                 <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Delivery Time</span>

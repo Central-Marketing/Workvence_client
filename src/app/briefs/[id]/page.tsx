@@ -441,6 +441,7 @@ const BriefDetail = () => {
 
   // Message seller handler
   const handleMessageSeller = async (sellerId: string, sellerName: string) => {
+    if (messagingSellerId) return;
     const buyerId = user?._id || user?.id;
     if (!buyerId) {
       toast.error("Please login to message this seller");
@@ -1212,7 +1213,10 @@ const BriefDetail = () => {
                           <button
                             type="button"
                             disabled={messagingSellerId === item.sellerId}
-                            onClick={() => handleMessageSeller(item.sellerId, item.name)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMessageSeller(item.sellerId, item.name);
+                            }}
                             className="flex-1 py-2.5 rounded-[10px] bg-black hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
                           >
                             <span>
@@ -1472,7 +1476,10 @@ const BriefDetail = () => {
                               <button
                                 type="button"
                                 disabled={messagingSellerId === displayItem.sellerId}
-                                onClick={() => handleMessageSeller(displayItem.sellerId, displayItem.name)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleMessageSeller(displayItem.sellerId, displayItem.name);
+                                }}
                                 className="flex-1 py-2.5 rounded-[10px] bg-black hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
                               >
                                 <span>
@@ -1637,7 +1644,10 @@ const BriefDetail = () => {
                     <button
                       type="button"
                       disabled={messagingSellerId === detailedProposal.sellerId}
-                      onClick={() => handleMessageSeller(detailedProposal.sellerId, detailedProposal.name)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMessageSeller(detailedProposal.sellerId, detailedProposal.name);
+                      }}
                       className="w-full py-3 rounded-xl bg-black hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
                     >
                       <span>

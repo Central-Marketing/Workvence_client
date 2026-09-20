@@ -18,6 +18,7 @@ import {
   Flame,
   Clock
 } from "lucide-react";
+import { Button } from "@/components";
 import toast from "react-hot-toast";
 
 interface Thread {
@@ -177,13 +178,16 @@ export default function ForumPage() {
               </p>
             </div>
 
-            <button
+            <Button
               onClick={() => setIsCreatingPost(true)}
-              className="px-6 py-3 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 flex items-center gap-2 cursor-pointer self-start md:self-auto shrink-0"
+              variant="brand"
+              size="md"
+              radius="xl"
+              leftIcon={<PlusCircle className="w-4 h-4" />}
+              className="self-start md:self-auto shrink-0 font-semibold shadow-xs"
             >
-              <PlusCircle className="w-4 h-4" />
-              <span>Start New Discussion</span>
-            </button>
+              Start New Discussion
+            </Button>
           </div>
         </div>
       </section>
@@ -198,18 +202,22 @@ export default function ForumPage() {
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Categories</h3>
               <div className="space-y-1">
                 {categories.map((cat) => (
-                  <button
+                  <Button
                     key={cat}
                     onClick={() => setSelectedCat(cat)}
-                    className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition cursor-pointer flex items-center justify-between ${
+                    variant={selectedCat === cat ? "brand" : "ghost"}
+                    size="sm"
+                    radius="xl"
+                    fullWidth
+                    rightIcon={<ChevronRight className="w-3.5 h-3.5 opacity-60" />}
+                    className={`justify-between text-left font-medium ${
                       selectedCat === cat
-                        ? "bg-[#327C73] text-white font-semibold"
+                        ? "font-semibold"
                         : "text-gray-600 hover:bg-gray-100"
                     }`}
                   >
                     <span>{cat}</span>
-                    <ChevronRight className="w-3.5 h-3.5 opacity-60" />
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -283,13 +291,16 @@ export default function ForumPage() {
 
                   {/* Upvotes & Replies Counters */}
                   <div className="flex items-center gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
-                    <button
+                    <Button
                       onClick={() => handleUpvote(thread.id)}
-                      className="px-3 py-1.5 rounded-xl bg-gray-50 hover:bg-emerald-50 text-gray-600 hover:text-[#327C73] border border-gray-200 text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 cursor-pointer"
+                      variant="outline"
+                      size="xs"
+                      radius="xl"
+                      leftIcon={<ThumbsUp className="w-3.5 h-3.5" />}
+                      className="bg-gray-50 hover:bg-emerald-50 text-gray-600 hover:text-[#327C73] border-gray-200 font-semibold"
                     >
-                      <ThumbsUp className="w-3.5 h-3.5" />
-                      <span>{thread.upvotes}</span>
-                    </button>
+                      {thread.upvotes}
+                    </Button>
 
                     <div className="flex items-center gap-3 text-xs text-gray-400">
                       <span className="flex items-center gap-1">
@@ -315,12 +326,16 @@ export default function ForumPage() {
       {isCreatingPost && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
-            <button
+            <Button
               onClick={() => setIsCreatingPost(false)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition cursor-pointer"
+              variant="soft"
+              size="icon"
+              radius="full"
+              className="absolute top-5 right-5 w-8 h-8 text-gray-600 hover:text-black"
+              aria-label="Close modal"
             >
               <X className="w-4 h-4" />
-            </button>
+            </Button>
 
             <div className="space-y-1 mb-5">
               <h3 className="text-xl font-bold text-[#0f172a]">Start a Discussion</h3>
@@ -376,13 +391,17 @@ export default function ForumPage() {
                 />
               </div>
 
-              <button
+              <Button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer mt-2"
+                variant="brand"
+                size="md"
+                radius="xl"
+                fullWidth
+                leftIcon={<Send className="w-4 h-4" />}
+                className="font-semibold shadow-md mt-2"
               >
-                <Send className="w-4 h-4" />
-                <span>Publish Discussion</span>
-              </button>
+                Publish Discussion
+              </Button>
             </form>
           </div>
         </div>

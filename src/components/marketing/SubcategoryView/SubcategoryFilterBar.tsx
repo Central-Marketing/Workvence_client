@@ -2,6 +2,7 @@
 
 import React from "react";
 import { FiArrowRight } from "react-icons/fi";
+import { Button } from "@/components/ui";
 
 interface SubcategoryFilterBarProps {
   items: string[];
@@ -27,10 +28,13 @@ const SubcategoryFilterBar: React.FC<SubcategoryFilterBarProps> = ({
   return (
     <div className={`w-full flex flex-wrap sm:flex-nowrap items-center justify-between gap-y-3 gap-x-2 sm:gap-4 ${className}`}>
       {/* Filter Toggle Button (Top-left on mobile, Left on desktop) */}
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="sm"
+        radius="lg"
         onClick={onOpenFilter}
-        className="order-1 flex items-center gap-1.5 hover:opacity-80 transition-opacity px-2 py-1.5 rounded-lg hover:bg-gray-100/70 cursor-pointer shrink-0"
+        className="order-1 flex items-center gap-1.5 hover:opacity-80 px-2 py-1.5 hover:bg-gray-100/70 shrink-0 h-auto font-normal"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
           <path d="M5.8335 17.5V15" stroke="#868686" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -50,7 +54,7 @@ const SubcategoryFilterBar: React.FC<SubcategoryFilterBarProps> = ({
             </svg>
           </span>
         )}
-      </button>
+      </Button>
 
       {/* Vertical Divider (Desktop only) */}
       <div className="hidden sm:block sm:order-2 h-5 w-[1px] bg-gray-200 shrink-0" />
@@ -60,30 +64,36 @@ const SubcategoryFilterBar: React.FC<SubcategoryFilterBarProps> = ({
         {items.map((item, idx) => {
           const isSelected = activeTag.toLowerCase() === item.toLowerCase();
           return (
-            <button
+            <Button
               key={idx}
               type="button"
+              variant={isSelected ? "dark" : "outline"}
+              size="sm"
+              radius="full"
               onClick={() => (isSelected ? onClearTag?.() : onSelectTag(item))}
-              className={`px-3.5 sm:px-4 py-1.5 rounded-full text-sm sm:text-base font-[510] font-sf-pro transition-all duration-200 whitespace-nowrap cursor-pointer shrink-0 ${isSelected
-                ? "bg-gray-900 text-white border border-gray-900 shadow-xs"
-                : "bg-white text-gray-800 border border-gray-200/90 hover:border-gray-900"
+              className={`px-3.5 sm:px-4 py-1.5 text-sm sm:text-base font-[510] font-sf-pro whitespace-nowrap shrink-0 ${isSelected
+                ? "bg-gray-900 text-white border-gray-900 shadow-xs"
+                : "bg-white text-gray-800 border-gray-200/90 hover:border-gray-900"
                 }`}
             >
               {item}
-            </button>
+            </Button>
           );
         })}
       </div>
 
       {/* Right: View All Button (Top-right on mobile, Far-right on desktop) */}
-      <button
+      <Button
         type="button"
+        variant="dark"
+        size="sm"
+        radius="full"
         onClick={onViewAll || onClearTag}
-        className="order-2 sm:order-3 shrink-0 px-3.5 sm:px-4 py-1.5 rounded-full text-sm sm:text-base font-[510] font-sf-pro transition-all duration-200 whitespace-nowrap cursor-pointer bg-gray-900 text-white border border-gray-900 shadow-xs hover:bg-neutral-800 flex items-center gap-1.5 active:scale-95 ml-auto sm:ml-0"
+        rightIcon={<FiArrowRight className="w-4 h-4" />}
+        className="order-2 sm:order-3 shrink-0 px-3.5 sm:px-4 py-1.5 text-sm sm:text-base font-[510] font-sf-pro whitespace-nowrap shadow-xs hover:bg-neutral-800 ml-auto sm:ml-0"
       >
         <span>View All</span>
-        <FiArrowRight className="w-4 h-4" />
-      </button>
+      </Button>
     </div>
   );
 };

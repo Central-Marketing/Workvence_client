@@ -9,7 +9,7 @@ import { Trash2, X } from "lucide-react";
 import { FiHome, FiEdit2, FiTrash2 } from "react-icons/fi";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "@/components";
+import { Loader, Button } from "@/components";
 
 const MyPackages = () => {
   const user = useUserStore((state: any) => state.user);
@@ -109,30 +109,34 @@ const MyPackages = () => {
               </p>
             </div>
 
-            <Link href="/organize" className="self-start sm:self-auto shrink-0">
-              <button
-                type="button"
-                className="bg-gradient-to-r from-[#98FDE8] to-[#80B6FD] hover:opacity-95 text-[#0A3B32] font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-2xs transition-all cursor-pointer"
-              >
-                Create New Package
-              </button>
-            </Link>
+            <Button
+              href="/organize"
+              variant="outline"
+              size="sm"
+              radius="fiverr"
+              className="bg-gradient-to-r from-[#98FDE8] to-[#80B6FD] hover:opacity-95 text-[#0A3B32] border-transparent shadow-2xs self-start sm:self-auto shrink-0"
+            >
+              Create New Package
+            </Button>
           </div>
 
           {/* Tab Filter: Published and Draft */}
           <div className="bg-[#F1F3F5] rounded-xl p-1 inline-flex items-center gap-1 shadow-2xs">
-            <button
+            <Button
               type="button"
               onClick={() => setActiveTab("published")}
-              className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+              size="sm"
+              radius="fiverr"
+              variant={activeTab === "published" ? "brand" : "ghost"}
+              className={
                 activeTab === "published"
-                  ? "bg-[#0B3A33] text-white shadow-2xs"
+                  ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
                   : "text-gray-600 hover:text-gray-900"
-              }`}
+              }
             >
               <span>Published</span>
               <span
-                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ml-1.5 ${
                   activeTab === "published"
                     ? "bg-white/20 text-white"
                     : "bg-gray-200/80 text-gray-700"
@@ -140,20 +144,23 @@ const MyPackages = () => {
               >
                 {publishedPackages.length}
               </span>
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
               onClick={() => setActiveTab("draft")}
-              className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+              size="sm"
+              radius="fiverr"
+              variant={activeTab === "draft" ? "brand" : "ghost"}
+              className={
                 activeTab === "draft"
-                  ? "bg-[#0B3A33] text-white shadow-2xs"
+                  ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
                   : "text-gray-600 hover:text-gray-900"
-              }`}
+              }
             >
               <span>Draft</span>
               <span
-                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ml-1.5 ${
                   activeTab === "draft"
                     ? "bg-white/20 text-white"
                     : "bg-amber-100 text-amber-800"
@@ -161,7 +168,7 @@ const MyPackages = () => {
               >
                 {draftPackages.length}
               </span>
-            </button>
+            </Button>
           </div>
 
           {/* Main Card Container */}
@@ -195,14 +202,14 @@ const MyPackages = () => {
                               ? "You don't have any packages saved as drafts."
                               : "You haven't published any packages yet. Click \"Create New Package\" to publish your first offering!"}
                           </p>
-                          <Link href="/organize">
-                            <button
-                              type="button"
-                              className="bg-black hover:bg-slate-800 text-white font-semibold text-xs px-5 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer"
-                            >
-                              Create New Package
-                            </button>
-                          </Link>
+                          <Button
+                            href="/organize"
+                            variant="dark"
+                            size="sm"
+                            radius="fiverr"
+                          >
+                            Create New Package
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -275,30 +282,34 @@ const MyPackages = () => {
                           <td className="py-4 px-6 align-middle whitespace-nowrap text-right">
                             <div className="inline-flex items-center justify-end gap-2.5">
                               {/* Edit Button */}
-                              <button
+                              <Button
                                 type="button"
                                 title="Edit package"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   router.push(`/organize/${pkg._id}`);
                                 }}
-                                className="w-8 h-8 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:text-gray-950 hover:bg-gray-50 transition-colors cursor-pointer shadow-2xs"
-                              >
-                                <FiEdit2 className="text-xs" />
-                              </button>
+                                variant="outline"
+                                size="icon"
+                                radius="full"
+                                className="w-8 h-8 min-w-[32px] min-h-[32px] p-0 shadow-2xs"
+                                icon={<FiEdit2 className="text-xs" />}
+                              />
 
                               {/* Delete Button */}
-                              <button
+                              <Button
                                 type="button"
                                 title="Delete package"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setPackageToDelete(pkg);
                                 }}
-                                className="w-8 h-8 rounded-full border border-red-100 bg-white flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer shadow-2xs"
-                              >
-                                <FiTrash2 className="text-xs" />
-                              </button>
+                                variant="danger-soft"
+                                size="icon"
+                                radius="full"
+                                className="w-8 h-8 min-w-[32px] min-h-[32px] p-0 bg-white hover:bg-red-50 border-red-100 text-red-500 shadow-2xs"
+                                icon={<FiTrash2 className="text-xs" />}
+                              />
                             </div>
                           </td>
                         </tr>
@@ -325,14 +336,16 @@ const MyPackages = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
-            <button
+            <Button
               type="button"
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50"
+              variant="ghost"
+              size="icon"
+              radius="full"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50 w-8 h-8 min-h-[32px] p-0"
               onClick={() => setPackageToDelete(null)}
               disabled={mutation.isPending}
-            >
-              <X size={20} />
-            </button>
+              icon={<X size={20} />}
+            />
 
             {/* Trash Icon */}
             <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center mb-4 border border-red-100">
@@ -348,30 +361,30 @@ const MyPackages = () => {
             </p>
 
             <div className="flex items-center gap-3 w-full">
-              <button
+              <Button
                 type="button"
-                className="flex-1 py-3 px-5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-colors disabled:opacity-50"
+                variant="outline"
+                size="md"
+                radius="fiverr"
+                className="flex-1"
                 onClick={() => setPackageToDelete(null)}
                 disabled={mutation.isPending}
               >
                 Cancel
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="button"
-                className="flex-1 py-3 px-5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all disabled:bg-red-300 flex items-center justify-center gap-2"
+                variant="danger"
+                size="md"
+                radius="fiverr"
+                className="flex-1"
                 onClick={() => confirmDelete()}
                 disabled={mutation.isPending}
+                isLoading={mutation.isPending}
               >
-                {mutation.isPending ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    Deleting...
-                  </>
-                ) : (
-                  "Yes, Delete"
-                )}
-              </button>
+                {mutation.isPending ? "Deleting..." : "Yes, Delete"}
+              </Button>
             </div>
           </div>
         </div>

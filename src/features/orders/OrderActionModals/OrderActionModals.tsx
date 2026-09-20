@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Calendar, FileText, X } from 'lucide-react';
+import { Button } from '@/components/ui';
 
 interface RevisionModalProps {
   isOpen: boolean;
@@ -40,14 +41,16 @@ export const RevisionModal: React.FC<RevisionModalProps> = ({
         className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <button
+        <Button
           type="button"
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer"
+          variant="ghost"
+          size="icon"
+          radius="full"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer w-8 h-8 min-h-[32px] p-0"
           onClick={onClose}
           disabled={isLoading}
-        >
-          <X size={20} />
-        </button>
+          icon={<X size={20} />}
+        />
 
         <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
@@ -78,21 +81,28 @@ export const RevisionModal: React.FC<RevisionModalProps> = ({
           </div>
 
           <div className="flex items-center gap-3 pt-2">
-            <button
+            <Button
               type="button"
-              className="flex-1 py-3 px-4 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-50"
+              variant="outline"
+              size="md"
+              radius="fiverr"
+              className="flex-1"
               onClick={onClose}
               disabled={isLoading}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isLoading || !reason.trim()}
-              className="flex-1 py-3 px-4 rounded-xl bg-brand-green font-semibold text-sm text-white shadow-md shadow-emerald-500/20 hover:bg-[#059669] transition-all cursor-pointer disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none"
+              isLoading={isLoading}
+              variant="brand"
+              size="md"
+              radius="fiverr"
+              className="flex-1"
             >
               {isLoading ? 'Submitting...' : 'Submit Request'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -143,14 +153,16 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
         className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <button
+        <Button
           type="button"
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer"
+          variant="ghost"
+          size="icon"
+          radius="full"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer w-8 h-8 min-h-[32px] p-0"
           onClick={onClose}
           disabled={isLoading}
-        >
-          <X size={20} />
-        </button>
+          icon={<X size={20} />}
+        />
 
         <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 shrink-0">
@@ -193,21 +205,28 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
           {error && <p className="text-xs text-red-500 font-medium">{error}</p>}
 
           <div className="flex items-center gap-3 pt-2">
-            <button
+            <Button
               type="button"
-              className="flex-1 py-3 px-4 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-50"
+              variant="outline"
+              size="md"
+              radius="fiverr"
+              className="flex-1"
               onClick={onClose}
               disabled={isLoading}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isLoading || !reason.trim()}
-              className="flex-1 py-3 px-4 rounded-xl bg-brand-green font-semibold text-sm text-white shadow-md shadow-emerald-500/20 hover:bg-[#059669] transition-all cursor-pointer disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none"
+              isLoading={isLoading}
+              variant="brand"
+              size="md"
+              radius="fiverr"
+              className="flex-1"
             >
               {isLoading ? 'Submitting...' : 'Submit Extension'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

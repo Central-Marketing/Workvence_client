@@ -18,7 +18,7 @@ import {
 } from "recharts";
 
 import adminAxios from "@/utils/adminAxios";
-import { Loader } from "@/components";
+import { Loader, Button } from "@/components";
 import "./AdminDashboard.scss";
 
 /* ═══════════════════════════════════════════
@@ -104,13 +104,16 @@ function RevenueTrendChart() {
         <h3>Revenue Trend</h3>
         <div className="period-tabs">
           {PERIOD_OPTIONS.map((opt) => (
-            <button
+            <Button
               key={opt.value}
+              type="button"
+              variant="ghost"
+              size="xs"
               className={period === opt.value ? "active" : ""}
               onClick={() => setPeriod(opt.value)}
             >
               {opt.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

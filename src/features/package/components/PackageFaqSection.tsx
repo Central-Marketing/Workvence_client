@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { FiChevronDown } from "react-icons/fi";
+import { Button } from "@/components/ui";
 import { FaqItem } from "../utils/packageDetailsNormalizer";
 
 interface PackageFaqSectionProps {
@@ -37,22 +38,26 @@ export const PackageFaqSection: React.FC<PackageFaqSectionProps> = ({ faqs = [] 
           const isOpen = openIndex === idx;
           return (
             <div key={idx} className="py-4.5 first:pt-0 last:pb-0">
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="xs"
                 onClick={() => toggleFaq(idx)}
-                className="w-full flex items-center justify-between gap-4 text-left cursor-pointer group py-1"
+                className="w-full !p-0 !min-h-0 !h-auto flex items-center justify-between gap-4 text-left cursor-pointer group py-1"
+                rightIcon={
+                  <FiChevronDown
+                    className={`w-4 h-4 text-gray-400 group-hover:text-gray-700 transition-transform duration-200 shrink-0 ${
+                      isOpen ? "rotate-180 text-brand-green" : ""
+                    }`}
+                  />
+                }
               >
                 <span className={`text-[14.5px] sm:text-[15px] font-semibold transition-colors ${
                   isOpen ? "text-brand-green" : "text-gray-900 group-hover:text-brand-green"
                 }`}>
                   {faq.question}
                 </span>
-                <FiChevronDown
-                  className={`w-4 h-4 text-gray-400 group-hover:text-gray-700 transition-transform duration-200 shrink-0 ${
-                    isOpen ? "rotate-180 text-brand-green" : ""
-                  }`}
-                />
-              </button>
+              </Button>
 
               {isOpen && (
                 <div className="mt-2.5 text-[14px] text-gray-600 leading-relaxed animate-fadeIn pr-6 whitespace-pre-line">

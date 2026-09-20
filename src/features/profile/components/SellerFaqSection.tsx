@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { FiChevronDown } from "react-icons/fi";
+import { Button } from "@/components/ui";
 import { SellerFaqItem } from "../utils/sellerProfileNormalizer";
 
 interface SellerFaqSectionProps {
@@ -39,10 +40,12 @@ export const SellerFaqSection: React.FC<SellerFaqSectionProps> = ({ faqs = [] })
 
           return (
             <div key={idx} className="py-4 sm:py-5 first:pt-0 last:pb-0">
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="xs"
                 onClick={() => toggleFaq(idx)}
-                className="w-full flex items-center justify-between gap-4 text-left group cursor-pointer"
+                className="w-full flex items-center justify-between gap-4 text-left group hover:!bg-transparent !p-0 !min-h-0 !h-auto"
                 aria-expanded={isOpen}
               >
                 <span className="text-sm sm:text-[15px] font-semibold font-sf-pro text-gray-900 group-hover:text-teal-700 transition-colors">
@@ -55,7 +58,7 @@ export const SellerFaqSection: React.FC<SellerFaqSectionProps> = ({ faqs = [] })
                 >
                   <FiChevronDown className="w-4 h-4" />
                 </span>
-              </button>
+              </Button>
 
               {isOpen && (
                 <div className="mt-3 text-xs sm:text-sm text-gray-500 leading-relaxed font-normal font-sf-pro pr-4 sm:pr-8 animate-fadeIn">

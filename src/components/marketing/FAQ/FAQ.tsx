@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@/components/ui';
 
 const faqData = [
   {
@@ -64,11 +65,16 @@ const FAQ = () => {
               <p className="text-[14px] text-gray-500 leading-relaxed mb-6">
                 Our specialized support team is ready to help you navigate the marketplace and answer technical queries.
               </p>
-              <button
-                className="inline-flex items-center gap-2 px-6 py-3 border border-gray-200 rounded-xl text-[14px] font-medium text-gray-500 bg-white hover:border-gray-300 hover:text-gray-700 transition-colors"
+              <Button
+                href="/support"
+                variant="outline"
+                size="md"
+                radius="fiverr"
+                rightIcon={<span className="text-lg leading-none">&rarr;</span>}
+                className="text-gray-600 hover:text-gray-900 border-gray-200 hover:border-gray-300"
               >
-                Contact Support <span className="text-lg leading-none">&rarr;</span>
-              </button>
+                Contact Support
+              </Button>
             </div>
           </div>
 
@@ -86,9 +92,13 @@ const FAQ = () => {
                   <span className="text-[16px] font-semibold text-gray-900 leading-snug">
                     {item.question}
                   </span>
-                  <button
-                    className="flex-shrink-0 ml-4 text-gray-600 hover:text-gray-900 transition-colors"
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    radius="full"
                     aria-label="Toggle answer"
+                    className="flex-shrink-0 ml-4 text-gray-600 hover:text-gray-900 transition-colors p-0 h-auto min-h-0 w-6 h-6 border-none shadow-none hover:bg-transparent"
                   >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="1.2" />
@@ -101,7 +111,7 @@ const FAQ = () => {
                         </>
                       )}
                     </svg>
-                  </button>
+                  </Button>
                 </div>
                 <div
                   className={`overflow-hidden transition-all duration-300 ease-in-out ${

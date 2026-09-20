@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { axiosFetch } from '@/utils';
+import { Button } from '@/components/ui';
 import Image from 'next/image';
 
 const ForgotPassword = () => {
@@ -53,7 +54,15 @@ const ForgotPassword = () => {
               </Link>
             </div>
             <div className="flex justify-center md:justify-start w-full">
-              <button className="bg-transparent border-none text-[#666] text-base cursor-pointer mb-7 flex items-center hover:text-emerald-500" onClick={() => router.back()}>← Back</button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => router.back()}
+                className="self-start mb-7 text-[#666] hover:text-emerald-500 p-0 hover:bg-transparent h-auto"
+              >
+                ← Back
+              </Button>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col items-start w-full max-w-[450px]">
@@ -76,9 +85,18 @@ const ForgotPassword = () => {
                   error && <p className="text-sm text-red-500">{error}</p>
                 }
 
-                <button type="submit" className="mt-2 bg-emerald-500 text-white py-4 border-none rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed w-full" disabled={loading}>
-                  {loading ? 'Loading...' : 'Continue'}
-                </button>
+                <Button
+                  type="submit"
+                  variant="emerald"
+                  size="lg"
+                  fullWidth
+                  radius="fiverr"
+                  disabled={loading}
+                  isLoading={loading}
+                  className="mt-2 text-base font-semibold"
+                >
+                  Continue
+                </Button>
               </div>
             </form>
 

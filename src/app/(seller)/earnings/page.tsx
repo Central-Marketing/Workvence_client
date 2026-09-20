@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
-import { Loader, KycRequiredModal, PayoneerLogo, PayoneerIcon } from "@/components";
+import { Loader, KycRequiredModal, PayoneerLogo, PayoneerIcon, Button } from "@/components";
 import { FaStripe } from "react-icons/fa";
 import moment from "moment";
 import toast from "react-hot-toast";
@@ -481,81 +481,75 @@ const Earnings = () => {
 
           {/* Action Buttons: Sync funds, Connect Wallet, Request Payout */}
           <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0 flex-wrap sm:flex-nowrap">
-            <button
+            <Button
               type="button"
               onClick={() => syncClearanceMutation.mutate()}
               disabled={syncClearanceMutation.isPending}
-              className="bg-[rgb(239_252_250_/_50%)] hover:bg-gray-50 border border-black/10 text-gray-800 font-semibold text-xs sm:text-[13px] py-[12px] px-[24px] rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-2xs"
+              variant="outline"
+              size="md"
+              radius="fiverr"
+              className="bg-[rgb(239_252_250_/_50%)] hover:bg-gray-50 border border-black/10 text-gray-800 shadow-2xs"
               title="Sync mature completed orders into your available balance"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                className={`w-3.5 h-3.5 shrink-0 ${syncClearanceMutation.isPending ? "animate-spin text-gray-500" : "text-[#292929]"
+              leftIcon={
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className={`w-3.5 h-3.5 shrink-0 ${
+                    syncClearanceMutation.isPending ? "animate-spin text-gray-500" : "text-[#292929]"
                   }`}
-              >
-                <path
-                  d="M16.5 8H18C19.4142 8 20.1213 8 20.5607 7.56066C21 7.12132 21 6.41421 21 5V3.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M3 12C3 7.02943 7.0293 3 12 3C15.571 3 18.0948 4.73053 20 7.08371M21 12C21 16.9705 16.9707 21 12 21C8.42904 21 5.90524 19.2694 4 16.9162"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M7.5 16H6C4.58579 16 3.87868 16 3.43934 16.4393C3 16.8786 3 17.5857 3 19V20.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+                >
+                  <path
+                    d="M16.5 8H18C19.4142 8 20.1213 8 20.5607 7.56066C21 7.12132 21 6.41421 21 5V3.5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M3 12C3 7.02943 7.0293 3 12 3C15.571 3 18.0948 4.73053 20 7.08371M21 12C21 16.9705 16.9707 21 12 21C8.42904 21 5.90524 19.2694 4 16.9162"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M7.5 16H6C4.58579 16 3.87868 16 3.43934 16.4393C3 16.8786 3 17.5857 3 19V20.5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              }
+            >
               <span>{syncClearanceMutation.isPending ? "Syncing..." : "Sync funds"}</span>
               {readyToSync > 0 && !syncClearanceMutation.isPending && (
                 <span className="ml-1 bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                   ${readyToSync.toFixed(2)}
                 </span>
               )}
-            </button>
-            {/* {isStripeConnected && (
-              <button
-                type="button"
-                onClick={() => connectDashboardMutation.mutate()}
-                disabled={connectDashboardMutation.isPending}
-                className="bg-[#635BFF]/10 hover:bg-[#635BFF]/15 text-[#635bff] border border-[#635bff]/20 font-semibold text-xs sm:text-[13px] py-[12px] px-[24px] rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
-                title="Open Stripe Express Dashboard"
-              >
-                {connectDashboardMutation.isPending ? (
-                  <span className="w-3.5 h-3.5 border-2 border-[#635bff] border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <FaStripe size={18} className="text-[#635bff] shrink-0" />
-                )}
-                <span>Stripe Dashboard</span>
-                <ArrowUpRight className="w-3.5 h-3.5 text-[#635bff] shrink-0" />
-              </button>
-            )} */}
+            </Button>
 
-            <button
+            <Button
               type="button"
               onClick={() => setShowWalletModal(true)}
-              className="bg-[#F1F3F5] hover:bg-gray-200 border border-transparent text-gray-800 font-semibold text-xs sm:text-[13px] py-[12px] px-[24px] rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-2xs"
+              variant="soft"
+              size="md"
+              radius="fiverr"
+              className="bg-[#F1F3F5] hover:bg-gray-200 text-gray-800 shadow-2xs"
+              leftIcon={
+                hasAnyConnected ? (
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200 shrink-0" />
+                ) : undefined
+              }
             >
-              {hasAnyConnected && (
-                <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200 shrink-0" />
-              )}
-              <span>{hasAnyConnected ? "Payout Channels" : "Connect Wallet"}</span>
-            </button>
+              {hasAnyConnected ? "Payout Channels" : "Connect Wallet"}
+            </Button>
 
-            <button
+            <Button
               type="button"
               onClick={() => {
                 if (!hasAnyConnected) {
@@ -568,10 +562,12 @@ const Earnings = () => {
                 }
               }}
               disabled={availableBalance <= 0}
-              className="bg-black hover:bg-gray-900 border border-transparent disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold text-xs sm:text-[13px] py-[12px] px-[24px] rounded-lg transition-colors shadow-2xs cursor-pointer flex items-center justify-center text-center"
+              variant="dark"
+              size="md"
+              radius="fiverr"
             >
               Request Payout
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -626,26 +622,34 @@ const Earnings = () => {
 
         {/* 4. Tab Navigation Pills */}
         <div className="bg-[#F1F3F5] rounded-xl p-1 inline-flex items-center gap-1 shadow-2xs">
-          <button
+          <Button
             type="button"
             onClick={() => setActiveTab("payout")}
-            className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${activeTab === "payout"
-              ? "bg-[#0B3A33] text-white shadow-2xs"
-              : "text-gray-600 hover:text-gray-900"
-              }`}
+            size="sm"
+            radius="fiverr"
+            variant={activeTab === "payout" ? "brand" : "ghost"}
+            className={
+              activeTab === "payout"
+                ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
+                : "text-gray-600 hover:text-gray-900"
+            }
           >
             Payout Request
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={() => setActiveTab("clearance")}
-            className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${activeTab === "clearance"
-              ? "bg-[#0B3A33] text-white shadow-2xs"
-              : "text-gray-600 hover:text-gray-900"
-              }`}
+            size="sm"
+            radius="fiverr"
+            variant={activeTab === "clearance" ? "brand" : "ghost"}
+            className={
+              activeTab === "clearance"
+                ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
+                : "text-gray-600 hover:text-gray-900"
+            }
           >
             Order Clearance
-          </button>
+          </Button>
         </div>
 
         {/* 5. Main Card for Tab Content */}
@@ -659,13 +663,15 @@ const Earnings = () => {
 
             <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
               {/* Calendar Filter Icon */}
-              <button
+              <Button
                 type="button"
-                className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-50 transition-colors cursor-pointer"
+                variant="outline"
+                size="icon"
+                radius="lg"
+                className="w-9 h-9 border-gray-200 text-gray-500 hover:text-gray-800 hover:bg-gray-50 shrink-0"
                 title="Filter by date"
-              >
-                <CalendarIcon className="w-4 h-4" />
-              </button>
+                icon={<CalendarIcon className="w-4 h-4" />}
+              />
 
               {/* Search Bar */}
               <div className="relative flex-1 sm:w-64">
@@ -681,13 +687,16 @@ const Earnings = () => {
 
               {/* Export CSV (Visible on Order Clearance tab) */}
               {activeTab === "clearance" && (
-                <button
+                <Button
                   type="button"
                   onClick={handleExportCSV}
-                  className="bg-black hover:bg-gray-900 text-white font-semibold text-xs px-4 py-2 rounded-lg transition-colors cursor-pointer shrink-0"
+                  variant="dark"
+                  size="sm"
+                  radius="fiverr"
+                  className="shrink-0"
                 >
                   Export CSV
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -862,13 +871,15 @@ const Earnings = () => {
             {/* Header */}
             <div className="flex justify-between items-center pb-1">
               <h3 className="text-base sm:text-lg font-bold text-gray-950">Payout Channel</h3>
-              <button
+              <Button
                 type="button"
-                className="text-gray-400 hover:text-gray-700 p-1 cursor-pointer transition-colors"
+                variant="ghost"
+                size="icon"
+                radius="full"
+                className="text-gray-400 hover:text-gray-700 w-8 h-8 min-h-[32px] p-0"
                 onClick={() => setShowWalletModal(false)}
-              >
-                <X className="w-5 h-5" />
-              </button>
+                icon={<X className="w-5 h-5" />}
+              />
             </div>
 
             {/* Channels List */}
@@ -1002,13 +1013,15 @@ const Earnings = () => {
             {/* Header */}
             <div className="flex justify-between items-center pb-1">
               <h3 className="text-base sm:text-lg font-bold text-gray-950">Request Balance Payout</h3>
-              <button
+              <Button
                 type="button"
-                className="text-gray-400 hover:text-gray-700 p-1 cursor-pointer transition-colors"
+                variant="ghost"
+                size="icon"
+                radius="full"
+                className="text-gray-400 hover:text-gray-700 w-8 h-8 min-h-[32px] p-0"
                 onClick={() => setShowPayoutModal(false)}
-              >
-                <X className="w-5 h-5" />
-              </button>
+                icon={<X className="w-5 h-5" />}
+              />
             </div>
 
             {/* Available Balance Box */}
@@ -1119,20 +1132,26 @@ const Earnings = () => {
                     Amount to withdraw in <strong className="text-gray-900">USD</strong>
                   </label>
                   <div className="flex items-center gap-1.5 text-[11px]">
-                    <button
+                    <Button
                       type="button"
+                      variant="soft"
+                      size="xs"
+                      radius="md"
                       onClick={() => setPayoutAmount(String(MIN_PAYOUT_AMOUNT))}
-                      className="px-2 py-0.5 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition cursor-pointer"
+                      className="!px-2 !py-0.5 !min-h-0 !h-auto text-[11px] font-medium"
                     >
                       Min (${MIN_PAYOUT_AMOUNT})
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
+                      variant="emerald"
+                      size="xs"
+                      radius="md"
                       onClick={() => setPayoutAmount(availableBalance.toFixed(2))}
-                      className="px-2 py-0.5 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-medium transition cursor-pointer"
+                      className="!px-2 !py-0.5 !min-h-0 !h-auto text-[11px] font-medium !bg-emerald-50 hover:!bg-emerald-100 !text-emerald-700 !border-transparent shadow-none"
                     >
                       All (${availableBalance.toFixed(2)})
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
@@ -1171,14 +1190,17 @@ const Earnings = () => {
 
               {/* Action Buttons: Cancel Request, Submit Payout Request */}
               <div className="flex items-center justify-between gap-3 pt-2">
-                <button
+                <Button
                   type="button"
                   onClick={() => setShowPayoutModal(false)}
-                  className="flex-1 bg-[#F1F3F5] hover:bg-gray-200 text-gray-800 font-semibold text-xs sm:text-[13px] py-3 px-4 rounded-xl transition-colors cursor-pointer text-center"
+                  variant="soft"
+                  size="md"
+                  radius="fiverr"
+                  className="flex-1"
                 >
                   Cancel Request
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   disabled={
                     payoutMutation.isPending ||
@@ -1186,17 +1208,15 @@ const Earnings = () => {
                     Number(payoutAmount) < MIN_PAYOUT_AMOUNT ||
                     Number(payoutAmount) > availableBalance
                   }
-                  className="flex-1 bg-[#327C73] hover:bg-[#28635c] disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold text-xs sm:text-[13px] py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer text-center font-sf-pro"
+                  isLoading={payoutMutation.isPending}
+                  variant="brand"
+                  size="md"
+                  radius="fiverr"
+                  rightIcon={<span>→</span>}
+                  className="flex-1"
                 >
-                  {payoutMutation.isPending ? (
-                    "Processing..."
-                  ) : (
-                    <>
-                      <span>Submit Payout Request</span>
-                      <span>→</span>
-                    </>
-                  )}
-                </button>
+                  Submit Payout Request
+                </Button>
               </div>
             </form>
           </div>

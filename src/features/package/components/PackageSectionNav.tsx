@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useUserStore } from "@/store/userStore";
+import { Button } from "@/components/ui";
 
 interface PackageSectionNavProps {
   activeSection: string;
@@ -43,13 +44,16 @@ export const PackageSectionNav: React.FC<PackageSectionNavProps> = ({
       {sections.map((sec) => {
         const isActive = activeSection === sec.id;
         return (
-          <button
+          <Button
             key={sec.id}
             type="button"
+            variant={isActive ? "brand" : "ghost"}
+            size="sm"
+            radius="xl"
             onClick={() => onNavigate(sec.id)}
-            className={`px-5 py-2 rounded-xl text-[13.5px] font-medium flex items-center gap-2 transition-all whitespace-nowrap cursor-pointer ${isActive
-              ? "bg-brand-green text-white shadow-xs"
-              : "text-gray-600 hover:text-gray-900 hover:bg-gray-200/50"
+            className={`px-5 py-2 text-[13.5px] font-medium flex items-center gap-2 whitespace-nowrap cursor-pointer ${isActive
+              ? "!bg-brand-green !text-white shadow-xs"
+              : "!text-gray-600 hover:!text-gray-900 hover:!bg-gray-200/50"
               }`}
           >
             <span>{sec.label}</span>
@@ -61,7 +65,7 @@ export const PackageSectionNav: React.FC<PackageSectionNavProps> = ({
                 {sec.badge}
               </span>
             )}
-          </button>
+          </Button>
         );
       })}
     </div>

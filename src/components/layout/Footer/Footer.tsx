@@ -7,6 +7,7 @@ import { axiosFetch } from "@/utils";
 import useAdminCategories from "@/hooks/useAdminCategories";
 import toast from "react-hot-toast";
 import { ArrowRight, Globe } from "lucide-react";
+import { Button } from "@/components/ui";
 
 const socialLinks = [
   { href: "https://www.instagram.com/workvence", icon: "/all-icons/instagram.svg", label: "Instagram" },
@@ -189,14 +190,17 @@ const Footer = () => {
                   disabled={isSubscribing}
                   className="w-full bg-transparent font-sf-pro text-[13px] text-[#222427] placeholder-[#8E8E93] outline-none px-2.5 py-1"
                 />
-                <button
+                <Button
                   type="submit"
+                  variant="dark"
+                  size="icon"
+                  radius="fiverr"
                   disabled={isSubscribing}
+                  isLoading={isSubscribing}
                   aria-label="Subscribe"
-                  className="w-8 h-8 rounded-[7px] bg-black hover:bg-black/90 active:scale-95 disabled:opacity-50 text-white flex items-center justify-center shrink-0 transition-all cursor-pointer"
-                >
-                  <ArrowRight size={15} strokeWidth={2} />
-                </button>
+                  className="w-8 h-8 min-h-[32px] !p-0 shrink-0"
+                  icon={<ArrowRight size={15} strokeWidth={2} />}
+                />
               </div>
 
               {subscribedMsg && (
@@ -247,15 +251,25 @@ const Footer = () => {
 
             {/* Language & Currency */}
             <div className="flex items-center gap-3 text-[#6E6E6E]">
-              <button className="flex items-center gap-1.5 hover:text-[#222427] transition-colors">
-                <Globe size={15} strokeWidth={1.75} />
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                className="flex items-center gap-1.5 !p-0 !min-h-0 !h-auto text-[#6E6E6E] hover:!text-[#222427] hover:!bg-transparent"
+                leftIcon={<Globe size={15} strokeWidth={1.75} />}
+              >
                 <span className="font-sf-pro font-medium text-[13px]">English</span>
-              </button>
+              </Button>
               <span className="text-gray-300">|</span>
-              <button className="flex items-center gap-1 hover:text-[#222427] transition-colors font-sf-pro font-medium text-[13px]">
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                className="flex items-center gap-1 !p-0 !min-h-0 !h-auto text-[#6E6E6E] hover:!text-[#222427] hover:!bg-transparent font-sf-pro font-medium text-[13px]"
+              >
                 <span>$</span>
                 <span>USD</span>
-              </button>
+              </Button>
             </div>
 
             {/* Social Media Pill Buttons */}

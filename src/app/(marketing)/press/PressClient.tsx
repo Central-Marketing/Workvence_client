@@ -16,6 +16,7 @@ import {
   Share2
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { Button } from "@/components";
 
 interface PressRelease {
   id: string;
@@ -133,13 +134,17 @@ export default function PressClient() {
               Stay up to date with product launches, company milestones, independent work research, and official brand assets.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-              <button
+              <Button
+                type="button"
+                variant="brand"
+                size="md"
+                radius="xl"
                 onClick={handleDownloadKit}
-                className="px-6 py-3 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-md transition active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                leftIcon={<Download className="w-4 h-4" />}
+                className="px-6 py-3 font-semibold text-xs shadow-md bg-[#327C73] hover:bg-[#28635c]"
               >
-                <Download className="w-4 h-4" />
-                <span>Download Media Kit (.ZIP)</span>
-              </button>
+                Download Media Kit (.ZIP)
+              </Button>
               <a
                 href="#media-inquiries"
                 className="px-6 py-3 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-xs transition"
@@ -191,13 +196,16 @@ export default function PressClient() {
                     </p>
 
                     <div className="pt-2">
-                      <button
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="xs"
                         onClick={() => setSelectedRelease(pr)}
-                        className="text-xs font-bold text-[#327C73] hover:text-[#28635c] inline-flex items-center gap-1.5 cursor-pointer"
+                        rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+                        className="text-xs font-bold text-[#327C73] hover:text-[#28635c] p-0 h-auto hover:bg-transparent"
                       >
                         <span>Read Full Release</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
+                      </Button>
                     </div>
                   </article>
                 ))}
@@ -263,13 +271,18 @@ export default function PressClient() {
                   </div>
                 </div>
 
-                <button
+                <Button
+                  type="button"
+                  variant="dark"
+                  size="md"
+                  radius="xl"
+                  fullWidth
                   onClick={handleDownloadKit}
-                  className="w-full py-2.5 rounded-xl bg-[#0f172a] hover:bg-black text-white font-semibold text-xs transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                  leftIcon={<Download className="w-3.5 h-3.5" />}
+                  className="py-2.5 font-semibold text-xs"
                 >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download Complete Brand Kit</span>
-                </button>
+                  Download Complete Brand Kit
+                </Button>
               </div>
 
               {/* Media Inquiries Form */}
@@ -335,13 +348,17 @@ export default function PressClient() {
                       className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] focus:ring-1 focus:ring-[#327C73] outline-none resize-none"
                     />
                   </div>
-                  <button
+                  <Button
                     type="submit"
-                    className="w-full py-2.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                    variant="brand"
+                    size="md"
+                    radius="xl"
+                    fullWidth
+                    leftIcon={<Mail className="w-3.5 h-3.5" />}
+                    className="py-2.5 font-semibold text-xs shadow-xs bg-[#327C73] hover:bg-[#28635c]"
                   >
-                    <Mail className="w-3.5 h-3.5" />
-                    <span>Send Press Inquiry</span>
-                  </button>
+                    Send Press Inquiry
+                  </Button>
                 </form>
 
                 <div className="pt-2 text-center text-[11px] text-gray-400">
@@ -359,12 +376,17 @@ export default function PressClient() {
       {selectedRelease && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
-            <button
+            <Button
+              type="button"
+              variant="soft"
+              size="icon"
+              radius="full"
               onClick={() => setSelectedRelease(null)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition cursor-pointer"
+              className="absolute top-5 right-5 w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-600 p-0"
+              aria-label="Close release"
             >
               <X className="w-4 h-4" />
-            </button>
+            </Button>
 
             <div className="space-y-4 mb-6">
               <div className="flex items-center gap-2 text-xs">
@@ -385,16 +407,20 @@ export default function PressClient() {
 
             <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-between">
               <span className="text-xs text-gray-400">Workvence Press Office</span>
-              <button
+              <Button
+                type="button"
+                variant="soft"
+                size="xs"
+                radius="xl"
+                leftIcon={<Share2 className="w-3.5 h-3.5" />}
                 onClick={() => {
                   navigator.clipboard?.writeText(window.location.href);
                   toast.success("Article link copied to clipboard!");
                 }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer"
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 font-semibold text-gray-700"
               >
-                <Share2 className="w-3.5 h-3.5" />
-                <span>Share Release</span>
-              </button>
+                Share Release
+              </Button>
             </div>
           </div>
         </div>

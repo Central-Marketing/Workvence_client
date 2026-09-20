@@ -16,6 +16,7 @@ import {
   Mail
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { Button } from "@/components";
 
 interface BlogPost {
   id: string;
@@ -175,17 +176,21 @@ export default function BlogPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-12">
             <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto scrollbar-none">
               {categories.map((cat) => (
-                <button
+                <Button
                   key={cat}
+                  type="button"
+                  variant={selectedCat === cat ? "brand" : "soft"}
+                  size="xs"
+                  radius="xl"
                   onClick={() => setSelectedCat(cat)}
-                  className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
+                  className={`px-4 py-2 whitespace-nowrap ${
                     selectedCat === cat
-                      ? "bg-[#327C73] text-white shadow-xs"
+                      ? "bg-[#327C73] hover:bg-[#2b6b63] text-white shadow-xs"
                       : "bg-[#f1f5f9] text-gray-600 hover:bg-gray-200"
                   }`}
                 >
                   {cat}
-                </button>
+                </Button>
               ))}
             </div>
 
@@ -253,12 +258,15 @@ export default function BlogPage() {
                 placeholder="Enter your work email"
                 className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#10b981]"
               />
-              <button
+              <Button
                 type="submit"
-                className="px-6 py-3 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs transition active:scale-95 shrink-0 cursor-pointer"
+                variant="emerald"
+                size="md"
+                radius="xl"
+                className="px-6 py-3 font-semibold text-xs transition active:scale-95 shrink-0"
               >
                 Subscribe
-              </button>
+              </Button>
             </form>
           </div>
         </div>
@@ -268,12 +276,17 @@ export default function BlogPage() {
       {selectedPost && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
-            <button
+            <Button
+              type="button"
+              variant="soft"
+              size="icon"
+              radius="full"
               onClick={() => setSelectedPost(null)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition cursor-pointer"
+              className="absolute top-5 right-5 w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-600 p-0"
+              aria-label="Close article"
             >
               <X className="w-4 h-4" />
-            </button>
+            </Button>
 
             <div className="space-y-3 mb-6">
               <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-[#10b981]/10 text-[#327C73]">
@@ -293,16 +306,20 @@ export default function BlogPage() {
 
             <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-between">
               <span className="text-xs text-gray-400">Workvence Insights Editorial</span>
-              <button
+              <Button
+                type="button"
+                variant="soft"
+                size="xs"
+                radius="xl"
+                leftIcon={<Share2 className="w-3.5 h-3.5" />}
                 onClick={() => {
                   navigator.clipboard?.writeText(window.location.href);
                   toast.success("Article link copied!");
                 }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-gray-700 transition cursor-pointer"
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 font-semibold text-gray-700"
               >
-                <Share2 className="w-3.5 h-3.5" />
-                <span>Share</span>
-              </button>
+                Share
+              </Button>
             </div>
           </div>
         </div>

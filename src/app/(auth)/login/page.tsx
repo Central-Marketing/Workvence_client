@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { axiosFetch } from '@/utils';
 import { useUserStore } from '@/store/userStore';
+import { Button } from '@/components/ui';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import Image from 'next/image';
 
@@ -150,13 +151,15 @@ const LoginForm = () => {
             </div>
 
             <div className="flex justify-center md:justify-start w-full">
-              <button
+              <Button
                 type="button"
-                className="self-start bg-transparent border-none text-[#666] text-base cursor-pointer mb-7 flex items-center hover:text-emerald-500 transition-colors"
+                variant="ghost"
+                size="sm"
                 onClick={() => router.back()}
+                className="self-start mb-7 text-[#666] hover:text-emerald-500 p-0 hover:bg-transparent h-auto"
               >
                 ← Back
-              </button>
+              </Button>
             </div>
 
             <form onSubmit={handleFormSubmit} className="flex flex-col items-start w-full max-w-[450px] m-0">
@@ -186,13 +189,16 @@ const LoginForm = () => {
                       onChange={handleFormInput}
                       className="w-full p-3.5 pr-11 border border-[#e0e0e0] rounded-lg text-[15px] bg-white transition-colors focus:outline-none focus:border-emerald-500 box-border"
                     />
-                    <button
+                    <Button
                       type="button"
-                      className="absolute right-3.5 bg-transparent border-none text-[#888] text-xl cursor-pointer flex items-center justify-center p-0 hover:text-[#555] transition-colors"
+                      variant="ghost"
+                      size="icon"
+                      radius="full"
                       onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                    </button>
+                      className="absolute right-3.5 text-[#888] hover:text-[#555] hover:!bg-transparent !p-0 !min-h-0 !h-auto w-auto"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      icon={showPassword ? <AiOutlineEyeInvisible className="text-xl" /> : <AiOutlineEye className="text-xl" />}
+                    />
                   </div>
 
                   {error && (
@@ -209,13 +215,18 @@ const LoginForm = () => {
                   </div>
                 </div>
 
-                <button
+                <Button
                   type="submit"
-                  className="mt-5 bg-black text-white p-4 border-none rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-brand-green disabled:bg-[#71cfb2] disabled:cursor-not-allowed"
+                  variant="dark"
+                  size="md"
+                  fullWidth
+                  radius="fiverr"
                   disabled={loading}
+                  isLoading={loading}
+                  className="mt-5 hover:bg-brand-green font-semibold"
                 >
-                  {loading ? 'Loading...' : 'Sign In'}
-                </button>
+                  Sign In
+                </Button>
               </div>
             </form>
 

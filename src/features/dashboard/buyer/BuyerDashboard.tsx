@@ -4,6 +4,7 @@ import React, { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
+import { Button } from "@/components/ui";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import BuyerDashboardCard from "../components/BuyerDashboardCard";
@@ -81,12 +82,14 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
               Welcome to Workvence, <span className="font-extrabold text-gray-950">{userDisplayName}</span>
             </h1>
             {/* {user?.isSeller && onSwitchToSeller && (
-              <button
+              <Button
+                variant="ghost"
+                size="xs"
                 onClick={onSwitchToSeller}
-                className="mt-2 text-xs font-semibold text-[#327C73] hover:underline flex items-center gap-1 cursor-pointer"
+                className="mt-2 text-xs font-semibold text-[#327C73] hover:underline flex items-center gap-1 cursor-pointer p-0 h-auto"
               >
                 Switch to Seller Dashboard →
-              </button>
+              </Button>
             )} */}
           </div>
 
@@ -132,18 +135,23 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
 
           {/* Action Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-3.5">
-            <Link
+            <Button
               href="/briefs"
-              className="bg-[#EFEFEF] hover:bg-gray-200 text-gray-800 font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors"
+              variant="soft"
+              size="md"
+              radius="fiverr"
+              className="bg-[#EFEFEF] hover:bg-gray-200 text-gray-800"
             >
               Explore Projects
-            </Link>
-            <Link
+            </Button>
+            <Button
               href="/packages?category=ai-services"
-              className="bg-black hover:bg-gray-800 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors shadow-sm"
+              variant="dark"
+              size="md"
+              radius="fiverr"
             >
               Browse Packages
-            </Link>
+            </Button>
           </div>
         </div>
 
@@ -176,20 +184,26 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
               Most Popular Packages
             </h2>
             <div className="flex items-center gap-2">
-              <button
+              <Button
+                type="button"
                 onClick={handleScrollLeft}
                 aria-label="Previous popular packages"
-                className="w-8 h-8 rounded-full bg-[#F5F5F7] hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors cursor-pointer"
-              >
-                <FiArrowLeft className="text-sm" />
-              </button>
-              <button
+                variant="soft"
+                size="icon"
+                radius="full"
+                className="w-8 h-8 min-w-[32px] min-h-[32px] bg-[#F5F5F7] hover:bg-gray-200 text-gray-700 p-0"
+                icon={<FiArrowLeft className="text-sm" />}
+              />
+              <Button
+                type="button"
                 onClick={handleScrollRight}
                 aria-label="Next popular packages"
-                className="w-8 h-8 rounded-full bg-[#F5F5F7] hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors cursor-pointer"
-              >
-                <FiArrowRight className="text-sm" />
-              </button>
+                variant="soft"
+                size="icon"
+                radius="full"
+                className="w-8 h-8 min-w-[32px] min-h-[32px] bg-[#F5F5F7] hover:bg-gray-200 text-gray-700 p-0"
+                icon={<FiArrowRight className="text-sm" />}
+              />
             </div>
           </div>
 

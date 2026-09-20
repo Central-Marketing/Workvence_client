@@ -16,6 +16,7 @@ import {
   Send,
   X
 } from "lucide-react";
+import { Button } from "@/components";
 import toast from "react-hot-toast";
 
 interface CreativeMember {
@@ -125,16 +126,20 @@ export default function WorkingNotWorkingPage() {
             {/* Filter Toggle */}
             <div className="flex items-center justify-center gap-2 pt-4">
               {["All", "Available", "Booked"].map((st) => (
-                <button
+                <Button
                   key={st}
                   onClick={() => setFilterStatus(st)}
-                  className={`px-5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${filterStatus === st
-                    ? "bg-[#0db890] text-[#0f172a] font-bold shadow-xs"
-                    : "bg-white/10 text-gray-300 hover:bg-white/20"
-                    }`}
+                  variant={filterStatus === st ? "brand" : "ghost"}
+                  size="xs"
+                  radius="xl"
+                  className={`font-semibold transition cursor-pointer ${
+                    filterStatus === st
+                      ? "bg-[#0db890] text-[#0f172a] font-bold shadow-xs hover:bg-[#0db890]"
+                      : "bg-white/10 text-gray-300 hover:bg-white/20"
+                  }`}
                 >
                   {st === "All" ? "All Creatives" : st === "Available" ? "Available Now" : "Currently Booked"}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -192,13 +197,16 @@ export default function WorkingNotWorkingPage() {
                   <span className="text-[11px] text-gray-400">Standard Day Rate</span>
                 </div>
 
-                <button
+                <Button
                   onClick={() => setSelectedCreative(cr)}
-                  className="px-6 py-3 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+                  variant="brand"
+                  size="md"
+                  radius="xl"
+                  rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+                  className="font-semibold text-xs shadow-xs whitespace-nowrap"
                 >
-                  <span>Book / Check Dates</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                  Book / Check Dates
+                </Button>
               </div>
             </div>
           ))}
@@ -209,12 +217,16 @@ export default function WorkingNotWorkingPage() {
       {selectedCreative && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
-            <button
+            <Button
               onClick={() => setSelectedCreative(null)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition cursor-pointer"
+              variant="soft"
+              size="icon"
+              radius="full"
+              className="absolute top-5 right-5 w-8 h-8 text-gray-600 hover:text-black"
+              aria-label="Close modal"
             >
               <X className="w-4 h-4" />
-            </button>
+            </Button>
 
             <div className="space-y-1 mb-5">
               <span className="text-xs font-bold text-[#327C73] uppercase tracking-wider">Direct Talent Booking</span>
@@ -258,13 +270,17 @@ export default function WorkingNotWorkingPage() {
                 />
               </div>
 
-              <button
+              <Button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer mt-2"
+                variant="brand"
+                size="md"
+                radius="xl"
+                fullWidth
+                leftIcon={<Send className="w-4 h-4" />}
+                className="font-semibold shadow-md mt-2"
               >
-                <Send className="w-4 h-4" />
-                <span>Send Booking Request</span>
-              </button>
+                Send Booking Request
+              </Button>
             </form>
           </div>
         </div>

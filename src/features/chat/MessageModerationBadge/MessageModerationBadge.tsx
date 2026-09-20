@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { RiAlertFill } from 'react-icons/ri';
 import { MessageModeration } from '@/types';
+import { Button } from '@/components/ui';
 import { getModerationConfig, getModerationNoticeContent } from '@/utils/moderationConfig';
 
 interface MessageModerationBadgeProps {
@@ -23,23 +24,21 @@ export const MessageModerationBadge: React.FC<MessageModerationBadgeProps> = ({
   return (
     <div className="relative inline-block my-0.5">
       {/* Moderation Badge / Trigger */}
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="icon"
+        radius="md"
         onMouseEnter={() => setIsOpen(true)}
         onMouseLeave={() => setIsOpen(false)}
         onClick={(e) => {
           e.stopPropagation();
           setIsOpen((prev) => !prev);
         }}
-        className={`inline-flex items-center justify-center w-7 h-7 rounded-md
-    transition-colors cursor-pointer
-    ${config.badgeText}
-    hover:bg-muted
-    focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1`}
+        className={`w-7 h-7 min-h-[28px] !p-0 ${config.badgeText} hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1`}
         aria-label={config.badgeLabel}
-      >
-        <RiAlertFill className={`w-4 h-4 ${config.iconColor}`} />
-      </button>
+        icon={<RiAlertFill className={`w-4 h-4 ${config.iconColor}`} />}
+      />
 
       {/* Friendly Marketplace Tooltip */}
       {isOpen && (

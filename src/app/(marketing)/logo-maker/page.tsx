@@ -15,6 +15,7 @@ import {
   Type,
   Maximize2
 } from "lucide-react";
+import { Button } from "@/components";
 import toast from "react-hot-toast";
 
 const mockups = ["All", "Business Card", "App Icon", "Storefront", "T-Shirt"];
@@ -202,13 +203,17 @@ export default function LogoMakerPage() {
                 <label className="block text-xs font-semibold text-gray-700 mb-2">Color Palette Accent</label>
                 <div className="flex items-center gap-3">
                   {["#327C73", "#10b981", "#2563eb", "#7c3aed", "#e11d48", "#0f172a"].map((c) => (
-                    <button
+                    <Button
                       key={c}
                       onClick={() => setPrimaryColor(c)}
-                      className={`w-8 h-8 rounded-full transition-transform cursor-pointer ${
+                      variant="ghost"
+                      size="icon"
+                      radius="full"
+                      className={`w-8 h-8 transition-transform cursor-pointer p-0 ${
                         primaryColor === c ? "scale-125 ring-2 ring-offset-2 ring-gray-400" : "hover:scale-110"
                       }`}
                       style={{ backgroundColor: c }}
+                      aria-label={`Select color ${c}`}
                     />
                   ))}
                 </div>
@@ -254,13 +259,16 @@ export default function LogoMakerPage() {
                   </div>
 
                   <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                    <button
+                    <Button
                       onClick={() => handleDownloadLogo(item.id)}
-                      className="text-xs font-semibold text-[#327C73] hover:text-[#28635c] inline-flex items-center gap-1.5 cursor-pointer"
+                      variant="ghost"
+                      size="sm"
+                      radius="xl"
+                      leftIcon={<Download className="w-3.5 h-3.5" />}
+                      className="text-xs font-semibold text-[#327C73] hover:text-[#28635c] p-0 h-auto"
                     >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Download Logo Kit</span>
-                    </button>
+                      Download Logo Kit
+                    </Button>
 
                     <Link
                       href="/packages?category=graphics-and-design"

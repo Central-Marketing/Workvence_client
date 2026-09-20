@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { FiMaximize2, FiX } from "react-icons/fi";
+import { Button } from "@/components/ui";
 
 interface PackageGalleryProps {
   mainBanner?: string;
@@ -109,9 +110,12 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
               const isSelected = activeImage === img;
 
               return (
-                <button
+                <Button
                   key={idx}
                   type="button"
+                  variant="ghost"
+                  size="xs"
+                  radius="xl"
                   onClick={(e) => handleSelectThumb(img, idx, e)}
                   style={
                     hasMoreThan5
@@ -122,7 +126,7 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
                         }
                       : { height: "76px", minHeight: "76px" }
                   }
-                  className={`relative w-full rounded-xl overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 shadow-2xs shrink-0 ${
+                  className={`relative w-full !p-0 !min-h-0 overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 shadow-2xs shrink-0 ${
                     isSelected
                       ? "border-brand-green ring-1 ring-brand-green scale-[0.98]"
                       : "border-transparent opacity-80 hover:opacity-100 hover:border-gray-300"
@@ -133,7 +137,7 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
                     alt={`${title} thumbnail ${idx + 1}`}
                     className="w-full h-full object-cover"
                   />
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -151,13 +155,15 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
             <span className="text-sm font-semibold bg-white/10 px-3.5 py-1 rounded-full">
               {title}
             </span>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
+              radius="full"
               onClick={() => setIsLightboxOpen(false)}
-              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer transition-colors"
-            >
-              <FiX className="w-5 h-5" />
-            </button>
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors p-0"
+              icon={<FiX className="w-5 h-5" />}
+            />
           </div>
 
           {/* Main Large Image */}
@@ -173,16 +179,19 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
           {hasThumbnails && (
             <div className="flex items-center gap-2.5 max-w-full overflow-x-auto p-2 no-scrollbar z-10" onClick={(e) => e.stopPropagation()}>
               {allImages.map((img, idx) => (
-                <button
+                <Button
                   key={idx}
                   type="button"
+                  variant="ghost"
+                  size="xs"
+                  radius="lg"
                   onClick={() => setActiveImage(img)}
-                  className={`w-14 h-14 rounded-lg overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
+                  className={`w-14 h-14 !p-0 !min-h-0 overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
                     activeImage === img ? "border-white scale-105" : "border-transparent opacity-50 hover:opacity-100"
                   }`}
                 >
                   <img src={img} alt="" className="w-full h-full object-cover" />
-                </button>
+                </Button>
               ))}
             </div>
           )}

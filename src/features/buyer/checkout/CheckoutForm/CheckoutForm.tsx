@@ -8,6 +8,7 @@ import {
   useElements
 } from "@stripe/react-stripe-js";
 import './CheckoutForm.scss';
+import { Button } from "@/components/ui";
 
 const CheckoutForm: React.FC = () => {
   const stripe = useStripe();
@@ -85,11 +86,19 @@ const CheckoutForm: React.FC = () => {
         onChange={(e: any) => setEmail(e.value?.email || '')}
       />
       <PaymentElement id="payment-element" options={paymentElementOptions} />
-      <button disabled={isLoading || !stripe || !elements} id="submit">
-        <span id="button-text">
-          {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"}
-        </span>
-      </button>
+      <Button
+        type="submit"
+        variant="brand"
+        size="md"
+        radius="fiverr"
+        fullWidth
+        disabled={isLoading || !stripe || !elements}
+        isLoading={isLoading}
+        loadingText="Processing payment..."
+        id="submit"
+      >
+        <span id="button-text">Pay now</span>
+      </Button>
       {/* Show any error or success messages */}
       {message && <div id="payment-message">{message}</div>}
     </form>

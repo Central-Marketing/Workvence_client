@@ -18,7 +18,7 @@ import {
 
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "@/components";
+import { Loader, Button } from "@/components";
 
 const DEFAULT_AVATARS = [
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
@@ -190,36 +190,36 @@ const MyBriefs = () => {
 
         {/* Filter Pills */}
         <div className="flex items-center gap-2.5 mb-8">
-          <button
+          <Button
             type="button"
+            variant={filter === "all" ? "dark" : "outline"}
+            size="sm"
+            radius="full"
             onClick={() => setFilter("all")}
-            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${filter === "all"
-                ? "bg-white text-slate-900 border border-slate-400 shadow-2xs"
-                : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-700"
-              }`}
+            className="px-4 font-semibold text-xs sm:text-sm"
           >
             All Projects
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant={filter === "open" ? "dark" : "outline"}
+            size="sm"
+            radius="full"
             onClick={() => setFilter("open")}
-            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${filter === "open"
-                ? "bg-white text-slate-900 border border-slate-400 shadow-2xs"
-                : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-700"
-              }`}
+            className="px-4 font-semibold text-xs sm:text-sm"
           >
             Open
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant={filter === "closed" ? "dark" : "outline"}
+            size="sm"
+            radius="full"
             onClick={() => setFilter("closed")}
-            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${filter === "closed"
-                ? "bg-white text-slate-900 border border-slate-400 shadow-2xs"
-                : "bg-white text-slate-500 border border-slate-200 hover:border-slate-300 hover:text-slate-700"
-              }`}
+            className="px-4 font-semibold text-xs sm:text-sm"
           >
             Closed
-          </button>
+          </Button>
         </div>
 
         {/* Content Section */}
@@ -248,13 +248,16 @@ const MyBriefs = () => {
                 Post Your First Project
               </Link>
             ) : filter !== "all" ? (
-              <button
+              <Button
                 type="button"
+                variant="soft"
+                size="md"
+                radius="xl"
                 onClick={() => setFilter("all")}
-                className="px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 text-slate-800 transition-colors cursor-pointer"
+                className="px-5 py-2.5 font-semibold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 text-slate-800"
               >
                 Show All Projects
-              </button>
+              </Button>
             ) : null}
           </div>
         ) : (
@@ -316,13 +319,16 @@ const MyBriefs = () => {
                             setOpenMenuId(isMenuOpen ? null : brief._id);
                           }}
                         >
-                          <button
+                          <Button
                             type="button"
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                            variant="ghost"
+                            size="icon"
+                            radius="full"
+                            className="w-8 h-8 text-slate-400 hover:text-slate-700 hover:bg-slate-100 border-none shadow-none"
                             title="Options"
                           >
                             <FiMoreVertical className="text-base" />
-                          </button>
+                          </Button>
 
                           {/* Dropdown Menu */}
                           {isMenuOpen && (
@@ -330,44 +336,56 @@ const MyBriefs = () => {
                               onClick={(e) => e.stopPropagation()}
                               className="absolute right-0 top-9 w-44 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-20"
                             >
-                              <button
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                size="sm"
+                                radius="none"
+                                fullWidth
                                 onClick={() => {
                                   setOpenMenuId(null);
                                   router.push(`/briefs/${brief._id}`);
                                 }}
-                                className="w-full px-4 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                leftIcon={<FiEye className="text-slate-400" />}
+                                className="justify-start px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 border-none shadow-none h-auto min-h-0"
                               >
-                                <FiEye className="text-slate-400" />
-                                <span>View Details</span>
-                              </button>
+                                View Details
+                              </Button>
 
                               {!isClosed && proposalCount > 0 && (
-                                <button
+                                <Button
                                   type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  radius="none"
+                                  fullWidth
                                   onClick={() => {
                                     setOpenMenuId(null);
                                     router.push(`/briefs/${brief._id}/proposals`);
                                   }}
-                                  className="w-full px-4 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                  leftIcon={<FiUsers className="text-slate-400" />}
+                                  className="justify-start px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 border-none shadow-none h-auto min-h-0"
                                 >
-                                  <FiUsers className="text-slate-400" />
-                                  <span>View Proposals</span>
-                                </button>
+                                  View Proposals
+                                </Button>
                               )}
 
                               {!isClosed && (
-                                <button
+                                <Button
                                   type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  radius="none"
+                                  fullWidth
                                   onClick={() => {
                                     setOpenMenuId(null);
                                     closeMutation.mutate(brief._id);
                                   }}
-                                  className="w-full px-4 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                                  leftIcon={<FiXCircle className="text-rose-500" />}
+                                  className="justify-start px-4 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 border-none shadow-none h-auto min-h-0"
                                 >
-                                  <FiXCircle className="text-rose-500" />
-                                  <span>Close Project</span>
-                                </button>
+                                  Close Project
+                                </Button>
                               )}
                             </div>
                           )}

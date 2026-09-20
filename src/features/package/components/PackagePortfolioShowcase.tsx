@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { FiArrowLeft, FiArrowRight } from "react-icons/fi";
+import { Button } from "@/components/ui";
 
 interface PackagePortfolioShowcaseProps {
   sellerPackages?: any[];
@@ -99,22 +100,26 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
         {/* Carousel Arrow Controls */}
         {sellerPackages.length > 1 && (
           <div className="flex items-center gap-2">
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="icon"
+              radius="full"
               onClick={handlePrev}
               aria-label="Previous package"
-              className="w-8 h-8 rounded-full border border-gray-200 hover:border-gray-900 flex items-center justify-center text-gray-700 hover:text-black transition-colors cursor-pointer"
-            >
-              <FiArrowLeft className="w-3.5 h-3.5" />
-            </button>
-            <button
+              className="w-8 h-8 rounded-full border-gray-200 hover:border-gray-900 text-gray-700 hover:text-black shrink-0 p-0 min-h-[32px]"
+              icon={<FiArrowLeft className="w-3.5 h-3.5" />}
+            />
+            <Button
               type="button"
+              variant="outline"
+              size="icon"
+              radius="full"
               onClick={handleNext}
               aria-label="Next package"
-              className="w-8 h-8 rounded-full border border-gray-200 hover:border-gray-900 flex items-center justify-center text-gray-700 hover:text-black transition-colors cursor-pointer"
-            >
-              <FiArrowRight className="w-3.5 h-3.5" />
-            </button>
+              className="w-8 h-8 rounded-full border-gray-200 hover:border-gray-900 text-gray-700 hover:text-black shrink-0 p-0 min-h-[32px]"
+              icon={<FiArrowRight className="w-3.5 h-3.5" />}
+            />
           </div>
         )}
       </div>
@@ -192,13 +197,16 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
             const isSelected = activeIndex === idx;
             const thumbImg = pkg.cover || (Array.isArray(pkg.images) && pkg.images[0]) || "";
             return (
-              <button
+              <Button
                 key={idx}
                 type="button"
+                variant="ghost"
+                size="xs"
+                radius="xl"
                 onClick={() => {
                   if (!hasMoved) setActiveIndex(idx);
                 }}
-                className={`relative w-[130px] sm:w-[160px] md:w-[180px] shrink-0 aspect-[16/10] rounded-xl overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 active:scale-95 ${isSelected
+                className={`relative w-[130px] sm:w-[160px] md:w-[180px] !p-0 !min-h-0 shrink-0 aspect-[16/10] overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 active:scale-95 ${isSelected
                     ? "border-brand-green ring-1 ring-brand-green shadow-xs scale-98"
                     : "border-transparent opacity-75 hover:opacity-100 hover:border-gray-300"
                   }`}
@@ -211,7 +219,7 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
                     draggable={false}
                   />
                 )}
-              </button>
+              </Button>
             );
           })}
         </div>

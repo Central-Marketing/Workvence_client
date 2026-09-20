@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { FiChevronDown } from "react-icons/fi";
+import { Button } from "@/components/ui";
 import { ClientReviewItem } from "../utils/packageDetailsNormalizer";
 
 interface PackageReviewsSectionProps {
@@ -172,16 +173,20 @@ export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
               {/* Optional Seller Response */}
               {review.sellerResponse && (
                 <div className="mt-3 pt-3 border-t border-gray-200/60">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="xs"
                     onClick={() => toggleResponse(review.id)}
-                    className="flex items-center gap-1 text-xs font-semibold text-brand-green hover:underline cursor-pointer"
+                    className="flex items-center gap-1 text-xs font-semibold !text-brand-green hover:underline cursor-pointer !p-0 !min-h-0 !h-auto"
+                    rightIcon={
+                      <FiChevronDown
+                        className={`w-3.5 h-3.5 transition-transform ${isResponseOpen ? "rotate-180" : ""}`}
+                      />
+                    }
                   >
                     <span>Seller response</span>
-                    <FiChevronDown
-                      className={`w-3.5 h-3.5 transition-transform ${isResponseOpen ? "rotate-180" : ""}`}
-                    />
-                  </button>
+                  </Button>
                   {isResponseOpen && (
                     <p className="mt-2 text-xs text-gray-600 bg-white p-3 rounded-lg border border-gray-100 leading-relaxed">
                       {review.sellerResponse}
@@ -196,13 +201,17 @@ export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
 
       {/* Show More Reviews Button */}
       {reviews.length > visibleCount && (
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
+          radius="xl"
+          fullWidth
           onClick={handleShowMore}
-          className="w-full py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl border border-gray-200 transition-colors cursor-pointer"
+          className="bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-semibold"
         >
           Show More Reviews ({reviews.length - visibleCount} remaining)
-        </button>
+        </Button>
       )}
     </div>
   );

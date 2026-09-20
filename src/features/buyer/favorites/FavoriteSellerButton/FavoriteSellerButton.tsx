@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
 import toast from "react-hot-toast";
+import { Button } from "@/components/ui";
 
 interface FavoriteSellerButtonProps {
   sellerId: string;
@@ -80,14 +81,17 @@ export const FavoriteSellerButton: React.FC<FavoriteSellerButtonProps> = ({
   };
 
   return (
-    <button
+    <Button
       type="button"
+      variant={isFavorited ? "danger-soft" : "outline"}
+      size={showText ? "sm" : "icon"}
+      radius="full"
       onClick={handleToggleFavorite}
       disabled={loading}
-      className={`inline-flex items-center justify-center gap-2 p-2.5 rounded-full transition-all duration-200 cursor-pointer shadow-xs ${
+      className={`transition-all duration-200 cursor-pointer shadow-xs ${
         isFavorited
-          ? "bg-red-50 text-red-500 hover:bg-red-100 border border-red-200"
-          : "bg-white/90 hover:bg-gray-100 text-gray-400 hover:text-red-500 border border-gray-200"
+          ? "!bg-red-50 !text-red-500 hover:!bg-red-100 !border-red-200"
+          : "!bg-white/90 hover:!bg-gray-100 !text-gray-400 hover:!text-red-500 !border-gray-200"
       } ${className}`}
       title={isFavorited ? "Remove from Favorite Sellers" : "Add to Favorite Sellers"}
       aria-label="Favorite Seller"
@@ -108,7 +112,7 @@ export const FavoriteSellerButton: React.FC<FavoriteSellerButtonProps> = ({
           {isFavorited ? "Favorite Seller" : "Add to Favorite"}
         </span>
       )}
-    </button>
+    </Button>
   );
 };
 

@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import socket from "@/utils/socket";
 import adminAxios from "@/utils/adminAxios";
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "@/components";
+import { Loader, Button } from "@/components";
 import AdminSidebar from "./AdminSidebar";
 import "./AdminLayout.scss";
 
@@ -102,22 +102,30 @@ export default function AdminLayout({
         {/* Top Bar */}
         <header className="admin-topbar">
           <div className="topbar-left">
-            <button
-              className="mobile-menu-btn"
+            <Button
+              type="button"
+              variant="ghost"
+              size="xs"
+              className="mobile-menu-btn !p-0 !min-h-0 !h-auto"
               onClick={() => setSidebarOpen(true)}
+              aria-label="Toggle menu"
             >
               ☰
-            </button>
+            </Button>
             <span className="page-title">Admin Panel</span>
           </div>
           <div className="topbar-right">
-            <button
-              className="refresh-btn"
+            <Button
+              type="button"
+              variant="ghost"
+              size="xs"
+              className="refresh-btn !p-0 !min-h-0 !h-auto"
               onClick={() => refreshMutation.mutate()}
               disabled={refreshMutation.isPending}
+              isLoading={refreshMutation.isPending}
             >
               🔄 {refreshMutation.isPending ? "Refreshing..." : "Refresh Data"}
-            </button>
+            </Button>
             <span className="status-dot">System Online</span>
           </div>
         </header>

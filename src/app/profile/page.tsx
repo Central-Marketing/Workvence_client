@@ -31,7 +31,7 @@ import {
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
 import supportService from "@/utils/supportService";
-import { Loader, KycVerificationForm } from "@/components";
+import { Loader, KycVerificationForm, Button } from "@/components";
 import { calculateProfileCompletion } from "@/features/dashboard";
 
 export default function ProfilePage() {
@@ -441,74 +441,84 @@ export default function ProfilePage() {
 
           {/* Section Pill Tabs */}
           <div className="bg-white border border-slate-200/80 rounded-xl p-1 flex items-center gap-1 self-start md:self-auto overflow-x-auto max-w-full">
-            <button
+            <Button
               type="button"
+              size="sm"
+              radius="fiverr"
               onClick={() => {
                 setActiveSection("personal");
                 scrollToSection("section-personal");
               }}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${activeSection === "personal"
-                  ? "bg-[#0D3B34] text-white shadow-2xs"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+              className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "personal"
+                  ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
+                  : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                 }`}
             >
               Personal Info
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              size="sm"
+              radius="fiverr"
               onClick={() => {
                 setActiveSection("professional");
                 scrollToSection("section-professional");
               }}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${activeSection === "professional"
-                  ? "bg-[#0D3B34] text-white shadow-2xs"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+              className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "professional"
+                  ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
+                  : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                 }`}
             >
               Professional Details
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              size="sm"
+              radius="fiverr"
               onClick={() => {
                 setActiveSection("experience");
                 scrollToSection("section-experience");
               }}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${activeSection === "experience"
-                  ? "bg-[#0D3B34] text-white shadow-2xs"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+              className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "experience"
+                  ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
+                  : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                 }`}
             >
               Experience &amp; Education
-            </button>
+            </Button>
             {isSeller && (
-              <button
+              <Button
                 type="button"
+                size="sm"
+                radius="fiverr"
                 onClick={() => {
                   setActiveSection("portfolio");
                   scrollToSection("section-portfolio");
                 }}
-                className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${activeSection === "portfolio"
-                    ? "bg-[#0D3B34] text-white shadow-2xs"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "portfolio"
+                    ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
+                    : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`}
               >
                 Portfolio
-              </button>
+              </Button>
             )}
             {isSeller && (
-              <button
+              <Button
                 type="button"
+                size="sm"
+                radius="fiverr"
                 onClick={() => {
                   setActiveSection("verification");
                   scrollToSection("section-verification");
                 }}
-                className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${activeSection === "verification"
-                    ? "bg-[#0D3B34] text-white shadow-2xs"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "verification"
+                    ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
+                    : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`}
               >
                 Verification
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -522,8 +532,11 @@ export default function ProfilePage() {
           >
             {/* Top Right Banner Controls */}
             <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-2">
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="xs"
+                radius="full"
                 onClick={() => {
                   const targetUser = user?.username || user?._id || user?.id;
                   if (targetUser) {
@@ -532,18 +545,21 @@ export default function ProfilePage() {
                     toast.error("User profile unavailable");
                   }
                 }}
-                className="bg-white/95 hover:bg-white text-slate-800 text-xs font-bold px-4 py-1.5 rounded-full shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+                className="bg-white/95 hover:bg-white text-slate-800 font-bold px-4 py-1.5 shadow-md flex items-center gap-1.5"
               >
                 <span>See Public View</span>
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
+                radius="full"
                 onClick={() => coverInputRef.current?.click()}
-                className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 shadow-md flex items-center justify-center transition-all cursor-pointer"
+                className="w-8 h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 shadow-md flex items-center justify-center p-0"
                 title="Change Cover Image"
               >
                 <FiEdit2 className="text-xs" />
-              </button>
+              </Button>
               <input
                 ref={coverInputRef}
                 type="file"
@@ -564,14 +580,17 @@ export default function ProfilePage() {
                   alt={user?.username || "Avatar"}
                   className="w-20 h-20 sm:w-22 sm:h-22 rounded-full object-cover border-4 border-white shadow-md bg-slate-100"
                 />
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
+                  radius="full"
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute inset-0 rounded-full bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                  className="absolute inset-0 w-full h-full rounded-full bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-0 hover:bg-black/50"
                   title="Upload profile picture"
                 >
                   <FiCamera className="text-lg" />
-                </button>
+                </Button>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -622,13 +641,16 @@ export default function ProfilePage() {
         >
           <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
             <h2 className="text-base sm:text-lg font-bold text-slate-900">Personal Info</h2>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
+              radius="fiverr"
               onClick={() => scrollToSection("section-personal")}
-              className="text-slate-400 hover:text-slate-700 transition-colors p-1"
+              className="text-slate-400 hover:text-slate-700 w-7 h-7 p-1 hover:bg-slate-100"
             >
               <FiEdit2 className="text-sm" />
-            </button>
+            </Button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -700,13 +722,16 @@ export default function ProfilePage() {
             <h2 className="text-base sm:text-lg font-bold text-slate-900">
               Professional Details
             </h2>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
+              radius="fiverr"
               onClick={() => scrollToSection("section-professional")}
-              className="text-slate-400 hover:text-slate-700 transition-colors p-1"
+              className="text-slate-400 hover:text-slate-700 w-7 h-7 p-1 hover:bg-slate-100"
             >
               <FiEdit2 className="text-sm" />
-            </button>
+            </Button>
           </div>
 
           {/* Professional Title */}
@@ -749,13 +774,16 @@ export default function ProfilePage() {
                   className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200/60 inline-flex items-center gap-1.5"
                 >
                   <span>{skill}</span>
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
+                    radius="full"
                     onClick={() => handleRemoveSkill(skill)}
-                    className="text-slate-400 hover:text-slate-700 text-xs cursor-pointer"
+                    className="text-slate-400 hover:text-slate-700 w-4 h-4 p-0 min-h-0 hover:bg-transparent"
                   >
-                    <FiX />
-                  </button>
+                    <FiX className="w-3 h-3" />
+                  </Button>
                 </span>
               ))}
               {skillsList.length >= 5 && (
@@ -782,30 +810,39 @@ export default function ProfilePage() {
                   className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs outline-none focus:border-teal-500 flex-1"
                   autoFocus
                 />
-                <button
+                <Button
                   type="button"
+                  variant="dark"
+                  size="xs"
+                  radius="fiverr"
                   onClick={handleAddSkill}
-                  className="px-3 py-1.5 rounded-lg bg-black text-white text-xs font-semibold cursor-pointer"
+                  className="px-3 py-1.5 font-semibold"
                 >
                   Add
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="xs"
+                  radius="fiverr"
                   onClick={() => setIsAddingSkill(false)}
-                  className="px-2 py-1.5 text-xs text-slate-500 hover:text-slate-700 cursor-pointer"
+                  className="px-2 py-1.5 text-slate-500 hover:text-slate-700"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             ) : (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="xs"
+                radius="fiverr"
                 onClick={() => setIsAddingSkill(true)}
-                className="text-xs font-bold text-[#0D9488] hover:underline inline-flex items-center gap-1 cursor-pointer mt-1"
+                rightIcon={<FiPlus className="text-sm" />}
+                className="text-xs font-bold text-[#0D9488] hover:text-[#0b7a70] p-0 hover:bg-transparent inline-flex items-center gap-1 mt-1"
               >
                 <span>Add Skills</span>
-                <FiPlus className="text-sm" />
-              </button>
+              </Button>
             )}
           </div>
 
@@ -827,13 +864,16 @@ export default function ProfilePage() {
                       {lang.language || lang.name}{" "}
                       <span className="text-slate-400 text-[11px]">({lang.level || "Fluent"})</span>
                     </span>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
+                      radius="full"
                       onClick={() => handleRemoveLanguage(idx)}
-                      className="text-slate-400 hover:text-slate-700 text-xs cursor-pointer"
+                      className="text-slate-400 hover:text-slate-700 w-4 h-4 p-0 min-h-0 hover:bg-transparent"
                     >
-                      <FiX />
-                    </button>
+                      <FiX className="w-3 h-3" />
+                    </Button>
                   </span>
                 ))}
               </div>
@@ -859,30 +899,39 @@ export default function ProfilePage() {
                   <option value="Fluent">Fluent</option>
                   <option value="Native">Native</option>
                 </select>
-                <button
+                <Button
                   type="button"
+                  variant="dark"
+                  size="xs"
+                  radius="fiverr"
                   onClick={handleAddLanguageItem}
-                  className="px-3 py-1.5 rounded-lg bg-black text-white text-xs font-semibold cursor-pointer"
+                  className="px-3 py-1.5 font-semibold"
                 >
                   Add
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="xs"
+                  radius="fiverr"
                   onClick={() => setIsAddingLanguage(false)}
-                  className="px-2 py-1.5 text-xs text-slate-500 hover:text-slate-700 cursor-pointer"
+                  className="px-2 py-1.5 text-slate-500 hover:text-slate-700"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             ) : (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="xs"
+                radius="fiverr"
                 onClick={() => setIsAddingLanguage(true)}
-                className="text-xs font-bold text-[#0D9488] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                rightIcon={<FiPlus className="text-sm" />}
+                className="text-xs font-bold text-[#0D9488] hover:text-[#0b7a70] p-0 hover:bg-transparent inline-flex items-center gap-1"
               >
                 <span>Add Languages</span>
-                <FiPlus className="text-sm" />
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -896,13 +945,16 @@ export default function ProfilePage() {
             <h2 className="text-base sm:text-lg font-bold text-slate-900">
               Experience &amp; Education
             </h2>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
+              radius="fiverr"
               onClick={() => scrollToSection("section-experience")}
-              className="text-slate-400 hover:text-slate-700 transition-colors p-1"
+              className="text-slate-400 hover:text-slate-700 w-7 h-7 p-1 hover:bg-slate-100"
             >
               <FiEdit2 className="text-sm" />
-            </button>
+            </Button>
           </div>
 
           {/* Work Experiences */}
@@ -928,13 +980,16 @@ export default function ProfilePage() {
                         <p className="text-xs text-slate-600 mt-1 leading-relaxed">{exp.description}</p>
                       )}
                     </div>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
+                      radius="fiverr"
                       onClick={() => handleRemoveExperience(idx)}
-                      className="text-slate-400 hover:text-rose-500 p-1"
+                      className="text-slate-400 hover:text-rose-500 w-7 h-7 p-1 hover:bg-rose-50"
                     >
                       <FiTrash2 className="text-xs" />
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -981,20 +1036,26 @@ export default function ProfilePage() {
                   className="w-full p-2.5 bg-white rounded-lg border border-slate-200 text-xs outline-none focus:border-teal-500 resize-none"
                 />
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
                     type="button"
+                    variant="dark"
+                    size="sm"
+                    radius="fiverr"
                     onClick={handleAddExperienceItem}
-                    className="px-4 py-1.5 rounded-lg bg-black text-white text-xs font-semibold cursor-pointer"
+                    className="px-4 py-1.5 font-semibold"
                   >
                     Save Experience
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
+                    radius="fiverr"
                     onClick={() => setIsAddingExperience(false)}
-                    className="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-700 cursor-pointer"
+                    className="px-3 py-1.5 text-slate-500 hover:text-slate-700"
                   >
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -1032,13 +1093,16 @@ export default function ProfilePage() {
                         {ed.university} • {ed.year || "Graduated"}
                       </p>
                     </div>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
+                      radius="fiverr"
                       onClick={() => handleRemoveEducation(idx)}
-                      className="text-slate-400 hover:text-rose-500 p-1"
+                      className="text-slate-400 hover:text-rose-500 w-7 h-7 p-1 hover:bg-rose-50"
                     >
                       <FiTrash2 className="text-xs" />
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -1078,20 +1142,26 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
                     type="button"
+                    variant="dark"
+                    size="sm"
+                    radius="fiverr"
                     onClick={handleAddEducationItem}
-                    className="px-4 py-1.5 rounded-lg bg-black text-white text-xs font-semibold cursor-pointer"
+                    className="px-4 py-1.5 font-semibold"
                   >
                     Save Education
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
+                    radius="fiverr"
                     onClick={() => setIsAddingEducation(false)}
-                    className="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-700 cursor-pointer"
+                    className="px-3 py-1.5 text-slate-500 hover:text-slate-700"
                   >
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -1122,14 +1192,17 @@ export default function ProfilePage() {
                   <p className="text-xs text-slate-500 mt-0.5">Showcase your completed works, case studies, and live links to clients.</p>
                 </div>
                 {editingProjectIdx === null && (
-                  <button
+                  <Button
                     type="button"
+                    variant="dark"
+                    size="sm"
+                    radius="fiverr"
                     onClick={handleAddPortfolio}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-black hover:bg-slate-800 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
+                    leftIcon={<FiPlus />}
+                    className="font-bold shadow-xs px-3.5 py-1.5"
                   >
-                    <FiPlus />
-                    <span>Add Project</span>
-                  </button>
+                    Add Project
+                  </Button>
                 )}
               </div>
 
@@ -1142,14 +1215,17 @@ export default function ProfilePage() {
                         ? `Edit Project: ${portfolio[editingProjectIdx].title}`
                         : "New Portfolio Project"}
                     </h3>
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
+                      size="sm"
+                      radius="fiverr"
                       onClick={() => handleCancelEditProject(editingProjectIdx)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors cursor-pointer"
+                      leftIcon={<ArrowLeft size={13} />}
+                      className="font-semibold text-slate-600 bg-white hover:bg-slate-100 border border-slate-200 px-3 py-1.5"
                     >
-                      <ArrowLeft size={13} />
-                      <span>Back to Projects</span>
-                    </button>
+                      Back to Projects
+                    </Button>
                   </div>
 
                   <div className="space-y-4">
@@ -1192,13 +1268,16 @@ export default function ProfilePage() {
                               alt="Preview"
                               className="w-full h-full object-cover"
                             />
-                            <button
+                            <Button
                               type="button"
+                              variant="dark"
+                              size="xs"
+                              radius="none"
                               onClick={() => handleUpdatePortfolio(editingProjectIdx, "image", "")}
-                              className="absolute inset-0 bg-black/60 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center font-bold text-xs transition-opacity cursor-pointer"
+                              className="absolute inset-0 w-full h-full bg-black/60 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center font-bold text-xs transition-opacity rounded-none p-0"
                             >
                               Remove
-                            </button>
+                            </Button>
                           </div>
                         ) : null}
 
@@ -1247,13 +1326,16 @@ export default function ProfilePage() {
 
                     {/* Editor Action Buttons */}
                     <div className="pt-2 flex justify-end items-center gap-2.5">
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
+                        size="sm"
+                        radius="fiverr"
                         onClick={() => handleCancelEditProject(editingProjectIdx)}
-                        className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200/70 rounded-xl transition-colors cursor-pointer"
+                        className="text-slate-600 hover:bg-slate-200/70 font-semibold px-4 py-2"
                       >
                         Cancel
-                      </button>
+                      </Button>
 
                       {(() => {
                         const currentProject = editingProjectIdx !== null ? portfolio[editingProjectIdx] : null;
@@ -1261,18 +1343,17 @@ export default function ProfilePage() {
                           currentProject?.title?.trim() && currentProject?.image?.trim()
                         );
                         return (
-                          <button
+                          <Button
                             type="button"
+                            variant="dark"
+                            size="sm"
+                            radius="fiverr"
                             disabled={!isProjectFormValid}
                             onClick={() => handleSaveProject(editingProjectIdx)}
-                            className={`px-5 py-2 text-xs font-bold rounded-xl transition-all shadow-xs ${
-                              isProjectFormValid
-                                ? "bg-black hover:bg-slate-800 text-white cursor-pointer"
-                                : "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300"
-                            }`}
+                            className="font-bold px-5 py-2 shadow-xs"
                           >
                             Save Project
-                          </button>
+                          </Button>
                         );
                       })()}
                     </div>
@@ -1288,14 +1369,17 @@ export default function ProfilePage() {
                       <p className="text-xs text-slate-500 max-w-sm mx-auto">
                         Showcase your best work, case studies, and live project links to attract more clients.
                       </p>
-                      <button
+                      <Button
                         type="button"
+                        variant="dark"
+                        size="sm"
+                        radius="fiverr"
                         onClick={handleAddPortfolio}
-                        className="px-4 py-2 bg-black text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition-colors shadow-xs inline-flex items-center gap-1.5 cursor-pointer"
+                        leftIcon={<FiPlus className="text-sm" />}
+                        className="font-bold px-4 py-2 shadow-xs"
                       >
-                        <FiPlus className="text-sm" />
-                        <span>Add First Project</span>
-                      </button>
+                        Add First Project
+                      </Button>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -1321,22 +1405,28 @@ export default function ProfilePage() {
 
                             {/* Quick Action Badges */}
                             <div className="absolute top-3 right-3 flex items-center gap-1.5">
-                              <button
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                size="icon"
+                                radius="fiverr"
                                 onClick={() => setEditingProjectIdx(idx)}
-                                className="p-2 bg-white/95 hover:bg-white text-slate-700 hover:text-teal-700 rounded-lg shadow-xs backdrop-blur-xs transition-colors cursor-pointer"
+                                className="w-8 h-8 p-1.5 bg-white/95 hover:bg-white text-slate-700 hover:text-teal-700 shadow-xs backdrop-blur-xs"
                                 title="Edit Project"
                               >
                                 <FiEdit2 className="text-xs" />
-                              </button>
-                              <button
+                              </Button>
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                size="icon"
+                                radius="fiverr"
                                 onClick={() => handleRemovePortfolio(idx)}
-                                className="p-2 bg-white/95 hover:bg-white text-slate-700 hover:text-rose-600 rounded-lg shadow-xs backdrop-blur-xs transition-colors cursor-pointer"
+                                className="w-8 h-8 p-1.5 bg-white/95 hover:bg-white text-slate-700 hover:text-rose-600 shadow-xs backdrop-blur-xs"
                                 title="Delete Project"
                               >
                                 <FiTrash2 className="text-xs" />
-                              </button>
+                              </Button>
                             </div>
                           </div>
 
@@ -1366,13 +1456,16 @@ export default function ProfilePage() {
                                 <span className="text-slate-400 text-[11px]">No link attached</span>
                               )}
 
-                              <button
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                size="xs"
+                                radius="fiverr"
                                 onClick={() => setEditingProjectIdx(idx)}
-                                className="text-xs font-bold text-slate-600 hover:text-teal-700 transition-colors cursor-pointer"
+                                className="text-xs font-bold text-slate-600 hover:text-teal-700 p-0 hover:bg-transparent"
                               >
                                 Edit Project
-                              </button>
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -1399,21 +1492,29 @@ export default function ProfilePage() {
 
         {/* BOTTOM ACTION BAR */}
         <div className="flex items-center justify-end gap-3 pt-2">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="md"
+            radius="fiverr"
             onClick={() => router.back()}
-            className="px-5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-200/60 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+            className="text-slate-600 hover:bg-slate-200/60 font-semibold px-5 py-2.5"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="dark"
+            size="md"
+            radius="fiverr"
             disabled={isUpdating}
+            isLoading={isUpdating}
+            loadingText="Saving..."
             onClick={() => handleSubmit()}
-            className="px-6 py-2.5 rounded-xl bg-black hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+            className="px-6 py-2.5 font-semibold shadow-xs"
           >
-            {isUpdating ? "Saving..." : "Save Changes"}
-          </button>
+            Save Changes
+          </Button>
         </div>
       </div>
     </div>

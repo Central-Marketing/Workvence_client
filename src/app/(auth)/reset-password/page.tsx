@@ -6,6 +6,7 @@ import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { axiosFetch } from '@/utils';
+import { Button } from '@/components/ui';
 import Image from 'next/image';
 
 const ResetPasswordContent = () => {
@@ -105,7 +106,15 @@ const ResetPasswordContent = () => {
                 </Link>
               </div>
               <div className="flex justify-center md:justify-start w-full">
-                <button className="bg-transparent border-none text-[#666] text-base cursor-pointer mb-7 flex items-center hover:text-emerald-500" onClick={() => router.back()}>← Back</button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => router.back()}
+                  className="self-start mb-7 text-[#666] hover:text-emerald-500 p-0 hover:bg-transparent h-auto"
+                >
+                  ← Back
+                </Button>
               </div>
 
               <form onSubmit={handleVerifyOtp} className="flex flex-col items-start w-full max-w-[450px]">
@@ -129,9 +138,18 @@ const ResetPasswordContent = () => {
                     ))}
                   </div>
 
-                  <button type="submit" className="w-full bg-emerald-500 text-white py-3.5 border-none rounded-lg text-base font-bold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed" disabled={loading}>
+                  <Button
+                    type="submit"
+                    variant="emerald"
+                    size="lg"
+                    fullWidth
+                    radius="fiverr"
+                    disabled={loading}
+                    isLoading={loading}
+                    className="text-base font-bold"
+                  >
                     Verify OTP
-                  </button>
+                  </Button>
                 </div>
               </form>
 
@@ -148,7 +166,15 @@ const ResetPasswordContent = () => {
                 </Link>
               </div>
               <div className="flex justify-center md:justify-start w-full">
-                <button className="bg-transparent border-none text-[#666] text-base cursor-pointer mb-7 flex items-center hover:text-emerald-500" onClick={() => setStep(1)}>← Back</button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setStep(1)}
+                  className="self-start mb-7 text-[#666] hover:text-emerald-500 p-0 hover:bg-transparent h-auto"
+                >
+                  ← Back
+                </Button>
               </div>
 
               <form onSubmit={handleSubmitPassword} className="flex flex-col items-start w-full max-w-[450px]">
@@ -166,13 +192,16 @@ const ResetPasswordContent = () => {
                         onChange={handleChange}
                         className="py-3 px-3 pr-11 border border-gray-200 rounded-lg text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full"
                       />
-                      <button
+                      <Button
                         type="button"
-                        className="absolute right-3.5 bg-transparent border-none text-[#888] text-xl cursor-pointer flex items-center justify-center p-0 hover:text-[#555]"
+                        variant="ghost"
+                        size="icon"
+                        radius="full"
                         onClick={() => setShowNewPassword(!showNewPassword)}
-                      >
-                        {showNewPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                      </button>
+                        className="absolute right-3.5 text-[#888] hover:text-[#555] hover:!bg-transparent !p-0 !min-h-0 !h-auto w-auto"
+                        aria-label={showNewPassword ? "Hide password" : "Show password"}
+                        icon={showNewPassword ? <AiOutlineEyeInvisible className="text-xl" /> : <AiOutlineEye className="text-xl" />}
+                      />
                     </div>
                   </div>
 
@@ -187,19 +216,31 @@ const ResetPasswordContent = () => {
                         onChange={handleChange}
                         className="py-3 px-3 pr-11 border border-gray-200 rounded-lg text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full"
                       />
-                      <button
+                      <Button
                         type="button"
-                        className="absolute right-3.5 bg-transparent border-none text-[#888] text-xl cursor-pointer flex items-center justify-center p-0 hover:text-[#555]"
+                        variant="ghost"
+                        size="icon"
+                        radius="full"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      >
-                        {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                      </button>
+                        className="absolute right-3.5 text-[#888] hover:text-[#555] hover:!bg-transparent !p-0 !min-h-0 !h-auto w-auto"
+                        aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                        icon={showConfirmPassword ? <AiOutlineEyeInvisible className="text-xl" /> : <AiOutlineEye className="text-xl" />}
+                      />
                     </div>
                   </div>
 
-                  <button type="submit" className="mt-2 w-full bg-emerald-500 text-white py-4 border-none rounded-lg text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-600 disabled:bg-emerald-300 disabled:cursor-not-allowed" disabled={loading}>
-                    {loading ? 'Loading...' : 'Submit'}
-                  </button>
+                  <Button
+                    type="submit"
+                    variant="emerald"
+                    size="lg"
+                    fullWidth
+                    radius="fiverr"
+                    disabled={loading}
+                    isLoading={loading}
+                    className="mt-2 text-base font-semibold"
+                  >
+                    Submit
+                  </Button>
                 </div>
               </form>
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Search, Star, PenTool, Zap, CircleDollarSign, Trophy } from 'lucide-react';
+import { Button } from "@/components/ui";
 
 // Custom pixel-accurate SVG icons matching Figma
 const SearchIcon = ({ className = "w-7 h-7" }: { className?: string }) => (
@@ -119,24 +120,34 @@ const HowItWorks = () => {
 
           {/* Toggle Tabs (Buyer / Seller) */}
           <div className="flex items-center w-[214px] h-[46px] bg-[#F4F4F6] p-[4px] rounded-[10px] border border-gray-200/50">
-            <button
+            <Button
+              type="button"
               onClick={() => setActiveTab('buyer')}
-              className={`flex-1 h-full flex items-center justify-center px-[20px] py-[10px] rounded-[8px] font-sf-pro font-medium text-[14px] sm:text-[15px] transition-all duration-200 ${activeTab === 'buyer'
-                ? 'bg-[#0B403F] text-white shadow-sm'
-                : 'text-[#6E6E6E] hover:text-[#222427]'
-                }`}
+              variant={activeTab === 'buyer' ? 'brand' : 'ghost'}
+              size="sm"
+              radius="fiverr"
+              className={`flex-1 h-full font-sf-pro font-medium text-[14px] sm:text-[15px] ${
+                activeTab === 'buyer'
+                  ? 'bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm'
+                  : 'text-[#6E6E6E] hover:text-[#222427]'
+              }`}
             >
               Buyer
-            </button>
-            <button
+            </Button>
+            <Button
+              type="button"
               onClick={() => setActiveTab('seller')}
-              className={`flex-1 h-full flex items-center justify-center px-[20px] py-[10px] rounded-[8px] font-sf-pro font-medium text-[14px] sm:text-[15px] transition-all duration-200 ${activeTab === 'seller'
-                ? 'bg-[#0B403F] text-white shadow-sm'
-                : 'text-[#6E6E6E] hover:text-[#222427]'
-                }`}
+              variant={activeTab === 'seller' ? 'brand' : 'ghost'}
+              size="sm"
+              radius="fiverr"
+              className={`flex-1 h-full font-sf-pro font-medium text-[14px] sm:text-[15px] ${
+                activeTab === 'seller'
+                  ? 'bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm'
+                  : 'text-[#6E6E6E] hover:text-[#222427]'
+              }`}
             >
               Seller
-            </button>
+            </Button>
           </div>
         </div>
 

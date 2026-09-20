@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { FiCheck } from "react-icons/fi";
+import { Button } from "@/components/ui";
 import { NormalizedOrder } from "../types";
 
 interface OrderTimelineStepperProps {
@@ -22,14 +23,16 @@ export const OrderTimelineStepper: React.FC<OrderTimelineStepperProps> = ({ orde
       <div className="flex items-center justify-between pb-5 border-b border-slate-100">
         <h2 className="text-xl font-bold text-slate-900">Order Activity Timeline</h2>
         {rawActivities.length > 0 && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="xs"
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="text-xs font-semibold text-[#0D9488] hover:underline flex items-center gap-1 cursor-pointer"
+            className="!p-0 !h-auto !min-h-0 text-xs font-semibold !text-[#0D9488] hover:underline flex items-center gap-1 cursor-pointer"
+            rightIcon={<span>→</span>}
           >
             <span>{showAdvanced ? "Hide Advanced Timeline" : "See Advanced Timeline"}</span>
-            <span>→</span>
-          </button>
+          </Button>
         )}
       </div>
 

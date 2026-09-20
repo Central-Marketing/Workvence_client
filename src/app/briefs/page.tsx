@@ -20,7 +20,7 @@ import { RiSearchLine } from "react-icons/ri";
 import { axiosFetch } from "@/utils";
 import useAdminCategories from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "@/components";
+import { Loader, Button } from "@/components";
 import { ClientBrief } from "@/types";
 
 function formatCategoryName(cat?: string): string {
@@ -225,51 +225,58 @@ function BriefsContent() {
         <div className="flex items-center justify-between gap-3 mb-7 pb-2 border-b border-gray-200/60">
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0">
             {/* Filter Drawer Toggle */}
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
+              radius="lg"
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center gap-1.5 text-gray-700 font-medium text-xs sm:text-[13px] hover:text-black transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-200/50 cursor-pointer shrink-0 mr-1"
+              leftIcon={<FiSliders className="w-3.5 h-3.5 text-gray-600" />}
+              className="text-gray-700 font-medium text-xs sm:text-[13px] hover:text-black transition-colors px-3 py-1.5 hover:bg-gray-200/50 shrink-0 mr-1 border-none shadow-none"
             >
-              <FiSliders className="w-3.5 h-3.5 text-gray-600" />
-              <span>Filter</span>
-            </button>
+              Filter
+            </Button>
 
             {/* Dynamic Category Pills */}
             {pillFilters.map((pill) => {
               const isActive = activePill === pill.id;
               return (
-                <button
+                <Button
                   key={pill.id}
                   type="button"
+                  variant={isActive ? "dark" : "outline"}
+                  size="sm"
+                  radius="full"
                   onClick={() => {
                     setActivePill(pill.id);
                     setCurrentPage(1);
                   }}
-                  className={`px-4 py-1.5 rounded-full text-xs sm:text-[13px] font-medium transition-all duration-200 whitespace-nowrap shrink-0 cursor-pointer ${isActive
-                      ? "bg-gray-900 text-white border border-gray-900 shadow-xs"
-                      : "bg-white text-gray-700 border border-gray-200 hover:border-gray-900 hover:text-black"
-                    }`}
+                  className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${
+                    isActive ? "shadow-xs border-gray-900" : "hover:border-gray-900 hover:text-black"
+                  }`}
                 >
                   {pill.title}
-                </button>
+                </Button>
               );
             })}
           </div>
 
           {/* Reset Action */}
           {(activePill !== "all" || search) && (
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => {
                 setActivePill("all");
                 setSearch("");
                 setCurrentPage(1);
               }}
-              className="shrink-0 text-[#327C73] hover:text-[#256059] font-semibold text-xs sm:text-[13px] flex items-center gap-1 transition-colors cursor-pointer pl-3"
+              rightIcon={<FiArrowRight className="w-3.5 h-3.5 text-[#327C73]" />}
+              className="shrink-0 text-[#327C73] hover:text-[#256059] font-semibold text-xs sm:text-[13px] transition-colors pl-3 border-none shadow-none p-0 h-auto hover:bg-transparent"
             >
-              <span>View All</span>
-              <FiArrowRight className="w-3.5 h-3.5 text-[#327C73]" />
-            </button>
+              View All
+            </Button>
           )}
         </div>
 
@@ -290,24 +297,31 @@ function BriefsContent() {
                   className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#327C73] focus:bg-white transition-colors"
                 />
                 {search && (
-                  <button
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    radius="full"
                     onClick={() => {
                       setSearch("");
                       setCurrentPage(1);
                     }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0 w-6 h-6 h-auto min-h-0 border-none shadow-none hover:bg-transparent"
                   >
                     <FiX className="w-4 h-4" />
-                  </button>
+                  </Button>
                 )}
               </div>
-              <button
+              <Button
                 type="button"
+                variant="brand"
+                size="md"
+                radius="xl"
                 onClick={() => setIsFilterOpen(false)}
-                className="bg-[#327C73] hover:bg-[#256059] text-white font-medium text-xs sm:text-sm px-5 py-2.5 rounded-xl transition-colors shrink-0 shadow-xs"
+                className="font-medium text-xs sm:text-sm px-5 py-2.5 shrink-0 shadow-xs"
               >
                 Done
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -359,17 +373,20 @@ function BriefsContent() {
             </p>
             <div className="flex items-center gap-3">
               {(search || activePill !== "all") && (
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="md"
+                  radius="xl"
                   onClick={() => {
                     setSearch("");
                     setActivePill("all");
                     setCurrentPage(1);
                   }}
-                  className="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-50 transition shadow-2xs"
+                  className="px-5 py-2.5 text-xs font-semibold shadow-2xs"
                 >
                   Clear Filters
-                </button>
+                </Button>
               )}
               {user && !user.isSeller && (
                 <Link
@@ -527,35 +544,41 @@ function BriefsContent() {
             {/* Pagination Controls from Real Backend totalPages */}
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-2 mt-10">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
+                  radius="xl"
                   onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-2xs"
+                  className="px-4 py-2 text-xs font-semibold shadow-2xs"
                 >
                   Previous
-                </button>
+                </Button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                  <button
+                  <Button
                     key={pageNum}
                     type="button"
+                    variant={currentPage === pageNum ? "brand" : "outline"}
+                    size="sm"
+                    radius="xl"
                     onClick={() => handlePageChange(pageNum)}
-                    className={`w-9 h-9 text-xs font-semibold rounded-xl transition shadow-2xs ${currentPage === pageNum
-                        ? "bg-[#327C73] text-white"
-                        : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
-                      }`}
+                    className="w-9 h-9 p-0 text-xs font-semibold shadow-2xs"
                   >
                     {pageNum}
-                  </button>
+                  </Button>
                 ))}
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
+                  radius="xl"
                   onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-2xs"
+                  className="px-4 py-2 text-xs font-semibold shadow-2xs"
                 >
                   Next
-                </button>
+                </Button>
               </div>
             )}
           </>

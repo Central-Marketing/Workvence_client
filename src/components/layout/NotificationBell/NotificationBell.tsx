@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { FiBell } from "react-icons/fi";
 import { playNotificationSound } from "@/utils/soundUtil";
 import { useUserStore } from "@/store/userStore";
+import { Button } from "@/components/ui";
 
 interface NotificationBellProps {
   currentUser: any;
@@ -169,12 +170,16 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
 
       toast.custom((t) => (
         <div className={`relative bg-white border-l-4 border-[#6ad724] shadow-xl p-4 rounded-lg max-w-[350px] flex flex-col gap-1 transition-all duration-300 ${t.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}>
-          <button 
-            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 font-bold px-1 text-base leading-none cursor-pointer"
+          <Button 
+            type="button"
+            variant="ghost"
+            size="icon"
+            radius="full"
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 p-0 w-5 h-5 h-auto min-h-0 border-none shadow-none hover:bg-transparent"
             onClick={(e) => { e.stopPropagation(); toast.dismiss(t.id); }}
           >
             ×
-          </button>
+          </Button>
           <strong className="text-[#333] text-sm font-bold">🔔 {newNotif.title}</strong>
           <p className="text-[#666] text-[13px] m-0 leading-snug">{newNotif.message}</p>
         </div>
@@ -254,12 +259,16 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
             }
           }}
         >
-          <button 
-            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 font-bold px-1 text-base leading-none cursor-pointer"
+          <Button 
+            type="button"
+            variant="ghost"
+            size="icon"
+            radius="full"
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 p-0 w-5 h-5 h-auto min-h-0 border-none shadow-none hover:bg-transparent"
             onClick={(e) => { e.stopPropagation(); toast.dismiss(t.id); }}
           >
             ×
-          </button>
+          </Button>
           <strong className="text-[#333] text-sm font-bold">💬 {displayName}</strong>
           <p className="text-[#666] text-[13px] m-0 leading-snug">{msgPreview}</p>
         </div>
@@ -321,18 +330,22 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
   return (
     <div className="notification-wrapper relative flex items-center" ref={dropdownRef}>
       {/* Header Bell Icon with Red Badge */}
-      <button 
-        className={triggerClassName || "bell-btn text-gray-500 hover:text-brand-green transition-colors relative"} 
+      <Button 
+        type="button"
+        variant="ghost"
+        size="icon"
+        radius="full"
+        className={triggerClassName || "bell-btn text-gray-500 hover:text-brand-green transition-colors relative p-0 w-8 h-8 h-auto min-h-0 border-none shadow-none hover:bg-transparent"} 
         onClick={() => setIsOpen(!isOpen)}
         title="Notifications"
       >
         <FiBell className={iconClassName || `text-[22px] transition-transform ${isAnimating ? 'animate-bounce text-brand-green' : ''}`} />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center pointer-events-none">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
-      </button>
+      </Button>
 
       {/* Notification Dropdown Menu */}
       {isOpen && (
@@ -340,12 +353,15 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
           <div className="dropdown-header p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-lg">
             <h4 className="font-bold text-gray-800 text-sm m-0">Notifications</h4>
             {unreadCount > 0 && (
-              <button 
-                className="mark-all-btn text-brand-green text-xs font-semibold hover:underline bg-transparent border-none cursor-pointer" 
+              <Button 
+                type="button"
+                variant="ghost"
+                size="xs"
+                className="mark-all-btn text-brand-green hover:text-brand-green text-xs font-semibold hover:underline p-0 h-auto border-none shadow-none hover:bg-transparent" 
                 onClick={handleMarkAllAsRead}
               >
                 Mark all as read
-              </button>
+              </Button>
             )}
           </div>
           <div className="dropdown-body max-h-96 overflow-y-auto">
@@ -374,19 +390,23 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
             <span className="text-[11px] text-gray-400 font-medium">
               {notifications.length} {notifications.length === 1 ? 'notification' : 'notifications'}
             </span>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="xs"
               onClick={() => {
                 setIsOpen(false);
                 router.push('/notifications');
               }}
-              className="text-xs font-bold text-[#0E3834] hover:text-[#092724] hover:underline cursor-pointer flex items-center gap-1 transition-colors"
+              rightIcon={
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              }
+              className="text-xs font-bold text-[#0E3834] hover:text-[#092724] hover:underline p-0 h-auto border-none shadow-none hover:bg-transparent"
             >
-              <span>View all</span>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </button>
+              View all
+            </Button>
           </div>
         </div>
       )}

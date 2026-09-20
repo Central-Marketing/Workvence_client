@@ -16,6 +16,7 @@ import {
   X,
   Share2
 } from "lucide-react";
+import { Button } from "@/components";
 import toast from "react-hot-toast";
 
 interface ProjectInspiration {
@@ -171,17 +172,20 @@ export default function GetInspiredPage() {
             {/* Category Filter Pills */}
             <div className="flex flex-wrap items-center justify-center gap-2 pt-4">
               {categories.map((cat) => (
-                <button
+                <Button
                   key={cat}
                   onClick={() => setSelectedCat(cat)}
-                  className={`px-5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                  variant={selectedCat === cat ? "brand" : "soft"}
+                  size="xs"
+                  radius="xl"
+                  className={`font-semibold transition cursor-pointer ${
                     selectedCat === cat
-                      ? "bg-[#327C73] text-white shadow-xs"
-                      : "bg-[#f1f5f9] text-gray-600 hover:bg-gray-200"
+                      ? "shadow-xs"
+                      : "hover:bg-gray-200"
                   }`}
                 >
                   {cat}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -215,16 +219,20 @@ export default function GetInspiredPage() {
                     <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-black/50 text-white backdrop-blur-md border border-white/10">
                       {item.category}
                     </span>
-                    <button
+                    <Button
                       onClick={(e) => toggleLike(e, item.id)}
-                      className={`w-9 h-9 rounded-full backdrop-blur-md flex items-center justify-center transition cursor-pointer ${
+                      variant="ghost"
+                      size="icon"
+                      radius="full"
+                      className={`w-9 h-9 backdrop-blur-md transition cursor-pointer ${
                         isLiked
-                          ? "bg-rose-500 text-white shadow-md scale-110"
+                          ? "bg-rose-500 text-white shadow-md scale-110 hover:bg-rose-600"
                           : "bg-black/50 hover:bg-black/70 text-white border border-white/10"
                       }`}
+                      aria-label={isLiked ? "Unlike project" : "Like project"}
                     >
                       <Heart className={`w-4 h-4 ${isLiked ? "fill-white" : ""}`} />
-                    </button>
+                    </Button>
                   </div>
 
                   <div className="absolute bottom-4 left-4 right-4 z-10">
@@ -267,12 +275,16 @@ export default function GetInspiredPage() {
       {selectedProject && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
-            <button
+            <Button
               onClick={() => setSelectedProject(null)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition cursor-pointer z-20"
+              variant="soft"
+              size="icon"
+              radius="full"
+              className="absolute top-5 right-5 w-8 h-8 text-gray-600 hover:text-black z-20"
+              aria-label="Close modal"
             >
               <X className="w-4 h-4" />
-            </button>
+            </Button>
 
             {/* High-Res Hero Image Preview */}
             <div className="relative h-72 sm:h-80 w-full rounded-2xl overflow-hidden mb-6 bg-gray-100">
@@ -300,15 +312,19 @@ export default function GetInspiredPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
                     onClick={() => {
                       navigator.clipboard?.writeText(window.location.href);
                       toast.success("Project link copied!");
                     }}
-                    className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition cursor-pointer"
+                    variant="soft"
+                    size="icon"
+                    radius="xl"
+                    className="p-2.5 text-gray-700 hover:bg-gray-200"
+                    aria-label="Share project"
                   >
                     <Share2 className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
 

@@ -12,6 +12,7 @@ import {
   SubcategoryHeader,
   SubcategoryFilterBar,
   LeftFilterSidebar,
+  Button,
 } from '@/components';
 import { getCategoryTaxonomy, SubcategoryItem } from '@/data/categoryTaxonomy';
 import { STATIC_SUBCATEGORY_GIGS, getStaticSubcategoryGigs } from '@/data/staticSubcategoryGigs';
@@ -69,13 +70,15 @@ const EmptyGigsState: React.FC<EmptyGigsStateProps> = ({
         </p>
 
         {hasActiveFilters && onReset && (
-          <button
+          <Button
             type="button"
             onClick={onReset}
-            className="mt-6 px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/25 rounded-full text-xs sm:text-sm font-medium transition-all backdrop-blur-sm cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98]"
+            variant="ghost"
+            radius="full"
+            className="mt-6 px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs sm:text-sm font-medium backdrop-blur-sm shadow-sm hover:scale-[1.02] active:scale-[0.98]"
           >
             Clear all filters
-          </button>
+          </Button>
         )}
       </div>
 
@@ -606,15 +609,20 @@ const Packages = () => {
                 </svg>
                 <h3 className="text-xl font-bold text-gray-900">Filters</h3>
               </div>
-              <button
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                radius="full"
                 onClick={() => setShowFilterDrawer(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                className="w-8 h-8 text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                aria-label="Close filters"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
-              </button>
+              </Button>
             </div>
 
             {/* Drawer Scrollable Body */}
@@ -757,18 +765,25 @@ const Packages = () => {
 
             {/* Drawer Footer Actions */}
             <div className="p-5 border-t border-gray-100 bg-white flex items-center justify-end gap-4">
-              <button
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
                 onClick={handleReset}
-                className="text-sm font-medium text-gray-500 hover:text-gray-800 transition-colors px-2 py-2"
+                className="text-sm font-medium text-gray-500 hover:text-gray-800 px-2 py-2"
               >
                 Clear filter
-              </button>
-              <button
+              </Button>
+              <Button
+                type="button"
+                variant="brand"
+                size="md"
+                radius="xl"
                 onClick={handleApplyFilter}
-                className="bg-brand-green hover:bg-brand-green text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors shadow-sm"
+                className="text-sm font-semibold px-6 py-2.5 shadow-sm"
               >
                 Apply filter
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -818,17 +833,19 @@ const Packages = () => {
                     Explore top-rated services delivered by verified professionals
                   </p>
                 </div>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
+                  rightIcon={<FiArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />}
                   onClick={() => {
                     setViewTab('gigs');
                     syncUrlWithFilters({ view: 'gigs', resetPage: true });
                   }}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-brand-green hover:underline cursor-pointer group self-start sm:self-auto"
+                  className="text-sm font-semibold text-brand-green hover:underline cursor-pointer group self-start sm:self-auto p-0 h-auto hover:bg-transparent"
                 >
                   <span>View all</span>
-                  <FiArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                </button>
+                </Button>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
@@ -985,27 +1002,35 @@ const Packages = () => {
                   {/* Pagination Controls */}
                   {displayPackages.length > 0 && (
                     <div className="flex justify-center items-center gap-4 mt-12 mb-4">
-                      <button
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="md"
+                        radius="xl"
                         onClick={() => {
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                           syncUrlWithFilters({ page: page - 1 });
                         }}
                         disabled={page === 1}
-                        className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+                        className="px-6 py-2.5 font-semibold shadow-sm"
                       >
                         Previous
-                      </button>
+                      </Button>
                       <span className="font-semibold text-gray-800 bg-gray-100 px-4 py-2 rounded-lg">Page {page}</span>
-                      <button
+                      <Button
+                        type="button"
+                        variant="dark"
+                        size="md"
+                        radius="xl"
                         onClick={() => {
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                           syncUrlWithFilters({ page: page + 1 });
                         }}
                         disabled={displayPackages.length < 8}
-                        className="px-6 py-2.5 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+                        className="px-6 py-2.5 font-semibold shadow-sm"
                       >
                         Next
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </>
@@ -1020,15 +1045,17 @@ const Packages = () => {
           <div className="flex items-center justify-between mb-5">
             <div>
               <p className="text-sm text-gray-500 flex items-center flex-wrap gap-2">
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="xs"
                   onClick={handleReset}
-                  className="text-teal-600 hover:text-teal-700 transition-colors flex items-center cursor-pointer"
+                  leftIcon={<FiHome className="w-4 h-4 mr-0.5" />}
+                  className="text-teal-600 hover:text-teal-700 transition-colors p-0 h-auto hover:bg-transparent font-normal"
                   title="All services"
                 >
-                  <FiHome className="w-4 h-4 mr-1" />
-                  <span>Home</span>
-                </button>
+                  Home
+                </Button>
                 {categoryAncestry && categoryAncestry.length > 0 ? (
                   categoryAncestry.map((crumb, idx) => {
                     const isLast = idx === categoryAncestry.length - 1;
@@ -1038,13 +1065,15 @@ const Packages = () => {
                         {isLast ? (
                           <span className="text-gray-800 font-medium">{crumb.name}</span>
                         ) : (
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="xs"
                             onClick={() => handleCategoryClick(crumb.name || crumb.slug)}
-                            className="text-gray-600 hover:text-gray-900 hover:underline transition-colors cursor-pointer"
+                            className="text-gray-600 hover:text-gray-900 hover:underline transition-colors p-0 h-auto hover:bg-transparent font-normal"
                           >
                             {crumb.name}
-                          </button>
+                          </Button>
                         )}
                       </span>
                     );
@@ -1056,29 +1085,37 @@ const Packages = () => {
                   </>
                 )}
                 {categoryAncestry.length > 0 && categoryAncestry[0].isRoot && (
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="xs"
+                    leftIcon={<FiArrowLeft className="w-3.5 h-3.5" />}
                     onClick={() => {
                       setViewTab('hub');
                       syncUrlWithFilters({ category: categoryAncestry[0].name || categoryAncestry[0].slug, view: 'hub' });
                     }}
-                    className="inline-flex items-center gap-1 text-xs text-brand-green hover:underline font-semibold ml-2 cursor-pointer"
+                    className="text-xs text-brand-green hover:underline font-semibold ml-2 p-0 h-auto hover:bg-transparent"
                   >
-                    <FiArrowLeft className="w-3.5 h-3.5" />
                     <span>Explore {categoryAncestry[0].name} Hub</span>
-                  </button>
+                  </Button>
                 )}
               </p>
             </div>
-            <button
+            <Button
+              type="button"
+              variant="brand"
+              size="md"
+              radius="xl"
               onClick={() => setShowFilterDrawer(true)}
-              className="flex items-center gap-2 bg-brand-green hover:bg-brand-green text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
+              leftIcon={
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3 6H21M7 12H17M11 18H13" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              }
+              className="text-sm font-semibold px-5 py-2.5 shadow-sm"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 6H21M7 12H17M11 18H13" stroke="white" strokeWidth="2" strokeLinecap="round" />
-              </svg>
               Filter
-            </button>
+            </Button>
           </div>
 
           {/* Active Filter Tags & Results Count Bar & Sort */}
@@ -1094,93 +1131,130 @@ const Packages = () => {
 
                   {/* Keyword Tag */}
                   {searchVal && (
-                    <button
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      radius="full"
                       onClick={() => { setSearchVal(''); syncUrlWithFilters({ searchVal: '' }); }}
-                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                      leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                      className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                     >
-                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                      <span>{searchVal}</span>
-                    </button>
+                      {searchVal}
+                    </Button>
                   )}
 
                   {/* Active Category Tag */}
                   {(filterCategory || (activeCategory !== 'All services' && activeCategory !== 'Results')) && (
-                    <button
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      radius="full"
                       onClick={() => { setFilterCategory(''); setActiveCategory('All services'); syncUrlWithFilters({ category: '' }); }}
-                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                      leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                      className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                     >
-                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                      <span>{filterCategory || activeCategory}</span>
-                    </button>
+                      {filterCategory || activeCategory}
+                    </Button>
                   )}
 
                   {/* Price Range Tag */}
                   {(minPrice || maxPrice) && (
-                    <button
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      radius="full"
                       onClick={() => { setMinPrice(''); setMaxPrice(''); syncUrlWithFilters({ minPrice: '', maxPrice: '' }); }}
-                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                      leftIcon={<span className="text-gray-400 font-bold group-hover:text-red-500 transition-colors">—</span>}
+                      className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                     >
-                      <span className="text-gray-400 font-bold group-hover:text-red-500 transition-colors">—</span>
-                      <span>${minPrice || '0'} - ${maxPrice || 'Any'}</span>
-                    </button>
+                      ${minPrice || '0'} - ${maxPrice || 'Any'}
+                    </Button>
                   )}
 
                   {/* Delivery Days Tag */}
                   {deliveryDays && (
-                    <button
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      radius="full"
                       onClick={() => { setDeliveryDays(''); syncUrlWithFilters({ deliveryDays: '' }); }}
-                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                      leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                      className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                     >
-                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                      <span>Delivery: {deliveryDays === '1' ? '24 Hours' : `Up to ${deliveryDays} Days`}</span>
-                    </button>
+                      Delivery: {deliveryDays === '1' ? '24 Hours' : `Up to ${deliveryDays} Days`}
+                    </Button>
                   )}
 
                   {/* Seller Level Tags */}
                   {sellerLevels.top_rated && (
-                    <button
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      radius="full"
                       onClick={() => toggleSellerLevel('top_rated')}
-                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                      leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                      className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                     >
-                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                      <span>Top Rated</span>
-                    </button>
+                      Top Rated
+                    </Button>
                   )}
                   {sellerLevels.level_two && (
-                    <button
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      radius="full"
                       onClick={() => toggleSellerLevel('level_two')}
-                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                      leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                      className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                     >
-                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                      <span>Level 2</span>
-                    </button>
+                      Level 2
+                    </Button>
                   )}
                   {sellerLevels.level_one && (
-                    <button
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      radius="full"
                       onClick={() => toggleSellerLevel('level_one')}
-                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                      leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                      className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                     >
-                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                      <span>Level 1</span>
-                    </button>
+                      Level 1
+                    </Button>
                   )}
                   {sellerLevels.new_seller && (
-                    <button
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      radius="full"
                       onClick={() => toggleSellerLevel('new_seller')}
-                      className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                      leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                      className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                     >
-                      <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                      <span>New Seller</span>
-                    </button>
+                      New Seller
+                    </Button>
                   )}
 
                   {/* Clear All Pill Button */}
-                  <button
+                  <Button
+                    type="button"
+                    variant="dark"
+                    size="xs"
+                    radius="full"
                     onClick={handleReset}
-                    className="bg-black hover:bg-gray-800 text-white text-xs px-4 py-1.5 rounded-full flex items-center gap-1.5 font-semibold transition-colors shadow-sm ml-1"
+                    leftIcon={<span>✕</span>}
+                    className="px-4 py-1.5 font-semibold shadow-sm ml-1"
                   >
-                    <span>✕</span> Clear All
-                  </button>
+                    Clear All
+                  </Button>
                 </>
               )}
             </div>
@@ -1222,13 +1296,17 @@ const Packages = () => {
               <p className="text-gray-500 max-w-md text-sm sm:text-base mb-6 leading-relaxed">
                 We encountered an issue connecting to our servers. Please check your connection or try again.
               </p>
-              <button
+              <Button
+                type="button"
+                variant="brand"
+                size="md"
+                radius="xl"
                 onClick={() => refetch()}
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-green text-white font-semibold rounded-xl hover:bg-[#3ea917] transition-all shadow-sm active:scale-[0.98] cursor-pointer"
+                leftIcon={<FiRefreshCw className="w-4 h-4" />}
+                className="px-6 py-2.5 font-semibold hover:bg-[#3ea917] shadow-sm active:scale-[0.98]"
               >
-                <FiRefreshCw className="w-4 h-4" />
                 Try Again
-              </button>
+              </Button>
             </div>
           ) : (!packagesList || packagesList.length === 0) ? (
             <EmptyGigsState
@@ -1246,27 +1324,35 @@ const Packages = () => {
           {/* Pagination Controls */}
           {packagesList && packagesList.length > 0 && (
             <div className="flex justify-center items-center gap-4 mt-12 mb-4">
-              <button
+              <Button
+                type="button"
+                variant="outline"
+                size="md"
+                radius="xl"
                 onClick={() => {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   syncUrlWithFilters({ page: page - 1 });
                 }}
                 disabled={page === 1}
-                className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+                className="px-6 py-2.5 font-semibold shadow-sm"
               >
                 Previous
-              </button>
+              </Button>
               <span className="font-semibold text-gray-800 bg-gray-100 px-4 py-2 rounded-lg">Page {page}</span>
-              <button
+              <Button
+                type="button"
+                variant="dark"
+                size="md"
+                radius="xl"
                 onClick={() => {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   syncUrlWithFilters({ page: page + 1 });
                 }}
                 disabled={packagesList.length < 20}
-                className="px-6 py-2.5 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+                className="px-6 py-2.5 font-semibold shadow-sm"
               >
                 Next
-              </button>
+              </Button>
             </div>
           )}
         </div>

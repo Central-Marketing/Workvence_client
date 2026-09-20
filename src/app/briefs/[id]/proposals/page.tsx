@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "@/components";
+import { Loader, Button } from "@/components";
 import { FiCheck, FiAlertTriangle, FiStar } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 
@@ -118,15 +118,20 @@ const Proposals = () => {
             <p className="text-slate-400 text-sm">Review submitted proposals and find the best seller</p>
           </div>
           {proposals.length >= 1 && (
-            <button
+            <Button
               type="button"
-              className="py-2.5 px-5 rounded-xl font-semibold text-sm bg-[#0D6D5F] hover:bg-[#0b5c50] text-white border-none transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+              variant="brand"
+              size="sm"
+              radius="xl"
               onClick={() => aiMutation.mutate()}
               disabled={aiMutation.isPending}
+              isLoading={aiMutation.isPending}
+              loadingText="Analyzing..."
+              leftIcon={<HiSparkles className="text-base text-amber-300" />}
+              className="py-2.5 px-5 font-semibold text-sm whitespace-nowrap shadow-xs"
             >
-              <HiSparkles className="text-base text-amber-300" />
-              <span>{aiMutation.isPending ? "Analyzing..." : "Get AI Recommendations"}</span>
-            </button>
+              Get AI Recommendations
+            </Button>
           )}
         </div>
 
@@ -252,16 +257,20 @@ const Proposals = () => {
                           </div>
                         )}
                       </div>
-                      <button
+                      <Button
                         type="button"
-                        className="py-2.5 px-5 rounded-xl text-xs font-semibold bg-[#0D6D5F] hover:bg-[#0b5c50] text-white transition-colors cursor-pointer whitespace-nowrap shadow-xs disabled:opacity-50 disabled:cursor-not-allowed self-end sm:self-center"
+                        variant="brand"
+                        size="sm"
+                        radius="xl"
                         onClick={() =>
                           chatMutation.mutate({ proposalId: proposal._id, sellerId: targetSellerId, sellerUsername: seller.username })
                         }
                         disabled={chatMutation.isPending}
+                        isLoading={chatMutation.isPending}
+                        className="py-2.5 px-5 text-xs font-semibold whitespace-nowrap shadow-xs self-end sm:self-center"
                       >
                         Chat
-                      </button>
+                      </Button>
                     </div>
                   );
                 }
@@ -371,16 +380,19 @@ const Proposals = () => {
                         </span>
                       )}
                     </div>
-                    <button
+                    <Button
                       type="button"
-                      className="py-2 px-5 rounded-lg font-semibold text-sm bg-emerald-500 hover:bg-emerald-600 text-white transition-all cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                      variant="emerald"
+                      size="sm"
+                      radius="lg"
                       onClick={() => chatMutation.mutate({ proposalId: proposal._id, sellerId: targetSellerId, sellerUsername: seller.username })}
                       disabled={chatMutation.isPending}
+                      isLoading={chatMutation.isPending}
+                      loadingText="Starting..."
+                      className="py-2 px-5 font-semibold text-sm shadow-xs"
                     >
-                      {chatMutation.isPending
-                        ? "Starting..."
-                        : "Initiate Chat"}
-                    </button>
+                      Initiate Chat
+                    </Button>
                   </div>
                 </div>
               );

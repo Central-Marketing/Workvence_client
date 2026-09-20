@@ -13,7 +13,7 @@ import adminAxios from "@/utils/adminAxios";
 import useAdminCategories from "@/hooks/useAdminCategories";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "@/components";
+import { Loader, Button } from "@/components";
 
 // Dynamically import ReactQuill to ensure SSG/SSR compatibility
 const ReactQuill = dynamic(() => import("react-quill-new"), {
@@ -620,30 +620,30 @@ const OrganizePage = () => {
 
           {/* Action Buttons: Draft and Save & Save and Publish */}
           <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
-            <button
+            <Button
               type="button"
+              variant="soft"
+              size="sm"
+              radius="fiverr"
               onClick={() => handleSubmit(true)}
               disabled={mutation.isPending}
-              className="bg-[#F1F3F5] hover:bg-gray-200 text-gray-800 font-semibold text-xs sm:text-[13px] px-5 py-2.5 rounded-lg transition-colors cursor-pointer"
+              className="bg-[#F1F3F5] hover:bg-gray-200 text-[#353535] hover:text-gray-900 font-semibold px-5 py-2.5"
             >
               Draft and Save
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="dark"
+              size="sm"
+              radius="fiverr"
               onClick={() => handleSubmit(false)}
-              disabled={mutation.isPending}
-              className="bg-black hover:bg-gray-900 text-white font-semibold text-xs sm:text-[13px] px-5 py-2.5 rounded-lg transition-colors shadow-2xs cursor-pointer flex items-center gap-2"
+              isLoading={mutation.isPending}
+              loadingText="Publishing..."
+              className="font-semibold px-5 py-2.5 shadow-2xs"
             >
-              {mutation.isPending ? (
-                <>
-                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                  Publishing...
-                </>
-              ) : (
-                "Save and Publish"
-              )}
-            </button>
+              Save and Publish
+            </Button>
           </div>
         </div>
 
@@ -659,17 +659,19 @@ const OrganizePage = () => {
               };
               const isActive = activeTab === tab;
               return (
-                <button
+                <Button
                   key={tab}
                   type="button"
+                  size="sm"
+                  radius="fiverr"
                   onClick={() => scrollToSection(tab)}
-                  className={`px-4 sm:px-5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${isActive
-                    ? "bg-[#0B3A33] text-white shadow-2xs"
-                    : "text-gray-600 hover:text-gray-900"
+                  className={`px-4 sm:px-5 py-1.5 font-semibold transition-all ${isActive
+                    ? "bg-[#0B3A33] text-white shadow-2xs hover:bg-[#0B3A33]"
+                    : "bg-transparent text-gray-600 hover:text-gray-900 hover:bg-transparent"
                     }`}
                 >
                   {labelMap[tab]}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -854,28 +856,37 @@ const OrganizePage = () => {
                     className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-800 outline-none w-48 sm:w-56"
                     autoFocus
                   />
-                  <button
+                  <Button
                     type="submit"
-                    className="bg-[#0B3A33] text-white text-xs px-3 py-1.5 rounded-lg font-semibold cursor-pointer"
+                    size="xs"
+                    radius="fiverr"
+                    className="bg-[#0B3A33] hover:bg-[#0B3A33]/90 text-white font-semibold"
                   >
                     Add
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="xs"
+                    radius="fiverr"
                     onClick={() => setShowAddTool(false)}
-                    className="text-gray-400 hover:text-gray-600 text-xs px-2"
+                    className="text-gray-400 hover:text-gray-600 px-2"
                   >
                     Cancel
-                  </button>
+                  </Button>
                 </form>
               ) : (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="xs"
+                  radius="fiverr"
                   onClick={() => setShowAddTool(true)}
-                  className="text-[#0D6D5F] hover:text-[#0A5348] text-xs font-semibold flex items-center gap-1 cursor-pointer pt-1 transition-colors"
+                  rightIcon={<Plus className="w-3.5 h-3.5" />}
+                  className="text-[#0D6D5F] hover:text-[#0A5348] font-semibold pt-1 p-0 hover:bg-transparent"
                 >
-                  Add Tool <Plus className="w-3.5 h-3.5" />
-                </button>
+                  Add Tool
+                </Button>
               )}
             </div>
 
@@ -919,32 +930,41 @@ const OrganizePage = () => {
                     className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-800 outline-none w-48 sm:w-56"
                     autoFocus
                   />
-                  <button
+                  <Button
                     type="submit"
-                    className="bg-[#0B3A33] text-white text-xs px-3 py-1.5 rounded-lg font-semibold cursor-pointer"
+                    size="xs"
+                    radius="fiverr"
+                    className="bg-[#0B3A33] hover:bg-[#0B3A33]/90 text-white font-semibold"
                   >
                     Add
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="xs"
+                    radius="fiverr"
                     onClick={() => {
                       setShowAddKeyword(false);
                       setNewKeywordInput("");
                     }}
-                    className="text-gray-400 hover:text-gray-600 text-xs px-2"
+                    className="text-gray-400 hover:text-gray-600 px-2"
                   >
                     Cancel
-                  </button>
+                  </Button>
                 </form>
               ) : (
                 keywordsList.length < 5 && (
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="xs"
+                    radius="fiverr"
                     onClick={() => setShowAddKeyword(true)}
-                    className="text-[#0D6D5F] hover:text-[#0A5348] text-xs font-semibold flex items-center gap-1 cursor-pointer pt-1 transition-colors"
+                    rightIcon={<Plus className="w-3.5 h-3.5" />}
+                    className="text-[#0D6D5F] hover:text-[#0A5348] font-semibold pt-1 p-0 hover:bg-transparent"
                   >
-                    Add Keyword <Plus className="w-3.5 h-3.5" />
-                  </button>
+                    Add Keyword
+                  </Button>
                 )
               )}
             </div>
@@ -966,9 +986,11 @@ const OrganizePage = () => {
                 const isCurrent = activeTier === tierKey;
 
                 return (
-                  <button
+                  <Button
                     key={tierKey}
                     type="button"
+                    size="xs"
+                    radius="fiverr"
                     onClick={() => {
                       setActiveTier(tierKey);
                       if (!(state.packages as any)?.[tierKey]) {
@@ -978,13 +1000,13 @@ const OrganizePage = () => {
                         });
                       }
                     }}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition-all cursor-pointer ${isCurrent
-                      ? "bg-[#0B3A33] text-white shadow-2xs"
-                      : "text-gray-600 hover:text-gray-900"
+                    className={`flex-1 py-1.5 font-semibold text-center transition-all ${isCurrent
+                      ? "bg-[#0B3A33] text-white shadow-2xs hover:bg-[#0B3A33]"
+                      : "bg-transparent text-gray-600 hover:text-gray-900 hover:bg-transparent"
                       }`}
                   >
                     {label}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -1101,28 +1123,37 @@ const OrganizePage = () => {
                     className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-2.5 py-1 text-xs text-gray-800 outline-none flex-1"
                     autoFocus
                   />
-                  <button
+                  <Button
                     type="submit"
-                    className="bg-[#0B3A33] text-white text-xs px-2.5 py-1 rounded font-semibold cursor-pointer"
+                    size="xs"
+                    radius="fiverr"
+                    className="bg-[#0B3A33] hover:bg-[#0B3A33]/90 text-white font-semibold px-2.5 py-1"
                   >
                     Add
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="xs"
+                    radius="fiverr"
                     onClick={() => setShowAddFeature(false)}
-                    className="text-gray-400 hover:text-gray-600 text-xs px-1"
+                    className="text-gray-400 hover:text-gray-600 px-1 hover:bg-transparent"
                   >
                     ✕
-                  </button>
+                  </Button>
                 </form>
               ) : (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="xs"
+                  radius="fiverr"
                   onClick={() => setShowAddFeature(true)}
-                  className="text-[#0D6D5F] hover:text-[#0A5348] text-xs font-semibold flex items-center gap-1 cursor-pointer transition-colors"
+                  rightIcon={<Plus className="w-3.5 h-3.5" />}
+                  className="text-[#0D6D5F] hover:text-[#0A5348] font-semibold p-0 hover:bg-transparent"
                 >
-                  Add Features <Plus className="w-3.5 h-3.5" />
-                </button>
+                  Add Features
+                </Button>
               )}
             </div>
 
@@ -1155,22 +1186,28 @@ const OrganizePage = () => {
               Packages Media &amp; Gallery
             </h2>
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="icon"
+                radius="full"
                 onClick={() => scrollGallery("left")}
                 title="Previous"
-                className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                className="w-8 h-8 text-gray-400 hover:text-gray-700 hover:bg-gray-100"
               >
                 <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="soft"
+                size="icon"
+                radius="full"
                 onClick={() => scrollGallery("right")}
                 title="Next"
-                className="w-8 h-8 rounded-full bg-[#EAECEF] hover:bg-gray-300 flex items-center justify-center text-gray-700 hover:text-gray-950 transition-colors cursor-pointer"
+                className="w-8 h-8 bg-[#EAECEF] hover:bg-gray-300 text-gray-700 hover:text-gray-950"
               >
                 <ChevronRight className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -1228,21 +1265,27 @@ const OrganizePage = () => {
                     alt={`Attachment ${idx + 1}`}
                     className="w-full h-full object-cover"
                   />
-                  <button
+                  <Button
                     type="button"
+                    variant="danger"
+                    size="icon"
+                    radius="full"
                     onClick={() => handleRemoveImage(imgUrl)}
-                    className="absolute top-1.5 right-1.5 bg-red-600 hover:bg-red-700 text-white p-1 rounded-full opacity-90 hover:opacity-100 transition-opacity shadow-xs cursor-pointer z-10"
+                    className="absolute top-1.5 right-1.5 w-6 h-6 p-1 opacity-90 hover:opacity-100 shadow-xs z-10"
                     title="Remove image"
                   >
                     <X className="w-3.5 h-3.5" />
-                  </button>
+                  </Button>
                   {imgUrl === state.cover ? (
                     <span className="absolute bottom-0 inset-x-0 bg-black/75 text-white text-[9px] font-bold text-center py-0.5 tracking-wider uppercase">
                       BANNER
                     </span>
                   ) : (
-                    <button
+                    <Button
                       type="button"
+                      variant="dark"
+                      size="xs"
+                      radius="none"
                       onClick={() => {
                         dispatch({
                           type: "ADD_IMAGES",
@@ -1253,10 +1296,10 @@ const OrganizePage = () => {
                         });
                         toast.success("Set as banner!");
                       }}
-                      className="absolute bottom-0 inset-x-0 bg-black/60 hover:bg-black/80 text-white text-[9px] font-semibold text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                      className="absolute bottom-0 inset-x-0 bg-black/60 hover:bg-black/80 text-white text-[9px] font-semibold text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity rounded-none"
                     >
                       Set as Banner
-                    </button>
+                    </Button>
                   )}
                 </div>
               ))}
@@ -1307,14 +1350,17 @@ const OrganizePage = () => {
                     <h4 className="text-sm sm:text-base font-bold text-gray-900 leading-snug">
                       {faq.question}
                     </h4>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
+                      radius="fiverr"
                       onClick={() => handleRemoveFaq(idx)}
-                      className="text-red-500 hover:text-red-700 p-1 cursor-pointer transition-colors shrink-0"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 shrink-0 w-8 h-8"
                       title="Delete question"
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
-                    </button>
+                    </Button>
                   </div>
                   <p className="text-xs sm:text-[13px] text-gray-600 mt-2 leading-relaxed">
                     {faq.answer}
@@ -1357,13 +1403,17 @@ const OrganizePage = () => {
 
           {/* Add Another + Button */}
           <div>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
+              radius="fiverr"
               onClick={handleAddFaq}
-              className="text-[#0D6D5F] hover:text-[#0A5348] text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer pt-1 transition-colors"
+              rightIcon={<Plus className="w-4 h-4" />}
+              className="text-[#0D6D5F] hover:text-[#0A5348] font-bold p-0 hover:bg-transparent"
             >
-              Add Another <Plus className="w-4 h-4" />
-            </button>
+              Add Another
+            </Button>
           </div>
         </div>
 

@@ -14,6 +14,7 @@ import {
   Globe2,
   X
 } from "lucide-react";
+import { Button } from "@/components";
 import toast from "react-hot-toast";
 
 const creatorTiers = [
@@ -101,13 +102,16 @@ export default function InfluencersPage() {
               Partner with the fastest-growing freelance marketplace. Get sponsored integrations, earn competitive affiliate commissions, and receive free project credits.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
-              <button
+              <Button
                 onClick={() => setIsApplying(true)}
-                className="px-7 py-3.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                variant="brand"
+                size="lg"
+                radius="xl"
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+                className="font-semibold text-sm shadow-md hover:shadow-lg"
               >
-                <span>Apply as a Creator</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+                Apply as a Creator
+              </Button>
               <a
                 href="#tiers"
                 className="px-7 py-3.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
@@ -157,13 +161,17 @@ export default function InfluencersPage() {
                   </div>
                 </div>
 
-                <button
+                <Button
                   onClick={() => setIsApplying(true)}
-                  className="w-full py-3 rounded-xl bg-gray-50 hover:bg-[#327C73] hover:text-white text-[#0f172a] font-semibold text-xs border border-gray-200 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                  variant="outline"
+                  size="md"
+                  radius="xl"
+                  fullWidth
+                  rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+                  className="bg-gray-50 hover:bg-[#327C73] hover:text-white text-[#0f172a] font-semibold text-xs border-gray-200"
                 >
-                  <span>Apply for {t.tier}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                  Apply for {t.tier}
+                </Button>
               </div>
             ))}
           </div>
@@ -174,12 +182,16 @@ export default function InfluencersPage() {
       {isApplying && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
-            <button
+            <Button
               onClick={() => setIsApplying(false)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition cursor-pointer"
+              variant="soft"
+              size="icon"
+              radius="full"
+              className="absolute top-5 right-5 w-8 h-8 text-gray-600 hover:text-black"
+              aria-label="Close modal"
             >
               <X className="w-4 h-4" />
-            </button>
+            </Button>
 
             <div className="space-y-1 mb-5">
               <h3 className="text-xl font-bold text-[#0f172a]">Apply to Creator Program</h3>
@@ -280,13 +292,17 @@ export default function InfluencersPage() {
                 />
               </div>
 
-              <button
+              <Button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer mt-2"
+                variant="brand"
+                size="md"
+                radius="xl"
+                fullWidth
+                leftIcon={<Send className="w-4 h-4" />}
+                className="font-semibold shadow-md mt-2"
               >
-                <Send className="w-4 h-4" />
-                <span>Submit Creator Application</span>
-              </button>
+                Submit Creator Application
+              </Button>
             </form>
           </div>
         </div>

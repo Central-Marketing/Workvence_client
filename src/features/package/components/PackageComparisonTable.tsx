@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { FiClock } from "react-icons/fi";
+import { Button } from "@/components/ui";
 import { PackageTierDetails } from "../utils/packageDetailsNormalizer";
 
 interface PackageComparisonTableProps {
@@ -58,19 +59,22 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
             </h2>
           </div>
 
-          <button
+          <Button
             type="button"
             role="switch"
             aria-checked={showComparisonTable}
             aria-label="Toggle compare packages table"
+            variant="ghost"
+            size="xs"
+            radius="full"
             onClick={() => setShowComparisonTable(!showComparisonTable)}
-            className={`w-[60px] h-[34px] p-[4px] rounded-[40px] flex items-center transition-colors duration-200 cursor-pointer shrink-0 ${showComparisonTable
-                ? "bg-[var(--success-500,#008000)] justify-end"
-                : "bg-[#D1D5DB] justify-start"
+            className={`!w-[60px] !h-[34px] !min-h-[34px] !p-[4px] rounded-[40px] flex items-center transition-colors duration-200 cursor-pointer shrink-0 ${showComparisonTable
+                ? "!bg-[var(--success-500,#008000)] justify-end"
+                : "!bg-[#D1D5DB] justify-start"
               }`}
           >
             <span className="w-[26px] h-[26px] bg-white rounded-full shadow-sm pointer-events-none block transition-transform duration-200" />
-          </button>
+          </Button>
         </div>
 
         {/* Comparison */}
@@ -325,44 +329,53 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
               <div className="grid grid-cols-3 border-t border-gray-200 p-3 sm:p-4 xl:p-5 bg-gray-50/50">
                 <div className="px-1.5 sm:px-2">
                   {basicPkg && (
-                    <button
+                    <Button
                       type="button"
                       onClick={() => {
                         onSelectTier('basic');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="w-full py-2.5 px-2 sm:px-3 bg-white border border-gray-300 hover:border-gray-900 text-gray-800 font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer text-center"
+                      variant="outline"
+                      size="sm"
+                      radius="fiverr"
+                      fullWidth
                     >
                       Select Basic
-                    </button>
+                    </Button>
                   )}
                 </div>
                 <div className="px-1.5 sm:px-2">
                   {standardPkg && (
-                    <button
+                    <Button
                       type="button"
                       onClick={() => {
                         onSelectTier('standard');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="w-full py-2.5 px-2 sm:px-3 bg-brand-green text-white font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer shadow-xs text-center"
+                      variant="brand"
+                      size="sm"
+                      radius="fiverr"
+                      fullWidth
                     >
                       Select Standard
-                    </button>
+                    </Button>
                   )}
                 </div>
                 <div className="px-1.5 sm:px-2">
                   {premiumPkg && (
-                    <button
+                    <Button
                       type="button"
                       onClick={() => {
                         onSelectTier('premium');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="w-full py-2.5 px-2 sm:px-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer text-center"
+                      variant="dark"
+                      size="sm"
+                      radius="fiverr"
+                      fullWidth
                     >
                       Select Premium
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>

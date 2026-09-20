@@ -15,6 +15,7 @@ import {
   User,
   X
 } from "lucide-react";
+import { Button } from "@/components";
 import toast from "react-hot-toast";
 
 interface Course {
@@ -128,17 +129,20 @@ export default function LearnPage() {
             {/* Filter Pills */}
             <div className="flex flex-wrap items-center justify-center gap-2 pt-4">
               {categories.map((cat) => (
-                <button
+                <Button
                   key={cat}
                   onClick={() => setSelectedCat(cat)}
-                  className={`px-5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
+                  variant={selectedCat === cat ? "brand" : "soft"}
+                  size="xs"
+                  radius="xl"
+                  className={`font-semibold transition cursor-pointer ${
                     selectedCat === cat
-                      ? "bg-[#327C73] text-white shadow-xs"
-                      : "bg-[#f1f5f9] text-gray-600 hover:bg-gray-200"
+                      ? "shadow-xs"
+                      : "hover:bg-gray-200"
                   }`}
                 >
                   {cat}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -194,12 +198,15 @@ export default function LearnPage() {
 
               <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
                 <span className="text-2xl font-extrabold text-[#0f172a]">{course.price}</span>
-                <button
+                <Button
                   onClick={() => setSelectedCourse(course)}
-                  className="px-5 py-2.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs transition active:scale-95 cursor-pointer"
+                  variant="brand"
+                  size="sm"
+                  radius="xl"
+                  className="font-semibold text-xs"
                 >
                   View Syllabus
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -210,12 +217,16 @@ export default function LearnPage() {
       {selectedCourse && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
-            <button
+            <Button
               onClick={() => setSelectedCourse(null)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition cursor-pointer"
+              variant="soft"
+              size="icon"
+              radius="full"
+              className="absolute top-5 right-5 w-8 h-8 text-gray-600 hover:text-black"
+              aria-label="Close modal"
             >
               <X className="w-4 h-4" />
-            </button>
+            </Button>
 
             <div className="space-y-2 mb-6">
               <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-[#10b981]/10 text-[#327C73]">
@@ -241,13 +252,17 @@ export default function LearnPage() {
               </div>
             </div>
 
-            <button
+            <Button
               onClick={() => handleEnroll(selectedCourse.title)}
-              className="w-full py-3.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+              variant="brand"
+              size="md"
+              radius="xl"
+              fullWidth
+              rightIcon={<ArrowRight className="w-4 h-4" />}
+              className="font-bold text-xs shadow-md"
             >
-              <span>Enroll Now for {selectedCourse.price} (Instant Access)</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+              Enroll Now for {selectedCourse.price} (Instant Access)
+            </Button>
           </div>
         </div>
       )}

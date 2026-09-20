@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { axiosFetch } from "@/utils";
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
+import { Button } from "@/components/ui";
 
 const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
   const [price, setPrice] = useState(brief?.budget || "");
@@ -74,14 +75,17 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
               </p>
             )}
           </div>
-          <button
+          <Button
             type="button"
-            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer shrink-0"
+            variant="ghost"
+            size="icon"
+            radius="full"
+            className="w-8 h-8 text-gray-400 hover:text-gray-700 hover:bg-gray-100 border-none shadow-none shrink-0"
             onClick={onClose}
             title="Close"
           >
             <X className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
 
         {errorMsg && (
@@ -159,28 +163,29 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
 
           {/* Action Buttons */}
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100 mt-1">
-            <button
+            <Button
               type="button"
-              className="py-2.5 px-5 rounded-xl text-xs sm:text-[13px] font-semibold cursor-pointer transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200/80"
+              variant="soft"
+              size="md"
+              radius="xl"
               onClick={onClose}
               disabled={loading}
+              className="font-semibold text-xs sm:text-[13px] bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200/80"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className="py-2.5 px-6 rounded-[10px] text-xs sm:text-[13px] font-semibold cursor-pointer transition-all bg-black hover:bg-gray-900 text-white shadow-xs disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              variant="dark"
+              size="md"
+              radius="fiverr"
               disabled={loading}
+              isLoading={loading}
+              loadingText="Submitting..."
+              className="py-2.5 px-6 font-semibold text-xs sm:text-[13px] shadow-xs"
             >
-              {loading ? (
-                <>
-                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-[10px] animate-spin" />
-                  <span>Submitting...</span>
-                </>
-              ) : (
-                "Submit Proposal"
-              )}
-            </button>
+              Submit Proposal
+            </Button>
           </div>
         </form>
       </div>

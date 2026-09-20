@@ -26,6 +26,7 @@ import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
 import generateImageURL from "@/utils/generateImageURL";
 import { ExtensionModal } from "@/components";
+import { Button } from "@/components/ui";
 import { NormalizedOrder } from "../types";
 import { OrderTimelineStepper } from "../components/OrderTimelineStepper";
 import { OrderDeliverablesList } from "../components/OrderDeliverablesList";
@@ -353,14 +354,17 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
           </div>
 
           <div className="flex items-center gap-2">
-            <button
+            <Button
               type="button"
+              variant="soft"
+              size="xs"
+              radius="full"
               onClick={() => setIsLedgerOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition-colors cursor-pointer"
+              leftIcon={<FiClock className="text-emerald-600 text-xs" />}
+              className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs font-semibold"
             >
-              <FiClock className="text-emerald-600 text-xs" />
-              <span>Escrow Ledger</span>
-            </button>
+              Escrow Ledger
+            </Button>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Seller Workspace
@@ -461,21 +465,26 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
               <div className="flex flex-wrap items-center gap-3">
                 {!isDelivered ? (
                   <>
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
+                      size="sm"
+                      radius="fiverr"
                       onClick={() => setIsExtensionModalOpen(true)}
-                      className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs sm:text-sm transition-colors cursor-pointer"
                     >
                       Extend Delivery Date
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
+                      variant="emerald"
+                      size="sm"
+                      radius="fiverr"
+                      leftIcon={<FiUploadCloud className="text-lg" />}
                       onClick={() => setShowDeliverModal(true)}
-                      className="px-6 py-2.5 rounded-xl bg-[#10B981] hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+                      className="px-6 font-bold shadow-sm"
                     >
-                      <FiUploadCloud className="text-lg" />
-                      <span>Deliver Completed Work</span>
-                    </button>
+                      Deliver Completed Work
+                    </Button>
                   </>
                 ) : (
                   <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 text-xs sm:text-sm font-semibold">
@@ -570,22 +579,29 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
 
               {isExtensionRequestedByBuyer && (
                 <div className="flex items-center gap-2 shrink-0">
-                  <button
+                  <Button
                     type="button"
+                    variant="brand"
+                    size="xs"
+                    radius="fiverr"
                     disabled={isRespondingExtension}
+                    isLoading={isRespondingExtension}
                     onClick={() => handleRespondExtension("accept")}
-                    className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+                    className="font-bold shadow-xs"
                   >
                     Accept Extension
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="danger"
+                    size="xs"
+                    radius="fiverr"
                     disabled={isRespondingExtension}
                     onClick={() => handleRespondExtension("reject")}
-                    className="px-4 py-2 rounded-xl bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer"
+                    className="font-bold bg-white border border-rose-200 text-rose-700 hover:bg-rose-50"
                   >
                     Reject
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
@@ -599,13 +615,17 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             <div>
               <h4 className="font-bold text-sm text-amber-900">Buyer Requested a Revision</h4>
               <p className="text-xs sm:text-sm text-amber-800 mt-1">{order.revisionReason}</p>
-              <button
+              <Button
                 type="button"
+                variant="soft"
+                size="xs"
+                radius="fiverr"
                 onClick={() => setShowDeliverModal(true)}
-                className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                rightIcon={<FiArrowRight className="text-xs" />}
+                className="mt-3 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold"
               >
-                Upload Revised Files →
-              </button>
+                Upload Revised Files
+              </Button>
             </div>
           </div>
         )}
@@ -730,14 +750,17 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   <p className="text-xs sm:text-sm text-slate-500">
                     The buyer has not filled out the project requirement questions yet. You can message them if you need clarifications.
                   </p>
-                  <button
+                  <Button
                     type="button"
+                    variant="dark"
+                    size="sm"
+                    radius="xl"
                     disabled={isContacting}
                     onClick={handleContact}
-                    className="mt-3 px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold text-xs hover:bg-black transition-colors disabled:opacity-50"
+                    className="mt-3 text-xs"
                   >
                     Contact Buyer
-                  </button>
+                  </Button>
                 </div>
               )}
             </div> */}
@@ -750,13 +773,16 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   <p className="text-xs text-slate-400">Files and notes you provided for this order</p>
                 </div>
                 {!isCompleted && !isCancelled && !isDelivered && (
-                  <button
+                  <Button
                     type="button"
+                    variant="soft"
+                    size="xs"
+                    radius="fiverr"
                     onClick={() => setShowDeliverModal(true)}
-                    className="text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                    className="text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-bold"
                   >
                     + Deliver Work
-                  </button>
+                  </Button>
                 )}
                 {isDelivered && (
                   <span className="bg-teal-50 text-teal-700 border border-teal-200 text-xs font-semibold px-3 py-1 rounded-full">
@@ -802,14 +828,17 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   </p>
                 </div>
               </div>
-              <button
+              <Button
                 type="button"
+                variant="dark"
+                size="sm"
+                radius="fiverr"
                 onClick={() => setIsLedgerOpen(true)}
-                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer shrink-0"
+                rightIcon={<FiArrowRight className="text-sm" />}
+                className="shrink-0 shadow-xs"
               >
-                <span>View Full Ledger</span>
-                <FiArrowRight className="text-sm" />
-              </button>
+                View Full Ledger
+              </Button>
             </div>
 
           </div>
@@ -848,15 +877,20 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                 )}
               </div>
 
-              <button
+              <Button
                 type="button"
+                variant="dark"
+                size="md"
+                fullWidth
+                radius="fiverr"
                 disabled={isContacting}
+                isLoading={isContacting}
+                leftIcon={<FiMessageSquare className="text-base" />}
                 onClick={handleContact}
-                className="mt-4 w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-50"
+                className="mt-4 shadow-xs font-semibold"
               >
-                <FiMessageSquare className="text-base" />
-                <span>{isContacting ? "Opening Chat..." : "Message Buyer"}</span>
-              </button>
+                Message Buyer
+              </Button>
             </div>
 
             {/* Order Details & Earnings Card */}
@@ -933,14 +967,18 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                 </div>
               </div>
 
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
+                fullWidth
+                radius="fiverr"
                 onClick={() => setIsLedgerOpen(true)}
-                className="mt-4 w-full py-2.5 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                leftIcon={<FiClock className="text-emerald-600 text-sm" />}
+                className="mt-4"
               >
-                <FiClock className="text-emerald-600 text-sm" />
-                <span>View Escrow Ledger</span>
-              </button>
+                View Escrow Ledger
+              </Button>
 
               {/* Delivery Duration & Dates */}
               <div className="pt-4 space-y-2 text-xs text-slate-600">
@@ -962,13 +1000,17 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                 <p className="text-xs text-slate-500 mt-1 mb-3">
                   Need more time or need help resolving an issue with this order?
                 </p>
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
+                  fullWidth
+                  radius="fiverr"
                   onClick={() => setIsExtensionModalOpen(true)}
-                  className="w-full py-2.5 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition-colors cursor-pointer"
+                  className="bg-white hover:bg-slate-100"
                 >
                   Ask for Time Extension
-                </button>
+                </Button>
               </div>
             )}
 
@@ -987,14 +1029,16 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col relative overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
+            <Button
               type="button"
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer"
+              variant="ghost"
+              size="icon"
+              radius="full"
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer w-8 h-8 min-h-[32px]"
               onClick={() => setShowDeliverModal(false)}
               disabled={isSubmittingDelivery}
-            >
-              <FiX size={20} />
-            </button>
+              icon={<FiX size={20} />}
+            />
 
             <div className="flex items-center gap-3 mb-5">
               <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
@@ -1032,18 +1076,21 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   onChange={handleFileChange}
                   className="hidden"
                 />
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="md"
+                  radius="xl"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className="w-full py-4 border-2 border-dashed border-slate-200 hover:border-emerald-400 rounded-xl bg-slate-50 hover:bg-emerald-50/50 transition-colors flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+                  className="w-full py-4 h-auto min-h-[100px] border-2 border-dashed border-slate-200 hover:border-emerald-400 bg-slate-50 hover:bg-emerald-50/50 transition-colors flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
                 >
                   <FiUploadCloud className="text-2xl text-slate-400" />
                   <span className="text-xs font-semibold text-slate-700">
                     {isUploading ? "Uploading files..." : "Click to browse and upload files"}
                   </span>
-                  <span className="text-[11px] text-slate-400">ZIP, PNG, PDF, JPG, or design files</span>
-                </button>
+                  <span className="text-[11px] text-slate-400 font-normal">ZIP, PNG, PDF, JPG, or design files</span>
+                </Button>
 
                 {/* Uploaded files preview list */}
                 {uploadedFiles.length > 0 && (
@@ -1062,22 +1109,29 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
               </div>
 
               <div className="flex items-center gap-3 pt-3">
-                <button
+                <Button
                   type="button"
-                  onClick={() => setShowDeliverModal(false)}
+                  variant="soft"
+                  size="md"
+                  radius="fiverr"
                   disabled={isSubmittingDelivery}
-                  className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-700 font-semibold text-xs sm:text-sm hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-50"
+                  onClick={() => setShowDeliverModal(false)}
+                  className="flex-1 font-semibold"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
+                  variant="emerald"
+                  size="md"
+                  radius="fiverr"
                   disabled={isSubmittingDelivery || isUploading}
-                  className="flex-1 py-3 rounded-xl bg-[#10B981] hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                  isLoading={isSubmittingDelivery}
+                  rightIcon={<FiCheck />}
+                  className="flex-1 font-bold shadow-md"
                 >
-                  <span>{isSubmittingDelivery ? "Submitting..." : "Send Delivery"}</span>
-                  <FiCheck />
-                </button>
+                  Send Delivery
+                </Button>
               </div>
             </form>
           </div>

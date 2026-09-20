@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { axiosFetch } from '@/utils';
 import Review, { ReviewItem } from '../Review/Review';
+import { Button } from "@/components/ui";
 
 export interface RatingBreakdownData {
     communication?: number;
@@ -261,13 +262,16 @@ const Reviews: React.FC<ReviewsProps> = ({
             {/* Action Buttons: Show More Reviews */}
             {filteredReviews.length > 4 && (
                 <div className="flex flex-wrap items-center justify-end gap-4 mt-6 pt-2">
-                    <button
+                    <Button
                         type="button"
+                        variant="brand"
+                        size="md"
+                        radius="xl"
                         onClick={() => setShowMore(!showMore)}
-                        className="px-7 py-3 bg-brand-green hover:bg-brand-green text-white font-semibold rounded-xl shadow-sm transition-all text-sm cursor-pointer"
+                        className="px-7 py-3 font-semibold shadow-sm text-sm cursor-pointer"
                     >
                         {showMore ? "Show fewer reviews" : "Show more review"}
-                    </button>
+                    </Button>
                 </div>
             )}
         </div>

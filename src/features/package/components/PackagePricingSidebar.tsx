@@ -5,7 +5,7 @@ import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import { FiClock, FiRepeat, FiArrowRight, FiMessageSquare } from "react-icons/fi";
 import { PackageTierDetails, SellerDetails } from "../utils/packageDetailsNormalizer";
-import { AiGradientButton } from "@/components/ui";
+import { AiGradientButton, Button } from "@/components/ui";
 
 interface PackagePricingSidebarProps {
   packages: {
@@ -63,17 +63,20 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
               const pkg = packages[tierKey];
               const isSelected = selectedTier === tierKey;
               return (
-                <button
+                <Button
                   key={tierKey}
                   type="button"
+                  variant={isSelected ? "dark" : "ghost"}
+                  size="xs"
+                  radius="lg"
                   onClick={() => onSelectTier(tierKey)}
                   className={`py-2 sm:py-2.5 2xl:py-[10px] px-2 sm:px-3 lg:px-2.5 xl:px-3.5 2xl:px-[20px] rounded-[10px] font-inter font-normal not-italic text-[13px] min-[400px]:text-[14px] sm:text-[15px] md:text-[16px] lg:text-[16px] xl:text-[18px] macbook:text-[19px] 2xl:text-[20px] leading-[20px] sm:leading-[22px] lg:leading-[24px] 2xl:leading-[26px] transition-all cursor-pointer ${isSelected
-                    ? "bg-[var(--Foundation-Green-green-900,#0B403F)] text-[var(--Foundation-White-white-50,#FFF)] shadow-xs"
-                    : "text-[var(--Foundation-Grey-grey-400,#6E6E6E)] hover:text-gray-900"
+                    ? "!bg-[var(--Foundation-Green-green-900,#0B403F)] !text-[var(--Foundation-White-white-50,#FFF)] shadow-xs"
+                    : "!text-[var(--Foundation-Grey-grey-400,#6E6E6E)] hover:!text-gray-900"
                     }`}
                 >
                   {pkg.name}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -170,25 +173,31 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
 
         {/* Primary Action Button: Continue / Checkout */}
         {onCheckout && (
-          <button
-            type="button"
+          <Button
+            variant="brand"
+            size="md"
+            radius="fiverr"
+            fullWidth
             onClick={() => onCheckout(activePkg.key)}
-            className="w-full py-3 sm:py-3.5 bg-brand-green hover:bg-brand-green/90 text-white text-xs min-[400px]:text-[13px] sm:text-sm 2xl:text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-[0.99] mb-2.5"
+            rightIcon={<FiArrowRight className="w-4 h-4" />}
+            className="mb-2.5 font-bold"
           >
-            <span>Continue (${activePkg.price})</span>
-            <FiArrowRight className="w-4 h-4" />
-          </button>
+            Continue (${activePkg.price})
+          </Button>
         )}
 
         {/* Secondary Action Button: Contact Me */}
-        <button
-          type="button"
+        <Button
+          variant="soft"
+          size="md"
+          radius="fiverr"
+          fullWidth
           onClick={onContact}
-          className="w-full py-2.5 sm:py-3 bg-[#EAECEF] hover:bg-[#DFE2E6] text-gray-800 text-xs min-[400px]:text-[13px] sm:text-sm 2xl:text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"
+          leftIcon={<FiMessageSquare className="w-3.5 h-3.5 text-gray-600" />}
+          className="font-semibold"
         >
-          <FiMessageSquare className="w-3.5 h-3.5 text-gray-600" />
-          <span>Contact Seller</span>
-        </button>
+          Contact Seller
+        </Button>
       </div>
 
       {/* 2. Bottom Card: About The Seller Card */}
@@ -258,13 +267,15 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
           <p className="text-[11px] min-[400px]:text-xs sm:text-[13px] md:text-[13px] lg:text-xs xl:text-[13px] 2xl:text-sm text-gray-600 leading-relaxed mb-4">
             {isBioExpanded ? seller.bio : `${seller.bio.slice(0, 115)}${seller.bio.length > 115 ? '...' : ''} `}
             {seller.bio.length > 115 && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="xs"
                 onClick={() => setIsBioExpanded(!isBioExpanded)}
-                className="font-bold text-gray-900 hover:underline inline ml-1 cursor-pointer"
+                className="font-bold text-gray-900 hover:underline inline ml-1 cursor-pointer !p-0 !min-h-0 !h-auto text-[11px] min-[400px]:text-xs sm:text-[13px] md:text-[13px] lg:text-xs xl:text-[13px] 2xl:text-sm"
               >
                 {isBioExpanded ? "Show less" : "See more"}
-              </button>
+              </Button>
             )}
           </p>
         )}

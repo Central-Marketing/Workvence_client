@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { FiChevronDown, FiChevronUp, FiTag, FiCalendar, FiArrowRight } from "react-icons/fi";
+import { Button } from "@/components/ui";
 import { SellerReviewItem, SELLER_FALLBACK_IMAGES } from "../utils/sellerProfileNormalizer";
 
 interface SellerReviewsSectionProps {
@@ -219,18 +220,22 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
               {/* Collapsible Seller Response */}
               {rev.sellerResponse && (
                 <div className="border-t border-gray-200/60 pt-3">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="xs"
                     onClick={() => toggleResponse(rev.id)}
-                    className="text-xs font-semibold text-gray-600 hover:text-gray-900 flex items-center gap-1.5 cursor-pointer transition-colors"
+                    className="text-xs font-semibold text-gray-600 hover:text-gray-900 flex items-center gap-1.5 transition-colors !p-0 !min-h-0 !h-auto hover:!bg-transparent"
+                    rightIcon={
+                      isRespOpen ? (
+                        <FiChevronUp className="w-3.5 h-3.5" />
+                      ) : (
+                        <FiChevronDown className="w-3.5 h-3.5" />
+                      )
+                    }
                   >
                     <span>Seller Response</span>
-                    {isRespOpen ? (
-                      <FiChevronUp className="w-3.5 h-3.5" />
-                    ) : (
-                      <FiChevronDown className="w-3.5 h-3.5" />
-                    )}
-                  </button>
+                  </Button>
 
                   {isRespOpen && (
                     <div className="mt-3 pl-4 border-l-2 border-teal-600 bg-white/70 p-3 rounded-r-lg">
@@ -249,14 +254,17 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
       {/* 4. Show More Reviews Button */}
       {reviews.length > visibleCount && (
         <div className="mt-6">
-          <button
+          <Button
             type="button"
+            variant="dark"
+            size="sm"
+            radius="fiverr"
             onClick={() => setVisibleCount((prev) => prev + 2)}
-            className="bg-black hover:bg-neutral-800 text-white text-xs font-semibold px-5 py-3 rounded-[10px] flex items-center gap-2 transition-all cursor-pointer shadow-xs active:scale-[0.98]"
+            rightIcon={<FiArrowRight className="w-3.5 h-3.5" />}
+            className="font-semibold shadow-xs px-5 py-3"
           >
-            <span>Show More Reviews</span>
-            <FiArrowRight className="w-3.5 h-3.5" />
-          </button>
+            Show More Reviews
+          </Button>
         </div>
       )}
     </div>

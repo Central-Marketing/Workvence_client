@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import { FiMapPin, FiClock, FiPackage } from "react-icons/fi";
+import { Button } from "@/components/ui";
 import { SellerDetails } from "../utils/packageDetailsNormalizer";
 
 interface PackageSellerSectionProps {
@@ -120,19 +121,23 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
 
       {/* Action Buttons */}
       <div className="flex items-center gap-3">
-        <button
+        <Button
           type="button"
           onClick={onContact}
-          className="px-6 py-2.5 bg-black hover:bg-neutral-800 text-white text-sm font-semibold rounded-xl transition-colors cursor-pointer shadow-xs"
+          variant="dark"
+          size="md"
+          radius="fiverr"
         >
           Contact Seller
-        </button>
-        <Link
+        </Button>
+        <Button
           href={`/seller/${seller.username || seller.name}`}
-          className="px-6 py-2.5 bg-white border border-gray-300 hover:border-gray-900 hover:bg-gray-50 text-gray-800 text-sm font-semibold rounded-xl transition-colors inline-flex items-center justify-center shadow-2xs"
+          variant="outline"
+          size="md"
+          radius="fiverr"
         >
           View Profile
-        </Link>
+        </Button>
       </div>
     </div>
   );

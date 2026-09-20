@@ -15,6 +15,7 @@ import {
   Users,
   ChevronDown
 } from "lucide-react";
+import { Button } from "@/components";
 import toast from "react-hot-toast";
 
 const referralFaqs = [
@@ -105,13 +106,16 @@ export default function InviteAFriendPage() {
                 value={referralLink}
                 className="w-full px-3 text-xs sm:text-sm font-mono text-gray-800 bg-transparent outline-none"
               />
-              <button
+              <Button
                 onClick={handleCopy}
-                className="px-5 py-2.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white text-xs font-semibold flex items-center gap-1.5 shrink-0 transition active:scale-95 cursor-pointer"
+                variant="brand"
+                size="sm"
+                radius="xl"
+                leftIcon={copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                className="shrink-0 font-semibold"
               >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                <span>{copied ? "Copied!" : "Copy Link"}</span>
-              </button>
+                {copied ? "Copied!" : "Copy Link"}
+              </Button>
             </div>
 
             {/* 1-Click Social Sharing */}
@@ -120,24 +124,33 @@ export default function InviteAFriendPage() {
                 Or share instantly via:
               </span>
               <div className="flex flex-wrap items-center justify-center gap-3">
-                <button
+                <Button
                   onClick={() => handleSocialShare("whatsapp")}
-                  className="px-4 py-2.5 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] text-xs font-semibold transition cursor-pointer"
+                  variant="outline"
+                  size="sm"
+                  radius="xl"
+                  className="bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] border-[#25D366]/20 text-xs font-semibold"
                 >
                   WhatsApp
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => handleSocialShare("twitter")}
-                  className="px-4 py-2.5 rounded-xl bg-black text-white text-xs font-semibold transition hover:bg-gray-800 cursor-pointer"
+                  variant="dark"
+                  size="sm"
+                  radius="xl"
+                  className="text-xs font-semibold"
                 >
                   X (Twitter)
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => handleSocialShare("linkedin")}
-                  className="px-4 py-2.5 rounded-xl bg-[#0077b5]/10 hover:bg-[#0077b5]/20 text-[#0077b5] text-xs font-semibold transition cursor-pointer"
+                  variant="outline"
+                  size="sm"
+                  radius="xl"
+                  className="bg-[#0077b5]/10 hover:bg-[#0077b5]/20 text-[#0077b5] border-[#0077b5]/20 text-xs font-semibold"
                 >
                   LinkedIn
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -157,13 +170,17 @@ export default function InviteAFriendPage() {
                     className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-xs focus:border-[#327C73] outline-none resize-none"
                   />
                 </div>
-                <button
+                <Button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-[#0f172a] hover:bg-black text-white font-semibold text-xs shadow-xs transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                  variant="dark"
+                  size="md"
+                  radius="xl"
+                  fullWidth
+                  leftIcon={<Send className="w-3.5 h-3.5" />}
+                  className="font-semibold shadow-xs"
                 >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Send $25 Gift Invitations</span>
-                </button>
+                  Send $25 Gift Invitations
+                </Button>
               </form>
             </div>
 

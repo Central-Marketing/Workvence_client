@@ -6,6 +6,7 @@ import { FiHome, FiHeart, FiShare2, FiMoreVertical, FiShield, FiClock, FiAward, 
 import { FaAward } from "react-icons/fa";
 import { SellerDetails } from "../utils/packageDetailsNormalizer";
 import { BadgeCheck } from "lucide-react";
+import { Button } from "@/components/ui";
 
 interface PackageHeaderStatsProps {
   title: string;
@@ -130,24 +131,28 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
           </span>
 
           <div className="flex items-center gap-2 sm:gap-2.5">
-            <button
+            <Button
               type="button"
+              variant={isFavorited ? "danger-soft" : "outline"}
+              size="icon"
+              radius="full"
               onClick={onToggleFavorite}
-              className={`w-9 h-9 sm:w-10 sm:h-10 md:w-[48px] md:h-[48px] aspect-square rounded-[60px] bg-[var(--Foundation-White-white-50,#FFF)] border border-gray-200 flex items-center justify-center gap-[10px] transition-colors cursor-pointer hover:bg-gray-50 shrink-0 ${isFavorited ? 'text-red-500 bg-red-50/50 border-red-200' : 'text-gray-500'
+              className={`w-9 h-9 sm:w-10 sm:h-10 md:w-[48px] md:h-[48px] !min-h-0 !p-0 aspect-square rounded-[60px] flex items-center justify-center transition-colors cursor-pointer hover:bg-gray-50 shrink-0 ${isFavorited ? '!text-red-500 !bg-red-50/50 !border-red-200' : 'text-gray-500 !bg-white border-gray-200'
                 }`}
               title="Save to favorites"
-            >
-              <FiHeart className={`w-4 h-4 sm:w-5 sm:h-5 ${isFavorited ? 'fill-red-500' : ''}`} />
-            </button>
+              icon={<FiHeart className={`w-4 h-4 sm:w-5 sm:h-5 ${isFavorited ? 'fill-red-500' : ''}`} />}
+            />
 
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="icon"
+              radius="full"
               onClick={onShare}
-              className="w-9 h-9 sm:w-10 sm:h-10 md:w-[48px] md:h-[48px] aspect-square rounded-[60px] bg-[var(--Foundation-White-white-50,#FFF)] border border-gray-200 flex items-center justify-center gap-[10px] text-gray-500 hover:bg-gray-50 transition-colors cursor-pointer shrink-0"
+              className="w-9 h-9 sm:w-10 sm:h-10 md:w-[48px] md:h-[48px] !min-h-0 !p-0 aspect-square rounded-[60px] !bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors cursor-pointer shrink-0"
               title="Share"
-            >
-              <FiShare2 className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
+              icon={<FiShare2 className="w-4 h-4 sm:w-5 sm:h-5" />}
+            />
           </div>
         </div>
       </div>

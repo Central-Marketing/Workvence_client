@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { useUserStore } from '@/store/userStore';
 import useAdminCategories, { isCategoryRoot } from '@/hooks/useAdminCategories';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { Button } from '@/components/ui';
 
 interface CategoryBarProps {
   visible: boolean;
@@ -124,13 +125,16 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
         
         {/* Left Scroll Arrow Button */}
         <div className={`transition-opacity duration-200 shrink-0 ${canScrollLeft ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none w-0'}`}>
-          <button
+          <Button
+            type="button"
+            variant="soft"
+            size="icon"
+            radius="full"
             onClick={() => scrollCategories('left')}
             aria-label="Scroll categories left"
-            className="w-7 h-7 rounded-full bg-[#F4F4F6] hover:bg-[#EAEAEF] text-[#327C73] flex items-center justify-center transition-colors shadow-xs cursor-pointer"
-          >
-            <FiChevronLeft size={16} />
-          </button>
+            className="w-7 h-7 min-h-[28px] !p-0 !bg-[#F4F4F6] hover:!bg-[#EAEAEF] text-[#327C73] shadow-xs shrink-0"
+            icon={<FiChevronLeft size={16} />}
+          />
         </div>
 
         {/* Scrollable Category Pills Track */}
@@ -161,13 +165,16 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
 
         {/* Right Scroll Arrow Button */}
         <div className={`transition-opacity duration-200 shrink-0 ${canScrollRight ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none w-0'}`}>
-          <button
+          <Button
+            type="button"
+            variant="soft"
+            size="icon"
+            radius="full"
             onClick={() => scrollCategories('right')}
             aria-label="Scroll categories right"
-            className="w-7 h-7 rounded-full bg-[#F4F4F6] hover:bg-[#EAEAEF] text-[#327C73] flex items-center justify-center transition-colors shadow-xs cursor-pointer"
-          >
-            <FiChevronRight size={16} />
-          </button>
+            className="w-7 h-7 min-h-[28px] !p-0 !bg-[#F4F4F6] hover:!bg-[#EAEAEF] text-[#327C73] shadow-xs shrink-0"
+            icon={<FiChevronRight size={16} />}
+          />
         </div>
 
       </div>

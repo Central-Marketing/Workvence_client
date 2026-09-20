@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo, Suspense } from 'react';
-import { PackageCard, TopRatedSellers, GigsGridSkeleton, Skeleton } from '@/components';
+import { PackageCard, TopRatedSellers, GigsGridSkeleton, Skeleton, Button } from '@/components';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
@@ -281,16 +281,19 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
       <div className="w-full bg-gray-100 border-b border-gray-200 sticky top-0 z-10 select-none">
         <div className="container mx-auto px-2 sm:px-4 md:px-6 relative flex items-center group">
           {/* Scroll Left Button */}
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
+            radius="full"
             onClick={() => scrollCategories('left')}
-            className="flex items-center justify-center absolute left-1 z-20 w-7 h-7 rounded-full bg-white/90 shadow-md text-gray-700 hover:bg-white transition-all cursor-pointer opacity-80 hover:opacity-100 xl:hidden"
+            className="absolute left-1 z-20 w-7 h-7 bg-white/90 shadow-md text-gray-700 hover:bg-white transition-all cursor-pointer opacity-80 hover:opacity-100 xl:hidden p-0"
             aria-label="Scroll left"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
             </svg>
-          </button>
+          </Button>
 
           {/* Scrollable Container */}
           <div
@@ -302,32 +305,37 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
               const slug = typeof cat === 'string' ? cat : cat.slug;
               const isActive = activeCategory === slug || activeCategory === name || filterCategory === slug || filterCategory === name;
               return (
-                <button
+                <Button
                   key={slug}
                   type="button"
+                  variant="ghost"
+                  radius="none"
                   onClick={() => handleCategoryClick(cat)}
-                  className={`flex-shrink-0 px-4 py-4 text-[13.5px] font-medium transition-colors whitespace-nowrap border-b-2 cursor-pointer ${isActive
+                  className={`flex-shrink-0 px-4 py-4 text-[13.5px] font-medium transition-colors whitespace-nowrap border-b-2 cursor-pointer h-auto hover:bg-transparent ${isActive
                     ? 'border-gray-900 text-gray-900 font-semibold'
                     : 'border-transparent text-gray-500 hover:text-gray-900'
                     }`}
                 >
                   {name}
-                </button>
+                </Button>
               );
             })}
           </div>
 
           {/* Scroll Right Button */}
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
+            radius="full"
             onClick={() => scrollCategories('right')}
-            className="flex items-center justify-center absolute right-1 z-20 w-7 h-7 rounded-full bg-white/90 shadow-md text-gray-700 hover:bg-white transition-all cursor-pointer opacity-80 hover:opacity-100 xl:hidden"
+            className="absolute right-1 z-20 w-7 h-7 bg-white/90 shadow-md text-gray-700 hover:bg-white transition-all cursor-pointer opacity-80 hover:opacity-100 xl:hidden p-0"
             aria-label="Scroll right"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
             </svg>
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -340,15 +348,21 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
               Home / <span className="text-gray-800 font-medium">Search Result</span>
             </p>
           </div>
-          <button
+          <Button
+            type="button"
+            variant="brand"
+            size="md"
+            radius="xl"
             onClick={() => setShowFilter(true)}
-            className="flex items-center gap-2 bg-brand-green hover:bg-brand-green text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
+            leftIcon={
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 6H21M7 12H17M11 18H13" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            }
+            className="text-sm font-semibold px-5 py-2.5 shadow-sm"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 6H21M7 12H17M11 18H13" stroke="white" strokeWidth="2" strokeLinecap="round" />
-            </svg>
             Filter
-          </button>
+          </Button>
         </div>
 
         {/* Active Filter Tags & Results Count Bar */}
@@ -363,95 +377,132 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
 
               {/* Keyword Tag */}
               {searchVal && (
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="xs"
+                  radius="full"
                   onClick={() => { setSearchVal(''); syncUrlWithFilters({ searchVal: '' }); }}
-                  className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                  leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                  className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                 >
-                  <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                  <span>{searchVal}</span>
-                </button>
+                  {searchVal}
+                </Button>
               )}
 
               {/* Active Category Tag */}
               {(filterCategory || (activeCategory !== 'All services' && activeCategory !== 'Results')) && (
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="xs"
+                  radius="full"
                   onClick={() => { setFilterCategory(''); setActiveCategory('All services'); syncUrlWithFilters({ category: '' }); }}
-                  className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                  leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                  className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                 >
-                  <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                  <span>{filterCategory || activeCategory}</span>
-                </button>
+                  {filterCategory || activeCategory}
+                </Button>
               )}
 
               {/* Price Range Tag */}
               {(minPrice || maxPrice) && (
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="xs"
+                  radius="full"
                   onClick={() => { setMinPrice(''); setMaxPrice(''); syncUrlWithFilters({ minPrice: '', maxPrice: '' }); }}
-                  className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                  leftIcon={<span className="text-gray-400 font-bold group-hover:text-red-500 transition-colors">—</span>}
+                  className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                 >
-                  <span className="text-gray-400 font-bold group-hover:text-red-500 transition-colors">—</span>
-                  <span>${minPrice || '0'} - ${maxPrice || 'Any'}</span>
-                </button>
+                  ${minPrice || '0'} - ${maxPrice || 'Any'}
+                </Button>
               )}
 
               {/* Experience Tags */}
               {experience.entry && (
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="xs"
+                  radius="full"
                   onClick={() => { toggleExperience('entry'); }}
-                  className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                  leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                  className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                 >
-                  <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                  <span>Entry Level</span>
-                </button>
+                  Entry Level
+                </Button>
               )}
               {experience.intermediate && (
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="xs"
+                  radius="full"
                   onClick={() => { toggleExperience('intermediate'); }}
-                  className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                  leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                  className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                 >
-                  <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                  <span>Intermediate</span>
-                </button>
+                  Intermediate
+                </Button>
               )}
               {experience.expert && (
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="xs"
+                  radius="full"
                   onClick={() => { toggleExperience('expert'); }}
-                  className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                  leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                  className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                 >
-                  <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                  <span>Expert</span>
-                </button>
+                  Expert
+                </Button>
               )}
 
               {/* English Level Tag */}
               {englishLevel && (
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="xs"
+                  radius="full"
                   onClick={() => { setEnglishLevel(''); }}
-                  className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                  leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                  className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                 >
-                  <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                  <span>{englishLevel === 'basic' ? 'Basic English' : englishLevel === 'fluent' ? 'Fluent English' : 'Native English'}</span>
-                </button>
+                  {englishLevel === 'basic' ? 'Basic English' : englishLevel === 'fluent' ? 'Fluent English' : 'Native English'}
+                </Button>
               )}
 
               {/* Location Tag */}
               {clientLocation && (
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="xs"
+                  radius="full"
                   onClick={() => { setClientLocation(''); }}
-                  className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-medium transition-colors shadow-2xs group"
+                  leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
+                  className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
                 >
-                  <span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>
-                  <span>{clientLocation}</span>
-                </button>
+                  {clientLocation}
+                </Button>
               )}
 
               {/* Clear All Pill Button */}
-              <button
+              <Button
+                type="button"
+                variant="dark"
+                size="xs"
+                radius="full"
                 onClick={handleReset}
-                className="bg-black hover:bg-gray-800 text-white text-xs px-4 py-1.5 rounded-full flex items-center gap-1.5 font-semibold transition-colors shadow-sm ml-1"
+                leftIcon={<span>✕</span>}
+                className="px-4 py-1.5 font-semibold shadow-sm ml-1"
               >
-                <span>✕</span> Clear All
-              </button>
+                Clear All
+              </Button>
             </>
           )}
         </div>
@@ -484,15 +535,20 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
                   </svg>
                   <h3 className="text-xl font-bold text-gray-900">Filters</h3>
                 </div>
-                <button
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  radius="full"
                   onClick={() => setShowFilter(false)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                  className="w-8 h-8 text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                  aria-label="Close filters"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                   </svg>
-                </button>
+                </Button>
               </div>
 
               {/* Drawer Scrollable Body */}
@@ -648,18 +704,25 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
 
               {/* Drawer Footer Actions */}
               <div className="p-5 border-t border-gray-100 bg-white flex items-center justify-end gap-4">
-                <button
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={handleReset}
-                  className="text-sm font-medium text-gray-500 hover:text-gray-800 transition-colors px-2 py-2"
+                  className="text-sm font-medium text-gray-500 hover:text-gray-800 px-2 py-2"
                 >
                   Clear filter
-                </button>
-                <button
+                </Button>
+                <Button
+                  type="button"
+                  variant="brand"
+                  size="md"
+                  radius="xl"
                   onClick={handleApplyFilter}
-                  className="bg-brand-green hover:bg-brand-green text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors shadow-sm"
+                  className="text-sm font-semibold px-6 py-2.5 shadow-sm"
                 >
                   Apply filter
-                </button>
+                </Button>
               </div>
 
             </div>
@@ -682,13 +745,17 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
             <p className="text-gray-500 max-w-md text-sm sm:text-base mb-6 leading-relaxed">
               We encountered an issue connecting to our servers. Please check your connection or try again.
             </p>
-            <button
+            <Button
+              type="button"
+              variant="brand"
+              size="md"
+              radius="xl"
               onClick={() => refetch()}
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-green text-white font-semibold rounded-xl hover:bg-[#3ea917] transition-all shadow-sm active:scale-[0.98] cursor-pointer"
+              leftIcon={<FiRefreshCw className="w-4 h-4" />}
+              className="px-6 py-2.5 font-semibold hover:bg-[#3ea917] shadow-sm active:scale-[0.98]"
             >
-              <FiRefreshCw className="w-4 h-4" />
               Try Again
-            </button>
+            </Button>
           </div>
         ) : (!packagesList || packagesList.length === 0) ? (
           <div className="py-8 w-full animate-fadeIn">
@@ -707,12 +774,16 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
                 Try adjusting your search keywords, clearing applied filters, or exploring other categories.
               </p>
               {hasActiveFilters && (
-                <button
+                <Button
+                  type="button"
+                  variant="brand"
+                  size="md"
+                  radius="xl"
                   onClick={handleReset}
-                  className="px-6 py-2.5 bg-brand-green text-white text-sm font-semibold rounded-xl hover:bg-[#3ea917] transition-all shadow-sm active:scale-[0.98] cursor-pointer"
+                  className="px-6 py-2.5 font-semibold hover:bg-[#3ea917] shadow-sm active:scale-[0.98]"
                 >
                   Clear all filters
-                </button>
+                </Button>
               )}
             </div>
 
@@ -739,27 +810,35 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
         {/* Pagination Controls */}
         {packagesList && packagesList.length > 0 && (
           <div className="flex justify-center items-center gap-4 mt-12 mb-4">
-            <button
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              radius="xl"
               onClick={() => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 syncUrlWithFilters({ page: page - 1 });
               }}
               disabled={page === 1}
-              className="px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+              className="px-6 py-2.5 font-semibold shadow-sm"
             >
               Previous
-            </button>
+            </Button>
             <span className="font-semibold text-gray-800 bg-gray-100 px-4 py-2 rounded-lg">Page {page}</span>
-            <button
+            <Button
+              type="button"
+              variant="dark"
+              size="md"
+              radius="xl"
               onClick={() => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 syncUrlWithFilters({ page: page + 1 });
               }}
               disabled={packagesList.length < 20}
-              className="px-6 py-2.5 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm"
+              className="px-6 py-2.5 font-semibold shadow-sm"
             >
               Next
-            </button>
+            </Button>
           </div>
         )}
       </div>

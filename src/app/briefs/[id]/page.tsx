@@ -29,6 +29,7 @@ import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader, SubmitProposalModal } from "@/components";
+import { Button } from "@/components/ui";
 
 function formatCategoryName(cat?: string): string {
   if (!cat) return "";
@@ -850,17 +851,19 @@ const BriefDetail = () => {
                 </div>
 
                 {/* Underlined Clickable Proposals Link */}
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="xs"
                   onClick={(e) => {
                     e.stopPropagation();
                     setModalView("list");
                     setShowProposalsModal(true);
                   }}
-                  className="text-xs sm:text-[13px] font-medium text-slate-900 underline group-hover:text-[#327C73] transition-colors cursor-pointer text-left"
+                  className="text-xs sm:text-[13px] font-medium text-slate-900 underline group-hover:text-[#327C73] transition-colors text-left p-0 h-auto hover:bg-transparent border-none shadow-none"
                 >
                   View {totalProposalsCount} {totalProposalsCount === 1 ? "proposal" : "proposals"}
-                </button>
+                </Button>
               </div>
             </div>
           ) : (
@@ -919,47 +922,52 @@ const BriefDetail = () => {
               {/* Action Button: Guest ("Join Now") vs Logged-in Seller ("Send Proposal" / "Proposal Submitted") */}
               <div className="mt-4">
                 {!user ? (
-                  <button
+                  <Button
                     type="button"
+                    variant="dark"
+                    size="md"
+                    radius="fiverr"
                     onClick={handleProposalAction}
-                    className="bg-black hover:bg-slate-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                    rightIcon={<FiArrowRight className="text-sm" />}
                   >
-                    <span>Join Now</span>
-                    <FiArrowRight className="text-xs" />
-                  </button>
+                    Join Now
+                  </Button>
                 ) : isSeller ? (
                   showSubmittedUI ? (
-                    <button
+                    <Button
                       type="button"
+                      variant="emerald"
+                      size="sm"
+                      radius="fiverr"
                       onClick={handleProposalAction}
-                      className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                      leftIcon={<FiCheck className="text-xs" />}
                     >
-                      <FiCheck className="text-xs" />
-                      <span>Proposal Submitted</span>
-                    </button>
+                      Proposal Submitted
+                    </Button>
                   ) : (
-                    <button
+                    <Button
                       type="button"
+                      variant={isClosed ? "soft" : "dark"}
+                      size="sm"
+                      radius="fiverr"
                       onClick={handleProposalAction}
                       disabled={isClosed}
-                      className={`text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 shadow-xs transition-colors ${isClosed
-                        ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
-                        : "bg-black hover:bg-slate-800 text-white cursor-pointer"
-                        }`}
+                      rightIcon={!isClosed ? <FiArrowRight className="text-xs" /> : undefined}
                     >
-                      <span>{isClosed ? "Project Closed" : "Send Proposal"}</span>
-                      {!isClosed && <FiArrowRight className="text-xs" />}
-                    </button>
+                      {isClosed ? "Project Closed" : "Send Proposal"}
+                    </Button>
                   )
                 ) : (
-                  <button
+                  <Button
                     type="button"
+                    variant="dark"
+                    size="sm"
+                    radius="fiverr"
                     onClick={handleProposalAction}
-                    className="bg-black hover:bg-slate-800 text-white text-xs font-semibold px-5 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                    rightIcon={<FiArrowRight className="text-xs" />}
                   >
-                    <span>Join as Seller</span>
-                    <FiArrowRight className="text-xs" />
-                  </button>
+                    Join as Seller
+                  </Button>
                 )}
               </div>
             </div>
@@ -990,34 +998,34 @@ const BriefDetail = () => {
               <p className="text-emerald-100/75 text-xs sm:text-sm leading-relaxed mb-6 font-normal">
                 Explore real project opportunities from clients looking for the right skills and expertise.
               </p>
-              <button
+              <Button
                 type="button"
+                variant={isClosed ? "soft" : "primary"}
+                size="sm"
+                radius="fiverr"
                 onClick={handleProposalAction}
                 disabled={isClosed}
-                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 ${isClosed
-                  ? "bg-slate-200 text-slate-500 cursor-not-allowed"
-                  : "bg-white hover:bg-emerald-50 text-slate-900 cursor-pointer"
-                  }`}
+                rightIcon={
+                  !isClosed ? (
+                    isSeller && showSubmittedUI ? (
+                      <FiCheck className="text-emerald-700 text-xs" />
+                    ) : (
+                      <FiArrowRight className="text-xs" />
+                    )
+                  ) : undefined
+                }
+                className={isClosed ? "" : "bg-white hover:bg-emerald-50 text-slate-900 border-none shadow-md active:scale-95"}
               >
-                <span>
-                  {isClosed
-                    ? "Project Closed"
-                    : !user
-                      ? "Send Proposal"
-                      : isSeller && showSubmittedUI
-                        ? "View My Proposal"
-                        : isSeller
-                          ? "Send Proposal"
-                          : "Join as Seller"}
-                </span>
-                {!isClosed && (
-                  isSeller && showSubmittedUI ? (
-                    <FiCheck className="text-emerald-700 text-xs" />
-                  ) : (
-                    <FiArrowRight className="text-xs" />
-                  )
-                )}
-              </button>
+                {isClosed
+                  ? "Project Closed"
+                  : !user
+                    ? "Send Proposal"
+                    : isSeller && showSubmittedUI
+                      ? "View My Proposal"
+                      : isSeller
+                        ? "Send Proposal"
+                        : "Join as Seller"}
+              </Button>
             </div>
           </div>
         )}
@@ -1041,8 +1049,11 @@ const BriefDetail = () => {
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white shrink-0">
               <div className="flex items-center gap-2.5">
                 {modalView !== "list" && (
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
+                    radius="full"
                     onClick={() => {
                       if (modalView === "detail") {
                         setModalView(previousModalView);
@@ -1050,11 +1061,11 @@ const BriefDetail = () => {
                         setModalView("list");
                       }
                     }}
-                    className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-600 transition-colors cursor-pointer mr-1"
+                    className="w-8 h-8 text-slate-600 hover:bg-slate-100 mr-1 border-none shadow-none"
                     title={modalView === "detail" ? "Back" : "Back to proposals"}
                   >
                     <FiArrowLeft className="text-base" />
-                  </button>
+                  </Button>
                 )}
                 <h2 className={`${modalView === "ai" ? "text-xl sm:text-2xl" : "text-lg sm:text-xl"} font-bold text-slate-900 font-sf-pro`}>
                   {modalView === "list" && `Proposals (${totalProposalsCount})`}
@@ -1072,26 +1083,33 @@ const BriefDetail = () => {
 
               <div className="flex items-center gap-3">
                 {modalView === "list" && normalizedProposals.length > 0 && (
-                  <button
+                  <Button
                     type="button"
+                    variant="soft"
+                    size="xs"
+                    radius="fiverr"
                     onClick={handleGetAiRecommendation}
                     disabled={aiLoading}
-                    className="bg-[#D8F5ED] hover:bg-[#C3F0E4] text-[#0D6B5D] border border-[#BCE8DE] text-xs font-bold px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer disabled:opacity-50"
+                    isLoading={aiLoading}
+                    leftIcon={<HiSparkles className="text-[#0D6B5D] text-sm" />}
+                    className="bg-[#D8F5ED] hover:bg-[#C3F0E4] text-[#0D6B5D] border border-[#BCE8DE] font-bold shadow-2xs"
                   >
-                    <HiSparkles className="text-[#0D6B5D] text-sm" />
-                    <span>{aiLoading ? "Analyzing..." : "Get AI Recommendation"}</span>
-                  </button>
+                    Get AI Recommendation
+                  </Button>
                 )}
 
                 {/* Red Close Button */}
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
+                  radius="full"
                   onClick={() => setShowProposalsModal(false)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer text-2xl font-light leading-none"
+                  className="w-8 h-8 text-red-500 hover:text-red-700 hover:bg-red-50 text-2xl font-light leading-none border-none shadow-none"
                   title="Close"
                 >
                   &times;
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -1199,31 +1217,36 @@ const BriefDetail = () => {
 
                         {/* Action Buttons: View Proposal & Message */}
                         <div className="flex items-center gap-2.5 pt-1">
-                          <button
+                          <Button
                             type="button"
+                            variant="soft"
+                            size="sm"
+                            radius="fiverr"
                             onClick={() => {
                               setPreviousModalView("list");
                               setSelectedProposal(item);
                               setModalView("detail");
                             }}
-                            className="flex-1 py-2.5 rounded-[10px] bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors cursor-pointer text-center"
+                            className="flex-1 text-center"
                           >
                             View Proposal
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             type="button"
+                            variant="dark"
+                            size="sm"
+                            radius="fiverr"
                             disabled={messagingSellerId === item.sellerId}
+                            isLoading={messagingSellerId === item.sellerId}
+                            rightIcon={<FiArrowRight className="text-xs" />}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleMessageSeller(item.sellerId, item.name);
                             }}
-                            className="flex-1 py-2.5 rounded-[10px] bg-black hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
+                            className="flex-1 text-center shadow-xs"
                           >
-                            <span>
-                              {messagingSellerId === item.sellerId ? "Connecting..." : "Message"}
-                            </span>
-                            <FiArrowRight className="text-xs" />
-                          </button>
+                            Message
+                          </Button>
                         </div>
                       </div>
                     );
@@ -1462,31 +1485,36 @@ const BriefDetail = () => {
 
                             {/* Action Buttons */}
                             <div className="flex items-center gap-2.5 pt-3 mt-1">
-                              <button
+                              <Button
                                 type="button"
+                                variant="soft"
+                                size="sm"
+                                radius="fiverr"
                                 onClick={() => {
                                   setPreviousModalView("ai");
                                   setSelectedProposal(displayItem);
                                   setModalView("detail");
                                 }}
-                                className="flex-1 py-2.5 rounded-[10px] bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors cursor-pointer text-center"
+                                className="flex-1 text-center"
                               >
                                 View Proposal
-                              </button>
-                              <button
+                              </Button>
+                              <Button
                                 type="button"
+                                variant="dark"
+                                size="sm"
+                                radius="fiverr"
                                 disabled={messagingSellerId === displayItem.sellerId}
+                                isLoading={messagingSellerId === displayItem.sellerId}
+                                rightIcon={<FiArrowRight className="text-xs" />}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleMessageSeller(displayItem.sellerId, displayItem.name);
                                 }}
-                                className="flex-1 py-2.5 rounded-[10px] bg-black hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
+                                className="flex-1 text-center shadow-xs"
                               >
-                                <span>
-                                  {messagingSellerId === displayItem.sellerId ? "Connecting..." : "Message"}
-                                </span>
-                                <FiArrowRight className="text-xs" />
-                              </button>
+                                Message
+                              </Button>
                             </div>
                           </div>
                         );
@@ -1641,22 +1669,23 @@ const BriefDetail = () => {
                       </p>
                     </div>
 
-                    <button
+                    <Button
                       type="button"
+                      variant="dark"
+                      size="md"
+                      fullWidth
+                      radius="fiverr"
                       disabled={messagingSellerId === detailedProposal.sellerId}
+                      isLoading={messagingSellerId === detailedProposal.sellerId}
+                      rightIcon={<FiArrowRight className="text-sm" />}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleMessageSeller(detailedProposal.sellerId, detailedProposal.name);
                       }}
-                      className="w-full py-3 rounded-xl bg-black hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
+                      className="shadow-xs"
                     >
-                      <span>
-                        {messagingSellerId === detailedProposal.sellerId
-                          ? "Connecting..."
-                          : "Message"}
-                      </span>
-                      <FiArrowRight className="text-sm" />
-                    </button>
+                      Message
+                    </Button>
                   </div>
                 </div>
 
@@ -1703,13 +1732,16 @@ const BriefDetail = () => {
           >
             <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-white shrink-0">
               <h2 className="text-xl font-bold text-slate-900">Your Proposal</h2>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
+                radius="lg"
                 onClick={() => setShowMyProposalModal(false)}
-                className="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                className="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none p-1.5 hover:bg-slate-100 border-none shadow-none"
               >
                 &times;
-              </button>
+              </Button>
             </div>
 
             <div className="p-6 flex flex-col gap-5 overflow-y-auto">

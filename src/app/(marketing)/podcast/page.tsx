@@ -17,6 +17,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { Button } from "@/components";
 
 interface Episode {
   id: string;
@@ -117,27 +118,39 @@ export default function PodcastPage() {
 
             {/* Listening Platforms Badges */}
             <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
-              <button
+              <Button
+                type="button"
+                variant="dark"
+                size="sm"
+                radius="xl"
                 onClick={() => toast.success("Opening Spotify channel...")}
-                className="px-4 py-2 rounded-xl bg-black text-white text-xs font-semibold flex items-center gap-2 hover:bg-gray-800 transition cursor-pointer"
+                rightIcon={<ExternalLink className="w-3 h-3 text-gray-400" />}
+                className="px-4 py-2 font-semibold text-xs"
               >
                 <span>Listen on Spotify</span>
-                <ExternalLink className="w-3 h-3 text-gray-400" />
-              </button>
-              <button
+              </Button>
+              <Button
+                type="button"
+                variant="soft"
+                size="sm"
+                radius="xl"
                 onClick={() => toast.success("Opening Apple Podcasts...")}
-                className="px-4 py-2 rounded-xl bg-[#f1f5f9] text-gray-800 text-xs font-semibold flex items-center gap-2 hover:bg-gray-200 transition cursor-pointer"
+                rightIcon={<ExternalLink className="w-3 h-3 text-gray-400" />}
+                className="px-4 py-2 bg-[#f1f5f9] text-gray-800 hover:bg-gray-200 font-semibold text-xs"
               >
                 <span>Apple Podcasts</span>
-                <ExternalLink className="w-3 h-3 text-gray-400" />
-              </button>
-              <button
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                radius="xl"
                 onClick={() => toast.success("Opening YouTube...")}
-                className="px-4 py-2 rounded-xl bg-red-50 text-red-700 border border-red-200 text-xs font-semibold flex items-center gap-2 hover:bg-red-100 transition cursor-pointer"
+                rightIcon={<ExternalLink className="w-3 h-3 text-red-500" />}
+                className="px-4 py-2 bg-red-50 text-red-700 border-red-200 hover:bg-red-100 font-semibold text-xs"
               >
                 <span>YouTube Watch</span>
-                <ExternalLink className="w-3 h-3 text-red-500" />
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -188,31 +201,41 @@ export default function PodcastPage() {
             {/* Controls Bar */}
             <div className="flex items-center justify-between pt-2">
               <div className="flex items-center gap-4">
-                <button
+                <Button
+                  type="button"
+                  variant="emerald"
+                  size="icon"
+                  radius="2xl"
                   onClick={() => togglePlay(activeEpisode.id)}
-                  className="w-12 h-12 rounded-2xl bg-[#10b981] hover:bg-[#059669] text-white flex items-center justify-center transition active:scale-95 shadow-lg cursor-pointer"
+                  className="w-12 h-12 shadow-lg active:scale-95 p-0"
+                  aria-label={isPlaying && playingId === activeEpisode.id ? "Pause" : "Play"}
                 >
                   {isPlaying && playingId === activeEpisode.id ? (
                     <Pause className="w-6 h-6" />
                   ) : (
                     <Play className="w-6 h-6 ml-0.5" />
                   )}
-                </button>
+                </Button>
                 <span className="text-xs font-semibold text-gray-300">
                   {isPlaying ? "Playing Now" : "Click to Play Episode"}
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
-                <button
+                <Button
+                  type="button"
+                  variant="soft"
+                  size="icon"
+                  radius="xl"
                   onClick={() => {
                     navigator.clipboard?.writeText(window.location.href);
                     toast.success("Episode link copied!");
                   }}
-                  className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-gray-300 transition cursor-pointer"
+                  className="p-2.5 bg-white/10 hover:bg-white/20 text-gray-300"
+                  aria-label="Share episode"
                 >
                   <Share2 className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -242,16 +265,21 @@ export default function PodcastPage() {
                     </p>
                   </div>
 
-                  <button
+                  <Button
+                    type="button"
+                    variant="brand"
+                    size="icon"
+                    radius="xl"
                     onClick={() => togglePlay(ep.id)}
-                    className="w-10 h-10 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white flex items-center justify-center shrink-0 transition active:scale-95 cursor-pointer"
+                    className="w-10 h-10 shrink-0 active:scale-95 bg-[#327C73] hover:bg-[#28635c] text-white p-0"
+                    aria-label={isPlaying && playingId === ep.id ? "Pause" : "Play"}
                   >
                     {isPlaying && playingId === ep.id ? (
                       <Pause className="w-4 h-4" />
                     ) : (
                       <Play className="w-4 h-4 ml-0.5" />
                     )}
-                  </button>
+                  </Button>
                 </div>
 
                 <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">

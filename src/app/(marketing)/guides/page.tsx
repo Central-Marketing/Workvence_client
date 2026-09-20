@@ -14,6 +14,7 @@ import {
   X,
   Share2
 } from "lucide-react";
+import { Button } from "@/components";
 import toast from "react-hot-toast";
 
 interface Guide {
@@ -121,17 +122,20 @@ export default function GuidesPage() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10">
           <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto scrollbar-none">
             {categories.map((cat) => (
-              <button
+              <Button
                 key={cat}
                 onClick={() => setSelectedCat(cat)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
+                variant={selectedCat === cat ? "brand" : "soft"}
+                size="xs"
+                radius="xl"
+                className={`font-semibold whitespace-nowrap transition cursor-pointer ${
                   selectedCat === cat
-                    ? "bg-[#327C73] text-white shadow-xs"
-                    : "bg-[#f1f5f9] text-gray-600 hover:bg-gray-200"
+                    ? "shadow-xs"
+                    : "hover:bg-gray-200"
                 }`}
               >
                 {cat}
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -201,12 +205,16 @@ export default function GuidesPage() {
       {selectedGuide && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
-            <button
+            <Button
               onClick={() => setSelectedGuide(null)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition cursor-pointer"
+              variant="soft"
+              size="icon"
+              radius="full"
+              className="absolute top-5 right-5 w-8 h-8 text-gray-600 hover:text-black"
+              aria-label="Close modal"
             >
               <X className="w-4 h-4" />
-            </button>
+            </Button>
 
             <div className="space-y-3 mb-6">
               <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-[#10b981]/10 text-[#327C73]">
@@ -223,19 +231,25 @@ export default function GuidesPage() {
             </div>
 
             <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-between">
-              <button
+              <Button
                 onClick={() => toast.success("Downloading Guide Checklist PDF...")}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#327C73] text-white text-xs font-semibold cursor-pointer"
+                variant="brand"
+                size="sm"
+                radius="xl"
+                leftIcon={<Download className="w-3.5 h-3.5" />}
+                className="font-semibold"
               >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download Checklist PDF</span>
-              </button>
-              <button
+                Download Checklist PDF
+              </Button>
+              <Button
                 onClick={() => setSelectedGuide(null)}
-                className="text-xs font-semibold text-gray-500 hover:text-gray-800 cursor-pointer"
+                variant="ghost"
+                size="sm"
+                radius="xl"
+                className="text-xs font-semibold text-gray-500 hover:text-gray-800"
               >
                 Close
-              </button>
+              </Button>
             </div>
           </div>
         </div>

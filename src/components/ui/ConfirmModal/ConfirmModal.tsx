@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { AlertTriangle, HelpCircle, X } from 'lucide-react';
+import { Button } from '../Button';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -64,14 +65,17 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
-        <button
+        <Button
           type="button"
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer"
+          variant="ghost"
+          size="icon"
+          radius="full"
+          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100"
           onClick={onClose}
           disabled={isLoading}
-        >
-          <X size={20} />
-        </button>
+          aria-label="Close"
+          icon={<X size={20} />}
+        />
 
         {/* Icon Header */}
         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border ${iconBg}`}>
@@ -88,22 +92,30 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3 w-full">
-          <button
+          <Button
             type="button"
-            className="flex-1 py-3 px-4 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
+            variant="outline"
+            size="md"
+            radius="xl"
+            className="flex-1 border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50"
             onClick={onClose}
             disabled={isLoading}
           >
             {cancelText}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm shadow-md transition-all disabled:opacity-50 cursor-pointer ${confirmBtn}`}
+            variant={variant === 'danger' ? 'danger' : variant === 'info' ? 'brand' : 'primary'}
+            size="md"
+            radius="xl"
+            className={`flex-1 font-semibold text-sm shadow-md ${confirmBtn}`}
             onClick={onConfirm}
             disabled={isLoading}
+            isLoading={isLoading}
+            loadingText="Processing..."
           >
-            {isLoading ? 'Processing...' : confirmText}
-          </button>
+            {confirmText}
+          </Button>
         </div>
       </div>
     </div>

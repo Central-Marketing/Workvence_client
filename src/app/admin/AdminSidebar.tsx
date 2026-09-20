@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { User } from "@/types";
+import { Button } from "@/components/ui";
 
 const NAV_ITEMS = [
   {
@@ -91,9 +92,17 @@ const AdminSidebar = ({ isOpen, onClose, user, onLogout }: AdminSidebarProps) =>
                 <div className="user-name">{user.username}</div>
                 <div className="user-role">Administrator</div>
               </div>
-              <button className="logout-btn" onClick={onLogout} title="Logout">
+              <Button
+                type="button"
+                variant="ghost"
+                size="xs"
+                className="logout-btn !p-0 !min-h-0 !h-auto"
+                onClick={onLogout}
+                title="Logout"
+                aria-label="Logout"
+              >
                 🚪
-              </button>
+              </Button>
             </div>
           </div>
         )}

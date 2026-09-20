@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { FiCalendar, FiArrowRight } from "react-icons/fi";
+import { Button } from "@/components/ui";
 import { calculateProfileCompletion } from "../utils/dashboardNormalizer";
 
 interface SellerDashboardProps {
@@ -223,45 +224,59 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
               </h2>
 
               <div className="flex items-center gap-3 self-start sm:self-auto flex-wrap">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="icon"
+                  radius="lg"
                   title="Filter by date"
-                  className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors"
-                >
-                  <FiCalendar className="text-sm" />
-                </button>
+                  className="w-9 h-9 border-gray-200 text-gray-500 hover:bg-gray-50"
+                  icon={<FiCalendar className="text-sm" />}
+                />
 
                 <div className="bg-white border border-gray-200/90 rounded-lg p-0.5 flex items-center gap-0.5">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setOrderTypeFilter("all")}
-                    className={`px-5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${orderTypeFilter === "all"
-                      ? "bg-[#0B3A33] text-white shadow-2xs"
-                      : "text-gray-600 hover:text-gray-900"
-                      }`}
+                    variant={orderTypeFilter === "all" ? "brand" : "ghost"}
+                    size="xs"
+                    radius="fiverr"
+                    className={
+                      orderTypeFilter === "all"
+                        ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
+                        : "text-gray-600 hover:text-gray-900"
+                    }
                   >
                     All
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     onClick={() => setOrderTypeFilter("package")}
-                    className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${orderTypeFilter === "package"
-                      ? "bg-[#0B3A33] text-white shadow-2xs"
-                      : "text-gray-600 hover:text-gray-900"
-                      }`}
+                    variant={orderTypeFilter === "package" ? "brand" : "ghost"}
+                    size="xs"
+                    radius="fiverr"
+                    className={
+                      orderTypeFilter === "package"
+                        ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
+                        : "text-gray-600 hover:text-gray-900"
+                    }
                   >
                     Packages
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     onClick={() => setOrderTypeFilter("brief")}
-                    className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${orderTypeFilter === "brief"
-                      ? "bg-[#0B3A33] text-white shadow-2xs"
-                      : "text-gray-600 hover:text-gray-900"
-                      }`}
+                    variant={orderTypeFilter === "brief" ? "brand" : "ghost"}
+                    size="xs"
+                    radius="fiverr"
+                    className={
+                      orderTypeFilter === "brief"
+                        ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
+                        : "text-gray-600 hover:text-gray-900"
+                    }
                   >
                     Briefs
-                  </button>
+                  </Button>
                 </div>
 
                 <Link

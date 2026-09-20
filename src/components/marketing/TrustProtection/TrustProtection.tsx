@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui';
 
 const TrustProtection = () => {
   return (
@@ -47,13 +48,16 @@ const TrustProtection = () => {
               </p>
 
               <div>
-                <Link
+                <Button
                   href="/faq"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-[8px] bg-black text-white font-sf-pro font-[510] text-[14px] sm:text-[15px] md:text-[20px] hover:bg-black/90 hover:shadow-sm active:scale-[0.98] transition-all duration-200 w-fit"
+                  variant="dark"
+                  size="lg"
+                  radius="fiverr"
+                  rightIcon={<ArrowRight size={16} strokeWidth={2} />}
+                  className="w-fit"
                 >
-                  <span>How Escrow Works</span>
-                  <ArrowRight size={16} strokeWidth={2} />
-                </Link>
+                  How Escrow Works
+                </Button>
               </div>
             </div>
 

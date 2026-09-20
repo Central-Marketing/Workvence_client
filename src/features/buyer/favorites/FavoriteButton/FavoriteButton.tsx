@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { axiosFetch } from "@/utils";
 import toast from "react-hot-toast";
+import { Button } from "@/components/ui";
 
 interface FavoriteButtonProps {
   gigId: string;
@@ -64,11 +65,14 @@ const FavoriteButton = ({
   };
 
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="sm"
+      radius="full"
       onClick={handleToggleFavorite}
       disabled={loading}
-      className={`flex items-center justify-center transition-colors outline-none text-red-500 cursor-pointer ${className} ${isFavorited ? "text-red-500" : " hover:text-red-500"
+      className={`!p-0 !min-h-0 !h-auto flex items-center justify-center transition-colors outline-none text-red-500 cursor-pointer ${className} ${isFavorited ? "text-red-500" : " hover:text-red-500"
         }`}
       title={isFavorited ? "Remove from Favorites" : "Add to Favorites"}
     >
@@ -87,7 +91,7 @@ const FavoriteButton = ({
       {showCount && favoriteCount !== undefined && (
         <span className="text-[13.5px] font-semibold text-gray-700 ml-1.5 whitespace-nowrap">{favoriteCount}</span>
       )}
-    </button>
+    </Button>
   );
 };
 

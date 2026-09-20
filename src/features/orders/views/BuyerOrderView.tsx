@@ -21,6 +21,7 @@ import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { RevisionModal } from "@/components";
+import { Button } from "@/components/ui";
 import { NormalizedOrder } from "../types";
 import { OrderTimelineStepper } from "../components/OrderTimelineStepper";
 import { OrderDeliverablesList } from "../components/OrderDeliverablesList";
@@ -337,21 +338,25 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
               </div>
 
               <div className="flex flex-wrap items-center gap-3 shrink-0">
-                <button
+                <Button
                   type="button"
                   onClick={() => setIsRevisionModalOpen(true)}
-                  className="px-5 py-3 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-2xs"
+                  variant="outline"
+                  size="md"
+                  radius="fiverr"
                 >
                   Request Revision
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={handleCompleteOrder}
-                  className="px-6 py-3 rounded-xl bg-[#10B981] hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                  variant="emerald"
+                  size="md"
+                  radius="fiverr"
+                  rightIcon={<FiCheck className="text-base" />}
                 >
-                  <span>Accept &amp; Complete Order</span>
-                  <FiCheck className="text-base" />
-                </button>
+                  Accept &amp; Complete Order
+                </Button>
               </div>
             </div>
           </div>
@@ -373,22 +378,27 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <button
+                <Button
                   type="button"
                   disabled={isRespondingExtension}
                   onClick={handleRejectExtension}
-                  className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 cursor-pointer disabled:opacity-50"
+                  variant="outline"
+                  size="sm"
+                  radius="fiverr"
                 >
                   Reject
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   disabled={isRespondingExtension}
                   onClick={handleApproveExtension}
-                  className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-black cursor-pointer disabled:opacity-50"
+                  isLoading={isRespondingExtension}
+                  variant="dark"
+                  size="sm"
+                  radius="fiverr"
                 >
                   {isRespondingExtension ? "Processing..." : "Approve Extension"}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -432,21 +442,25 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
               {/* Action buttons inside deliverables card if delivered */}
               {isDelivered && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-6 border-t border-slate-100 mt-6">
-                  <button
-                    type="button"
+                  <Button
+                    variant="soft"
+                    size="md"
+                    radius="fiverr"
                     onClick={() => setIsRevisionModalOpen(true)}
-                    className="py-3 px-4 rounded-xl bg-[#F1F3F5] hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-semibold transition-colors cursor-pointer text-center"
+                    className="w-full text-center"
                   >
                     I need modifications (Request Revision)
-                  </button>
-                  <button
-                    type="button"
+                  </Button>
+                  <Button
+                    variant="emerald"
+                    size="md"
+                    radius="fiverr"
                     onClick={handleCompleteOrder}
-                    className="py-3 px-4 rounded-xl bg-[#10B981] hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer"
+                    rightIcon={<FiCheck />}
+                    className="w-full"
                   >
-                    <span>Yes, I approve delivery</span>
-                    <FiCheck />
-                  </button>
+                    Yes, I approve delivery
+                  </Button>
                 </div>
               )}
             </div>
@@ -530,22 +544,25 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                           <span className="text-xs font-semibold text-slate-800">{crit.label}</span>
                           <div className="flex items-center gap-1">
                             {[1, 2, 3, 4, 5].map((starVal) => (
-                              <button
+                              <Button
                                 key={starVal}
                                 type="button"
+                                variant="ghost"
+                                size="xs"
+                                radius="full"
                                 onClick={() =>
                                   setFeedbackData((prev) => ({
                                     ...prev,
                                     [crit.key]: prev[crit.key] === starVal ? 0 : starVal,
                                   }))
                                 }
-                                className={`text-base sm:text-lg transition-transform hover:scale-110 cursor-pointer p-0.5 ${starVal <= feedbackData[crit.key]
-                                  ? "text-amber-400"
-                                  : "text-slate-200 hover:text-amber-200"
+                                className={`!p-0.5 !min-h-0 !h-auto text-base sm:text-lg transition-transform hover:scale-110 cursor-pointer ${starVal <= feedbackData[crit.key]
+                                  ? "!text-amber-400"
+                                  : "!text-slate-200 hover:!text-amber-200"
                                   }`}
                               >
                                 ★
-                              </button>
+                              </Button>
                             ))}
                           </div>
                         </div>
@@ -565,13 +582,17 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                       />
                     </div>
 
-                    <button
+                    <Button
                       type="submit"
                       disabled={submittingReview}
-                      className="w-full py-3 rounded-xl bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-bold transition-all disabled:opacity-50 cursor-pointer shadow-xs"
+                      isLoading={submittingReview}
+                      variant="dark"
+                      size="md"
+                      radius="fiverr"
+                      fullWidth
                     >
                       {submittingReview ? "Submitting Review..." : "Submit Review"}
-                    </button>
+                    </Button>
                   </form>
                 )}
               </div>
@@ -631,13 +652,18 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     />
                   </div>
 
-                  <button
+                  <Button
                     type="submit"
+                    variant="dark"
+                    size="md"
+                    radius="xl"
                     disabled={submittingRequirements}
-                    className="w-full py-3 rounded-xl bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                    isLoading={submittingRequirements}
+                    loadingText="Submitting Requirements..."
+                    className="w-full text-xs sm:text-sm font-semibold"
                   >
-                    {submittingRequirements ? "Submitting Requirements..." : "Send Requirements to Freelancer"}
-                  </button>
+                    Send Requirements to Freelancer
+                  </Button>
                 </form>
               )}
             </div> */}
@@ -697,14 +723,17 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                 </div>
               </div>
 
-              <button
+              <Button
                 type="button"
                 onClick={() => router.push(`/message/${order.seller.id}`)}
-                className="mt-4 w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                variant="dark"
+                size="md"
+                radius="fiverr"
+                fullWidth
+                leftIcon={<FiMessageSquare className="text-base" />}
               >
-                <FiMessageSquare className="text-base" />
-                <span>Message Freelancer</span>
-              </button>
+                Message Freelancer
+              </Button>
             </div>
 
             {/* Order Summary Card */}

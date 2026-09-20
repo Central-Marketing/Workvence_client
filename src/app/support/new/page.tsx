@@ -20,6 +20,7 @@ import {
   FileText,
 } from "lucide-react";
 import { supportService } from "@/utils/supportService";
+import { Button } from "@/components/ui";
 
 const CATEGORIES = [
   { id: "Account & Billing", label: "Account & Billing", icon: UserCheck, desc: "Login issues, profile settings, verification, or invoice questions." },
@@ -180,11 +181,14 @@ export default function CreateSupportTicketPage() {
                 const Icon = cat.icon;
                 const isSelected = category === cat.id;
                 return (
-                  <button
+                  <Button
                     key={cat.id}
                     type="button"
+                    variant="outline"
+                    radius="xl"
+                    fullWidth
                     onClick={() => setCategory(cat.id)}
-                    className={`p-4 rounded-xl text-left transition-all cursor-pointer space-y-2.5 ${
+                    className={`p-4 text-left justify-start flex-col items-start space-y-2.5 transition-all h-auto min-h-0 ${
                       isSelected
                         ? "bg-white border-2 border-[#327C73] shadow-xs ring-2 ring-[#327C73]/10"
                         : "bg-white border border-[#e2e8f0] text-[#1e293b] hover:border-[#327C73]/50 hover:shadow-xs"
@@ -196,10 +200,10 @@ export default function CreateSupportTicketPage() {
                       </div>
                       <span className="text-xs font-bold text-[#0f172a] font-sf-pro">{cat.label}</span>
                     </div>
-                    <p className="text-[12px] text-[#64748b] leading-relaxed line-clamp-2 font-inter">
+                    <p className="text-[12px] text-[#64748b] leading-relaxed line-clamp-2 font-inter font-normal">
                       {cat.desc}
                     </p>
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -276,24 +280,20 @@ export default function CreateSupportTicketPage() {
                   className="hidden"
                 />
                 
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
+                  radius="fiverr"
                   disabled={uploadingFile}
+                  isLoading={uploadingFile}
+                  loadingText="Uploading to Cloudinary..."
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#327C73]/10 text-[#327C73] border border-[#327C73]/30 hover:bg-[#327C73]/20 text-xs font-bold transition cursor-pointer disabled:opacity-50 font-sf-pro"
+                  leftIcon={<Upload className="w-4 h-4" />}
+                  className="bg-[#327C73]/10 text-[#327C73] border-[#327C73]/30 hover:bg-[#327C73]/20 text-xs font-bold font-sf-pro shadow-none"
                 >
-                  {uploadingFile ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Uploading to Cloudinary...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="w-4 h-4" />
-                      <span>Upload File / Image</span>
-                    </>
-                  )}
-                </button>
+                  Upload File / Image
+                </Button>
               </div>
 
               {/* Uploaded File Badges */}
@@ -306,13 +306,16 @@ export default function CreateSupportTicketPage() {
                     >
                       <FileText className="w-3.5 h-3.5" />
                       <span className="truncate max-w-[200px]">{att.name}</span>
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
+                        size="icon"
+                        radius="full"
                         onClick={() => handleRemoveAttachment(idx)}
-                        className="hover:text-rose-600 transition ml-1"
+                        className="hover:text-rose-600 transition ml-1 p-0 w-4 h-4 h-auto min-h-0 border-none shadow-none hover:bg-transparent"
                       >
                         <X className="w-3.5 h-3.5" />
-                      </button>
+                      </Button>
                     </span>
                   ))}
                 </div>
@@ -329,23 +332,19 @@ export default function CreateSupportTicketPage() {
             >
               Cancel
             </Link>
-            <button
+            <Button
               type="submit"
+              variant="brand"
+              size="md"
+              radius="fiverr"
               disabled={submitting || uploadingFile}
-              className="inline-flex items-center gap-2 px-7 py-3 rounded-lg bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-sm transition active:scale-95 disabled:opacity-50 cursor-pointer font-sf-pro"
+              isLoading={submitting}
+              loadingText="Submitting Ticket..."
+              leftIcon={<Send className="w-4 h-4" />}
+              className="px-7 py-3 text-xs font-semibold shadow-sm font-sf-pro"
             >
-              {submitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Submitting Ticket...</span>
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4" />
-                  <span>Submit Ticket</span>
-                </>
-              )}
-            </button>
+              Submit Ticket
+            </Button>
           </div>
 
         </form>

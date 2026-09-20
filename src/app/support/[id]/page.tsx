@@ -24,6 +24,7 @@ import {
 import { supportService, SupportTicketItem } from "@/utils/supportService";
 import { useSupportSocket, SocketSupportMessage } from "@/hooks/useSupportSocket";
 import { useUserStore } from "@/store/userStore";
+import { Button } from "@/components/ui";
 
 function AttachmentDisplayItem({ att, ticketId }: { att: any; ticketId: string }) {
   const [resolvedUrl, setResolvedUrl] = useState<string>(att.url || att.secure_url || "");
@@ -328,12 +329,15 @@ export default function TicketDetailsPage() {
             >
               Back to Dashboard
             </Link>
-            <button
+            <Button
               onClick={fetchTicketDetails}
-              className="px-5 py-2.5 rounded-lg bg-[#327C73] text-white font-semibold text-xs hover:bg-[#28635c] transition cursor-pointer font-sf-pro"
+              variant="brand"
+              size="sm"
+              radius="fiverr"
+              className="px-5 py-2.5 font-semibold text-xs font-sf-pro"
             >
               Retry
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -380,13 +384,16 @@ export default function TicketDetailsPage() {
               </h1>
             </div>
 
-            <button
+            <Button
               onClick={fetchTicketDetails}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#f1f5f9] text-[#334155] hover:bg-[#e2e8f0] text-xs font-semibold transition cursor-pointer self-start md:self-auto font-sf-pro"
+              variant="soft"
+              size="sm"
+              radius="fiverr"
+              leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+              className="px-3.5 py-2 text-xs font-semibold self-start md:self-auto font-sf-pro"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>Refresh</span>
-            </button>
+              Refresh
+            </Button>
           </div>
 
           {/* Linked Order Banner */}
@@ -505,13 +512,16 @@ export default function TicketDetailsPage() {
                   >
                     <FileText className="w-3.5 h-3.5" />
                     <span>{att.name}</span>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
+                      radius="full"
                       onClick={() => setAttachments((prev) => prev.filter((_, i) => i !== idx))}
-                      className="hover:text-rose-600"
+                      className="hover:text-rose-600 p-0 w-4 h-4 h-auto min-h-0 border-none shadow-none hover:bg-transparent"
                     >
                       ×
-                    </button>
+                    </Button>
                   </span>
                 ))}
               </div>
@@ -553,24 +563,20 @@ export default function TicketDetailsPage() {
                     className="hidden"
                   />
 
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
+                    size="xs"
+                    radius="fiverr"
                     disabled={uploadingFile}
+                    isLoading={uploadingFile}
+                    loadingText="Uploading..."
                     onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#e2e8f0] hover:border-[#327C73]/40 text-[#475569] hover:text-[#327C73] text-xs font-semibold shadow-2xs transition active:scale-95 cursor-pointer disabled:opacity-50 font-sf-pro"
+                    leftIcon={<Upload className="w-3.5 h-3.5 text-[#327C73]" />}
+                    className="bg-white border-[#e2e8f0] hover:border-[#327C73]/40 text-[#475569] hover:text-[#327C73] text-xs font-semibold font-sf-pro shadow-2xs"
                   >
-                    {uploadingFile ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-[#327C73]" />
-                        <span>Uploading...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-3.5 h-3.5 text-[#327C73]" />
-                        <span>Upload File</span>
-                      </>
-                    )}
-                  </button>
+                    Upload File
+                  </Button>
 
                   <span className="text-[11px] text-[#94a3b8] hidden md:inline">
                     Press Ctrl + Enter to send
@@ -578,23 +584,19 @@ export default function TicketDetailsPage() {
                 </div>
 
                 {/* Right: Send Button */}
-                <button
+                <Button
                   type="submit"
+                  variant="brand"
+                  size="sm"
+                  radius="xl"
                   disabled={sending || uploadingFile || !replyText.trim()}
-                  className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2 sm:py-2.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer font-sf-pro shrink-0"
+                  isLoading={sending}
+                  loadingText="Sending..."
+                  rightIcon={<Send className="w-3.5 h-3.5" />}
+                  className="px-5 sm:px-6 py-2 sm:py-2.5 text-xs font-semibold shadow-xs font-sf-pro shrink-0"
                 >
-                  {sending ? (
-                    <>
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Sending...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Send Reply</span>
-                      <Send className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </button>
+                  Send Reply
+                </Button>
               </div>
             </form>
           </div>

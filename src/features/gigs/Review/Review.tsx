@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import moment from 'moment';
 import { getCountryFlag } from '@/utils';
+import { Button } from "@/components/ui";
 
 export interface ReviewUser {
   _id?: string;
@@ -113,13 +114,15 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
         <p className="text-gray-600 text-[14px] leading-relaxed mb-3 font-normal">
           {displayDesc}
           {isLong && (
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="xs"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-brand-green hover:text-brand-green font-bold ml-1.5 transition-colors cursor-pointer inline-block"
+              className="!text-brand-green hover:!text-brand-green font-bold ml-1.5 transition-colors cursor-pointer !p-0 !min-h-0 !h-auto inline-flex"
             >
               {isExpanded ? "See less" : "See more"}
-            </button>
+            </Button>
           )}
         </p>
 

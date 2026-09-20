@@ -6,4 +6,7 @@ export { default as PrevArrow } from './Arrows/PrevArrow';
 export { default as NextArrow } from './Arrows/NextArrow';
 export { default as AiGradientButton, AiGradientButton as GradientButton } from './AiGradientButton/AiGradientButton';
 export type { AiGradientButtonProps } from './AiGradientButton/AiGradientButton';
+export { Button, default as ButtonComponent } from './Button';
+export type { ButtonProps, ButtonVariant, ButtonSize, ButtonRadius } from './Button';
 export * from './Skeletons';
+

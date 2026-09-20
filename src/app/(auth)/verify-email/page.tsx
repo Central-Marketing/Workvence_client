@@ -7,6 +7,7 @@ import Image from 'next/image';
 import toast from 'react-hot-toast';
 import { axiosFetch } from '@/utils';
 import { useUserStore } from '@/store/userStore';
+import { Button } from '@/components/ui';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 
 const VerifyEmailContent = () => {
@@ -168,14 +169,17 @@ const VerifyEmailContent = () => {
         {/* Center Content */}
         <div className="flex flex-col my-auto w-full max-w-[420px] mx-auto py-8">
           <div className="w-full mb-5">
-            <button
+            <Button
               data-testid="back-to-register-btn"
               type="button"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#f3f4f6] text-[#374151] rounded-lg text-xs font-semibold hover:bg-gray-200 transition-colors cursor-pointer border-none"
+              variant="soft"
+              size="xs"
+              radius="fiverr"
               onClick={() => router.push('/register')}
+              className="font-semibold text-[#374151]"
             >
               ← Back
-            </button>
+            </Button>
           </div>
 
           <form data-testid="otp-form" onSubmit={handleOtpSubmit} className="flex flex-col items-start w-full">
@@ -210,35 +214,33 @@ const VerifyEmailContent = () => {
                     Retry in <strong className="font-bold">{resendTimer}</strong> seconds
                   </span>
                 ) : (
-                  <button
+                  <Button
                     data-testid="resend-otp-btn"
                     type="button"
+                    variant="ghost"
+                    size="xs"
                     onClick={handleResendOtp}
-                    className="font-bold text-gray-900 hover:text-emerald-600 transition-colors cursor-pointer bg-transparent border-none p-0 inline"
+                    className="font-bold text-gray-900 hover:text-emerald-600 !p-0 !min-h-0 !h-auto inline-flex hover:!bg-transparent text-sm"
                   >
                     Retry
-                  </button>
+                  </Button>
                 )}
               </div>
 
-              <button
+              <Button
                 data-testid="verify-email-btn"
                 type="submit"
+                variant="emerald"
+                size="lg"
+                fullWidth
+                radius="fiverr"
                 disabled={loading || otp.join('').length < 6}
-                className={`w-full flex items-center justify-center gap-2 py-3.5 border-none rounded-xl text-sm font-semibold transition-all shadow-sm ${loading || otp.join('').length < 6
-                  ? 'bg-[#DADADA] text-[#6E6E6E] cursor-not-allowed'
-                  : 'bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer'
-                  }`}
+                isLoading={loading}
+                rightIcon={<AiOutlineArrowRight className="text-base" />}
+                className="font-semibold shadow-sm"
               >
-                {loading ? (
-                  'Verifying...'
-                ) : (
-                  <>
-                    <span>Submit</span>
-                    <AiOutlineArrowRight className="text-base" />
-                  </>
-                )}
-              </button>
+                Submit
+              </Button>
             </div>
           </form>
         </div>

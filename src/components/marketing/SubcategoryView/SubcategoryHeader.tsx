@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FiHome, FiCheck } from "react-icons/fi";
 import { SubcategoryItem } from "@/data/categoryTaxonomy";
+import { Button } from "@/components/ui";
 
 export interface BreadcrumbCrumb {
   name: string;
@@ -48,14 +49,16 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
     <div className="w-full mb-6">
       {/* Breadcrumb Navigation */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] text-gray-500 mb-3 flex-wrap">
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="xs"
           onClick={onSelectCategory}
-          className="text-teal-600 hover:text-teal-700 transition-colors flex items-center cursor-pointer"
+          className="text-teal-600 hover:text-teal-700 transition-colors p-0 h-auto hover:bg-transparent"
           title="All services"
         >
           <FiHome className="w-4 h-4" />
-        </button>
+        </Button>
 
         {breadcrumbTrail && breadcrumbTrail.length > 0 ? (
           breadcrumbTrail.map((crumb, idx) => {
@@ -68,13 +71,15 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
                     {crumb.name}
                   </span>
                 ) : (
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="xs"
                     onClick={() => (onNavigateBreadcrumb ? onNavigateBreadcrumb(crumb) : onSelectCategory())}
-                    className="text-gray-600 hover:text-gray-900 hover:underline transition-colors font-normal cursor-pointer"
+                    className="text-gray-600 hover:text-gray-900 hover:underline transition-colors font-normal p-0 h-auto hover:bg-transparent"
                   >
                     {crumb.name}
-                  </button>
+                  </Button>
                 )}
               </React.Fragment>
             );
@@ -82,13 +87,15 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
         ) : (
           <>
             <span className="text-gray-300">/</span>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="xs"
               onClick={onSelectCategory}
-              className="text-gray-600 hover:text-gray-900 transition-colors font-normal cursor-pointer"
+              className="text-gray-600 hover:text-gray-900 transition-colors font-normal p-0 h-auto hover:bg-transparent"
             >
               {categoryName.replace(" & Design", "") || categoryName}
-            </button>
+            </Button>
             <span className="text-gray-300">/</span>
             <span className="text-gray-500 font-normal truncate">
               {activeSubcategory.title}
@@ -105,11 +112,14 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
           </h1>
 
           {/* Circular Down Chevron Button */}
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
+            radius="full"
             onClick={() => setDropdownOpen((prev) => !prev)}
             aria-label="Switch Subcategory"
-            className="w-7 h-7 sm:w-8 sm:h-8 aspect-square rounded-[60px] border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-50,#FFF)] hover:bg-gray-50 flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95 shrink-0"
+            className="w-7 h-7 sm:w-8 sm:h-8 aspect-square border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-50,#FFF)] hover:bg-gray-50 shadow-xs active:scale-95 shrink-0 p-0"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +139,7 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
                 strokeLinejoin="round"
               />
             </svg>
-          </button>
+          </Button>
         </div>
 
         {/* Subcategories Dropdown Menu */}
@@ -144,22 +154,26 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
               {subcategories.map((subcat) => {
                 const isSelected = subcat.id === activeSubcategory.id;
                 return (
-                  <button
+                  <Button
                     key={subcat.id}
                     type="button"
+                    variant="ghost"
+                    size="sm"
+                    radius="none"
+                    fullWidth
                     onClick={() => {
                       onSelectSubcategory(subcat);
                       setDropdownOpen(false);
                     }}
-                    className={`w-full text-left px-3.5 py-2.5 text-sm flex items-center justify-between transition-colors cursor-pointer ${
+                    rightIcon={isSelected ? <FiCheck className="w-4 h-4 text-teal-600 shrink-0 ml-2" /> : undefined}
+                    className={`w-full text-left justify-between px-3.5 py-2.5 text-sm transition-colors border-none shadow-none h-auto min-h-0 ${
                       isSelected
-                        ? "bg-teal-50/70 text-teal-800 font-semibold"
+                        ? "bg-teal-50/70 text-teal-800 font-semibold hover:bg-teal-50"
                         : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
                     <span className="truncate">{subcat.title}</span>
-                    {isSelected && <FiCheck className="w-4 h-4 text-teal-600 shrink-0 ml-2" />}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

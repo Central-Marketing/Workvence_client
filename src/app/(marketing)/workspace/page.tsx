@@ -16,6 +16,7 @@ import {
   FolderOpen
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { Button } from "@/components";
 
 const workspaceTabs = [
   {
@@ -131,18 +132,19 @@ export default function WorkspacePage() {
             {workspaceTabs.map((tab) => {
               const Icon = tab.icon;
               return (
-                <button
+                <Button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-xs font-semibold whitespace-nowrap transition cursor-pointer ${
-                    activeTab === tab.id
-                      ? "bg-[#327C73] text-white shadow-md"
-                      : "bg-[#f1f5f9] text-gray-600 hover:bg-gray-200"
+                  variant={activeTab === tab.id ? "brand" : "soft"}
+                  size="md"
+                  radius="2xl"
+                  leftIcon={<Icon className="w-4 h-4" />}
+                  className={`px-6 py-3 text-xs font-semibold whitespace-nowrap ${
+                    activeTab === tab.id ? "shadow-md" : ""
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
-                  <span>{tab.name}</span>
-                </button>
+                  {tab.name}
+                </Button>
               );
             })}
           </div>

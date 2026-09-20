@@ -15,6 +15,7 @@ export { default as PrevArrow } from "./ui/Arrows/PrevArrow";
 export { default as NextArrow } from "./ui/Arrows/NextArrow";
 export { default as AiGradientButton, GradientButton } from "./ui/AiGradientButton/AiGradientButton";
 export type { AiGradientButtonProps } from "./ui/AiGradientButton/AiGradientButton";
+export { Button } from "./ui/Button";
 export * from "./ui/Skeletons";
 
 // Marketing components

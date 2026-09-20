@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { axiosFetch, getAvatarUrl } from "@/utils";
-import { PackageCard, Loader, FavoriteSellerButton } from "@/components";
+import { PackageCard, Loader, FavoriteSellerButton, Button } from "@/components";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -155,12 +155,15 @@ const FavoritesPage = () => {
         <p className="text-gray-500 text-center mb-6 max-w-md">
           Only buyers have access to the Favorites list. Please switch to a buyer account to manage saved services and sellers.
         </p>
-        <button
+        <Button
+          variant="brand"
+          size="md"
+          radius="xl"
           onClick={() => router.push("/")}
-          className="px-6 py-2.5 bg-brand-green hover:bg-brand-green text-white font-semibold rounded-xl transition-all shadow-sm cursor-pointer"
+          className="px-6 py-2.5 font-semibold shadow-sm"
         >
           Return to Home
-        </button>
+        </Button>
       </div>
     );
   }
@@ -193,33 +196,41 @@ const FavoritesPage = () => {
 
         {/* Tab Switcher */}
         <div className="flex items-center gap-3 border-b border-gray-200 mb-8 pb-3">
-          <button
+          <Button
+            type="button"
             onClick={() => setActiveTab("gigs")}
-            className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all cursor-pointer flex items-center gap-2 ${activeTab === "gigs"
-                ? "bg-gray-900 text-white shadow-sm"
-                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-              }`}
+            variant={activeTab === "gigs" ? "dark" : "outline"}
+            size="sm"
+            radius="fiverr"
+            className="flex items-center gap-2"
           >
             <span>Saved Services</span>
-            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${activeTab === "gigs" ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
-              }`}>
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full font-bold ml-1.5 ${
+                activeTab === "gigs" ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
+              }`}
+            >
               {favoriteGigs.length}
             </span>
-          </button>
+          </Button>
 
-          <button
+          <Button
+            type="button"
             onClick={() => setActiveTab("sellers")}
-            className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all cursor-pointer flex items-center gap-2 ${activeTab === "sellers"
-                ? "bg-gray-900 text-white shadow-sm"
-                : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
-              }`}
+            variant={activeTab === "sellers" ? "dark" : "outline"}
+            size="sm"
+            radius="fiverr"
+            className="flex items-center gap-2"
           >
             <span>Favorite Sellers</span>
-            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${activeTab === "sellers" ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
-              }`}>
+            <span
+              className={`text-xs px-2 py-0.5 rounded-full font-bold ml-1.5 ${
+                activeTab === "sellers" ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
+              }`}
+            >
               {favoriteSellers.length}
             </span>
-          </button>
+          </Button>
         </div>
 
         {/* Tab 1: Saved Gigs */}
@@ -234,11 +245,14 @@ const FavoritesPage = () => {
                 <p className="text-gray-500 mb-8 max-w-md text-sm">
                   You haven't saved any services to your favorites yet. Explore the marketplace to bookmark top offerings!
                 </p>
-                <Link href="/packages?category=ai-services">
-                  <button className="px-8 py-3 bg-black hover:bg-gray-900 text-white font-semibold rounded-xl transition-all shadow-sm cursor-pointer">
-                    Browse Marketplace
-                  </button>
-                </Link>
+                <Button
+                  href="/packages?category=ai-services"
+                  variant="dark"
+                  size="md"
+                  radius="fiverr"
+                >
+                  Browse Marketplace
+                </Button>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -262,11 +276,14 @@ const FavoritesPage = () => {
                 <p className="text-gray-500 mb-8 max-w-md text-sm">
                   You haven't added any freelancers to your favorite sellers list. Visit seller profiles and click the heart icon to save them here!
                 </p>
-                <Link href="/packages?category=ai-services">
-                  <button className="px-8 py-3 bg-black hover:bg-gray-900 text-white font-semibold rounded-xl transition-all shadow-sm cursor-pointer">
-                    Explore Freelancers
-                  </button>
-                </Link>
+                <Button
+                  href="/packages?category=ai-services"
+                  variant="dark"
+                  size="md"
+                  radius="fiverr"
+                >
+                  Explore Freelancers
+                </Button>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -316,18 +333,26 @@ const FavoritesPage = () => {
 
                       {/* Action buttons */}
                       <div className="w-full grid grid-cols-2 gap-2 mt-6 pt-4 border-t border-gray-100">
-                        <button
+                        <Button
+                          type="button"
                           onClick={() => router.push(`/seller/${username}`)}
-                          className="w-full px-3 py-2 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors cursor-pointer"
+                          variant="soft"
+                          size="sm"
+                          radius="fiverr"
+                          fullWidth
                         >
                           View Profile
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          type="button"
                           onClick={() => handleContactSeller(seller)}
-                          className="w-full px-3 py-2 text-xs font-semibold text-white bg-[#0D6D5F] hover:bg-[#0b5c50] rounded-xl transition-colors shadow-2xs cursor-pointer"
+                          variant="brand"
+                          size="sm"
+                          radius="fiverr"
+                          fullWidth
                         >
                           Chat Now
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   );

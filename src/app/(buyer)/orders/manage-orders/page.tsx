@@ -16,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { ManageOrderItem } from "@/features/dashboard/data/mockBuyerDashboard";
-import { Loader } from "@/components";
+import { Loader, Button } from "@/components";
 
 export default function BuyerManageOrdersPage() {
   const router = useRouter();
@@ -268,28 +268,36 @@ export default function BuyerManageOrdersPage() {
             {/* Pill Tabs */}
             <div className="bg-white border border-slate-200 rounded-xl p-1 flex items-center gap-1 overflow-x-auto scrollbar-none">
               {(["Priority", "Active", "Late", "Delivered", "Completed", "Cancelled", "Starred"] as const).map((tab) => (
-                <button
+                <Button
                   key={tab}
+                  type="button"
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${activeTab === tab
-                    ? "bg-[#0D3B34] text-white shadow-xs"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                    }`}
+                  variant={activeTab === tab ? "brand" : "ghost"}
+                  size="sm"
+                  radius="fiverr"
+                  className={`whitespace-nowrap ${
+                    activeTab === tab
+                      ? "bg-[#0D3B34] hover:bg-[#0D3B34] text-white shadow-xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  }`}
                 >
                   {tab}
-                </button>
+                </Button>
               ))}
             </div>
 
             {/* Right Tools: Calendar button + Search box */}
             <div className="flex items-center gap-3">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="icon"
+                radius="xl"
                 aria-label="Calendar view"
-                className="w-10 h-10 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-600 transition-colors shadow-xs cursor-pointer shrink-0"
+                className="w-10 h-10 text-slate-600 shadow-xs shrink-0"
               >
                 <FiCalendar className="text-base" />
-              </button>
+              </Button>
 
               <div className="relative flex items-center w-full sm:w-64">
                 <RiSearchLine className="absolute left-3.5 text-slate-400 text-sm pointer-events-none" />
@@ -380,17 +388,20 @@ export default function BuyerManageOrdersPage() {
                               </div>
 
                               {order.notes && (
-                                <button
+                                <Button
                                   type="button"
+                                  variant="outline"
+                                  size="icon"
+                                  radius="lg"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setActiveNotesOrder(order);
                                   }}
-                                  className="shrink-0 p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+                                  className="shrink-0 p-1.5 w-8 h-8 text-slate-500 hover:text-slate-800 border-slate-200"
                                   title="View requirement notes"
                                 >
                                   <FiFileText className="text-sm" />
-                                </button>
+                                </Button>
                               )}
                             </div>
                           </td>
@@ -431,13 +442,16 @@ export default function BuyerManageOrdersPage() {
                 <FiFileText className="text-teal-600" />
                 Order Requirements & Notes
               </h3>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
+                radius="full"
                 onClick={() => setActiveNotesOrder(null)}
-                className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors"
+                className="w-8 h-8 text-slate-400 hover:text-slate-700 border-none shadow-none"
               >
                 <FiX className="text-lg" />
-              </button>
+              </Button>
             </div>
 
             <div className="space-y-3">
@@ -460,13 +474,15 @@ export default function BuyerManageOrdersPage() {
             </div>
 
             <div className="mt-6 flex justify-end">
-              <button
+              <Button
                 type="button"
                 onClick={() => setActiveNotesOrder(null)}
-                className="px-5 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors cursor-pointer"
+                variant="dark"
+                size="sm"
+                radius="fiverr"
               >
                 Close
-              </button>
+              </Button>
             </div>
           </div>
         </div>

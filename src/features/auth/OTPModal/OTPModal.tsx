@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Mail, RefreshCw, X } from 'lucide-react';
+import { Button } from '@/components/ui';
 
 interface OTPModalProps {
   isOpen: boolean;
@@ -47,14 +48,17 @@ const OTPModal: React.FC<OTPModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
-        <button
+        <Button
           type="button"
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer"
+          variant="ghost"
+          size="icon"
+          radius="full"
+          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100"
           onClick={onClose}
           disabled={isLoading}
-        >
-          <X size={20} />
-        </button>
+          aria-label="Close"
+          icon={<X size={20} />}
+        />
 
         {/* Mail Icon */}
         <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 border border-emerald-100">
@@ -89,25 +93,32 @@ const OTPModal: React.FC<OTPModalProps> = ({
             )}
           </div>
 
-          <button
+          <Button
             type="submit"
+            variant="brand"
+            size="lg"
+            fullWidth
+            radius="fiverr"
             disabled={isLoading || otp.length !== 6}
-            className="w-full py-3.5 px-4 rounded-xl bg-brand-green font-semibold text-white shadow-md shadow-emerald-500/20 hover:bg-[#059669] transition-all disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none cursor-pointer"
+            isLoading={isLoading}
+            className="shadow-md shadow-emerald-500/20"
           >
-            {isLoading ? 'Verifying Code...' : 'Verify OTP'}
-          </button>
+            Verify OTP
+          </Button>
 
           <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
             <span>Didn&apos;t receive the code?</span>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="xs"
               onClick={onResend}
               disabled={isResending || isLoading}
-              className="text-brand-green font-semibold hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
+              leftIcon={<RefreshCw size={12} className={isResending ? 'animate-spin' : ''} />}
+              className="text-brand-green font-semibold hover:underline p-0 hover:bg-transparent h-auto"
             >
-              <RefreshCw size={12} className={isResending ? 'animate-spin' : ''} />
               {isResending ? 'Resending...' : 'Resend Code'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

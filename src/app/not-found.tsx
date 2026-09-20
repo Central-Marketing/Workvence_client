@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui";
 
 const NotFound = () => {
   useEffect(() => {
@@ -44,14 +45,17 @@ const NotFound = () => {
           </p>
 
           <div className="flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 macbook:gap-5">
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="lg"
+              radius="full"
               onClick={() => window.history.back()}
-              className="inline-flex items-center justify-center gap-2 sm:gap-2.5 macbook:gap-3 px-4 sm:px-5 md:px-6 macbook:px-7 2xl:px-8 py-2.5 sm:py-3 md:py-3.5 macbook:py-4 bg-white/10 hover:bg-white/20 text-white border border-white/25 hover:border-white/45 rounded-full text-[13px] sm:text-[14px] md:text-[15px] macbook:text-base 2xl:text-[17px] font-semibold transition-all duration-200 backdrop-blur-md hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 sm:gap-2.5 macbook:gap-3 px-4 sm:px-5 md:px-6 macbook:px-7 2xl:px-8 py-2.5 sm:py-3 md:py-3.5 macbook:py-4 !bg-white/10 hover:!bg-white/20 text-white !border-white/25 hover:!border-white/45 text-[13px] sm:text-[14px] md:text-[15px] macbook:text-base 2xl:text-[17px] font-semibold transition-all duration-200 backdrop-blur-md hover:-translate-y-0.5 active:translate-y-0"
+              leftIcon={<ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 macbook:w-[18px] macbook:h-[18px] 2xl:w-5 2xl:h-5 shrink-0" />}
             >
-              <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 macbook:w-[18px] macbook:h-[18px] 2xl:w-5 2xl:h-5 shrink-0" />
               <span>Go Back</span>
-            </button>
+            </Button>
 
             <Link
               href="/"

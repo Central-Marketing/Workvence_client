@@ -5,6 +5,7 @@ import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { axiosFetch, generateImageURL } from '@/utils';
+import { Button } from '@/components/ui';
 import { FcGoogle } from 'react-icons/fc';
 import { MdOutlineEmail } from 'react-icons/md';
 import { AiOutlineEye, AiOutlineEyeInvisible, AiOutlineCheckCircle, AiOutlineArrowRight } from 'react-icons/ai';
@@ -264,29 +265,36 @@ const RegisterContent = () => {
                 <span>Continue with Google</span>
               </button> */}
 
-              <button
+              <Button
                 data-testid="continue-email-btn"
                 type="button"
+                variant="outline"
+                size="lg"
+                fullWidth
+                radius="fiverr"
+                leftIcon={<MdOutlineEmail className="text-[20px] text-[#374151]" />}
                 onClick={() => setStep(2)}
-                className="flex items-center justify-center gap-3 w-full py-3.5 px-4 rounded-xl text-[14px] font-medium text-[#1f2937] bg-white border border-[#e5e7eb] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80 transition-all cursor-pointer"
+                className="font-medium text-[#1f2937] shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
               >
-                <MdOutlineEmail className="text-[20px] text-[#374151]" />
-                <span>Continue with Email</span>
-              </button>
+                Continue with Email
+              </Button>
             </div>
           </div>
         ) : (
           /* Step 2: Account Details */
           <div className="flex flex-col my-auto w-full max-w-[420px] mx-auto py-8">
             <div className="w-full mb-4">
-              <button
+              <Button
                 data-testid="back-to-step1-btn"
                 type="button"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#f3f4f6] text-[#374151] rounded-lg text-xs font-semibold hover:bg-gray-200 transition-colors cursor-pointer border-none"
+                variant="soft"
+                size="xs"
+                radius="fiverr"
                 onClick={() => setStep(1)}
+                className="font-semibold text-[#374151]"
               >
                 ← Back
-              </button>
+              </Button>
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col items-start w-full">
@@ -368,13 +376,16 @@ const RegisterContent = () => {
                       onChange={handleChange}
                       className="w-full py-3 px-3.5 pr-11 border border-gray-200 rounded-xl text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500"
                     />
-                    <button
+                    <Button
                       type="button"
-                      className="absolute right-3.5 bg-transparent border-none text-[#888] text-xl cursor-pointer flex items-center justify-center p-0 hover:text-[#555]"
+                      variant="ghost"
+                      size="icon"
+                      radius="full"
                       onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                    </button>
+                      className="absolute right-3.5 text-[#888] hover:text-[#555] hover:!bg-transparent !p-0 !min-h-0 !h-auto w-auto"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      icon={showPassword ? <AiOutlineEyeInvisible className="text-xl" /> : <AiOutlineEye className="text-xl" />}
+                    />
                   </div>
                 </div>
 
@@ -412,13 +423,16 @@ const RegisterContent = () => {
                           : 'border-gray-200 focus:border-emerald-500'
                         }`}
                     />
-                    <button
+                    <Button
                       type="button"
-                      className="absolute right-3.5 bg-transparent border-none text-[#888] text-xl cursor-pointer flex items-center justify-center p-0 hover:text-[#555]"
+                      variant="ghost"
+                      size="icon"
+                      radius="full"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                    </button>
+                      className="absolute right-3.5 text-[#888] hover:text-[#555] hover:!bg-transparent !p-0 !min-h-0 !h-auto w-auto"
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                      icon={showConfirmPassword ? <AiOutlineEyeInvisible className="text-xl" /> : <AiOutlineEye className="text-xl" />}
+                    />
                   </div>
                   {formInput.confirmPassword && formInput.password !== formInput.confirmPassword && (
                     <p className="text-xs font-medium mt-0.5 text-red-500">
@@ -454,24 +468,20 @@ const RegisterContent = () => {
                   </label>
                 </div>
 
-                <button
+                <Button
                   data-testid="signup-submit-btn"
                   type="submit"
-                  className={`mt-2 w-full flex items-center justify-center gap-2 py-3.5 border-none rounded-xl text-sm font-semibold transition-all shadow-sm ${isFormDisabled
-                    ? 'bg-[#DADADA] text-[#6E6E6E] cursor-not-allowed'
-                    : 'bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer'
-                    }`}
+                  variant="emerald"
+                  size="lg"
+                  fullWidth
+                  radius="fiverr"
                   disabled={isFormDisabled}
+                  isLoading={loading}
+                  rightIcon={<AiOutlineArrowRight className="text-base" />}
+                  className="mt-2 font-semibold shadow-sm"
                 >
-                  {loading ? (
-                    'Loading...'
-                  ) : (
-                    <>
-                      <span>Get Started</span>
-                      <AiOutlineArrowRight className="text-base" />
-                    </>
-                  )}
-                </button>
+                  Get Started
+                </Button>
               </div>
             </form>
           </div>

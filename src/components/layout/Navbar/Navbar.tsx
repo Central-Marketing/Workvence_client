@@ -11,7 +11,7 @@ import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
 import toast from 'react-hot-toast';
 import { axiosFetch, socket, handleAuthExpired, isAccessTokenExpiringSoon, refreshAccessToken, getCookie } from '@/utils';
 import { useUserStore } from "@/store/userStore";
-import { Loader, NotificationBell, HeaderInboxIcon, AiGradientButton } from '@/components';
+import { Loader, NotificationBell, HeaderInboxIcon, AiGradientButton, Button } from '@/components';
 import CategoryBar from "../CategoryBar/CategoryBar";
 
 const Navbar = () => {
@@ -223,14 +223,25 @@ const Navbar = () => {
               <div className="flex items-center gap-1 font-sf-pro font-[510] text-[16px] leading-normal">
                 {/* Explore Category Dropdown without extra icons */}
                 <div className="relative category-dropdown-container">
-                  <button
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="md"
+                    radius="lg"
                     onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                    className={`flex items-center gap-1.5 cursor-pointer px-4 py-[10px] rounded-lg font-sf-pro font-[510] text-[16px] leading-normal transition-colors ${isCategoryDropdownOpen ? "text-[#327C73]" : "text-black hover:text-[#327C73]"
-                      }`}
+                    className={`flex items-center gap-1.5 px-4 py-[10px] font-sf-pro font-[510] text-[16px] leading-normal ${
+                      isCategoryDropdownOpen ? "!text-[#327C73]" : "text-black hover:!text-[#327C73]"
+                    }`}
+                    rightIcon={
+                      <FiChevronDown
+                        className={`text-base text-[#327C73] transition-transform duration-200 ${
+                          isCategoryDropdownOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    }
                   >
                     <span>Explore Category</span>
-                    <FiChevronDown className={`text-base text-[#327C73] transition-transform duration-200 ${isCategoryDropdownOpen ? "rotate-180" : ""}`} />
-                  </button>
+                  </Button>
 
                   {isCategoryDropdownOpen && (
                     <div className="absolute left-0 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl py-2 flex flex-col z-[60] text-[14px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
@@ -285,20 +296,26 @@ const Navbar = () => {
 
               {/* Auth Buttons Group */}
               <div className="flex items-center gap-[10px]">
-                <Link
+                <Button
                   href="/login"
-                  className="px-6 py-3 rounded-xl bg-[#F1F3F5] hover:bg-[#E5E7EB] text-[#292929] font-sf-pro font-[510] text-[20px] leading-none transition-colors"
+                  variant="soft"
+                  size="md"
+                  radius="fiverr"
+                  className="bg-[#EDEDED] hover:bg-[#E0E0E0] h-[40px] text-[16px] px-5 font-sf-pro font-semibold text-[#292929]"
                 >
                   Sign in
-                </Link>
+                </Button>
 
-                <Link
+                <Button
                   href="/register"
-                  className="px-6 py-3 rounded-xl bg-[#0B0F19] hover:bg-black text-[#E8F5F5] font-sf-pro font-[510] text-[20px] leading-none transition-colors flex items-center gap-1.5 shadow-sm"
+                  variant="dark"
+                  size="md"
+                  radius="fiverr"
+                  rightIcon={<FiArrowRight className="text-[16px]" />}
+                  className="h-[40px] text-[16px] px-5 font-sf-pro font-semibold bg-[#0B0F19] hover:bg-black text-[#E8F5F5] shadow-sm"
                 >
-                  <span>Join Now</span>
-                  <FiArrowRight className="text-[18px]" />
-                </Link>
+                  Join Now
+                </Button>
               </div>
             </>
           ) : isBuyer ? (
@@ -487,9 +504,16 @@ const Navbar = () => {
               />
             </div>
           )}
-          <button onClick={() => setIsMobileMenuOpen(true)} className="text-2xl text-gray-700 focus:outline-none hover:text-brand-green transition-colors ml-1 p-1 rounded-lg shrink-0" aria-label="Open menu">
-            <FiMenu width={24} height={24} />
-          </button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            radius="lg"
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="text-2xl text-gray-700 hover:text-brand-green ml-1 p-1 shrink-0"
+            aria-label="Open menu"
+            icon={<FiMenu width={24} height={24} />}
+          />
         </div>
       </div>
 
@@ -503,22 +527,38 @@ const Navbar = () => {
       <div className={`fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] shadow-2xl transform transition-transform duration-300 ease-in-out lg:hidden flex flex-col ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <Image src="/Workvence-logo-Horizontal3.png" width={140} height={32} alt="Workvence" className="h-8 w-auto object-contain" style={{ width: "auto", height: "auto" }} />
-          <button onClick={() => setIsMobileMenuOpen(false)} className="text-2xl text-gray-600 focus:outline-none hover:text-red-500 transition-colors">
-            <FiX />
-          </button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            radius="full"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="text-2xl text-gray-600 hover:text-red-500"
+            aria-label="Close menu"
+            icon={<FiX />}
+          />
         </div>
 
         <div className="flex flex-col flex-1 overflow-y-auto p-6 gap-5 text-[16px] font-semibold text-gray-700">
           {/* Mobile Explore Category Accordion (Non-sellers only) */}
           {!isSeller && (
             <div className="flex flex-col border-b border-gray-100 pb-3">
-              <button
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => setIsMobileCategoryOpen(!isMobileCategoryOpen)}
-                className="flex items-center justify-between py-2 text-gray-800 hover:text-brand-green transition-colors"
+                className="w-full flex items-center justify-between py-2 text-gray-800 hover:text-brand-green hover:!bg-transparent !px-0 !min-h-0 !h-auto font-semibold text-[16px]"
+                rightIcon={
+                  <FiChevronDown
+                    className={`transition-transform duration-200 ${
+                      isMobileCategoryOpen ? "rotate-180 text-brand-green" : "text-gray-400"
+                    }`}
+                  />
+                }
               >
                 <span>Explore Category</span>
-                <FiChevronDown className={`transition-transform duration-200 ${isMobileCategoryOpen ? "rotate-180 text-brand-green" : "text-gray-400"}`} />
-              </button>
+              </Button>
 
               {isMobileCategoryOpen && (
                 <div className="pl-4 pt-1 flex flex-col gap-2 max-h-48 overflow-y-auto">
@@ -546,8 +586,8 @@ const Navbar = () => {
               <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a Seller</Link>
               <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
               <hr className="my-2 border-gray-100" />
-              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Sign in</Link>
-              <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="text-brand-green hover:opacity-80 transition-opacity flex items-center gap-1.5">
+              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors text-[16px] font-semibold">Sign in</Link>
+              <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="text-brand-green hover:opacity-80 transition-opacity flex items-center gap-1.5 text-[16px] font-semibold">
                 <span>Join Now</span>
                 <FiArrowRight className="text-sm" />
               </Link>

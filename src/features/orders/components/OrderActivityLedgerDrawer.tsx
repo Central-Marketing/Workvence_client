@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo } from "react";
 import moment from "moment";
 import { FiX } from "react-icons/fi";
+import { Button } from "@/components/ui";
 import { NormalizedOrder } from "../types";
 
 export interface LedgerEventItem {
@@ -438,15 +439,17 @@ export const OrderActivityLedgerDrawer: React.FC<OrderActivityLedgerDrawerProps>
             <h2 className="text-2xl sm:text-[26px] font-bold text-gray-900 tracking-tight">
               Order Activity &amp; Escrow Ledger
             </h2>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
+              radius="full"
               onClick={onClose}
-              className="text-red-500 hover:text-red-600 transition-colors p-1 cursor-pointer"
+              className="text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors p-1 cursor-pointer w-8 h-8 min-h-[32px]"
               title="Close"
               aria-label="Close ledger"
-            >
-              <FiX className="w-6 h-6" />
-            </button>
+              icon={<FiX className="w-6 h-6" />}
+            />
           </div>
 
           {/* Top Divider */}

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { Button } from "@/components/ui";
 
 interface SubcategoryCardProps {
   id?: string;
@@ -66,16 +67,20 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
       {/* Sub-services List */}
       <div className="flex-1 flex flex-col divide-y divide-gray-100 text-[12.5px] sm:text-[13px] text-[#4b5563] pb-1">
         {items.map((item, idx) => (
-          <button
+          <Button
             key={idx}
             type="button"
+            variant="ghost"
+            size="sm"
+            radius="none"
+            fullWidth
             onClick={() => onSelectService(item, id || title, title)}
-            className="w-full text-left px-4 py-2.5 hover:bg-gray-50/50 hover:text-brand-green transition-colors cursor-pointer group"
+            className="w-full text-left justify-start px-4 py-2.5 hover:bg-gray-50/50 text-[#4b5563] hover:text-brand-green transition-colors cursor-pointer group font-normal text-[12.5px] sm:text-[13px] border-none shadow-none h-auto min-h-0"
           >
             <span className="truncate block font-normal group-hover:font-medium">
               {item}
             </span>
-          </button>
+          </Button>
         ))}
       </div>
     </div>

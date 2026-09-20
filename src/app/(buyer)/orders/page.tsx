@@ -14,7 +14,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "@/components";
+import { Loader, Button } from "@/components";
 
 export default function BuyerOrdersPage() {
   const router = useRouter();
@@ -347,31 +347,37 @@ export default function BuyerOrdersPage() {
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
                 Recent Orders
               </h2>
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="icon"
+                radius="xl"
                 aria-label="Filter by date"
-                className="w-9 h-9 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-600 transition-colors shadow-xs cursor-pointer"
+                className="w-9 h-9 text-slate-600 shadow-xs"
               >
                 <FiCalendar className="text-base" />
-              </button>
+              </Button>
             </div>
 
             <div className="flex items-center gap-5 justify-between sm:justify-end">
               {/* Pill Switcher */}
-              <div className="bg-[#F1F3F5] p-1 rounded-xl flex items-center">
+              <div className="bg-[#F1F3F5] p-1 rounded-xl flex items-center gap-1">
                 {(["All", "Packages", "Briefs"] as const).map((tab) => (
-                  <button
+                  <Button
                     key={tab}
                     type="button"
                     onClick={() => setActiveTab(tab)}
-                    className={`px-5 sm:px-6 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                    variant={activeTab === tab ? "brand" : "ghost"}
+                    size="sm"
+                    radius="fiverr"
+                    className={
                       activeTab === tab
-                        ? "bg-[#113E37] text-white shadow-xs"
+                        ? "bg-[#113E37] hover:bg-[#113E37] text-white shadow-xs"
                         : "text-slate-600 hover:text-slate-900"
-                    }`}
+                    }
                   >
                     {tab}
-                  </button>
+                  </Button>
                 ))}
               </div>
 
@@ -496,14 +502,20 @@ export default function BuyerOrdersPage() {
           {/* See more orders button */}
           {normalizedOrders.length > 5 && (
             <div className="flex justify-center mt-6">
-              <button
+              <Button
                 type="button"
                 onClick={() => setShowAllOrders(!showAllOrders)}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all shadow-xs cursor-pointer"
+                variant="outline"
+                size="sm"
+                radius="full"
+                rightIcon={
+                  <FiChevronDown
+                    className={`transition-transform duration-200 ${showAllOrders ? "rotate-180" : ""}`}
+                  />
+                }
               >
-                <span>{showAllOrders ? "Show less orders" : "See more orders"}</span>
-                <FiChevronDown className={`transition-transform duration-200 ${showAllOrders ? "rotate-180" : ""}`} />
-              </button>
+                {showAllOrders ? "Show less orders" : "See more orders"}
+              </Button>
             </div>
           )}
 

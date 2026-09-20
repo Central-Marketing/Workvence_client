@@ -5,6 +5,7 @@ import { CategoryTaxonomy } from "@/data/categoryTaxonomy";
 import SubcategoryCard from "./SubcategoryCard";
 import CategoryHeroBanner from "./CategoryHeroBanner";
 import { FiGrid, FiArrowRight } from "react-icons/fi";
+import { Button } from "@/components/ui";
 
 interface CategoryHubViewProps {
   taxonomy: CategoryTaxonomy;
@@ -44,15 +45,18 @@ const CategoryHubView: React.FC<CategoryHubViewProps> = ({
             </p>
           </div>
 
-          <button
+          <Button
             type="button"
+            variant="soft"
+            size="md"
+            radius="xl"
             onClick={onViewAllGigs}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-100 hover:bg-emerald-50 text-gray-800 hover:text-brand-green font-semibold text-sm transition-all shadow-2xs self-start sm:self-auto cursor-pointer"
+            leftIcon={<FiGrid className="w-4 h-4 text-brand-green" />}
+            rightIcon={<FiArrowRight className="w-3.5 h-3.5" />}
+            className="self-start sm:self-auto px-4 py-2.5 bg-gray-100 hover:bg-emerald-50 text-gray-800 hover:text-brand-green font-semibold text-sm shadow-2xs"
           >
-            <FiGrid className="w-4 h-4 text-brand-green" />
             <span>Browse All Packages ({totalGigsCount})</span>
-            <FiArrowRight className="w-3.5 h-3.5" />
-          </button>
+          </Button>
         </div>
 
         {/* 8-Card Grid matching design screenshot */}
@@ -75,12 +79,16 @@ const CategoryHubView: React.FC<CategoryHubViewProps> = ({
             <p className="text-gray-500 mb-4">
               Explore packages for {taxonomy.name}
             </p>
-            <button
+            <Button
+              type="button"
+              variant="brand"
+              size="md"
+              radius="xl"
               onClick={onViewAllGigs}
-              className="px-6 py-2.5 bg-brand-green text-white font-semibold rounded-xl text-sm shadow-sm"
+              className="px-6 py-2.5 font-semibold text-sm shadow-sm"
             >
               View Available Packages
-            </button>
+            </Button>
           </div>
         )}
       </div>

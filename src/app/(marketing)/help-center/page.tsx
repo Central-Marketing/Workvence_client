@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { Home, Search, X, MessageSquare, Ticket, LifeBuoy } from "lucide-react";
+import { Button } from "@/components";
 
 interface HelpTopic {
   title: string;
@@ -160,14 +161,17 @@ export default function HelpCenterPage() {
                 className="w-full bg-transparent text-sm sm:text-[15px] text-[#292929] placeholder-[#9CA3AF] focus:outline-none"
               />
               {searchQuery && (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
+                  radius="full"
                   onClick={() => setSearchQuery("")}
-                  className="text-gray-400 hover:text-gray-600 p-0.5 ml-1 transition-colors"
+                  className="text-gray-400 hover:text-gray-600 p-0.5 ml-1 transition-colors w-6 h-6 min-h-0"
                   aria-label="Clear search"
                 >
                   <X className="w-4 h-4" />
-                </button>
+                </Button>
               )}
             </div>
           </div>

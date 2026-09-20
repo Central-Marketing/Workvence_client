@@ -28,7 +28,7 @@ import toast from "react-hot-toast";
 import moment from "moment";
 import kycService, { KycRecord, KycSubmitPayload } from "@/utils/kycService";
 import countriesFlags from "@/utils/countriesFlags";
-import { Loader } from "@/components";
+import { Loader, Button } from "@/components";
 
 interface KycVerificationFormProps {
   initialKycData?: KycRecord | null;
@@ -400,14 +400,17 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
               Submissions are locked during review to prevent duplication. You will receive an email once approved.
             </p>
           </div>
-          <button
+          <Button
             type="button"
             onClick={() => refetch()}
-            className="text-xs font-semibold text-blue-700 hover:text-blue-900 flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-lg bg-blue-100/80 hover:bg-blue-100 transition-colors"
+            variant="soft"
+            size="xs"
+            radius="fiverr"
+            className="text-blue-700 bg-blue-100/80 hover:bg-blue-100 font-semibold"
+            leftIcon={<RefreshCw size={13} />}
           >
-            <RefreshCw size={13} />
             Check Status
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -442,14 +445,16 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                 &ldquo;{kyc.rejectionReason || "ID photo was blurry or expiration date was unreadable. Please upload clearer photos."}&rdquo;
               </div>
               <div className="mt-4 flex items-center gap-3">
-                <button
+                <Button
                   type="button"
                   onClick={() => setIsReSubmitting(true)}
-                  className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl transition-all shadow-sm hover:shadow-md cursor-pointer flex items-center gap-2"
+                  variant="danger"
+                  size="md"
+                  radius="fiverr"
+                  leftIcon={<RefreshCw size={16} />}
                 >
-                  <RefreshCw size={16} />
                   Update & Re-Submit Documents
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -473,29 +478,38 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
 
             {/* Stepper Indicator */}
             <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-gray-200 self-start sm:self-auto text-xs font-semibold">
-              <button
+              <Button
                 type="button"
                 onClick={() => setActiveStep(1)}
-                className={`px-2.5 py-1 rounded-lg transition-colors ${activeStep === 1 ? "bg-brand-green text-white" : "text-gray-600 hover:bg-gray-100"}`}
+                size="xs"
+                radius="fiverr"
+                variant={activeStep === 1 ? "brand" : "ghost"}
+                className={activeStep === 1 ? "bg-brand-green text-white" : "text-gray-600 hover:bg-gray-100"}
               >
                 1. Personal
-              </button>
+              </Button>
               <ChevronRight size={14} className="text-gray-300" />
-              <button
+              <Button
                 type="button"
                 onClick={() => setActiveStep(2)}
-                className={`px-2.5 py-1 rounded-lg transition-colors ${activeStep === 2 ? "bg-brand-green text-white" : "text-gray-600 hover:bg-gray-100"}`}
+                size="xs"
+                radius="fiverr"
+                variant={activeStep === 2 ? "brand" : "ghost"}
+                className={activeStep === 2 ? "bg-brand-green text-white" : "text-gray-600 hover:bg-gray-100"}
               >
                 2. ID Type
-              </button>
+              </Button>
               <ChevronRight size={14} className="text-gray-300" />
-              <button
+              <Button
                 type="button"
                 onClick={() => setActiveStep(3)}
-                className={`px-2.5 py-1 rounded-lg transition-colors ${activeStep === 3 ? "bg-brand-green text-white" : "text-gray-600 hover:bg-gray-100"}`}
+                size="xs"
+                radius="fiverr"
+                variant={activeStep === 3 ? "brand" : "ghost"}
+                className={activeStep === 3 ? "bg-brand-green text-white" : "text-gray-600 hover:bg-gray-100"}
               >
                 3. Photos
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -568,7 +582,7 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                 </div>
 
                 <div className="flex justify-end pt-4">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => {
                       if (!legalFullName.trim() || !dateOfBirth || !country) {
@@ -577,11 +591,13 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                       }
                       setActiveStep(2);
                     }}
-                    className="px-6 py-3 bg-brand-green hover:bg-[#389115] text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+                    variant="brand"
+                    size="md"
+                    radius="fiverr"
+                    rightIcon={<ChevronRight size={16} />}
                   >
                     Next: Select Document Type
-                    <ChevronRight size={16} />
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
@@ -637,14 +653,16 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                 </div>
 
                 <div className="flex items-center justify-between pt-4">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setActiveStep(1)}
-                    className="px-5 py-2.5 border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-semibold rounded-xl transition-all cursor-pointer"
+                    variant="outline"
+                    size="md"
+                    radius="fiverr"
                   >
                     Back
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     onClick={() => {
                       if (!documentNumber.trim()) {
@@ -653,11 +671,13 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                       }
                       setActiveStep(3);
                     }}
-                    className="px-6 py-3 bg-brand-green hover:bg-[#389115] text-white text-sm font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+                    variant="brand"
+                    size="md"
+                    radius="fiverr"
+                    rightIcon={<ChevronRight size={16} />}
                   >
                     Next: Upload Photos
-                    <ChevronRight size={16} />
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
@@ -687,17 +707,19 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                       {frontPreview ? (
                         <div className="relative rounded-xl overflow-hidden border border-gray-200 h-40 bg-black/5 flex items-center justify-center mb-3">
                           <img src={frontPreview} alt="Front Preview" className="h-full w-full object-contain" />
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="icon"
+                            radius="full"
                             onClick={() => {
                               setFrontFile(null);
                               setFrontPreview("");
                               setFrontUrl("");
                             }}
-                            className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors"
-                          >
-                            <X size={16} />
-                          </button>
+                            className="absolute top-2 right-2 !p-1.5 !bg-black/60 hover:!bg-black/80 text-white rounded-full transition-colors w-7 h-7 min-h-[28px]"
+                            icon={<X size={16} />}
+                          />
                         </div>
                       ) : frontUrl ? (
                         <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 mb-3">
@@ -765,17 +787,19 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                         {backPreview ? (
                           <div className="relative rounded-xl overflow-hidden border border-gray-200 h-40 bg-black/5 flex items-center justify-center mb-3">
                             <img src={backPreview} alt="Back Preview" className="h-full w-full object-contain" />
-                            <button
+                            <Button
                               type="button"
+                              variant="ghost"
+                              size="icon"
+                              radius="full"
                               onClick={() => {
                                 setBackFile(null);
                                 setBackPreview("");
                                 setBackUrl("");
                               }}
-                              className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors"
-                            >
-                              <X size={16} />
-                            </button>
+                              className="absolute top-2 right-2 !p-1.5 !bg-black/60 hover:!bg-black/80 text-white rounded-full transition-colors w-7 h-7 min-h-[28px]"
+                              icon={<X size={16} />}
+                            />
                           </div>
                         ) : backUrl ? (
                           <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 mb-3">
@@ -843,17 +867,19 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                       {selfiePreview ? (
                         <div className="relative rounded-xl overflow-hidden border border-gray-200 h-40 bg-black/5 flex items-center justify-center mb-3">
                           <img src={selfiePreview} alt="Selfie Preview" className="h-full w-full object-contain" />
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="icon"
+                            radius="full"
                             onClick={() => {
                               setSelfieFile(null);
                               setSelfiePreview("");
                               setSelfieUrl("");
                             }}
-                            className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors"
-                          >
-                            <X size={16} />
-                          </button>
+                            className="absolute top-2 right-2 !p-1.5 !bg-black/60 hover:!bg-black/80 text-white rounded-full transition-colors w-7 h-7 min-h-[28px]"
+                            icon={<X size={16} />}
+                          />
                         </div>
                       ) : selfieUrl ? (
                         <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 mb-3">
@@ -920,17 +946,19 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                       {selfieWithNotePreview ? (
                         <div className="relative rounded-xl overflow-hidden border border-gray-200 h-40 bg-black/5 flex items-center justify-center mb-3">
                           <img src={selfieWithNotePreview} alt="Note Preview" className="h-full w-full object-contain" />
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="icon"
+                            radius="full"
                             onClick={() => {
                               setSelfieWithNoteFile(null);
                               setSelfieWithNotePreview("");
                               setSelfieWithNoteUrl("");
                             }}
-                            className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors"
-                          >
-                            <X size={16} />
-                          </button>
+                            className="absolute top-2 right-2 !p-1.5 !bg-black/60 hover:!bg-black/80 text-white rounded-full transition-colors w-7 h-7 min-h-[28px]"
+                            icon={<X size={16} />}
+                          />
                         </div>
                       ) : selfieWithNoteUrl ? (
                         <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-3 mb-3">
@@ -985,31 +1013,27 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                 </div>
 
                 <div className="flex items-center justify-between pt-6 border-t border-gray-100">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setActiveStep(2)}
-                    className="px-5 py-2.5 border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-semibold rounded-xl transition-all cursor-pointer"
+                    variant="outline"
+                    size="md"
+                    radius="fiverr"
                   >
                     Back
-                  </button>
+                  </Button>
 
-                  <button
+                  <Button
                     type="submit"
                     disabled={submitMutation.isPending || frontUploading || backUploading || selfieUploading || noteUploading}
-                    className="px-8 py-3.5 bg-brand-green hover:bg-[#389115] disabled:opacity-50 text-white text-sm font-bold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer"
+                    isLoading={submitMutation.isPending}
+                    variant="brand"
+                    size="lg"
+                    radius="fiverr"
+                    leftIcon={!submitMutation.isPending ? <Check size={18} strokeWidth={2.5} /> : undefined}
                   >
-                    {submitMutation.isPending ? (
-                      <>
-                        <RefreshCw size={16} className="animate-spin" />
-                        Submitting Application...
-                      </>
-                    ) : (
-                      <>
-                        <Check size={18} strokeWidth={2.5} />
-                        Submit Verification
-                      </>
-                    )}
-                  </button>
+                    {submitMutation.isPending ? "Submitting Application..." : "Submit Verification"}
+                  </Button>
                 </div>
               </div>
             )}

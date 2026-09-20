@@ -18,6 +18,7 @@ import {
   Send,
   Building
 } from "lucide-react";
+import { Button } from "@/components";
 import toast from "react-hot-toast";
 
 const financialReports = [
@@ -206,12 +207,16 @@ export default function InvestorRelationsPage() {
                   <span className="text-xs text-gray-400">{report.size} • {report.type}</span>
                 </div>
 
-                <button
+                <Button
                   onClick={() => handleDownload(report.title)}
-                  className="w-10 h-10 rounded-xl bg-gray-50 group-hover:bg-[#327C73] group-hover:text-white text-gray-700 flex items-center justify-center transition shrink-0 cursor-pointer"
+                  variant="soft"
+                  size="icon"
+                  radius="xl"
+                  className="w-10 h-10 group-hover:bg-[#327C73] group-hover:text-white text-gray-700 shrink-0"
+                  aria-label={`Download ${report.title}`}
                 >
                   <Download className="w-4 h-4" />
-                </button>
+                </Button>
               </div>
             ))}
           </div>
@@ -328,13 +333,17 @@ export default function InvestorRelationsPage() {
                     />
                   </div>
 
-                  <button
+                  <Button
                     type="submit"
-                    className="w-full py-2.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                    variant="brand"
+                    size="md"
+                    radius="xl"
+                    fullWidth
+                    leftIcon={<Send className="w-3.5 h-3.5" />}
+                    className="font-semibold shadow-xs"
                   >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>Send IR Inquiry</span>
-                  </button>
+                    Send IR Inquiry
+                  </Button>
                 </form>
 
                 <div className="pt-2 text-center text-[11px] text-gray-400">

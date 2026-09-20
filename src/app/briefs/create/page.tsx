@@ -20,6 +20,7 @@ import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
 import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
+import { Button } from "@/components/ui";
 
 const CATEGORIES = [
   "AI",
@@ -336,18 +337,23 @@ const CreateBrief = () => {
             and submit proposals immediately.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
-            <Link
+            <Button
               href="/briefs/my-briefs"
-              className="py-3 px-6 rounded-xl font-semibold text-xs sm:text-sm bg-black hover:bg-slate-800 text-white transition-all shadow-xs text-center"
+              variant="dark"
+              size="md"
+              radius="fiverr"
+              className="shadow-xs"
             >
               View My Projects
-            </Link>
-            <Link
+            </Button>
+            <Button
               href="/briefs"
-              className="py-3 px-6 rounded-xl font-semibold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors text-center"
+              variant="soft"
+              size="md"
+              radius="fiverr"
             >
               Browse All Projects
-            </Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -385,15 +391,18 @@ const CreateBrief = () => {
             </p>
           </div>
 
-          <button
+          <Button
             type="button"
             onClick={handleOpenAiModal}
-            className="bg-[#042823] hover:bg-[#073932] text-white font-semibold text-xs sm:text-sm px-5 py-3 rounded-xl transition-all shadow-xs cursor-pointer flex items-center gap-2 self-start sm:self-auto shrink-0 border border-emerald-600/30 active:scale-[0.98]"
+            variant="brand"
+            size="md"
+            radius="fiverr"
+            leftIcon={<HiSparkles className="text-emerald-400 text-base" />}
+            className="self-start sm:self-auto shrink-0 border border-emerald-600/30 active:scale-[0.98]"
             title="Draft project with Workvence AI"
           >
-            <HiSparkles className="text-emerald-400 text-base" />
-            <span>Create with AI</span>
-          </button>
+            Create with AI
+          </Button>
         </div>
 
         {/* AI Draft Banner (Displayed after AI generates or when draft is ready) */}
@@ -407,13 +416,15 @@ const CreateBrief = () => {
                 Project draft generated with AI! Review and customize the details below before publishing.
               </span>
             </div>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="xs"
               onClick={handleOpenAiModal}
-              className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 underline self-start sm:self-auto shrink-0 cursor-pointer"
+              className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 underline self-start sm:self-auto shrink-0 p-0 h-auto hover:bg-transparent border-none shadow-none"
             >
               Draft again with AI
-            </button>
+            </Button>
           </div>
         )}
 
@@ -434,14 +445,16 @@ const CreateBrief = () => {
               </p>
             </div>
             {!aiGeneratedSuccess && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="xs"
                 onClick={handleOpenAiModal}
-                className="text-xs font-semibold text-[#0D6B5D] hover:text-[#0a5247] flex items-center gap-1 self-start sm:self-auto cursor-pointer"
+                leftIcon={<HiSparkles className="text-sm" />}
+                className="text-[#0D6B5D] hover:text-[#0a5247] p-0 hover:bg-transparent h-auto self-start sm:self-auto"
               >
-                <HiSparkles className="text-sm" />
-                <span>Draft with AI</span>
-              </button>
+                Draft with AI
+              </Button>
             )}
           </div>
 
@@ -517,14 +530,17 @@ const CreateBrief = () => {
                 >
                   <FiTag className="text-[11px] text-emerald-600" />
                   <span>{skill}</span>
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
+                    radius="full"
                     onClick={() => handleRemoveSkill(skill)}
-                    className="hover:text-emerald-950 p-0.5 rounded-full hover:bg-emerald-100 transition-colors cursor-pointer"
+                    className="hover:text-emerald-950 p-0.5 w-4 h-4 h-auto min-h-0 hover:bg-emerald-100 transition-colors border-none shadow-none"
                     title={`Remove ${skill}`}
                   >
                     <FiX className="text-xs" />
-                  </button>
+                  </Button>
                 </span>
               ))}
               {form.requiredSkills.length === 0 && (
@@ -549,15 +565,18 @@ const CreateBrief = () => {
                 }}
                 className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-xs sm:text-sm outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
               />
-              <button
+              <Button
                 type="button"
+                variant="dark"
+                size="sm"
+                radius="fiverr"
                 onClick={handleAddSkill}
                 disabled={!newSkillInput.trim()}
-                className="py-2.5 px-4 rounded-xl font-semibold text-xs bg-slate-900 hover:bg-slate-800 text-white transition-colors cursor-pointer flex items-center gap-1 shrink-0 disabled:opacity-50"
+                leftIcon={<FiPlus className="text-sm" />}
+                className="shrink-0"
               >
-                <FiPlus className="text-sm" />
-                <span>Add</span>
-              </button>
+                Add
+              </Button>
             </div>
           </div>
 
@@ -604,21 +623,27 @@ const CreateBrief = () => {
 
           {/* Form Actions */}
           <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-100">
-            <Link
+            <Button
               href="/briefs"
-              className="py-3 px-6 rounded-xl font-semibold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer text-center"
+              variant="soft"
+              size="md"
+              radius="fiverr"
             >
               Cancel
-            </Link>
+            </Button>
 
-            <button
+            <Button
               type="submit"
+              variant="dark"
+              size="md"
+              radius="fiverr"
               disabled={postBrief.isPending}
-              className="py-3.5 px-8 rounded-xl font-semibold text-xs sm:text-sm bg-black hover:bg-slate-800 text-white transition-all shadow-xs cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+              isLoading={postBrief.isPending}
+              rightIcon={<FiArrowRight className="text-xs" />}
+              className="px-8 shadow-xs"
             >
-              <span>{postBrief.isPending ? "Publishing Project..." : "Publish Project"}</span>
-              {!postBrief.isPending && <FiArrowRight className="text-xs" />}
-            </button>
+              Publish Project
+            </Button>
           </div>
         </form>
       </div>
@@ -634,15 +659,18 @@ const CreateBrief = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top Close Button */}
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
+              radius="xl"
               onClick={() => !aiGenerate.isPending && setIsAiModalOpen(false)}
               disabled={aiGenerate.isPending}
-              className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-50"
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors border-none shadow-none"
               title="Close modal"
             >
               <FiX className="text-lg" />
-            </button>
+            </Button>
 
             {/* Modal Header */}
             <div className="flex items-center gap-3 mb-2">
@@ -689,50 +717,50 @@ const CreateBrief = () => {
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {PROMPT_SUGGESTIONS.map((suggestion) => (
-                    <button
+                    <Button
                       key={suggestion}
                       type="button"
+                      variant="soft"
+                      size="xs"
+                      radius="lg"
                       onClick={() => {
                         setAiPrompt(suggestion);
                         handleGenerateFromModal(suggestion);
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-emerald-50 hover:text-emerald-900 text-slate-700 text-[11px] font-medium transition-all cursor-pointer border border-slate-200/60"
+                      className="px-2.5 py-1 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-900 text-slate-700 text-[11px] font-medium transition-all border border-slate-200/60 shadow-2xs"
                     >
                       {suggestion}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
 
               {/* Modal Actions */}
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 mt-5">
-                <button
+                <Button
                   type="button"
+                  variant="soft"
+                  size="sm"
+                  radius="fiverr"
                   onClick={() => setIsAiModalOpen(false)}
                   disabled={aiGenerate.isPending}
-                  className="py-2.5 px-5 rounded-xl font-semibold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer disabled:opacity-50"
                 >
                   Cancel
-                </button>
+                </Button>
 
-                <button
+                <Button
                   type="button"
+                  variant="brand"
+                  size="sm"
+                  radius="fiverr"
                   onClick={() => handleGenerateFromModal()}
                   disabled={aiGenerate.isPending || !aiPrompt.trim()}
-                  className="py-2.5 px-6 rounded-xl font-semibold text-xs sm:text-sm bg-[#042823] hover:bg-[#073932] text-white transition-all shadow-sm cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  isLoading={aiGenerate.isPending}
+                  leftIcon={<HiSparkles className="text-emerald-400 text-base" />}
+                  className="px-6 shadow-sm"
                 >
-                  {aiGenerate.isPending ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Generating Draft...</span>
-                    </>
-                  ) : (
-                    <>
-                      <HiSparkles className="text-emerald-400 text-base" />
-                      <span>Generate Project Draft</span>
-                    </>
-                  )}
-                </button>
+                  Generate Project Draft
+                </Button>
               </div>
             </div>
           </div>

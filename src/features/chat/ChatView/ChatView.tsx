@@ -34,7 +34,7 @@ import { axiosFetch, socket, getAvatarUrl } from "@/utils";
 import supportService from "@/utils/supportService";
 import { getOtherUser, isConversationUnread, isTargetConversation, renderMessageTextWithLinks } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
-import { Loader, ChatSkeleton, Skeleton, AiGradientButton } from "@/components";
+import { Loader, ChatSkeleton, Skeleton, AiGradientButton, Button } from "@/components";
 import { MessageModerationBadge } from "@/features/chat";
 import { formatFileSize } from "@/lib";
 import moment from 'moment';
@@ -1457,18 +1457,20 @@ const ChatView = () => {
               {/* Header: Back Button + Messages Heading */}
               <div className="p-4 sm:p-5 pb-3 flex flex-col gap-3.5 border-b border-slate-100">
                 <div className="flex items-center gap-3">
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
+                    size="icon"
+                    radius="full"
                     onClick={() => {
                       const targetDashboard = user?.isSeller ? '/dashboard/seller' : '/dashboard/buyer';
                       navigate.push(targetDashboard);
                     }}
-                    className="w-9 h-9 rounded-full border border-slate-200 flex items-center justify-center text-[#126D6B] bg-[#ffffff] hover:bg-slate-50 transition-colors shrink-0 cursor-pointer"
+                    className="w-9 h-9 min-h-[36px] !p-0 border-slate-200 text-[#126D6B] bg-white hover:bg-slate-50 shrink-0"
                     aria-label="Back to Dashboard"
                     title="Back to Dashboard"
-                  >
-                    <ArrowLeft className="w-4 h-4 text-slate-700" />
-                  </button>
+                    icon={<ArrowLeft className="w-4 h-4 text-slate-700" />}
+                  />
                   <h2 className="text-[24px] sm:text-[26px] md:text-[28px] lg:text-[30px] macbook:text-[32px] 2xl:text-[36px] font-normal leading-tight tracking-tight text-[#292929] font-sf-pro">
                     Messages
                   </h2>
@@ -1488,39 +1490,51 @@ const ChatView = () => {
 
                 {/* Filter Pills */}
                 <div className="flex items-center gap-2 pt-0.5">
-                  <button
+                  <Button
                     type="button"
+                    variant={convFilterTab === 'all' ? 'pill-tab' : 'ghost'}
+                    size="xs"
+                    radius="full"
                     onClick={() => setConvFilterTab('all')}
-                    className={`px-4 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${convFilterTab === 'all'
-                      ? 'border-teal-700 text-teal-800 bg-white shadow-2xs font-semibold'
-                      : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'
-                      }`}
+                    className={`px-4 py-1.5 text-xs font-medium border transition-colors ${
+                      convFilterTab === 'all'
+                        ? '!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold'
+                        : '!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50'
+                    }`}
                   >
                     All
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant={convFilterTab === 'read' ? 'pill-tab' : 'ghost'}
+                    size="xs"
+                    radius="full"
                     onClick={() => setConvFilterTab('read')}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors flex items-center gap-1.5 cursor-pointer ${convFilterTab === 'read'
-                      ? 'border-teal-700 text-teal-800 bg-white shadow-2xs font-semibold'
-                      : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'
-                      }`}
+                    className={`px-3 py-1.5 text-xs font-medium border transition-colors flex items-center gap-1.5 ${
+                      convFilterTab === 'read'
+                        ? '!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold'
+                        : '!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50'
+                    }`}
                   >
                     <span>Read</span>
                     <span className="px-1.5 py-0.2 bg-slate-100 text-slate-500 rounded-full text-[10px] font-semibold">
                       {readCount}
                     </span>
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant={convFilterTab === 'unread' ? 'pill-tab' : 'ghost'}
+                    size="xs"
+                    radius="full"
                     onClick={() => setConvFilterTab('unread')}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${convFilterTab === 'unread'
-                      ? 'border-teal-700 text-teal-800 bg-white shadow-2xs font-semibold'
-                      : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-50'
-                      }`}
+                    className={`px-3.5 py-1.5 text-xs font-medium border transition-colors ${
+                      convFilterTab === 'unread'
+                        ? '!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold'
+                        : '!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50'
+                    }`}
                   >
                     Unread
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -1634,17 +1648,19 @@ const ChatView = () => {
                 {/* Mobile Full-Width Search Takeover */}
                 {isMsgSearchActive && (
                   <div className="md:hidden fixed top-0 left-0 right-0 z-50 h-[64px] bg-white px-3 flex items-center gap-2 border-b border-slate-200 shadow-xs animate-in fade-in duration-150">
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
+                      radius="full"
                       onClick={() => {
                         setIsMsgSearchActive(false);
                         setMsgSearchQuery('');
                       }}
-                      className="w-9 h-9 flex items-center justify-center text-slate-700 hover:bg-slate-100 rounded-full shrink-0 cursor-pointer"
+                      className="w-9 h-9 flex items-center justify-center text-slate-700 hover:bg-slate-100 shrink-0"
                       aria-label="Close search"
-                    >
-                      <ArrowLeft className="w-5 h-5" />
-                    </button>
+                      icon={<ArrowLeft className="w-5 h-5" />}
+                    />
                     <div className="flex-1 flex items-center bg-slate-100 rounded-xl px-3 py-1.5 min-w-0">
                       <input
                         type="text"
@@ -1655,38 +1671,45 @@ const ChatView = () => {
                         autoFocus
                       />
                       {msgSearchQuery && (
-                        <button
+                        <Button
                           type="button"
+                          variant="ghost"
+                          size="xs"
+                          radius="full"
                           onClick={() => setMsgSearchQuery('')}
-                          className="text-slate-400 hover:text-slate-700 shrink-0 ml-1 p-0.5 cursor-pointer text-xs"
+                          className="text-slate-400 hover:text-slate-700 shrink-0 ml-1 !p-0.5 !min-h-0 !h-auto text-xs"
                           aria-label="Clear search"
                         >
                           ✕
-                        </button>
+                        </Button>
                       )}
                     </div>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="xs"
                       onClick={() => {
                         setIsMsgSearchActive(false);
                         setMsgSearchQuery('');
                       }}
-                      className="text-xs font-semibold text-teal-800 hover:text-teal-900 shrink-0 px-1 py-1 cursor-pointer"
+                      className="text-xs font-semibold text-teal-800 hover:text-teal-900 shrink-0 px-1 py-1"
                     >
                       Cancel
-                    </button>
+                    </Button>
                   </div>
                 )}
 
                 {/* Mobile Menu */}
-                <button
+                <Button
                   type="button"
-                  className="md:hidden mr-2 sm:mr-3 shrink-0 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                  variant="ghost"
+                  size="icon"
+                  radius="md"
+                  className="md:hidden mr-2 sm:mr-3 shrink-0 w-8 h-8 sm:w-9 sm:h-9 text-slate-600 hover:bg-slate-100"
                   onClick={() => setIsLeftSideOpen(true)}
                   aria-label="Open conversations"
-                >
-                  <RiMenuLine className="text-lg sm:text-xl" />
-                </button>
+                  icon={<RiMenuLine className="text-lg sm:text-xl" />}
+                />
 
                 {finalRecipientUser ? (
                   <>
@@ -1728,41 +1751,25 @@ const ChatView = () => {
 
                       {/* Create Offer */}
                       {user?.isSeller && (
-                        <button
+                        <Button
                           type="button"
-                          className="
-        h-8 sm:h-9
-        px-2 sm:px-3
-        text-[11px] sm:text-xs
-        font-medium
-        rounded-md sm:rounded-lg
-        bg-black
-        text-white
-        hover:bg-gray-800
-        transition-colors
-        whitespace-nowrap
-        shrink-0
-        cursor-pointer
-      "
+                          variant="dark"
+                          size="xs"
+                          radius="fiverr"
                           onClick={() => setShowOfferModal(true)}
+                          className="h-8 sm:h-9 px-2 sm:px-3 text-[11px] sm:text-xs font-medium whitespace-nowrap shrink-0"
                         >
                           Create Offer
-                        </button>
+                        </Button>
                       )}
 
                       {/* Video Meeting */}
-                      <button
+                      <Button
                         type="button"
-                        className="
-      w-8 h-8 sm:w-9 sm:h-9
-      rounded-md sm:rounded-lg
-      hover:bg-emerald-50
-      text-emerald-600
-      transition-colors
-      flex items-center justify-center
-      shrink-0
-      cursor-pointer
-    "
+                        variant="ghost"
+                        size="icon"
+                        radius="lg"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg hover:bg-emerald-50 text-emerald-600 shrink-0"
                         onClick={() => {
                           setMeetingTitle(
                             `Job Discussion with @${finalRecipientUser?.username || 'Client'}`
@@ -1771,33 +1778,34 @@ const ChatView = () => {
                         }}
                         title="Start Video Meeting"
                         aria-label="Start Video Meeting"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="21"
-                          height="21"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          className="sm:w-6 sm:h-6"
-                        >
-                          <path
-                            d="M2 11C2 7.70017 2 6.05025 3.02513 5.02513C4.05025 4 5.70017 4 9 4H10C13.2998 4 14.9497 4 15.9749 5.02513C17 6.05025 17 7.70017 17 11V13C17 16.2998 17 17.9497 15.9749 18.9749C14.9497 20 13.2998 20 10 20H9C5.70017 20 4.05025 18.9749 3.02513 18.9749C2 17.9497 2 16.2998 2 13V11Z"
-                            stroke="#292929"
-                            strokeWidth="1.5"
-                          />
-                          <path
-                            d="M17 8.90585L17.1259 8.80196C19.2417 7.05623 20.2998 6.18336 21.1498 6.60482C22 7.02628 22 8.42355 22 11.2181V12.7819C22 15.5765 22 16.9737 21.1498 17.3952C20.2996 17.8166 19.2417 16.9438 17.1259 15.198L17 15.0941"
-                            stroke="#292929"
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                          />
-                          <path
-                            d="M11.5 11C12.3284 11 13 10.3284 13 9.5C13 8.67157 12.3284 8 11.5 8C10.6716 8 10 8.67157 10 9.5C10 10.3284 10.6716 11 11.5 11Z"
-                            stroke="#292929"
-                            strokeWidth="1.5"
-                          />
-                        </svg>
-                      </button>
+                        icon={
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="21"
+                            height="21"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            className="sm:w-6 sm:h-6"
+                          >
+                            <path
+                              d="M2 11C2 7.70017 2 6.05025 3.02513 5.02513C4.05025 4 5.70017 4 9 4H10C13.2998 4 14.9497 4 15.9749 5.02513C17 6.05025 17 7.70017 17 11V13C17 16.2998 17 17.9497 15.9749 18.9749C14.9497 20 13.2998 20 10 20H9C5.70017 20 4.05025 18.9749 3.02513 18.9749C2 17.9497 2 16.2998 2 13V11Z"
+                              stroke="#292929"
+                              strokeWidth="1.5"
+                            />
+                            <path
+                              d="M17 8.90585L17.1259 8.80196C19.2417 7.05623 20.2998 6.18336 21.1498 6.60482C22 7.02628 22 8.42355 22 11.2181V12.7819C22 15.5765 22 16.9737 21.1498 17.3952C20.2996 17.8166 19.2417 16.9438 17.1259 15.198L17 15.0941"
+                              stroke="#292929"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                            />
+                            <path
+                              d="M11.5 11C12.3284 11 13 10.3284 13 9.5C13 8.67157 12.3284 8 11.5 8C10.6716 8 10 8.67157 10 9.5C10 10.3284 10.6716 11 11.5 11Z"
+                              stroke="#292929"
+                              strokeWidth="1.5"
+                            />
+                          </svg>
+                        }
+                      />
 
                       {/* Search */}
                       {isMsgSearchActive ? (
@@ -1831,88 +1839,86 @@ const ChatView = () => {
                             autoFocus
                           />
 
-                          <button
+                          <Button
                             type="button"
-                            className="
-                w-5 h-5
-                shrink-0
-                flex items-center justify-center
-                text-slate-500
-                hover:text-slate-800
-                cursor-pointer
-                text-lg
-                leading-none
-              "
+                            variant="ghost"
+                            size="icon"
+                            radius="full"
+                            className="w-5 h-5 min-h-0 !p-0 text-slate-500 hover:text-slate-800 text-lg leading-none"
                             onClick={() => {
                               setIsMsgSearchActive(false);
                               setMsgSearchQuery('');
                             }}
                             aria-label="Close search"
-                          >
-                            &times;
-                          </button>
+                            icon={<span>&times;</span>}
+                          />
                         </div>
                       ) : (
-                        <button
+                        <Button
                           type="button"
-                          className="
-        w-8 h-8 sm:w-9 sm:h-9
-        rounded-md sm:rounded-lg
-        hover:bg-slate-100
-        text-slate-600
-        transition-colors
-        flex items-center justify-center
-        shrink-0
-        cursor-pointer
-      "
+                          variant="ghost"
+                          size="icon"
+                          radius="lg"
+                          className="w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg hover:bg-slate-100 text-slate-600 shrink-0"
                           onClick={() => setIsMsgSearchActive(true)}
                           aria-label="Search messages"
-                        >
+                          icon={
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="21"
+                              height="21"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              className="sm:w-6 sm:h-6"
+                            >
+                              <path
+                                d="M17 17L21 21"
+                                stroke="#292929"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C15.4183 19 19 15.4183 19 11Z"
+                                stroke="#292929"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          }
+                        />
+                      )}
+
+                      {/* Mobile Right Sidebar */}
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        radius="lg"
+                        className="lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg hover:bg-slate-100 text-slate-600 shrink-0"
+                        onClick={() => setIsRightSideOpen(true)}
+                        aria-label="Open contact info"
+                        icon={
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="21"
-                            height="21"
+                            width="20"
+                            height="20"
                             viewBox="0 0 24 24"
                             fill="none"
                             className="sm:w-6 sm:h-6"
                           >
                             <path
-                              d="M17 17L21 21"
+                              d="M12 11C12.5523 11 13 11.4477 13 12V16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16V12C11 11.4477 11.4477 11 12 11Z"
                               stroke="#292929"
                               strokeWidth="1.5"
                               strokeLinecap="round"
-                              strokeLinejoin="round"
                             />
-                            <path
-                              d="M19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19C15.4183 19 19 15.4183 19 11Z"
-                              stroke="#292929"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
+                            <circle cx="12" cy="7.5" r="1" fill="#292929" />
+                            <circle cx="12" cy="12" r="9" stroke="#292929" strokeWidth="1.5" />
                           </svg>
-                        </button>
-                      )}
-
-                      {/* Mobile Right Sidebar */}
-                      <button
-                        type="button"
-                        className="
-      lg:hidden
-      w-8 h-8 sm:w-9 sm:h-9
-      rounded-md sm:rounded-lg
-      hover:bg-slate-100
-      text-slate-600
-      transition-colors
-      flex items-center justify-center
-      shrink-0
-      cursor-pointer
-    "
-                        onClick={() => setIsRightSideOpen(true)}
-                        aria-label="Open contact information"
-                      >
-                        <RiInformationLine className="text-lg sm:text-xl" />
-                      </button>
+                        }
+                      />
 
                     </div>
                   </>
@@ -2065,8 +2071,10 @@ const ChatView = () => {
                               <p className="text-[14px] text-slate-600 leading-relaxed m-0 font-normal">
                                 {renderMessageTextWithLinks(offer.desc || "1 Screen -Clean Dashboard UI UX design - Developer-ready Figma files - Unlimited revisions")}
                               </p>
-                              <button
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                size="xs"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setViewingOfferDetails({
@@ -2076,14 +2084,16 @@ const ChatView = () => {
                                     isOwner,
                                   });
                                 }}
-                                className="text-[14px] font-medium text-[#007A64] hover:text-[#005c4b] cursor-pointer flex items-center gap-1.5 w-fit mt-0.5 transition-colors"
+                                className="text-[14px] font-medium text-[#007A64] hover:text-[#005c4b] hover:!bg-transparent !p-0 !min-h-0 !h-auto flex items-center gap-1.5 w-fit mt-0.5"
+                                rightIcon={
+                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    <polyline points="12 5 19 12 12 19"></polyline>
+                                  </svg>
+                                }
                               >
                                 <span>Read Full Proposal</span>
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                                  <polyline points="12 5 19 12 12 19"></polyline>
-                                </svg>
-                              </button>
+                              </Button>
                             </div>
 
                             <div className="w-full h-[1px] bg-[#EBEBEB] -my-1" />
@@ -2114,44 +2124,60 @@ const ChatView = () => {
                             {/* Action Button */}
                             <div className="w-full pt-1">
                               {isAccepted ? (
-                                <button
+                                <Button
                                   type="button"
-                                  className="w-full h-12 rounded-[10px] font-semibold text-[15px] bg-[#000000] text-white hover:bg-neutral-800 active:scale-[0.99] transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-xs"
+                                  variant="dark"
+                                  size="lg"
+                                  fullWidth
+                                  radius="fiverr"
+                                  rightIcon={
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                                      <polyline points="12 5 19 12 12 19"></polyline>
+                                    </svg>
+                                  }
                                   onClick={() => {
                                     if (targetOrderId) navigate.push(`/orders/${targetOrderId}`);
                                     else navigate.push('/orders');
                                   }}
+                                  className="h-12 font-semibold shadow-xs"
                                 >
-                                  <span>View Order</span>
-                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    <polyline points="12 5 19 12 12 19"></polyline>
-                                  </svg>
-                                </button>
+                                  View Order
+                                </Button>
                               ) : isWithdrawn ? (
-                                <div className="w-full h-12 rounded-[10px] font-semibold text-[15px] bg-[#F3F4F6] text-slate-400 flex items-center justify-center select-none">
+                                <div className="w-full h-12 rounded-[6px] font-semibold text-[15px] bg-[#F3F4F6] text-slate-400 flex items-center justify-center select-none">
                                   Withdrawn
                                 </div>
                               ) : !isOwner ? (
-                                <button
+                                <Button
                                   type="button"
-                                  className="w-full h-12 rounded-[10px] font-semibold text-[15px] bg-[#000000] text-white hover:bg-neutral-800 active:scale-[0.99] transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-xs"
+                                  variant="dark"
+                                  size="lg"
+                                  fullWidth
+                                  radius="fiverr"
+                                  rightIcon={
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                                      <polyline points="12 5 19 12 12 19"></polyline>
+                                    </svg>
+                                  }
                                   onClick={() => handleAcceptOffer(offer)}
+                                  className="h-12 font-semibold shadow-xs"
                                 >
-                                  <span>Accept Offer</span>
-                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                                    <polyline points="12 5 19 12 12 19"></polyline>
-                                  </svg>
-                                </button>
+                                  Accept Offer
+                                </Button>
                               ) : (
-                                <button
+                                <Button
                                   type="button"
-                                  className="w-full h-12 rounded-[10px] font-semibold text-[15px] bg-[#ECECEC] text-[#1E293B] hover:bg-[#E0E0E0] active:scale-[0.99] transition-all flex items-center justify-center cursor-pointer shadow-xs"
+                                  variant="soft"
+                                  size="lg"
+                                  fullWidth
+                                  radius="fiverr"
                                   onClick={() => handleWithdraw(msg._id || msg.id)}
+                                  className="h-12 font-semibold text-[#1E293B] shadow-xs"
                                 >
-                                  <span>Withdraw</span>
-                                </button>
+                                  Withdraw
+                                </Button>
                               )}
                             </div>
                           </div>
@@ -2177,17 +2203,22 @@ const ChatView = () => {
                                 </svg>
                                 <span className="text-[16px] font-bold text-slate-900 leading-none">Video Meeting Invitation</span>
                               </div>
-                              <button
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                size="icon"
+                                radius="md"
                                 onClick={() => handleCopyText(meeting.roomUrl || meeting.joinUrl || `Meeting ID: ${meeting.meetingId || ''}`, "Meeting link copied to clipboard!")}
-                                className="text-slate-700 hover:text-black cursor-pointer p-1 rounded-md hover:bg-slate-100 transition-colors"
+                                className="text-slate-700 hover:text-black p-1 hover:bg-slate-100"
                                 title="Copy meeting link"
-                              >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                                  <rect x="8" y="8" width="13" height="13" rx="3" />
-                                  <path d="M5 16H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1" />
-                                </svg>
-                              </button>
+                                aria-label="Copy meeting link"
+                                icon={
+                                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="8" y="8" width="13" height="13" rx="3" />
+                                    <path d="M5 16H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1" />
+                                  </svg>
+                                }
+                              />
                             </div>
 
                             <div className="w-full h-[1px] bg-[#EBEBEB] -my-1" />
@@ -2198,34 +2229,44 @@ const ChatView = () => {
                                 <span className="text-sm font-medium text-slate-700 truncate">
                                   ID- {meeting.meetingId || (meeting.roomUrl ? String(meeting.roomUrl).split('/').pop() : '81346682237')}
                                 </span>
-                                <button
+                                <Button
                                   type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  radius="md"
                                   onClick={() => handleCopyText(meeting.meetingId || (meeting.roomUrl ? String(meeting.roomUrl).split('/').pop() : ''), "Meeting ID copied!")}
-                                  className="text-slate-600 hover:text-black shrink-0 cursor-pointer p-0.5"
+                                  className="text-slate-600 hover:text-black shrink-0 !p-0.5 !min-h-0 !h-auto w-auto"
                                   title="Copy Meeting ID"
-                                >
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                                    <rect x="8" y="8" width="13" height="13" rx="3" />
-                                    <path d="M5 16H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1" />
-                                  </svg>
-                                </button>
+                                  aria-label="Copy Meeting ID"
+                                  icon={
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                                      <rect x="8" y="8" width="13" height="13" rx="3" />
+                                      <path d="M5 16H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1" />
+                                    </svg>
+                                  }
+                                />
                               </div>
 
                               <div className="flex-1 bg-[#F0F0F0] rounded-[10px] px-3.5 py-2.5 flex items-center justify-between gap-2 min-w-0">
                                 <span className="text-sm font-medium text-slate-700 truncate">
                                   Pass- {meeting.password || meeting.passcode || 'i4Rs8N'}
                                 </span>
-                                <button
+                                <Button
                                   type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  radius="md"
                                   onClick={() => handleCopyText(meeting.password || meeting.passcode || '', "Passcode copied!")}
-                                  className="text-slate-600 hover:text-black shrink-0 cursor-pointer p-0.5"
+                                  className="text-slate-600 hover:text-black shrink-0 !p-0.5 !min-h-0 !h-auto w-auto"
                                   title="Copy Passcode"
-                                >
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                                    <rect x="8" y="8" width="13" height="13" rx="3" />
-                                    <path d="M5 16H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1" />
-                                  </svg>
-                                </button>
+                                  aria-label="Copy Passcode"
+                                  icon={
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                                      <rect x="8" y="8" width="13" height="13" rx="3" />
+                                      <path d="M5 16H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1" />
+                                    </svg>
+                                  }
+                                />
                               </div>
                             </div>
 
@@ -2329,14 +2370,18 @@ const ChatView = () => {
                         {attachment.size ? `${(attachment.size / 1024).toFixed(1)} KB` : 'Attachment'} • Ready to send
                       </p>
                     </div>
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
+                      radius="full"
                       onClick={handleRemoveAttachment}
-                      className="text-slate-400 hover:text-red-500 font-bold p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                      className="w-6 h-6 min-h-0 !p-0 text-slate-400 hover:text-red-500 font-bold hover:bg-slate-200 dark:hover:bg-slate-800"
                       title="Remove attachment from server"
+                      aria-label="Remove attachment"
                     >
                       ✕
-                    </button>
+                    </Button>
                   </div>
                 )}
 
@@ -2353,20 +2398,24 @@ const ChatView = () => {
                     />
 
                     {/* Plus / Attach Button */}
-                    <button
+                    <Button
                       type="button"
-                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors flex-shrink-0 mb-0.5 cursor-pointer disabled:opacity-50"
+                      variant="ghost"
+                      size="icon"
+                      radius="xl"
+                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 flex-shrink-0 mb-0.5"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploadingAttachment}
-                      title="Attach file or image "
+                      title="Attach file or image"
                       aria-label="Attach file or image"
-                    >
-                      {isUploadingAttachment ? (
-                        <Loader size={18} />
-                      ) : (
-                        <RiAddLine className="w-5 h-5" />
-                      )}
-                    </button>
+                      icon={
+                        isUploadingAttachment ? (
+                          <Loader size={18} />
+                        ) : (
+                          <RiAddLine className="w-5 h-5" />
+                        )
+                      }
+                    />
 
 
                     {/* Message Textarea */}
@@ -2381,14 +2430,16 @@ const ChatView = () => {
                     />
 
                     {/* Send Button */}
-                    <button
+                    <Button
                       type="submit"
-                      className="p-2 text-gray-500 hover:text-blue-600 disabled:opacity-30 disabled:hover:text-gray-500 transition-colors flex-shrink-0 mb-0.5"
+                      variant="ghost"
+                      size="icon"
+                      radius="xl"
+                      className="p-2 text-gray-500 hover:text-blue-600 disabled:opacity-30 disabled:hover:text-gray-500 flex-shrink-0 mb-0.5"
                       disabled={(!messageText.trim() && !attachment?.url) || isUploadingAttachment || mutation.isPending}
                       aria-label="Send message"
-                    >
-                      <RiSendPlaneFill className="w-5 h-5" />
-                    </button>
+                      icon={<RiSendPlaneFill className="w-5 h-5" />}
+                    />
                   </form>
                 )}
               </div>
@@ -2510,37 +2561,47 @@ const ChatView = () => {
           return (
             <aside className={`w-[320px] min-w-[280px] xl:w-[340px] xl:min-w-[320px] h-full max-h-full min-h-0 border-l border-[rgba(0, 0, 0, 0.10)] bg-[#F8F8F8] overflow-y-auto overflow-x-hidden p-4 xl:p-5 flex flex-col shrink-0 box-border [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full max-lg:fixed max-lg:top-0 max-lg:bottom-0 max-lg:right-0 max-lg:z-40 max-lg:shadow-2xl max-lg:h-full max-lg:flex max-lg:transform max-lg:transition-transform max-lg:duration-300 max-lg:ease-in-out ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
               <div className="w-full flex flex-col gap-4 pb-20">
-                <button
+                <Button
                   type="button"
-                  className="lg:hidden self-end text-gray-500 hover:text-gray-800 text-2xl -mb-2 cursor-pointer"
+                  variant="ghost"
+                  size="icon"
+                  radius="full"
+                  className="lg:hidden self-end text-gray-500 hover:text-gray-800 text-2xl -mb-2"
                   onClick={() => setIsRightSideOpen(false)}
                   aria-label="Close sidebar"
-                >
-                  <RiCloseLine />
-                </button>
+                  icon={<RiCloseLine />}
+                />
 
                 {/* Top Segmented Controls: Profile | Media */}
                 <div className="bg-[#f0f2f5] p-1 rounded-2xl flex items-center border border-slate-200/70 shadow-xs">
-                  <button
+                  <Button
                     type="button"
+                    variant={contactSidebarTab === 'profile' ? 'dark' : 'ghost'}
+                    size="sm"
+                    radius="xl"
                     onClick={() => setContactSidebarTab('profile')}
-                    className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all duration-200 text-center cursor-pointer ${contactSidebarTab === 'profile'
-                      ? 'bg-[#0e3834] text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                      }`}
+                    className={`flex-1 py-2 text-sm font-semibold text-center ${
+                      contactSidebarTab === 'profile'
+                        ? '!bg-[#0e3834] !text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
                   >
                     Profile
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant={contactSidebarTab === 'media' ? 'dark' : 'ghost'}
+                    size="sm"
+                    radius="xl"
                     onClick={() => setContactSidebarTab('media')}
-                    className={`flex-1 py-2 text-sm font-semibold rounded-xl transition-all duration-200 text-center cursor-pointer ${contactSidebarTab === 'media'
-                      ? 'bg-[#0e3834] text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                      }`}
+                    className={`flex-1 py-2 text-sm font-semibold text-center ${
+                      contactSidebarTab === 'media'
+                        ? '!bg-[#0e3834] !text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
                   >
                     Media
-                  </button>
+                  </Button>
                 </div>
 
                 {contactSidebarTab === 'profile' ? (
@@ -2706,13 +2767,17 @@ const ChatView = () => {
                           )}
 
                           {displayedOrders.length > 0 && (
-                            <button
+                            <Button
                               type="button"
-                              className="w-full mt-2 py-2.5 bg-[#f1f3f5] hover:bg-[#e4e7eb] text-slate-700 font-semibold text-xs sm:text-sm rounded-xl transition-colors text-center cursor-pointer"
+                              variant="soft"
+                              size="sm"
+                              radius="xl"
+                              fullWidth
+                              className="mt-2 py-2.5 bg-[#f1f3f5] hover:bg-[#e4e7eb] text-slate-700 font-semibold text-xs sm:text-sm text-center"
                               onClick={() => navigate.push('/orders')}
                             >
                               view all
-                            </button>
+                            </Button>
                           )}
                         </>
                       )}
@@ -2740,15 +2805,17 @@ const ChatView = () => {
                               </span>
                             ) : null}
                           </div>
-                          <button
+                          <Button
                             type="button"
+                            variant="outline"
+                            size="icon"
+                            radius="xl"
                             onClick={() => handleDownloadMedia(file)}
-                            className="w-10 h-10 rounded-[12px] border border-[#E5E7EB] hover:border-[#0E3834] hover:bg-slate-50 flex items-center justify-center text-[#5F71B0] hover:text-[#0E3834] transition-all shrink-0 cursor-pointer shadow-2xs active:scale-95"
+                            className="w-10 h-10 rounded-[12px] border border-[#E5E7EB] hover:border-[#0E3834] hover:bg-slate-50 text-[#5F71B0] hover:text-[#0E3834] transition-all shrink-0 shadow-2xs active:scale-95"
                             title={`Download ${file.name}`}
                             aria-label={`Download ${file.name}`}
-                          >
-                            <Download className="w-[18px] h-[18px]" strokeWidth={1.8} />
-                          </button>
+                            icon={<Download className="w-[18px] h-[18px]" strokeWidth={1.8} />}
+                          />
                         </div>
                       ))
                     ) : (
@@ -2770,7 +2837,17 @@ const ChatView = () => {
           <div className="bg-white w-[92%] max-w-[460px] max-h-[calc(100vh-40px)] flex flex-col overflow-hidden rounded-2xl shadow-2xl border border-slate-100 max-md:w-[96%] max-md:max-h-[95vh]" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center px-5 py-4 border-b border-slate-200 bg-slate-50/80 shrink-0">
               <h3 className="text-[15px] font-bold text-slate-900 m-0">Create Custom Offer</h3>
-              <button type="button" onClick={() => setShowOfferModal(false)} className="text-slate-400 hover:text-slate-800 text-2xl leading-none cursor-pointer p-1">&times;</button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                radius="full"
+                onClick={() => setShowOfferModal(false)}
+                className="text-slate-400 hover:text-slate-800 text-2xl leading-none p-1"
+                aria-label="Close modal"
+              >
+                &times;
+              </Button>
             </div>
             <form onSubmit={handleOfferSubmit} className="p-5 flex flex-col gap-3.5 overflow-y-auto">
               <div className="flex flex-col gap-1.5">
@@ -2849,19 +2926,25 @@ const ChatView = () => {
                 </div>
               </div>
               <div className="flex gap-2.5 mt-2">
-                <button
+                <Button
                   type="submit"
-                  className="flex-1 py-2.5 px-4 rounded-xl font-bold text-sm bg-black text-white hover:bg-neutral-800 transition-colors cursor-pointer"
+                  variant="dark"
+                  size="md"
+                  radius="fiverr"
+                  className="flex-1 font-bold"
                 >
                   Send Offer
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className="flex-1 py-2.5 px-4 rounded-xl font-semibold text-sm bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer border border-slate-200"
+                  variant="soft"
+                  size="md"
+                  radius="fiverr"
+                  className="flex-1 font-semibold border border-slate-200"
                   onClick={() => setShowOfferModal(false)}
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -2879,14 +2962,18 @@ const ChatView = () => {
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">Create Video Meeting</h3>
               </div>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
+                radius="full"
                 disabled={isCreatingMeeting}
                 onClick={() => setShowMeetingModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold"
+                aria-label="Close modal"
               >
                 ✕
-              </button>
+              </Button>
             </div>
 
             <form onSubmit={handleCreateMeeting} className="space-y-4 pt-4">
@@ -2909,32 +2996,29 @@ const ChatView = () => {
               </div>
 
               <div className="pt-2 flex gap-2">
-                <button
+                <Button
                   type="submit"
+                  variant="dark"
+                  size="md"
+                  radius="fiverr"
                   disabled={isCreatingMeeting}
-                  className="flex-1 py-3 rounded-xl font-semibold text-sm bg-brand-green text-white hover:brightness-95 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
-                  style={{ background: '#000000', color: '#ffffff' }}
+                  isLoading={isCreatingMeeting}
+                  leftIcon={<RiVideoChatLine className="w-4 h-4" />}
+                  className="flex-1 font-semibold shadow-sm"
                 >
-                  {isCreatingMeeting ? (
-                    <>
-                      <Loader size={18} />
-                      <span>Creating Room...</span>
-                    </>
-                  ) : (
-                    <>
-                      <RiVideoChatLine className="w-4 h-4" />
-                      <span>Create & Send Link</span>
-                    </>
-                  )}
-                </button>
-                <button
+                  Create & Send Link
+                </Button>
+                <Button
                   type="button"
+                  variant="outline"
+                  size="md"
+                  radius="fiverr"
                   disabled={isCreatingMeeting}
                   onClick={() => setShowMeetingModal(false)}
-                  className="py-3 px-4 rounded-xl font-semibold text-sm border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all cursor-pointer"
+                  className="font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -2953,12 +3037,17 @@ const ChatView = () => {
           >
             <div className="flex justify-between items-center border-b border-slate-100 pb-4">
               <h3 className="text-xl font-bold text-slate-900">Custom Proposal Details</h3>
-              <button
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                radius="full"
                 onClick={() => setViewingOfferDetails(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-lg transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold text-lg"
+                aria-label="Close modal"
               >
                 ✕
-              </button>
+              </Button>
             </div>
 
             <div className="flex justify-between items-center bg-emerald-50/70 border border-emerald-200/60 rounded-2xl p-4">
@@ -2985,8 +3074,11 @@ const ChatView = () => {
 
             <div className="pt-2 flex gap-3">
               {viewingOfferDetails.acceptedOrder ? (
-                <button
-                  className="flex-1 py-3 rounded-xl font-bold text-sm bg-brand-green text-white hover:brightness-95 transition-all text-center shadow-sm"
+                <Button
+                  variant="brand"
+                  size="md"
+                  radius="fiverr"
+                  className="flex-1 font-bold shadow-sm"
                   onClick={() => {
                     const orderId = typeof viewingOfferDetails.acceptedOrder === 'string' ? viewingOfferDetails.acceptedOrder : viewingOfferDetails.acceptedOrder?._id;
                     setViewingOfferDetails(null);
@@ -2995,12 +3087,15 @@ const ChatView = () => {
                   }}
                 >
                   View Order
-                </button>
+                </Button>
               ) : (
                 <>
                   {!viewingOfferDetails.isOwner && (
-                    <button
-                      className="flex-1 py-3 rounded-xl font-bold text-sm bg-brand-green text-white hover:brightness-95 transition-all text-center shadow-sm"
+                    <Button
+                      variant="brand"
+                      size="md"
+                      radius="fiverr"
+                      className="flex-1 font-bold shadow-sm"
                       onClick={() => {
                         const offer = viewingOfferDetails.offer;
                         setViewingOfferDetails(null);
@@ -3008,11 +3103,14 @@ const ChatView = () => {
                       }}
                     >
                       Accept & Proceed to Checkout
-                    </button>
+                    </Button>
                   )}
                   {viewingOfferDetails.isOwner && (
-                    <button
-                      className="flex-1 py-3 rounded-xl font-bold text-sm bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all text-center"
+                    <Button
+                      variant="danger"
+                      size="md"
+                      radius="fiverr"
+                      className="flex-1 font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
                       onClick={() => {
                         const msgId = viewingOfferDetails.msgId;
                         setViewingOfferDetails(null);
@@ -3020,17 +3118,20 @@ const ChatView = () => {
                       }}
                     >
                       Withdraw Proposal
-                    </button>
+                    </Button>
                   )}
                 </>
               )}
-              <button
+              <Button
                 type="button"
-                className="py-3 px-5 rounded-xl font-semibold text-sm border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all"
+                variant="outline"
+                size="md"
+                radius="fiverr"
+                className="font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200"
                 onClick={() => setViewingOfferDetails(null)}
               >
                 Close
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -3044,12 +3145,17 @@ const ChatView = () => {
         >
           <div className="relative max-w-4xl max-h-[90vh]" onClick={e => e.stopPropagation()}>
             <img src={lightboxImage} alt="Enlarged preview" className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl" />
-            <button
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              radius="full"
               onClick={() => setLightboxImage(null)}
-              className="absolute top-2 right-2 text-white bg-black/60 hover:bg-black/90 w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold"
+              className="absolute top-2 right-2 text-white bg-black/60 hover:bg-black/90 w-8 h-8 font-bold"
+              aria-label="Close preview"
             >
               ✕
-            </button>
+            </Button>
           </div>
         </div>
       )}

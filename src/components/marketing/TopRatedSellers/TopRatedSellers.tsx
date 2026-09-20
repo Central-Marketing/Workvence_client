@@ -11,6 +11,7 @@ import 'swiper/css/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { axiosFetch } from '@/utils';
 import { TopSellersSkeleton } from '@/components';
+import { Button } from '@/components/ui';
 
 const TopRatedSellers = () => {
   const swiperRef = useRef<any>(null);
@@ -120,23 +121,29 @@ const TopRatedSellers = () => {
             ))}
           </Swiper>
 
-          <button
+          <Button
+            type="button"
             onClick={(e) => { e.preventDefault(); swiperRef.current?.slidePrev(); }}
             aria-label="Previous seller slide"
             title="Previous seller"
-            className="absolute left-0 md:-left-5 top-[45%] -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-[0_4px_15px_rgba(0,0,0,0.15)] hover:bg-gray-50 transition-all focus:outline-none"
-          >
-            <ChevronLeft size={22} strokeWidth={2} />
-          </button>
+            variant="outline"
+            size="icon"
+            radius="full"
+            className="absolute left-0 md:-left-5 top-[45%] -translate-y-1/2 z-10 w-10 h-10 min-w-[40px] min-h-[40px] p-0 border border-gray-200 bg-white text-gray-600 shadow-[0_4px_15px_rgba(0,0,0,0.15)]"
+            icon={<ChevronLeft size={22} strokeWidth={2} />}
+          />
 
-          <button
+          <Button
+            type="button"
             onClick={(e) => { e.preventDefault(); swiperRef.current?.slideNext(); }}
             aria-label="Next seller slide"
             title="Next seller"
-            className="absolute right-0 md:-right-5 top-[45%] -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 bg-white text-gray-600 shadow-[0_4px_15px_rgba(0,0,0,0.15)] hover:bg-gray-50 transition-all focus:outline-none"
-          >
-            <ChevronRight size={22} strokeWidth={2} />
-          </button>
+            variant="outline"
+            size="icon"
+            radius="full"
+            className="absolute right-0 md:-right-5 top-[45%] -translate-y-1/2 z-10 w-10 h-10 min-w-[40px] min-h-[40px] p-0 border border-gray-200 bg-white text-gray-600 shadow-[0_4px_15px_rgba(0,0,0,0.15)]"
+            icon={<ChevronRight size={22} strokeWidth={2} />}
+          />
         </div>
       </div>
     </section>

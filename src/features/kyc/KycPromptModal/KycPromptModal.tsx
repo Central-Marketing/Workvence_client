@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { ShieldAlert, ShieldCheck, ArrowRight, X, Lock, CheckCircle2 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
+import { Button } from "@/components/ui";
 
 export const KycPromptModal: React.FC = () => {
   const router = useRouter();
@@ -86,14 +87,16 @@ export const KycPromptModal: React.FC = () => {
 
         {/* Close / Skip button (if allowed) */}
         {allowSkipKyc && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
+            radius="full"
             onClick={handleDismiss}
-            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
+            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors cursor-pointer w-8 h-8 min-h-[32px] p-0"
             aria-label="Skip for now"
-          >
-            <X size={20} />
-          </button>
+            icon={<X size={20} />}
+          />
         )}
 
         {/* Header Icon */}
@@ -126,23 +129,29 @@ export const KycPromptModal: React.FC = () => {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
           {allowSkipKyc && (
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="md"
+              radius="xl"
               onClick={handleDismiss}
-              className="w-full sm:flex-1 py-3 px-4 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-colors cursor-pointer"
+              className="w-full sm:flex-1 text-slate-700 font-semibold text-sm"
             >
               Skip for Now
-            </button>
+            </Button>
           )}
 
-          <button
+          <Button
             type="button"
+            variant="brand"
+            size="md"
+            radius="xl"
             onClick={handleGoToKyc}
-            className="w-full sm:flex-1 py-3 px-5 rounded-xl bg-brand-green hover:bg-[#389115] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full sm:flex-1 font-bold text-sm shadow-md hover:shadow-lg"
+            rightIcon={<ArrowRight size={16} />}
           >
-            <span>Verify Identity Now</span>
-            <ArrowRight size={16} />
-          </button>
+            Verify Identity Now
+          </Button>
         </div>
 
         {/* Subtitle helper note */}

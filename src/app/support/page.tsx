@@ -21,6 +21,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { supportService, SupportTicketItem } from "@/utils/supportService";
+import { Button } from "@/components/ui";
 
 const CATEGORIES = [
   { id: "All", label: "All Categories", icon: Inbox },
@@ -218,17 +219,17 @@ export default function SupportDashboardPage() {
               const Icon = cat.icon;
               const isSelected = selectedCategory === cat.id;
               return (
-                <button
+                <Button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition cursor-pointer ${isSelected
-                      ? "bg-[#327C73] text-white shadow-xs"
-                      : "bg-[#f1f5f9] text-[#475569] hover:bg-[#e2e8f0]"
-                    }`}
+                  variant={isSelected ? "brand" : "soft"}
+                  size="sm"
+                  radius="fiverr"
+                  leftIcon={<Icon className="w-4 h-4" />}
+                  className="px-4 py-2 text-xs font-semibold whitespace-nowrap shadow-xs"
                 >
-                  <Icon className="w-4 h-4" />
-                  <span>{cat.label}</span>
-                </button>
+                  {cat.label}
+                </Button>
               );
             })}
           </div>
@@ -240,16 +241,16 @@ export default function SupportDashboardPage() {
             <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto">
               <span className="text-xs font-semibold text-[#64748b] mr-1">Status:</span>
               {STATUSES.map((st) => (
-                <button
+                <Button
                   key={st}
                   onClick={() => setSelectedStatus(st)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition cursor-pointer ${selectedStatus === st
-                      ? "bg-[#0f172a] text-white shadow-xs"
-                      : "text-[#64748b] hover:text-[#0f172a]"
-                    }`}
+                  variant={selectedStatus === st ? "dark" : "ghost"}
+                  size="xs"
+                  radius="fiverr"
+                  className="px-3 py-1.5 font-semibold capitalize"
                 >
                   {st.replace(/_/g, " ")}
-                </button>
+                </Button>
               ))}
             </div>
 
@@ -282,13 +283,16 @@ export default function SupportDashboardPage() {
                 <h3 className="text-base font-bold text-rose-900">Unable to load tickets</h3>
                 <p className="text-xs text-rose-700 max-w-md mx-auto">{error}</p>
               </div>
-              <button
+              <Button
                 onClick={fetchTickets}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-rose-600 text-white font-semibold text-xs hover:bg-rose-700 transition cursor-pointer"
+                variant="danger"
+                size="sm"
+                radius="fiverr"
+                leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+                className="px-5 py-2.5 font-semibold text-xs shadow-xs"
               >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>Retry</span>
-              </button>
+                Retry
+              </Button>
             </div>
           ) : filteredTickets.length === 0 ? (
             <div className="bg-white p-12 rounded-2xl border border-[#e2e8f0] text-center space-y-4">

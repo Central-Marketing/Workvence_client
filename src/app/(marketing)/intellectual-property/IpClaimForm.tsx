@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Send } from "lucide-react";
+import { Button } from "@/components";
 import toast from "react-hot-toast";
 
 export default function IpClaimForm() {
@@ -195,13 +196,17 @@ export default function IpClaimForm() {
             />
           </div>
 
-          <button
+          <Button
             type="submit"
-            className="w-full py-3 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer mt-2"
+            variant="brand"
+            size="md"
+            radius="xl"
+            fullWidth
+            leftIcon={<Send className="w-4 h-4" />}
+            className="mt-2 text-xs shadow-md font-semibold"
           >
-            <Send className="w-4 h-4" />
-            <span>Submit DMCA Takedown Notice</span>
-          </button>
+            Submit DMCA Takedown Notice
+          </Button>
         </form>
       </div>
     </div>

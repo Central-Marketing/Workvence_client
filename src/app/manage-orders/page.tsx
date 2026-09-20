@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "@/components";
+import { Loader, Button } from "@/components";
 import { FiHome, FiCalendar, FiSearch } from "react-icons/fi";
 
 
@@ -217,30 +217,35 @@ const ManageOrders = () => {
                 {tabs.map((tab) => {
                   const isActive = activeTab === tab.id;
                   return (
-                    <button
+                    <Button
                       key={tab.id}
                       type="button"
+                      variant={isActive ? "dark" : "ghost"}
+                      size="xs"
+                      radius="lg"
                       onClick={() => setActiveTab(tab.id)}
-                      className={`px-4 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${isActive
-                          ? "bg-[#0B3A33] text-white shadow-2xs"
-                          : "text-gray-600 hover:text-gray-900"
+                      className={`px-4 py-1.5 whitespace-nowrap transition-all cursor-pointer ${isActive
+                          ? "!bg-[#0B3A33] !text-white shadow-2xs"
+                          : "!text-gray-600 hover:!text-gray-900"
                         }`}
                     >
                       {tab.label}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
 
               {/* Right Side: Calendar Button + Search Box */}
               <div className="flex items-center gap-3 self-start lg:self-auto">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="icon"
+                  radius="lg"
                   title="Filter by date"
-                  className="w-9 h-9 rounded-lg border border-gray-200/90 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors bg-white shrink-0"
-                >
-                  <FiCalendar className="text-sm" />
-                </button>
+                  className="w-9 h-9 border-gray-200/90 text-gray-500 hover:bg-gray-50 bg-white shrink-0"
+                  icon={<FiCalendar className="text-sm" />}
+                />
 
                 <div className="relative flex items-center">
                   <FiSearch className="absolute left-3 text-gray-400 text-xs pointer-events-none" />

@@ -7,6 +7,7 @@ import { Navigation } from 'swiper/modules';
 import { ArrowRight } from 'lucide-react';
 import useAdminCategories from '@/hooks/useAdminCategories';
 import { axiosFetch } from '@/utils';
+import { Button } from '@/components/ui';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -76,28 +77,38 @@ const PopularServices = () => {
           </div>
 
           <div className="flex gap-2">
-            <button
+            <Button
+              type="button"
               onClick={() => swiperRef.current?.slidePrev()}
               aria-label="Previous service slide"
               title="Previous slide"
-              className="w-10 h-10 flex items-center justify-center rounded-full border-[1px] border-[#0000001A] text-[#868686] transition-colors bg-white shadow-sm"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M5.49997 12L19 12" stroke="#868686" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M11 6C11 6 5 10.4189 5 12C5 13.5812 11 18 11 18" stroke="#868686" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <button
+              variant="outline"
+              size="icon"
+              radius="full"
+              className="w-10 h-10 min-w-[40px] min-h-[40px] p-0 border-[#0000001A] text-[#868686] bg-white shadow-sm"
+              icon={
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M5.49997 12L19 12" stroke="#868686" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M11 6C11 6 5 10.4189 5 12C5 13.5812 11 18 11 18" stroke="#868686" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              }
+            />
+            <Button
+              type="button"
               onClick={() => swiperRef.current?.slideNext()}
               aria-label="Next service slide"
               title="Next slide"
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-[#126D6B] border-[1px] border-[#0000001A]  transition-colors shadow-sm"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M18.5 12H5" stroke="#126D6B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M13 18C13 18 19 13.5811 19 12C19 10.4188 13 6 13 6" stroke="#126D6B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
+              variant="outline"
+              size="icon"
+              radius="full"
+              className="w-10 h-10 min-w-[40px] min-h-[40px] p-0 bg-white text-[#126D6B] border-[#0000001A] shadow-sm"
+              icon={
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M18.5 12H5" stroke="#126D6B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M13 18C13 18 19 13.5811 19 12C19 10.4188 13 6 13 6" stroke="#126D6B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              }
+            />
           </div>
         </div>
 

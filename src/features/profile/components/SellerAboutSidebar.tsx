@@ -2,7 +2,7 @@
 
 import React from "react";
 import { FiMapPin, FiClock, FiPackage, FiArrowRight } from "react-icons/fi";
-import { AiGradientButton } from "@/components/ui";
+import { AiGradientButton, Button } from "@/components/ui";
 
 interface SellerAboutSidebarProps {
   name: string;
@@ -158,14 +158,18 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
           </div>
 
           {/* Black Primary Action Button */}
-          <button
+          <Button
             type="button"
+            variant="dark"
+            size="md"
+            radius="fiverr"
+            fullWidth
             onClick={onContact}
-            className="w-full py-3 bg-black hover:bg-neutral-800 text-white text-sm font-semibold rounded-[10px] flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-[0.98] mb-3"
+            rightIcon={<FiArrowRight className="w-4 h-4" />}
+            className="font-semibold shadow-xs mb-3"
           >
-            <span>Contact with {name.split(" ")[0]}</span>
-            <FiArrowRight className="w-4 h-4" />
-          </button>
+            Contact with {name.split(" ")[0]}
+          </Button>
 
           {/* Secondary Action Row: Message + Analysis Seller Profile */}
           {/* <div className="grid grid-cols-2 gap-2.5">

@@ -26,6 +26,7 @@ import {
   X,
   Inbox
 } from "lucide-react";
+import { Button } from "@/components/ui";
 
 type TabFilter = "all" | "unread" | "read";
 
@@ -297,26 +298,34 @@ const NotificationsPage = () => {
 
           {/* Top Actions */}
           <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
+              radius="xl"
               onClick={() => fetchNotifications(true)}
               disabled={isRefreshing}
-              className="px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-2xs hover:border-slate-300 active:scale-95 disabled:opacity-60"
+              leftIcon={<RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-[#0E3834]" : ""}`} />}
+              className="px-3.5 py-2.5 text-xs font-semibold shadow-2xs"
               title="Refresh notifications"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-[#0E3834]" : ""}`} />
-              <span>Refresh</span>
-            </button>
+              Refresh
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant="brand"
+              size="sm"
+              radius="xl"
               onClick={handleMarkAllAsRead}
               disabled={isMarkingAll || unreadCount === 0}
-              className="px-4 py-2.5 rounded-xl bg-[#0E3834] hover:bg-[#092724] text-white text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#0E3834]"
+              isLoading={isMarkingAll}
+              loadingText="Marking all..."
+              leftIcon={<CheckCheck className="w-4 h-4" />}
+              className="px-4 py-2.5 bg-[#0E3834] hover:bg-[#092724] text-xs font-semibold shadow-xs"
             >
-              <CheckCheck className="w-4 h-4" />
-              <span>Mark all as read</span>
-            </button>
+              Mark all as read
+            </Button>
           </div>
         </div>
 
@@ -324,11 +333,14 @@ const NotificationsPage = () => {
         <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-xs mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           {/* Segmented Filter Tabs */}
           <div className="bg-[#F3F4F6] p-1 rounded-xl flex items-center gap-1 shrink-0">
-            <button
+            <Button
               type="button"
+              variant={activeTab === "all" ? "brand" : "ghost"}
+              size="xs"
+              radius="lg"
               onClick={() => setActiveTab("all")}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${activeTab === "all"
-                ? "bg-[#0E3834] text-white shadow-xs"
+              className={`px-4 py-2 text-xs font-semibold gap-1.5 ${activeTab === "all"
+                ? "bg-[#0E3834] hover:bg-[#0E3834] text-white shadow-xs"
                 : "text-slate-600 hover:text-slate-900"
                 }`}
             >
@@ -337,13 +349,16 @@ const NotificationsPage = () => {
                 }`}>
                 {notifications.length}
               </span>
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant={activeTab === "unread" ? "brand" : "ghost"}
+              size="xs"
+              radius="lg"
               onClick={() => setActiveTab("unread")}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${activeTab === "unread"
-                ? "bg-[#0E3834] text-white shadow-xs"
+              className={`px-4 py-2 text-xs font-semibold gap-1.5 ${activeTab === "unread"
+                ? "bg-[#0E3834] hover:bg-[#0E3834] text-white shadow-xs"
                 : "text-slate-600 hover:text-slate-900"
                 }`}
             >
@@ -354,13 +369,16 @@ const NotificationsPage = () => {
                   {unreadCount}
                 </span>
               )}
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
+              variant={activeTab === "read" ? "brand" : "ghost"}
+              size="xs"
+              radius="lg"
               onClick={() => setActiveTab("read")}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${activeTab === "read"
-                ? "bg-[#0E3834] text-white shadow-xs"
+              className={`px-4 py-2 text-xs font-semibold gap-1.5 ${activeTab === "read"
+                ? "bg-[#0E3834] hover:bg-[#0E3834] text-white shadow-xs"
                 : "text-slate-600 hover:text-slate-900"
                 }`}
             >
@@ -369,7 +387,7 @@ const NotificationsPage = () => {
                 }`}>
                 {readCount}
               </span>
-            </button>
+            </Button>
           </div>
 
           {/* Search Input Box */}
@@ -383,14 +401,17 @@ const NotificationsPage = () => {
               className="w-full pl-9 pr-8 py-2 bg-[#F9FAFB] hover:bg-white focus:bg-white text-xs text-slate-900 rounded-xl border border-slate-200 focus:border-[#0E3834] focus:ring-1 focus:ring-[#0E3834] outline-hidden transition-all placeholder:text-slate-400"
             />
             {searchQuery && (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
+                radius="full"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 w-6 h-6 h-auto min-h-0 border-none shadow-none hover:bg-transparent"
                 title="Clear search"
               >
                 <X className="w-3.5 h-3.5" />
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -435,21 +456,27 @@ const NotificationsPage = () => {
                   : "You don't have any notifications at the moment. When orders, messages, or updates arrive, they will appear right here."}
             </p>
             {searchQuery ? (
-              <button
+              <Button
                 type="button"
+                variant="soft"
+                size="md"
+                radius="xl"
                 onClick={() => setSearchQuery("")}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold cursor-pointer transition-colors"
+                className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold"
               >
                 Clear search filter
-              </button>
+              </Button>
             ) : (
-              <button
+              <Button
                 type="button"
+                variant="brand"
+                size="md"
+                radius="xl"
                 onClick={() => router.push(dashboardRoute)}
-                className="px-5 py-2.5 rounded-xl bg-[#0E3834] hover:bg-[#092724] text-white text-xs font-semibold cursor-pointer transition-all shadow-xs"
+                className="px-5 py-2.5 bg-[#0E3834] hover:bg-[#092724] text-white text-xs font-semibold shadow-xs"
               >
                 Return to Dashboard
-              </button>
+              </Button>
             )}
           </div>
         ) : (
@@ -533,26 +560,32 @@ const NotificationsPage = () => {
                           {/* Item Actions */}
                           <div className="flex items-center gap-1 shrink-0 self-center pl-1">
                             {!n.isRead && (
-                              <button
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                size="icon"
+                                radius="lg"
                                 onClick={(e) => handleMarkAsRead(e, n)}
-                                className="w-8 h-8 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 flex items-center justify-center transition-colors cursor-pointer"
+                                className="w-8 h-8 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 border-none shadow-none"
                                 title="Mark as read"
                                 aria-label="Mark as read"
                               >
                                 <Check className="w-4 h-4" />
-                              </button>
+                              </Button>
                             )}
 
-                            <button
+                            <Button
                               type="button"
+                              variant="ghost"
+                              size="icon"
+                              radius="lg"
                               onClick={(e) => handleDeleteNotification(e, n._id)}
-                              className="w-8 h-8 rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center transition-colors cursor-pointer opacity-0 group-hover:opacity-100 max-sm:opacity-100"
+                              className="w-8 h-8 text-slate-300 hover:text-rose-500 hover:bg-rose-50 opacity-0 group-hover:opacity-100 max-sm:opacity-100 border-none shadow-none"
                               title="Dismiss notification"
                               aria-label="Dismiss notification"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       );

@@ -457,10 +457,10 @@ body.hide-navbar nav {
   -webkit-background-clip: padding-box, border-box !important;
 }
 
-/* Global Fluid Container - Automatically takes body width with responsive gutters */
+/* Global Container - 1400px Max Width */
 .container {
   width: 100% !important;
-  max-width: 100% !important;
+  max-width: 1400px !important;
   margin-left: auto !important;
   margin-right: auto !important;
   padding-left: 1rem;
@@ -483,15 +483,15 @@ body.hide-navbar nav {
 
 @media (min-width: 1024px) {
   .container {
-    padding-left: 3rem;
-    padding-right: 3rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }
 
 @media (min-width: 1280px) {
   .container {
-    padding-left: 80px !important;
-    padding-right: 80px !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
   }
 }
 

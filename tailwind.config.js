@@ -29,6 +29,7 @@ module.exports = {
       addComponents({
         '.container': {
           width: '100%',
+          maxWidth: '1400px',
           marginLeft: 'auto',
           marginRight: 'auto',
           paddingLeft: '1rem',
@@ -42,16 +43,16 @@ module.exports = {
             paddingRight: '2rem',
           },
           '@screen lg': {
-            paddingLeft: '3rem',
-            paddingRight: '3rem',
+            paddingLeft: '2rem',
+            paddingRight: '2rem',
           },
           '@screen xl': {
-            paddingLeft: '80px',
-            paddingRight: '80px',
+            paddingLeft: '2rem',
+            paddingRight: '2rem',
           },
           '@screen 2xl': {
-            paddingLeft: '80px',
-            paddingRight: '80px',
+            paddingLeft: '2rem',
+            paddingRight: '2rem',
           },
         },
       });

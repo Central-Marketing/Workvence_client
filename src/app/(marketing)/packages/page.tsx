@@ -22,7 +22,6 @@ import useAdminCategories from "@/hooks/useAdminCategories";
 import { FiAlertCircle, FiRefreshCw, FiGrid, FiArrowRight, FiArrowLeft, FiHome } from "react-icons/fi";
 
 const DEFAULT_CATEGORIES = [
-  "All services",
   "Technology & Programming",
   "Writing & Translation",
   "Design",
@@ -186,7 +185,7 @@ const Packages = () => {
       c.name.toLowerCase().includes('other')
     );
 
-    return [{ name: "All services", slug: "All services" }, ...regularCats, ...otherCats];
+    return [...regularCats, ...otherCats];
   }, [parentCategories]);
 
   const findCategoryInList = (catInput: string) => {

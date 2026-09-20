@@ -1029,13 +1029,11 @@ const BriefDetail = () => {
           onClick={() => setShowProposalsModal(false)}
         >
           <div
-            className={`bg-white rounded-2xl w-full ${
-              modalView === "ai" ? "max-w-2xl" : "max-w-xl"
-            } max-h-[90vh] flex flex-col overflow-hidden relative transition-all ${
-              modalView === "ai"
+            className={`bg-white rounded-2xl w-full ${modalView === "ai" ? "max-w-2xl" : "max-w-xl"
+              } max-h-[90vh] flex flex-col overflow-hidden relative transition-all ${modalView === "ai"
                 ? "border-2 border-[#0D6D5F]/30 ring-4 ring-[#0D6D5F]/10 shadow-2xl"
                 : "border border-slate-100 shadow-2xl"
-            }`}
+              }`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* MODAL HEADER */}
@@ -1063,7 +1061,7 @@ const BriefDetail = () => {
                   {modalView === "ai" && (
                     <span className="inline-flex items-center gap-2 text-xl sm:text-2xl font-bold leading-normal">
                       <span className="text-slate-900">Recommended by</span>
-                      <span className="bg-gradient-to-r from-[#0D6D5F] to-[#10b981] bg-clip-text text-transparent [-webkit-text-fill-color:transparent] font-sf-pro font-extrabold text-xl sm:text-2xl">
+                      <span className="bg-gradient-to-r from-[#8A38F5]/80 to-[#82C2FD] bg-clip-text text-transparent [-webkit-text-fill-color:transparent] font-sf-pro font-extrabold text-xl sm:text-2xl">
                         AI
                       </span>
                     </span>
@@ -1207,7 +1205,7 @@ const BriefDetail = () => {
                               setSelectedProposal(item);
                               setModalView("detail");
                             }}
-                            className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors cursor-pointer text-center"
+                            className="flex-1 py-2.5 rounded-[10px] bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors cursor-pointer text-center"
                           >
                             View Proposal
                           </button>
@@ -1215,7 +1213,7 @@ const BriefDetail = () => {
                             type="button"
                             disabled={messagingSellerId === item.sellerId}
                             onClick={() => handleMessageSeller(item.sellerId, item.name)}
-                            className="flex-1 py-2.5 rounded-xl bg-black hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
+                            className="flex-1 py-2.5 rounded-[10px] bg-black hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
                           >
                             <span>
                               {messagingSellerId === item.sellerId ? "Connecting..." : "Message"}
@@ -1287,11 +1285,10 @@ const BriefDetail = () => {
                         return (
                           <div
                             key={displayItem.id || `ai-rec-${index}`}
-                            className={`bg-white border rounded-2xl p-4 sm:p-5 transition-all shadow-2xs ${
-                              rank === 1
-                                ? "border-[#0D6D5F]/40 ring-2 ring-[#0D6D5F]/10 hover:border-[#0D6D5F]/60"
-                                : "border-slate-200/90 hover:border-slate-300"
-                            }`}
+                            className={`bg-white border rounded-2xl p-4 sm:p-5 transition-all shadow-2xs ${rank === 1
+                              ? "border-[#0D6D5F]/40 ring-2 ring-[#0D6D5F]/10 hover:border-[#0D6D5F]/60"
+                              : "border-slate-200/90 hover:border-slate-300"
+                              }`}
                           >
                             {/* Card Top Bar: Rank, Score & Price */}
                             <div className="flex items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-100">
@@ -1468,7 +1465,7 @@ const BriefDetail = () => {
                                   setSelectedProposal(displayItem);
                                   setModalView("detail");
                                 }}
-                                className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors cursor-pointer text-center"
+                                className="flex-1 py-2.5 rounded-[10px] bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors cursor-pointer text-center"
                               >
                                 View Proposal
                               </button>
@@ -1476,7 +1473,7 @@ const BriefDetail = () => {
                                 type="button"
                                 disabled={messagingSellerId === displayItem.sellerId}
                                 onClick={() => handleMessageSeller(displayItem.sellerId, displayItem.name)}
-                                className="flex-1 py-2.5 rounded-xl bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs font-semibold transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
+                                className="flex-1 py-2.5 rounded-[10px] bg-black hover:bg-slate-800 text-white text-xs font-semibold transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50"
                               >
                                 <span>
                                   {messagingSellerId === displayItem.sellerId ? "Connecting..." : "Message"}

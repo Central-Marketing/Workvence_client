@@ -7,11 +7,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { RiSearchLine } from "react-icons/ri";
 import { FiMenu, FiX, FiMessageSquare, FiBell, FiChevronDown, FiGrid, FiArrowRight, FiHeart } from "react-icons/fi";
 import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
+import useSearchSuggestions, { SuggestionItem } from "@/hooks/useSearchSuggestions";
 
 import toast from 'react-hot-toast';
 import { axiosFetch, socket, handleAuthExpired, isAccessTokenExpiringSoon, refreshAccessToken, getCookie } from '@/utils';
 import { useUserStore } from "@/store/userStore";
-import { Loader, NotificationBell, HeaderInboxIcon, AiGradientButton, Button } from '@/components';
+import { Loader, NotificationBell, HeaderInboxIcon, AiGradientButton, Button, SearchSuggestionsDropdown } from '@/components';
 import CategoryBar from "../CategoryBar/CategoryBar";
 
 const Navbar = () => {
@@ -29,6 +30,8 @@ const Navbar = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const { items, isOpen, setIsOpen, isLoading: isSuggestionsLoading } = useSearchSuggestions(searchQuery, { limit: 8 });
 
   useEffect(() => {
     setIsMounted(true);
@@ -55,9 +58,55 @@ const Navbar = () => {
       };
     });
 
+  const handleSelectSuggestion = (item: SuggestionItem | { text: string; type: 'query' }) => {
+    const text = item.text.trim();
+    setSearchQuery(text);
+    setIsOpen(false);
+    setSelectedIndex(-1);
+    if (item.type === 'category') {
+      router.push(`/packages?category=${encodeURIComponent((item as SuggestionItem).slug || text)}`);
+    } else {
+      router.push(`/packages?search=${encodeURIComponent(text)}`);
+    }
+  };
+
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && searchQuery.trim()) {
-      router.push(`/packages?search=${encodeURIComponent(searchQuery.trim())}`);
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (!isOpen && items.length > 0) {
+        setIsOpen(true);
+      }
+      const maxIndex = searchQuery.trim() ? items.length : items.length - 1;
+      setSelectedIndex((prev) => (prev < maxIndex ? prev + 1 : 0));
+      return;
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const maxIndex = searchQuery.trim() ? items.length : items.length - 1;
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : maxIndex));
+      return;
+    }
+
+    if (e.key === "Escape") {
+      setIsOpen(false);
+      setSelectedIndex(-1);
+      return;
+    }
+
+    if (e.key === "Enter") {
+      if (selectedIndex >= 0 && selectedIndex < items.length) {
+        handleSelectSuggestion(items[selectedIndex]);
+        return;
+      }
+      if (selectedIndex === items.length && searchQuery.trim()) {
+        handleSelectSuggestion({ text: searchQuery.trim(), type: 'query' });
+        return;
+      }
+      if (searchQuery.trim()) {
+        setIsOpen(false);
+        router.push(`/packages?search=${encodeURIComponent(searchQuery.trim())}`);
+      }
     }
   };
 
@@ -152,6 +201,10 @@ const Navbar = () => {
       if (!e.target.closest('.category-dropdown-container')) {
         setIsCategoryDropdownOpen(false);
       }
+      if (!e.target.closest('.search-container')) {
+        setIsOpen(false);
+        setSelectedIndex(-1);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
 
@@ -224,12 +277,13 @@ const Navbar = () => {
             />
           </Link>
 
-          <div className={`flex items-center overflow-hidden transition-all duration-300 ${showSearchBar ? 'opacity-100 flex-1 min-w-0 max-w-full' : 'opacity-0 max-w-0 pointer-events-none w-0'}`}>
-            <div className="flex items-center rounded-xl px-3 sm:px-3.5 xl:px-4 py-2 sm:py-2.5 w-full max-w-full lg:max-w-[340px] xl:max-w-[460px] macbook:max-w-[540px] 2xl:max-w-[620px] bg-[#F4F4F6] border border-transparent focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-sm transition-all group">
+          <div className={`flex items-center transition-all duration-300 ${showSearchBar ? 'opacity-100 flex-1 min-w-0 max-w-full' : 'opacity-0 max-w-0 pointer-events-none w-0 overflow-hidden'}`}>
+            <div className="relative search-container flex items-center rounded-xl px-3 sm:px-3.5 xl:px-4 py-2 sm:py-2.5 w-full max-w-full lg:max-w-[340px] xl:max-w-[460px] macbook:max-w-[540px] 2xl:max-w-[620px] bg-[#F4F4F6] border border-transparent focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-sm transition-all group">
               <RiSearchLine
                 className="text-gray-400 text-base sm:text-lg mr-2 sm:mr-2.5 group-focus-within:text-brand-green transition-colors shrink-0 cursor-pointer"
                 onClick={() => {
                   if (searchQuery.trim()) {
+                    setIsOpen(false);
                     router.push(`/packages?search=${encodeURIComponent(searchQuery.trim())}`);
                   }
                 }}
@@ -239,8 +293,23 @@ const Navbar = () => {
                 placeholder="What you are looking for"
                 className="bg-transparent border-none outline-none w-full text-xs sm:text-[13px] xl:text-[14px] font-medium text-gray-800 placeholder-gray-400 min-w-0 truncate"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setSelectedIndex(-1);
+                }}
+                onFocus={() => {
+                  if (items.length > 0) setIsOpen(true);
+                }}
                 onKeyDown={handleSearch}
+              />
+
+              <SearchSuggestionsDropdown
+                items={items}
+                query={searchQuery}
+                isOpen={isOpen}
+                isLoading={isSuggestionsLoading}
+                selectedIndex={selectedIndex}
+                onSelect={handleSelectSuggestion}
               />
             </div>
           </div>

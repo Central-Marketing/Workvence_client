@@ -9,4 +9,4 @@ export type { AiGradientButtonProps } from './AiGradientButton/AiGradientButton'
 export { Button, default as ButtonComponent } from './Button';
 export type { ButtonProps, ButtonVariant, ButtonSize, ButtonRadius } from './Button';
 export * from './Skeletons';
-
+export { SearchSuggestionsDropdown, default as SearchSuggestionsDropdownComponent } from './SearchSuggestions/SearchSuggestionsDropdown';

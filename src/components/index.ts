@@ -17,6 +17,7 @@ export { default as AiGradientButton, GradientButton } from "./ui/AiGradientButt
 export type { AiGradientButtonProps } from "./ui/AiGradientButton/AiGradientButton";
 export { Button } from "./ui/Button";
 export * from "./ui/Skeletons";
+export { SearchSuggestionsDropdown } from "./ui/SearchSuggestions/SearchSuggestionsDropdown";
 
 // Marketing components
 export { default as Featured } from "./marketing/Featured/Featured";

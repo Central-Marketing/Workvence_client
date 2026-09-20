@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import useAdminCategories from '@/hooks/useAdminCategories';
+import useSearchSuggestions, { SuggestionItem } from '@/hooks/useSearchSuggestions';
+import { SearchSuggestionsDropdown } from '@/components/ui';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -164,6 +166,72 @@ const Featured = () => {
     { scope: containerRef }
   );
 
+  const { items, isOpen, setIsOpen, isLoading: isSuggestionsLoading } = useSearchSuggestions(search, { limit: 8 });
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+
+  const handleSelectSuggestion = (item: SuggestionItem | { text: string; type: 'query' }) => {
+    const text = item.text.trim();
+    setSearch(text);
+    setIsOpen(false);
+    setSelectedIndex(-1);
+    if (item.type === 'category') {
+      router.push(`/packages?category=${encodeURIComponent((item as SuggestionItem).slug || text)}`);
+    } else {
+      router.push(`/packages?search=${encodeURIComponent(text)}`);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (!isOpen && items.length > 0) {
+        setIsOpen(true);
+      }
+      const maxIndex = search.trim() ? items.length : items.length - 1;
+      setSelectedIndex((prev) => (prev < maxIndex ? prev + 1 : 0));
+      return;
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const maxIndex = search.trim() ? items.length : items.length - 1;
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : maxIndex));
+      return;
+    }
+
+    if (e.key === "Escape") {
+      setIsOpen(false);
+      setSelectedIndex(-1);
+      return;
+    }
+
+    if (e.key === "Enter") {
+      if (selectedIndex >= 0 && selectedIndex < items.length) {
+        handleSelectSuggestion(items[selectedIndex]);
+        return;
+      }
+      if (selectedIndex === items.length && search.trim()) {
+        handleSelectSuggestion({ text: search.trim(), type: 'query' });
+        return;
+      }
+      if (search.trim()) {
+        setIsOpen(false);
+        handleSearch();
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+        setSelectedIndex(-1);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [setIsOpen]);
+
   const handleSearch = () => {
     if (search.trim() || category) {
       router.push(`/packages?search=${encodeURIComponent(search.trim())}&category=${encodeURIComponent(category)}`);
@@ -268,64 +336,27 @@ const Featured = () => {
             <input
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setSelectedIndex(-1);
+              }}
+              onFocus={() => {
+                if (items.length > 0) setIsOpen(true);
+              }}
+              onKeyDown={handleKeyDown}
               placeholder="What services are you looking for..."
               className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-[#868686] placeholder:text-[16px] placeholder:font-sf-pro text-xs sm:text-sm md:text-base font-normal font-sf-pro"
             />
           </div>
 
-          {/* Floating Dynamic Category Suggestions */}
-          {search.trim().length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white/98 backdrop-blur-md p-2 rounded-xl sm:rounded-2xl border border-slate-200 shadow-xl z-50 flex flex-col gap-1 text-left">
-              {filteredCategories.length > 0 ? (
-                <>
-                  <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-2.5 py-1">
-                    Matching Categories
-                  </div>
-                  {filteredCategories.slice(0, 5).map((cat: any, index: number) => {
-                    const name = cat.name;
-                    const slug = cat.slug;
-                    const iconStr = cat.icon || '';
-
-                    return (
-                      <div
-                        key={slug || index}
-                        className="flex items-center gap-3 cursor-pointer px-3 py-2 rounded-lg hover:bg-slate-100/90 transition-colors"
-                        onClick={() => router.push(`/packages?category=${encodeURIComponent(slug)}`)}
-                      >
-                        <div className="text-[#327C73] shrink-0">
-                          {getCategoryIcon(iconStr, name)}
-                        </div>
-                        <span className="text-sm font-medium text-slate-700">
-                          {name}
-                        </span>
-                      </div>
-                    );
-                  })}
-                  <div
-                    className="flex items-center justify-between border-t border-slate-100 mt-1 pt-2 px-3 py-1.5 cursor-pointer rounded-lg hover:bg-emerald-50 text-[#327C73] transition-colors"
-                    onClick={handleSearch}
-                  >
-                    <span className="text-xs font-semibold">
-                      Search for &quot;{search.trim()}&quot;
-                    </span>
-                    <Search className="w-3.5 h-3.5" />
-                  </div>
-                </>
-              ) : (
-                <div
-                  className="flex items-center justify-between px-3 py-2 cursor-pointer rounded-lg hover:bg-emerald-50 text-[#327C73] transition-colors"
-                  onClick={handleSearch}
-                >
-                  <span className="text-xs font-medium text-slate-600">
-                    Search all gigs for &quot;<span className="font-semibold text-slate-800">{search.trim()}</span>&quot;
-                  </span>
-                  <Search className="w-3.5 h-3.5" />
-                </div>
-              )}
-            </div>
-          )}
+          <SearchSuggestionsDropdown
+            items={items}
+            query={search}
+            isOpen={isOpen}
+            isLoading={isSuggestionsLoading}
+            selectedIndex={selectedIndex}
+            onSelect={handleSelectSuggestion}
+          />
         </div>
       </div>
 

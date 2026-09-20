@@ -52,11 +52,11 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
   return (
     <div className={`w-full max-w-[500px] space-y-6 ${className}`.trim()}>
       {/* 1. Top Card: Packages Pricing Tier Card */}
-      <div className="bg-[#FFF] border border-[rgba(0,0,0,0.10)] rounded-[20px] p-[20px] shadow-2xs">
+      <div className="bg-[#FFF] border border-[rgba(0,0,0,0.10)] rounded-[20px] p-4 sm:p-5 2xl:p-[20px] shadow-2xs">
         {/* Tier Segmented Tabs (only if multiple tiers exist) */}
         {availableTiers.length > 1 && (
           <div
-            className="grid gap-1 bg-[var(--Foundation-White-white-300,#F5F5F5)] p-[10px] rounded-[10px] border border-[rgba(0,0,0,0.10)] text-center mb-5"
+            className="grid gap-1 bg-[var(--Foundation-White-white-300,#F5F5F5)] p-1.5 sm:p-2 2xl:p-[10px] rounded-[10px] border border-[rgba(0,0,0,0.10)] text-center mb-5"
             style={{ gridTemplateColumns: `repeat(${availableTiers.length}, minmax(0, 1fr))` }}
           >
             {availableTiers.map((tierKey) => {
@@ -67,7 +67,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
                   key={tierKey}
                   type="button"
                   onClick={() => onSelectTier(tierKey)}
-                  className={`py-[10px] px-2.5 sm:px-4 lg:px-[20px] rounded-[10px] font-inter font-normal not-italic text-[16px] sm:text-[18px] lg:text-[20px] leading-[26px] transition-all cursor-pointer ${isSelected
+                  className={`py-2 sm:py-2.5 2xl:py-[10px] px-2 sm:px-3 lg:px-2.5 xl:px-3.5 2xl:px-[20px] rounded-[10px] font-inter font-normal not-italic text-[13px] min-[400px]:text-[14px] sm:text-[15px] md:text-[16px] lg:text-[16px] xl:text-[18px] macbook:text-[19px] 2xl:text-[20px] leading-[20px] sm:leading-[22px] lg:leading-[24px] 2xl:leading-[26px] transition-all cursor-pointer ${isSelected
                     ? "bg-[var(--Foundation-Green-green-900,#0B403F)] text-[var(--Foundation-White-white-50,#FFF)] shadow-xs"
                     : "text-[var(--Foundation-Grey-grey-400,#6E6E6E)] hover:text-gray-900"
                     }`}
@@ -81,13 +81,13 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
 
         {/* Custom Tier Title / Tagline */}
         {(activePkg.tagline || activePkg.title) && (
-          <h4 className="font-sf-pro font-[510] not-italic text-[16px] sm:text-[18px] lg:text-[20px] text-[var(--Foundation-Grey-grey-400,#6E6E6E)] leading-normal mb-1">
+          <h4 className="font-sf-pro font-[510] not-italic text-[14px] min-[400px]:text-[15px] sm:text-[16px] md:text-[16px] lg:text-[17px] xl:text-[18px] macbook:text-[19px] 2xl:text-[20px] text-[var(--Foundation-Grey-grey-400,#6E6E6E)] leading-normal mb-1">
             {activePkg.tagline || activePkg.title}
           </h4>
         )}
 
         {/* Price Display */}
-        <div className="flex items-baseline mb-4 pb-4 border-b border-gray-100 font-sf-pro font-bold text-[32px] sm:text-[36px] leading-normal not-italic">
+        <div className="flex items-baseline mb-4 pb-4 border-b border-gray-100 font-sf-pro font-bold text-[26px] min-[400px]:text-[28px] sm:text-[20px] md:text-[22px] lg:text-[24px] xl:text-[26px] macbook:text-[28px] 2xl:text-[36px] not-italic">
           <span className="text-[var(--Foundation-Grey-grey-400,#6E6E6E)]">$</span>
           <span className="text-[#000]">{activePkg.price}</span>
         </div>
@@ -95,41 +95,38 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
         {/* Short Description */}
         {activePkg.shortDesc && (
           <p className="
-  font-sf-pro
-  font-normal
-  not-italic
-  text-[14px]
-  sm:text-[16px]
-  md:text-[18px]
-  lg:text-[21px]
-  xl:text-[24px]
-  leading-[21px]
-  sm:leading-[23px]
-  md:leading-[26px]
-  lg:leading-[29px]
-  xl:leading-[33px]
-  text-[var(--Foundation-Grey-grey-500,#4A4A4A)]
-  mb-5
-  pb-5
-  border-b
-  border-gray-100
-">
+            font-sf-pro
+            font-normal
+            not-italic
+            text-[14px]
+            min-[400px]:text-[15px]
+            md:text-[14px]
+            lg:text-[15px]
+            xl:text-[16px]
+            macbook:text-[18px]
+            2xl:text-[24px]
+            text-[var(--Foundation-Grey-grey-500,#4A4A4A)]
+            mb-5
+            pb-5
+            border-b
+            border-gray-100
+          ">
             {activePkg.shortDesc}
           </p>
         )}
 
         {/* Revisions & Delivery Meta Row */}
         {(Boolean(activePkg.revisions) || activePkg.deliveryTime > 0) && (
-          <div className="flex items-center gap-5 sm:gap-6 font-sf-pro font-normal not-italic text-[20px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] leading-normal mb-5 flex-wrap">
+          <div className="flex items-center gap-4 sm:gap-5 2xl:gap-6 font-sf-pro font-normal not-italic text-[13px] min-[400px]:text-[14px] sm:text-[15px] md:text-[16px] lg:text-[16px] xl:text-[18px] macbook:text-[19px] 2xl:text-[20px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] leading-normal mb-5 flex-wrap">
             {activePkg.revisions ? (
-              <div className="flex items-center gap-2">
-                <FiRepeat className="w-[24px] h-[24px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] shrink-0" />
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <FiRepeat className="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px] lg:w-[20px] lg:h-[20px] xl:w-[22px] xl:h-[22px] macbook:w-[23px] macbook:h-[23px] 2xl:w-[24px] 2xl:h-[24px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] shrink-0" />
                 <span>{activePkg.revisions}</span>
               </div>
             ) : null}
             {activePkg.deliveryTime > 0 ? (
-              <div className="flex items-center gap-2">
-                <FiClock className="w-[24px] h-[24px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] shrink-0" />
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <FiClock className="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px] lg:w-[20px] lg:h-[20px] xl:w-[22px] xl:h-[22px] macbook:w-[23px] macbook:h-[23px] 2xl:w-[24px] 2xl:h-[24px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] shrink-0" />
                 <span>{activePkg.deliveryTime} Day{activePkg.deliveryTime > 1 ? 's' : ''} Delivery</span>
               </div>
             ) : null}
@@ -142,10 +139,10 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
             {checklistItems.map((item, idx) => (
               <div
                 key={idx}
-                className="px-[20px] py-[24px] flex items-center gap-3"
+                className="px-3.5 sm:px-4 lg:px-[18px] 2xl:px-[20px] py-2.5 sm:py-3 lg:py-3.5 2xl:py-[20px] flex items-center gap-2.5 sm:gap-3"
               >
                 <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6 shrink-0"
+                  className="w-4 h-4 min-[400px]:w-5 min-[400px]:h-5 sm:w-[22px] sm:h-[22px] 2xl:w-6 2xl:h-6 shrink-0"
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -163,7 +160,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
                     strokeLinejoin="round"
                   />
                 </svg>
-                <span className="font-sf-pro font-[510] not-italic text-[15px] sm:text-[17px] text-[#6E6E6E] leading-normal">
+                <span className="font-sf-pro font-[510] not-italic text-[13px] min-[400px]:text-[14px] sm:text-[15px] md:text-[15px] lg:text-[15px] xl:text-[16px] macbook:text-[16px] 2xl:text-[17px] text-[#6E6E6E] leading-normal">
                   {item}
                 </span>
               </div>
@@ -176,7 +173,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
           <button
             type="button"
             onClick={() => onCheckout(activePkg.key)}
-            className="w-full py-3.5 bg-brand-green hover:bg-brand-green/90 text-white text-xs sm:text-[13px] font-bold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-[0.99] mb-2.5"
+            className="w-full py-3 sm:py-3.5 bg-brand-green hover:bg-brand-green/90 text-white text-xs min-[400px]:text-[13px] sm:text-sm 2xl:text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-[0.99] mb-2.5"
           >
             <span>Continue (${activePkg.price})</span>
             <FiArrowRight className="w-4 h-4" />
@@ -187,7 +184,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
         <button
           type="button"
           onClick={onContact}
-          className="w-full py-3 bg-[#EAECEF] hover:bg-[#DFE2E6] text-gray-800 text-xs sm:text-[13px] font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"
+          className="w-full py-2.5 sm:py-3 bg-[#EAECEF] hover:bg-[#DFE2E6] text-gray-800 text-xs min-[400px]:text-[13px] sm:text-sm 2xl:text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"
         >
           <FiMessageSquare className="w-3.5 h-3.5 text-gray-600" />
           <span>Contact Seller</span>
@@ -195,14 +192,14 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
       </div>
 
       {/* 2. Bottom Card: About The Seller Card */}
-      <div className="bg-[#FFF] border border-[rgba(0,0,0,0.10)] rounded-[20px] p-[20px] shadow-2xs">
+      <div className="bg-[#FFF] border border-[rgba(0,0,0,0.10)] rounded-[20px] p-4 sm:p-5 2xl:p-[20px] shadow-2xs">
         {/* Header */}
         <div className="flex items-center justify-between gap-2 mb-4">
-          <h3 className="text-sm font-bold text-gray-900">
+          <h3 className="text-xs min-[400px]:text-[13px] sm:text-sm md:text-sm lg:text-sm xl:text-[15px] 2xl:text-base font-bold text-gray-900">
             About the seller
           </h3>
           {seller.memberSince && (
-            <span className="text-[11px] text-gray-400 font-medium">
+            <span className="text-[10px] min-[400px]:text-[11px] sm:text-xs 2xl:text-xs text-gray-400 font-medium">
               Member Since, {seller.memberSince}
             </span>
           )}
@@ -218,7 +215,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
             <img
               src={seller.avatar || defaultAvatar}
               alt={seller.name}
-              className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-2xs group-hover:opacity-90 transition-opacity"
+              className="w-10 h-10 min-[400px]:w-11 min-[400px]:h-11 sm:w-12 sm:h-12 2xl:w-[50px] 2xl:h-[50px] rounded-full object-cover border border-gray-200 shadow-2xs group-hover:opacity-90 transition-opacity"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = defaultAvatar;
               }}
@@ -228,10 +225,10 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
             <div className="flex items-center gap-2 mb-0.5">
               <Link
                 href={`/seller/${seller.username || seller.name}`}
-                className="text-sm font-bold text-gray-900 hover:text-brand-green transition-colors"
+                className="text-xs min-[400px]:text-[13px] sm:text-sm md:text-sm lg:text-sm xl:text-[15px] 2xl:text-base font-bold text-gray-900 hover:text-brand-green transition-colors"
                 title={`View ${seller.name}'s profile`}
               >
-                <h4 className="text-sm font-bold text-gray-900 hover:text-brand-green transition-colors">
+                <h4 className="text-xs min-[400px]:text-[13px] sm:text-sm md:text-sm lg:text-sm xl:text-[15px] 2xl:text-base font-bold text-gray-900 hover:text-brand-green transition-colors">
                   {seller.name}
                 </h4>
               </Link>
@@ -241,7 +238,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2 text-xs text-gray-500 flex-wrap">
+            <div className="flex items-center gap-2 text-[11px] min-[400px]:text-xs 2xl:text-xs text-gray-500 flex-wrap">
               {seller.role ? <span>{seller.role}</span> : null}
               {seller.rating > 0 ? (
                 <div className="flex items-center gap-1 font-semibold text-gray-900">
@@ -258,7 +255,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
 
         {/* Seller Bio with See more */}
         {seller.bio && (
-          <p className="text-xs text-gray-600 leading-relaxed mb-4">
+          <p className="text-[11px] min-[400px]:text-xs sm:text-[13px] md:text-[13px] lg:text-xs xl:text-[13px] 2xl:text-sm text-gray-600 leading-relaxed mb-4">
             {isBioExpanded ? seller.bio : `${seller.bio.slice(0, 115)}${seller.bio.length > 115 ? '...' : ''} `}
             {seller.bio.length > 115 && (
               <button
@@ -274,7 +271,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
 
         {/* Country & Language */}
         {(seller.country || seller.languages.length > 0) && (
-          <div className="space-y-1.5 text-xs text-gray-600 mb-4 pb-4 border-b border-gray-100">
+          <div className="space-y-1.5 text-[11px] min-[400px]:text-xs sm:text-[13px] lg:text-xs xl:text-[13px] 2xl:text-sm text-gray-600 mb-4 pb-4 border-b border-gray-100">
             {seller.country ? (
               <div className="flex items-center justify-between">
                 <span className="text-gray-400">From</span>
@@ -296,7 +293,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
             {seller.skills.map((skill, idx) => (
               <span
                 key={idx}
-                className="text-[11px] font-medium text-gray-600 bg-gray-50 border border-gray-200/80 px-2.5 py-1 rounded-md"
+                className="text-[10px] min-[400px]:text-[11px] sm:text-xs 2xl:text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200/80 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md"
               >
                 {skill}
               </span>
@@ -308,7 +305,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
         {onViewSellerProfile && (
           <AiGradientButton
             onClick={onViewSellerProfile}
-            className="w-full py-3 text-xs sm:text-sm font-bold"
+            className="w-full py-2.5 sm:py-3 text-xs min-[400px]:text-[13px] sm:text-sm 2xl:text-sm font-bold"
             text="Seller Profile"
             icon={
               <svg

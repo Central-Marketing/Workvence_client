@@ -61,7 +61,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
       </nav>
 
       {/* 2. Main Title */}
-      <h1 className="text-[26px] sm:text-[34px] md:text-[42px] lg:text-[48px] font-[590] font-sf-pro text-[var(--Foundation-Grey-grey-800,#292929)] not-italic leading-[32px] sm:leading-[42px] lg:leading-[50px] mb-4">
+      <h1 className="text-[24px] min-[400px]:text-[26px] sm:text-[32px] md:text-[26px] lg:text-[28px] xl:text-[32px] macbook:text-[36px] 2xl:text-[48px] font-[590] font-sf-pro text-[var(--Foundation-Grey-grey-800,#292929)] not-italic leading-[30px] min-[400px]:leading-[32px] sm:leading-[38px] md:leading-[42px] lg:leading-[46px] xl:leading-[50px] macbook:leading-[52px] 2xl:leading-[54px] mb-4">
         {title}
       </h1>
 
@@ -157,67 +157,82 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
 
         {/* Card 1: Profile Status */}
         <div className="
-    min-h-[72px]
-    sm:min-h-[80px]
-    lg:h-[84px]
-    px-3
-    min-[480px]:px-3.5
-    sm:px-4
-    lg:px-5
-    py-3
-    lg:py-0
-    flex items-center
-    gap-2
-    sm:gap-2.5
-    lg:gap-4
-    border-b
-    min-[480px]:border-r
-    lg:border-b-0
-    border-black/10
-  ">
+          min-h-[72px]
+          sm:min-h-[80px]
+          lg:h-[84px]
+          px-3
+          min-[480px]:px-3.5
+          sm:px-4
+          lg:px-2.5
+          xl:px-3.5
+          macbook:px-4
+          2xl:px-5
+          py-3
+          lg:py-0
+          flex items-center
+          gap-2
+          sm:gap-2.5
+          lg:gap-2
+          xl:gap-2.5
+          macbook:gap-3
+          2xl:gap-4
+          border-b
+          min-[480px]:border-r
+          lg:border-b-0
+          border-black/10
+        ">
           <div className="
-      w-8 h-8
-      sm:w-9 sm:h-9
-      lg:w-10 lg:h-10
-      rounded-[10px]
-      border border-[#0000001A]
-      bg-[#FAFAFA]
-      text-[#5568AB]
-      flex items-center justify-center
-      shrink-0
-    ">
-            <BadgeCheck className="w-4 h-4 sm:w-[17px] sm:h-[17px] lg:w-[18px] lg:h-[18px]" />
+            w-8 h-8
+            sm:w-9 sm:h-9
+            lg:w-8 lg:h-8
+            xl:w-9 xl:h-9
+            2xl:w-10 2xl:h-10
+            rounded-[10px]
+            border border-[#0000001A]
+            bg-[#FAFAFA]
+            text-[#5568AB]
+            flex items-center justify-center
+            shrink-0
+          ">
+            <BadgeCheck className="w-4 h-4 sm:w-[17px] sm:h-[17px] lg:w-4 lg:h-4 xl:w-[17px] xl:h-[17px] 2xl:w-[18px] 2xl:h-[18px]" />
           </div>
 
           <div className="min-w-0 flex-1">
             <span className="
-        text-[11px]
-        min-[480px]:text-xs
-        sm:text-sm
-        lg:text-base
-        font-sf-pro
-        text-[#6E6E6E]
-        block
-        font-normal
-        leading-tight
-        truncate
-      ">
+              text-[11px]
+              min-[480px]:text-xs
+              sm:text-xs
+              md:text-xs
+              lg:text-[11px]
+              xl:text-xs
+              macbook:text-[13px]
+              2xl:text-sm
+              font-sf-pro
+              text-[#6E6E6E]
+              block
+              font-normal
+              leading-tight
+              truncate
+            ">
               Profile Status
             </span>
 
             <span className="
-        text-sm
-        min-[480px]:text-base
-        sm:text-lg
-        lg:text-xl
-        xl:text-2xl
-        font-sf-pro
-        font-bold
-        text-black
-        leading-tight
-        truncate
-        block
-      ">
+              text-sm
+              min-[480px]:text-[15px]
+              sm:text-base
+              md:text-base
+              lg:text-[15px]
+              xl:text-[18px]
+              macbook:text-[20px]
+              2xl:text-[24px]
+              font-sf-pro
+              font-bold
+              text-black
+              leading-tight
+              truncate
+              block
+            ">
               {seller.verified ? "Verified" : "Active"}
             </span>
           </div>
@@ -225,67 +240,82 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
 
         {/* Card 2: Response Time */}
         <div className="
-    min-h-[72px]
-    sm:min-h-[80px]
-    lg:h-[84px]
-    px-3
-    min-[480px]:px-3.5
-    sm:px-4
-    lg:px-5
-    py-3
-    lg:py-0
-    flex items-center
-    gap-2
-    sm:gap-2.5
-    lg:gap-4
-    border-b
-    lg:border-b-0
-    lg:border-r
-    border-black/10
-  ">
+          min-h-[72px]
+          sm:min-h-[80px]
+          lg:h-[84px]
+          px-3
+          min-[480px]:px-3.5
+          sm:px-4
+          lg:px-2.5
+          xl:px-3.5
+          macbook:px-4
+          2xl:px-5
+          py-3
+          lg:py-0
+          flex items-center
+          gap-2
+          sm:gap-2.5
+          lg:gap-2
+          xl:gap-2.5
+          macbook:gap-3
+          2xl:gap-4
+          border-b
+          lg:border-b-0
+          lg:border-r
+          border-black/10
+        ">
           <div className="
-      w-8 h-8
-      sm:w-9 sm:h-9
-      lg:w-10 lg:h-10
-      rounded-[10px]
-      border border-[#0000001A]
-      bg-[#FAFAFA]
-      text-[#F57727]
-      flex items-center justify-center
-      shrink-0
-    ">
-            <FiClock className="w-4 h-4 sm:w-[17px] sm:h-[17px] lg:w-[18px] lg:h-[18px]" />
+            w-8 h-8
+            sm:w-9 sm:h-9
+            lg:w-8 lg:h-8
+            xl:w-9 xl:h-9
+            2xl:w-10 2xl:h-10
+            rounded-[10px]
+            border border-[#0000001A]
+            bg-[#FAFAFA]
+            text-[#F57727]
+            flex items-center justify-center
+            shrink-0
+          ">
+            <FiClock className="w-4 h-4 sm:w-[17px] sm:h-[17px] lg:w-4 lg:h-4 xl:w-[17px] xl:h-[17px] 2xl:w-[18px] 2xl:h-[18px]" />
           </div>
 
           <div className="min-w-0 flex-1">
             <span className="
-        text-[11px]
-        min-[480px]:text-xs
-        sm:text-sm
-        lg:text-base
-        font-sf-pro
-        text-[#6E6E6E]
-        block
-        font-normal
-        leading-tight
-        truncate
-      ">
+              text-[11px]
+              min-[480px]:text-xs
+              sm:text-xs
+              md:text-xs
+              lg:text-[11px]
+              xl:text-xs
+              macbook:text-[13px]
+              2xl:text-sm
+              font-sf-pro
+              text-[#6E6E6E]
+              block
+              font-normal
+              leading-tight
+              truncate
+            ">
               Response Time
             </span>
 
             <span className="
-        text-sm
-        min-[480px]:text-base
-        sm:text-lg
-        lg:text-xl
-        xl:text-2xl
-        font-sf-pro
-        font-bold
-        text-black
-        leading-tight
-        truncate
-        block
-      ">
+              text-sm
+              min-[480px]:text-[15px]
+              sm:text-base
+              md:text-base
+              lg:text-[15px]
+              xl:text-[18px]
+              macbook:text-[20px]
+              2xl:text-[24px]
+              font-sf-pro
+              font-bold
+              text-black
+              leading-tight
+              truncate
+              block
+            ">
               {seller.responseTime}
             </span>
           </div>
@@ -293,68 +323,83 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
 
         {/* Card 3: Category */}
         <div className="
-    min-h-[72px]
-    sm:min-h-[80px]
-    lg:h-[84px]
-    px-3
-    min-[480px]:px-3.5
-    sm:px-4
-    lg:px-5
-    py-3
-    lg:py-0
-    flex items-center
-    gap-2
-    sm:gap-2.5
-    lg:gap-4
-    border-b
-    min-[480px]:border-b-0
-    lg:border-r
-    border-black/10
-  ">
+          min-h-[72px]
+          sm:min-h-[80px]
+          lg:h-[84px]
+          px-3
+          min-[480px]:px-3.5
+          sm:px-4
+          lg:px-2.5
+          xl:px-3.5
+          macbook:px-4
+          2xl:px-5
+          py-3
+          lg:py-0
+          flex items-center
+          gap-2
+          sm:gap-2.5
+          lg:gap-2
+          xl:gap-2.5
+          macbook:gap-3
+          2xl:gap-4
+          border-b
+          min-[480px]:border-b-0
+          lg:border-r
+          border-black/10
+        ">
           <div className="
-      w-8 h-8
-      sm:w-9 sm:h-9
-      lg:w-10 lg:h-10
-      rounded-[10px]
-      border border-[#0000001A]
-      bg-[#FAFAFA]
-      text-[#54AA54]
-      flex items-center justify-center
-      shrink-0
-    ">
-            <FaAward className="w-4 h-4 sm:w-[17px] sm:h-[17px] lg:w-[18px] lg:h-[18px]" />
+            w-8 h-8
+            sm:w-9 sm:h-9
+            lg:w-8 lg:h-8
+            xl:w-9 xl:h-9
+            2xl:w-10 2xl:h-10
+            rounded-[10px]
+            border border-[#0000001A]
+            bg-[#FAFAFA]
+            text-[#54AA54]
+            flex items-center justify-center
+            shrink-0
+          ">
+            <FaAward className="w-4 h-4 sm:w-[17px] sm:h-[17px] lg:w-4 lg:h-4 xl:w-[17px] xl:h-[17px] 2xl:w-[18px] 2xl:h-[18px]" />
           </div>
 
           <div className="min-w-0 flex-1">
             <span className="
-        text-[11px]
-        min-[480px]:text-xs
-        sm:text-sm
-        lg:text-base
-        font-sf-pro
-        text-[#6E6E6E]
-        block
-        font-normal
-        leading-tight
-        truncate
-      ">
+              text-[11px]
+              min-[480px]:text-xs
+              sm:text-xs
+              md:text-xs
+              lg:text-[11px]
+              xl:text-xs
+              macbook:text-[13px]
+              2xl:text-sm
+              font-sf-pro
+              text-[#6E6E6E]
+              block
+              font-normal
+              leading-tight
+              truncate
+            ">
               Category
             </span>
 
             <span
               className="
-          text-sm
-          min-[480px]:text-[15px]
-          sm:text-base
-          lg:text-lg
-          xl:text-xl
-          font-sf-pro
-          font-bold
-          text-black
-          truncate
-          block
-          leading-tight
-        "
+                text-sm
+                min-[480px]:text-[14px]
+                sm:text-[15px]
+                md:text-[15px]
+                lg:text-[13px]
+                xl:text-[16px]
+                macbook:text-[18px]
+                2xl:text-[24px]
+                font-sf-pro
+                font-bold
+                text-black
+                truncate
+                block
+                leading-tight
+              "
               title={seller.topRatedIn}
             >
               {seller.topRatedIn}
@@ -364,63 +409,78 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
 
         {/* Card 4: Completion */}
         <div className="
-    min-h-[72px]
-    sm:min-h-[80px]
-    lg:h-[84px]
-    px-3
-    min-[480px]:px-3.5
-    sm:px-4
-    lg:px-5
-    py-3
-    lg:py-0
-    flex items-center
-    gap-2
-    sm:gap-2.5
-    lg:gap-4
-  ">
+          min-h-[72px]
+          sm:min-h-[80px]
+          lg:h-[84px]
+          px-3
+          min-[480px]:px-3.5
+          sm:px-4
+          lg:px-2.5
+          xl:px-3.5
+          macbook:px-4
+          2xl:px-5
+          py-3
+          lg:py-0
+          flex items-center
+          gap-2
+          sm:gap-2.5
+          lg:gap-2
+          xl:gap-2.5
+          macbook:gap-3
+          2xl:gap-4
+        ">
           <div className="
-      w-8 h-8
-      sm:w-9 sm:h-9
-      lg:w-10 lg:h-10
-      rounded-[10px]
-      border border-[#0000001A]
-      bg-[#FAFAFA]
-      text-[#9654F4]
-      flex items-center justify-center
-      shrink-0
-    ">
-            <FiRepeat className="w-4 h-4 sm:w-[17px] sm:h-[17px] lg:w-[18px] lg:h-[18px]" />
+            w-8 h-8
+            sm:w-9 sm:h-9
+            lg:w-8 lg:h-8
+            xl:w-9 xl:h-9
+            2xl:w-10 2xl:h-10
+            rounded-[10px]
+            border border-[#0000001A]
+            bg-[#FAFAFA]
+            text-[#9654F4]
+            flex items-center justify-center
+            shrink-0
+          ">
+            <FiRepeat className="w-4 h-4 sm:w-[17px] sm:h-[17px] lg:w-4 lg:h-4 xl:w-[17px] xl:h-[17px] 2xl:w-[18px] 2xl:h-[18px]" />
           </div>
 
           <div className="min-w-0 flex-1">
             <span className="
-        text-[11px]
-        min-[480px]:text-xs
-        sm:text-sm
-        lg:text-base
-        font-sf-pro
-        text-[#6E6E6E]
-        block
-        font-normal
-        leading-tight
-        truncate
-      ">
+              text-[11px]
+              min-[480px]:text-xs
+              sm:text-xs
+              md:text-xs
+              lg:text-[11px]
+              xl:text-xs
+              macbook:text-[13px]
+              2xl:text-sm
+              font-sf-pro
+              text-[#6E6E6E]
+              block
+              font-normal
+              leading-tight
+              truncate
+            ">
               Completion
             </span>
 
             <span className="
-        text-sm
-        min-[480px]:text-base
-        sm:text-lg
-        lg:text-xl
-        xl:text-2xl
-        font-sf-pro
-        font-bold
-        text-black
-        leading-tight
-        truncate
-        block
-      ">
+              text-sm
+              min-[480px]:text-[15px]
+              sm:text-base
+              md:text-base
+              lg:text-[15px]
+              xl:text-[18px]
+              macbook:text-[20px]
+              2xl:text-[24px]
+              font-sf-pro
+              font-bold
+              text-black
+              leading-tight
+              truncate
+              block
+            ">
               {seller.returnRate || seller.onTimeDelivery || "100%"}
             </span>
           </div>

@@ -239,16 +239,17 @@ const BriefDetail = () => {
     return [];
   }, [brief?.proposals, fetchedProposals]);
 
-  const isClosed = brief?.isClosed || brief?.status === "closed";
-  const isOwner =
+  const isClosed = Boolean(brief?.isClosed || brief?.status === "closed");
+  const isOwner = Boolean(
     brief &&
     user &&
     (brief.userID?._id === user._id ||
       brief.userID === user._id ||
       brief.userID === user.id ||
       brief.user?.id === user._id ||
-      brief.user?.id === user.id);
-  const isSeller = user?.isSeller;
+      brief.user?.id === user.id)
+  );
+  const isSeller = Boolean(user?.isSeller);
 
   // Extract unique seller IDs from proposals to fetch their full live profiles
   const uniqueSellerIds: string[] = useMemo(() => {
@@ -269,7 +270,7 @@ const BriefDetail = () => {
           .get(`/users/${sid}`)
           .then(({ data }) => data?.user || data?.seller || data?.data || data)
           .catch(() => null),
-      enabled: !!sid && (showProposalsModal || isOwner),
+      enabled: Boolean(sid && (showProposalsModal || isOwner)),
       staleTime: 5 * 60 * 1000,
     })),
   });
@@ -345,7 +346,7 @@ const BriefDetail = () => {
           );
         })
         .catch(() => []),
-    enabled: !!briefId && !!user && isSeller && !isOwner,
+    enabled: Boolean(briefId && user && isSeller && !isOwner),
   });
 
   const sellerUserId = user?._id || user?.id;

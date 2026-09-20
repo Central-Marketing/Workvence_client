@@ -55,10 +55,10 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
         </p>
 
         {/* 3 Metric / Stat Boxes */}
-        <div className="bg-[#F8F8F8] border border-[#DADADA] rounded-[10px] overflow-hidden flex mb-6">
+        <div className="bg-[#F8F8F8] border border-[#DADADA] rounded-[10px] overflow-hidden flex flex-col sm:flex-row mb-6">
 
           {/* Box 1: Location */}
-          <div className="flex-1 p-2 flex items-center gap-4 border-r border-black/10">
+          <div className="flex-1 p-2 sm:p-4 flex items-center gap-4 border-b sm:border-b-0 sm:border-r border-black/10 min-w-0">
             <div className="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center shrink-0">
               <FiMapPin className="w-4 h-4" />
             </div>
@@ -75,7 +75,7 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
           </div>
 
           {/* Box 2: Response Time */}
-          <div className="flex-1 h-[76px] p-4 flex items-center gap-4 border-r border-black/10">
+          <div className="flex-1 h-[76px] p-4 flex items-center gap-4 border-b sm:border-b-0 sm:border-r border-black/10 min-w-0">
             <div className="w-8 h-8 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
               <FiClock className="w-4 h-4" />
             </div>
@@ -92,7 +92,7 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
           </div>
 
           {/* Box 3: On Time Delivery */}
-          <div className="flex-1 h-[76px] p-4 flex items-center gap-4">
+          <div className="flex-1 h-[76px] p-4 flex items-center gap-4 min-w-0">
             <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
               <FiPackage className="w-4 h-4" />
             </div>

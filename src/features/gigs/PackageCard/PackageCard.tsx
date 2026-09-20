@@ -7,6 +7,31 @@ import React from "react";
 import { useUserStore } from "@/store/userStore";
 import { FavoriteButton } from "@/components";
 
+const FALLBACK_COVER =
+  "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1000&q=85";
+
+const isValidUrl = (url?: unknown): boolean => {
+  if (!url || typeof url !== "string") return false;
+  const trimmed = url.trim();
+  if (!trimmed || trimmed === '""' || trimmed === "''" || trimmed === "null" || trimmed === "undefined") {
+    return false;
+  }
+  return trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/");
+};
+
+const resolveCoverImage = (data: any): string => {
+  const candidate =
+    data?.cover ||
+    data?.img ||
+    data?.image ||
+    (Array.isArray(data?.images) && data?.images[0]);
+
+  if (isValidUrl(candidate)) {
+    return (candidate as string).trim();
+  }
+  return FALLBACK_COVER;
+};
+
 const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean }) => {
   const router = useRouter();
   const { user } = useUserStore((state: any) => state);
@@ -15,12 +40,18 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
   const userObj = data.user || data.userId || data.userID || {};
   const userImg = userObj.image || data.pp || "/media/noavatar.png";
   const username = userObj.username || data.username || "Seller";
-  const coverImg =
-    data.cover ||
-    data.img ||
-    data.image ||
-    (Array.isArray(data.images) && data.images[0]) ||
-    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80";
+
+  const [imgSrc, setImgSrc] = React.useState<string>(() => resolveCoverImage(data));
+
+  React.useEffect(() => {
+    setImgSrc(resolveCoverImage(data));
+  }, [data?.cover, data?.img, data?.image, data?.images]);
+
+  const handleImageError = () => {
+    if (imgSrc !== FALLBACK_COVER) {
+      setImgSrc(FALLBACK_COVER);
+    }
+  };
 
   // Rating calculation
   const rawRating = data.starNumber > 0 ? (data.totalStars / data.starNumber).toFixed(1) : (data.star || 4.9);
@@ -51,20 +82,21 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
   return (
     <Link
       href={packageUrl}
-      className="group flex flex-col w-full h-full min-h-[400px] bg-white rounded-[10px] border border-[#DADADA] p-[10px] shadow-none hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-shadow duration-300"
+      className="group flex flex-col w-full h-full bg-white rounded-[10px] border border-[#DADADA] p-[10px] shadow-none hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-shadow duration-300"
     >
       {/* Top Image + Overlapping Avatar */}
-      <div className="relative w-full h-[220px] shrink-0">
+      <div className="relative w-full aspect-[405/220] shrink-0">
         {/* Thumbnail */}
-        <div className="relative w-full h-[220px] rounded-[5px] overflow-hidden bg-gray-100">
+        <div className="absolute inset-0 rounded-[5px] overflow-hidden bg-gray-100">
           <Image
-            src={coverImg}
+            src={imgSrc}
             alt={data.title || data.desc || "Package Cover"}
             fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 405px"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 405px"
             priority={priority}
             unoptimized
-            className="object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
+            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
+            onError={handleImageError}
           />
 
           {/* Favorite Button */}
@@ -110,44 +142,46 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
       </div>
 
       {/* Card Content Body */}
-      <div className="flex flex-col flex-1 pt-7 px-1">
-        {/* Row 1: Seller Name + Rating */}
-        <div className="flex items-center justify-between gap-2">
-          <span
-            onClick={handleProfileClick}
-            className="font-sf-pro font-[590] text-black text-[15px] sm:text-[16px] leading-normal not-italic hover:underline cursor-pointer truncate max-w-[65%]"
-          >
-            {username}
-          </span>
-
-          <div className="flex items-center gap-1 text-[13.5px] shrink-0">
-            <span className="text-gray-500 font-normal">
-              ({reviewCount})
-            </span>
-
-            <span className="text-gray-900 font-bold ml-0.5">
-              {rating}
-            </span>
-
-            <svg
-              className="w-3.5 h-3.5 text-[#F4AA1C] fill-[#F4AA1C] ml-0.5 -mt-0.5"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
+      <div className="flex flex-col flex-1 justify-between pt-7 px-1">
+        <div>
+          {/* Row 1: Seller Name + Rating */}
+          <div className="flex items-center justify-between gap-2">
+            <span
+              onClick={handleProfileClick}
+              className="font-sf-pro font-[590] text-black text-[15px] sm:text-[16px] leading-normal not-italic hover:underline cursor-pointer truncate max-w-[65%]"
             >
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
+              {username}
+            </span>
+
+            <div className="flex items-center gap-1 text-[13.5px] shrink-0">
+              <span className="text-gray-500 font-normal">
+                ({reviewCount})
+              </span>
+
+              <span className="text-gray-900 font-bold ml-0.5">
+                {rating}
+              </span>
+
+              <svg
+                className="w-3.5 h-3.5 text-[#F4AA1C] fill-[#F4AA1C] ml-0.5 -mt-0.5"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </div>
           </div>
+
+          {/* Row 2: Title / Description */}
+          <h3 className="mt-3 text-[16px] text-slate-900 font-normal font-inter not-italic line-clamp-2 min-h-[44px] sm:min-h-[48px] md:min-h-[52px] group-hover:text-gray-900 transition-colors">
+            {data.title ||
+              data.desc ||
+              "I will design,redesign business wordpress website as divi expert"}
+          </h3>
         </div>
 
-        {/* Row 2: Title / Description */}
-        <h3 className="mt-3 text-[16px] text-slate-900 font-normal font-inter not-italic line-clamp-2 min-h-[44px] sm:min-h-[48px] md:min-h-[52px] group-hover:text-gray-900 transition-colors">
-          {data.title ||
-            data.desc ||
-            "I will design,redesign business wordpress website as divi expert"}
-        </h3>
-
         {/* Row 3: Starting from Price */}
-        <div className="flex items-baseline gap-2 mt-[15px] pb-0.5">
+        <div className="flex items-baseline gap-2 mt-auto pt-3 pb-0.5">
           <span className="text-[14px] sm:text-[16px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] font-normal font-inter leading-[20px] sm:leading-[22px] not-italic">
             Starting from
           </span>

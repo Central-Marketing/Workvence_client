@@ -25,27 +25,27 @@ const isValidUrl = (url: unknown): boolean => {
   return t.startsWith("http://") || t.startsWith("https://") || t.startsWith("/");
 };
 
-const getFallbackSubcategoryBanner = (slugOrName: string = ""): string => {
+export const getFallbackSubcategoryBanner = (slugOrName: string = ""): string => {
   const s = slugOrName.toLowerCase();
   if (s.includes("artist") || s.includes("design") || s.includes("art") || s.includes("image")) {
-    return "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80";
+    return "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=85";
   }
   if (s.includes("bot") || s.includes("chat") || s.includes("agent")) {
-    return "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80";
+    return "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=85";
   }
   if (s.includes("workflow") || s.includes("automation") || s.includes("n8n") || s.includes("zapier")) {
-    return "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=600&q=80";
+    return "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=800&q=85";
   }
   if (s.includes("data") || s.includes("learning") || s.includes("science") || s.includes("analytics")) {
-    return "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=600&q=80";
+    return "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=85";
   }
   if (s.includes("consult") || s.includes("business") || s.includes("strategy")) {
-    return "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80";
+    return "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=85";
   }
   if (s.includes("code") || s.includes("tech") || s.includes("dev") || s.includes("software")) {
-    return "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80";
+    return "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=85";
   }
-  return "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=600&q=80";
+  return "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=85";
 };
 
 /**

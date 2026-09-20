@@ -61,7 +61,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
       </nav>
 
       {/* 2. Main Title */}
-      <h1 className="text-[24px] min-[400px]:text-[26px] sm:text-[32px] md:text-[26px] lg:text-[28px] xl:text-[32px] macbook:text-[36px] 2xl:text-[48px] font-[590] font-sf-pro text-[var(--Foundation-Grey-grey-800,#292929)] not-italic leading-[30px] min-[400px]:leading-[32px] sm:leading-[38px] md:leading-[42px] lg:leading-[46px] xl:leading-[50px] macbook:leading-[52px] 2xl:leading-[54px] mb-4">
+      <h1 className="text-[24px] min-[400px]:text-[26px] sm:text-[32px] md:text-[26px] lg:text-[28px] xl:text-[32px] macbook:text-[32px] 2xl:text-[48px] font-[590] font-sf-pro text-[var(--Foundation-Grey-grey-800,#292929)] not-italic mb-4">
         {title}
       </h1>
 

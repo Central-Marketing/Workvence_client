@@ -490,8 +490,8 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     </div>
 
                     {(existingReview?.description || reviewDescription) && (
-                      <div className="bg-white/90 border border-emerald-200/80 rounded-xl p-4 mt-3 max-w-lg mx-auto text-left shadow-2xs">
-                        <div className="flex items-center gap-1 text-xs mb-1.5">
+                      <div className="bg-white/90 border border-emerald-200/80 rounded-xl p-4 mt-3 w-full max-w-lg mx-auto text-center flex flex-col items-center justify-center shadow-2xs">
+                        <div className="flex items-center justify-center gap-1 text-sm mb-2">
                           {[1, 2, 3, 4, 5].map((s) => (
                             <span
                               key={s}
@@ -504,11 +504,11 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                               ★
                             </span>
                           ))}
-                          <span className="ml-1.5 font-bold text-slate-700 text-xs">
+                          <span className="ml-1.5 font-bold text-slate-700 text-xs sm:text-sm">
                             {Number(existingReview?.star ?? totalScore ?? 0).toFixed(1)}
                           </span>
                         </div>
-                        <p className="text-xs sm:text-sm text-slate-700 italic">
+                        <p className="w-full text-center text-xs sm:text-sm text-slate-700 italic leading-relaxed">
                           "{existingReview?.description || reviewDescription}"
                         </p>
                       </div>

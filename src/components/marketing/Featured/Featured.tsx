@@ -47,6 +47,8 @@ const Featured = ({
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const typewriterTlRef = useRef<gsap.core.Timeline | null>(null);
 
   useGSAP(
     () => {
@@ -101,6 +103,60 @@ const Featured = ({
           '-=0.55'
         );
       }
+
+      // GSAP Typewriter animation for placeholder text
+      const targetText = "What services are you looking for...";
+      const proxy = { length: 0 };
+
+      const typewriterTl = gsap.timeline({
+        repeat: -1,
+        repeatDelay: 0.6,
+        delay: 0.9,
+      });
+
+      // Clear placeholder at the start of typing cycle
+      typewriterTl.set({}, {
+        onComplete: () => {
+          if (searchInputRef.current) {
+            searchInputRef.current.placeholder = "";
+          }
+        },
+      });
+
+      // Forward typing
+      typewriterTl.to(proxy, {
+        length: targetText.length,
+        duration: 2.2,
+        ease: "none",
+        onUpdate: () => {
+          if (searchInputRef.current) {
+            searchInputRef.current.placeholder = targetText.slice(
+              0,
+              Math.ceil(proxy.length)
+            );
+          }
+        },
+      });
+
+      // Pause so user can comfortably read
+      typewriterTl.to({}, { duration: 2.5 });
+
+      // Backspace / erasing
+      typewriterTl.to(proxy, {
+        length: 0,
+        duration: 1.0,
+        ease: "power1.inOut",
+        onUpdate: () => {
+          if (searchInputRef.current) {
+            searchInputRef.current.placeholder = targetText.slice(
+              0,
+              Math.ceil(proxy.length)
+            );
+          }
+        },
+      });
+
+      typewriterTlRef.current = typewriterTl;
     },
     { scope: containerRef }
   );
@@ -384,14 +440,27 @@ const Featured = ({
                 <div className="flex items-center gap-2.5 sm:gap-3 w-full min-w-0">
                   <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 shrink-0" strokeWidth={2} />
                   <input
+                    ref={searchInputRef}
                     type="text"
                     value={search}
                     onChange={(e) => {
                       setSearch(e.target.value);
                       setSelectedIndex(-1);
+                      if (e.target.value) {
+                        typewriterTlRef.current?.pause();
+                      }
                     }}
                     onFocus={() => {
+                      typewriterTlRef.current?.pause();
+                      if (searchInputRef.current) {
+                        searchInputRef.current.placeholder = "What services are you looking for...";
+                      }
                       if (items.length > 0) setIsOpen(true);
+                    }}
+                    onBlur={() => {
+                      if (!search) {
+                        typewriterTlRef.current?.resume();
+                      }
                     }}
                     onKeyDown={handleKeyDown}
                     placeholder="What services are you looking for..."

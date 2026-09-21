@@ -404,7 +404,7 @@ const Navbar = () => {
                   variant="soft"
                   size="md"
                   radius="fiverr"
-                  className="bg-[#EDEDED] hover:bg-[#E0E0E0] h-[40px] text-[16px] px-3.5 xl:px-5 font-sf-pro font-semibold text-[#292929] whitespace-nowrap shrink-0"
+                  className="!bg-[#E0E0E0] hover:!bg-[#D5D5D5] h-[40px] text-[16px] px-3.5 xl:px-5 font-sf-pro font-semibold text-[#292929] whitespace-nowrap shrink-0"
                 >
                   Sign in
                 </Button>
@@ -699,8 +699,18 @@ const Navbar = () => {
               <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a Seller</Link>
               <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
               <hr className="my-2 border-gray-100" />
-              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors text-[16px] font-semibold">Sign in</Link>
-              <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="text-brand-green hover:opacity-80 transition-opacity flex items-center gap-1.5 text-[16px] font-semibold">
+              <Link
+                href="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center h-[40px] bg-[#E0E0E0] hover:bg-[#D5D5D5] text-[#292929] text-[16px] font-semibold rounded-[6px] transition-colors"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/register"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center gap-1.5 h-[40px] bg-[#0B0F19] hover:bg-black text-[#E8F5F5] text-[16px] font-semibold rounded-[6px] shadow-sm transition-colors"
+              >
                 <span>Join Now</span>
                 <FiArrowRight className="text-sm" />
               </Link>

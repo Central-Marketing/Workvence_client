@@ -14,6 +14,8 @@ import {
   FiUsers,
   FiXCircle,
   FiArrowRight,
+  FiSearch,
+  FiX,
 } from "react-icons/fi";
 
 import { axiosFetch } from "@/utils";
@@ -76,11 +78,20 @@ const getRateBadge = (brief: any): string => {
   return "40 hrs/week";
 };
 
+type BriefFilter = "all" | "new_proposals" | "new_projects" | "open" | "closed";
+
+const isProjectNew = (brief: any): boolean => {
+  if (!brief?.createdAt) return false;
+  return moment().diff(moment(brief.createdAt), "days") <= 14;
+};
+
 const MyBriefs = () => {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
   const queryClient = useQueryClient();
-  const [filter, setFilter] = useState<"all" | "open" | "closed">("all");
+  const [filter, setFilter] = useState<BriefFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"newest" | "proposals" | "budget">("newest");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -119,13 +130,131 @@ const MyBriefs = () => {
 
   const briefsArray = Array.isArray(briefs) ? briefs : [];
 
+  // Count stats for filter pills
+  const counts = useMemo(() => {
+    let newProposalsCount = 0;
+    let newProjectsCount = 0;
+    let openCount = 0;
+    let closedCount = 0;
+
+    briefsArray.forEach((b: any) => {
+      const isClosed = b.isClosed || b.status === "closed";
+      const pCount =
+        b.proposalCount ??
+        b.proposalsCount ??
+        (Array.isArray(b.proposals) ? b.proposals.length : 0);
+
+      if (pCount > 0 && !isClosed) newProposalsCount++;
+      if (isProjectNew(b) && !isClosed) newProjectsCount++;
+      if (!isClosed) openCount++;
+      if (isClosed) closedCount++;
+    });
+
+    return {
+      all: briefsArray.length,
+      new_proposals: newProposalsCount,
+      new_projects: newProjectsCount,
+      open: openCount,
+      closed: closedCount,
+    };
+  }, [briefsArray]);
+
   const filtered = useMemo(() => {
-    if (filter === "all") return briefsArray;
+    let list = [...briefsArray];
+
+    // 1. Status / Pill Filter
     if (filter === "open") {
-      return briefsArray.filter((b) => !b.isClosed && b.status !== "closed");
+      list = list.filter((b) => !b.isClosed && b.status !== "closed");
+    } else if (filter === "closed") {
+      list = list.filter((b) => b.isClosed || b.status === "closed");
+    } else if (filter === "new_proposals") {
+      list = list.filter((b) => {
+        const isClosed = b.isClosed || b.status === "closed";
+        const pCount =
+          b.proposalCount ??
+          b.proposalsCount ??
+          (Array.isArray(b.proposals) ? b.proposals.length : 0);
+        return pCount > 0 && !isClosed;
+      });
+    } else if (filter === "new_projects") {
+      list = list.filter((b) => isProjectNew(b) && !b.isClosed && b.status !== "closed");
     }
-    return briefsArray.filter((b) => b.isClosed || b.status === "closed");
-  }, [briefsArray, filter]);
+
+    // 2. Keyword Search
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
+      list = list.filter((b) => {
+        const title = (b.title || "").toLowerCase();
+        const description = (b.description || "").toLowerCase();
+        const category = (b.category || "").toLowerCase();
+        const skills = Array.isArray(b.skills)
+          ? b.skills.join(" ").toLowerCase()
+          : Array.isArray(b.requiredSkills)
+            ? b.requiredSkills.join(" ").toLowerCase()
+            : "";
+        return (
+          title.includes(q) ||
+          description.includes(q) ||
+          category.includes(q) ||
+          skills.includes(q)
+        );
+      });
+    }
+
+    // 3. Sorting
+    list.sort((a, b) => {
+      if (sortBy === "proposals") {
+        const pA = a.proposalCount ?? a.proposalsCount ?? (Array.isArray(a.proposals) ? a.proposals.length : 0);
+        const pB = b.proposalCount ?? b.proposalsCount ?? (Array.isArray(b.proposals) ? b.proposals.length : 0);
+        return pB - pA;
+      }
+      if (sortBy === "budget") {
+        const bA = typeof a.budget === "number" ? a.budget : parseFloat(a.budget) || 0;
+        const bB = typeof b.budget === "number" ? b.budget : parseFloat(b.budget) || 0;
+        return bB - bA;
+      }
+      // Default: newest first
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+    });
+
+    return list;
+  }, [briefsArray, filter, searchQuery, sortBy]);
+
+  const emptyState = useMemo(() => {
+    if (searchQuery) {
+      return {
+        title: "No matching projects found",
+        description: `We couldn't find any projects matching "${searchQuery}". Try adjusting your keywords.`,
+      };
+    }
+    switch (filter) {
+      case "new_proposals":
+        return {
+          title: "No projects with new proposals",
+          description: "None of your active projects have received candidate proposals yet.",
+        };
+      case "new_projects":
+        return {
+          title: "No new projects",
+          description: "Projects posted within the last 14 days will appear here.",
+        };
+      case "open":
+        return {
+          title: "No open projects",
+          description: "You don't have any open projects at the moment.",
+        };
+      case "closed":
+        return {
+          title: "No closed projects",
+          description: "Completed or archived projects will appear here.",
+        };
+      default:
+        return {
+          title: "No projects posted yet",
+          description: "Post your project specifications to receive detailed proposals from vetted freelancers.",
+        };
+    }
+  }, [filter, searchQuery]);
 
   if (!user) {
     return (
@@ -155,7 +284,7 @@ const MyBriefs = () => {
         {/* Title Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl sm:text-[34px] font-bold text-slate-900 tracking-tight">
+            <h1 className="text-xl sm:text-[34px] font-bold text-slate-900 tracking-tight">
               My Projects
             </h1>
             <p className="text-slate-500 text-xs sm:text-sm mt-1.5">
@@ -188,38 +317,132 @@ const MyBriefs = () => {
           )}
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-2.5 mb-8">
-          <Button
-            type="button"
-            variant={filter === "all" ? "dark" : "outline"}
-            size="sm"
-            radius="full"
-            onClick={() => setFilter("all")}
-            className="px-4 font-semibold text-xs sm:text-sm"
-          >
-            All Projects
-          </Button>
-          <Button
-            type="button"
-            variant={filter === "open" ? "dark" : "outline"}
-            size="sm"
-            radius="full"
-            onClick={() => setFilter("open")}
-            className="px-4 font-semibold text-xs sm:text-sm"
-          >
-            Open
-          </Button>
-          <Button
-            type="button"
-            variant={filter === "closed" ? "dark" : "outline"}
-            size="sm"
-            radius="full"
-            onClick={() => setFilter("closed")}
-            className="px-4 font-semibold text-xs sm:text-sm"
-          >
-            Closed
-          </Button>
+        {/* Filter Pills & Search / Sort Toolbar */}
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3.5 sm:gap-4 mb-6 sm:mb-8 w-full min-w-0 max-w-full">
+          {/* Filter Pills (Scrollable with edge bleed on mobile, smooth track on larger screens) */}
+          <div className="w-full xl:w-auto min-w-0 max-w-full overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-max">
+              <Button
+                type="button"
+                variant={filter === "all" ? "dark" : "outline"}
+                size="sm"
+                radius="full"
+                onClick={() => setFilter("all")}
+                className="px-3 sm:px-3.5 py-1.5 font-semibold text-xs sm:text-[13px] !inline-flex !items-center !flex-nowrap !whitespace-nowrap shrink-0"
+              >
+                <span className="whitespace-nowrap shrink-0">All Projects</span>
+                <span className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 whitespace-nowrap ${filter === "all" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+                  }`}>
+                  {counts.all}
+                </span>
+              </Button>
+
+              <Button
+                type="button"
+                variant={filter === "new_proposals" ? "dark" : "outline"}
+                size="sm"
+                radius="full"
+                onClick={() => setFilter("new_proposals")}
+                className={`px-3 sm:px-3.5 py-1.5 font-semibold text-xs sm:text-[13px] !inline-flex !items-center !flex-nowrap !whitespace-nowrap shrink-0 ${filter === "new_proposals" ? "!bg-[#0D6D5F] hover:!bg-[#0B403F] text-white border-transparent" : ""
+                  }`}
+              >
+                <span className="inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                  {counts.new_proposals > 0 && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0 inline-block" />
+                  )}
+                  <span>New Proposals</span>
+                </span>
+                <span className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 whitespace-nowrap ${filter === "new_proposals" ? "bg-white/20 text-white" : "bg-emerald-50 text-emerald-700"
+                  }`}>
+                  {counts.new_proposals}
+                </span>
+              </Button>
+
+              <Button
+                type="button"
+                variant={filter === "new_projects" ? "dark" : "outline"}
+                size="sm"
+                radius="full"
+                onClick={() => setFilter("new_projects")}
+                className={`px-3 sm:px-3.5 py-1.5 font-semibold text-xs sm:text-[13px] !inline-flex !items-center !flex-nowrap !whitespace-nowrap shrink-0 ${filter === "new_projects" ? "!bg-[#0D6D5F] hover:!bg-[#0B403F] text-white border-transparent" : ""
+                  }`}
+              >
+                <span className="whitespace-nowrap shrink-0">New Projects</span>
+                <span className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 whitespace-nowrap ${filter === "new_projects" ? "bg-white/20 text-white" : "bg-blue-50 text-blue-700"
+                  }`}>
+                  {counts.new_projects}
+                </span>
+              </Button>
+
+              <Button
+                type="button"
+                variant={filter === "open" ? "dark" : "outline"}
+                size="sm"
+                radius="full"
+                onClick={() => setFilter("open")}
+                className="px-3 sm:px-3.5 py-1.5 font-semibold text-xs sm:text-[13px] !inline-flex !items-center !flex-nowrap !whitespace-nowrap shrink-0"
+              >
+                <span className="whitespace-nowrap shrink-0">Open</span>
+                <span className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 whitespace-nowrap ${filter === "open" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+                  }`}>
+                  {counts.open}
+                </span>
+              </Button>
+
+              <Button
+                type="button"
+                variant={filter === "closed" ? "dark" : "outline"}
+                size="sm"
+                radius="full"
+                onClick={() => setFilter("closed")}
+                className="px-3 sm:px-3.5 py-1.5 font-semibold text-xs sm:text-[13px] !inline-flex !items-center !flex-nowrap !whitespace-nowrap shrink-0"
+              >
+                <span className="whitespace-nowrap shrink-0">Closed</span>
+                <span className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 whitespace-nowrap ${filter === "closed" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+                  }`}>
+                  {counts.closed}
+                </span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Search and Sort Toolbar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full xl:w-auto shrink-0">
+            {/* Search Input */}
+            <div className="relative flex items-center flex-1 sm:w-64 min-w-0">
+              <FiSearch className="absolute left-3 text-slate-400 text-xs sm:text-sm pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search projects..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-8 sm:pl-9 pr-7 py-2 bg-white border border-slate-200 focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F] rounded-xl text-xs sm:text-[13px] text-slate-800 placeholder:text-slate-400 outline-none transition-all shadow-2xs h-[38px]"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2 text-slate-400 hover:text-slate-600 p-1"
+                  aria-label="Clear search"
+                >
+                  <FiX className="text-xs" />
+                </button>
+              )}
+            </div>
+
+            {/* Sort Select */}
+            <div className="relative flex items-center w-full sm:w-auto shrink-0">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="w-full sm:w-auto px-3 py-2 bg-white border border-slate-200 focus:border-[#0D6D5F] rounded-xl text-xs sm:text-[13px] text-slate-700 font-medium outline-none cursor-pointer shadow-2xs h-[38px]"
+              >
+                <option value="newest">Sort: Newest</option>
+                <option value="proposals">Sort: Most Proposals</option>
+                <option value="budget">Sort: Budget</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Content Section */}
@@ -233,37 +456,39 @@ const MyBriefs = () => {
               📁
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-1.5">
-              {filter === "all" ? "No projects posted yet" : `No ${filter} projects`}
+              {emptyState.title}
             </h3>
             <p className="text-slate-500 text-xs sm:text-sm max-w-md mb-6">
-              {filter === "all"
-                ? "Post your project specifications to receive detailed proposals from vetted freelancers."
-                : "No projects match the selected filter."}
+              {emptyState.description}
             </p>
-            {filter === "all" && !user?.isSeller ? (
+            {filter === "all" && !searchQuery && !user?.isSeller ? (
               <Link
                 href="/briefs/create"
                 className="px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-[#0B0F19] hover:bg-black text-white transition-colors cursor-pointer shadow-xs"
               >
                 Post Your First Project
               </Link>
-            ) : filter !== "all" ? (
+            ) : (
               <Button
                 type="button"
                 variant="soft"
                 size="md"
                 radius="xl"
-                onClick={() => setFilter("all")}
+                onClick={() => {
+                  setFilter("all");
+                  setSearchQuery("");
+                }}
                 className="px-5 py-2.5 font-semibold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 text-slate-800"
               >
                 Show All Projects
               </Button>
-            ) : null}
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filtered.map((brief: any, index: number) => {
               const isClosed = brief.isClosed || brief.status === "closed";
+              const isNew = isProjectNew(brief);
               const proposalCount =
                 brief.proposalCount ??
                 brief.proposalsCount ??
@@ -277,23 +502,42 @@ const MyBriefs = () => {
                 <div
                   key={brief._id}
                   onClick={() => router.push(`/briefs/${brief._id}`)}
-                  className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 flex flex-col justify-between transition-all duration-200 hover:border-purple-300 hover:shadow-md hover:bg-gradient-to-br hover:from-white hover:to-purple-50/20 group cursor-pointer relative"
+                  className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-5 sm:p-6 sm:p-7 flex flex-col justify-between transition-all duration-200 hover:border-emerald-300 hover:shadow-md hover:bg-gradient-to-br hover:from-white hover:to-emerald-50/15 group cursor-pointer relative"
                 >
                   {/* Top Header Row */}
                   <div>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <h2 className="text-lg sm:text-[19px] font-bold text-slate-900 tracking-tight group-hover:text-slate-950 truncate">
+                        <h2 className="text-base sm:text-[19px] font-bold text-slate-900 tracking-tight group-hover:text-slate-950 truncate">
                           {brief.title}
                         </h2>
-                        <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
+                        <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-400 mt-1">
                           <span>Posted {moment(brief.createdAt).fromNow()}</span>
                           <span>•</span>
                           <span>{workType}</span>
+                          {isNew && !isClosed && (
+                            <>
+                              <span>•</span>
+                              <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                                New
+                              </span>
+                            </>
+                          )}
+                          {!isClosed && proposalCount > 0 && (
+                            <>
+                              <span>•</span>
+                              <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[11px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                {proposalCount} {proposalCount === 1 ? "New Proposal" : "New Proposals"}
+                              </span>
+                            </>
+                          )}
                           {isClosed && (
                             <>
                               <span>•</span>
-                              <span className="text-rose-600 font-semibold">Closed</span>
+                              <span className="text-rose-600 font-semibold bg-rose-50 border border-rose-200/80 text-[11px] px-2 py-0.5 rounded-full">
+                                Closed
+                              </span>
                             </>
                           )}
                         </div>
@@ -554,10 +798,10 @@ const MyProposals = () => {
                               <span>•</span>
                               <span
                                 className={`font-semibold capitalize ${proposal.status === "accepted"
-                                    ? "text-emerald-600"
-                                    : proposal.status === "rejected"
-                                      ? "text-rose-600"
-                                      : "text-amber-600"
+                                  ? "text-emerald-600"
+                                  : proposal.status === "rejected"
+                                    ? "text-rose-600"
+                                    : "text-amber-600"
                                   }`}
                               >
                                 {proposal.status}

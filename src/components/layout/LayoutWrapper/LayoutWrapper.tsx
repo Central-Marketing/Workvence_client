@@ -13,7 +13,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const isAdminPage = pathname.startsWith("/admin");
 
   return (
-    <div className={`flex flex-col ${isChatDetailPage ? 'h-screen h-[100dvh] max-h-[100dvh] overflow-hidden' : 'min-h-screen'}`}>
+    <div className={`flex flex-col overflow-x-clip w-full max-w-full ${isChatDetailPage ? 'h-screen h-[100dvh] max-h-[100dvh] overflow-hidden' : 'min-h-screen'}`}>
       {!isAuthPage && !isAdminPage && !isChatDetailPage && <Navbar />}
       {!isAdminPage && <KycPromptModal />}
       <main id="main-content" className={`flex-1 min-h-0 ${isChatDetailPage ? 'overflow-hidden flex flex-col h-full max-h-full' : ''}`}>

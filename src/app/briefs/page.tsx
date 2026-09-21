@@ -14,6 +14,8 @@ import {
   FiBriefcase,
   FiHeart,
   FiUser,
+  FiChevronLeft,
+  FiChevronRight,
 } from "react-icons/fi";
 import { RiSearchLine } from "react-icons/ri";
 
@@ -104,6 +106,37 @@ function BriefsContent() {
   }, [apiResponse]);
 
   const totalPages = apiResponse?.totalPages || 1;
+
+  // Generate smart pagination range with ellipsis to prevent responsive blowout
+  const paginationRange = useMemo(() => {
+    if (totalPages <= 1) return [];
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    const leftSibling = Math.max(currentPage - 1, 1);
+    const rightSibling = Math.min(currentPage + 1, totalPages);
+
+    const showLeftEllipsis = leftSibling > 2;
+    const showRightEllipsis = rightSibling < totalPages - 1;
+
+    if (!showLeftEllipsis && showRightEllipsis) {
+      const leftRange = [1, 2, 3, 4];
+      return [...leftRange, "...", totalPages];
+    }
+
+    if (showLeftEllipsis && !showRightEllipsis) {
+      const rightRange = [
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      ];
+      return [1, "...", ...rightRange];
+    }
+
+    return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
+  }, [currentPage, totalPages]);
 
   // Dynamic pill filters from real backend categories & briefs
   const pillFilters = useMemo(() => {
@@ -202,10 +235,10 @@ function BriefsContent() {
         {/* Main Title & Subtitle Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-7">
           <div>
-            <h1 className="text-3xl sm:text-[38px] font-bold text-gray-900 tracking-tight font-sf-pro leading-tight">
+            <h1 className="text-xl sm:text-[32px] font-bold text-gray-900 tracking-tight font-sf-pro leading-tight">
               Find Your Next Briefs
             </h1>
-            <p className="text-sm sm:text-[15px] text-gray-500 mt-1.5 max-w-2xl font-normal leading-relaxed">
+            <p className="text-[12px] sm:text-[15px] text-gray-500 mt-1.5 max-w-2xl font-normal leading-relaxed">
               Explore briefs from clients looking for the right talent, skills, and expertise to bring their ideas to life.
             </p>
           </div>
@@ -251,9 +284,8 @@ function BriefsContent() {
                     setActivePill(pill.id);
                     setCurrentPage(1);
                   }}
-                  className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${
-                    isActive ? "shadow-xs border-gray-900" : "hover:border-gray-900 hover:text-black"
-                  }`}
+                  className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${isActive ? "shadow-xs border-gray-900" : "hover:border-gray-900 hover:text-black"
+                    }`}
                 >
                   {pill.title}
                 </Button>
@@ -440,7 +472,7 @@ function BriefsContent() {
                       {/* Header Row: Title, Meta, Badges, Heart */}
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <div className="flex-1 min-w-0 pr-2">
-                          <h3 className="text-lg sm:text-[19px] font-bold text-gray-900 group-hover:text-[#327C73] transition-colors line-clamp-1 tracking-tight">
+                          <h3 className="text-base sm:text-[18px] font-bold text-gray-900 group-hover:text-[#327C73] transition-colors line-clamp-1 tracking-tight">
                             {brief.title}
                           </h3>
                           <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mt-1">
@@ -483,7 +515,7 @@ function BriefsContent() {
                       </div>
 
                       {/* Brief Description */}
-                      <p className="text-sm text-gray-600 line-clamp-2 my-4 leading-relaxed font-normal">
+                      <p className="text-[13px] text-gray-600 line-clamp-2 my-4 leading-relaxed font-normal">
                         {brief.description}
                       </p>
 
@@ -543,42 +575,72 @@ function BriefsContent() {
 
             {/* Pagination Controls from Real Backend totalPages */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-10">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  radius="xl"
-                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 text-xs font-semibold shadow-2xs"
+              <div className="w-full flex justify-center mt-10">
+                <nav
+                  aria-label="Pagination Navigation"
+                  className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 max-w-full px-2"
                 >
-                  Previous
-                </Button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
                   <Button
-                    key={pageNum}
                     type="button"
-                    variant={currentPage === pageNum ? "brand" : "outline"}
+                    variant="outline"
                     size="sm"
                     radius="xl"
-                    onClick={() => handlePageChange(pageNum)}
-                    className="w-9 h-9 p-0 text-xs font-semibold shadow-2xs"
+                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs font-semibold shadow-2xs shrink-0 flex items-center gap-1 min-h-[32px] sm:min-h-[36px]"
+                    aria-label="Previous page"
                   >
-                    {pageNum}
+                    <FiChevronLeft className="w-4 h-4 shrink-0" />
+                    <span className="hidden sm:inline">Previous</span>
                   </Button>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  radius="xl"
-                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 text-xs font-semibold shadow-2xs"
-                >
-                  Next
-                </Button>
+
+                  <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                    {paginationRange.map((pageNum, idx) => {
+                      if (typeof pageNum === "string") {
+                        return (
+                          <span
+                            key={`ellipsis-${idx}`}
+                            className="w-6 sm:w-8 h-8 sm:h-9 flex items-center justify-center text-xs text-slate-400 font-bold select-none shrink-0"
+                          >
+                            ...
+                          </span>
+                        );
+                      }
+
+                      const isActive = currentPage === pageNum;
+                      return (
+                        <Button
+                          key={`page-${pageNum}`}
+                          type="button"
+                          variant={isActive ? "brand" : "outline"}
+                          size="sm"
+                          radius="xl"
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`w-8 h-8 sm:w-9 sm:h-9 p-0 text-xs font-semibold shadow-2xs shrink-0 ${isActive ? "pointer-events-none !bg-[#0D6D5F] text-white" : "hover:border-gray-900"
+                            }`}
+                          aria-label={`Page ${pageNum}`}
+                          aria-current={isActive ? "page" : undefined}
+                        >
+                          {pageNum}
+                        </Button>
+                      );
+                    })}
+                  </div>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    radius="xl"
+                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs font-semibold shadow-2xs shrink-0 flex items-center gap-1 min-h-[32px] sm:min-h-[36px]"
+                    aria-label="Next page"
+                  >
+                    <span className="hidden sm:inline">Next</span>
+                    <FiChevronRight className="w-4 h-4 shrink-0" />
+                  </Button>
+                </nav>
               </div>
             )}
           </>

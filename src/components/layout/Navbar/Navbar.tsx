@@ -624,10 +624,21 @@ const Navbar = () => {
       {!isSeller && !isBriefsRoute && <CategoryBar visible={showCategoryBar} />}
 
       {/* Mobile Menu Sidebar Overlay */}
-      <div className={`fixed inset-0 bg-black/50 z-[60] transition-opacity duration-300 lg:hidden ${isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`} onClick={() => setIsMobileMenuOpen(false)}></div>
+      <div
+        className={`fixed inset-0 bg-black/50 z-[60] transition-all duration-300 lg:hidden ${
+          isMobileMenuOpen ? "opacity-100 visible pointer-events-auto" : "opacity-0 invisible pointer-events-none"
+        }`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      ></div>
 
       {/* Mobile Menu Sidebar */}
-      <div className={`fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] shadow-2xl transform transition-transform duration-300 ease-in-out lg:hidden flex flex-col ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
+      <div
+        className={`fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] shadow-2xl transform transition-all duration-300 ease-in-out lg:hidden flex flex-col ${
+          isMobileMenuOpen
+            ? "translate-x-0 opacity-100 visible pointer-events-auto"
+            : "translate-x-full opacity-0 invisible pointer-events-none"
+        }`}
+      >
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <Image src="/Workvence-logo-Horizontal3.png" width={140} height={32} alt="Workvence" className="h-8 w-auto object-contain" style={{ width: "auto", height: "auto" }} />
           <Button

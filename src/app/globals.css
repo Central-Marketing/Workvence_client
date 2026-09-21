@@ -200,6 +200,12 @@
     box-sizing: border-box;
 }
 
+html,
+body {
+    overflow-x: clip;
+    max-width: 100vw;
+}
+
 body {
     font-family: var(--font-sf-pro);
     background-color: #f8fafc;

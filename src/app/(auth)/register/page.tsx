@@ -256,7 +256,7 @@ const RegisterContent = () => {
             </h1>
 
             <div className="flex flex-col gap-3.5 w-full">
-              <Button
+              {/* <Button
                 data-testid="continue-google-btn"
                 type="button"
                 variant="outline"
@@ -271,7 +271,7 @@ const RegisterContent = () => {
                 className="font-medium text-[#1f2937] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80"
               >
                 Continue with Google
-              </Button>
+              </Button> */}
 
               <Button
                 data-testid="continue-email-btn"

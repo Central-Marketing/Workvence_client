@@ -125,12 +125,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
       const refreshToken = data?.refreshToken || user?.refreshToken;
       if (token) {
         document.cookie = `accessToken=${encodeURIComponent(token)}; path=/; max-age=2592000; SameSite=Lax`;
-        try { localStorage.setItem("accessToken", token); } catch {}
-        try { localStorage.setItem("token", token); } catch {}
+        try { localStorage.setItem("accessToken", token); } catch { }
+        try { localStorage.setItem("token", token); } catch { }
       }
       if (refreshToken) {
         document.cookie = `refreshToken=${encodeURIComponent(refreshToken)}; path=/; max-age=2592000; SameSite=Lax`;
-        try { localStorage.setItem("refreshToken", refreshToken); } catch {}
+        try { localStorage.setItem("refreshToken", refreshToken); } catch { }
       }
 
       localStorage.setItem("user", JSON.stringify(user));
@@ -349,11 +349,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 setLoginStep("options");
                 setError(null);
               }}
-              className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative ${
-                mode === "login"
+              className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative ${mode === "login"
                   ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
                   : "text-gray-400 hover:text-gray-600"
-              }`}
+                }`}
             >
               Sign In
             </button>
@@ -363,11 +362,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 setMode("register");
                 setError(null);
               }}
-              className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative ${
-                mode === "register"
+              className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative ${mode === "register"
                   ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
                   : "text-gray-400 hover:text-gray-600"
-              }`}
+                }`}
             >
               Join Workvence
             </button>
@@ -406,7 +404,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
             loginStep === "options" ? (
               <div className="flex flex-col justify-between flex-1 py-2">
                 <div className="flex flex-col gap-3.5 my-auto w-full py-4">
-                  <Button
+                  {/* <Button
                     data-testid="modal-login-google-btn"
                     type="button"
                     variant="outline"
@@ -418,7 +416,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     className="font-medium text-[#1f2937] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80"
                   >
                     Continue with Google
-                  </Button>
+                  </Button> */}
 
                   <Button
                     data-testid="modal-login-email-btn"
@@ -563,11 +561,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: true }))}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-                      registerInput.isSeller
+                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${registerInput.isSeller
                         ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
                         : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     <Briefcase className="w-3.5 h-3.5" />
                     <span>Work as Freelancer</span>
@@ -576,11 +573,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: false }))}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-                      !registerInput.isSeller
+                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${!registerInput.isSeller
                         ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
                         : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     <User className="w-3.5 h-3.5" />
                     <span>Hire as Client</span>

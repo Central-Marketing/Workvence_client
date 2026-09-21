@@ -614,8 +614,9 @@ const ChatView = () => {
     enabled: isValidId,
     retry: false,
     staleTime: 5000,
-    refetchInterval: 5000,
-    refetchIntervalInBackground: false
+    // Periodic polling disabled: real-time messages are delivered via Socket.io
+    // refetchInterval: 5000,
+    // refetchIntervalInBackground: false
   });
 
   // Manage room subscription & realtime events for active conversation

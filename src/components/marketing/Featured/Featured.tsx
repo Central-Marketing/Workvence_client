@@ -1,20 +1,17 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect } from 'react';
-import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import useAdminCategories from '@/hooks/useAdminCategories';
 import useSearchSuggestions, { SuggestionItem } from '@/hooks/useSearchSuggestions';
 import { SearchSuggestionsDropdown } from '@/components/ui';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
 import {
   Search,
+  ArrowRight,
+  Sparkles,
   Palette,
   Code,
   Megaphone,
@@ -29,37 +26,33 @@ import {
   Layers
 } from 'lucide-react';
 
-const Featured = () => {
+interface FeaturedProps {
+  videoSrc?: string;
+  posterSrc?: string;
+}
+
+const Featured = ({
+  videoSrc = "https://res.cloudinary.com/dlqhnyh8r/video/upload/q_auto,f_auto/6888552d6e57e969b9310e5a-oxjvcigoro_1080__D.mp4_h7un4d.mp4",
+  posterSrc = "https://res.cloudinary.com/dlqhnyh8r/video/upload/so_0,q_auto,f_auto/6888552d6e57e969b9310e5a-oxjvcigoro_1080__D.mp4_h7un4d.jpg",
+}: FeaturedProps = {}) => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
   const router = useRouter();
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [heroHeight, setHeroHeight] = useState<number | null>(null);
+
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
-  const galleryRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      if (glowRef.current) {
-        tl.fromTo(
-          glowRef.current,
-          { opacity: 0, scale: 0.9 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 1.1,
-            ease: 'power2.out',
-            force3D: true,
-          }
-        );
-      }
-
-      // 2. Headline entrance (smooth upward drift)
+      // 1. Headline entrance (smooth upward drift)
       if (headlineRef.current) {
         tl.fromTo(
           headlineRef.current,
@@ -71,12 +64,11 @@ const Featured = () => {
             ease: 'power3.out',
             force3D: true,
             clearProps: 'transform',
-          },
-          '-=0.85'
+          }
         );
       }
 
-      // 3. Subtitle & Search Bar entrance
+      // 2. Subtitle & Search Bar entrance
       if (subtitleRef.current) {
         tl.fromTo(
           subtitleRef.current,
@@ -102,69 +94,68 @@ const Featured = () => {
             opacity: 1,
             scale: 1,
             duration: 0.7,
-            ease: 'power3.out',
+            ease: 'power2.out',
             force3D: true,
             clearProps: 'transform',
           },
           '-=0.55'
         );
       }
-
-      // 4. Bottom 5 Gallery Columns (Wave-like emergence from center with complete isolation)
-      if (galleryRef.current) {
-        const cols = galleryRef.current.querySelectorAll('.hero-gallery-col');
-        if (cols && cols.length > 0) {
-          tl.fromTo(
-            cols,
-            { y: 75, opacity: 0, scale: 0.95 },
-            {
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              duration: 0.95,
-              stagger: {
-                each: 0.07,
-                from: 'center',
-              },
-              ease: 'power3.out',
-              force3D: true,
-              clearProps: 'transform',
-            },
-            '-=0.5'
-          );
-        }
-      }
-
-      // 5. ScrollTrigger: Smooth lift of gallery columns on scroll with enhanced parabolic depth
-      if (galleryRef.current && containerRef.current) {
-        const liftCols = galleryRef.current.querySelectorAll('.hero-gallery-lift');
-        // Enhanced parabolic lift values for prominent, clearly visible organic motion
-        const liftValues = [-10, -135, -170, -135, -10];
-
-        liftCols.forEach((col, idx) => {
-          gsap.to(col, {
-            y: liftValues[idx] ?? -120,
-            ease: 'none',
-            force3D: true,
-            scrollTrigger: {
-              trigger: containerRef.current,
-              // Start immediately from initial page scroll (accounting for sticky navbar offset)
-              start: () => `top ${containerRef.current ? Math.round(containerRef.current.getBoundingClientRect().top + window.scrollY) : 80}px`,
-              end: '+=400',
-              scrub: 1.2,
-              invalidateOnRefresh: true,
-            },
-          });
-        });
-
-        // Ensure ScrollTrigger refreshes after initial entrance finishes
-        tl.eventCallback('onComplete', () => {
-          ScrollTrigger.refresh();
-        });
-      }
     },
     { scope: containerRef }
   );
+
+  // Programmatic autoplay recovery for mobile/desktop browser policies
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {
+        // Autoplay policy prevented playback (e.g. low-power mode)
+      });
+    }
+  }, []);
+
+  // Performance assurance: pause video when scrolled off-screen, resume when visible
+  useEffect(() => {
+    const video = videoRef.current;
+    const container = containerRef.current;
+    if (!video || !container) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => { });
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  // Dynamically calculate visible screen height without navbar
+  useEffect(() => {
+    const calculateVisibleHeight = () => {
+      const navEl = document.querySelector('nav');
+      const navHeight = navEl
+        ? navEl.offsetHeight
+        : (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height')) || 72);
+      const windowHeight = window.innerHeight;
+      const calculated = Math.max(500, windowHeight - navHeight);
+      setHeroHeight(calculated);
+    };
+
+    calculateVisibleHeight();
+    window.addEventListener('resize', calculateVisibleHeight);
+    window.addEventListener('orientationchange', calculateVisibleHeight);
+
+    return () => {
+      window.removeEventListener('resize', calculateVisibleHeight);
+      window.removeEventListener('orientationchange', calculateVisibleHeight);
+    };
+  }, []);
 
   const { items, isOpen, setIsOpen, isLoading: isSuggestionsLoading } = useSearchSuggestions(search, { limit: 8 });
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
@@ -259,20 +250,48 @@ const Featured = () => {
     const iconKey = (iconStr || '').toLowerCase().replace(/[-_]/g, '');
     const nameKey = (nameStr || '').toLowerCase();
 
-    if (iconKey === 'palette' || nameKey.includes('design') || nameKey.includes('graphic')) return <Palette size={18} strokeWidth={1.5} />;
-    if (iconKey === 'code' || nameKey.includes('program') || nameKey.includes('tech') || nameKey.includes('code')) return <Code size={18} strokeWidth={1.5} />;
-    if (iconKey === 'bullhorn' || nameKey.includes('market') || nameKey.includes('digital')) return <Megaphone size={18} strokeWidth={1.5} />;
-    if (iconKey === 'video' || nameKey.includes('video') || nameKey.includes('animation')) return <Film size={18} strokeWidth={1.5} />;
-    if (iconKey === 'cpu' || nameKey.includes('ai')) return <Cpu size={18} strokeWidth={1.5} />;
-    if (iconKey === 'filetext' || nameKey.includes('write') || nameKey.includes('translation')) return <FileText size={18} strokeWidth={1.5} />;
-    if (iconKey === 'briefcase' || nameKey.includes('business') || nameKey.includes('consulting')) return <Briefcase size={18} strokeWidth={1.5} />;
-    if (iconKey === 'music' || nameKey.includes('music') || nameKey.includes('audio')) return <Music size={18} strokeWidth={1.5} />;
-    if (iconKey === 'barchart' || iconKey === 'chart' || nameKey.includes('data') || nameKey.includes('analytics')) return <BarChart2 size={18} strokeWidth={1.5} />;
-    if (iconKey === 'shoppingcart' || nameKey.includes('e-commerce') || nameKey.includes('commerce')) return <ShoppingCart size={18} strokeWidth={1.5} />;
-    if (iconKey === 'star' || nameKey.includes('other') || nameKey.includes('general')) return <Star size={18} strokeWidth={1.5} />;
+    if (iconKey === 'sparkles' || iconKey === 'ai' || nameKey.includes('ai') || nameKey.includes('artificial')) {
+      return <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    }
+    if (iconKey === 'code' || nameKey.includes('program') || nameKey.includes('tech') || nameKey.includes('code') || nameKey.includes('web') || nameKey.includes('develop')) {
+      return <Code className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    }
+    if (iconKey === 'palette' || nameKey.includes('design') || nameKey.includes('graphic') || nameKey.includes('art')) {
+      return <Palette className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    }
+    if (iconKey === 'music' || nameKey.includes('music') || nameKey.includes('audio') || nameKey.includes('sound')) {
+      return <Music className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    }
+    if (iconKey === 'bullhorn' || nameKey.includes('market') || nameKey.includes('digital')) {
+      return <Megaphone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    }
+    if (iconKey === 'video' || nameKey.includes('video') || nameKey.includes('animation')) {
+      return <Film className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    }
+    if (iconKey === 'briefcase' || nameKey.includes('business') || nameKey.includes('consulting')) {
+      return <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    }
+    if (iconKey === 'barchart' || iconKey === 'chart' || nameKey.includes('data') || nameKey.includes('analytics')) {
+      return <BarChart2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    }
+    if (iconKey === 'shoppingcart' || nameKey.includes('e-commerce') || nameKey.includes('commerce')) {
+      return <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    }
 
-    return <Layers size={18} strokeWidth={1.5} />;
+    return <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
   };
+
+  const displayedCategories = useMemo(() => {
+    if (categoryList && categoryList.length >= 4) {
+      return categoryList.slice(0, 4);
+    }
+    return [
+      { name: 'Ai Engineering', slug: 'ai-engineering', icon: 'sparkles' },
+      { name: 'Website Development', slug: 'website-development', icon: 'code' },
+      { name: 'Graphics Design', slug: 'graphics-design', icon: 'palette' },
+      { name: 'Music Production', slug: 'music-production', icon: 'music' },
+    ];
+  }, [categoryList]);
 
   const filteredCategories = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -288,32 +307,54 @@ const Featured = () => {
     <section
       ref={containerRef}
       id="featured-section"
-      className="relative w-full h-[620px] sm:h-[700px] md:h-[780px] lg:h-[720px] xl:h-[840px] 2xl:h-[900px] bg-[#E8F5F5] overflow-hidden flex flex-col justify-between pt-8 sm:pt-12 md:pt-14 pb-0 select-none"
+      style={{
+        height: heroHeight ? `${heroHeight}px` : 'calc(100dvh - var(--navbar-height, 72px))',
+        minHeight: '500px',
+      }}
+      className="relative w-full bg-black overflow-x-clip flex flex-col justify-center items-center py-6 sm:py-10 md:py-12 select-none"
     >
-      {/* Background ambient radial glow at top */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_50%_at_50%_15%,rgba(242,252,248,0.7),transparent)] pointer-events-none" />
+      {/* Background Video Layer with High Quality Assurance */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          poster={posterSrc}
+          onLoadedData={() => setIsVideoLoaded(true)}
+          onCanPlay={() => setIsVideoLoaded(true)}
+          className={`w-full h-full object-cover object-center transition-opacity duration-700 ease-out ${isVideoLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+        >
+          <source src={videoSrc} type="video/mp4" />
+          <source
+            src="https://res.cloudinary.com/dlqhnyh8r/video/upload/6888552d6e57e969b9310e5a-oxjvcigoro_1080__D.mp4_h7un4d.mp4"
+            type="video/mp4"
+          />
+        </video>
 
-      {/* Bottom glowing Ellipse - top 35% rises up into the bottom of the section */}
-      <div
-        ref={glowRef}
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[65%] w-[120%] max-w-[1600px] h-[550px] sm:h-[700px] md:h-[800px] rounded-[50%] bg-[#EBFEC5] pointer-events-none z-0"
-        style={{
-          filter: 'blur(120px)',
-          backdropFilter: 'blur(500px)',
-        }}
-      />
+        {/* Video Overlay from Figma */}
+        <div
+          className="absolute inset-0 pointer-events-none z-10"
+          style={{
+            background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.20) 0%, #000 100%)',
+          }}
+        />
+      </div>
 
       {/* TOP HEADER & SEARCH CONTENT */}
       <div className="relative z-20 container mx-auto px-4 text-center max-w-[1100px] flex flex-col items-center">
         {/* Headline */}
         <h1
           ref={headlineRef}
-          className="font-sf-pro font-[510] text-[28px] sm:text-[40px] md:text-[50px] lg:text-[56px] xl:text-[64px] macbook:text-[68px] 2xl:text-[68px] text-[#1E293B] tracking-[0px] leading-[1.08] text-center mb-4 sm:mb-5"
+          className="font-sf-pro font-[510] text-[28px] sm:text-[40px] md:text-[50px] lg:text-[56px] xl:text-[64px] macbook:text-[68px] 2xl:text-[84px] text-white tracking-[0px] leading-[1.08] text-center mb-4 sm:mb-5 drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]"
         >
-          <span className="block">
-            Find the right <span className="text-[#327C73]">freelancer</span>
+          <span className="block text-white">
+            Find the right <span className="text-[#7CE7DA]">freelancer</span>
           </span>
-          <span className="block ">
+          <span className="block text-white">
             and get to work in minutes.
           </span>
         </h1>
@@ -321,169 +362,81 @@ const Featured = () => {
         {/* Subtitle */}
         <p
           ref={subtitleRef}
-          className="text-[#4A4A4A] text-xs sm:text-sm md:text-lg font-normal font-inter max-w-xl mx-auto mb-5 sm:mb-6 leading-relaxed"
+          className="text-[#C7C7C7] text-xs sm:text-sm md:text-lg font-normal font-inter max-w-xl mx-auto leading-relaxed drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]"
         >
           Search thousands of vetted sellers, order in under a minute, and start today.
         </p>
 
-        {/* Search Bar Container with relative positioning for floating dropdown */}
+        {/* Search Bar & Dynamic Category Pills Container */}
         <div
           ref={searchRef}
-          className="relative w-full max-w-[460px] sm:max-w-[520px] md:max-w-[560px]"
+          className="relative w-full max-w-[640px] sm:max-w-[760px] md:max-w-[980px] flex flex-col items-center"
         >
-          <div className="w-full bg-white rounded-lg sm:rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 border border-slate-200 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center gap-2.5 sm:gap-3 transition-all focus-within:border-[#2C6E63]/70 focus-within:shadow-[0_4px_16px_rgba(44,110,99,0.12)]">
-            <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#292929] shrink-0" strokeWidth={2} />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setSelectedIndex(-1);
-              }}
-              onFocus={() => {
-                if (items.length > 0) setIsOpen(true);
-              }}
-              onKeyDown={handleKeyDown}
-              placeholder="What services are you looking for..."
-              className="w-full bg-transparent border-none outline-none text-slate-800 placeholder:text-[#868686] placeholder:text-[16px] placeholder:font-sf-pro text-xs sm:text-sm md:text-base font-normal font-sf-pro"
-            />
-          </div>
-
-          <SearchSuggestionsDropdown
-            items={items}
-            query={search}
-            isOpen={isOpen}
-            isLoading={isSuggestionsLoading}
-            selectedIndex={selectedIndex}
-            onSelect={handleSelectSuggestion}
-          />
-        </div>
-      </div>
-
-      {/* BOTTOM IMAGE GALLERY - 5 COLUMNS CONSTRAINED TO CONTAINER */}
-      <div
-        ref={galleryRef}
-        className="relative z-10 w-full max-w-[1400px] mx-auto px-4 md:px-6 flex items-end justify-center gap-4 sm:gap-5 md:gap-6 mt-auto pointer-events-none"
-      >
-
-        {/* COLUMN 1: LEFTMOST - 2 VERTICAL IMAGES */}
-        <div className="hero-gallery-col hidden sm:flex flex-1 min-w-[90px] max-w-[339px] shrink-0 flex-col justify-end gap-4 sm:gap-5 md:gap-6">
-          {/* Top image: Blue head silhouette (lifts on scroll) */}
-          <div className="hero-gallery-lift w-full will-change-transform">
-            <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-              <div className="relative w-full aspect-[339/429] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
-                <Image
-                  src="/media/hero_images/img4.png"
-                  alt="Creative Art"
-                  fill
-                  priority
-                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                  className="object-cover object-center"
+          {/* Row 1: Search Input Box + Search Now Button */}
+          <div className="w-full flex items-center justify-center gap-2.5 sm:gap-3 my-[40px]">
+            {/* White Search Input Container */}
+            <div className="relative flex-1 w-full md:w-[800px] max-w-[800px] h-[52px] sm:h-[60px] px-4 sm:px-[20px] py-[10px] bg-white rounded-[4px] border border-black/10 shadow-[0_2px_12px_rgba(0,0,0,0.06)] flex items-center justify-between gap-3 transition-all focus-within:border-black/30">
+              <div className="flex items-center gap-2.5 sm:gap-3 w-full min-w-0">
+                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 shrink-0" strokeWidth={2} />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setSelectedIndex(-1);
+                  }}
+                  onFocus={() => {
+                    if (items.length > 0) setIsOpen(true);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  placeholder="What services are you looking for..."
+                  className="w-full bg-transparent border-none outline-none text-slate-900 placeholder:text-gray-400 placeholder:text-sm sm:placeholder:text-[15px] placeholder:font-sf-pro text-sm sm:text-base font-normal font-sf-pro"
                 />
               </div>
-            </div>
-          </div>
-          {/* Bottom image: Laptop code editor (anchored flush to section bottom edge) */}
-          <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-[1.01] cursor-pointer pointer-events-auto">
-            <div className="relative w-full h-[55px] sm:h-[65px] md:h-[75px] lg:h-[85px] xl:h-[95px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-slate-900">
-              <Image
-                src="/media/hero_images/img7.png"
-                alt="Code Development"
-                fill
-                priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                className="object-cover object-top"
+
+              <SearchSuggestionsDropdown
+                items={items}
+                query={search}
+                isOpen={isOpen}
+                isLoading={isSuggestionsLoading}
+                selectedIndex={selectedIndex}
+                onSelect={handleSelectSuggestion}
               />
             </div>
+
+            {/* Black Search Now Button */}
+            <button
+              type="button"
+              onClick={handleSearch}
+              className="bg-black hover:bg-neutral-900 text-white rounded-[4px] px-4 sm:px-6 py-[14px] sm:py-[18px] h-[52px] sm:h-[60px] flex items-center justify-center gap-[10px] shrink-0 font-medium text-xs sm:text-sm md:text-[15px] font-sf-pro transition-all cursor-pointer shadow-md active:scale-95"
+            >
+              <span className="whitespace-nowrap">Search Now</span>
+              <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white shrink-0" strokeWidth={2} />
+            </button>
+          </div>
+
+          {/* Row 2: Dynamic Category Pills + More 200+ */}
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 w-full">
+            {displayedCategories.map((cat: any) => (
+              <button
+                key={cat.slug}
+                type="button"
+                onClick={() => router.push(`/packages?category=${encodeURIComponent(cat.slug)}`)}
+                className="flex items-center gap-[10px] pl-[10px] pr-[12px] py-[6px] rounded-[4px] bg-white/10 hover:bg-white/20 backdrop-blur-[50px] text-white text-xs sm:text-[13px] font-medium transition-all cursor-pointer active:scale-95"
+              >
+                {getCategoryIcon(cat.icon, cat.name)}
+                <span>{cat.name}</span>
+              </button>
+            ))}
+
+            <Link
+              href="/packages"
+              className="inline-flex items-center text-white text-xs sm:text-[13px] font-medium underline underline-offset-4 hover:text-white/80 transition-colors ml-1.5 shrink-0 cursor-pointer"
+            >
+              More 200+
+            </Link>
           </div>
         </div>
-
-        {/* COLUMN 2: SECOND - TALL ADOBE BOUQUET CARD */}
-        <div className="hero-gallery-col flex-1 min-w-[80px] sm:min-w-[90px] max-w-[339px] shrink-0">
-          <div className="hero-gallery-lift w-full will-change-transform">
-            <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-              <div className="relative w-full h-[160px] sm:h-[220px] md:h-[290px] lg:h-[340px] xl:h-[305px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-white">
-                <Image
-                  src="/media/hero_images/img1.png"
-                  alt="Design Forever"
-                  fill
-                  priority
-                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                  className="object-cover object-top"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* COLUMN 3: CENTER - VIBE CODING PHONE (LOWER POSITION) */}
-        <div className="hero-gallery-col flex-1 min-w-[80px] sm:min-w-[90px] max-w-[339px] shrink-0">
-          <div className="hero-gallery-lift w-full will-change-transform">
-            <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-              <div className="relative w-full h-[110px] sm:h-[155px] md:h-[200px] lg:h-[160px] xl:h-[180px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#a81e55]">
-                <Image
-                  src="/media/hero_images/img3.png"
-                  alt="Vibe Coding"
-                  fill
-                  priority
-                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                  className="object-cover object-top"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* COLUMN 4: FOURTH - TALL VIOLIN POSTER */}
-        <div className="hero-gallery-col flex-1 min-w-[80px] sm:min-w-[90px] max-w-[339px] shrink-0">
-          <div className="hero-gallery-lift w-full will-change-transform">
-            <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-              <div className="relative w-full h-[160px] sm:h-[220px] md:h-[290px] lg:h-[340px] xl:h-[305px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#fafafa]">
-                <Image
-                  src="/media/hero_images/img5.png"
-                  alt="Violin Night"
-                  fill
-                  priority
-                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                  className="object-cover object-top"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* COLUMN 5: RIGHTMOST - 2 VERTICAL IMAGES */}
-        <div className="hero-gallery-col hidden sm:flex flex-1 min-w-[90px] max-w-[339px] shrink-0 flex flex-col justify-end gap-4 sm:gap-5 md:gap-6">
-          {/* Top image: The Link (robots / clarity meets creativity) (lifts on scroll) */}
-          <div className="hero-gallery-lift w-full will-change-transform">
-            <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
-              <div className="relative w-full aspect-[339/429] rounded-xl sm:rounded-2xl overflow-hidden shadow-sm bg-[#0a182c]">
-                <Image
-                  src="/media/hero_images/img6.png"
-                  alt="Clarity Meets Creativity"
-                  fill
-                  priority
-                  sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                  className="object-cover object-center"
-                />
-              </div>
-            </div>
-          </div>
-          {/* Bottom image: 3D Chrome Icon (anchored flush to section bottom edge) */}
-          <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-1 hover:scale-[1.01] cursor-pointer pointer-events-auto">
-            <div className="relative w-full h-[55px] sm:h-[65px] md:h-[75px] lg:h-[85px] xl:h-[95px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#112236]">
-              <Image
-                src="/media/hero_images/img2.png"
-                alt="3D Icon"
-                fill
-                priority
-                sizes="(max-width: 640px) 90px, (max-width: 1024px) 20vw, 339px"
-                className="object-cover object-top"
-              />
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
   );

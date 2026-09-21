@@ -40,6 +40,7 @@ const Navbar = () => {
   const effectiveUser = isMounted ? user : null;
   const isBuyer = Boolean(effectiveUser && !effectiveUser.isSeller);
   const isSeller = Boolean(effectiveUser?.isSeller);
+  const isBriefsRoute = Boolean(pathname && (pathname === "/briefs" || pathname.startsWith("/briefs/")));
 
   // Fetch real categories from backend
   const { categoryList: rawCats, parentCategories } = useAdminCategories();
@@ -178,8 +179,8 @@ const Navbar = () => {
 
     setShowSearchBar(hasCrossedFeatured);
 
-    // Suppress category bar completely for seller on all pages
-    if (user?.isSeller) {
+    // Suppress category bar completely for seller on all pages, or on /briefs routes
+    if (user?.isSeller || isBriefsRoute) {
       setShowCategoryBar(false);
       return;
     }
@@ -620,7 +621,7 @@ const Navbar = () => {
       </div>
 
       {/* Sticky Bottom Category Bar (Appears when scrolled past Featured section) */}
-      {!isSeller && <CategoryBar visible={showCategoryBar} />}
+      {!isSeller && !isBriefsRoute && <CategoryBar visible={showCategoryBar} />}
 
       {/* Mobile Menu Sidebar Overlay */}
       <div className={`fixed inset-0 bg-black/50 z-[60] transition-opacity duration-300 lg:hidden ${isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`} onClick={() => setIsMobileMenuOpen(false)}></div>

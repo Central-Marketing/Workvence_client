@@ -28,7 +28,7 @@ import { HiSparkles } from "react-icons/hi2";
 
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader, SubmitProposalModal } from "@/components";
+import { Loader, SubmitProposalModal, AuthModal } from "@/components";
 import { Button } from "@/components/ui";
 
 function formatCategoryName(cat?: string): string {
@@ -146,6 +146,8 @@ const BriefDetail = () => {
   const [proposalSent, setProposalSent] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showMyProposalModal, setShowMyProposalModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<"login" | "register">("register");
   const [submittedProposalData, setSubmittedProposalData] = useState<any>(null);
 
   // Proposals modal states
@@ -366,10 +368,11 @@ const BriefDetail = () => {
   const showSubmittedUI = proposalSent || hasAlreadyProposed;
 
   // Unified proposal action handler for guest user vs logged-in seller vs owner
-  const handleProposalAction = () => {
-    // 1. Guest user: redirect to login/register
+  const handleProposalAction = (targetMode?: "login" | "register" | React.MouseEvent | unknown) => {
+    // 1. Guest user: show Fiverr-style auth modal with Workvence theme color
     if (!user) {
-      router.push(`/login?redirect=${encodeURIComponent(`/briefs/${briefId}`)}`);
+      setAuthModalMode(targetMode === "login" ? "login" : "register");
+      setShowAuthModal(true);
       return;
     }
 
@@ -603,7 +606,7 @@ const BriefDetail = () => {
         {/* Main Title & Header */}
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-slate-900 tracking-tight font-sf-pro leading-tight">
+            <h1 className="text-2xl sm:text-[26px] lg:text-[28px] font-bold text-slate-900 tracking-tight font-sf-pro leading-tight">
               {brief.title}
             </h1>
             <p className="text-slate-500 text-xs sm:text-sm mt-1.5 leading-relaxed font-normal">
@@ -927,7 +930,7 @@ const BriefDetail = () => {
                     variant="dark"
                     size="md"
                     radius="fiverr"
-                    onClick={handleProposalAction}
+                    onClick={() => handleProposalAction("register")}
                     rightIcon={<FiArrowRight className="text-sm" />}
                   >
                     Join Now
@@ -1003,7 +1006,7 @@ const BriefDetail = () => {
                 variant={isClosed ? "soft" : "primary"}
                 size="sm"
                 radius="fiverr"
-                onClick={handleProposalAction}
+                onClick={() => handleProposalAction(!user ? "register" : undefined)}
                 disabled={isClosed}
                 rightIcon={
                   !isClosed ? (
@@ -1785,6 +1788,19 @@ const BriefDetail = () => {
           onSuccess={handleProposalSuccess}
         />
       )}
+
+      {/* Guest Auth Modal (Fiverr style with theme color) */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode={authModalMode}
+        defaultIsSeller={true}
+        onSuccess={(loggedInUser) => {
+          if (loggedInUser?.isSeller && !showSubmittedUI && !isClosed) {
+            setShowModal(true);
+          }
+        }}
+      />
     </div>
   );
 };

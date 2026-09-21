@@ -53,6 +53,7 @@ export { default as SubmitProposalModal } from "../features/buyer/briefs/SubmitP
 export { default as SellerPublicProfile } from "../features/profile/SellerPublicProfile/SellerPublicProfile";
 export { default as SuspendedSeller } from "../features/seller/suspended/SuspendedSeller/SuspendedSeller";
 export { default as OTPModal } from "../features/auth/OTPModal/OTPModal";
+export { default as AuthModal } from "../features/auth/AuthModal/AuthModal";
 export { RevisionModal, ExtensionModal } from "../features/orders/OrderActionModals/OrderActionModals";
 export { default as KycVerificationForm } from "../features/kyc/KycVerificationForm/KycVerificationForm";
 export { default as KycPromptModal } from "../features/kyc/KycPromptModal/KycPromptModal";

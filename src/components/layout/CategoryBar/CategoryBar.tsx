@@ -79,9 +79,10 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
   }, [currentCategory, rootCategories, rawCats]);
 
   const isSeller = Boolean(user?.isSeller);
+  const isBriefsRoute = Boolean(pathname && (pathname === "/briefs" || pathname.startsWith("/briefs/")));
 
-  // CategoryBar is visible for buyers/guests across pages
-  const isBarVisible = visible && !isSeller;
+  // CategoryBar is visible for buyers/guests across pages (except briefs)
+  const isBarVisible = visible && !isSeller && !isBriefsRoute;
 
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -111,7 +112,7 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
     }
   };
 
-  if (isSeller) {
+  if (isSeller || isBriefsRoute) {
     return null;
   }
 

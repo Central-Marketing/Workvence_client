@@ -244,7 +244,7 @@ export default function BuyerOrdersPage() {
         {/* Order Summary Section */}
         <div className="space-y-3">
           <div>
-            <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 tracking-tight">
+            <h1 className="text-[20px] font-bold text-slate-900">
               Order Summary
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
@@ -259,7 +259,7 @@ export default function BuyerOrdersPage() {
             <div className="p-5 sm:p-6 flex items-center justify-between">
               <div>
                 <p className="text-xs text-slate-500 font-medium">Total Spend</p>
-                <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1 tracking-tight">
+                <p className="text-[24px] font-semibold text-slate-900 mt-1 tracking-tight">
                   {totalSpend.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                 </p>
                 <p className="text-xs text-slate-400 mt-1">Across all {totalOrdersCount} placed orders</p>
@@ -279,7 +279,7 @@ export default function BuyerOrdersPage() {
             <div className="p-5 sm:p-6 flex items-center justify-between">
               <div>
                 <p className="text-xs text-slate-500 font-medium">Active Orders</p>
-                <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1 tracking-tight">
+                <p className="text-[24px] font-semibold text-slate-900 mt-1 tracking-tight">
                   {activeOrdersCount}
                 </p>
                 <p className="text-xs text-slate-400 mt-1">Currently in progress</p>
@@ -293,7 +293,7 @@ export default function BuyerOrdersPage() {
             <div className="p-5 sm:p-6 flex items-center justify-between">
               <div>
                 <p className="text-xs text-slate-500 font-medium">Completed Orders</p>
-                <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1 tracking-tight">
+                <p className="text-[24px] font-semibold text-slate-900 mt-1 tracking-tight">
                   {completedOrdersCount}
                 </p>
                 <p className="text-xs text-slate-400 mt-1">Packages successfully closed</p>
@@ -322,7 +322,7 @@ export default function BuyerOrdersPage() {
                     →
                   </span>
                 </div>
-                <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1 tracking-tight">
+                <p className="text-[24px] font-semibold text-slate-900 mt-1 tracking-tight">
                   {totalFavoritesCount}
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
@@ -344,7 +344,7 @@ export default function BuyerOrdersPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
 
             <div className="flex items-center gap-3">
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+              <h2 className="text-xl font-bold text-slate-900 ">
                 Recent Orders
               </h2>
               <Button
@@ -353,7 +353,7 @@ export default function BuyerOrdersPage() {
                 size="icon"
                 radius="xl"
                 aria-label="Filter by date"
-                className="w-9 h-9 text-slate-600 shadow-xs"
+                className="w-10 h-10 min-h-[40px] text-slate-600 shadow-xs"
               >
                 <FiCalendar className="text-base" />
               </Button>
@@ -361,7 +361,7 @@ export default function BuyerOrdersPage() {
 
             <div className="flex items-center gap-5 justify-between sm:justify-end">
               {/* Pill Switcher */}
-              <div className="bg-[#F1F3F5] p-1 rounded-xl flex items-center gap-1">
+              <div className="bg-[#F1F3F5] p-1 rounded-[10px] flex items-center gap-1 overflow-x-auto scrollbar-none">
                 {(["All", "Packages", "Briefs"] as const).map((tab) => (
                   <Button
                     key={tab}
@@ -369,7 +369,7 @@ export default function BuyerOrdersPage() {
                     onClick={() => setActiveTab(tab)}
                     variant={activeTab === tab ? "brand" : "ghost"}
                     size="sm"
-                    radius="fiverr"
+                    radius="lg"
                     className={
                       activeTab === tab
                         ? "bg-[#113E37] hover:bg-[#113E37] text-white shadow-xs"
@@ -398,7 +398,7 @@ export default function BuyerOrdersPage() {
               <Loader size={40} />
             </div>
           ) : (
-            <div className="w-full overflow-x-auto">
+            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
               <table className="w-full min-w-[760px] border-collapse text-left">
                 <thead>
                   <tr className="border-b border-slate-100 text-xs sm:text-sm font-bold text-slate-700">
@@ -439,7 +439,7 @@ export default function BuyerOrdersPage() {
                               </div>
                               <div className="flex flex-col min-w-0">
                                 <span
-                                  className="text-sm font-bold text-slate-900 leading-snug line-clamp-2 group-hover:text-[#327C73] transition-colors"
+                                  className="text-[13px] font-semibold text-slate-900 leading-snug line-clamp-2 group-hover:text-[#327C73] transition-colors"
                                   title={order.title}
                                 >
                                   {order.title}

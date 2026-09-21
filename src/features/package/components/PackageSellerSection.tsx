@@ -24,7 +24,7 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
     <div id="section-seller" className="scroll-mt-36 bg-[#F5F5F5] border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
       {/* Header */}
       <div className="flex items-center justify-between gap-4 mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+        <h2 className="text-xl font-bold text-gray-900 ">
           About the Seller
         </h2>
         {seller.memberSince && (

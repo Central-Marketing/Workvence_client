@@ -459,6 +459,7 @@ body.hide-navbar nav {
 
 /* Global Container - 1400px Max Width */
 .container {
+  box-sizing: border-box !important;
   width: 100% !important;
   max-width: 1400px !important;
   margin-left: auto !important;
@@ -489,6 +490,13 @@ body.hide-navbar nav {
 }
 
 @media (min-width: 1280px) {
+  .container {
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+  }
+}
+
+@media (min-width: 1536px) {
   .container {
     padding-left: 2rem !important;
     padding-right: 2rem !important;

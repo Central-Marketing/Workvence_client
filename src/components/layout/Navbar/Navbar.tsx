@@ -278,7 +278,7 @@ const Navbar = () => {
           </Link>
 
           <div className={`flex items-center transition-all duration-300 ${showSearchBar ? 'opacity-100 flex-1 min-w-0 max-w-full' : 'opacity-0 max-w-0 pointer-events-none w-0 overflow-hidden'}`}>
-            <div className="relative search-container flex items-center rounded-xl px-3 sm:px-3.5 xl:px-4 py-2 sm:py-2.5 w-full max-w-full lg:max-w-[340px] xl:max-w-[460px] macbook:max-w-[540px] 2xl:max-w-[620px] bg-[#F4F4F6] border border-transparent focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-sm transition-all group">
+            <div className="relative search-container flex items-center rounded-xl px-3 sm:px-3.5 xl:px-4 py-2 sm:py-2.5 w-full max-w-full lg:max-w-[240px] xl:max-w-[420px] macbook:max-w-[540px] 2xl:max-w-[620px] bg-[#F4F4F6] border border-transparent focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-sm transition-all group">
               <RiSearchLine
                 className="text-gray-400 text-base sm:text-lg mr-2 sm:mr-2.5 group-focus-within:text-brand-green transition-colors shrink-0 cursor-pointer"
                 onClick={() => {
@@ -331,7 +331,7 @@ const Navbar = () => {
                     size="md"
                     radius="lg"
                     onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                    className={`flex items-center gap-1 xl:gap-1.5 px-2.5 xl:px-4 py-[8px] xl:py-[10px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal whitespace-nowrap ${
+                    className={`flex items-center gap-1 xl:gap-1.5 px-2 xl:px-4 py-[8px] xl:py-[10px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal whitespace-nowrap ${
                       isCategoryDropdownOpen ? "!text-[#327C73]" : "text-black hover:!text-[#327C73]"
                     }`}
                     rightIcon={
@@ -376,14 +376,14 @@ const Navbar = () => {
 
                 <Link
                   href="/register?seller=true"
-                  className="px-2.5 xl:px-4 py-[8px] xl:py-[10px] rounded-lg font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
+                  className="px-2 xl:px-4 py-[8px] xl:py-[10px] rounded-lg font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
                 >
                   Become a Seller
                 </Link>
 
                 <Link
                   href="/briefs"
-                  className="px-2.5 xl:px-4 py-[8px] xl:py-[10px] rounded-lg font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
+                  className="px-2 xl:px-4 py-[8px] xl:py-[10px] rounded-lg font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
                 >
                   Projects
                 </Link>
@@ -396,7 +396,7 @@ const Navbar = () => {
                   variant="soft"
                   size="md"
                   radius="fiverr"
-                  className="bg-[#EDEDED] hover:bg-[#E0E0E0] h-[38px] xl:h-[40px] text-[14px] xl:text-[16px] px-3.5 xl:px-5 font-sf-pro font-semibold text-[#292929] whitespace-nowrap shrink-0"
+                  className="bg-[#EDEDED] hover:bg-[#E0E0E0] h-[40px] text-[16px] px-3.5 xl:px-5 font-sf-pro font-semibold text-[#292929] whitespace-nowrap shrink-0"
                 >
                   Sign in
                 </Button>
@@ -406,8 +406,8 @@ const Navbar = () => {
                   variant="dark"
                   size="md"
                   radius="fiverr"
-                  rightIcon={<FiArrowRight className="text-[14px] xl:text-[16px]" />}
-                  className="h-[38px] xl:h-[40px] text-[14px] xl:text-[16px] px-3.5 xl:px-5 font-sf-pro font-semibold bg-[#0B0F19] hover:bg-black text-[#E8F5F5] shadow-sm whitespace-nowrap shrink-0"
+                  rightIcon={<FiArrowRight className="text-[16px]" />}
+                  className="h-[40px] text-[16px] px-3.5 xl:px-5 font-sf-pro font-semibold bg-[#0B0F19] hover:bg-black text-[#E8F5F5] shadow-sm whitespace-nowrap shrink-0"
                 >
                   Join Now
                 </Button>
@@ -448,7 +448,7 @@ const Navbar = () => {
                 text="Post a Project with AI"
                 px="px-3 xl:px-4"
                 py="py-2"
-                className="h-9 xl:h-10 rounded-xl text-[13px] xl:text-[14px] font-medium text-[#112131] shadow-none shrink-0 whitespace-nowrap"
+                className="h-[40px] rounded-xl text-[14px] xl:text-[15px] font-medium text-[#112131] shadow-none shrink-0 whitespace-nowrap"
               />
 
               <div className="relative profile-dropdown-container">

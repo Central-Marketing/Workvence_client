@@ -230,7 +230,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                   size="icon"
                   radius="lg"
                   title="Filter by date"
-                  className="w-9 h-9 border-gray-200 text-gray-500 hover:bg-gray-50"
+                  className="w-10 h-10 min-h-[40px] border-gray-200 text-gray-500 hover:bg-gray-50 bg-white shrink-0 shadow-2xs"
                   icon={<FiCalendar className="text-sm" />}
                 />
 
@@ -289,7 +289,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
             </div>
 
             {/* Orders Table */}
-            <div className="w-full overflow-x-auto">
+            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
               <table className="w-full text-left text-sm border-collapse min-w-[700px]">
                 <thead>
                   <tr className="text-xs font-bold text-gray-700 border-b border-gray-100">

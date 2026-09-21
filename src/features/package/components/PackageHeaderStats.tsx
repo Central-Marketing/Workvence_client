@@ -62,7 +62,23 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
       </nav>
 
       {/* 2. Main Title */}
-      <h1 className="text-[24px] min-[400px]:text-[26px] sm:text-[32px] md:text-[26px] lg:text-[28px] xl:text-[32px] macbook:text-[32px] 2xl:text-[48px] font-[590] font-sf-pro text-[var(--Foundation-Grey-grey-800,#292929)] not-italic mb-4">
+      <h1
+        className="
+    text-[24px]
+    min-[400px]:text-[26px]
+    sm:text-[28px]
+    md:text-[26px]
+    lg:text-[28px]
+    xl:text-[32px]
+    2xl:text-[32px]
+    font-[590]
+    font-sf-pro
+    leading-[1.2]
+    text-[var(--Foundation-Grey-grey-800,#292929)]
+    not-italic
+    mb-4
+  "
+      >
         {title}
       </h1>
 
@@ -87,7 +103,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
             <div className="flex items-center gap-2">
               <Link
                 href={`/seller/${seller.username || seller.name}`}
-                className="font-[510] text-[#000] font-sf-pro text-lg sm:text-xl md:text-[24px] not-italic leading-normal hover:text-brand-green transition-colors"
+                className="font-[510] text-[#000] font-sf-pro text-lg not-italic leading-normal hover:text-brand-green transition-colors"
                 title={`View ${seller.name}'s profile`}
               >
                 {seller.name}
@@ -103,13 +119,13 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
               <span className="text-[#000] text-sm sm:text-[16px] font-sf-pro font-[510] not-italic leading-normal">{seller.role}</span>
               <span className="text-gray-400 text-sm"> | </span>
               <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-900">
-                <span className="text-base sm:text-lg md:text-[20px] font-sf-pro font-bold text-[#000] not-italic leading-normal">
+                <span className="text-base font-sf-pro font-bold text-[#000] not-italic leading-normal">
                   {seller.rating > 0 ? seller.rating.toFixed(1) : "New"}
                 </span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" className="w-4 h-4 shrink-0">
                   <path d="M13.7276 3.44418L15.4874 6.99288C15.7274 7.48687 16.3673 7.9607 16.9073 8.05143L20.0969 8.58575C22.1367 8.92853 22.6167 10.4206 21.1468 11.8925L18.6671 14.3927C18.2471 14.8161 18.0172 15.6327 18.1471 16.2175L18.8571 19.3125C19.417 21.7623 18.1271 22.71 15.9774 21.4296L12.9877 19.6452C12.4478 19.3226 11.5579 19.3226 11.0079 19.6452L8.01827 21.4296C5.8785 22.71 4.57865 21.7522 5.13859 19.3125L5.84851 16.2175C5.97849 15.6327 5.74852 14.8161 5.32856 14.3927L2.84884 11.8925C1.389 10.4206 1.85895 8.92853 3.89872 8.58575L7.08837 8.05143C7.61831 7.9607 8.25824 7.48687 8.49821 6.99288L10.258 3.44418C11.2179 1.51861 12.7777 1.51861 13.7276 3.44418Z" fill="#F5B400" />
                 </svg>
-                <span className="text-[var(--Foundation-Grey-grey-300,#868686)] text-sm sm:text-base md:text-[20px] font-sf-pro font-normal not-italic leading-normal">
+                <span className="text-[var(--Foundation-Grey-grey-300,#868686)] text-base font-sf-pro font-normal not-italic leading-normal">
                   ({seller.reviewCount})
                 </span>
               </div>
@@ -120,7 +136,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
 
         {/* Right Actions */}
         <div className="flex items-center gap-3 sm:gap-4 text-sm text-gray-600 flex-wrap justify-between sm:justify-end w-full sm:w-auto">
-          <span className="text-[var(--Foundation-Grey-grey-500,#4A4A4A)] font-bold font-sf-pro text-base sm:text-lg md:text-[24px] not-italic leading-normal">
+          <span className="text-[var(--Foundation-Grey-grey-500,#4A4A4A)] font-normal font-sf-pro text-base not-italic leading-normal">
             {seller.ordersInQueue > 0 ? (
               <>
                 <strong className="text-[#222222] font-bold">{seller.ordersInQueue} </strong> orders in queue
@@ -137,7 +153,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
               size="icon"
               radius="full"
               onClick={onToggleFavorite}
-              className={`w-9 h-9 sm:w-10 sm:h-10 md:w-[48px] md:h-[48px] !min-h-0 !p-0 aspect-square rounded-[60px] flex items-center justify-center transition-colors cursor-pointer hover:bg-gray-50 shrink-0 ${isFavorited ? '!text-red-500 !bg-red-50/50 !border-red-200' : 'text-gray-500 !bg-white border-gray-200'
+              className={`w-9 h-9 sm:w-10 sm:h-10 !min-h-0 !p-0 aspect-square rounded-[60px] flex items-center justify-center transition-colors cursor-pointer hover:bg-gray-50 shrink-0 ${isFavorited ? '!text-red-500 !bg-red-50/50 !border-red-200' : 'text-gray-500 !bg-white border-gray-200'
                 }`}
               title="Save to favorites"
               icon={<FiHeart className={`w-4 h-4 sm:w-5 sm:h-5 ${isFavorited ? 'fill-red-500' : ''}`} />}
@@ -149,7 +165,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
               size="icon"
               radius="full"
               onClick={onShare}
-              className="w-9 h-9 sm:w-10 sm:h-10 md:w-[48px] md:h-[48px] !min-h-0 !p-0 aspect-square rounded-[60px] !bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors cursor-pointer shrink-0"
+              className="w-9 h-9 sm:w-10 sm:h-10 !min-h-0 !p-0 aspect-square rounded-[60px] !bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors cursor-pointer shrink-0"
               title="Share"
               icon={<FiShare2 className="w-4 h-4 sm:w-5 sm:h-5" />}
             />
@@ -158,32 +174,33 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
       </div>
 
       {/* 4. Seller Stats */}
-      <div className="w-full mb-6 overflow-hidden rounded-[10px] border border-[#DADADA] bg-[#F5F5F5] grid grid-cols-2 min-[480px]:grid-cols-2 lg:grid-cols-4">
+      <div className="w-full mb-6 overflow-hidden rounded-[10px] border border-[#DADADA] bg-[#F5F5F5] grid grid-cols-2 xl:grid-cols-4">
 
         {/* Card 1: Profile Status */}
         <div className="
           min-h-[72px]
           sm:min-h-[80px]
-          lg:h-[84px]
+          xl:h-[84px]
           px-3
           min-[480px]:px-3.5
           sm:px-4
-          lg:px-2.5
+          lg:px-4
           xl:px-3.5
           macbook:px-4
           2xl:px-5
           py-3
-          lg:py-0
+          sm:py-3.5
+          xl:py-0
           flex items-center
           gap-2
           sm:gap-2.5
-          lg:gap-2
+          lg:gap-2.5
           xl:gap-2.5
           macbook:gap-3
           2xl:gap-4
           border-b
-          min-[480px]:border-r
-          lg:border-b-0
+          border-r
+          xl:border-b-0
           border-black/10
         ">
           <div className="
@@ -204,39 +221,28 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
 
           <div className="min-w-0 flex-1">
             <span className="
-              text-[11px]
-              min-[480px]:text-xs
-              sm:text-xs
-              md:text-xs
-              lg:text-[11px]
-              xl:text-xs
-              macbook:text-[13px]
-              2xl:text-sm
-              font-sf-pro
-              text-[#6E6E6E]
-              block
-              font-normal
-              leading-tight
-              truncate
+              text-xs
+  macbook:text-[13px]
+  2xl:text-[13px]
+  font-sf-pro
+  font-normal
+  leading-tight
+  text-[#6E6E6E]
+  block
+  truncate
             ">
               Profile Status
             </span>
 
             <span className="
-              text-sm
-              min-[480px]:text-[15px]
-              sm:text-base
-              md:text-base
-              lg:text-[15px]
-              xl:text-[18px]
-              macbook:text-[20px]
-              2xl:text-[24px]
-              font-sf-pro
-              font-bold
-              text-black
-              leading-tight
-              truncate
-              block
+              text-base
+  
+  font-sf-pro
+  font-bold
+  leading-tight
+  text-black
+  block
+  truncate
             ">
               {seller.verified ? "Verified" : "Active"}
             </span>
@@ -247,26 +253,27 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
         <div className="
           min-h-[72px]
           sm:min-h-[80px]
-          lg:h-[84px]
+          xl:h-[84px]
           px-3
           min-[480px]:px-3.5
           sm:px-4
-          lg:px-2.5
+          lg:px-4
           xl:px-3.5
           macbook:px-4
           2xl:px-5
           py-3
-          lg:py-0
+          sm:py-3.5
+          xl:py-0
           flex items-center
           gap-2
           sm:gap-2.5
-          lg:gap-2
+          lg:gap-2.5
           xl:gap-2.5
           macbook:gap-3
           2xl:gap-4
           border-b
-          lg:border-b-0
-          lg:border-r
+          xl:border-b-0
+          xl:border-r
           border-black/10
         ">
           <div className="
@@ -306,20 +313,13 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
             </span>
 
             <span className="
-              text-sm
-              min-[480px]:text-[15px]
-              sm:text-base
-              md:text-base
-              lg:text-[15px]
-              xl:text-[18px]
-              macbook:text-[20px]
-              2xl:text-[24px]
-              font-sf-pro
-              font-bold
-              text-black
-              leading-tight
-              truncate
-              block
+              text-base
+  font-sf-pro
+  font-bold
+  leading-tight
+  text-black
+  block
+  truncate
             ">
               {seller.responseTime}
             </span>
@@ -330,26 +330,25 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
         <div className="
           min-h-[72px]
           sm:min-h-[80px]
-          lg:h-[84px]
+          xl:h-[84px]
           px-3
           min-[480px]:px-3.5
           sm:px-4
-          lg:px-2.5
+          lg:px-4
           xl:px-3.5
           macbook:px-4
           2xl:px-5
           py-3
-          lg:py-0
+          sm:py-3.5
+          xl:py-0
           flex items-center
           gap-2
           sm:gap-2.5
-          lg:gap-2
+          lg:gap-2.5
           xl:gap-2.5
           macbook:gap-3
           2xl:gap-4
-          border-b
-          min-[480px]:border-b-0
-          lg:border-r
+          border-r
           border-black/10
         ">
           <div className="
@@ -390,20 +389,14 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
 
             <span
               className="
-                text-sm
-                min-[480px]:text-[14px]
-                sm:text-[15px]
-                md:text-[15px]
-                lg:text-[13px]
-                xl:text-[16px]
-                macbook:text-[18px]
-                2xl:text-[24px]
-                font-sf-pro
-                font-bold
-                text-black
-                truncate
-                block
-                leading-tight
+                text-base
+  
+  font-sf-pro
+  font-bold
+  leading-tight
+  text-black
+  block
+  truncate
               "
               title={seller.topRatedIn}
             >
@@ -416,20 +409,21 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
         <div className="
           min-h-[72px]
           sm:min-h-[80px]
-          lg:h-[84px]
+          xl:h-[84px]
           px-3
           min-[480px]:px-3.5
           sm:px-4
-          lg:px-2.5
+          lg:px-4
           xl:px-3.5
           macbook:px-4
           2xl:px-5
           py-3
-          lg:py-0
+          sm:py-3.5
+          xl:py-0
           flex items-center
           gap-2
           sm:gap-2.5
-          lg:gap-2
+          lg:gap-2.5
           xl:gap-2.5
           macbook:gap-3
           2xl:gap-4
@@ -471,20 +465,14 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
             </span>
 
             <span className="
-              text-sm
-              min-[480px]:text-[15px]
-              sm:text-base
-              md:text-base
-              lg:text-[15px]
-              xl:text-[18px]
-              macbook:text-[20px]
-              2xl:text-[24px]
-              font-sf-pro
-              font-bold
-              text-black
-              leading-tight
-              truncate
-              block
+              text-base
+  
+  font-sf-pro
+  font-bold
+  leading-tight
+  text-black
+  block
+  truncate
             ">
               {seller.returnRate || seller.onTimeDelivery || "100%"}
             </span>

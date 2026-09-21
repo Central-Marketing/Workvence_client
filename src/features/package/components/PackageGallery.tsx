@@ -82,7 +82,7 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
         {/* Main Hero Image */}
         <div
           onClick={() => setIsLightboxOpen(true)}
-          className="flex-1 h-full rounded-2xl overflow-hidden bg-gray-950 border border-gray-100 relative group cursor-pointer shadow-xs"
+          className="flex-1 h-full rounded-[10px] overflow-hidden bg-gray-950 border border-gray-100 relative group cursor-pointer shadow-xs"
         >
           <img
             src={activeImage || heroImage}
@@ -100,11 +100,10 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
         {hasThumbnails && (
           <div
             ref={containerRef}
-            className={`w-[80px] sm:w-[95px] md:w-[105px] flex flex-col gap-2 h-full shrink-0 ${
-              hasMoreThan5
-                ? "overflow-y-auto scroll-smooth scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden overscroll-y-contain"
-                : "justify-start"
-            }`}
+            className={`w-[80px] sm:w-[95px] md:w-[105px] flex flex-col gap-2 h-full shrink-0 ${hasMoreThan5
+              ? "overflow-y-auto scroll-smooth scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden overscroll-y-contain"
+              : "justify-start"
+              }`}
           >
             {allImages.map((img, idx) => {
               const isSelected = activeImage === img;
@@ -115,22 +114,21 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
                   type="button"
                   variant="ghost"
                   size="xs"
-                  radius="xl"
+                  radius="lg"
                   onClick={(e) => handleSelectThumb(img, idx, e)}
                   style={
                     hasMoreThan5
                       ? {
-                          height: itemHeight ? `${itemHeight}px` : "calc((100% - 32px) / 4.5)",
-                          minHeight: itemHeight ? `${itemHeight}px` : "calc((100% - 32px) / 4.5)",
-                          flexBasis: itemHeight ? `${itemHeight}px` : "calc((100% - 32px) / 4.5)",
-                        }
+                        height: itemHeight ? `${itemHeight}px` : "calc((100% - 32px) / 4.5)",
+                        minHeight: itemHeight ? `${itemHeight}px` : "calc((100% - 32px) / 4.5)",
+                        flexBasis: itemHeight ? `${itemHeight}px` : "calc((100% - 32px) / 4.5)",
+                      }
                       : { height: "76px", minHeight: "76px" }
                   }
-                  className={`relative w-full !p-0 !min-h-0 overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 shadow-2xs shrink-0 ${
-                    isSelected
-                      ? "border-brand-green ring-1 ring-brand-green scale-[0.98]"
-                      : "border-transparent opacity-80 hover:opacity-100 hover:border-gray-300"
-                  }`}
+                  className={`relative w-full !p-0 !min-h-0 overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 shadow-2xs shrink-0 ${isSelected
+                    ? "border-brand-green ring-1 ring-brand-green scale-[0.98]"
+                    : "border-transparent opacity-80 hover:opacity-100 hover:border-gray-300"
+                    }`}
                 >
                   <img
                     src={img}
@@ -186,9 +184,8 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
                   size="xs"
                   radius="lg"
                   onClick={() => setActiveImage(img)}
-                  className={`w-14 h-14 !p-0 !min-h-0 overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
-                    activeImage === img ? "border-white scale-105" : "border-transparent opacity-50 hover:opacity-100"
-                  }`}
+                  className={`w-14 h-14 !p-0 !min-h-0 overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${activeImage === img ? "border-white scale-105" : "border-transparent opacity-50 hover:opacity-100"
+                    }`}
                 >
                   <img src={img} alt="" className="w-full h-full object-cover" />
                 </Button>

@@ -209,10 +209,12 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
 
           <div
             ref={popularScrollRef}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 overflow-x-auto scrollbar-none scroll-smooth pb-2"
+            className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 overflow-x-auto scrollbar-none scroll-smooth pb-2"
           >
             {popularList.slice(0, 4).map((pkg) => (
-              <BuyerDashboardCard key={pkg.id} pkg={pkg} />
+              <div key={pkg.id} className="min-w-[270px] sm:min-w-0 flex-1">
+                <BuyerDashboardCard pkg={pkg} />
+              </div>
             ))}
           </div>
         </section>

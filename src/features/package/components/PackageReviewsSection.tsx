@@ -62,7 +62,7 @@ export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
     <div id="section-reviews" className="scroll-mt-36 bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+        <h2 className="text-[20px] font-bold font-sf-pro text-gray-900">
           Reviews from Clients
         </h2>
         <div className="flex items-center gap-1.5 font-semibold text-gray-900 text-sm">

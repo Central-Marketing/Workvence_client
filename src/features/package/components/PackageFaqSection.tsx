@@ -24,7 +24,7 @@ export const PackageFaqSection: React.FC<PackageFaqSectionProps> = ({ faqs = [] 
     <div id="section-faq" className="scroll-mt-36 bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
       {/* Header */}
       <div className="flex items-center justify-between gap-4 mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+        <h2 className="text-[20px] font-bold font-sf-pro text-gray-900">
           Frequently Asked Questions
         </h2>
         <span className="text-xs font-semibold text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-md">
@@ -37,7 +37,7 @@ export const PackageFaqSection: React.FC<PackageFaqSectionProps> = ({ faqs = [] 
         {faqs.map((faq, idx) => {
           const isOpen = openIndex === idx;
           return (
-            <div key={idx} className="py-4.5 first:pt-0 last:pb-0">
+            <div key={idx} className="py-4 first:pt-0 last:pb-0">
               <Button
                 type="button"
                 variant="ghost"
@@ -46,21 +46,19 @@ export const PackageFaqSection: React.FC<PackageFaqSectionProps> = ({ faqs = [] 
                 className="w-full !p-0 !min-h-0 !h-auto flex items-center justify-between gap-4 text-left cursor-pointer group py-1"
                 rightIcon={
                   <FiChevronDown
-                    className={`w-4 h-4 text-gray-400 group-hover:text-gray-700 transition-transform duration-200 shrink-0 ${
-                      isOpen ? "rotate-180 text-brand-green" : ""
-                    }`}
+                    className={`w-4 h-4 text-gray-400 group-hover:text-gray-700 transition-transform duration-200 shrink-0 ${isOpen ? "rotate-180 text-brand-green" : ""
+                      }`}
                   />
                 }
               >
-                <span className={`text-[14.5px] sm:text-[15px] font-semibold transition-colors ${
-                  isOpen ? "text-brand-green" : "text-gray-900 group-hover:text-brand-green"
-                }`}>
+                <span className={`text-[14px] font-semibold transition-colors ${isOpen ? "text-brand-green" : "text-gray-900 group-hover:text-brand-green"
+                  }`}>
                   {faq.question}
                 </span>
               </Button>
 
               {isOpen && (
-                <div className="mt-2.5 text-[14px] text-gray-600 leading-relaxed animate-fadeIn pr-6 whitespace-pre-line">
+                <div className="mt-4 text-[14px] text-gray-600 leading-relaxed animate-fadeIn pr-6 whitespace-pre-line">
                   {faq.answer}
                 </div>
               )}

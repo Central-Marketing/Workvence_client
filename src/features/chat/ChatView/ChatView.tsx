@@ -1754,10 +1754,10 @@ const ChatView = () => {
                         <Button
                           type="button"
                           variant="dark"
-                          size="xs"
+                          size="md"
                           radius="fiverr"
                           onClick={() => setShowOfferModal(true)}
-                          className="h-8 sm:h-9 px-2 sm:px-3 text-[11px] sm:text-xs font-medium whitespace-nowrap shrink-0"
+                          className="h-10 text-[16px] font-semibold px-4 whitespace-nowrap shrink-0"
                         >
                           Create Offer
                         </Button>
@@ -1896,7 +1896,7 @@ const ChatView = () => {
                         variant="ghost"
                         size="icon"
                         radius="lg"
-                        className="lg:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg hover:bg-slate-100 text-slate-600 shrink-0"
+                        className="xl:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg hover:bg-slate-100 text-slate-600 shrink-0"
                         onClick={() => setIsRightSideOpen(true)}
                         aria-label="Open contact info"
                         icon={
@@ -2447,13 +2447,13 @@ const ChatView = () => {
           )}
         </main>
 
-        <div className={`lg:hidden fixed inset-0 bg-black/20 z-30 transition-opacity duration-300 ease-in-out ${isRightSideOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsRightSideOpen(false)}></div>
+        <div className={`xl:hidden fixed inset-0 bg-black/20 z-30 transition-opacity duration-300 ease-in-out ${isRightSideOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsRightSideOpen(false)}></div>
 
         {/* ── RIGHT: About This Contact ── */}
         {isValidId && (() => {
           if (!finalRecipientUser && isFetchingTargetUser) {
             return (
-              <aside className={`w-[320px] min-w-[280px] xl:w-[340px] xl:min-w-[320px] h-full max-h-full min-h-0 border-l border-[rgba(0, 0, 0, 0.10)] bg-[#F8F8F8] overflow-y-auto overflow-x-hidden p-4 xl:p-5 flex flex-col shrink-0 box-border max-lg:fixed max-lg:top-0 max-lg:bottom-0 max-lg:right-0 max-lg:z-40 max-lg:shadow-2xl max-lg:h-full max-lg:flex max-lg:transform max-lg:transition-transform max-lg:duration-300 max-lg:ease-in-out ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
+              <aside className={`w-[320px] min-w-[280px] xl:w-[340px] xl:min-w-[320px] h-full max-h-full min-h-0 border-l border-[rgba(0, 0, 0, 0.10)] bg-[#F8F8F8] overflow-y-auto overflow-x-hidden p-4 xl:p-5 flex flex-col shrink-0 box-border max-xl:fixed max-xl:top-0 max-xl:bottom-0 max-xl:right-0 max-xl:z-40 max-xl:shadow-2xl max-xl:h-full max-xl:flex max-xl:transform max-xl:transition-transform max-xl:duration-300 max-xl:ease-in-out ${isRightSideOpen ? 'max-xl:translate-x-0' : 'max-xl:translate-x-full'}`}>
                 <div className="flex flex-col gap-4">
                   <Skeleton className="w-full h-44 rounded-2xl" />
                   <Skeleton className="w-full h-36 rounded-2xl" />
@@ -2559,14 +2559,14 @@ const ChatView = () => {
           };
 
           return (
-            <aside className={`w-[320px] min-w-[280px] xl:w-[340px] xl:min-w-[320px] h-full max-h-full min-h-0 border-l border-[rgba(0, 0, 0, 0.10)] bg-[#F8F8F8] overflow-y-auto overflow-x-hidden p-4 xl:p-5 flex flex-col shrink-0 box-border [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full max-lg:fixed max-lg:top-0 max-lg:bottom-0 max-lg:right-0 max-lg:z-40 max-lg:shadow-2xl max-lg:h-full max-lg:flex max-lg:transform max-lg:transition-transform max-lg:duration-300 max-lg:ease-in-out ${isRightSideOpen ? 'max-lg:translate-x-0' : 'max-lg:translate-x-full'}`}>
+            <aside className={`w-[320px] min-w-[280px] xl:w-[340px] xl:min-w-[320px] h-full max-h-full min-h-0 border-l border-[rgba(0, 0, 0, 0.10)] bg-[#F8F8F8] overflow-y-auto overflow-x-hidden p-4 xl:p-5 flex flex-col shrink-0 box-border [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full max-xl:fixed max-xl:top-0 max-xl:bottom-0 max-xl:right-0 max-xl:z-40 max-xl:shadow-2xl max-xl:h-full max-xl:flex max-xl:transform max-xl:transition-transform max-xl:duration-300 max-xl:ease-in-out ${isRightSideOpen ? 'max-xl:translate-x-0' : 'max-xl:translate-x-full'}`}>
               <div className="w-full flex flex-col gap-4 pb-20">
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
                   radius="full"
-                  className="lg:hidden self-end text-gray-500 hover:text-gray-800 text-2xl -mb-2"
+                  className="xl:hidden self-end text-gray-500 hover:text-gray-800 text-2xl -mb-2"
                   onClick={() => setIsRightSideOpen(false)}
                   aria-label="Close sidebar"
                   icon={<RiCloseLine />}

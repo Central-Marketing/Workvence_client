@@ -655,7 +655,7 @@ const CreateBrief = () => {
           onClick={() => !aiGenerate.isPending && setIsAiModalOpen(false)}
         >
           <div
-            className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl max-w-xl w-full relative overflow-hidden select-text"
+            className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl max-w-xl w-full max-h-[calc(100dvh-2rem)] flex flex-col p-6 sm:p-8 shadow-2xl relative overflow-y-auto select-text"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top Close Button */}
@@ -736,14 +736,15 @@ const CreateBrief = () => {
               </div>
 
               {/* Modal Actions */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 mt-5">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 border-t border-slate-100 mt-5">
                 <Button
                   type="button"
                   variant="soft"
-                  size="sm"
+                  size="md"
                   radius="fiverr"
                   onClick={() => setIsAiModalOpen(false)}
                   disabled={aiGenerate.isPending}
+                  className="w-full sm:w-auto text-center"
                 >
                   Cancel
                 </Button>
@@ -751,13 +752,13 @@ const CreateBrief = () => {
                 <Button
                   type="button"
                   variant="brand"
-                  size="sm"
+                  size="md"
                   radius="fiverr"
                   onClick={() => handleGenerateFromModal()}
                   disabled={aiGenerate.isPending || !aiPrompt.trim()}
                   isLoading={aiGenerate.isPending}
                   leftIcon={<HiSparkles className="text-emerald-400 text-base" />}
-                  className="px-6 shadow-sm"
+                  className="w-full sm:w-auto px-6 shadow-sm"
                 >
                   Generate Project Draft
                 </Button>

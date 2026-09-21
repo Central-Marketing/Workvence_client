@@ -52,25 +52,28 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
   return (
     <div className={`w-full max-w-[500px] space-y-6 ${className}`.trim()}>
       {/* 1. Top Card: Packages Pricing Tier Card */}
-      <div className="bg-[#FFF] border border-[rgba(0,0,0,0.10)] rounded-[20px] p-4 sm:p-5 2xl:p-[20px] shadow-2xs">
+      <div className="bg-[#FFF] border border-[rgba(0,0,0,0.10)] rounded-[20px] p-[10px] shadow-2xs">
         {/* Tier Segmented Tabs (only if multiple tiers exist) */}
         {availableTiers.length > 1 && (
           <div
-            className="grid gap-1 bg-[var(--Foundation-White-white-300,#F5F5F5)] p-1.5 sm:p-2 2xl:p-[10px] rounded-[10px] border border-[rgba(0,0,0,0.10)] text-center mb-5"
-            style={{ gridTemplateColumns: `repeat(${availableTiers.length}, minmax(0, 1fr))` }}
+            className="grid gap-1 bg-[var(--Foundation-White-white-300,#F5F5F5)] p-[10px] rounded-[10px] border border-[rgba(0,0,0,0.10)] text-center mb-5"
+            style={{
+              gridTemplateColumns: `repeat(${availableTiers.length}, minmax(0, 1fr))`,
+            }}
           >
             {availableTiers.map((tierKey) => {
               const pkg = packages[tierKey];
               const isSelected = selectedTier === tierKey;
+
               return (
                 <Button
                   key={tierKey}
                   type="button"
                   variant={isSelected ? "dark" : "ghost"}
                   size="xs"
-                  radius="lg"
+                  radius="fiverr"
                   onClick={() => onSelectTier(tierKey)}
-                  className={`py-2 sm:py-2.5 2xl:py-[10px] px-2 sm:px-3 lg:px-2.5 xl:px-3.5 2xl:px-[20px] rounded-[10px] font-inter font-normal not-italic text-[13px] min-[400px]:text-[14px] sm:text-[15px] md:text-[16px] lg:text-[16px] xl:text-[18px] macbook:text-[19px] 2xl:text-[20px] leading-[20px] sm:leading-[22px] lg:leading-[24px] 2xl:leading-[26px] transition-all cursor-pointer ${isSelected
+                  className={`!h-auto !min-h-0 !px-2 !py-2 sm:!px-3 sm:!py-2.5 2xl:!px-[20px] 2xl:!py-[10px] rounded-[10px] font-inter font-normal not-italic text-[16px] transition-all cursor-pointer ${isSelected
                     ? "!bg-[var(--Foundation-Green-green-900,#0B403F)] !text-[var(--Foundation-White-white-50,#FFF)] shadow-xs"
                     : "!text-[var(--Foundation-Grey-grey-400,#6E6E6E)] hover:!text-gray-900"
                     }`}
@@ -84,14 +87,14 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
 
         {/* Custom Tier Title / Tagline */}
         {(activePkg.tagline || activePkg.title) && (
-          <h4 className="font-sf-pro font-[510] not-italic text-[14px] min-[400px]:text-[15px] sm:text-[16px] md:text-[16px] lg:text-[17px] xl:text-[18px] macbook:text-[19px] 2xl:text-[20px] text-[var(--Foundation-Grey-grey-400,#6E6E6E)] leading-normal mb-1">
+          <h4 className="font-sf-pro font-[510] not-italic text-[12px] text-[var(--Foundation-Grey-grey-400,#6E6E6E)] leading-normal mb-1">
             {activePkg.tagline || activePkg.title}
           </h4>
         )}
 
         {/* Price Display */}
-        <div className="flex items-baseline mb-4 pb-4 border-b border-gray-100 font-sf-pro font-bold text-[26px] min-[400px]:text-[28px] sm:text-[20px] md:text-[22px] lg:text-[24px] xl:text-[26px] macbook:text-[28px] 2xl:text-[36px] not-italic">
-          <span className="text-[var(--Foundation-Grey-grey-400,#6E6E6E)]">$</span>
+        <div className="flex items-baseline mb-4 pb-4 border-b border-gray-100 font-sf-pro font-semibold text-[26px] min-[400px]:text-[28px] sm:text-[20px] md:text-[22px] lg:text-[24px] xl:text-[26px]  not-italic">
+          <span className="text-[000]">$</span>
           <span className="text-[#000]">{activePkg.price}</span>
         </div>
 
@@ -102,12 +105,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
             font-normal
             not-italic
             text-[14px]
-            min-[400px]:text-[15px]
-            md:text-[14px]
-            lg:text-[15px]
-            xl:text-[16px]
-            macbook:text-[18px]
-            2xl:text-[24px]
+            leading-[1.3]
             text-[var(--Foundation-Grey-grey-500,#4A4A4A)]
             mb-5
             pb-5
@@ -120,16 +118,16 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
 
         {/* Revisions & Delivery Meta Row */}
         {(Boolean(activePkg.revisions) || activePkg.deliveryTime > 0) && (
-          <div className="flex items-center gap-4 sm:gap-5 2xl:gap-6 font-sf-pro font-normal not-italic text-[13px] min-[400px]:text-[14px] sm:text-[15px] md:text-[16px] lg:text-[16px] xl:text-[18px] macbook:text-[19px] 2xl:text-[20px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] leading-normal mb-5 flex-wrap">
+          <div className="flex items-center gap-4 sm:gap-5 2xl:gap-6 font-sf-pro font-normal not-italic text-[13px]  text-[var(--Foundation-Grey-grey-500,#4A4A4A)] leading-normal mb-5 flex-wrap">
             {activePkg.revisions ? (
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <FiRepeat className="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px] lg:w-[20px] lg:h-[20px] xl:w-[22px] xl:h-[22px] macbook:w-[23px] macbook:h-[23px] 2xl:w-[24px] 2xl:h-[24px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] shrink-0" />
+                <FiRepeat className="w-[15px] h-[15px]  text-[var(--Foundation-Grey-grey-500,#4A4A4A)] shrink-0" />
                 <span>{activePkg.revisions}</span>
               </div>
             ) : null}
             {activePkg.deliveryTime > 0 ? (
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <FiClock className="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px] lg:w-[20px] lg:h-[20px] xl:w-[22px] xl:h-[22px] macbook:w-[23px] macbook:h-[23px] 2xl:w-[24px] 2xl:h-[24px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] shrink-0" />
+                <FiClock className="w-[15px] h-[15px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] shrink-0" />
                 <span>{activePkg.deliveryTime} Day{activePkg.deliveryTime > 1 ? 's' : ''} Delivery</span>
               </div>
             ) : null}

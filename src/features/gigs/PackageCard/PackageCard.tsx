@@ -35,17 +35,18 @@ const resolveCoverImage = (data: any): string => {
 const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean }) => {
   const router = useRouter();
   const { user } = useUserStore((state: any) => state);
-  if (!data) return null;
-
-  const userObj = data.user || data.userId || data.userID || {};
-  const userImg = userObj.image || data.pp || "/media/noavatar.png";
-  const username = userObj.username || data.username || "Seller";
 
   const [imgSrc, setImgSrc] = React.useState<string>(() => resolveCoverImage(data));
 
   React.useEffect(() => {
     setImgSrc(resolveCoverImage(data));
   }, [data?.cover, data?.img, data?.image, data?.images]);
+
+  if (!data) return null;
+
+  const userObj = data.user || data.userId || data.userID || {};
+  const userImg = userObj.image || data.pp || "/media/noavatar.png";
+  const username = userObj.username || data.username || "Seller";
 
   const handleImageError = () => {
     if (imgSrc !== FALLBACK_COVER) {

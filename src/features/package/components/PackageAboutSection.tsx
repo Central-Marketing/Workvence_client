@@ -26,7 +26,7 @@ export const PackageAboutSection: React.FC<PackageAboutSectionProps> = ({
     >
       {/* Section Header */}
       <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 mb-6 pb-2">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+        <h2 className="text-xl font-bold text-gray-900 ">
           About this package
         </h2>
         <span className="text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200/80 px-3 py-1 rounded-md max-w-full truncate">

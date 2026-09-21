@@ -54,7 +54,7 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-7 border-b border-gray-200">
           <div>
-            <h2 className="text-[22px] sm:text-[25px] font-semibold text-gray-900 tracking-tight">
+            <h2 className="text-[20px] font-bold font-sf-pro text-gray-900">
               Compare packages
             </h2>
           </div>
@@ -67,20 +67,52 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
             variant="ghost"
             size="xs"
             radius="full"
-            onClick={() => setShowComparisonTable(!showComparisonTable)}
-            className={`!w-[60px] !h-[34px] !min-h-[34px] !p-[4px] rounded-[40px] flex items-center transition-colors duration-200 cursor-pointer shrink-0 ${showComparisonTable
-                ? "!bg-[var(--success-500,#008000)] justify-end"
-                : "!bg-[#D1D5DB] justify-start"
-              }`}
+            onClick={() => setShowComparisonTable((prev) => !prev)}
+            className={`
+    !w-[60px]
+    !h-[34px]
+    !min-h-[34px]
+    !p-0
+    !rounded-full
+    !border-0
+    !outline-none
+    flex
+    items-center
+    relative
+    shrink-0
+    cursor-pointer
+    transition-colors
+    duration-200
+    ${showComparisonTable
+                ? "!bg-[var(--success-500,#008000)]"
+                : "!bg-[#D1D5DB]"
+              }
+  `}
           >
-            <span className="w-[26px] h-[26px] bg-white rounded-full shadow-sm pointer-events-none block transition-transform duration-200" />
+            <span
+              className={`
+      absolute
+      left-[4px]
+      top-[4px]
+      w-[26px]
+      h-[26px]
+      bg-white
+      rounded-full
+      shadow-sm
+      pointer-events-none
+      transition-transform
+      duration-200
+      ease-in-out
+      ${showComparisonTable ? "translate-x-[26px]" : "translate-x-0"}
+    `}
+            />
           </Button>
         </div>
 
         {/* Comparison */}
         {showComparisonTable && (
-          <div className="animate-fadeIn w-full overflow-hidden">
-            <div className="w-full">
+          <div className="animate-fadeIn w-full overflow-x-auto no-scrollbar">
+            <div className="min-w-[600px] sm:min-w-0 w-full">
               {/* Package Headers */}
               <div className="grid grid-cols-3 border-b border-gray-200">
                 {/* Basic */}
@@ -336,7 +368,7 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                       variant="outline"
-                      size="sm"
+                      size="md"
                       radius="fiverr"
                       fullWidth
                     >
@@ -353,7 +385,7 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                       variant="brand"
-                      size="sm"
+                      size="md"
                       radius="fiverr"
                       fullWidth
                     >
@@ -370,7 +402,7 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
                       variant="dark"
-                      size="sm"
+                      size="md"
                       radius="fiverr"
                       fullWidth
                     >

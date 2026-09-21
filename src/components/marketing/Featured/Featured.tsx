@@ -288,7 +288,7 @@ const Featured = () => {
     <section
       ref={containerRef}
       id="featured-section"
-      className="relative w-full h-[620px] sm:h-[700px] md:h-[780px] lg:h-[840px] xl:h-[900px] bg-[#E8F5F5] overflow-hidden flex flex-col justify-between pt-8 sm:pt-12 md:pt-14 pb-0 select-none"
+      className="relative w-full h-[620px] sm:h-[700px] md:h-[780px] lg:h-[720px] xl:h-[840px] 2xl:h-[900px] bg-[#E8F5F5] overflow-hidden flex flex-col justify-between pt-8 sm:pt-12 md:pt-14 pb-0 select-none"
     >
       {/* Background ambient radial glow at top */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_50%_at_50%_15%,rgba(242,252,248,0.7),transparent)] pointer-events-none" />
@@ -308,7 +308,7 @@ const Featured = () => {
         {/* Headline */}
         <h1
           ref={headlineRef}
-          className="font-sf-pro font-[510] text-[28px] sm:text-[40px] md:text-[54px] lg:text-[64px] macbook:text-[74px] 2xl:text-[84px] text-[#1E293B] tracking-[0px] leading-[1.08] text-center mb-4 sm:mb-5"
+          className="font-sf-pro font-[510] text-[28px] sm:text-[40px] md:text-[50px] lg:text-[56px] xl:text-[64px] macbook:text-[68px] 2xl:text-[68px] text-[#1E293B] tracking-[0px] leading-[1.08] text-center mb-4 sm:mb-5"
         >
           <span className="block">
             Find the right <span className="text-[#327C73]">freelancer</span>
@@ -363,11 +363,11 @@ const Featured = () => {
       {/* BOTTOM IMAGE GALLERY - 5 COLUMNS CONSTRAINED TO CONTAINER */}
       <div
         ref={galleryRef}
-        className="relative z-10 w-full max-w-[1800px] mx-auto px-4 md:px-6 flex items-end justify-center gap-4 sm:gap-5 md:gap-6 mt-auto pointer-events-none"
+        className="relative z-10 w-full max-w-[1400px] mx-auto px-4 md:px-6 flex items-end justify-center gap-4 sm:gap-5 md:gap-6 mt-auto pointer-events-none"
       >
 
         {/* COLUMN 1: LEFTMOST - 2 VERTICAL IMAGES */}
-        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0 flex flex-col justify-end gap-4 sm:gap-5 md:gap-6">
+        <div className="hero-gallery-col hidden sm:flex flex-1 min-w-[90px] max-w-[339px] shrink-0 flex-col justify-end gap-4 sm:gap-5 md:gap-6">
           {/* Top image: Blue head silhouette (lifts on scroll) */}
           <div className="hero-gallery-lift w-full will-change-transform">
             <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
@@ -399,7 +399,7 @@ const Featured = () => {
         </div>
 
         {/* COLUMN 2: SECOND - TALL ADOBE BOUQUET CARD */}
-        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
+        <div className="hero-gallery-col flex-1 min-w-[80px] sm:min-w-[90px] max-w-[339px] shrink-0">
           <div className="hero-gallery-lift w-full will-change-transform">
             <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
               <div className="relative w-full h-[160px] sm:h-[220px] md:h-[290px] lg:h-[340px] xl:h-[305px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-white">
@@ -417,7 +417,7 @@ const Featured = () => {
         </div>
 
         {/* COLUMN 3: CENTER - VIBE CODING PHONE (LOWER POSITION) */}
-        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
+        <div className="hero-gallery-col flex-1 min-w-[80px] sm:min-w-[90px] max-w-[339px] shrink-0">
           <div className="hero-gallery-lift w-full will-change-transform">
             <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
               <div className="relative w-full h-[110px] sm:h-[155px] md:h-[200px] lg:h-[160px] xl:h-[180px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#a81e55]">
@@ -435,7 +435,7 @@ const Featured = () => {
         </div>
 
         {/* COLUMN 4: FOURTH - TALL VIOLIN POSTER */}
-        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0">
+        <div className="hero-gallery-col flex-1 min-w-[80px] sm:min-w-[90px] max-w-[339px] shrink-0">
           <div className="hero-gallery-lift w-full will-change-transform">
             <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">
               <div className="relative w-full h-[160px] sm:h-[220px] md:h-[290px] lg:h-[340px] xl:h-[305px] rounded-t-xl sm:rounded-t-2xl rounded-b-none overflow-hidden shadow-sm bg-[#fafafa]">
@@ -453,7 +453,7 @@ const Featured = () => {
         </div>
 
         {/* COLUMN 5: RIGHTMOST - 2 VERTICAL IMAGES */}
-        <div className="hero-gallery-col flex-1 min-w-[90px] max-w-[339px] shrink-0 flex flex-col justify-end gap-4 sm:gap-5 md:gap-6">
+        <div className="hero-gallery-col hidden sm:flex flex-1 min-w-[90px] max-w-[339px] shrink-0 flex flex-col justify-end gap-4 sm:gap-5 md:gap-6">
           {/* Top image: The Link (robots / clarity meets creativity) (lifts on scroll) */}
           <div className="hero-gallery-lift w-full will-change-transform">
             <div className="w-full transition-transform duration-300 ease-out hover:-translate-y-2 hover:scale-[1.02] cursor-pointer pointer-events-auto">

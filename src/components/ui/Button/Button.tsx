@@ -53,14 +53,32 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
     },
     ref
   ) => {
-    const isIconOnly = Boolean(icon && !children);
+    const isIconOnly = Boolean((icon && !children) || size === "icon");
     const resolvedSize = isIconOnly ? "icon" : size;
 
     const rawVariant = buttonVariantStyles[variant] || buttonVariantStyles.brand;
     const rawSize = buttonSizeStyles[resolvedSize] || buttonSizeStyles.md;
     const rawRadius = buttonRadiusStyles[radius] || buttonRadiusStyles.fiverr;
 
-    const isFixed40Variant = !isIconOnly && ["dark", "black", "soft", "secondary"].includes(variant);
+    const standardActionVariants: ButtonVariant[] = [
+      "brand",
+      "primary",
+      "emerald",
+      "dark",
+      "black",
+      "soft",
+      "secondary",
+      "outline",
+      "danger",
+      "danger-soft",
+    ];
+
+    const isFixed40Variant =
+      !isIconOnly &&
+      standardActionVariants.includes(variant) &&
+      size !== "lg" &&
+      size !== "xl";
+
     let effectiveSizeClasses = rawSize;
     if (isFixed40Variant) {
       effectiveSizeClasses = rawSize
@@ -123,7 +141,9 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 
     const iconClasses = [
       "shrink-0 inline-flex items-center justify-center",
-      buttonIconSizeStyles[resolvedSize] || buttonIconSizeStyles.md,
+      isFixed40Variant
+        ? buttonIconSizeStyles.md
+        : (buttonIconSizeStyles[resolvedSize] || buttonIconSizeStyles.md),
     ].join(" ");
 
     const renderSpinner = () => (
@@ -161,11 +181,11 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 
         {/* Icon-only mode */}
         {isIconOnly && !isLoading ? (
-          <span className={iconClasses}>{icon}</span>
+          <span className={iconClasses}>{icon || children}</span>
         ) : null}
 
         {/* Text Content */}
-        {children !== undefined && children !== null ? (
+        {!isIconOnly && children !== undefined && children !== null ? (
           <span className="truncate">{isLoading && loadingText ? loadingText : children}</span>
         ) : null}
 

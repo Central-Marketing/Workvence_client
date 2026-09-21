@@ -84,7 +84,7 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap min-w-0">
-          <h2 className="text-[20px] min-[400px]:text-[24px] sm:text-[28px] md:text-[32px] lg:text-[36px] font-[590] font-sf-pro text-[var(--Foundation-Grey-grey-800,#292929)] not-italic leading-tight tracking-tight">
+          <h2 className="text-[20px] font-bold font-sf-pro text-[var(--Foundation-Grey-grey-800,#292929)] not-italic leading-tight tracking-tight">
             Packages
           </h2>
           <span className="inline-flex items-center gap-1 rounded-[4px] border border-[var(--Foundation-Grey-grey-100,#C7C7C7)] bg-[var(--Foundation-Grey-grey-50,#EDEDED)] px-2 sm:px-[10px] py-0.5 sm:py-[4px] text-xs sm:text-sm md:text-[16px] font-[510] font-sf-pro text-[var(--Foundation-Grey-grey-400,#6E6E6E)] not-italic leading-normal shrink-0">
@@ -189,9 +189,8 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUpOrLeave}
           onMouseLeave={handleMouseUpOrLeave}
-          className={`flex items-center gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar scroll-smooth flex-nowrap py-1 select-none ${
-            isDragging ? "cursor-grabbing" : "cursor-grab"
-          }`}
+          className={`flex items-center gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar scroll-smooth flex-nowrap py-1 select-none ${isDragging ? "cursor-grabbing" : "cursor-grab"
+            }`}
         >
           {sellerPackages.map((pkg, idx) => {
             const isSelected = activeIndex === idx;
@@ -207,8 +206,8 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
                   if (!hasMoved) setActiveIndex(idx);
                 }}
                 className={`relative w-[130px] sm:w-[160px] md:w-[180px] !p-0 !min-h-0 shrink-0 aspect-[16/10] overflow-hidden border-2 transition-all cursor-pointer bg-gray-100 active:scale-95 ${isSelected
-                    ? "border-brand-green ring-1 ring-brand-green shadow-xs scale-98"
-                    : "border-transparent opacity-75 hover:opacity-100 hover:border-gray-300"
+                  ? "border-brand-green ring-1 ring-brand-green shadow-xs scale-98"
+                  : "border-transparent opacity-75 hover:opacity-100 hover:border-gray-300"
                   }`}
               >
                 {thumbImg && (

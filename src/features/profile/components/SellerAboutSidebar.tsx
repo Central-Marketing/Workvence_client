@@ -55,10 +55,10 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
         </p>
 
         {/* 3 Metric / Stat Boxes */}
-        <div className="bg-[#F8F8F8] border border-[#DADADA] rounded-[10px] overflow-hidden grid grid-cols-1 sm:grid-cols-3 mb-6">
+        <div className="bg-[#F8F8F8] border border-[#DADADA] rounded-[10px] overflow-hidden grid grid-cols-1 xl:grid-cols-3 mb-6">
 
           {/* Box 1: Location */}
-          <div className="min-h-[64px] sm:min-h-[72px] macbook:min-h-[76px] px-3 py-3 sm:px-2.5 sm:py-3 macbook:px-3 macbook:py-3.5 flex items-center gap-2 sm:gap-2 macbook:gap-2.5 border-b sm:border-b-0 sm:border-r border-black/10 min-w-0">
+          <div className="min-h-[64px] sm:min-h-[72px] macbook:min-h-[76px] px-3.5 py-3 xl:px-2.5 xl:py-3 macbook:px-3 macbook:py-3.5 flex items-center gap-2.5 xl:gap-2 macbook:gap-2.5 border-b xl:border-b-0 xl:border-r border-black/10 min-w-0">
             <div className="w-7 h-7 sm:w-7.5 sm:h-7.5 macbook:w-8 macbook:h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center shrink-0">
               <FiMapPin className="w-3.5 h-3.5 macbook:w-4 macbook:h-4" />
             </div>
@@ -78,7 +78,7 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
           </div>
 
           {/* Box 2: Response Time */}
-          <div className="min-h-[64px] sm:min-h-[72px] macbook:min-h-[76px] px-3 py-3 sm:px-2.5 sm:py-3 macbook:px-3 macbook:py-3.5 flex items-center gap-2 sm:gap-2 macbook:gap-2.5 border-b sm:border-b-0 sm:border-r border-black/10 min-w-0">
+          <div className="min-h-[64px] sm:min-h-[72px] macbook:min-h-[76px] px-3.5 py-3 xl:px-2.5 xl:py-3 macbook:px-3 macbook:py-3.5 flex items-center gap-2.5 xl:gap-2 macbook:gap-2.5 border-b xl:border-b-0 xl:border-r border-black/10 min-w-0">
             <div className="w-7 h-7 sm:w-7.5 sm:h-7.5 macbook:w-8 macbook:h-8 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
               <FiClock className="w-3.5 h-3.5 macbook:w-4 macbook:h-4" />
             </div>
@@ -98,7 +98,7 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
           </div>
 
           {/* Box 3: On Time Delivery */}
-          <div className="min-h-[64px] sm:min-h-[72px] macbook:min-h-[76px] px-3 py-3 sm:px-2.5 sm:py-3 macbook:px-3 macbook:py-3.5 flex items-center gap-2 sm:gap-2 macbook:gap-2.5 min-w-0">
+          <div className="min-h-[64px] sm:min-h-[72px] macbook:min-h-[76px] px-3.5 py-3 xl:px-2.5 xl:py-3 macbook:px-3 macbook:py-3.5 flex items-center gap-2.5 xl:gap-2 macbook:gap-2.5 min-w-0">
             <div className="w-7 h-7 sm:w-7.5 sm:h-7.5 macbook:w-8 macbook:h-8 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
               <FiPackage className="w-3.5 h-3.5 macbook:w-4 macbook:h-4" />
             </div>

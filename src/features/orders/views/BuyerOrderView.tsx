@@ -295,7 +295,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-8 font-sans">
-      <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+      <div className="container mx-auto px-4 md:px-6">
 
         {/* Top Breadcrumb */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -337,13 +337,14 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 shrink-0">
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0 w-full md:w-auto">
                 <Button
                   type="button"
                   onClick={() => setIsRevisionModalOpen(true)}
                   variant="outline"
                   size="md"
                   radius="fiverr"
+                  className="w-full sm:w-auto text-center"
                 >
                   Request Revision
                 </Button>
@@ -354,6 +355,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                   size="md"
                   radius="fiverr"
                   rightIcon={<FiCheck className="text-base" />}
+                  className="w-full sm:w-auto"
                 >
                   Accept &amp; Complete Order
                 </Button>
@@ -377,14 +379,15 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0 w-full sm:w-auto">
                 <Button
                   type="button"
                   disabled={isRespondingExtension}
                   onClick={handleRejectExtension}
                   variant="outline"
-                  size="sm"
+                  size="md"
                   radius="fiverr"
+                  className="w-full sm:w-auto"
                 >
                   Reject
                 </Button>
@@ -394,8 +397,9 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                   onClick={handleApproveExtension}
                   isLoading={isRespondingExtension}
                   variant="dark"
-                  size="sm"
+                  size="md"
                   radius="fiverr"
+                  className="w-full sm:w-auto"
                 >
                   {isRespondingExtension ? "Processing..." : "Approve Extension"}
                 </Button>

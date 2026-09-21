@@ -38,7 +38,7 @@ export const RevisionModal: React.FC<RevisionModalProps> = ({
       onClick={() => !isLoading && onClose()}
     >
       <div
-        className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col relative overflow-hidden"
+        className="bg-white rounded-3xl max-w-lg w-full max-h-[calc(100dvh-2rem)] flex flex-col overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-100 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <Button
@@ -80,13 +80,13 @@ export const RevisionModal: React.FC<RevisionModalProps> = ({
             {error && <p className="text-xs text-red-500 font-medium mt-1">{error}</p>}
           </div>
 
-          <div className="flex items-center gap-3 pt-2">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 pt-2">
             <Button
               type="button"
               variant="outline"
               size="md"
               radius="fiverr"
-              className="flex-1"
+              className="w-full sm:w-auto sm:flex-1 text-center"
               onClick={onClose}
               disabled={isLoading}
             >
@@ -99,7 +99,7 @@ export const RevisionModal: React.FC<RevisionModalProps> = ({
               variant="brand"
               size="md"
               radius="fiverr"
-              className="flex-1"
+              className="w-full sm:w-auto sm:flex-1"
             >
               {isLoading ? 'Submitting...' : 'Submit Request'}
             </Button>
@@ -150,7 +150,7 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
       onClick={() => !isLoading && onClose()}
     >
       <div
-        className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col relative overflow-hidden"
+        className="bg-white rounded-3xl max-w-lg w-full max-h-[calc(100dvh-2rem)] flex flex-col overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-100 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <Button
@@ -204,13 +204,13 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
 
           {error && <p className="text-xs text-red-500 font-medium">{error}</p>}
 
-          <div className="flex items-center gap-3 pt-2">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 pt-2">
             <Button
               type="button"
               variant="outline"
               size="md"
               radius="fiverr"
-              className="flex-1"
+              className="w-full sm:w-auto sm:flex-1 text-center"
               onClick={onClose}
               disabled={isLoading}
             >
@@ -223,7 +223,7 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
               variant="brand"
               size="md"
               radius="fiverr"
-              className="flex-1"
+              className="w-full sm:w-auto sm:flex-1"
             >
               {isLoading ? 'Submitting...' : 'Submit Extension'}
             </Button>

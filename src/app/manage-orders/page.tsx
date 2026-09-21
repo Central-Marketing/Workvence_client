@@ -198,7 +198,7 @@ const ManageOrders = () => {
 
           {/* Page Heading */}
           <div>
-            <h1 className="text-2xl sm:text-[32px] font-bold tracking-tight text-gray-950">
+            <h1 className="text-[20px] font-bold text-slate-900">
               Manage Orders
             </h1>
             <p className="text-xs sm:text-[13px] text-gray-500 mt-1.5 leading-relaxed">
@@ -207,13 +207,13 @@ const ManageOrders = () => {
           </div>
 
           {/* Main Card Container */}
-          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <div className="bg-white rounded-[10px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
 
             {/* Top Toolbar: Filter Tabs on Left + Calendar & Search on Right */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
 
               {/* Segmented Filter Tab Pills */}
-              <div className="bg-white border border-gray-200/90 rounded-xl p-1 inline-flex items-center gap-1 overflow-x-auto max-w-full">
+              <div className="bg-white border border-gray-200/90 rounded-[10px] p-1 inline-flex items-center gap-1 overflow-x-auto scrollbar-none max-w-full">
                 {tabs.map((tab) => {
                   const isActive = activeTab === tab.id;
                   return (
@@ -225,8 +225,8 @@ const ManageOrders = () => {
                       radius="lg"
                       onClick={() => setActiveTab(tab.id)}
                       className={`px-4 py-1.5 whitespace-nowrap transition-all cursor-pointer ${isActive
-                          ? "!bg-[#0B3A33] !text-white shadow-2xs"
-                          : "!text-gray-600 hover:!text-gray-900"
+                        ? "!bg-[#0B3A33] !text-white shadow-2xs"
+                        : "!text-gray-600 hover:!text-gray-900"
                         }`}
                     >
                       {tab.label}
@@ -243,7 +243,7 @@ const ManageOrders = () => {
                   size="icon"
                   radius="lg"
                   title="Filter by date"
-                  className="w-9 h-9 border-gray-200/90 text-gray-500 hover:bg-gray-50 bg-white shrink-0"
+                  className="w-10 h-10 min-h-[40px] border-gray-200/90 text-gray-500 hover:bg-gray-50 bg-white shrink-0 shadow-2xs"
                   icon={<FiCalendar className="text-sm" />}
                 />
 
@@ -261,7 +261,7 @@ const ManageOrders = () => {
             </div>
 
             {/* Orders Table */}
-            <div className="w-full overflow-x-auto">
+            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
               <table className="w-full text-left text-sm border-collapse min-w-[800px]">
                 <thead>
                   <tr className="text-xs font-bold text-gray-800 border-b border-gray-100">
@@ -352,7 +352,7 @@ const ManageOrders = () => {
                               />
                               <div className="flex flex-col">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="text-xs sm:text-[13px] font-bold text-gray-950">
+                                  <span className="text-xs sm:text-[13px] font-semibold text-gray-950">
                                     {buyerName}
                                   </span>
                                   {isVerified && (
@@ -372,11 +372,12 @@ const ManageOrders = () => {
                           <td className="py-4 px-4 align-middle max-w-[340px]">
                             <div className="flex flex-col">
                               <span
-                                className="text-xs sm:text-[13px] font-bold text-gray-900 line-clamp-1 leading-snug"
+                                className="text-[13px] font-semibold text-gray-900 line-clamp-1 leading-snug"
                                 title={projectTitle}
                               >
                                 {projectTitle}
                               </span>
+
                               {projectDescription && (
                                 <span
                                   className="text-[11px] text-gray-500 mt-0.5 line-clamp-1 leading-normal"

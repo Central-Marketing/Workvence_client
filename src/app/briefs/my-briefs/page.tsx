@@ -267,7 +267,7 @@ const MyBriefs = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-10 font-sans">
+    <div className="min-h-screen bg-[#F5F5F5] py-6 sm:py-10 font-sans">
       <div className="container mx-auto px-4 md:px-6">
         {/* Top Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-medium mb-3">
@@ -502,10 +502,27 @@ const MyBriefs = () => {
                 <div
                   key={brief._id}
                   onClick={() => router.push(`/briefs/${brief._id}`)}
-                  className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-5 sm:p-6 sm:p-7 flex flex-col justify-between transition-all duration-200 hover:border-emerald-300 hover:shadow-md hover:bg-gradient-to-br hover:from-white hover:to-emerald-50/15 group cursor-pointer relative"
+                  className="relative overflow-hidden bg-white rounded-[10px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[10px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-5 sm:p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer"
                 >
+                  {/* Ambient Purple Glow (appears on card hover) */}
+                  <div
+                    className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out z-0"
+                    style={{
+                      position: "absolute",
+                      right: "-210px",
+                      top: "-407px",
+                      width: "555px",
+                      height: "513px",
+                      borderRadius: "555px",
+                      transform: "rotate(-180deg)",
+                      background: "var(--purple-100, #CEB0FA)",
+                      filter: "blur(150px)",
+                    }}
+                    aria-hidden="true"
+                  />
+
                   {/* Top Header Row */}
-                  <div>
+                  <div className="relative z-10">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <h2 className="text-base sm:text-[19px] font-bold text-slate-900 tracking-tight group-hover:text-slate-950 truncate">
@@ -656,7 +673,7 @@ const MyBriefs = () => {
                   </div>
 
                   {/* Divider & Footer */}
-                  <div className="border-t border-slate-100 pt-4 flex items-center justify-between mt-auto">
+                  <div className="relative z-10 border-t border-slate-100 pt-4 flex items-center justify-between mt-auto">
                     {/* Left: Avatar Stack and Proposal Count */}
                     <div className="flex items-center">
                       {proposalCount > 0 ? (
@@ -720,7 +737,7 @@ const MyProposals = () => {
   const proposalsArray = Array.isArray(proposals) ? proposals : [];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-10 font-sans">
+    <div className="min-h-screen bg-[#F5F5F5] py-6 sm:py-10 font-sans">
       <div className="container mx-auto px-4 md:px-6">
         {/* Top Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-medium mb-3">
@@ -783,9 +800,26 @@ const MyProposals = () => {
                 <div
                   key={proposal._id}
                   onClick={() => router.push(`/briefs/${briefId}`)}
-                  className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 flex flex-col justify-between transition-all duration-200 hover:border-purple-300 hover:shadow-md hover:bg-gradient-to-br hover:from-white hover:to-purple-50/20 group cursor-pointer"
+                  className="relative overflow-hidden bg-white rounded-[10px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[10px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer"
                 >
-                  <div>
+                  {/* Ambient Purple Glow (appears on card hover) */}
+                  <div
+                    className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out z-0"
+                    style={{
+                      position: "absolute",
+                      right: "-210px",
+                      top: "-407px",
+                      width: "555px",
+                      height: "513px",
+                      borderRadius: "555px",
+                      transform: "rotate(-180deg)",
+                      background: "var(--purple-100, #CEB0FA)",
+                      filter: "blur(150px)",
+                    }}
+                    aria-hidden="true"
+                  />
+
+                  <div className="relative z-10">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <h2 className="text-lg sm:text-[19px] font-bold text-slate-900 tracking-tight group-hover:text-slate-950 truncate">
@@ -832,7 +866,7 @@ const MyProposals = () => {
                     )}
                   </div>
 
-                  <div className="border-t border-slate-100 pt-4 flex items-center justify-between mt-auto">
+                  <div className="relative z-10 border-t border-slate-100 pt-4 flex items-center justify-between mt-auto">
                     <span className="text-xs text-slate-400 font-medium">
                       Status:{" "}
                       <strong className="text-slate-700 capitalize">

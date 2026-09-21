@@ -217,7 +217,7 @@ function BriefsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-gray-800 pb-28 pt-5 sm:pt-7">
+    <div className="min-h-screen bg-[#F5F5F5] text-gray-800 pb-28 pt-5 sm:pt-7">
       <div className="container mx-auto">
         {/* Top Breadcrumb Navigation */}
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] text-gray-500 mb-3 select-none">
@@ -465,10 +465,27 @@ function BriefsContent() {
                   <div
                     key={briefId}
                     onClick={() => router.push(`/briefs/${briefId}`)}
-                    className="bg-white rounded-2xl border border-gray-200/90 p-6 sm:p-7 shadow-2xs hover:shadow-md hover:border-gray-300 transition-all duration-200 flex flex-col justify-between cursor-pointer group select-none"
+                    className="relative overflow-hidden bg-white rounded-[10px] border border-gray-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[10px] p-6 sm:p-7 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer group select-none"
                   >
+                    {/* Ambient Purple Glow (appears on card hover) */}
+                    <div
+                      className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out z-0"
+                      style={{
+                        position: "absolute",
+                        right: "-210px",
+                        top: "-407px",
+                        width: "555px",
+                        height: "513px",
+                        borderRadius: "555px",
+                        transform: "rotate(-180deg)",
+                        background: "var(--purple-100, #CEB0FA)",
+                        filter: "blur(150px)",
+                      }}
+                      aria-hidden="true"
+                    />
+
                     {/* Top Content Area */}
-                    <div>
+                    <div className="relative z-10">
                       {/* Header Row: Title, Meta, Badges, Heart */}
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <div className="flex-1 min-w-0 pr-2">
@@ -535,7 +552,7 @@ function BriefsContent() {
                     </div>
 
                     {/* Divider & Bottom Client / Proposals Bar - 100% Real Backend Data */}
-                    <div className="border-t border-gray-100 pt-4 mt-auto flex items-center justify-between">
+                    <div className="relative z-10 border-t border-gray-100 pt-4 mt-auto flex items-center justify-between">
                       {/* Project Owner (Anonymous like Fiverr/Upwork) */}
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200/80 shadow-2xs shrink-0">

@@ -604,11 +604,11 @@ function BriefsContent() {
                     radius="xl"
                     onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
-                    className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs font-semibold shadow-2xs shrink-0 flex items-center gap-1 min-h-[32px] sm:min-h-[36px]"
+                    className="!inline-flex !flex-row !items-center !justify-center !gap-1.5 px-3 sm:px-3.5 !h-9 !min-h-[36px] !text-xs font-semibold shadow-2xs shrink-0 whitespace-nowrap"
+                    leftIcon={<FiChevronLeft className="w-3.5 h-3.5 shrink-0" />}
                     aria-label="Previous page"
                   >
-                    <FiChevronLeft className="w-4 h-4 shrink-0" />
-                    <span className="hidden sm:inline">Previous</span>
+                    <span className="whitespace-nowrap">Previous</span>
                   </Button>
 
                   <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
@@ -617,7 +617,7 @@ function BriefsContent() {
                         return (
                           <span
                             key={`ellipsis-${idx}`}
-                            className="w-6 sm:w-8 h-8 sm:h-9 flex items-center justify-center text-xs text-slate-400 font-bold select-none shrink-0"
+                            className="w-7 sm:w-9 !h-9 !min-h-[36px] flex items-center justify-center text-xs text-slate-400 font-bold select-none shrink-0"
                           >
                             ...
                           </span>
@@ -633,8 +633,9 @@ function BriefsContent() {
                           size="sm"
                           radius="xl"
                           onClick={() => handlePageChange(pageNum)}
-                          className={`w-8 h-8 sm:w-9 sm:h-9 p-0 text-xs font-semibold shadow-2xs shrink-0 ${isActive ? "pointer-events-none !bg-[#0D6D5F] text-white" : "hover:border-gray-900"
-                            }`}
+                          className={`!w-9 !h-9 !min-h-[36px] p-0 !text-xs font-semibold shadow-2xs shrink-0 !inline-flex !items-center !justify-center ${
+                            isActive ? "pointer-events-none !bg-[#0D6D5F] text-white" : "hover:border-gray-900"
+                          }`}
                           aria-label={`Page ${pageNum}`}
                           aria-current={isActive ? "page" : undefined}
                         >
@@ -651,11 +652,11 @@ function BriefsContent() {
                     radius="xl"
                     onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                     disabled={currentPage === totalPages}
-                    className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs font-semibold shadow-2xs shrink-0 flex items-center gap-1 min-h-[32px] sm:min-h-[36px]"
+                    className="!inline-flex !flex-row !items-center !justify-center !gap-1.5 px-3 sm:px-3.5 !h-9 !min-h-[36px] !text-xs font-semibold shadow-2xs shrink-0 whitespace-nowrap"
+                    rightIcon={<FiChevronRight className="w-3.5 h-3.5 shrink-0" />}
                     aria-label="Next page"
                   >
-                    <span className="hidden sm:inline">Next</span>
-                    <FiChevronRight className="w-4 h-4 shrink-0" />
+                    <span className="whitespace-nowrap">Next</span>
                   </Button>
                 </nav>
               </div>

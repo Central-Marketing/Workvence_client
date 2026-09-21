@@ -139,11 +139,25 @@ const Featured = ({
   useEffect(() => {
     const calculateVisibleHeight = () => {
       const navEl = document.querySelector('nav');
-      const navHeight = navEl
-        ? navEl.offsetHeight
-        : (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height')) || 72);
-      const windowHeight = window.innerHeight;
-      const calculated = Math.max(500, windowHeight - navHeight);
+      const featuredEl = containerRef.current;
+
+      let navHeight = 80;
+      if (featuredEl) {
+        // Measure exact offset from top of document to top of hero section
+        const rect = featuredEl.getBoundingClientRect();
+        const heroTop = rect.top + window.scrollY;
+        if (heroTop > 0) {
+          navHeight = heroTop;
+        } else if (navEl) {
+          navHeight = navEl.getBoundingClientRect().height || 80;
+        }
+      } else if (navEl) {
+        navHeight = navEl.getBoundingClientRect().height || 80;
+      }
+
+      // Use window.innerHeight or documentElement.clientHeight for exact visible viewport
+      const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+      const calculated = Math.max(450, windowHeight - navHeight);
       setHeroHeight(calculated);
     };
 
@@ -151,9 +165,15 @@ const Featured = ({
     window.addEventListener('resize', calculateVisibleHeight);
     window.addEventListener('orientationchange', calculateVisibleHeight);
 
+    // Re-verify after initial render, image loads, and layout settles
+    const t1 = setTimeout(calculateVisibleHeight, 50);
+    const t2 = setTimeout(calculateVisibleHeight, 300);
+
     return () => {
       window.removeEventListener('resize', calculateVisibleHeight);
       window.removeEventListener('orientationchange', calculateVisibleHeight);
+      clearTimeout(t1);
+      clearTimeout(t2);
     };
   }, []);
 
@@ -308,10 +328,10 @@ const Featured = ({
       ref={containerRef}
       id="featured-section"
       style={{
-        height: heroHeight ? `${heroHeight}px` : 'calc(100dvh - var(--navbar-height, 72px))',
-        minHeight: '500px',
+        height: heroHeight ? `${heroHeight}px` : 'calc(100vh - var(--navbar-height, 80px))',
+        minHeight: heroHeight ? `${heroHeight}px` : 'calc(100vh - var(--navbar-height, 80px))',
       }}
-      className="relative w-full bg-black overflow-x-clip flex flex-col justify-center items-center py-6 sm:py-10 md:py-12 select-none"
+      className="relative w-full bg-black overflow-x-clip flex flex-col justify-center items-center py-4 sm:py-6 md:py-8 select-none"
     >
       {/* Background Video Layer with High Quality Assurance */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
@@ -325,8 +345,7 @@ const Featured = ({
           poster={posterSrc}
           onLoadedData={() => setIsVideoLoaded(true)}
           onCanPlay={() => setIsVideoLoaded(true)}
-          className={`w-full h-full object-cover object-center transition-opacity duration-700 ease-out ${isVideoLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
+          className="w-full h-full object-cover object-center"
         >
           <source src={videoSrc} type="video/mp4" />
           <source

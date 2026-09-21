@@ -456,7 +456,7 @@ const Navbar = () => {
                 text="Post a Project with AI"
                 px="px-3 xl:px-4"
                 py="py-2"
-                className="h-[40px] rounded-xl text-[14px] xl:text-[15px] font-medium text-[#112131] shadow-none shrink-0 whitespace-nowrap"
+                className="h-[40px] rounded-[6px] text-[16px] font-semibold text-[#112131] shadow-none shrink-0 whitespace-nowrap"
               />
 
               <div className="relative profile-dropdown-container">
@@ -750,7 +750,7 @@ const Navbar = () => {
                     <AiGradientButton
                       href="/briefs/create"
                       text="Post a Project with AI"
-                      className="w-full h-11 rounded-xl text-[14px] font-medium"
+                      className="w-full h-11 rounded-[6px] text-[14px] font-medium"
                       onClick={() => setIsMobileMenuOpen(false)}
                     />
                   </div>

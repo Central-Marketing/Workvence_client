@@ -44,7 +44,7 @@ const TwoWays = () => {
             </p>
             <Link
               href="/briefs/create"
-              className="inline-flex items-center justify-center h-[46px] px-8 rounded-lg text-sm font-semibold bg-white text-[#1a1a1a] border border-gray-300 hover:border-[#1a1a1a] hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center justify-center h-[46px] px-8 rounded-[6px] text-sm font-semibold bg-white text-[#1a1a1a] border border-gray-300 hover:border-[#1a1a1a] hover:bg-gray-50 transition-colors"
             >
               Post project
             </Link>

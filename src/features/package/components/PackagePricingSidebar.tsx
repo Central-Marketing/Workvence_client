@@ -73,7 +73,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
   return (
     <div className={`w-full max-w-[500px] space-y-6 ${className}`.trim()}>
       {/* 1. Top Card: Packages Pricing Tier Card */}
-      <div className="bg-[#FFF] border border-[rgba(0,0,0,0.10)] rounded-[20px] p-[10px] shadow-2xs">
+      <div className="bg-[#FFF] border border-[rgba(0,0,0,0.10)] rounded-[6px] p-[10px] shadow-2xs">
         {/* Tier Segmented Tabs (only if multiple tiers exist) */}
         {availableTiers.length > 1 && (
           <div
@@ -157,7 +157,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
 
         {/* Feature Checklist with rounded pill rows (only if features exist) */}
         {checklistItems.length > 0 && (
-          <div className="mb-6 bg-[#F5F5F5] rounded-[20px] border border-[rgba(0,0,0,0.10)] overflow-hidden divide-y divide-[rgba(0,0,0,0.10)]">
+          <div className="mb-6 bg-[#F5F5F5] rounded-[6px] border border-[rgba(0,0,0,0.10)] overflow-hidden divide-y divide-[rgba(0,0,0,0.10)]">
             {checklistItems.map((item, idx) => (
               <div
                 key={idx}
@@ -182,7 +182,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
                     strokeLinejoin="round"
                   />
                 </svg>
-                <span className="font-sf-pro font-[510] not-italic text-[13px] min-[400px]:text-[14px] sm:text-[15px] md:text-[15px] lg:text-[15px] xl:text-[16px] macbook:text-[16px] 2xl:text-[17px] text-[#6E6E6E] leading-normal">
+                <span className="font-sf-pro font-[510] not-italic text-[13px] text-[#6E6E6E] leading-normal">
                   {item}
                 </span>
               </div>
@@ -255,9 +255,8 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
             }}
           />
           <span
-            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white ${
-              seller.isOnline ? "bg-[#10B981]" : "bg-[#E5A93C]"
-            }`}
+            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white ${seller.isOnline ? "bg-[#10B981]" : "bg-[#E5A93C]"
+              }`}
           />
         </div>
 

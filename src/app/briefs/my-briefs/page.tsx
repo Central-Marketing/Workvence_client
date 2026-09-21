@@ -299,7 +299,7 @@ const MyBriefs = () => {
     gap-2
     px-3 sm:px-4.5
     py-2 sm:py-2.5
-    rounded-xl
+    rounded-[6px]
     bg-[#0B0F19]
     hover:bg-black
     text-white
@@ -435,7 +435,7 @@ const MyBriefs = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="w-full sm:w-auto px-3 py-2 bg-white border border-slate-200 focus:border-[#0D6D5F] rounded-xl text-xs sm:text-[13px] text-slate-700 font-medium outline-none cursor-pointer shadow-2xs h-[38px]"
+                className="w-full sm:w-auto px-3 py-2 bg-white border border-slate-200 focus:border-[#0D6D5F] rounded-[6px] text-xs sm:text-[13px] text-slate-700 font-medium outline-none cursor-pointer shadow-2xs h-[38px]"
               >
                 <option value="newest">Sort: Newest</option>
                 <option value="proposals">Sort: Most Proposals</option>
@@ -464,7 +464,7 @@ const MyBriefs = () => {
             {filter === "all" && !searchQuery && !user?.isSeller ? (
               <Link
                 href="/briefs/create"
-                className="px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-[#0B0F19] hover:bg-black text-white transition-colors cursor-pointer shadow-xs"
+                className="px-5 py-2.5 rounded-[6px] font-semibold text-xs sm:text-sm bg-[#0B0F19] hover:bg-black text-white transition-colors cursor-pointer shadow-xs"
               >
                 Post Your First Project
               </Link>

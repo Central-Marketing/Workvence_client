@@ -247,7 +247,7 @@ function BriefsContent() {
           {user && !user.isSeller && (
             <Link
               href="/briefs/create"
-              className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#327C73] hover:bg-[#256059] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors shrink-0"
+              className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-[6px] bg-[#327C73] hover:bg-[#256059] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors shrink-0"
             >
               + Post a Project
             </Link>
@@ -423,7 +423,7 @@ function BriefsContent() {
               {user && !user.isSeller && (
                 <Link
                   href="/briefs/create"
-                  className="px-5 py-2.5 bg-[#327C73] text-white text-xs font-semibold rounded-xl hover:bg-[#256059] transition shadow-xs"
+                  className="px-5 py-2.5 bg-[#327C73] text-white text-xs font-semibold rounded-[6px] hover:bg-[#256059] transition shadow-xs"
                 >
                   + Post a Project
                 </Link>
@@ -633,9 +633,8 @@ function BriefsContent() {
                           size="sm"
                           radius="xl"
                           onClick={() => handlePageChange(pageNum)}
-                          className={`!w-9 !h-9 !min-h-[36px] p-0 !text-xs font-semibold shadow-2xs shrink-0 !inline-flex !items-center !justify-center ${
-                            isActive ? "pointer-events-none !bg-[#0D6D5F] text-white" : "hover:border-gray-900"
-                          }`}
+                          className={`!w-9 !h-9 !min-h-[36px] p-0 !text-xs font-semibold shadow-2xs shrink-0 !inline-flex !items-center !justify-center ${isActive ? "pointer-events-none !bg-[#0D6D5F] text-white" : "hover:border-gray-900"
+                            }`}
                           aria-label={`Page ${pageNum}`}
                           aria-current={isActive ? "page" : undefined}
                         >

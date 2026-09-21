@@ -191,7 +191,7 @@ const Featured = ({
     return () => observer.disconnect();
   }, []);
 
-  // Dynamically calculate visible screen height (full 100vh viewport as hero extends behind navbar)
+  // Dynamically calculate visible screen height (full 100vh viewport starting after navbar)
   useEffect(() => {
     const calculateVisibleHeight = () => {
       const windowHeight = window.innerHeight || document.documentElement.clientHeight;
@@ -368,7 +368,7 @@ const Featured = ({
         height: heroHeight ? `${heroHeight}px` : '100vh',
         minHeight: heroHeight ? `${heroHeight}px` : '100vh',
       }}
-      className="relative w-full bg-black overflow-x-clip flex flex-col justify-center items-center -mt-[var(--navbar-height,80px)] pt-[calc(var(--navbar-height,80px)+1.5rem)] pb-6 sm:pb-8 select-none"
+      className="relative w-full bg-black overflow-x-clip flex flex-col justify-center items-center py-6 sm:py-8 select-none"
     >
       {/* Background Video Layer with High Quality Assurance */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">

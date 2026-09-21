@@ -37,9 +37,9 @@ export const AiGradientButton: React.FC<AiGradientButtonProps> = ({
   iconSize = 18,
   iconPosition = "right",
   px = "px-[24px]",
-  py = "py-[12px]",
+  py = "py-2",
   width,
-  height,
+  height = "h-[40px]",
 }) => {
   const content = text !== undefined ? text : children;
 
@@ -63,7 +63,7 @@ export const AiGradientButton: React.FC<AiGradientButtonProps> = ({
     ...style,
   };
 
-  const combinedClasses = `group relative overflow-hidden inline-flex items-center justify-center gap-[10px] rounded-[10px] text-[#112131] font-sf-pro font-medium text-[15px] border border-white/40 shadow-xs hover:shadow-lg hover:shadow-[#82C2FD]/30 hover:-translate-y-[1px] active:translate-y-0 active:scale-[0.98] transition-all duration-300 ease-out cursor-pointer select-none disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#82C2FD]/60 focus-visible:ring-offset-2 ${px} ${py} ${width || ""} ${height || ""} ${className}`.trim();
+  const combinedClasses = `group relative overflow-hidden inline-flex items-center justify-center gap-[10px] rounded-[10px] text-[#112131] font-sf-pro font-semibold text-[16px] border border-white/40 shadow-xs hover:shadow-lg hover:shadow-[#82C2FD]/30 hover:-translate-y-[1px] active:translate-y-0 active:scale-[0.98] transition-all duration-300 ease-out cursor-pointer select-none disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#82C2FD]/60 focus-visible:ring-offset-2 ${height || "h-[40px]"} ${px} ${py} ${width || ""} ${className}`.trim();
 
   const innerContent = (
     <>

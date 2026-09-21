@@ -149,7 +149,7 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
           <div className="flex items-center justify-between gap-2">
             <span
               onClick={handleProfileClick}
-              className="font-sf-pro font-[590] text-black text-[15px] sm:text-[16px] leading-normal not-italic hover:underline cursor-pointer truncate max-w-[65%]"
+              className="font-sf-pro font-[590] text-black text-[13px] not-italic hover:underline cursor-pointer truncate max-w-[65%]"
             >
               {username}
             </span>
@@ -174,20 +174,18 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
           </div>
 
           {/* Row 2: Title / Description */}
-          <h3 className="mt-3 text-[16px] text-slate-900 font-normal font-inter not-italic line-clamp-2 min-h-[44px] sm:min-h-[48px] md:min-h-[52px] group-hover:text-gray-900 transition-colors">
-            {data.title ||
-              data.desc ||
-              "I will design,redesign business wordpress website as divi expert"}
+          <h3 className="mt-3 text-[14px] text-[rgba(24,24,27,1)] font-[500] font-inter not-italic line-clamp-2 min-h-[44px] sm:min-h-[48px] md:min-h-[52px] group-hover:text-gray-900 transition-colors">
+            {data.title}
           </h3>
         </div>
 
         {/* Row 3: Starting from Price */}
         <div className="flex items-baseline gap-2 mt-auto pt-3 pb-0.5">
-          <span className="text-[14px] sm:text-[16px] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] font-normal font-inter leading-[20px] sm:leading-[22px] not-italic">
+          <span className="text-[14px] text-[#222325] font-normal font-inter leading-[20px] sm:leading-[22px] not-italic">
             Starting from
           </span>
 
-          <span className="text-[18px] sm:text-[20px] font-bold font-inter text-[var(--Foundation-Grey-grey-500,#4A4A4A)] leading-[22px] not-italic">
+          <span className="text-[18px] font-semibold font-inter text-[#222325] leading-[22px] not-italic">
             {formattedPrice}
           </span>
         </div>

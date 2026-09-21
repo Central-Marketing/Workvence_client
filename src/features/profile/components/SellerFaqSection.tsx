@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { FiChevronDown } from "react-icons/fi";
-import { Button } from "@/components/ui";
 import { SellerFaqItem } from "../utils/sellerProfileNormalizer";
 
 interface SellerFaqSectionProps {
@@ -40,25 +39,22 @@ export const SellerFaqSection: React.FC<SellerFaqSectionProps> = ({ faqs = [] })
 
           return (
             <div key={idx} className="py-4 sm:py-5 first:pt-0 last:pb-0">
-              <Button
+              <button
                 type="button"
-                variant="ghost"
-                size="xs"
                 onClick={() => toggleFaq(idx)}
-                className="w-full flex items-center justify-between gap-4 text-left group hover:!bg-transparent !p-0 !min-h-0 !h-auto"
+                className="w-full flex items-center justify-between gap-4 text-left group hover:bg-transparent p-0 min-h-0 h-auto cursor-pointer focus:outline-none"
                 aria-expanded={isOpen}
               >
                 <span className="text-sm sm:text-[15px] font-semibold font-sf-pro text-gray-900 group-hover:text-teal-700 transition-colors">
                   {faq.question}
                 </span>
                 <span
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-teal-600 transition-transform duration-200 shrink-0 ${
-                    isOpen ? "rotate-180 text-teal-700" : ""
-                  }`}
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-teal-600 transition-transform duration-200 shrink-0 ${isOpen ? "rotate-180 text-teal-700" : ""
+                    }`}
                 >
                   <FiChevronDown className="w-4 h-4" />
                 </span>
-              </Button>
+              </button>
 
               {isOpen && (
                 <div className="mt-3 text-xs sm:text-sm text-gray-500 leading-relaxed font-normal font-sf-pro pr-4 sm:pr-8 animate-fadeIn">

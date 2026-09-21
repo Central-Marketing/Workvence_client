@@ -763,7 +763,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
               <div className="py-4 space-y-2.5 text-xs border-b border-slate-100">
                 <div className="flex justify-between text-slate-600">
                   <span>Order Number</span>
-                  <span className="font-mono text-slate-900">#{order.orderNumber}</span>
+                  <span className="font-mono text-slate-900">#{order.orderCode}</span>
                 </div>
                 <div className="flex justify-between text-slate-600">
                   <span>Order Date</span>

@@ -71,10 +71,10 @@ export const buttonSizeStyles: Record<ButtonSize, string> = {
 export const buttonRadiusStyles: Record<ButtonRadius, string> = {
   fiverr: "rounded-[6px]",          // Fiverr modern default
   "fiverr-classic": "rounded-[4px]", // Fiverr compact classic
-  md: "rounded-md",
-  lg: "rounded-[8px]",
-  xl: "rounded-xl",
-  "2xl": "rounded-2xl",
+  md: "rounded-[6px]",
+  lg: "rounded-[6px]",
+  xl: "rounded-[6px]",
+  "2xl": "rounded-[6px]",
   full: "rounded-full",
   none: "rounded-none",
 };

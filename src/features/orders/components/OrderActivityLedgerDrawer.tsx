@@ -119,23 +119,27 @@ function parseHistoryItem(item: any, idx: number, fallbackTime: string | Date): 
     action === "EXTENSION_APPROVED"
   ) {
     const days = item.days || item.extraDays || 1;
+    const raw = item.details || "";
+    const cleanDesc = raw.replace(/^Accepted \d+ day\(s\) extension\.?\s*/i, "").trim();
     return {
       id,
       timestamp,
       category,
       boldPrefix: `Accepted ${days} day(s) extension.`,
-      description: item.details || "",
+      description: cleanDesc,
     };
   }
 
   if (action === "EXTENSION_REJECTED") {
     const days = item.days || item.extraDays || 1;
+    const raw = item.details || item.reason || "";
+    const cleanDesc = raw.replace(/^Rejected \d+ day\(s\) extension\.?\s*/i, "").trim();
     return {
       id,
       timestamp,
       category,
       boldPrefix: `Rejected ${days} day(s) extension.`,
-      description: item.details || item.reason || "",
+      description: cleanDesc,
     };
   }
 
@@ -152,12 +156,14 @@ function parseHistoryItem(item: any, idx: number, fallbackTime: string | Date): 
   }
 
   if (action === "WORK_DELIVERED" || action === "DELIVERY_SUBMITTED") {
+    const raw = item.details || rawText || "Seller submitted work deliverables for inspection.";
+    const cleanDesc = raw.replace(/^Work delivered:?\s*/i, "").trim();
     return {
       id,
       timestamp,
       category,
       boldPrefix: `Work delivered:`,
-      description: item.details || rawText || "Seller submitted work deliverables for inspection.",
+      description: cleanDesc || "Seller submitted work deliverables for inspection.",
     };
   }
 
@@ -176,12 +182,17 @@ function parseHistoryItem(item: any, idx: number, fallbackTime: string | Date): 
   }
 
   if (action === "ORDER_COMPLETED" || action === "ORDER_ACCEPTED") {
+    const raw = item.details || rawText || "Buyer accepted delivery. Escrow funds released.";
+    const cleanDesc = raw
+      .replace(/^Order accepted:?\s*/i, "")
+      .replace(/^Order completed:?\s*/i, "")
+      .trim();
     return {
       id,
       timestamp,
       category,
       boldPrefix: `Order accepted:`,
-      description: item.details || rawText || "Buyer accepted delivery. Escrow funds released.",
+      description: cleanDesc || "Buyer accepted delivery. Escrow funds released.",
     };
   }
 
@@ -379,23 +390,26 @@ export const OrderActivityLedgerDrawer: React.FC<OrderActivityLedgerDrawerProps>
       allEvents = synth;
     }
 
-    // Group consecutive events by formatted date string and category
+    // Sort all events chronologically (oldest to newest)
+    allEvents.sort((a, b) => {
+      const timeA = new Date(a.timestamp).getTime();
+      const timeB = new Date(b.timestamp).getTime();
+      return (isNaN(timeA) ? 0 : timeA) - (isNaN(timeB) ? 0 : timeB);
+    });
+
+    // Group consecutive events by formatted calendar date string (ignoring time)
     const grouped: LedgerEventGroup[] = [];
 
     allEvents.forEach((event) => {
       const d = new Date(event.timestamp);
       const isValidDate = !isNaN(d.getTime());
       const dateStr = isValidDate
-        ? moment(d).format("MMM DD, YYYY - hh:mm A")
+        ? moment(d).format("MMM DD, YYYY")
         : String(event.timestamp);
 
       const lastGroup = grouped[grouped.length - 1];
 
-      if (
-        lastGroup &&
-        lastGroup.dateStr === dateStr &&
-        lastGroup.category === event.category
-      ) {
+      if (lastGroup && lastGroup.dateStr === dateStr) {
         lastGroup.items.push(event);
       } else {
         grouped.push({

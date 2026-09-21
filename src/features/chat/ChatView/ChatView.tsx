@@ -3,7 +3,7 @@
 import toast from 'react-hot-toast';
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, Flag, ArrowRight, Download } from "lucide-react";
+import { ArrowLeft, Flag, ArrowRight, Download, Eye } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   RiSearchLine,
@@ -37,8 +37,149 @@ import { Loader, ChatSkeleton, Skeleton, AiGradientButton, Button } from "@/comp
 import { MessageModerationBadge } from "@/features/chat";
 import { formatFileSize } from "@/lib";
 import moment from 'moment';
+// Helper to reliably extract file extension from URL, item metadata, or MIME type
+const extractFileExtension = (url: string, itemObj?: any, msgObj?: any): string => {
+  if (!url && !itemObj && !msgObj) return '';
+
+  // 1. Check if format or extension is explicitly specified in itemObj or msgObj
+  const explicitFormat =
+    itemObj?.format ||
+    itemObj?.ext ||
+    itemObj?.extension ||
+    msgObj?.format ||
+    msgObj?.fileFormat ||
+    msgObj?.attachment?.format;
+  if (explicitFormat && typeof explicitFormat === 'string') {
+    return explicitFormat.replace(/^\./, '').toLowerCase();
+  }
+
+  const rawUrl = String(url || itemObj?.url || itemObj?.secure_url || itemObj?.file || '');
+
+  // 2. Check query params or Cloudinary URL transformations for format (e.g. format=pdf, format=png, f_pdf, f_png)
+  const formatQueryMatch = rawUrl.match(/[?&]format=([a-zA-Z0-9]+)/i);
+  if (formatQueryMatch) {
+    return formatQueryMatch[1].toLowerCase();
+  }
+
+  const cldFormatMatch = rawUrl.match(/\/f_([a-zA-Z0-9]+)[\/,]/i);
+  if (cldFormatMatch && cldFormatMatch[1].toLowerCase() !== 'auto') {
+    return cldFormatMatch[1].toLowerCase();
+  }
+
+  // 3. Check if PDF is indicated anywhere in the URL (path, filename, or query)
+  if (
+    /\.pdf($|[?#])/i.test(rawUrl) ||
+    /format=pdf/i.test(rawUrl) ||
+    rawUrl.toLowerCase().includes('.pdf') ||
+    rawUrl.toLowerCase().includes('format=pdf')
+  ) {
+    return 'pdf';
+  }
+
+  // 4. Check url path for standard file extension (before query string)
+  const cleanUrl = rawUrl.split('?')[0].split('#')[0];
+  const urlExtMatch = cleanUrl.match(/\.([a-zA-Z0-9]{2,6})$/);
+  if (urlExtMatch) {
+    return urlExtMatch[1].toLowerCase();
+  }
+
+  // 5. Check MIME types
+  const mime = (
+    itemObj?.type ||
+    itemObj?.mimeType ||
+    msgObj?.fileType ||
+    msgObj?.attachment?.type ||
+    ''
+  ).toLowerCase();
+  if (mime.includes('pdf')) return 'pdf';
+  if (mime.includes('image/png')) return 'png';
+  if (mime.includes('image/jpeg') || mime.includes('image/jpg')) return 'jpg';
+  if (mime.includes('image/webp')) return 'webp';
+  if (mime.includes('image/gif')) return 'gif';
+  if (mime.includes('image/svg')) return 'svg';
+  if (mime.includes('application/zip') || mime.includes('zip')) return 'zip';
+  if (mime.includes('text/csv') || mime.includes('csv')) return 'csv';
+  if (mime.includes('text/plain')) return 'txt';
+  if (mime.includes('word') || mime.includes('docx')) return 'docx';
+  if (mime.includes('sheet') || mime.includes('xlsx')) return 'xlsx';
+
+  // 6. Check common video extensions
+  if (/\.(mp4|webm|ogg|mov|mkv|avi|m4v)($|[?#])/i.test(rawUrl) || rawUrl.includes('/video/')) {
+    return 'mp4';
+  }
+
+  // 7. Check if Cloudinary raw file
+  if (cleanUrl.includes('cloudinary.com') && cleanUrl.includes('/raw/')) {
+    return '';
+  }
+
+  // 8. If Cloudinary image upload and not pdf/doc/video, fallback to image format (jpg/png)
+  if (
+    cleanUrl.includes('cloudinary.com') &&
+    cleanUrl.includes('/image/') &&
+    !rawUrl.toLowerCase().includes('pdf') &&
+    !rawUrl.toLowerCase().includes('format=')
+  ) {
+    return 'png';
+  }
+
+  return '';
+};
+
+// Formats file name to ensure it ALWAYS has its proper extension
+const formatFileNameWithExtension = (name: string, url: string, itemObj?: any, msgObj?: any): string => {
+  let trimmed = (name || '').trim();
+
+  // Try extracting filename from URL query params (e.g. ?filename=my_doc.pdf or ?name=photo.jpg)
+  if (!trimmed || trimmed === 'Attachment' || trimmed === 'download' || trimmed === 'download.png') {
+    const rawUrl = String(url || itemObj?.url || '');
+    const qNameMatch = rawUrl.match(/[?&](?:filename|original_filename|name|file|title)=([^&#]+)/i);
+    if (qNameMatch) {
+      try {
+        const decoded = decodeURIComponent(qNameMatch[1]).trim();
+        if (decoded) trimmed = decoded;
+      } catch {
+        // ignore decoding error
+      }
+    }
+  }
+
+  if (!trimmed) {
+    trimmed = 'Attachment';
+  }
+
+  const ext = extractFileExtension(url, itemObj, msgObj);
+
+  // If the name already ends with the correct extension (case insensitive)
+  if (ext && new RegExp(`\\.${ext}$`, 'i').test(trimmed)) {
+    return trimmed;
+  }
+
+  // If name has a different extension (e.g. name was "download.png", but format is "pdf"!)
+  if (ext && /\.[a-zA-Z0-9]{2,6}$/.test(trimmed)) {
+    const currentExtMatch = trimmed.match(/\.([a-zA-Z0-9]{2,6})$/);
+    const currentExt = currentExtMatch ? currentExtMatch[1].toLowerCase() : '';
+    if (currentExt !== ext) {
+      return trimmed.replace(/\.[a-zA-Z0-9]{2,6}$/, `.${ext}`);
+    }
+    return trimmed;
+  }
+
+  if (/\.[a-zA-Z0-9]{2,6}$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  return ext ? `${trimmed}.${ext}` : trimmed;
+};
+
 // Subcomponent to reliably render attachments without broken images and open in a new tab
-const ChatMessageAttachmentItem = ({ msg }: { msg: any }) => {
+const ChatMessageAttachmentItem = ({
+  msg,
+  onImagePreview,
+}: {
+  msg: any;
+  onImagePreview?: (url: string) => void;
+}) => {
   const rawUrl = msg.file || (Array.isArray(msg.attachments) && msg.attachments[0]) || null;
   const [resolvedUrl, setResolvedUrl] = useState<string>(rawUrl || '');
   const [imgError, setImgError] = useState<boolean>(false);
@@ -88,29 +229,38 @@ const ChatMessageAttachmentItem = ({ msg }: { msg: any }) => {
   const hasMsgText = Boolean(msg.description || msg.desc || msg.text || msg.message);
 
   // Determine file type
-  const isPdf = /\.pdf($|\?)/i.test(rawUrl) || rawUrl.toLowerCase().includes('.pdf') || msg.fileType?.includes('pdf');
+  const isPdf =
+    /\.pdf($|[?#])/i.test(rawUrl) ||
+    rawUrl.toLowerCase().includes('.pdf') ||
+    rawUrl.toLowerCase().includes('format=pdf') ||
+    msg.fileType?.includes('pdf') ||
+    msg.attachment?.type?.includes('pdf');
+
   const isVideo =
-    /\.(mp4|webm|ogg|mov|mkv|avi|m4v|3gp)($|\?)/i.test(rawUrl) ||
+    /\.(mp4|webm|ogg|mov|mkv|avi|m4v|3gp)($|[?#])/i.test(rawUrl) ||
     rawUrl.includes('/video/upload/') ||
     (rawUrl.includes('cloudinary.com') && rawUrl.includes('/video/')) ||
     msg.fileType?.includes('video');
 
   const isDoc =
     isPdf ||
-    /\.(docx?|xlsx?|pptx?|txt|csv|zip|rar|tar|gz)($|\?)/i.test(rawUrl) ||
-    msg.fileType?.includes('document');
+    /\.(docx?|xlsx?|pptx?|txt|csv|zip|rar|tar|gz)($|[?#])/i.test(rawUrl) ||
+    msg.fileType?.includes('document') ||
+    /[?&]format=(docx?|xlsx?|pptx?|zip|rar|tar|gz|txt|csv)/i.test(rawUrl);
 
   const isImage =
     !isDoc &&
     !isVideo &&
     !imgError &&
-    (/\.(png|jpe?g|gif|webp|svg|bmp|avif)($|\?)/i.test(rawUrl) ||
+    (/\.(png|jpe?g|gif|webp|svg|bmp|avif)($|[?#])/i.test(rawUrl) ||
+      /[?&]format=(png|jpe?g|gif|webp|svg|bmp|avif)/i.test(rawUrl) ||
       (rawUrl.includes('cloudinary.com') && rawUrl.includes('/image/') && !isPdf && !isDoc) ||
       msg.fileType?.includes('image'));
 
-  const fileName = rawUrl.split('/').pop()?.split('?')[0] || 'Attachment';
+  const rawFileName = rawUrl.split('/').pop()?.split('?')[0] || 'Attachment';
+  const fileName = formatFileNameWithExtension(rawFileName, currentUrl, null, msg);
 
-  // Always open in a new tab when clicked
+  // Always open in a new tab when clicked (for documents and files)
   const handleOpenInNewTab = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -139,13 +289,21 @@ const ChatMessageAttachmentItem = ({ msg }: { msg: any }) => {
     window.open(currentUrl, '_blank', 'noopener,noreferrer');
   };
 
-  // Image attachment view
+  // Image attachment view - Opens directly in lightbox preview modal without opening new tab
   if (isImage && !imgError) {
     return (
       <div
-        onClick={handleOpenInNewTab}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (onImagePreview) {
+            onImagePreview(currentUrl);
+          } else {
+            handleOpenInNewTab(e);
+          }
+        }}
         className={`mt-1 overflow-hidden rounded-xl border border-slate-200/90 shadow-sm max-w-[280px] bg-slate-50 cursor-pointer group hover:border-[#327C73]/50 transition-all ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}
-        title="Click to open image in a new tab"
+        title="Click to preview image"
       >
         <img
           src={currentUrl}
@@ -1400,7 +1558,7 @@ const ChatView = () => {
     });
 
   const renderMessageAttachment = (msg: any) => {
-    return <ChatMessageAttachmentItem msg={msg} />;
+    return <ChatMessageAttachmentItem msg={msg} onImagePreview={(url: string) => setLightboxImage(url)} />;
   };
 
   const renderMessageContent = (msg: any) => {
@@ -1565,7 +1723,7 @@ const ChatView = () => {
                     return (
                       <div
                         key={conv._id || canonicalId}
-                        className={`flex items-center gap-3 p-2.5 sm:p-3 rounded-2xl cursor-pointer transition-all duration-150 ${isActive ? 'bg-white' : 'hover:bg-slate-50'
+                        className={`flex items-center gap-3 p-2.5 sm:p-3 rounded-[6px] cursor-pointer transition-all duration-150 ${isActive ? 'bg-white' : 'hover:bg-slate-50'
                           }`}
                         onClick={() => {
                           if (canonicalId) {
@@ -2499,8 +2657,15 @@ const ChatView = () => {
               const parseItem = (item: any) => {
                 if (!item) return;
                 if (typeof item === 'string' && item.trim().length > 0) {
-                  const fileName = item.split('/').pop()?.split('?')[0] || 'Attachment';
-                  const rawSize = m.fileSize || m.size || m.bytes;
+                  const rawName =
+                    m.attachment?.name ||
+                    m.fileName ||
+                    m.name ||
+                    m.originalName ||
+                    item.split('/').pop()?.split('?')[0] ||
+                    'Attachment';
+                  const fileName = formatFileNameWithExtension(rawName, item, null, m);
+                  const rawSize = m.fileSize || m.size || m.bytes || m.attachment?.size;
                   items.push({
                     name: fileName,
                     sizeText: formatFileSize(rawSize),
@@ -2509,10 +2674,19 @@ const ChatView = () => {
                 } else if (typeof item === 'object' && (item.url || item.file || item.secure_url)) {
                   const url = item.url || item.file || item.secure_url;
                   if (typeof url === 'string' && url.trim().length > 0) {
-                    const name = item.name || item.fileName || item.original_filename || url.split('/').pop()?.split('?')[0] || 'Attachment';
-                    const rawSize = item.sizeText || item.size || item.bytes || m.fileSize || m.size;
+                    const rawName =
+                      item.name ||
+                      item.fileName ||
+                      item.original_filename ||
+                      m.attachment?.name ||
+                      m.fileName ||
+                      m.name ||
+                      url.split('/').pop()?.split('?')[0] ||
+                      'Attachment';
+                    const fileName = formatFileNameWithExtension(rawName, url, item, m);
+                    const rawSize = item.sizeText || item.size || item.bytes || m.fileSize || m.size || m.attachment?.size;
                     items.push({
-                      name,
+                      name: fileName,
                       sizeText: formatFileSize(rawSize),
                       url,
                     });
@@ -2520,12 +2694,74 @@ const ChatView = () => {
                 }
               };
               if (m.file) parseItem(m.file);
+              if (m.attachment && m.attachment.url && m.attachment.url !== m.file) parseItem(m.attachment);
               if (Array.isArray(m.attachments)) m.attachments.forEach(parseItem);
               return items;
             });
 
-          const handleDownloadMedia = (file: { name: string; url: string }) => {
+          const isImageFile = (file: { name: string; url: string }) => {
+            const url = (file.url || '').toLowerCase();
+            const name = (file.name || '').toLowerCase();
+
+            // Check if PDF (never treat as image!)
+            const isPdf =
+              url.includes('format=pdf') ||
+              url.includes('.pdf') ||
+              name.endsWith('.pdf') ||
+              /\.pdf($|[?#])/i.test(url);
+            if (isPdf) return false;
+
+            const isDoc =
+              /\.(docx?|xlsx?|pptx?|txt|csv|zip|rar|tar|gz)($|[?#])/i.test(url) ||
+              /\.(docx?|xlsx?|pptx?|txt|csv|zip|rar|tar|gz)$/i.test(name) ||
+              /[?&]format=(docx?|xlsx?|pptx?|zip|rar|tar|gz|txt|csv)/i.test(url);
+            if (isDoc) return false;
+
+            const isVideo =
+              /\.(mp4|webm|ogg|mov|mkv|avi|m4v|3gp)($|[?#])/i.test(url) ||
+              /\.(mp4|webm|ogg|mov|mkv|avi|m4v|3gp)$/i.test(name) ||
+              /[?&]format=(mp4|webm|ogg|mov)/i.test(url);
+            if (isVideo) return false;
+
+            return (
+              /\.(png|jpe?g|gif|webp|svg|bmp|avif)($|[?#])/i.test(url) ||
+              /\.(png|jpe?g|gif|webp|svg|bmp|avif)$/i.test(name) ||
+              /[?&]format=(png|jpe?g|gif|webp|svg|bmp|avif)/i.test(url) ||
+              (url.includes('cloudinary.com') && url.includes('/image/upload/') && !url.includes('pdf'))
+            );
+          };
+
+          const handlePreviewMedia = (file: { name: string; url: string }) => {
+            if (!file.url || file.url === '#') {
+              toast.error('File URL is not available');
+              return;
+            }
+            if (isImageFile(file)) {
+              setLightboxImage(file.url);
+            } else {
+              window.open(file.url, '_blank', 'noopener,noreferrer');
+            }
+          };
+
+          const handleDownloadMedia = async (file: { name: string; url: string }) => {
             if (file.url && file.url !== '#') {
+              try {
+                const res = await fetch(file.url);
+                if (res.ok) {
+                  const blob = await res.blob();
+                  const blobUrl = window.URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = blobUrl;
+                  link.download = file.name;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  window.URL.revokeObjectURL(blobUrl);
+                  return;
+                }
+              } catch {
+                // Fallback to direct anchor if fetch blocked by CORS
+              }
               const link = document.createElement('a');
               link.href = file.url;
               link.download = file.name;
@@ -2591,7 +2827,7 @@ const ChatView = () => {
                 />
 
                 {/* Top Segmented Controls: Profile | Media */}
-                <div className="bg-[#f0f2f5] p-1 rounded-2xl flex items-center border border-slate-200/70 shadow-xs">
+                <div className="bg-[#f0f2f5] p-1 rounded-[6px] flex items-center border border-slate-200/70 shadow-xs">
                   <Button
                     type="button"
                     variant={contactSidebarTab === 'profile' ? 'dark' : 'ghost'}
@@ -2808,7 +3044,17 @@ const ChatView = () => {
                           key={idx}
                           className="bg-white rounded-[16px] px-4 py-3.5 flex items-center justify-between border border-slate-100/90 shadow-2xs hover:border-slate-200 transition-all group"
                         >
-                          <div className="min-w-0 flex-1 pr-3">
+                          <div
+                            className="min-w-0 flex-1 pr-3 cursor-pointer"
+                            onClick={() => {
+                              if (isImageFile(file)) {
+                                handlePreviewMedia(file);
+                              } else {
+                                handleDownloadMedia(file);
+                              }
+                            }}
+                            title={isImageFile(file) ? `Preview ${file.name}` : `Download ${file.name}`}
+                          >
                             <h4
                               className="font-bold text-gray-950 text-[13.5px] leading-tight truncate font-sf-pro group-hover:text-[#0E3834] transition-colors"
                               title={file.name}
@@ -2821,17 +3067,32 @@ const ChatView = () => {
                               </span>
                             ) : null}
                           </div>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            radius="xl"
-                            onClick={() => handleDownloadMedia(file)}
-                            className="w-10 h-10 rounded-[12px] border border-[#E5E7EB] hover:border-[#0E3834] hover:bg-slate-50 text-[#5F71B0] hover:text-[#0E3834] transition-all shrink-0 shadow-2xs active:scale-95"
-                            title={`Download ${file.name}`}
-                            aria-label={`Download ${file.name}`}
-                            icon={<Download className="w-[18px] h-[18px]" strokeWidth={1.8} />}
-                          />
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {isImageFile(file) && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                radius="xl"
+                                onClick={() => handlePreviewMedia(file)}
+                                className="w-10 h-10 rounded-[12px] border border-[#E5E7EB] hover:border-[#0E3834] hover:bg-slate-50 text-[#5F71B0] hover:text-[#0E3834] transition-all shrink-0 shadow-2xs active:scale-95"
+                                title={`Preview ${file.name}`}
+                                aria-label={`Preview ${file.name}`}
+                                icon={<Eye className="w-[18px] h-[18px]" strokeWidth={1.8} />}
+                              />
+                            )}
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              radius="xl"
+                              onClick={() => handleDownloadMedia(file)}
+                              className="w-10 h-10 rounded-[12px] border border-[#E5E7EB] hover:border-[#0E3834] hover:bg-slate-50 text-[#5F71B0] hover:text-[#0E3834] transition-all shrink-0 shadow-2xs active:scale-95"
+                              title={`Download ${file.name}`}
+                              aria-label={`Download ${file.name}`}
+                              icon={<Download className="w-[18px] h-[18px]" strokeWidth={1.8} />}
+                            />
+                          </div>
                         </div>
                       ))
                     ) : (

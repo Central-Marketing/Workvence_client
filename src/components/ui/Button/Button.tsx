@@ -98,12 +98,14 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
     let variantClasses = rawVariant;
     if (className) {
       const userTokens = className.trim().split(/\s+/);
+      const isNonColorTextToken = (t: string) =>
+        /!?text-(xs|sm|base|lg|xl|\d+xl|\[\d+px\]|left|center|right|justify|start|end|ellipsis|clip|wrap|nowrap|balance|pretty)/.test(
+          t
+        );
       const hasCustomBg = userTokens.some((t) => t.startsWith("bg-") || t.startsWith("!bg-"));
       const hasCustomHoverBg = userTokens.some((t) => t.startsWith("hover:bg-") || t.startsWith("hover:!bg-"));
       const hasCustomText = userTokens.some(
-        (t) =>
-          (t.startsWith("text-") || t.startsWith("!text-")) &&
-          !/!?text-(xs|sm|base|lg|xl|\[\d+px\])/.test(t)
+        (t) => (t.startsWith("text-") || t.startsWith("!text-")) && !isNonColorTextToken(t)
       );
       const hasCustomHoverText = userTokens.some((t) => t.startsWith("hover:text-") || t.startsWith("hover:!text-"));
       const hasCustomBorder = userTokens.some((t) => t.startsWith("border-") || t === "border" || t.startsWith("!border"));
@@ -115,7 +117,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
           .filter((t) => {
             if (hasCustomBg && t.startsWith("bg-")) return false;
             if (hasCustomHoverBg && t.startsWith("hover:bg-")) return false;
-            if (hasCustomText && t.startsWith("text-") && !/text-(xs|sm|base|lg|xl|\[\d+px\])/.test(t)) return false;
+            if (hasCustomText && t.startsWith("text-") && !isNonColorTextToken(t)) return false;
             if (hasCustomHoverText && t.startsWith("hover:text-")) return false;
             if (hasCustomBorder && (t.startsWith("border-") || t === "border")) return false;
             if (hasCustomHoverBorder && t.startsWith("hover:border")) return false;

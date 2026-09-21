@@ -1241,12 +1241,12 @@ const BriefDetail = () => {
                             radius="fiverr"
                             disabled={messagingSellerId === item.sellerId}
                             isLoading={messagingSellerId === item.sellerId}
-                            rightIcon={<FiArrowRight className="text-xs" />}
+                            rightIcon={<FiArrowRight className="text-xs text-white" />}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleMessageSeller(item.sellerId, item.name);
                             }}
-                            className="flex-1 text-center shadow-xs"
+                            className="flex-1 text-center shadow-xs !text-white text-white"
                           >
                             Message
                           </Button>
@@ -1509,12 +1509,12 @@ const BriefDetail = () => {
                                 radius="fiverr"
                                 disabled={messagingSellerId === displayItem.sellerId}
                                 isLoading={messagingSellerId === displayItem.sellerId}
-                                rightIcon={<FiArrowRight className="text-xs" />}
+                                rightIcon={<FiArrowRight className="text-xs text-white" />}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleMessageSeller(displayItem.sellerId, displayItem.name);
                                 }}
-                                className="flex-1 text-center shadow-xs"
+                                className="flex-1 text-center shadow-xs !text-white text-white"
                               >
                                 Message
                               </Button>

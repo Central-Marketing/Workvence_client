@@ -174,7 +174,7 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
           </div>
 
           {/* Row 2: Title / Description */}
-          <h3 className="mt-3 text-[14px] text-[rgba(24,24,27,1)] font-[500] font-inter not-italic line-clamp-2 min-h-[44px] sm:min-h-[48px] md:min-h-[52px] group-hover:text-gray-900 transition-colors">
+          <h3 className="mt-3 text-[14px] leading-[22px] text-[rgba(24,24,27,1)] font-[500] font-inter not-italic line-clamp-2 h-[44px] max-h-[44px] overflow-hidden group-hover:text-gray-900 transition-colors">
             {data.title}
           </h3>
         </div>

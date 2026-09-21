@@ -315,9 +315,8 @@ const PackageContent = () => {
             style={{
               top: `calc(var(--navbar-height, ${isSeller ? "82px" : "136px"}) + 10px)`,
             }}
-            className={`w-full sticky self-start z-20 transition-[top] duration-200 ${
-              isSeller ? "top-[74px] md:top-[92px]" : "top-[128px] md:top-[146px]"
-            }`}
+            className={`w-full sticky self-start z-20 transition-[top] duration-200 ${isSeller ? "top-[74px] md:top-[92px]" : "top-[128px] md:top-[146px]"
+              }`}
           >
             <PackagePricingSidebar
               packages={normalizedData.packages}

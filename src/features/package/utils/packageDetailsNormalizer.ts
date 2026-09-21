@@ -43,6 +43,8 @@ export interface SellerDetails {
   languages: string[];
   bio: string;
   skills: string[];
+  isOnline?: boolean;
+  lastSeen?: string;
 }
 
 export interface PortfolioProject {
@@ -145,7 +147,16 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
 
   const sellerId = rawUser._id || rawUser.id || (typeof raw.userID === "string" ? raw.userID : "");
   const sellerUsername = rawUser.username || "Seller";
-  const sellerAvatar = rawUser.image || "";
+  const sellerName =
+    rawUser.name ||
+    rawUser.fullName ||
+    (rawUser.firstName
+      ? `${rawUser.firstName} ${rawUser.lastName || ""}`.trim()
+      : "") ||
+    sellerUsername;
+  const sellerAvatar = rawUser.image || rawUser.img || rawUser.avatar || "";
+  const isOnline = Boolean(rawUser.isOnline ?? raw.isOnline ?? false);
+  const lastSeen = rawUser.lastSeen || rawUser.updatedAt || raw.updatedAt || raw.createdAt || "";
   const isPro = Boolean(
     rawUser.isPro ||
     (typeof rawUser.sellerLevel === "string" &&
@@ -189,7 +200,7 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
   const seller: SellerDetails = {
     id: sellerId,
     username: sellerUsername,
-    name: sellerUsername,
+    name: sellerName,
     avatar: sellerAvatar,
     isPro,
     role: sellerRole,
@@ -205,7 +216,9 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
     memberSince,
     languages: Array.isArray(rawUser.languages) ? rawUser.languages : [],
     bio: sellerBio,
-    skills: sellerSkills
+    skills: sellerSkills,
+    isOnline,
+    lastSeen,
   };
 
   // Real gallery images only

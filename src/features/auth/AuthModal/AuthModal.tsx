@@ -16,6 +16,8 @@ import {
   Sparkles,
   ArrowRight,
 } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import { MdOutlineEmail } from "react-icons/md";
 import { Button } from "@/components/ui";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
@@ -41,8 +43,17 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const setUser = useUserStore((state) => state.setUser);
 
   const [mode, setMode] = useState<"login" | "register">(initialMode);
+  const [loginStep, setLoginStep] = useState<"options" | "email">("options");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleGoogleAuth = () => {
+    const apiUrl =
+      process.env.NEXT_PUBLIC_SERVER_API_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      "http://localhost:8080/api";
+    window.location.href = `${apiUrl}/auth/google`;
+  };
 
   // Login Form State
   const [loginInput, setLoginInput] = useState({
@@ -67,6 +78,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setMode(initialMode);
+      setLoginStep("options");
       setError(null);
     }
   }, [isOpen, initialMode]);
@@ -334,6 +346,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
               type="button"
               onClick={() => {
                 setMode("login");
+                setLoginStep("options");
                 setError(null);
               }}
               className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative ${
@@ -363,11 +376,17 @@ const AuthModal: React.FC<AuthModalProps> = ({
           {/* Title and Description */}
           <div className="mb-4">
             <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-bold text-gray-900 font-sf-pro">
-              {mode === "login" ? "Welcome back" : "Create an account"}
+              {mode === "login"
+                ? loginStep === "email"
+                  ? "Continue with Email"
+                  : "Welcome back"
+                : "Create an account"}
             </h2>
             <p className="text-xs sm:text-[13px] text-gray-500 mt-1">
               {mode === "login"
-                ? "Sign in to submit proposals and connect with clients."
+                ? loginStep === "email"
+                  ? "Enter your email or username to sign in."
+                  : "Welcome back! Please choose your preferred sign-in method."
                 : "Join Workvence to discover project opportunities and submit proposals."}
             </p>
           </div>
@@ -384,89 +403,156 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* SIGN IN FORM */}
           {mode === "login" ? (
-            <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3.5 flex-1">
-              {/* Email / Username */}
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700">Email or Username</label>
-                <input
-                  type="text"
-                  placeholder="Enter email address or username"
-                  value={loginInput.identifier}
-                  onChange={(e) =>
-                    setLoginInput((prev) => ({ ...prev, identifier: e.target.value }))
-                  }
-                  required
-                  className="w-full px-3.5 py-2.5 sm:py-3 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-xl text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
-                />
-              </div>
-
-              {/* Password */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-gray-700">Password</label>
-                  <Link
-                    href="/forgot-password"
-                    onClick={onClose}
-                    className="text-[11px] font-medium text-[#0D6D5F] hover:underline"
+            loginStep === "options" ? (
+              <div className="flex flex-col justify-between flex-1 py-2">
+                <div className="flex flex-col gap-3.5 my-auto w-full py-4">
+                  <Button
+                    data-testid="modal-login-google-btn"
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    fullWidth
+                    radius="fiverr"
+                    leftIcon={<FcGoogle className="text-[20px]" />}
+                    onClick={handleGoogleAuth}
+                    className="font-medium text-[#1f2937] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80"
                   >
-                    Forgot password?
-                  </Link>
+                    Continue with Google
+                  </Button>
+
+                  <Button
+                    data-testid="modal-login-email-btn"
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    fullWidth
+                    radius="fiverr"
+                    leftIcon={<MdOutlineEmail className="text-[20px] text-[#374151]" />}
+                    onClick={() => {
+                      setError(null);
+                      setLoginStep("email");
+                    }}
+                    className="font-medium text-[#1f2937] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80"
+                  >
+                    Continue with Email
+                  </Button>
                 </div>
-                <div className="relative flex items-center">
-                  <input
-                    type={showLoginPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={loginInput.password}
-                    onChange={(e) =>
-                      setLoginInput((prev) => ({ ...prev, password: e.target.value }))
-                    }
-                    required
-                    className="w-full px-3.5 py-2.5 sm:py-3 pr-10 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-xl text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
-                  />
+
+                {/* Bottom Switch */}
+                <div className="mt-4 text-center text-xs text-gray-500">
+                  Don&apos;t have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode("register");
+                      setError(null);
+                    }}
+                    className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
+                  >
+                    Join now
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3.5 flex-1">
+                <div className="flex items-center -mt-1 mb-0.5">
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon"
-                    radius="full"
-                    className="absolute right-2.5 text-gray-400 hover:text-gray-600 !p-1 !h-auto !w-auto border-none"
-                    onClick={() => setShowLoginPassword(!showLoginPassword)}
-                    aria-label={showLoginPassword ? "Hide password" : "Show password"}
+                    size="sm"
+                    onClick={() => {
+                      setError(null);
+                      setLoginStep("options");
+                    }}
+                    className="p-0 h-auto text-xs text-gray-500 hover:text-[#0D6D5F] hover:bg-transparent"
                   >
-                    {showLoginPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    ← Back
                   </Button>
                 </div>
-              </div>
 
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                variant="dark"
-                size="md"
-                fullWidth
-                radius="fiverr"
-                disabled={loading}
-                isLoading={loading}
-                className="mt-2 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
-                rightIcon={<ArrowRight className="w-4 h-4" />}
-              >
-                Sign In
-              </Button>
+                {/* Email / Username */}
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-700">Email or Username</label>
+                  <input
+                    type="text"
+                    placeholder="Enter email address or username"
+                    value={loginInput.identifier}
+                    onChange={(e) =>
+                      setLoginInput((prev) => ({ ...prev, identifier: e.target.value }))
+                    }
+                    required
+                    className="w-full px-3.5 py-2.5 sm:py-3 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-xl text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                  />
+                </div>
 
-              {/* Bottom Switch */}
-              <div className="mt-4 text-center text-xs text-gray-500">
-                Don&apos;t have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode("register");
-                    setError(null);
-                  }}
-                  className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
+                {/* Password */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-gray-700">Password</label>
+                    <Link
+                      href="/forgot-password"
+                      onClick={onClose}
+                      className="text-[11px] font-medium text-[#0D6D5F] hover:underline"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <div className="relative flex items-center">
+                    <input
+                      type={showLoginPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={loginInput.password}
+                      onChange={(e) =>
+                        setLoginInput((prev) => ({ ...prev, password: e.target.value }))
+                      }
+                      required
+                      className="w-full px-3.5 py-2.5 sm:py-3 pr-10 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-xl text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      radius="full"
+                      className="absolute right-2.5 text-gray-400 hover:text-gray-600 !p-1 !h-auto !w-auto border-none"
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                      aria-label={showLoginPassword ? "Hide password" : "Show password"}
+                    >
+                      {showLoginPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  variant="dark"
+                  size="md"
+                  fullWidth
+                  radius="fiverr"
+                  disabled={loading}
+                  isLoading={loading}
+                  className="mt-2 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
+                  rightIcon={<ArrowRight className="w-4 h-4" />}
                 >
-                  Join now
-                </button>
-              </div>
-            </form>
+                  Sign In
+                </Button>
+
+                {/* Bottom Switch */}
+                <div className="mt-4 text-center text-xs text-gray-500">
+                  Don&apos;t have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode("register");
+                      setError(null);
+                    }}
+                    className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
+                  >
+                    Join now
+                  </button>
+                </div>
+              </form>
+            )
           ) : (
             /* REGISTER FORM */
             <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-3 flex-1">
@@ -630,6 +716,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   type="button"
                   onClick={() => {
                     setMode("login");
+                    setLoginStep("options");
                     setError(null);
                   }}
                   className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"

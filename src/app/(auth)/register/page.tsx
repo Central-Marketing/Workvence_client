@@ -256,14 +256,22 @@ const RegisterContent = () => {
             </h1>
 
             <div className="flex flex-col gap-3.5 w-full">
-              {/* <button
+              <Button
                 data-testid="continue-google-btn"
                 type="button"
-                className="flex items-center justify-center gap-3 w-full py-3.5 px-4 rounded-xl text-[14px] font-medium text-[#1f2937] bg-white border border-[#e5e7eb] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80 transition-all cursor-pointer"
+                variant="outline"
+                size="lg"
+                fullWidth
+                radius="fiverr"
+                leftIcon={<FcGoogle className="text-[20px]" />}
+                onClick={() => {
+                  const apiUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+                  window.location.href = `${apiUrl}/auth/google`;
+                }}
+                className="font-medium text-[#1f2937] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80"
               >
-                <FcGoogle className="text-[20px]" />
-                <span>Continue with Google</span>
-              </button> */}
+                Continue with Google
+              </Button>
 
               <Button
                 data-testid="continue-email-btn"

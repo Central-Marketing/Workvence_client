@@ -256,7 +256,7 @@ export default function AffiliatesPage() {
 
                 <Button
                   onClick={() => setIsJoining(true)}
-                  variant="emerald"
+                  variant="brand"
                   size="md"
                   radius="xl"
                   fullWidth

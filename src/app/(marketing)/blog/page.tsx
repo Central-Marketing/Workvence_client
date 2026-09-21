@@ -183,11 +183,10 @@ export default function BlogPage() {
                   size="xs"
                   radius="xl"
                   onClick={() => setSelectedCat(cat)}
-                  className={`px-4 py-2 whitespace-nowrap ${
-                    selectedCat === cat
+                  className={`px-4 py-2 whitespace-nowrap ${selectedCat === cat
                       ? "bg-[#327C73] hover:bg-[#2b6b63] text-white shadow-xs"
                       : "bg-[#f1f5f9] text-gray-600 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   {cat}
                 </Button>
@@ -260,7 +259,7 @@ export default function BlogPage() {
               />
               <Button
                 type="submit"
-                variant="emerald"
+                variant="brand"
                 size="md"
                 radius="xl"
                 className="px-6 py-3 font-semibold text-xs transition active:scale-95 shrink-0"

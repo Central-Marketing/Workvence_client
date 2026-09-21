@@ -181,99 +181,98 @@ const Proposals = () => {
                 ? aiResult
                 : (aiResult?.top3Recommendations || aiResult?.recommendation?.top3 || aiResult?.topProposals || aiResult?.recommendations || aiResult?.data || [])
               ).map((item: any, index: number) => {
-                  const proposal = item.proposal || item;
-                  const seller = typeof proposal.sellerID === 'object' && proposal.sellerID !== null 
-                    ? proposal.sellerID 
-                    : (typeof proposal.sellerId === 'object' && proposal.sellerId !== null 
-                        ? proposal.sellerId 
-                        : (typeof proposal.seller === 'object' && proposal.seller !== null ? proposal.seller : {}));
-                  const targetSellerId = seller._id || seller.id || (typeof proposal.sellerID === 'string' ? proposal.sellerID : (typeof proposal.sellerId === 'string' ? proposal.sellerId : (typeof proposal.seller === 'string' ? proposal.seller : '')));
-                  return (
-                    <div
-                      key={proposal._id || index}
-                      className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 rounded-2xl border transition-all ${
-                        index === 0 ? "border-[#0D6D5F]/40 ring-2 ring-[#0D6D5F]/10 bg-white" : "border-slate-200 bg-white hover:border-slate-300"
+                const proposal = item.proposal || item;
+                const seller = typeof proposal.sellerID === 'object' && proposal.sellerID !== null
+                  ? proposal.sellerID
+                  : (typeof proposal.sellerId === 'object' && proposal.sellerId !== null
+                    ? proposal.sellerId
+                    : (typeof proposal.seller === 'object' && proposal.seller !== null ? proposal.seller : {}));
+                const targetSellerId = seller._id || seller.id || (typeof proposal.sellerID === 'string' ? proposal.sellerID : (typeof proposal.sellerId === 'string' ? proposal.sellerId : (typeof proposal.seller === 'string' ? proposal.seller : '')));
+                return (
+                  <div
+                    key={proposal._id || index}
+                    className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 rounded-2xl border transition-all ${index === 0 ? "border-[#0D6D5F]/40 ring-2 ring-[#0D6D5F]/10 bg-white" : "border-slate-200 bg-white hover:border-slate-300"
                       }`}
+                  >
+                    <div
+                      className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-extrabold shrink-0 ${getRankBadgeClasses(index)}`}
                     >
-                      <div
-                        className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-extrabold shrink-0 ${getRankBadgeClasses(index)}`}
-                      >
-                        #{index + 1}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[15px] font-bold text-slate-900 mb-0.5 flex items-center gap-2">
-                          <span>{seller.username || "Seller"}</span>
-                          {item.score !== undefined && item.score !== null && (
-                            <span className="bg-emerald-50 text-[#0D6D5F] border border-[#0D6D5F]/20 px-2 py-0.5 rounded text-[11px] font-bold tracking-wide">
-                              Score: {item.score}/100
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-xs text-slate-500">
-                          {proposal.price && `$${Number(proposal.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}`}
-                          {proposal.deliveryTime &&
-                            ` · ${proposal.deliveryTime} days`}
-                          {item.summaryRationale && ` — ${item.summaryRationale}`}
-                        </div>
-                        
-                        {(item.pros?.length > 0 || item.cons?.length > 0) && (
-                          <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                            {item.pros && item.pros.length > 0 && (
-                              <div className="bg-[#0D6D5F]/5 p-3 rounded-xl border border-[#0D6D5F]/20">
-                                <div className="flex items-center gap-1.5 mb-1.5">
-                                  <div className="w-4 h-4 rounded-full bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F] shrink-0">
-                                    <FiCheck className="text-[10px] stroke-[2.5]" />
-                                  </div>
-                                  <span className="font-bold text-[#0D6D5F] text-xs uppercase tracking-wide">Pros</span>
-                                </div>
-                                <ul className="space-y-1 text-slate-700 text-xs">
-                                  {item.pros.map((pro: string, i: number) => (
-                                    <li key={i} className="flex items-start gap-1.5 leading-relaxed">
-                                      <span className="text-[#0D6D5F] font-bold text-xs shrink-0">✓</span>
-                                      <span>{pro}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {item.cons && item.cons.length > 0 && (
-                              <div className="bg-rose-50/70 p-3 rounded-xl border border-rose-200/70">
-                                <div className="flex items-center gap-1.5 mb-1.5">
-                                  <div className="w-4 h-4 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 shrink-0">
-                                    <FiAlertTriangle className="text-[10px] stroke-[2.5]" />
-                                  </div>
-                                  <span className="font-bold text-rose-700 text-xs uppercase tracking-wide">Cons</span>
-                                </div>
-                                <ul className="space-y-1 text-slate-700 text-xs">
-                                  {item.cons.map((con: string, i: number) => (
-                                    <li key={i} className="flex items-start gap-1.5 leading-relaxed">
-                                      <span className="text-rose-500 font-bold text-xs shrink-0">✕</span>
-                                      <span>{con}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                          </div>
+                      #{index + 1}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[15px] font-bold text-slate-900 mb-0.5 flex items-center gap-2">
+                        <span>{seller.username || "Seller"}</span>
+                        {item.score !== undefined && item.score !== null && (
+                          <span className="bg-emerald-50 text-[#0D6D5F] border border-[#0D6D5F]/20 px-2 py-0.5 rounded text-[11px] font-bold tracking-wide">
+                            Score: {item.score}/100
+                          </span>
                         )}
                       </div>
-                      <Button
-                        type="button"
-                        variant="brand"
-                        size="sm"
-                        radius="xl"
-                        onClick={() =>
-                          chatMutation.mutate({ proposalId: proposal._id, sellerId: targetSellerId, sellerUsername: seller.username })
-                        }
-                        disabled={chatMutation.isPending}
-                        isLoading={chatMutation.isPending}
-                        className="py-2.5 px-5 text-xs font-semibold whitespace-nowrap shadow-xs self-end sm:self-center"
-                      >
-                        Chat
-                      </Button>
+                      <div className="text-xs text-slate-500">
+                        {proposal.price && `$${Number(proposal.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}`}
+                        {proposal.deliveryTime &&
+                          ` · ${proposal.deliveryTime} days`}
+                        {item.summaryRationale && ` — ${item.summaryRationale}`}
+                      </div>
+
+                      {(item.pros?.length > 0 || item.cons?.length > 0) && (
+                        <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                          {item.pros && item.pros.length > 0 && (
+                            <div className="bg-[#0D6D5F]/5 p-3 rounded-xl border border-[#0D6D5F]/20">
+                              <div className="flex items-center gap-1.5 mb-1.5">
+                                <div className="w-4 h-4 rounded-full bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F] shrink-0">
+                                  <FiCheck className="text-[10px] stroke-[2.5]" />
+                                </div>
+                                <span className="font-bold text-[#0D6D5F] text-xs uppercase tracking-wide">Pros</span>
+                              </div>
+                              <ul className="space-y-1 text-slate-700 text-xs">
+                                {item.pros.map((pro: string, i: number) => (
+                                  <li key={i} className="flex items-start gap-1.5 leading-relaxed">
+                                    <span className="text-[#0D6D5F] font-bold text-xs shrink-0">✓</span>
+                                    <span>{pro}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {item.cons && item.cons.length > 0 && (
+                            <div className="bg-rose-50/70 p-3 rounded-xl border border-rose-200/70">
+                              <div className="flex items-center gap-1.5 mb-1.5">
+                                <div className="w-4 h-4 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 shrink-0">
+                                  <FiAlertTriangle className="text-[10px] stroke-[2.5]" />
+                                </div>
+                                <span className="font-bold text-rose-700 text-xs uppercase tracking-wide">Cons</span>
+                              </div>
+                              <ul className="space-y-1 text-slate-700 text-xs">
+                                {item.cons.map((con: string, i: number) => (
+                                  <li key={i} className="flex items-start gap-1.5 leading-relaxed">
+                                    <span className="text-rose-500 font-bold text-xs shrink-0">✕</span>
+                                    <span>{con}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  );
-                }
+                    <Button
+                      type="button"
+                      variant="brand"
+                      size="sm"
+                      radius="xl"
+                      onClick={() =>
+                        chatMutation.mutate({ proposalId: proposal._id, sellerId: targetSellerId, sellerUsername: seller.username })
+                      }
+                      disabled={chatMutation.isPending}
+                      isLoading={chatMutation.isPending}
+                      className="py-2.5 px-5 text-xs font-semibold whitespace-nowrap shadow-xs self-end sm:self-center"
+                    >
+                      Chat
+                    </Button>
+                  </div>
+                );
+              }
               )}
             </div>
           </div>
@@ -296,13 +295,13 @@ const Proposals = () => {
         ) : (
           <div className="flex flex-col gap-4">
             {proposals.map((proposal: any) => {
-              const seller = typeof proposal.sellerID === 'object' && proposal.sellerID !== null 
-                ? proposal.sellerID 
-                : (typeof proposal.sellerId === 'object' && proposal.sellerId !== null 
-                    ? proposal.sellerId 
-                    : (typeof proposal.seller === 'object' && proposal.seller !== null ? proposal.seller : {}));
+              const seller = typeof proposal.sellerID === 'object' && proposal.sellerID !== null
+                ? proposal.sellerID
+                : (typeof proposal.sellerId === 'object' && proposal.sellerId !== null
+                  ? proposal.sellerId
+                  : (typeof proposal.seller === 'object' && proposal.seller !== null ? proposal.seller : {}));
               const targetSellerId = seller._id || seller.id || (typeof proposal.sellerID === 'string' ? proposal.sellerID : (typeof proposal.sellerId === 'string' ? proposal.sellerId : (typeof proposal.seller === 'string' ? proposal.seller : '')));
-              
+
               // Check if AI recommended
               const aiList = Array.isArray(aiResult) ? aiResult : (aiResult?.top3Recommendations || aiResult?.topProposals || aiResult?.recommendations || aiResult?.data || []);
               const isRecommended = aiList.some((item: any) => {
@@ -311,11 +310,10 @@ const Proposals = () => {
               });
 
               return (
-                <div 
-                  key={proposal._id} 
-                  className={`bg-white rounded-xl p-5 sm:p-6 transition-all shadow-xs hover:shadow-md relative overflow-hidden ${
-                    isRecommended ? "border-2 border-indigo-400 bg-indigo-50/20" : "border border-slate-200 hover:border-emerald-500/30"
-                  }`}
+                <div
+                  key={proposal._id}
+                  className={`bg-white rounded-xl p-5 sm:p-6 transition-all shadow-xs hover:shadow-md relative overflow-hidden ${isRecommended ? "border-2 border-indigo-400 bg-indigo-50/20" : "border border-slate-200 hover:border-emerald-500/30"
+                    }`}
                 >
                   {isRecommended && (
                     <div className="absolute top-3 right-4 bg-gradient-to-r from-indigo-500 to-violet-600 text-white px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide shadow-xs">
@@ -338,7 +336,7 @@ const Proposals = () => {
                       >
                         {seller.username || "Seller"}
                       </div>
-                      
+
                       {/* Enriched Seller Badges */}
                       <div className="flex items-center gap-3 mt-0.5 mb-0.5 text-xs">
                         {seller.starRating !== undefined && (
@@ -382,7 +380,7 @@ const Proposals = () => {
                     </div>
                     <Button
                       type="button"
-                      variant="emerald"
+                      variant="brand"
                       size="sm"
                       radius="lg"
                       onClick={() => chatMutation.mutate({ proposalId: proposal._id, sellerId: targetSellerId, sellerUsername: seller.username })}

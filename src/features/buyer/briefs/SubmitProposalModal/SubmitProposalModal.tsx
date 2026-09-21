@@ -167,7 +167,7 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
               type="button"
               variant="soft"
               size="md"
-              radius="xl"
+              radius="fiverr"
               onClick={onClose}
               disabled={loading}
               className="font-semibold text-xs sm:text-[13px] bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200/80"

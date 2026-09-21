@@ -26,6 +26,7 @@ import {
   Folder,
   ArrowLeft,
   Image as ImageIcon,
+  CheckCircle2,
 } from "lucide-react";
 
 import { useUserStore } from "@/store/userStore";
@@ -618,18 +619,32 @@ export default function ProfilePage() {
 
             {/* Profile Completion Progress Bar */}
             <div className="sm:text-right pb-1">
-              <div className="flex items-center sm:justify-end gap-2 text-xs mb-1.5">
-                <span className="font-semibold text-slate-800 underline">
-                  Complete your profile
-                </span>
-                <span className="font-bold text-slate-900">{profileCompletion}%</span>
-              </div>
-              <div className="w-full sm:w-44 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full transition-all duration-500"
-                  style={{ width: `${profileCompletion}%` }}
-                />
-              </div>
+              {profileCompletion >= 100 ? (
+                <div className="flex flex-col sm:items-end gap-1.5">
+                  <div className="flex items-center sm:justify-end gap-1.5 text-xs font-semibold text-emerald-700">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Profile 100% Completed</span>
+                  </div>
+                  <div className="w-full sm:w-44 h-1.5 bg-emerald-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500 rounded-full transition-all duration-500 w-full" />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center sm:justify-end gap-2 text-xs mb-1.5">
+                    <span className="font-semibold text-slate-800 underline">
+                      Complete your profile
+                    </span>
+                    <span className="font-bold text-slate-900">{profileCompletion}%</span>
+                  </div>
+                  <div className="w-full sm:w-44 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full transition-all duration-500"
+                      style={{ width: `${profileCompletion}%` }}
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -230,7 +230,7 @@ const VerifyEmailContent = () => {
               <Button
                 data-testid="verify-email-btn"
                 type="submit"
-                variant="emerald"
+                variant="brand"
                 size="lg"
                 fullWidth
                 radius="fiverr"

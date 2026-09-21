@@ -351,7 +351,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                 <Button
                   type="button"
                   onClick={handleCompleteOrder}
-                  variant="emerald"
+                  variant="brand"
                   size="md"
                   radius="fiverr"
                   rightIcon={<FiCheck className="text-base" />}
@@ -456,7 +456,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     I need modifications (Request Revision)
                   </Button>
                   <Button
-                    variant="emerald"
+                    variant="brand"
                     size="md"
                     radius="fiverr"
                     onClick={handleCompleteOrder}

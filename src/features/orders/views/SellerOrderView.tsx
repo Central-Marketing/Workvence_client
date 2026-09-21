@@ -477,7 +477,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                     </Button>
                     <Button
                       type="button"
-                      variant="emerald"
+                      variant="brand"
                       size="md"
                       radius="fiverr"
                       leftIcon={<FiUploadCloud className="text-lg" />}
@@ -1123,7 +1123,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                 </Button>
                 <Button
                   type="submit"
-                  variant="emerald"
+                  variant="brand"
                   size="md"
                   radius="fiverr"
                   disabled={isSubmittingDelivery || isUploading}

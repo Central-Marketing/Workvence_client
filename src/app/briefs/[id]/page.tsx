@@ -939,7 +939,7 @@ const BriefDetail = () => {
                   showSubmittedUI ? (
                     <Button
                       type="button"
-                      variant="emerald"
+                      variant="brand"
                       size="sm"
                       radius="fiverr"
                       onClick={handleProposalAction}

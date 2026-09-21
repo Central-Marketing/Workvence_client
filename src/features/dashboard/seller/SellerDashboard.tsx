@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
-import { FiCalendar, FiArrowRight } from "react-icons/fi";
+import { FiCalendar, FiArrowRight, FiCheckCircle } from "react-icons/fi";
 import { Button } from "@/components/ui";
 import { calculateProfileCompletion } from "../utils/dashboardNormalizer";
 
@@ -446,14 +446,27 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
             className="flex flex-col items-start sm:items-end gap-1.5 group cursor-pointer self-start sm:self-auto"
           >
             <div className="flex items-center gap-3 text-[11px] sm:text-xs">
-              <span className="text-[#374151] group-hover:text-teal-600 transition-colors underline underline-offset-2">
-                Complete your profile
-              </span>
-              <span className="font-bold text-[#111827]">{completionPercentage}%</span>
+              {isProfileCompleted ? (
+                <span className="flex items-center gap-1.5 text-emerald-700 font-semibold">
+                  <FiCheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  Profile 100% Completed
+                </span>
+              ) : (
+                <>
+                  <span className="text-[#374151] group-hover:text-teal-600 transition-colors underline underline-offset-2">
+                    Complete your profile
+                  </span>
+                  <span className="font-bold text-[#111827]">{completionPercentage}%</span>
+                </>
+              )}
             </div>
             <div className="w-[170px] sm:w-[200px] h-[5px] bg-[#E9EBEF] rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-[#00E575] to-[#00E3A2] rounded-full transition-all duration-500"
+                className={`h-full rounded-full transition-all duration-500 ${
+                  isProfileCompleted
+                    ? "bg-emerald-500 w-full"
+                    : "bg-gradient-to-r from-[#00E575] to-[#00E3A2]"
+                }`}
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>

@@ -203,7 +203,7 @@ export default function PodcastPage() {
               <div className="flex items-center gap-4">
                 <Button
                   type="button"
-                  variant="emerald"
+                  variant="brand"
                   size="icon"
                   radius="2xl"
                   onClick={() => togglePlay(activeEpisode.id)}

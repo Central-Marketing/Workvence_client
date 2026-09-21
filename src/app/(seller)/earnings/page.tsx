@@ -497,9 +497,8 @@ const Earnings = () => {
                   height="24"
                   viewBox="0 0 24 24"
                   fill="none"
-                  className={`w-3.5 h-3.5 shrink-0 ${
-                    syncClearanceMutation.isPending ? "animate-spin text-gray-500" : "text-[#292929]"
-                  }`}
+                  className={`w-3.5 h-3.5 shrink-0 ${syncClearanceMutation.isPending ? "animate-spin text-gray-500" : "text-[#292929]"
+                    }`}
                 >
                   <path
                     d="M16.5 8H18C19.4142 8 20.1213 8 20.5607 7.56066C21 7.12132 21 6.41421 21 5V3.5"
@@ -1144,7 +1143,7 @@ const Earnings = () => {
                     </Button>
                     <Button
                       type="button"
-                      variant="emerald"
+                      variant="brand"
                       size="xs"
                       radius="md"
                       onClick={() => setPayoutAmount(availableBalance.toFixed(2))}

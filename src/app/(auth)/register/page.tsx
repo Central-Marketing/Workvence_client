@@ -479,7 +479,7 @@ const RegisterContent = () => {
                 <Button
                   data-testid="signup-submit-btn"
                   type="submit"
-                  variant="emerald"
+                  variant="brand"
                   size="lg"
                   fullWidth
                   radius="fiverr"

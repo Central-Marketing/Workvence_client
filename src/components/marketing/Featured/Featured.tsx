@@ -374,41 +374,47 @@ const Featured = ({
         >
           {/* Row 1: Search Input Box + Search Now Button */}
           <div className="w-full flex items-center justify-center gap-2.5 sm:gap-3 my-[40px]">
-            {/* White Search Input Container */}
-            <div className="relative flex-1 w-full md:w-[800px] max-w-[800px] h-[52px] sm:h-[60px] px-4 sm:px-[20px] py-[10px] bg-white rounded-[4px] border border-black/10 shadow-[0_2px_12px_rgba(0,0,0,0.06)] flex items-center justify-between gap-3 transition-all focus-within:border-black/30">
-              <div className="flex items-center gap-2.5 sm:gap-3 w-full min-w-0">
-                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 shrink-0" strokeWidth={2} />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setSelectedIndex(-1);
-                  }}
-                  onFocus={() => {
-                    if (items.length > 0) setIsOpen(true);
-                  }}
-                  onKeyDown={handleKeyDown}
-                  placeholder="What services are you looking for..."
-                  className="w-full bg-transparent border-none outline-none text-slate-900 placeholder:text-gray-400 placeholder:text-sm sm:placeholder:text-[15px] placeholder:font-sf-pro text-sm sm:text-base font-normal font-sf-pro"
+            {/* White Search Input Container with Pink, Violet, Green Gradient Border on Hover */}
+            <div className="relative group/search flex-1 w-full md:w-[800px] max-w-[800px] h-[52px] sm:h-[60px] rounded-[4px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all">
+              {/* Gradient Border Layer (Pink: #FF5E8E, Violet: #8B5CF6, Green: #10B981) */}
+              <div className="absolute -inset-[1.5px] rounded-[5.5px] bg-gradient-to-r from-[#FF5E8E] via-[#8B5CF6] to-[#10B981] opacity-0 group-hover/search:opacity-100 group-focus-within/search:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+              {/* Inner White Box */}
+              <div className="relative z-10 w-full h-full bg-white rounded-[4px] border border-black/10 group-hover/search:border-transparent group-focus-within/search:border-transparent px-4 sm:px-[20px] py-[10px] flex items-center justify-between gap-3 transition-all">
+                <div className="flex items-center gap-2.5 sm:gap-3 w-full min-w-0">
+                  <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 shrink-0" strokeWidth={2} />
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      setSelectedIndex(-1);
+                    }}
+                    onFocus={() => {
+                      if (items.length > 0) setIsOpen(true);
+                    }}
+                    onKeyDown={handleKeyDown}
+                    placeholder="What services are you looking for..."
+                    className="w-full bg-transparent border-none outline-none text-slate-900 placeholder:text-gray-400 placeholder:text-sm sm:placeholder:text-[15px] placeholder:font-sf-pro text-sm sm:text-base font-normal font-sf-pro"
+                  />
+                </div>
+
+                <SearchSuggestionsDropdown
+                  items={items}
+                  query={search}
+                  isOpen={isOpen}
+                  isLoading={isSuggestionsLoading}
+                  selectedIndex={selectedIndex}
+                  onSelect={handleSelectSuggestion}
                 />
               </div>
-
-              <SearchSuggestionsDropdown
-                items={items}
-                query={search}
-                isOpen={isOpen}
-                isLoading={isSuggestionsLoading}
-                selectedIndex={selectedIndex}
-                onSelect={handleSelectSuggestion}
-              />
             </div>
 
-            {/* Black Search Now Button */}
+            {/* Search Now Button */}
             <button
               type="button"
               onClick={handleSearch}
-              className="bg-black hover:bg-neutral-900 text-white rounded-[4px] px-4 sm:px-6 py-[14px] sm:py-[18px] h-[52px] sm:h-[60px] flex items-center justify-center gap-[10px] shrink-0 font-medium text-xs sm:text-sm md:text-[15px] font-sf-pro transition-all cursor-pointer shadow-md active:scale-95"
+              className="bg-black hover:bg-[#0B403F] hover:shadow-[inset_0_0_8px_0_rgba(255,255,255,0.65)] text-white rounded-[4px] px-4 sm:px-6 py-[14px] sm:py-[18px] h-[52px] sm:h-[60px] flex items-center justify-center gap-[10px] shrink-0 font-medium text-xs sm:text-sm md:text-[15px] font-sf-pro transition-all duration-200 cursor-pointer shadow-md active:scale-95"
             >
               <span className="whitespace-nowrap">Search Now</span>
               <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white shrink-0" strokeWidth={2} />

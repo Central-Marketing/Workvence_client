@@ -306,7 +306,7 @@ export default function BuyerManageOrdersPage() {
                   placeholder="What you are looking for"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-white placeholder:text-slate-400 focus:outline-none focus:border-[#0D3B34] transition-colors"
+                  className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-[6px] border border-slate-200 bg-white placeholder:text-slate-400 focus:outline-none focus:border-[#0D3B34] transition-colors"
                 />
               </div>
             </div>

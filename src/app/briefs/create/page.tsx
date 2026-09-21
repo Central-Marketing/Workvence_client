@@ -511,7 +511,7 @@ const CreateBrief = () => {
               onChange={(e) => updateField("description", e.target.value)}
               required
               rows={6}
-              className="w-full p-4 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm leading-relaxed outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10 resize-y"
+              className="w-full p-4 rounded-[6px] border border-slate-200 bg-white text-slate-900 text-sm leading-relaxed outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10 resize-y"
             />
           </div>
 
@@ -706,7 +706,7 @@ const CreateBrief = () => {
                       handleGenerateFromModal();
                     }
                   }}
-                  className="w-full p-3.5 sm:p-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-xs sm:text-sm leading-relaxed outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:bg-white focus:ring-4 focus:ring-[#327C73]/10 resize-none"
+                  className="w-full p-3.5 sm:p-4 rounded-[6px] border border-slate-200 bg-slate-50 text-slate-900 text-xs sm:text-sm leading-relaxed outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:bg-white focus:ring-4 focus:ring-[#327C73]/10 resize-none"
                 />
               </div>
 

@@ -254,7 +254,7 @@ const ManageOrders = () => {
                     placeholder="What you are looking for"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-52 sm:w-64 pl-8 pr-3 py-2 text-xs border border-gray-200/90 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#0B3A33] transition-colors bg-white"
+                    className="w-52 sm:w-64 pl-8 pr-3 py-2 text-xs border border-gray-200/90 rounded-[6px] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#0B3A33] transition-colors bg-white"
                   />
                 </div>
               </div>

@@ -143,7 +143,7 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
               onChange={(e) => setCoverLetter(e.target.value)}
               placeholder="Explain why you are the best fit for this project, your approach, and experience..."
               required
-              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-normal resize-y min-h-[110px]"
+              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-normal resize-y min-h-[110px]"
             />
           </div>
 

@@ -213,7 +213,7 @@ export default function BusinessSolutionsPage() {
                   value={demoForm.projectScope}
                   onChange={(e) => setDemoForm({ ...demoForm, projectScope: e.target.value })}
                   placeholder="Tell us what talent you're looking to hire (e.g. AI engineers, brand design, video editing)..."
-                  className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
+                  className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
                 />
               </div>
 

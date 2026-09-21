@@ -149,7 +149,7 @@ export default function IpClaimForm() {
               value={claimForm.description}
               onChange={(e) => setClaimForm({ ...claimForm, description: e.target.value })}
               placeholder="Describe the copyrighted elements that have been copied without permission..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
+              className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
             />
           </div>
 

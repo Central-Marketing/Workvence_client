@@ -582,7 +582,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                         placeholder="Describe what it was like working with this seller..."
                         value={reviewDescription}
                         onChange={(e) => setReviewDescription(e.target.value)}
-                        className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl p-3.5 text-xs sm:text-sm outline-none focus:bg-white focus:border-slate-800 transition-colors resize-none placeholder-slate-400"
+                        className="w-full bg-[#F8FAFC] border border-slate-200 rounded-[6px] p-3.5 text-xs sm:text-sm outline-none focus:bg-white focus:border-slate-800 transition-colors resize-none placeholder-slate-400"
                       />
                     </div>
 
@@ -626,7 +626,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                       placeholder="e.g. E-commerce fashion brand, Tech SaaS startup..."
                       value={requirementAnswers.q1}
                       onChange={(e) => setRequirementAnswers({ ...requirementAnswers, q1: e.target.value })}
-                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl p-3 text-xs sm:text-sm outline-none focus:bg-white focus:border-slate-800 resize-none"
+                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded-[6px] p-3 text-xs sm:text-sm outline-none focus:bg-white focus:border-slate-800 resize-none"
                     />
                   </div>
 
@@ -639,7 +639,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                       placeholder="e.g. Yes, part of a full branding overhaul..."
                       value={requirementAnswers.q2}
                       onChange={(e) => setRequirementAnswers({ ...requirementAnswers, q2: e.target.value })}
-                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl p-3 text-xs sm:text-sm outline-none focus:bg-white focus:border-slate-800 resize-none"
+                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded-[6px] p-3 text-xs sm:text-sm outline-none focus:bg-white focus:border-slate-800 resize-none"
                     />
                   </div>
 
@@ -652,7 +652,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                       placeholder="e.g. Attached brand guidelines, inspiration URLs..."
                       value={requirementAnswers.q3}
                       onChange={(e) => setRequirementAnswers({ ...requirementAnswers, q3: e.target.value })}
-                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl p-3 text-xs sm:text-sm outline-none focus:bg-white focus:border-slate-800 resize-none"
+                      className="w-full bg-[#F8FAFC] border border-slate-200 rounded-[6px] p-3 text-xs sm:text-sm outline-none focus:bg-white focus:border-slate-800 resize-none"
                     />
                   </div>
 

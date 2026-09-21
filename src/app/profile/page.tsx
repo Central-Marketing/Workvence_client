@@ -773,7 +773,7 @@ export default function ProfilePage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Write here"
-              className="w-full p-4 bg-[#F1F3F5] border border-transparent rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all resize-none"
+              className="w-full p-4 bg-[#F1F3F5] border border-transparent rounded-[6px] text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all resize-none"
             />
           </div>
 
@@ -1048,7 +1048,7 @@ export default function ProfilePage() {
                   value={newExp.description}
                   onChange={(e) => setNewExp({ ...newExp, description: e.target.value })}
                   placeholder="Key responsibilities or summary..."
-                  className="w-full p-2.5 bg-white rounded-lg border border-slate-200 text-xs outline-none focus:border-teal-500 resize-none"
+                  className="w-full p-2.5 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500 resize-none"
                 />
                 <div className="flex items-center gap-2">
                   <Button
@@ -1266,7 +1266,7 @@ export default function ProfilePage() {
                         rows={3}
                         value={portfolio[editingProjectIdx]?.description || ""}
                         onChange={(e) => handleUpdatePortfolio(editingProjectIdx, "description", e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-teal-600 outline-none transition-colors resize-none"
+                        className="w-full px-3.5 py-2.5 bg-white rounded-[6px] border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-teal-600 outline-none transition-colors resize-none"
                       />
                     </div>
 

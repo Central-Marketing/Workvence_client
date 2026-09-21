@@ -99,7 +99,7 @@ const TrustedBy = () => {
   ];
 
   return (
-    <section className="w-full bg-[#fafafa]  pt-10  sm:pt-16  md:pt-20 lg:pt-24">
+    <section className="w-full bg-[#fafafa]">
       <div className="w-full container mx-auto px-4 md:px-6">
         <div className="w-full bg-white rounded-2xl border-r border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">

@@ -120,7 +120,7 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
 
       {/* 2. Search Input */}
       <div>
-        <div className="relative flex items-center bg-[#F6F7F9] border border-[#0000001A] focus-within:border-gray-200 focus-within:bg-white rounded-xl px-3.5 py-2.5 transition-all group">
+        <div className="relative flex items-center bg-[#F6F7F9] border border-[#0000001A] focus-within:border-gray-200 focus-within:bg-white rounded-[6px] px-3.5 py-2.5 transition-all group">
           <FiSearch className="w-4 h-4 text-gray-400 mr-2 group-focus-within:text-gray-700 shrink-0" />
           <input
             type="text"

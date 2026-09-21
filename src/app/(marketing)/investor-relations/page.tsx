@@ -329,7 +329,7 @@ export default function InvestorRelationsPage() {
                       value={irForm.message}
                       onChange={(e) => setIrForm({ ...irForm, message: e.target.value })}
                       placeholder="Brief description of your inquiry..."
-                      className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
+                      className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
                     />
                   </div>
 

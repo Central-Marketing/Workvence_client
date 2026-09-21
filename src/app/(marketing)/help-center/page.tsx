@@ -151,7 +151,7 @@ export default function HelpCenterPage() {
 
           {/* Search Input Bar */}
           <div className="mt-6 sm:mt-8 w-full max-w-[560px] relative">
-            <div className="w-full bg-white rounded-lg shadow-sm border border-black/[0.06] flex items-center px-3.5 sm:px-4 py-3 sm:py-3.5 transition-all focus-within:ring-2 focus-within:ring-[#79B5E8]/40">
+            <div className="w-full bg-white rounded-[6px] shadow-sm border border-black/[0.06] flex items-center px-3.5 sm:px-4 py-3 sm:py-3.5 transition-all focus-within:ring-2 focus-within:ring-[#79B5E8]/40">
               <Search className="w-4 h-4 text-gray-400 shrink-0 mr-2.5" />
               <input
                 type="text"

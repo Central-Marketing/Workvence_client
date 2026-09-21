@@ -326,7 +326,7 @@ function BriefsContent() {
                     setSearch(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#327C73] focus:bg-white transition-colors"
+                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:border-[#327C73] focus:bg-white transition-colors"
                 />
                 {search && (
                   <Button

@@ -167,7 +167,7 @@ export default function InviteAFriendPage() {
                     value={emails}
                     onChange={(e) => setEmails(e.target.value)}
                     placeholder="friend1@example.com, colleague@startup.com"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-xs focus:border-[#327C73] outline-none resize-none"
+                    className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 bg-white text-xs focus:border-[#327C73] outline-none resize-none"
                   />
                 </div>
                 <Button

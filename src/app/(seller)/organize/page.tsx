@@ -1035,7 +1035,7 @@ const OrganizePage = () => {
                 onChange={(e) => handleTierInputChange("shortDesc", e.target.value)}
                 placeholder="write description"
                 rows={3}
-                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[80px]"
+                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[80px]"
               />
             </div>
 
@@ -1396,7 +1396,7 @@ const OrganizePage = () => {
                 onChange={(e) => setFaqAnswer(e.target.value)}
                 placeholder="Write here"
                 rows={3}
-                className="w-full bg-[#ECEEF1]/70 hover:bg-[#ECEEF1] focus:bg-white border border-transparent focus:border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[70px]"
+                className="w-full bg-[#ECEEF1]/70 hover:bg-[#ECEEF1] focus:bg-white border border-transparent focus:border-gray-300 rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[70px]"
               />
             </div>
           </div>

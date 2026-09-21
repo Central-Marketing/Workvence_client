@@ -260,7 +260,7 @@ export default function CreateSupportTicketPage() {
                 placeholder="Please describe your question or problem in detail. Include any relevant steps or error messages..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-[#e2e8f0] bg-[#f8fafc] text-xs font-medium text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none transition resize-y font-inter"
+                className="w-full px-4 py-3 rounded-[6px] border border-[#e2e8f0] bg-[#f8fafc] text-xs font-medium text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none transition resize-y font-inter"
               />
             </div>
 

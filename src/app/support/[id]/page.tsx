@@ -529,7 +529,7 @@ export default function TicketDetailsPage() {
 
             <form
               onSubmit={handleSendReply}
-              className="bg-[#f8fafc] border border-[#e2e8f0] focus-within:border-[#327C73] focus-within:ring-2 focus-within:ring-[#327C73]/10 rounded-2xl p-3 sm:p-4 transition-all space-y-3"
+              className="bg-[#f8fafc] border border-[#e2e8f0] focus-within:border-[#327C73] focus-within:ring-2 focus-within:ring-[#327C73]/10 rounded-[6px] p-3 sm:p-4 transition-all space-y-3"
             >
               {/* Textarea */}
               <textarea

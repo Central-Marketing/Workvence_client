@@ -680,7 +680,7 @@ const Earnings = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="What are you looking for"
-                  className="w-full bg-white border border-gray-200 rounded-lg pl-9 pr-3.5 py-2 text-xs text-gray-800 placeholder-gray-400 outline-none focus:border-gray-400 transition-colors"
+                  className="w-full bg-white border border-gray-200 rounded-[6px] pl-9 pr-3.5 py-2 text-xs text-gray-800 placeholder-gray-400 outline-none focus:border-gray-400 transition-colors"
                 />
               </div>
 

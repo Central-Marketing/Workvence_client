@@ -398,7 +398,7 @@ const NotificationsPage = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search notifications..."
-              className="w-full pl-9 pr-8 py-2 bg-[#F9FAFB] hover:bg-white focus:bg-white text-xs text-slate-900 rounded-xl border border-slate-200 focus:border-[#0E3834] focus:ring-1 focus:ring-[#0E3834] outline-hidden transition-all placeholder:text-slate-400"
+              className="w-full pl-9 pr-8 py-2 bg-[#F9FAFB] hover:bg-white focus:bg-white text-xs text-slate-900 rounded-[6px] border border-slate-200 focus:border-[#0E3834] focus:ring-1 focus:ring-[#0E3834] outline-hidden transition-all placeholder:text-slate-400"
             />
             {searchQuery && (
               <Button

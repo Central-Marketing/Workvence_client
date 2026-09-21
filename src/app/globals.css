@@ -522,3 +522,10 @@ body.hide-navbar nav {
   -ms-overflow-style: none !important; /* IE and Edge */
   scrollbar-width: none !important; /* Firefox */
 }
+
+/* Maintain 6px border-radius across all textareas and search input boxes across the site */
+textarea,
+input[type="search"],
+.search-container {
+  border-radius: 6px !important;
+}

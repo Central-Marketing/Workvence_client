@@ -288,7 +288,7 @@ export default function InfluencersPage() {
                   value={influencerForm.notes}
                   onChange={(e) => setInfluencerForm({ ...influencerForm, notes: e.target.value })}
                   placeholder="Tell us about your audience demographics and previous brand partnerships..."
-                  className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
+                  className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
                 />
               </div>
 

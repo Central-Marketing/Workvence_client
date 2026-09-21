@@ -278,7 +278,7 @@ export default function ProTalentPage() {
                   value={proForm.notes}
                   onChange={(e) => setProForm({ ...proForm, notes: e.target.value })}
                   placeholder="Mention any high-profile clients, enterprise brands, or open-source projects..."
-                  className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
+                  className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
                 />
               </div>
 

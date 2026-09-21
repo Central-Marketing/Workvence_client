@@ -568,7 +568,7 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
                       value={searchVal}
                       onChange={(e) => setSearchVal(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleApplyFilter()}
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-brand-green bg-white transition-colors"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-[6px] text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-brand-green bg-white transition-colors"
                     />
                   </div>
                 </div>

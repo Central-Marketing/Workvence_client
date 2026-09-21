@@ -267,9 +267,9 @@ const Navbar = () => {
       style={pathname === "/" && !showMenu ? { background: "#EDEDED", opacity: "0.96" } : undefined}
       className={`w-full sticky top-0 z-50 transition-all duration-300 ${pathname === "/"
         ? showMenu
-          ? "bg-white/45 backdrop-blur-md backdrop-saturate-150 border-b border-white/20 shadow-xs text-gray-800"
+          ? "bg-white/75 backdrop-blur-md backdrop-saturate-150 border-b border-white/20 shadow-xs text-gray-800"
           : "bg-[#EDEDED] border-b border-gray-200/40 text-gray-800"
-        : "bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm text-gray-800"
+        : "bg-white/70 backdrop-blur-md border-b border-gray-100 shadow-sm text-gray-800"
         }`}
     >
       <div className="w-full container mx-auto flex justify-between items-center px-4 sm:px-6 md:px-8 xl:px-10 py-3.5 sm:py-4 md:py-5">
@@ -288,7 +288,7 @@ const Navbar = () => {
           </Link>
 
           <div className={`flex items-center transition-all duration-300 ${showSearchBar ? 'opacity-100 flex-1 min-w-0 max-w-full' : 'opacity-0 max-w-0 pointer-events-none w-0 overflow-hidden'}`}>
-            <div className="relative search-container flex items-center rounded-xl px-3 sm:px-3.5 xl:px-4 py-2 sm:py-2.5 w-full max-w-full lg:max-w-[240px] xl:max-w-[420px] macbook:max-w-[540px] 2xl:max-w-[620px] bg-[#F4F4F6] border border-transparent focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-sm transition-all group">
+            <div className="relative search-container flex items-center rounded-[6px] px-3 sm:px-3.5 xl:px-4 py-2 sm:py-2.5 w-full max-w-full lg:max-w-[240px] xl:max-w-[420px] macbook:max-w-[540px] 2xl:max-w-[620px] bg-[#F4F4F6] border border-transparent focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-sm transition-all group">
               <RiSearchLine
                 className="text-gray-400 text-base sm:text-lg mr-2 sm:mr-2.5 group-focus-within:text-brand-green transition-colors shrink-0 cursor-pointer"
                 onClick={() => {
@@ -625,19 +625,17 @@ const Navbar = () => {
 
       {/* Mobile Menu Sidebar Overlay */}
       <div
-        className={`fixed inset-0 bg-black/50 z-[60] transition-all duration-300 lg:hidden ${
-          isMobileMenuOpen ? "opacity-100 visible pointer-events-auto" : "opacity-0 invisible pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-black/50 z-[60] transition-all duration-300 lg:hidden ${isMobileMenuOpen ? "opacity-100 visible pointer-events-auto" : "opacity-0 invisible pointer-events-none"
+          }`}
         onClick={() => setIsMobileMenuOpen(false)}
       ></div>
 
       {/* Mobile Menu Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] shadow-2xl transform transition-all duration-300 ease-in-out lg:hidden flex flex-col ${
-          isMobileMenuOpen
-            ? "translate-x-0 opacity-100 visible pointer-events-auto"
-            : "translate-x-full opacity-0 invisible pointer-events-none"
-        }`}
+        className={`fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] shadow-2xl transform transition-all duration-300 ease-in-out lg:hidden flex flex-col ${isMobileMenuOpen
+          ? "translate-x-0 opacity-100 visible pointer-events-auto"
+          : "translate-x-full opacity-0 invisible pointer-events-none"
+          }`}
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <Image src="/Workvence-logo-Horizontal3.png" width={140} height={32} alt="Workvence" className="h-8 w-auto object-contain" style={{ width: "auto", height: "auto" }} />

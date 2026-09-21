@@ -234,7 +234,7 @@ export default function ForumPage() {
           <div className="lg:col-span-9 space-y-4">
             
             {/* Search Input Bar */}
-            <div className="bg-white p-3 rounded-2xl border border-gray-200/90 shadow-xs flex items-center gap-3">
+            <div className="bg-white p-3 rounded-[6px] border border-gray-200/90 shadow-xs flex items-center gap-3">
               <Search className="w-4 h-4 text-gray-400 ml-2" />
               <input
                 type="text"
@@ -376,7 +376,7 @@ export default function ForumPage() {
                   value={newPost.content}
                   onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
                   placeholder="Provide context, examples, or your specific questions..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
                 />
               </div>
 

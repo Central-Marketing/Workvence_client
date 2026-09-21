@@ -146,7 +146,7 @@ export default function GuidesPage() {
               placeholder="Search guides..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 text-xs focus:border-[#327C73] outline-none"
+              className="w-full pl-10 pr-4 py-2 rounded-[6px] border border-gray-200 text-xs focus:border-[#327C73] outline-none"
             />
           </div>
         </div>

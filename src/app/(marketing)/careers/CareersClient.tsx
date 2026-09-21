@@ -483,7 +483,7 @@ export default function CareersClient() {
                   value={applicantForm.notes}
                   onChange={(e) => setApplicantForm({ ...applicantForm, notes: e.target.value })}
                   placeholder="Tell us what excites you about this role..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none resize-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none resize-none"
                 />
               </div>
 

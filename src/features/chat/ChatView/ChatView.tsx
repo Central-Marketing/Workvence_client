@@ -14,7 +14,6 @@ import {
   RiCheckDoubleLine,
   RiAddLine,
   RiEmotionLine,
-  RiSendPlaneFill,
   RiTimeLine,
   RiRefreshLine,
   RiLineChartLine,
@@ -1484,7 +1483,7 @@ const ChatView = () => {
                     placeholder="Find seller..."
                     value={convSearchQuery}
                     onChange={(e) => setConvSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-3.5 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-slate-400 placeholder:text-slate-400 text-slate-800 transition-colors"
+                    className="w-full pl-9 pr-3.5 py-2.5 text-sm bg-white border border-slate-200 rounded-[6px] focus:outline-none focus:border-slate-400 placeholder:text-slate-400 text-slate-800 transition-colors"
                   />
                 </div>
 
@@ -1496,11 +1495,10 @@ const ChatView = () => {
                     size="xs"
                     radius="full"
                     onClick={() => setConvFilterTab('all')}
-                    className={`px-4 py-1.5 text-xs font-medium border transition-colors ${
-                      convFilterTab === 'all'
-                        ? '!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold'
-                        : '!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50'
-                    }`}
+                    className={`px-4 py-1.5 text-xs font-medium border transition-colors ${convFilterTab === 'all'
+                      ? '!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold'
+                      : '!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50'
+                      }`}
                   >
                     All
                   </Button>
@@ -1510,11 +1508,10 @@ const ChatView = () => {
                     size="xs"
                     radius="full"
                     onClick={() => setConvFilterTab('read')}
-                    className={`px-3 py-1.5 text-xs font-medium border transition-colors flex items-center gap-1.5 ${
-                      convFilterTab === 'read'
-                        ? '!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold'
-                        : '!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50'
-                    }`}
+                    className={`px-3 py-1.5 text-xs font-medium border transition-colors flex items-center gap-1.5 ${convFilterTab === 'read'
+                      ? '!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold'
+                      : '!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50'
+                      }`}
                   >
                     <span>Read</span>
                     <span className="px-1.5 py-0.2 bg-slate-100 text-slate-500 rounded-full text-[10px] font-semibold">
@@ -1527,11 +1524,10 @@ const ChatView = () => {
                     size="xs"
                     radius="full"
                     onClick={() => setConvFilterTab('unread')}
-                    className={`px-3.5 py-1.5 text-xs font-medium border transition-colors ${
-                      convFilterTab === 'unread'
-                        ? '!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold'
-                        : '!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50'
-                    }`}
+                    className={`px-3.5 py-1.5 text-xs font-medium border transition-colors ${convFilterTab === 'unread'
+                      ? '!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold'
+                      : '!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50'
+                      }`}
                   >
                     Unread
                   </Button>
@@ -1661,7 +1657,7 @@ const ChatView = () => {
                       aria-label="Close search"
                       icon={<ArrowLeft className="w-5 h-5" />}
                     />
-                    <div className="flex-1 flex items-center bg-slate-100 rounded-xl px-3 py-1.5 min-w-0">
+                    <div className="flex-1 flex items-center bg-slate-100 rounded-[6px] px-3 py-1.5 min-w-0">
                       <input
                         type="text"
                         placeholder="Search in chat..."
@@ -1815,7 +1811,7 @@ const ChatView = () => {
         h-8 sm:h-9
         w-[160px] lg:w-[200px]
         bg-slate-100
-        rounded-md sm:rounded-lg
+        rounded-[6px]
         px-2
         shrink-0
       "
@@ -2288,7 +2284,7 @@ const ChatView = () => {
                                 href={meeting.roomUrl || meeting.joinUrl || '#'}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-full h-12 rounded-[10px] font-semibold text-[15px] bg-[#000000] text-white hover:bg-neutral-800 active:scale-[0.99] transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-xs"
+                                className="w-full h-10 rounded-[6px] font-semibold text-[16px] bg-[#000000] text-white hover:bg-neutral-800 active:scale-[0.99] transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-xs"
                               >
                                 <span>Join Meeting</span>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -2430,16 +2426,38 @@ const ChatView = () => {
                     />
 
                     {/* Send Button */}
-                    <Button
+                    <button
                       type="submit"
-                      variant="ghost"
-                      size="icon"
-                      radius="xl"
-                      className="p-2 text-gray-500 hover:text-blue-600 disabled:opacity-30 disabled:hover:text-gray-500 flex-shrink-0 mb-0.5"
                       disabled={(!messageText.trim() && !attachment?.url) || isUploadingAttachment || mutation.isPending}
                       aria-label="Send message"
-                      icon={<RiSendPlaneFill className="w-5 h-5" />}
-                    />
+                      title="Send message"
+                      className="w-[28px] h-[28px] rounded-[60px] bg-[var(--Foundation-Grey-grey-900,#1F1F1F)] hover:bg-[#111111] active:scale-95 disabled:opacity-30 disabled:hover:bg-[var(--Foundation-Grey-grey-900,#1F1F1F)] disabled:cursor-not-allowed flex items-center justify-center shrink-0 transition-all duration-200 cursor-pointer shadow-sm mb-0.5"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        className="w-6 h-6 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M12 5.5V19"
+                          stroke="white"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M18 11C18 11 13.5811 5.00001 12 5C10.4188 4.99999 6 11 6 11"
+                          stroke="white"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
                   </form>
                 )}
               </div>
@@ -2580,11 +2598,10 @@ const ChatView = () => {
                     size="sm"
                     radius="xl"
                     onClick={() => setContactSidebarTab('profile')}
-                    className={`flex-1 py-2 text-sm font-semibold text-center ${
-                      contactSidebarTab === 'profile'
-                        ? '!bg-[#0e3834] !text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    className={`flex-1 py-2 text-sm font-semibold text-center ${contactSidebarTab === 'profile'
+                      ? '!bg-[#0e3834] !text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                      }`}
                   >
                     Profile
                   </Button>
@@ -2594,11 +2611,10 @@ const ChatView = () => {
                     size="sm"
                     radius="xl"
                     onClick={() => setContactSidebarTab('media')}
-                    className={`flex-1 py-2 text-sm font-semibold text-center ${
-                      contactSidebarTab === 'media'
-                        ? '!bg-[#0e3834] !text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                    className={`flex-1 py-2 text-sm font-semibold text-center ${contactSidebarTab === 'media'
+                      ? '!bg-[#0e3834] !text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                      }`}
                   >
                     Media
                   </Button>
@@ -2886,7 +2902,7 @@ const ChatView = () => {
                   onChange={e => setOfferDesc(e.target.value)}
                   rows={3}
                   required
-                  className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white resize-none transition-colors"
+                  className="px-3 py-2 border border-slate-300 rounded-[6px] text-sm text-slate-800 outline-none focus:border-brand-green bg-white resize-none transition-colors"
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-1">

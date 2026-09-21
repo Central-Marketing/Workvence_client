@@ -345,7 +345,7 @@ export default function PressClient() {
                       value={inquiryForm.message}
                       onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })}
                       placeholder="Story focus, interview requests..."
-                      className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] focus:ring-1 focus:ring-[#327C73] outline-none resize-none"
+                      className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] focus:ring-1 focus:ring-[#327C73] outline-none resize-none"
                     />
                   </div>
                   <Button

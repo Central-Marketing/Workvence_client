@@ -416,7 +416,7 @@ const MyBriefs = () => {
                 placeholder="Search projects..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 sm:pl-9 pr-7 py-2 bg-white border border-slate-200 focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F] rounded-xl text-xs sm:text-[13px] text-slate-800 placeholder:text-slate-400 outline-none transition-all shadow-2xs h-[38px]"
+                className="w-full pl-8 sm:pl-9 pr-7 py-2 bg-white border border-slate-200 focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F] rounded-[6px] text-xs sm:text-[13px] text-slate-800 placeholder:text-slate-400 outline-none transition-all shadow-2xs h-[38px]"
               />
               {searchQuery && (
                 <button

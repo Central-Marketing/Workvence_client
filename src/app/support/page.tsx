@@ -262,7 +262,7 @@ export default function SupportDashboardPage() {
                 placeholder="Search ticket subject or #ID..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg text-xs border border-[#e2e8f0] bg-[#f8fafc] text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none font-inter"
+                className="w-full pl-10 pr-4 py-2 rounded-[6px] text-xs border border-[#e2e8f0] bg-[#f8fafc] text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none font-inter"
               />
             </div>
 

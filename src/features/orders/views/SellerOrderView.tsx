@@ -1058,7 +1058,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   placeholder="Describe what you completed, instructions, or notes for the buyer..."
                   value={deliveryNotes}
                   onChange={(e) => setDeliveryNotes(e.target.value)}
-                  className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl p-3.5 text-xs sm:text-sm outline-none focus:bg-white focus:border-emerald-500 transition-colors resize-none placeholder-slate-400"
+                  className="w-full bg-[#F8FAFC] border border-slate-200 rounded-[6px] p-3.5 text-xs sm:text-sm outline-none focus:bg-white focus:border-emerald-500 transition-colors resize-none placeholder-slate-400"
                 />
               </div>
 

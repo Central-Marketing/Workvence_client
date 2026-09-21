@@ -150,7 +150,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const res = await generateImageURL(file);
+        const res = await generateImageURL(file, "order_deliveries");
         if (res?.url) {
           const sizeStr = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
           setUploadedFiles((prev) => [...prev, { name: file.name, size: sizeStr, url: res.url }]);
@@ -358,22 +358,19 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
               type="button"
               variant="soft"
               size="xs"
-              radius="full"
+              radius="lg"
               onClick={() => setIsLedgerOpen(true)}
               leftIcon={<FiClock className="text-emerald-600 text-xs" />}
               className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs font-semibold"
             >
               Escrow Ledger
             </Button>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Seller Workspace
-            </span>
+
           </div>
         </div>
 
         {/* Order Main Title */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-6">
           {order.title || order.packageTitle}
         </h1>
 

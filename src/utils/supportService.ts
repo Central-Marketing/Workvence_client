@@ -13,7 +13,7 @@ const getAuthToken = () => {
   try {
     const match = document.cookie.match(/(?:^|; )\s*accessToken\s*=\s*([^;]+)/i);
     if (match) return decodeURIComponent(match[1]);
-    return localStorage.getItem("accessToken") || "";
+    return localStorage.getItem("accessToken") || localStorage.getItem("token") || "";
   } catch {
     return "";
   }
@@ -128,14 +128,14 @@ export const supportService = {
   },
 
   /**
-   * Get Cloudinary upload signature from admin backend storage service
+   * Get Cloudinary upload signature from backend storage service
    */
-  async getCloudinarySignature(folder: string = 'support_chat_attachments', type: string = 'authenticated') {
+  async getCloudinarySignature(folder: string = 'support_chat_attachments', type: string = 'upload') {
     try {
-      const res = await adminAxiosFetch.post('/storage/cloudinary-signature', { folder, type });
+      const res = await axiosFetch.post('/storage/cloudinary-signature', { folder, type });
       return res.data;
     } catch {
-      const fallbackRes = await axiosFetch.post('/storage/cloudinary-signature', { folder, type });
+      const fallbackRes = await adminAxiosFetch.post('/storage/cloudinary-signature', { folder, type });
       return fallbackRes.data;
     }
   },
@@ -174,13 +174,16 @@ export const supportService = {
   /**
    * Upload a File object directly to Cloudinary using signed authentication parameters
    */
-  async uploadCloudinaryFile(file: File, folder: string = 'chat_attachments') {
-    return this.uploadFileToCloudinary(file, folder);
+  async uploadCloudinaryFile(file: File, folder: string = 'chat_attachments', customType?: string) {
+    return this.uploadFileToCloudinary(file, folder, customType);
   },
 
-  async uploadFileToCloudinary(file: File, folder: string = 'chat_attachments') {
+  async uploadFileToCloudinary(file: File, folder: string = 'chat_attachments', customType?: string) {
+    const isPrivate = folder === 'support_chat_attachments' || folder === 'kyc_documents';
+    const uploadType = customType || (isPrivate ? 'authenticated' : 'upload');
+
     try {
-      const sigData = await this.getCloudinarySignature(folder, 'authenticated').catch(() => null);
+      const sigData = await this.getCloudinarySignature(folder, uploadType).catch(() => null);
       const sigObj = sigData?.data || sigData;
 
       if (sigObj && sigObj.signature && sigObj.apiKey && sigObj.cloudName) {
@@ -190,7 +193,9 @@ export const supportService = {
         formData.append('timestamp', String(sigObj.timestamp));
         formData.append('signature', sigObj.signature);
         formData.append('folder', sigObj.folder || folder);
-        formData.append('type', sigObj.type || 'authenticated');
+        if (sigObj.type || uploadType) {
+          formData.append('type', sigObj.type || uploadType);
+        }
 
         const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/${sigObj.cloudName}/auto/upload`, {
           method: 'POST',

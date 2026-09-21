@@ -187,7 +187,7 @@ const RegisterContent = () => {
 
     setLoading(true);
     try {
-      const { url } = image ? await generateImageURL(image) : { url: "" };
+      const { url } = image ? await generateImageURL(image, "avatars") : { url: "" };
       const { confirmPassword, ...registerPayload } = formInput;
       await axiosFetch.post('/auth/register', { ...registerPayload, image: url });
       toast.success('Registration successful! Please confirm your email.');

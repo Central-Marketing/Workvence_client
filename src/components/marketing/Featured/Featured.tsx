@@ -135,29 +135,11 @@ const Featured = ({
     return () => observer.disconnect();
   }, []);
 
-  // Dynamically calculate visible screen height without navbar
+  // Dynamically calculate visible screen height (full 100vh viewport as hero extends behind navbar)
   useEffect(() => {
     const calculateVisibleHeight = () => {
-      const navEl = document.querySelector('nav');
-      const featuredEl = containerRef.current;
-
-      let navHeight = 80;
-      if (featuredEl) {
-        // Measure exact offset from top of document to top of hero section
-        const rect = featuredEl.getBoundingClientRect();
-        const heroTop = rect.top + window.scrollY;
-        if (heroTop > 0) {
-          navHeight = heroTop;
-        } else if (navEl) {
-          navHeight = navEl.getBoundingClientRect().height || 80;
-        }
-      } else if (navEl) {
-        navHeight = navEl.getBoundingClientRect().height || 80;
-      }
-
-      // Use window.innerHeight or documentElement.clientHeight for exact visible viewport
       const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-      const calculated = Math.max(450, windowHeight - navHeight);
+      const calculated = Math.max(500, windowHeight);
       setHeroHeight(calculated);
     };
 
@@ -165,7 +147,6 @@ const Featured = ({
     window.addEventListener('resize', calculateVisibleHeight);
     window.addEventListener('orientationchange', calculateVisibleHeight);
 
-    // Re-verify after initial render, image loads, and layout settles
     const t1 = setTimeout(calculateVisibleHeight, 50);
     const t2 = setTimeout(calculateVisibleHeight, 300);
 
@@ -328,10 +309,10 @@ const Featured = ({
       ref={containerRef}
       id="featured-section"
       style={{
-        height: heroHeight ? `${heroHeight}px` : 'calc(100vh - var(--navbar-height, 80px))',
-        minHeight: heroHeight ? `${heroHeight}px` : 'calc(100vh - var(--navbar-height, 80px))',
+        height: heroHeight ? `${heroHeight}px` : '100vh',
+        minHeight: heroHeight ? `${heroHeight}px` : '100vh',
       }}
-      className="relative w-full bg-black overflow-x-clip flex flex-col justify-center items-center py-4 sm:py-6 md:py-8 select-none"
+      className="relative w-full bg-black overflow-x-clip flex flex-col justify-center items-center -mt-[var(--navbar-height,80px)] pt-[calc(var(--navbar-height,80px)+1.5rem)] pb-6 sm:pb-8 select-none"
     >
       {/* Background Video Layer with High Quality Assurance */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">

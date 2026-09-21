@@ -261,7 +261,16 @@ const Navbar = () => {
   };
 
   return (
-    <nav ref={navRef} className={`w-full sticky top-0 z-50 transition-all duration-300 ${showMenu || pathname !== "/" || isBuyer ? "bg-white border-b border-gray-100 shadow-sm text-gray-600" : "bg-white text-gray-600"}`}>
+    <nav
+      ref={navRef}
+      style={pathname === "/" && !showMenu ? { background: "#EDEDED", opacity: "0.96" } : undefined}
+      className={`w-full sticky top-0 z-50 transition-all duration-300 ${pathname === "/"
+        ? showMenu
+          ? "bg-white/45 backdrop-blur-md backdrop-saturate-150 border-b border-white/20 shadow-xs text-gray-800"
+          : "bg-[#EDEDED] border-b border-gray-200/40 text-gray-800"
+        : "bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm text-gray-800"
+        }`}
+    >
       <div className="w-full container mx-auto flex justify-between items-center px-4 sm:px-6 md:px-8 xl:px-10 py-3.5 sm:py-4 md:py-5">
 
         {/* Left Section: Logo + Fluid Responsive Search Box */}
@@ -331,14 +340,12 @@ const Navbar = () => {
                     size="md"
                     radius="lg"
                     onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                    className={`flex items-center gap-1 xl:gap-1.5 px-2 xl:px-4 py-[8px] xl:py-[10px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal whitespace-nowrap ${
-                      isCategoryDropdownOpen ? "!text-[#327C73]" : "text-black hover:!text-[#327C73]"
-                    }`}
+                    className={`flex items-center gap-1 xl:gap-1.5 px-2 xl:px-4 py-[8px] xl:py-[10px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal whitespace-nowrap ${isCategoryDropdownOpen ? "!text-[#327C73]" : "text-black hover:!text-[#327C73]"
+                      }`}
                     rightIcon={
                       <FiChevronDown
-                        className={`text-sm xl:text-base text-[#327C73] transition-transform duration-200 ${
-                          isCategoryDropdownOpen ? "rotate-180" : ""
-                        }`}
+                        className={`text-sm xl:text-base text-[#327C73] transition-transform duration-200 ${isCategoryDropdownOpen ? "rotate-180" : ""
+                          }`}
                       />
                     }
                   >

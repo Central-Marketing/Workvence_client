@@ -1133,7 +1133,7 @@ const BriefDetail = () => {
                   disabled={aiLoading}
                   isLoading={aiLoading}
                   leftIcon={<HiSparkles className="text-[#0D6B5D] text-sm" />}
-                  className="bg-[#D8F5ED] hover:bg-[#C3F0E4] text-[#0D6B5D] border border-[#BCE8DE] font-bold shadow-2xs text-xs"
+                  className="bg-[#D8F5ED] hover:bg-[#C3F0E4] text-[#0D6B5D] border border-[#BCE8DE] font-semibold shadow-2xs text-xs"
                 >
                   Get AI Recommendation
                 </Button>

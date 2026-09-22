@@ -1647,7 +1647,7 @@ const ChatView = () => {
                       }`}
                   >
                     <span>Read</span>
-                    <span className="px-1.5 py-0.2 bg-slate-100 text-slate-500 rounded-full text-[10px] font-semibold">
+                    <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-semibold shrink-0 leading-none">
                       {readCount}
                     </span>
                   </Button>

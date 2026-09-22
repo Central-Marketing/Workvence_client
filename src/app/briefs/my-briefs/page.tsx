@@ -284,6 +284,11 @@ const MyBriefs = () => {
             <AiGradientButton
               href="/briefs/create"
               text="Post a Project with AI"
+              icon={
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                  <path d="M0.75 7.60886C3.56875 4.84296 10.19 -0.808996 12.025 1.15511C14.3438 3.63702 2.15937 9.91366 4.03854 12.6791C6.0234 15.6001 12.9646 5.30336 15.3135 7.14726C17.6625 8.99126 9.676 13.1401 11.5552 15.4451C12.3069 16.367 14.3739 14.9841 15.3135 14.0621" stroke="#292929" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              }
               px="px-3.5 sm:px-4.5"
               py="py-2 sm:py-2.5"
               className="h-[40px] rounded-[6px] text-xs sm:text-sm md:text-[15px] font-semibold text-[#112131] shadow-none shrink-0 whitespace-nowrap self-start sm:self-center"
@@ -305,7 +310,7 @@ const MyBriefs = () => {
                 className="px-3 sm:px-3.5 py-1.5 font-semibold text-xs sm:text-[13px] !inline-flex !items-center !flex-nowrap !whitespace-nowrap shrink-0"
               >
                 <span className="whitespace-nowrap shrink-0">All Projects</span>
-                <span className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 whitespace-nowrap ${filter === "all" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+                <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 whitespace-nowrap ${filter === "all" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
                   }`}>
                   {counts.all}
                 </span>
@@ -320,11 +325,8 @@ const MyBriefs = () => {
                 className={`px-3 sm:px-3.5 py-1.5 font-semibold text-xs sm:text-[13px] !inline-flex !items-center !flex-nowrap !whitespace-nowrap shrink-0 ${filter === "new_proposals" ? "!bg-[#0D6D5F] hover:!bg-[#0B403F] text-white border-transparent" : ""
                   }`}
               >
-                <span className="inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap">
-
-                  <span>New Proposals</span>
-                </span>
-                <span className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 whitespace-nowrap ${filter === "new_proposals" ? "bg-white/20 text-white" : "bg-emerald-50 text-emerald-700"
+                <span className="whitespace-nowrap shrink-0">New Proposals</span>
+                <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 whitespace-nowrap ${filter === "new_proposals" ? "bg-white/20 text-white" : "bg-emerald-50 text-emerald-700"
                   }`}>
                   {counts.new_proposals}
                 </span>
@@ -340,7 +342,7 @@ const MyBriefs = () => {
                   }`}
               >
                 <span className="whitespace-nowrap shrink-0">New Projects</span>
-                <span className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 whitespace-nowrap ${filter === "new_projects" ? "bg-white/20 text-white" : "bg-blue-50 text-blue-700"
+                <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 whitespace-nowrap ${filter === "new_projects" ? "bg-white/20 text-white" : "bg-blue-50 text-blue-700"
                   }`}>
                   {counts.new_projects}
                 </span>
@@ -355,7 +357,7 @@ const MyBriefs = () => {
                 className="px-3 sm:px-3.5 py-1.5 font-semibold text-xs sm:text-[13px] !inline-flex !items-center !flex-nowrap !whitespace-nowrap shrink-0"
               >
                 <span className="whitespace-nowrap shrink-0">Open</span>
-                <span className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 whitespace-nowrap ${filter === "open" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+                <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 whitespace-nowrap ${filter === "open" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
                   }`}>
                   {counts.open}
                 </span>
@@ -370,7 +372,7 @@ const MyBriefs = () => {
                 className="px-3 sm:px-3.5 py-1.5 font-semibold text-xs sm:text-[13px] !inline-flex !items-center !flex-nowrap !whitespace-nowrap shrink-0"
               >
                 <span className="whitespace-nowrap shrink-0">Closed</span>
-                <span className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 whitespace-nowrap ${filter === "closed" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+                <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 whitespace-nowrap ${filter === "closed" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
                   }`}>
                   {counts.closed}
                 </span>

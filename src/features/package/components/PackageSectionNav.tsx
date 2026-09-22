@@ -56,10 +56,10 @@ export const PackageSectionNav: React.FC<PackageSectionNavProps> = ({
               : "!text-gray-600 hover:!text-gray-900 hover:!bg-gray-200/50"
               }`}
           >
-            <span>{sec.label}</span>
+            <span className="whitespace-nowrap shrink-0">{sec.label}</span>
             {sec.badge !== undefined && (
               <span
-                className={`text-xs px-2 py-0.5 rounded-full font-bold transition-colors ${isActive ? "bg-teal-700/80 text-teal-100" : "bg-teal-100 text-teal-800"
+                className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 transition-colors ${isActive ? "bg-teal-700/80 text-teal-100" : "bg-teal-100 text-teal-800"
                   }`}
               >
                 {sec.badge}

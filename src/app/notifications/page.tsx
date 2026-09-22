@@ -344,13 +344,13 @@ const NotificationsPage = () => {
               size="sm"
               radius="fiverr"
               onClick={() => setActiveTab("all")}
-              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 gap-1.5 ${activeTab === "all"
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 gap-2.5 whitespace-nowrap ${activeTab === "all"
                 ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
                 : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                 }`}
             >
-              <span>All</span>
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${activeTab === "all" ? "bg-white/20 text-white" : "bg-gray-200/80 text-gray-700"
+              <span className="whitespace-nowrap shrink-0">All</span>
+              <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 ${activeTab === "all" ? "bg-white/20 text-white" : "bg-gray-200/80 text-gray-700"
                 }`}>
                 {notifications.length}
               </span>
@@ -362,14 +362,14 @@ const NotificationsPage = () => {
               size="sm"
               radius="fiverr"
               onClick={() => setActiveTab("unread")}
-              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 gap-1.5 ${activeTab === "unread"
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 gap-2.5 whitespace-nowrap ${activeTab === "unread"
                 ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
                 : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                 }`}
             >
-              <span>Unread</span>
+              <span className="whitespace-nowrap shrink-0">Unread</span>
               {unreadCount > 0 && (
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${activeTab === "unread" ? "bg-white/20 text-white" : "bg-amber-100 text-amber-800"
+                <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 ${activeTab === "unread" ? "bg-white/20 text-white" : "bg-amber-100 text-amber-800"
                   }`}>
                   {unreadCount}
                 </span>
@@ -382,13 +382,13 @@ const NotificationsPage = () => {
               size="sm"
               radius="fiverr"
               onClick={() => setActiveTab("read")}
-              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 gap-1.5 ${activeTab === "read"
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 gap-2.5 whitespace-nowrap ${activeTab === "read"
                 ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
                 : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                 }`}
             >
-              <span>Read</span>
-              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${activeTab === "read" ? "bg-white/20 text-white" : "bg-gray-200/80 text-gray-700"
+              <span className="whitespace-nowrap shrink-0">Read</span>
+              <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 ${activeTab === "read" ? "bg-white/20 text-white" : "bg-gray-200/80 text-gray-700"
                 }`}>
                 {readCount}
               </span>

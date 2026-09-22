@@ -24,7 +24,7 @@ import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader, Button } from "@/components";
 
-type StatusFilter = "all" | "pending" | "accepted" | "rejected";
+type StatusFilter = "all" | "open" | "closed";
 
 export default function MyProposalsPage() {
   const router = useRouter();
@@ -37,6 +37,21 @@ export default function MyProposalsPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Helper to determine if proposal is active/open (pending review, project not closed)
+  const isProposalOpen = (p: any) => {
+    const s = (p.status || "pending").toLowerCase();
+    const brief = typeof p.briefID === "object" && p.briefID !== null ? p.briefID : {};
+    const isBriefClosed = brief.isClosed || brief.status === "closed";
+    if (isBriefClosed || s === "closed" || s === "rejected" || s === "accepted") {
+      return false;
+    }
+    return s === "pending" || s === "open";
+  };
+
+  const isProposalClosed = (p: any) => {
+    return !isProposalOpen(p);
+  };
 
   // Fetch submitted proposals from backend endpoint
   const { isLoading, data: rawData = [] } = useQuery({
@@ -57,23 +72,22 @@ export default function MyProposalsPage() {
     return Array.isArray(rawData) ? rawData : [];
   }, [rawData]);
 
-  // Dynamic counts for status filters
+  // Dynamic counts for 3 status filters: All, Open (pending), Closed
   const counts = useMemo(() => {
-    const res = { all: proposals.length, pending: 0, accepted: 0, rejected: 0 };
+    let open = 0;
+    let closed = 0;
     proposals.forEach((p) => {
-      const s = (p.status || "pending").toLowerCase();
-      if (s === "accepted") res.accepted += 1;
-      else if (s === "rejected") res.rejected += 1;
-      else res.pending += 1;
+      if (isProposalOpen(p)) open += 1;
+      else closed += 1;
     });
-    return res;
+    return { all: proposals.length, open, closed };
   }, [proposals]);
 
   // Filtered & searched proposals list
   const filteredProposals = useMemo(() => {
     return proposals.filter((p) => {
-      const s = (p.status || "pending").toLowerCase();
-      if (statusFilter !== "all" && s !== statusFilter) return false;
+      if (statusFilter === "open" && !isProposalOpen(p)) return false;
+      if (statusFilter === "closed" && !isProposalClosed(p)) return false;
 
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase().trim();
@@ -90,8 +104,10 @@ export default function MyProposalsPage() {
     });
   }, [proposals, statusFilter, searchQuery]);
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, brief?: any) => {
     const s = (status || "pending").toLowerCase();
+    const isBriefClosed = brief?.isClosed || brief?.status === "closed";
+
     if (s === "accepted") {
       return (
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -108,10 +124,18 @@ export default function MyProposalsPage() {
         </span>
       );
     }
+    if (isBriefClosed || s === "closed") {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+          <FiXCircle className="w-3.5 h-3.5" />
+          <span>Closed</span>
+        </span>
+      );
+    }
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
         <FiClock className="w-3.5 h-3.5" />
-        <span>Pending Review</span>
+        <span>Open</span>
       </span>
     );
   };
@@ -129,8 +153,8 @@ export default function MyProposalsPage() {
               <span className="text-gray-300">/</span>
               <span className="text-xs font-medium text-gray-500">Proposals</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-gray-950 tracking-tight font-sf-pro">
-              Submitted Proposals
+            <h1 className="text-2xl sm:text-[28px] font-medium text-gray-950 tracking-tight font-sf-pro">
+              My Submitted Proposals
             </h1>
             <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-2xl leading-relaxed">
               Keep track of your bids, client responses, and proposal status for open client projects.
@@ -138,64 +162,66 @@ export default function MyProposalsPage() {
           </div>
 
           <div className="flex items-center gap-3 shrink-0 self-start sm:self-center">
-            <Link
+            <Button
               href="/briefs"
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0B5C50] text-white text-xs sm:text-[13px] font-semibold transition-all shadow-2xs hover:shadow-xs"
+              variant="brand"
+              size="sm"
+              radius="fiverr"
+              rightIcon={<FiArrowRight className="w-4 h-4" />}
             >
-              <span>Explore Projects</span>
-              <FiArrowRight className="w-4 h-4" />
-            </Link>
+              Explore Projects
+            </Button>
           </div>
         </div>
 
         {/* Controls: Status Filters & Search Bar */}
         <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-4 sm:p-5 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          {/* Status Tabs */}
+          {/* Status Tabs: 3 tabs (All Proposals, Open, Closed) */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
             {(
               [
                 { id: "all", label: "All Proposals", count: counts.all },
-                { id: "pending", label: "Pending", count: counts.pending },
-                { id: "accepted", label: "Accepted", count: counts.accepted },
-                { id: "rejected", label: "Rejected", count: counts.rejected },
+                { id: "open", label: "Open", count: counts.open },
+                { id: "closed", label: "Closed", count: counts.closed },
               ] as const
             ).map((tab) => {
               const active = statusFilter === tab.id;
               return (
-                <button
+                <Button
                   key={tab.id}
                   onClick={() => setStatusFilter(tab.id)}
                   type="button"
-                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-[6px] text-xs sm:text-[13px] font-semibold transition-colors shrink-0 ${
-                    active
-                      ? "bg-[#0D6D5F] text-white shadow-2xs"
-                      : "bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-transparent"
-                  }`}
-                >
-                  <span>{tab.label}</span>
-                  <span
-                    className={`text-[11px] px-1.5 py-0.2 rounded-full ${
-                      active
-                        ? "bg-white/20 text-white font-bold"
-                        : "bg-gray-200/70 text-gray-600 font-medium"
+                  variant={active ? "brand" : "ghost"}
+                  size="sm"
+                  radius="fiverr"
+                  className={`px-3.5 py-2 font-semibold text-xs sm:text-[13px] whitespace-nowrap shrink-0 ${active
+                    ? "!bg-[#0D6D5F] text-white shadow-2xs"
+                    : "!bg-gray-50 !text-gray-600 hover:!bg-gray-100 hover:!text-gray-900 border border-transparent"
                     }`}
+                >
+                  <span className="whitespace-nowrap shrink-0">{tab.label}</span>
+                  <span
+                    className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 ${active
+                      ? "bg-white/20 text-white"
+                      : "bg-gray-200/80 text-gray-700"
+                      }`}
                   >
                     {tab.count}
                   </span>
-                </button>
+                </Button>
               );
             })}
           </div>
 
           {/* Search Box */}
           <div className="relative w-full md:w-72 shrink-0">
-            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
             <input
               type="text"
               placeholder="Search by project or keywords..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9.5 pr-8 py-2 text-xs sm:text-[13px] bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] transition-colors outline-hidden text-gray-900 placeholder:text-gray-400"
+              className="w-full pl-10 pr-8 py-2 text-xs sm:text-[13px] bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] transition-colors outline-hidden text-gray-900 placeholder:text-gray-400"
             />
             {searchQuery && (
               <button
@@ -259,8 +285,8 @@ export default function MyProposalsPage() {
                 typeof proposal.briefID === "object" && proposal.briefID !== null
                   ? proposal.briefID
                   : typeof proposal.brief === "object" && proposal.brief !== null
-                  ? proposal.brief
-                  : {};
+                    ? proposal.brief
+                    : {};
               const briefId =
                 brief._id ||
                 brief.id ||
@@ -274,90 +300,114 @@ export default function MyProposalsPage() {
               return (
                 <div
                   key={proposal._id || proposal.id}
-                  className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] hover:border-[#0D6D5F]/40 hover:shadow-md transition-all duration-200 flex flex-col justify-between p-5 sm:p-6 group"
+                  onClick={() => setSelectedProposal(proposal)}
+                  className="relative overflow-hidden bg-white rounded-[6px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-5 sm:p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer"
                 >
-                  <div>
-                    {/* Top Row: Title, Date, and Status Badge */}
-                    <div className="flex items-start justify-between gap-3 mb-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          {brief.category && (
-                            <span className="text-[11px] font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
-                              {brief.category}
+                  {/* Ambient Purple Glow (appears on card hover) */}
+                  <div
+                    className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out z-0"
+                    style={{
+                      position: "absolute",
+                      right: "-210px",
+                      top: "-407px",
+                      width: "555px",
+                      height: "513px",
+                      borderRadius: "555px",
+                      transform: "rotate(-180deg)",
+                      background: "var(--purple-100, #CEB0FA)",
+                      filter: "blur(150px)",
+                    }}
+                    aria-hidden="true"
+                  />
+
+                  <div className="relative z-10 flex flex-col justify-between h-full">
+                    <div>
+                      {/* Top Row: Title, Date, and Status Badge */}
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            {brief.category && (
+                              <span className="text-[11px] font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                                {brief.category}
+                              </span>
+                            )}
+                            <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                              <FiCalendar className="w-3 h-3" />
+                              <span>Submitted {moment(proposal.createdAt).fromNow()}</span>
                             </span>
-                          )}
-                          <span className="text-[11px] text-gray-400 flex items-center gap-1">
-                            <FiCalendar className="w-3 h-3" />
-                            <span>Submitted {moment(proposal.createdAt).fromNow()}</span>
-                          </span>
+                          </div>
+                          <h2 className="text-base sm:text-[19px] font-bold text-slate-900 tracking-tight line-clamp-2 group-hover:text-slate-950 transition-colors font-sf-pro">
+                            {projectTitle}
+                          </h2>
                         </div>
-                        <h2 className="text-base sm:text-lg font-bold text-gray-950 tracking-tight line-clamp-2 group-hover:text-[#0D6D5F] transition-colors font-sf-pro">
-                          {projectTitle}
-                        </h2>
+                        <div className="shrink-0">{getStatusBadge(proposal.status, brief)}</div>
                       </div>
-                      <div className="shrink-0">{getStatusBadge(proposal.status)}</div>
-                    </div>
 
-                    {/* Price & Delivery duration tags */}
-                    <div className="flex flex-wrap items-center gap-2.5 mb-3.5 pt-1">
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[6px] bg-emerald-50/80 text-emerald-800 border border-emerald-200/60 text-xs font-bold">
-                        <FiDollarSign className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Your Bid: ${proposal.price}</span>
+                      {/* Price & Delivery duration tags */}
+                      <div className="flex flex-wrap items-center gap-2.5 mb-3.5 pt-1">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[6px] bg-emerald-50/80 text-emerald-800 border border-emerald-200/60 text-xs font-bold">
+                          <FiDollarSign className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Your Bid: ${proposal.price}</span>
+                        </div>
+                        {proposal.deliveryTime && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[6px] bg-gray-100 text-gray-700 border border-gray-200/60 text-xs font-semibold">
+                            <FiClock className="w-3.5 h-3.5 text-gray-500" />
+                            <span>{proposal.deliveryTime} Days Delivery</span>
+                          </div>
+                        )}
+                        {briefBudget && (
+                          <div className="text-[11px] text-gray-400 font-medium ml-auto">
+                            Client Budget:{" "}
+                            <strong className="text-gray-600">
+                              {typeof briefBudget === "number" ? `$${briefBudget}` : briefBudget}
+                            </strong>
+                          </div>
+                        )}
                       </div>
-                      {proposal.deliveryTime && (
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[6px] bg-gray-100 text-gray-700 border border-gray-200/60 text-xs font-semibold">
-                          <FiClock className="w-3.5 h-3.5 text-gray-500" />
-                          <span>{proposal.deliveryTime} Days Delivery</span>
+
+                      {/* Cover Letter Excerpt */}
+                      {proposal.coverLetter && (
+                        <p className="text-xs sm:text-[13px] text-gray-600 line-clamp-3 leading-relaxed mb-4 bg-gray-50/60 p-3 rounded-[6px] border border-gray-100 font-normal">
+                          {proposal.coverLetter}
+                        </p>
+                      )}
+
+                      {/* Attachment preview indicator */}
+                      {hasAttachments && (
+                        <div className="flex items-center gap-1 text-[11px] text-gray-500 mb-3 font-medium">
+                          <FiPaperclip className="w-3.5 h-3.5 text-gray-400" />
+                          <span>{proposal.attachments.length} attachment(s) included</span>
                         </div>
                       )}
-                      {briefBudget && (
-                        <div className="text-[11px] text-gray-400 font-medium ml-auto">
-                          Client Budget:{" "}
-                          <strong className="text-gray-600">
-                            {typeof briefBudget === "number" ? `$${briefBudget}` : briefBudget}
-                          </strong>
-                        </div>
-                      )}
                     </div>
 
-                    {/* Cover Letter Excerpt */}
-                    {proposal.coverLetter && (
-                      <p className="text-xs sm:text-[13px] text-gray-600 line-clamp-3 leading-relaxed mb-4 bg-gray-50/60 p-3 rounded-[6px] border border-gray-100 font-normal">
-                        {proposal.coverLetter}
-                      </p>
-                    )}
-
-                    {/* Attachment preview indicator */}
-                    {hasAttachments && (
-                      <div className="flex items-center gap-1 text-[11px] text-gray-500 mb-3 font-medium">
-                        <FiPaperclip className="w-3.5 h-3.5 text-gray-400" />
-                        <span>{proposal.attachments.length} attachment(s) included</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Card Footer Actions */}
-                  <div className="pt-3.5 border-t border-gray-100 flex items-center justify-between gap-3 mt-auto">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      radius="fiverr"
-                      onClick={() => setSelectedProposal(proposal)}
-                      className="text-xs sm:text-[13px] font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100 p-0 h-auto"
-                    >
-                      View Full Proposal
-                    </Button>
-
-                    {briefId && (
-                      <Link
-                        href={`/briefs/${briefId}`}
-                        className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-[#0D6D5F] hover:text-[#0B5C50] hover:underline transition-colors"
+                    {/* Card Footer Actions */}
+                    <div className="pt-3.5 border-t border-gray-100 flex items-center justify-between gap-3 mt-auto">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        radius="fiverr"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedProposal(proposal);
+                        }}
+                        className="text-xs sm:text-[13px] font-semibold text-gray-700 hover:text-gray-900 hover:bg-gray-100 p-0 h-auto"
                       >
-                        <span>View Project</span>
-                        <FiExternalLink className="w-3.5 h-3.5" />
-                      </Link>
-                    )}
+                        View Full Proposal
+                      </Button>
+
+                      {briefId && (
+                        <Link
+                          href={`/briefs/${briefId}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-[#0D6D5F] hover:text-[#0B5C50] group-hover:underline transition-colors"
+                        >
+                          <span>View Project</span>
+                          <FiExternalLink className="w-3.5 h-3.5" />
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -368,24 +418,21 @@ export default function MyProposalsPage() {
 
       {/* Slide-out Drawer for Full Proposal Details */}
       <div
-        className={`fixed inset-0 z-[1000] transition-all duration-300 ${
-          selectedProposal ? "visible pointer-events-auto" : "invisible pointer-events-none delay-300"
-        }`}
+        className={`fixed inset-0 z-[1000] transition-all duration-300 ${selectedProposal ? "visible pointer-events-auto" : "invisible pointer-events-none delay-300"
+          }`}
       >
         {/* Backdrop Overlay */}
         <div
-          className={`fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-300 ease-out ${
-            selectedProposal ? "opacity-100" : "opacity-0"
-          }`}
+          className={`fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-300 ease-out ${selectedProposal ? "opacity-100" : "opacity-0"
+            }`}
           onClick={() => setSelectedProposal(null)}
           aria-hidden="true"
         />
 
         {/* Drawer Panel from Right */}
         <aside
-          className={`fixed inset-y-0 right-0 z-[1001] w-full max-w-xl bg-white shadow-2xl flex flex-col h-full overflow-hidden transform transition-transform duration-300 ease-out ${
-            selectedProposal ? "translate-x-0" : "translate-x-full"
-          }`}
+          className={`fixed inset-y-0 right-0 z-[1001] w-full max-w-xl bg-white shadow-2xl flex flex-col h-full overflow-hidden transform transition-transform duration-300 ease-out ${selectedProposal ? "translate-x-0" : "translate-x-full"
+            }`}
           role="dialog"
           aria-modal="true"
           aria-label="Proposal Details"
@@ -398,7 +445,7 @@ export default function MyProposalsPage() {
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
                   Proposal Details
                 </span>
-                {selectedProposal && getStatusBadge(selectedProposal.status)}
+                {selectedProposal && getStatusBadge(selectedProposal.status, selectedProposal.briefID)}
               </div>
               <h2 className="text-lg font-bold text-gray-950 font-sf-pro truncate max-w-md">
                 {(() => {

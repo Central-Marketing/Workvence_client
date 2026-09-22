@@ -117,14 +117,14 @@ const MyPackages = () => {
               size="sm"
               radius="fiverr"
               variant={activeTab === "published" ? "brand" : "ghost"}
-              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 ${activeTab === "published"
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 whitespace-nowrap ${activeTab === "published"
                 ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
                 : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                 }`}
             >
-              <span>Published</span>
+              <span className="whitespace-nowrap shrink-0">Published</span>
               <span
-                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ml-1.5 ${activeTab === "published"
+                className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 ${activeTab === "published"
                   ? "bg-white/20 text-white"
                   : "bg-gray-200/80 text-gray-700"
                   }`}
@@ -139,14 +139,14 @@ const MyPackages = () => {
               size="sm"
               radius="fiverr"
               variant={activeTab === "draft" ? "brand" : "ghost"}
-              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 ${activeTab === "draft"
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 whitespace-nowrap ${activeTab === "draft"
                 ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
                 : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                 }`}
             >
-              <span>Draft</span>
+              <span className="whitespace-nowrap shrink-0">Draft</span>
               <span
-                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ml-1.5 ${activeTab === "draft"
+                className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 ${activeTab === "draft"
                   ? "bg-white/20 text-white"
                   : "bg-amber-100 text-amber-800"
                   }`}

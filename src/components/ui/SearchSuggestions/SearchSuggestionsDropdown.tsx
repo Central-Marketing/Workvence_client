@@ -48,7 +48,7 @@ export const SearchSuggestionsDropdown: React.FC<SearchSuggestionsDropdownProps>
 
   return (
     <div
-      className={`absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100/90 rounded-2xl shadow-2xl py-2 z-[70] overflow-hidden text-left animate-in fade-in slide-in-from-top-2 duration-150 ${className}`}
+      className={`absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-[6px] shadow-xl py-2 z-[70] overflow-hidden text-left animate-in fade-in slide-in-from-top-2 duration-150 ${className}`}
     >
       {/* Suggestions List */}
       <div className="max-h-[340px] overflow-y-auto divide-y divide-gray-50/60">
@@ -63,24 +63,24 @@ export const SearchSuggestionsDropdown: React.FC<SearchSuggestionsDropdownProps>
                 e.preventDefault();
                 onSelect(item);
               }}
-              className={`px-4 py-2.5 flex items-center justify-between cursor-pointer transition-colors group ${
-                isSelected ? 'bg-emerald-50/70 text-[#0D6D5F]' : 'hover:bg-gray-50/80 text-gray-700'
+              className={`px-3.5 py-2.5 flex items-center justify-between cursor-pointer transition-colors group ${
+                isSelected ? 'bg-teal-50/70 text-teal-800 font-medium' : 'hover:bg-gray-50 text-gray-700'
               }`}
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 {isCategory ? (
-                  <FiFolder className={`text-base shrink-0 ${isSelected ? 'text-[#0D6D5F]' : 'text-[#327C73]'}`} />
+                  <FiFolder className={`text-base shrink-0 ${isSelected ? 'text-teal-700' : 'text-[#327C73]'}`} />
                 ) : (
-                  <RiSearchLine className={`text-base shrink-0 ${isSelected ? 'text-[#0D6D5F]' : 'text-gray-400 group-hover:text-gray-600'}`} />
+                  <RiSearchLine className={`text-base shrink-0 ${isSelected ? 'text-teal-700' : 'text-gray-400 group-hover:text-gray-600'}`} />
                 )}
 
-                <span className="text-[13px] sm:text-[14px] font-medium truncate">
+                <span className="text-[13px] sm:text-[14px] truncate">
                   {highlightMatch(item.text, query)}
                 </span>
               </div>
 
               {isCategory && (
-                <span className="ml-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-[#0D6D5F] border border-emerald-100/80 shrink-0">
+                <span className="ml-2 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-[4px] bg-teal-50 text-teal-800 border border-teal-100/80 shrink-0">
                   Category
                 </span>
               )}
@@ -95,8 +95,8 @@ export const SearchSuggestionsDropdown: React.FC<SearchSuggestionsDropdownProps>
               e.preventDefault();
               onSelect({ text: query.trim(), type: 'query' });
             }}
-            className={`px-4 py-2.5 flex items-center justify-between cursor-pointer border-t border-gray-100 transition-colors ${
-              selectedIndex === items.length ? 'bg-emerald-50/70 text-[#0D6D5F]' : 'hover:bg-emerald-50/50 text-[#327C73]'
+            className={`px-3.5 py-2.5 flex items-center justify-between cursor-pointer border-t border-gray-100 transition-colors ${
+              selectedIndex === items.length ? 'bg-teal-50/70 text-teal-800 font-semibold' : 'hover:bg-teal-50/50 text-[#327C73]'
             }`}
           >
             <div className="flex items-center gap-2.5 min-w-0">

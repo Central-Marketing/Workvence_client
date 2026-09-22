@@ -595,7 +595,7 @@ const MyBriefs = () => {
                           {isMenuOpen && (
                             <div
                               onClick={(e) => e.stopPropagation()}
-                              className="absolute right-0 top-9 w-44 bg-white border border-slate-200 rounded-xl shadow-lg py-1.5 z-20"
+                              className="absolute right-0 top-9 w-44 bg-white border border-gray-100 rounded-[6px] shadow-xl py-1.5 z-20 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
                             >
                               <Button
                                 type="button"
@@ -607,8 +607,8 @@ const MyBriefs = () => {
                                   setOpenMenuId(null);
                                   router.push(`/briefs/${brief._id}`);
                                 }}
-                                leftIcon={<FiEye className="text-slate-400" />}
-                                className="justify-start px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 border-none shadow-none h-auto min-h-0"
+                                leftIcon={<FiEye className="text-slate-400 group-hover:text-teal-700" />}
+                                className="group justify-start px-3.5 py-2 text-xs font-medium text-gray-700 hover:bg-teal-50/70 hover:text-teal-800 border-none shadow-none h-auto min-h-0 transition-colors"
                               >
                                 View Details
                               </Button>
@@ -624,8 +624,8 @@ const MyBriefs = () => {
                                     setOpenMenuId(null);
                                     router.push(`/briefs/${brief._id}/proposals`);
                                   }}
-                                  leftIcon={<FiUsers className="text-slate-400" />}
-                                  className="justify-start px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 border-none shadow-none h-auto min-h-0"
+                                  leftIcon={<FiUsers className="text-slate-400 group-hover:text-teal-700" />}
+                                  className="group justify-start px-3.5 py-2 text-xs font-medium text-gray-700 hover:bg-teal-50/70 hover:text-teal-800 border-none shadow-none h-auto min-h-0 transition-colors"
                                 >
                                   View Proposals
                                 </Button>
@@ -643,7 +643,7 @@ const MyBriefs = () => {
                                     closeMutation.mutate(brief._id);
                                   }}
                                   leftIcon={<FiXCircle className="text-rose-500" />}
-                                  className="justify-start px-4 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 border-none shadow-none h-auto min-h-0"
+                                  className="justify-start px-3.5 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 border-none shadow-none h-auto min-h-0 transition-colors"
                                 >
                                   Close Project
                                 </Button>

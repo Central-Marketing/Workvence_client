@@ -107,7 +107,7 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
       {/* Main Subcategory Title + Chevron Dropdown */}
       <div className="relative inline-block" ref={dropdownRef}>
         <div className="flex items-center gap-2.5">
-          <h1 className="text-2xl sm:text-[34px] font-bold text-gray-900 tracking-tight leading-tight">
+          <h1 className="text-2xl  font-bold text-gray-900 ">
             {activeSubcategory.title}
           </h1>
 
@@ -119,7 +119,7 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
             radius="full"
             onClick={() => setDropdownOpen((prev) => !prev)}
             aria-label="Switch Subcategory"
-            className="w-7 h-7 sm:w-8 sm:h-8 aspect-square border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-50,#FFF)] hover:bg-gray-50 shadow-xs active:scale-95 shrink-0 p-0"
+            className="w-7 h-7 aspect-square border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-50,#FFF)] hover:bg-gray-50 shadow-xs active:scale-95 shrink-0 p-0"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -127,9 +127,8 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
               height="16"
               viewBox="0 0 16 16"
               fill="none"
-              className={`transition-transform duration-200 ${
-                dropdownOpen ? "rotate-180" : ""
-              }`}
+              className={`transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
+                }`}
             >
               <path
                 d="M12 6.00003C12 6.00003 9.05407 10 8 10C6.94587 10 4 6 4 6"
@@ -144,7 +143,7 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
 
         {/* Subcategories Dropdown Menu */}
         {dropdownOpen && subcategories.length > 0 && (
-          <div className="absolute left-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="absolute left-0 mt-2 w-72 bg-white rounded-[6px] shadow-xl border border-gray-100 py-2 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
             <div className="px-3.5 py-2 border-b border-gray-100">
               <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 {categoryName} Subcategories
@@ -166,11 +165,10 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
                       setDropdownOpen(false);
                     }}
                     rightIcon={isSelected ? <FiCheck className="w-4 h-4 text-teal-600 shrink-0 ml-2" /> : undefined}
-                    className={`w-full text-left justify-between px-3.5 py-2.5 text-sm transition-colors border-none shadow-none h-auto min-h-0 ${
-                      isSelected
-                        ? "bg-teal-50/70 text-teal-800 font-semibold hover:bg-teal-50"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
+                    className={`w-full text-left justify-between px-3.5 py-2.5 text-sm transition-colors border-none shadow-none h-auto min-h-0 ${isSelected
+                      ? "bg-teal-50/70 text-teal-800 font-semibold hover:bg-teal-50"
+                      : "text-gray-700 hover:bg-gray-50"
+                      }`}
                   >
                     <span className="truncate">{subcat.title}</span>
                   </Button>

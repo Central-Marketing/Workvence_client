@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { AiOutlineDown } from 'react-icons/ai';
+import { FiChevronDown, FiCheck } from 'react-icons/fi';
 
 interface Option {
   value: string | number;
@@ -62,17 +62,17 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, p
       <button
         type="button"
         disabled={disabled}
-        className="w-full flex items-center justify-between p-3.5 border border-slate-200 rounded-lg text-slate-800 bg-slate-50 transition-all duration-300 hover:bg-slate-100 focus:outline-none focus:border-brand-green focus:bg-white focus:ring-4 focus:ring-brand-green/10 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-50"
+        className="w-full h-[40px] flex items-center justify-between px-3.5 py-2 border border-gray-200 rounded-[6px] text-gray-800 bg-white transition-all duration-150 hover:border-gray-300 focus:outline-none focus:border-brand-green disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         onClick={() => !disabled && setIsOpen(!isOpen)}
       >
-        <span className={`text-[15px] ${selectedOption ? "text-slate-800" : "text-slate-400"}`}>
+        <span className={`text-[14px] font-medium truncate ${selectedOption ? "text-gray-800" : "text-gray-400"}`}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <AiOutlineDown className={`text-slate-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        <FiChevronDown className={`text-gray-500 text-sm transition-transform duration-200 shrink-0 ml-2 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-2 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-[6px] shadow-xl overflow-hidden py-1.5 animate-in fade-in slide-in-from-top-2 duration-150">
           <ul className="max-h-60 overflow-y-auto">
             {options.map((option) => {
               const isSelected = selectedOption
@@ -82,17 +82,18 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, p
                 <li key={option.value}>
                   <button
                     type="button"
-                    className={`w-full text-left px-4 py-3 text-sm transition-colors duration-150 ${
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 text-sm transition-colors cursor-pointer select-none text-left ${
                       isSelected
-                        ? "bg-green-50 text-brand-green font-semibold"
-                        : "text-slate-700 hover:bg-slate-50"
+                        ? "bg-teal-50/70 text-teal-800 font-semibold hover:bg-teal-50"
+                        : "text-gray-700 hover:bg-gray-50"
                     }`}
                     onClick={() => {
                       onChange(option.value);
                       setIsOpen(false);
                     }}
                   >
-                    {option.label}
+                    <span className="truncate">{option.label}</span>
+                    {isSelected && <FiCheck className="w-4 h-4 text-teal-600 shrink-0 ml-2" />}
                   </button>
                 </li>
               );

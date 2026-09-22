@@ -349,15 +349,15 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
 
       {/* Notification Dropdown Menu */}
       {isOpen && (
-        <div className="notification-dropdown absolute right-0 top-10 w-80 bg-white border border-gray-200 rounded-lg shadow-xl z-50 flex flex-col">
-          <div className="dropdown-header p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-lg">
+        <div className="notification-dropdown absolute right-0 top-10 w-80 bg-white border border-gray-100 rounded-[6px] shadow-xl z-50 flex flex-col overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="dropdown-header px-3.5 py-2.5 border-b border-gray-100 flex justify-between items-center bg-gray-50/70">
             <h4 className="font-bold text-gray-800 text-sm m-0">Notifications</h4>
             {unreadCount > 0 && (
               <Button 
                 type="button"
                 variant="ghost"
                 size="xs"
-                className="mark-all-btn text-brand-green hover:text-brand-green text-xs font-semibold hover:underline p-0 h-auto border-none shadow-none hover:bg-transparent" 
+                className="mark-all-btn text-teal-700 hover:text-teal-800 text-xs font-semibold hover:underline p-0 h-auto border-none shadow-none hover:bg-transparent" 
                 onClick={handleMarkAllAsRead}
               >
                 Mark all as read
@@ -371,12 +371,12 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
               notifications.map((n) => (
                 <div
                   key={n._id}
-                  className={`notif-item p-3 border-b border-gray-100 cursor-pointer transition-colors hover:bg-gray-50 ${!n.isRead ? "bg-green-50/30" : "bg-white"}`}
+                  className={`notif-item p-3 border-b border-gray-100 cursor-pointer transition-colors hover:bg-teal-50/40 ${!n.isRead ? "bg-teal-50/20" : "bg-white"}`}
                   onClick={() => handleNotificationClick(n)}
                 >
-                  <div className="notif-title text-sm font-bold text-gray-800 mb-1 flex items-center gap-1">
-                    {!n.isRead && <span className="w-2 h-2 rounded-full bg-brand-green inline-block"></span>}
-                    {n.title}
+                  <div className="notif-title text-sm font-bold text-gray-800 mb-1 flex items-center gap-1.5">
+                    {!n.isRead && <span className="w-2 h-2 rounded-full bg-teal-600 inline-block shrink-0"></span>}
+                    <span className="truncate">{n.title}</span>
                   </div>
                   <div className="notif-message text-xs text-gray-600 mb-1 line-clamp-2">{n.message}</div>
                   <div className="notif-time text-[10px] text-gray-400 font-medium">
@@ -386,7 +386,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
               ))
             )}
           </div>
-          <div className="dropdown-footer p-2.5 border-t border-gray-100 bg-gray-50/90 rounded-b-lg text-center flex items-center justify-between px-3">
+          <div className="dropdown-footer px-3.5 py-2.5 border-t border-gray-100 bg-gray-50/70 text-center flex items-center justify-between">
             <span className="text-[11px] text-gray-400 font-medium">
               {notifications.length} {notifications.length === 1 ? 'notification' : 'notifications'}
             </span>
@@ -403,7 +403,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
               }
-              className="text-xs font-bold text-[#0E3834] hover:text-[#092724] hover:underline p-0 h-auto border-none shadow-none hover:bg-transparent"
+              className="text-xs font-bold text-teal-800 hover:text-teal-900 hover:underline p-0 h-auto border-none shadow-none hover:bg-transparent"
             >
               View all
             </Button>

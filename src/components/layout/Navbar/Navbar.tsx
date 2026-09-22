@@ -354,26 +354,26 @@ const Navbar = () => {
                   </Button>
 
                   {isCategoryDropdownOpen && (
-                    <div className="absolute left-0 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-2xl py-2 flex flex-col z-[60] text-[14px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-                      <div className="px-4 py-2 border-b border-gray-100 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-400">
+                    <div className="absolute left-0 mt-2 w-64 bg-white border border-gray-100 rounded-[6px] shadow-xl py-2 flex flex-col z-[60] text-[14px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                      <div className="px-3.5 py-2 border-b border-gray-100 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-400">
                         <span>Categories</span>
                       </div>
 
-                      <div className="max-h-[320px] overflow-y-auto py-1">
+                      <div className="max-h-[320px] overflow-y-auto py-1 scrollbar-hide">
                         {categoryList.length > 0 ? (
                           categoryList.map((cat: any, index: number) => (
                             <Link
                               key={cat.slug || index}
                               href={`/packages?category=${encodeURIComponent(cat.slug)}`}
                               onClick={() => setIsCategoryDropdownOpen(false)}
-                              className="px-4 py-2.5 hover:bg-emerald-50/70 hover:text-[#327C73] transition-colors flex items-center justify-between group"
+                              className="px-3.5 py-2.5 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center justify-between group text-sm"
                             >
                               <span className="truncate">{cat.name}</span>
-                              <span className="text-gray-300 group-hover:text-[#327C73] transition-colors text-xs">→</span>
+                              <span className="text-gray-300 group-hover:text-teal-700 transition-colors text-xs">→</span>
                             </Link>
                           ))
                         ) : (
-                          <div className="px-4 py-3 text-sm text-gray-400 text-center">
+                          <div className="px-3.5 py-3 text-sm text-gray-400 text-center">
                             No categories found
                           </div>
                         )}
@@ -475,28 +475,28 @@ const Navbar = () => {
                 </div>
 
                 {isProfileDropdownOpen && (
-                  <div className="absolute right-0 mt-3 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-2 flex flex-col z-[60] text-[15px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-                    <div className="px-5 py-3 border-b border-gray-100 mb-1">
+                  <div className="absolute right-0 mt-3 w-56 bg-white border border-gray-100 rounded-[6px] shadow-xl py-2 flex flex-col z-[60] text-sm text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="px-3.5 py-2.5 border-b border-gray-100 mb-1">
                       <p className="font-bold text-gray-900 truncate">@{effectiveUser?.username}</p>
                       <p className="text-xs text-gray-500 truncate">{effectiveUser?.email}</p>
                     </div>
-                    <Link href="/profile" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                    <Link href="/profile" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                       My Profile
                     </Link>
-                    <Link href="/dashboard/buyer" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                    <Link href="/dashboard/buyer" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                       Dashboard
                     </Link>
-                    <Link href="/orders" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                    <Link href="/orders" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                       Orders
                     </Link>
-                    <Link href="/favorites" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                    <Link href="/favorites" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                       My Favorites
                     </Link>
-                    <Link href="/briefs/my-briefs" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                    <Link href="/briefs/my-briefs" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                       My Projects
                     </Link>
                     <hr className="my-1 border-gray-100" />
-                    <span onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }} className="px-5 py-2.5 hover:bg-red-50 text-red-500 cursor-pointer transition-colors flex items-center gap-3">
+                    <span onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }} className="px-3.5 py-2 hover:bg-red-50 text-red-500 cursor-pointer transition-colors flex items-center gap-3">
                       Logout
                     </span>
                   </div>
@@ -548,31 +548,31 @@ const Navbar = () => {
                 </div>
 
                 {isProfileDropdownOpen && (
-                  <div className="absolute right-0 mt-4 w-56 bg-white border border-gray-100 rounded-xl shadow-xl py-2 flex flex-col z-[60] text-[15px] text-gray-700 font-medium overflow-hidden">
-                    <div className="px-5 py-3 border-b border-gray-100 mb-1">
+                  <div className="absolute right-0 mt-4 w-56 bg-white border border-gray-100 rounded-[6px] shadow-xl py-2 flex flex-col z-[60] text-sm text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="px-3.5 py-2.5 border-b border-gray-100 mb-1">
                       <p className="font-bold text-gray-900 truncate">@{effectiveUser?.username}</p>
                       <p className="text-xs text-gray-500 truncate">{effectiveUser?.email}</p>
                     </div>
-                    <Link href="/profile" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                    <Link href="/profile" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                       My Profile
                     </Link>
-                    <Link href="/dashboard/seller" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                    <Link href="/dashboard/seller" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                       Dashboard
                     </Link>
-                    <Link href="/manage-orders" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                    <Link href="/manage-orders" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                       Orders
                     </Link>
                     <hr className="my-1 border-gray-100" />
-                    <Link href="/my-packages" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                    <Link href="/my-packages" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                       My Packages
                     </Link>
-                    <Link href="/organize" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center gap-3">
+                    <Link href="/organize" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                       Add New Package
                     </Link>
-                    <Link href="/earnings" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center justify-between">
+                    <Link href="/earnings" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center justify-between">
                       <span>Earnings</span>
                     </Link>
-                    <Link href="/kyc" onClick={() => setIsProfileDropdownOpen(false)} className="px-5 py-2.5 hover:bg-gray-50 hover:text-brand-green transition-colors flex items-center justify-between">
+                    <Link href="/kyc" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center justify-between">
                       <span>ID Verification</span>
                       {!effectiveUser?.isKycVerified ? (
                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Verify</span>
@@ -581,7 +581,7 @@ const Navbar = () => {
                       )}
                     </Link>
                     <hr className="my-1 border-gray-100" />
-                    <span onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }} className="px-5 py-2.5 hover:bg-red-50 text-red-500 cursor-pointer transition-colors flex items-center gap-3">
+                    <span onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }} className="px-3.5 py-2 hover:bg-red-50 text-red-500 cursor-pointer transition-colors flex items-center gap-3">
                       Logout
                     </span>
                   </div>

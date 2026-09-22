@@ -121,26 +121,24 @@ const MyPackages = () => {
           </div>
 
           {/* Tab Filter: Published and Draft */}
-          <div className="bg-[#F1F3F5] rounded-xl p-1 inline-flex items-center gap-1 shadow-2xs">
+          <div className="inline-flex items-center h-[46px] bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50">
             <Button
               type="button"
               onClick={() => setActiveTab("published")}
               size="sm"
               radius="fiverr"
               variant={activeTab === "published" ? "brand" : "ghost"}
-              className={
-                activeTab === "published"
-                  ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
-                  : "text-gray-600 hover:text-gray-900"
-              }
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 ${activeTab === "published"
+                  ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                  : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                }`}
             >
               <span>Published</span>
               <span
-                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ml-1.5 ${
-                  activeTab === "published"
+                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ml-1.5 ${activeTab === "published"
                     ? "bg-white/20 text-white"
                     : "bg-gray-200/80 text-gray-700"
-                }`}
+                  }`}
               >
                 {publishedPackages.length}
               </span>
@@ -152,19 +150,17 @@ const MyPackages = () => {
               size="sm"
               radius="fiverr"
               variant={activeTab === "draft" ? "brand" : "ghost"}
-              className={
-                activeTab === "draft"
-                  ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
-                  : "text-gray-600 hover:text-gray-900"
-              }
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 ${activeTab === "draft"
+                  ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                  : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                }`}
             >
               <span>Draft</span>
               <span
-                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ml-1.5 ${
-                  activeTab === "draft"
+                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ml-1.5 ${activeTab === "draft"
                     ? "bg-white/20 text-white"
                     : "bg-amber-100 text-amber-800"
-                }`}
+                  }`}
               >
                 {draftPackages.length}
               </span>
@@ -172,7 +168,7 @@ const MyPackages = () => {
           </div>
 
           {/* Main Card Container */}
-          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
 
             {/* Packages Table */}
             <div className="w-full overflow-x-auto">
@@ -191,7 +187,7 @@ const MyPackages = () => {
                     <tr>
                       <td colSpan={4} className="py-16 text-center">
                         <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
-                          <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
+                          <div className="w-12 h-12 rounded-[6px] bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
                             <FiEdit2 />
                           </div>
                           <p className="text-slate-800 font-semibold text-sm sm:text-base mb-1">
@@ -348,7 +344,7 @@ const MyPackages = () => {
             />
 
             {/* Trash Icon */}
-            <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center mb-4 border border-red-100">
+            <div className="w-14 h-14 rounded-[6px] bg-red-50 text-red-500 flex items-center justify-center mb-4 border border-red-100">
               <Trash2 size={26} strokeWidth={2} />
             </div>
 

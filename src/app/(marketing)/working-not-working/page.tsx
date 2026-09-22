@@ -132,11 +132,10 @@ export default function WorkingNotWorkingPage() {
                   variant={filterStatus === st ? "brand" : "ghost"}
                   size="xs"
                   radius="xl"
-                  className={`font-semibold transition cursor-pointer ${
-                    filterStatus === st
+                  className={`font-semibold transition cursor-pointer ${filterStatus === st
                       ? "bg-[#0db890] text-[#0f172a] font-bold shadow-xs hover:bg-[#0db890]"
                       : "bg-white/10 text-gray-300 hover:bg-white/20"
-                  }`}
+                    }`}
                 >
                   {st === "All" ? "All Creatives" : st === "Available" ? "Available Now" : "Currently Booked"}
                 </Button>
@@ -243,7 +242,7 @@ export default function WorkingNotWorkingPage() {
                   value={inquiryForm.clientName}
                   onChange={(e) => setInquiryForm({ ...inquiryForm, clientName: e.target.value })}
                   placeholder="e.g. Alex at Studio Nine"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                 />
               </div>
 
@@ -255,7 +254,7 @@ export default function WorkingNotWorkingPage() {
                   value={inquiryForm.email}
                   onChange={(e) => setInquiryForm({ ...inquiryForm, email: e.target.value })}
                   placeholder="alex@studionine.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                 />
               </div>
 

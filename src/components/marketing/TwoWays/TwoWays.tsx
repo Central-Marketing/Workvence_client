@@ -17,8 +17,8 @@ const TwoWays = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           {/* Option 1: Buy Fixed-Price Service */}
-          <div className="bg-white border border-gray-100 rounded-2xl p-7 sm:p-9 flex flex-col items-start transition-shadow duration-300 hover:shadow-md">
-            <div className="w-11 h-11 rounded-[10px] bg-[#f5f5f5] border border-gray-200 flex items-center justify-center mb-5">
+          <div className="bg-white border border-gray-100 rounded-[6px] p-7 sm:p-9 flex flex-col items-start transition-shadow duration-300 hover:shadow-md">
+            <div className="w-11 h-11 rounded-[6px] bg-[#f5f5f5] border border-gray-200 flex items-center justify-center mb-5">
               <img src="/all-icons/discount-tag-02.svg" alt="Fixed-Price" className="w-[22px] h-[22px] object-contain" />
             </div>
             <h3 className="text-lg sm:text-xl font-semibold text-[#1a1a1a] mb-2.5">Buy a Fixed-Price Service</h3>
@@ -34,8 +34,8 @@ const TwoWays = () => {
           </div>
 
           {/* Option 2: Post a Project */}
-          <div className="bg-white border border-gray-100 rounded-2xl p-7 sm:p-9 flex flex-col items-start transition-shadow duration-300 hover:shadow-md">
-            <div className="w-11 h-11 rounded-[10px] bg-[#f5f5f5] border border-gray-200 flex items-center justify-center mb-5">
+          <div className="bg-white border border-gray-100 rounded-[6px] p-7 sm:p-9 flex flex-col items-start transition-shadow duration-300 hover:shadow-md">
+            <div className="w-11 h-11 rounded-[6px] bg-[#f5f5f5] border border-gray-200 flex items-center justify-center mb-5">
               <img src="/all-icons/ai-security-03.svg" alt="Post Project" className="w-[22px] h-[22px] object-contain" />
             </div>
             <h3 className="text-lg sm:text-xl font-semibold text-[#1a1a1a] mb-2.5">Post a Project, Get Bids</h3>

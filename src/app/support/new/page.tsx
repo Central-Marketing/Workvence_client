@@ -139,7 +139,7 @@ export default function CreateSupportTicketPage() {
   return (
     <div className="min-h-screen bg-[#f8fafc] py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
-        
+
         {/* Back Link */}
         <Link
           href="/support"
@@ -161,7 +161,7 @@ export default function CreateSupportTicketPage() {
 
         {/* Error Alert */}
         {error && (
-          <div className="flex items-start gap-3 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold">
+          <div className="flex items-start gap-3 p-4 rounded-[6px] bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold">
             <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <p>{error}</p>
@@ -170,7 +170,7 @@ export default function CreateSupportTicketPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          
+
           {/* 1. Category Selection Grid */}
           <div className="space-y-3">
             <label className="block text-xs font-semibold text-[#475569] uppercase tracking-wider font-sf-pro">
@@ -188,11 +188,10 @@ export default function CreateSupportTicketPage() {
                     radius="xl"
                     fullWidth
                     onClick={() => setCategory(cat.id)}
-                    className={`p-4 text-left justify-start flex-col items-start space-y-2.5 transition-all h-auto min-h-0 ${
-                      isSelected
-                        ? "bg-white border-2 border-[#327C73] shadow-xs ring-2 ring-[#327C73]/10"
-                        : "bg-white border border-[#e2e8f0] text-[#1e293b] hover:border-[#327C73]/50 hover:shadow-xs"
-                    }`}
+                    className={`p-4 text-left justify-start flex-col items-start space-y-2.5 transition-all h-auto min-h-0 ${isSelected
+                      ? "bg-white border-2 border-[#327C73] shadow-xs ring-2 ring-[#327C73]/10"
+                      : "bg-white border border-[#e2e8f0] text-[#1e293b] hover:border-[#327C73]/50 hover:shadow-xs"
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${isSelected ? "bg-[#327C73] text-white" : "bg-[#327C73]/10 text-[#327C73]"}`}>
@@ -210,7 +209,7 @@ export default function CreateSupportTicketPage() {
           </div>
 
           {/* 2. Optional Order Linker */}
-          <div className="bg-white p-6 rounded-2xl border border-[#e2e8f0] shadow-xs space-y-3">
+          <div className="bg-white p-6 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-3">
             <label className="flex items-center gap-2 text-xs font-semibold text-[#475569] uppercase tracking-wider font-sf-pro">
               <ShoppingBag className="w-4 h-4 text-[#327C73]" />
               <span>2. Link to an Order (Optional)</span>
@@ -218,7 +217,7 @@ export default function CreateSupportTicketPage() {
             <p className="text-xs text-[#64748b] font-inter">
               If this inquiry is related to a specific buyer or seller order, selecting it helps support agents inspect the order context immediately.
             </p>
-            
+
             <select
               value={selectedOrderID}
               onChange={(e) => setSelectedOrderID(e.target.value)}
@@ -235,7 +234,7 @@ export default function CreateSupportTicketPage() {
           </div>
 
           {/* 3. Subject and Message */}
-          <div className="bg-white p-6 rounded-2xl border border-[#e2e8f0] shadow-xs space-y-6">
+          <div className="bg-white p-6 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-6">
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-[#475569] uppercase tracking-wider font-sf-pro">
                 3. Ticket Subject <span className="text-rose-500">*</span>
@@ -270,7 +269,7 @@ export default function CreateSupportTicketPage() {
                 <Paperclip className="w-4 h-4 text-[#327C73]" />
                 <span>Ticket Attachments (Optional)</span>
               </label>
-              
+
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 {/* File Upload Button */}
                 <input
@@ -279,7 +278,7 @@ export default function CreateSupportTicketPage() {
                   onChange={handleFileSelect}
                   className="hidden"
                 />
-                
+
                 <Button
                   type="button"
                   variant="outline"

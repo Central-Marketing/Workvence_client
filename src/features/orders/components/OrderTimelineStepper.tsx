@@ -19,7 +19,7 @@ export const OrderTimelineStepper: React.FC<OrderTimelineStepperProps> = ({ orde
   const rawActivities = order.raw?.activities || order.raw?.ledger || order.raw?.events || [];
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7">
+    <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7">
       <div className="flex items-center justify-between pb-5 border-b border-slate-100">
         <h2 className="text-xl font-bold text-slate-900">Order Activity Timeline</h2>
         {rawActivities.length > 0 && (
@@ -53,13 +53,12 @@ export const OrderTimelineStepper: React.FC<OrderTimelineStepperProps> = ({ orde
         <div className="flex gap-4 relative pb-8">
           <div className="absolute left-4 top-8 bottom-0 w-0.5 bg-slate-200" />
           <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 z-10 shadow-xs ${
-              isDeliveredOrCompleted
-                ? "bg-[#10B981] text-white"
-                : isLate
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 z-10 shadow-xs ${isDeliveredOrCompleted
+              ? "bg-[#10B981] text-white"
+              : isLate
                 ? "border-2 border-rose-300 bg-rose-50 text-rose-600"
                 : "border-2 border-slate-200 bg-white text-slate-400"
-            }`}
+              }`}
           >
             {isDeliveredOrCompleted ? <FiCheck /> : "2"}
           </div>
@@ -81,11 +80,10 @@ export const OrderTimelineStepper: React.FC<OrderTimelineStepperProps> = ({ orde
         {/* Step 3: Order Accepted & Completed */}
         <div className="flex gap-4 relative">
           <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 z-10 ${
-              isCompleted
-                ? "bg-[#10B981] text-white shadow-xs"
-                : "border-2 border-slate-200 bg-white text-slate-400"
-            }`}
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 z-10 ${isCompleted
+              ? "bg-[#10B981] text-white shadow-xs"
+              : "border-2 border-slate-200 bg-white text-slate-400"
+              }`}
           >
             {isCompleted ? <FiCheck /> : "3"}
           </div>
@@ -102,7 +100,7 @@ export const OrderTimelineStepper: React.FC<OrderTimelineStepperProps> = ({ orde
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Detailed Activity History</h4>
           <div className="space-y-3">
             {rawActivities.map((act: any, idx: number) => (
-              <div key={idx} className="text-xs p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start justify-between gap-4">
+              <div key={idx} className="text-xs p-3 rounded-[6px] bg-slate-50 border border-slate-200/80 flex items-start justify-between gap-4">
                 <div>
                   <p className="font-bold text-slate-800">{act.title || act.action || "Activity"}</p>
                   <p className="text-slate-600 mt-0.5">{act.desc || act.description || act.message || ""}</p>

@@ -21,8 +21,8 @@ export type ButtonRadius =
   | "fiverr-classic" // rounded-[4px] (Fiverr classic compact)
   | "md"             // rounded-md (6px)
   | "lg"             // rounded-[8px]
-  | "xl"             // rounded-xl (12px, Workvence card standard)
-  | "2xl"            // rounded-2xl (16px)
+  | "xl"             // rounded-[6px] (12px, Workvence card standard)
+  | "2xl"            // rounded-[6px] (16px)
   | "full"           // rounded-full (Pill button)
   | "none";          // rounded-none (Square button)
 

@@ -8,14 +8,14 @@ export const CategoryCarouselSkeleton: React.FC = () => {
         <div className="flex justify-between items-center">
           <Skeleton className="w-48 h-8" />
           <div className="flex gap-2">
-            <Skeleton className="w-10 h-10 rounded-xl" />
-            <Skeleton className="w-10 h-10 rounded-xl" />
+            <Skeleton className="w-10 h-10 rounded-[6px]" />
+            <Skeleton className="w-10 h-10 rounded-[6px]" />
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex flex-col bg-slate-50 rounded-2xl p-2 gap-3 border border-slate-100">
-              <Skeleton className="w-full h-44 rounded-xl" />
+            <div key={i} className="flex flex-col bg-slate-50 rounded-[6px] p-2 gap-3 border border-slate-100">
+              <Skeleton className="w-full h-44 rounded-[6px]" />
               <Skeleton className="w-3/4 h-4 mx-2" />
             </div>
           ))}

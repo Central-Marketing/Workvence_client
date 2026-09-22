@@ -54,9 +54,17 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
     }
   };
 
-  // Rating calculation
-  const rawRating = data.starNumber > 0 ? (data.totalStars / data.starNumber).toFixed(1) : (data.star || 4.9);
-  const rating = data?.gigRating || rawRating;
+  // Rating calculation: prioritize gigRating directly from backend
+  const rawRating =
+    typeof data.gigRating === "number"
+      ? data.gigRating
+      : typeof data.starRating === "number"
+      ? data.starRating
+      : data.starNumber > 0 && typeof data.totalStars === "number"
+      ? data.totalStars / data.starNumber
+      : data.star || data.rating || 0;
+
+  const rating = Number(rawRating || 0).toFixed(1);
   const sales = data.sales || 0;
   const reviewCount = data.starNumber || data.reviews || (data.sales ? data.sales : 0);
   const level = userObj.sellerLevel || data.user?.sellerLevel || userObj.level || "Level 1";
@@ -156,7 +164,7 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
 
             <div className="flex items-center gap-1 text-[13.5px] shrink-0">
               <span className="text-gray-500 font-normal">
-                ({reviewCount})
+                ({sales})
               </span>
 
               <span className="text-gray-900 font-bold ml-0.5">

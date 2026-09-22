@@ -571,7 +571,7 @@ const Earnings = () => {
         </div>
 
         {/* 3. Stat Cards: Next Income, Awaiting Clearance, Available Balance */}
-        <div className="bg-white rounded-[10px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] overflow-hidden">
+        <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
             {/* Next Income */}
             <div className="p-6">
@@ -620,18 +620,17 @@ const Earnings = () => {
         </div>
 
         {/* 4. Tab Navigation Pills */}
-        <div className="bg-[#F1F3F5] rounded-xl p-1 inline-flex items-center gap-1 shadow-2xs">
+        <div className="inline-flex items-center h-[46px] bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50">
           <Button
             type="button"
             onClick={() => setActiveTab("payout")}
             size="sm"
             radius="fiverr"
             variant={activeTab === "payout" ? "brand" : "ghost"}
-            className={
-              activeTab === "payout"
-                ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
-                : "text-gray-600 hover:text-gray-900"
-            }
+            className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 ${activeTab === "payout"
+                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+              }`}
           >
             Payout Request
           </Button>
@@ -641,18 +640,17 @@ const Earnings = () => {
             size="sm"
             radius="fiverr"
             variant={activeTab === "clearance" ? "brand" : "ghost"}
-            className={
-              activeTab === "clearance"
-                ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
-                : "text-gray-600 hover:text-gray-900"
-            }
+            className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 ${activeTab === "clearance"
+                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+              }`}
           >
             Order Clearance
           </Button>
         </div>
 
         {/* 5. Main Card for Tab Content */}
-        <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+        <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
 
           {/* Tab Header with Search & Controls */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -887,7 +885,7 @@ const Earnings = () => {
               {isStripeConnected ? (
                 <div
                   onClick={() => connectDashboardMutation.mutate()}
-                  className="bg-[#F7F4FF] hover:bg-[#F2EDFF] border border-purple-200/90 rounded-2xl p-4 sm:p-5 flex items-start justify-between cursor-pointer transition-all group shadow-2xs"
+                  className="bg-[#F7F4FF] hover:bg-[#F2EDFF] border border-purple-200/90 rounded-[6px] p-4 sm:p-5 flex items-start justify-between cursor-pointer transition-all group shadow-2xs"
                 >
                   <div className="space-y-1.5 flex-1 pr-3">
                     <div className="flex items-center gap-2.5">
@@ -919,7 +917,7 @@ const Earnings = () => {
               ) : (
                 <div
                   onClick={() => connectOnboardMutation.mutate()}
-                  className="bg-[#F7F4FF] hover:bg-[#F2EDFF] border border-purple-100 rounded-2xl p-4 sm:p-5 flex items-start justify-between cursor-pointer transition-all group"
+                  className="bg-[#F7F4FF] hover:bg-[#F2EDFF] border border-purple-100 rounded-[6px] p-4 sm:p-5 flex items-start justify-between cursor-pointer transition-all group"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center">
@@ -942,7 +940,7 @@ const Earnings = () => {
                   onClick={() => {
                     toast.success("Payoneer is connected and ready for payouts!");
                   }}
-                  className="bg-[#FAFCFB] border border-emerald-200/90 rounded-2xl p-4 sm:p-5 flex items-start justify-between transition-all shadow-2xs cursor-default"
+                  className="bg-[#FAFCFB] border border-emerald-200/90 rounded-[6px] p-4 sm:p-5 flex items-start justify-between transition-all shadow-2xs cursor-default"
                 >
                   <div className="space-y-1.5 flex-1 pr-3">
                     <div className="flex items-center gap-2.5">
@@ -978,7 +976,7 @@ const Earnings = () => {
               ) : (
                 <div
                   onClick={() => payoneerOnboardMutation.mutate()}
-                  className="bg-[#FAFCFB] hover:bg-[#F4F9F7] border border-gray-100 rounded-2xl p-4 sm:p-5 flex items-start justify-between cursor-pointer transition-all group"
+                  className="bg-[#FAFCFB] hover:bg-[#F4F9F7] border border-gray-100 rounded-[6px] p-4 sm:p-5 flex items-start justify-between cursor-pointer transition-all group"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center">
@@ -1024,7 +1022,7 @@ const Earnings = () => {
             </div>
 
             {/* Available Balance Box */}
-            <div className="border border-gray-100 rounded-2xl p-4 flex items-center justify-between bg-white shadow-2xs">
+            <div className="border border-gray-100 rounded-[6px] p-4 flex items-center justify-between bg-white shadow-2xs">
               <div>
                 <span className="text-xs sm:text-sm font-bold text-gray-950 block">Available Balance</span>
                 <span className="text-xs text-gray-400">Clear and ready for withdraw</span>
@@ -1045,7 +1043,7 @@ const Earnings = () => {
                     toast.error("Please connect Stripe in Payout Channels first.");
                   }
                 }}
-                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${selectedMethod === "stripe"
+                className={`rounded-[6px] p-4 flex items-center justify-between cursor-pointer transition-all ${selectedMethod === "stripe"
                   ? "bg-[#F7F4FF] border-2 border-[#635bff] shadow-2xs"
                   : "bg-white border border-gray-200 hover:border-gray-300"
                   } ${!isStripeReady ? "opacity-60" : ""}`}
@@ -1088,7 +1086,7 @@ const Earnings = () => {
                     toast.error("Please connect Payoneer in Payout Channels first.");
                   }
                 }}
-                className={`rounded-2xl p-4 flex items-center justify-between cursor-pointer transition-all ${selectedMethod === "payoneer"
+                className={`rounded-[6px] p-4 flex items-center justify-between cursor-pointer transition-all ${selectedMethod === "payoneer"
                   ? "bg-[#F4F9F7] border-2 border-[#327C73] shadow-2xs"
                   : "bg-white border border-gray-200 hover:border-gray-300"
                   } ${!isPayoneerReady ? "opacity-60" : ""}`}
@@ -1164,7 +1162,7 @@ const Earnings = () => {
                     value={payoutAmount}
                     onChange={(e) => setPayoutAmount(e.target.value)}
                     placeholder={`Min $${MIN_PAYOUT_AMOUNT}.00`}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-[#327C73] focus:bg-white rounded-xl pl-7 pr-4 py-3 text-xs sm:text-sm text-gray-800 placeholder-gray-400 outline-none transition-all font-medium"
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-[#327C73] focus:bg-white rounded-[6px] pl-7 pr-4 py-3 text-xs sm:text-sm text-gray-800 placeholder-gray-400 outline-none transition-all font-medium"
                     required
                   />
                 </div>

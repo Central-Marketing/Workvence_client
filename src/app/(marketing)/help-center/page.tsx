@@ -180,7 +180,7 @@ export default function HelpCenterPage() {
         {/* 2. Knowledge Base Topics: 2-Column Cards */}
         <div className="mt-8 sm:mt-10 md:mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {/* Left Card: For Freelancers */}
-          <div className="bg-white rounded-2xl md:rounded-[20px] border border-[#E5E7EB] shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-7 sm:p-9 md:p-10 flex flex-col">
+          <div className="bg-white rounded-[6px] md:rounded-[20px] border border-[#E5E7EB] shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-7 sm:p-9 md:p-10 flex flex-col">
             <header>
               <h2 className="font-sf-pro font-normal text-[#292929] text-2xl sm:text-3xl md:text-[34px] tracking-tight leading-snug">
                 For Freelancers
@@ -213,7 +213,7 @@ export default function HelpCenterPage() {
           </div>
 
           {/* Right Card: For Clients */}
-          <div className="bg-white rounded-2xl md:rounded-[20px] border border-[#E5E7EB] shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-7 sm:p-9 md:p-10 flex flex-col">
+          <div className="bg-white rounded-[6px] md:rounded-[20px] border border-[#E5E7EB] shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-7 sm:p-9 md:p-10 flex flex-col">
             <header>
               <h2 className="font-sf-pro font-normal text-[#292929] text-2xl sm:text-3xl md:text-[34px] tracking-tight leading-snug">
                 For Clients
@@ -249,10 +249,10 @@ export default function HelpCenterPage() {
         {/* 3. Support Continuity & Assistance Bar */}
         <aside
           aria-label="Contact and Support Assistance"
-          className="mt-10 sm:mt-12 md:mt-16 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 shadow-xs"
+          className="mt-10 sm:mt-12 md:mt-16 bg-[#F8FAFC] border border-[#E2E8F0] rounded-[6px] p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 shadow-xs"
         >
           <div className="flex items-center gap-3 text-center sm:text-left">
-            <div className="w-10 h-10 rounded-xl bg-[#E0F2FE] text-[#0284C7] flex items-center justify-center shrink-0 hidden sm:flex">
+            <div className="w-10 h-10 rounded-[6px] bg-[#E0F2FE] text-[#0284C7] flex items-center justify-center shrink-0 hidden sm:flex">
               <LifeBuoy className="w-5 h-5" />
             </div>
             <div>

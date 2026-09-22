@@ -181,7 +181,7 @@ const Footer = () => {
 
             {/* Newsletter Input Box */}
             <form onSubmit={handleSubscribe} className="w-full max-w-[290px]">
-              <div className="flex items-center w-full bg-[#F4F4F6] border border-gray-200/70 rounded-[10px] p-1.5 focus-within:border-gray-400 focus-within:bg-white transition-all">
+              <div className="flex items-center w-full bg-[#F4F4F6] border border-gray-200/70 rounded-[6px] p-1.5 focus-within:border-gray-400 focus-within:bg-white transition-all">
                 <input
                   type="email"
                   value={email}

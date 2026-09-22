@@ -16,9 +16,9 @@ export const Skeleton: React.FC<SkeletonProps> = ({ className = '', style }) => 
 
 export const CardSkeleton: React.FC = () => {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200/90 p-3.5 sm:p-4 shadow-[0_1px_4px_rgba(0,0,0,0.04)] flex flex-col h-full">
+    <div className="bg-white rounded-[6px] border border-gray-200/90 p-3.5 sm:p-4 shadow-[0_1px_4px_rgba(0,0,0,0.04)] flex flex-col h-full">
       <div className="relative w-full">
-        <Skeleton className="w-full aspect-[16/9] rounded-xl" />
+        <Skeleton className="w-full aspect-[16/9] rounded-[6px]" />
         <div className="absolute -bottom-4 left-3 sm:left-3.5">
           <Skeleton className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border-2 border-white" />
         </div>

@@ -91,14 +91,14 @@ export default function HowToSellPage() {
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <Link
                 href="/become-a-seller"
-                className="px-7 py-3.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-7 py-3.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Start Selling Today</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <a
                 href="#calculator"
-                className="px-7 py-3.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-7 py-3.5 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
               >
                 Calculate Potential Earnings
               </a>
@@ -121,8 +121,8 @@ export default function HowToSellPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="bg-[#f8fafc] border border-gray-200 rounded-2xl p-6 space-y-4 relative">
-              <div className="w-10 h-10 rounded-xl bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
+            <div className="bg-[#f8fafc] border border-gray-200 rounded-[6px] p-6 space-y-4 relative">
+              <div className="w-10 h-10 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
                 1
               </div>
               <h3 className="text-lg font-bold text-[#0f172a]">Create Your Package</h3>
@@ -131,8 +131,8 @@ export default function HowToSellPage() {
               </p>
             </div>
 
-            <div className="bg-[#f8fafc] border border-gray-200 rounded-2xl p-6 space-y-4 relative">
-              <div className="w-10 h-10 rounded-xl bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
+            <div className="bg-[#f8fafc] border border-gray-200 rounded-[6px] p-6 space-y-4 relative">
+              <div className="w-10 h-10 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
                 2
               </div>
               <h3 className="text-lg font-bold text-[#0f172a]">Receive Orders</h3>
@@ -141,8 +141,8 @@ export default function HowToSellPage() {
               </p>
             </div>
 
-            <div className="bg-[#f8fafc] border border-gray-200 rounded-2xl p-6 space-y-4 relative">
-              <div className="w-10 h-10 rounded-xl bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
+            <div className="bg-[#f8fafc] border border-gray-200 rounded-[6px] p-6 space-y-4 relative">
+              <div className="w-10 h-10 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
                 3
               </div>
               <h3 className="text-lg font-bold text-[#0f172a]">Deliver Quality Work</h3>
@@ -151,8 +151,8 @@ export default function HowToSellPage() {
               </p>
             </div>
 
-            <div className="bg-[#f8fafc] border border-gray-200 rounded-2xl p-6 space-y-4 relative">
-              <div className="w-10 h-10 rounded-xl bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
+            <div className="bg-[#f8fafc] border border-gray-200 rounded-[6px] p-6 space-y-4 relative">
+              <div className="w-10 h-10 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
                 4
               </div>
               <h3 className="text-lg font-bold text-[#0f172a]">Get Paid Instantly</h3>
@@ -184,7 +184,7 @@ export default function HowToSellPage() {
             {sellerLevels.map((lvl, idx) => (
               <div
                 key={idx}
-                className="bg-[#f8fafc] border border-gray-200 rounded-2xl p-6 space-y-4 hover:border-[#327C73] transition"
+                className="bg-[#f8fafc] border border-gray-200 rounded-[6px] p-6 space-y-4 hover:border-[#327C73] transition"
               >
                 <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${lvl.badgeColor}`}>
                   {lvl.level}

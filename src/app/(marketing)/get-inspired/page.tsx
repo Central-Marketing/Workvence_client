@@ -178,11 +178,10 @@ export default function GetInspiredPage() {
                   variant={selectedCat === cat ? "brand" : "soft"}
                   size="xs"
                   radius="xl"
-                  className={`font-semibold transition cursor-pointer ${
-                    selectedCat === cat
-                      ? "shadow-xs"
-                      : "hover:bg-gray-200"
-                  }`}
+                  className={`font-semibold transition cursor-pointer ${selectedCat === cat
+                    ? "shadow-xs"
+                    : "hover:bg-gray-200"
+                    }`}
                 >
                   {cat}
                 </Button>
@@ -224,11 +223,10 @@ export default function GetInspiredPage() {
                       variant="ghost"
                       size="icon"
                       radius="full"
-                      className={`w-9 h-9 backdrop-blur-md transition cursor-pointer ${
-                        isLiked
-                          ? "bg-rose-500 text-white shadow-md scale-110 hover:bg-rose-600"
-                          : "bg-black/50 hover:bg-black/70 text-white border border-white/10"
-                      }`}
+                      className={`w-9 h-9 backdrop-blur-md transition cursor-pointer ${isLiked
+                        ? "bg-rose-500 text-white shadow-md scale-110 hover:bg-rose-600"
+                        : "bg-black/50 hover:bg-black/70 text-white border border-white/10"
+                        }`}
                       aria-label={isLiked ? "Unlike project" : "Like project"}
                     >
                       <Heart className={`w-4 h-4 ${isLiked ? "fill-white" : ""}`} />
@@ -259,7 +257,7 @@ export default function GetInspiredPage() {
                   <Link
                     href={item.packageUrl}
                     onClick={(e) => e.stopPropagation()}
-                    className="px-4 py-2 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
+                    className="px-4 py-2 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0"
                   >
                     <span>Hire Creator</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -287,7 +285,7 @@ export default function GetInspiredPage() {
             </Button>
 
             {/* High-Res Hero Image Preview */}
-            <div className="relative h-72 sm:h-80 w-full rounded-2xl overflow-hidden mb-6 bg-gray-100">
+            <div className="relative h-72 sm:h-80 w-full rounded-[6px] overflow-hidden mb-6 bg-gray-100">
               <img
                 src={selectedProject.imageUrl}
                 alt={selectedProject.title}
@@ -364,7 +362,7 @@ export default function GetInspiredPage() {
 
                 <Link
                   href={selectedProject.packageUrl}
-                  className="w-full sm:w-auto px-7 py-3 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-7 py-3 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>Order a Package from {selectedProject.creator.split(" ")[0]}</span>
                   <ArrowRight className="w-4 h-4" />

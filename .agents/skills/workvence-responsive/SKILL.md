@@ -222,7 +222,7 @@ Never delete:
 ## Form Rules
 
 1. **Form Input Sizing:**
-   - Standard inputs: `h-11` or `py-3 px-4 rounded-xl text-[16px]`.
+   - Standard inputs: `h-11` or `py-3 px-4 rounded-[6px] text-[16px]`.
    - Never use `text-xs` on mobile form inputs to avoid browser zooming.
 2. **Stacking on Mobile:**
    - Multi-column inputs (`grid-cols-2` or `grid-cols-3` for city/country/zip) must stack into `grid-cols-1 sm:grid-cols-2` on mobile.
@@ -233,7 +233,7 @@ Never delete:
 
 1. **Universal Mobile Box Sizing:**
    - All modals must employ:
-     `max-h-[calc(100dvh-2rem)] flex flex-col overflow-hidden rounded-2xl`
+     `max-h-[calc(100dvh-2rem)] flex flex-col overflow-hidden rounded-[6px]`
    - Modal body must carry `overflow-y-auto p-4 sm:p-6`.
    - Modal footer actions must remain pinned or easily reachable.
 

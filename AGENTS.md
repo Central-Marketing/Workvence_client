@@ -152,10 +152,10 @@ Workvence has a distinctive, polished aesthetic that must be strictly preserved 
    - Custom screen breakpoint: `macbook: '1440px'`.
 
 4. **Component Styling Tokens:**
-   - **Border Radii:** Rounded cards use `rounded-2xl` or `rounded-xl`. Buttons and pills use `rounded-xl` or `rounded-full`.
+   - **Border Radii:** Rounded cards use `rounded-[6px]` or `rounded-[6px]`. Buttons and pills use `rounded-[6px]` or `rounded-full`.
    - **Borders:** Subtle gray borders: `border border-gray-200` or `border-gray-200/80`.
    - **Shadows:** Minimalist modern shadows: `shadow-2xs`, `shadow-xs`, `shadow-[0_1px_6px_rgba(0,0,0,0.02)]`.
-   - **Inputs:** `bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px]`.
+   - **Inputs:** `bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-4 py-3 text-xs sm:text-[13px]`.
    - **Buttons:** Dark primary buttons `bg-black hover:bg-gray-900 text-white`, brand buttons `bg-[#0D6D5F] hover:bg-[#0b5c50] text-white`, outline buttons `border border-gray-200 hover:bg-gray-50`.
    - **Icons:** Use `lucide-react` consistently with existing sizing (`w-4 h-4` or `w-3.5 h-3.5`).
 

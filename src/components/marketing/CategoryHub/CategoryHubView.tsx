@@ -75,7 +75,7 @@ const CategoryHubView: React.FC<CategoryHubViewProps> = ({
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 bg-white rounded-2xl border border-gray-100 p-8 shadow-xs">
+          <div className="text-center py-12 bg-white rounded-[6px] border border-gray-100 p-8 shadow-xs">
             <p className="text-gray-500 mb-4">
               Explore packages for {taxonomy.name}
             </p>

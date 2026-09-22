@@ -67,14 +67,14 @@ export default function CommunityHubPage() {
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <Link
                 href="/forum"
-                className="px-7 py-3.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-7 py-3.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Visit Forum</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/events"
-                className="px-7 py-3.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-7 py-3.5 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
               >
                 Upcoming Events
               </Link>
@@ -95,7 +95,7 @@ export default function CommunityHubPage() {
                   className="bg-white border border-gray-200/90 rounded-3xl p-8 space-y-6 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between"
                 >
                   <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
                       <Icon className="w-6 h-6" />
                     </div>
                     <h3 className="text-2xl font-bold text-[#0f172a]">{h.title}</h3>
@@ -125,19 +125,19 @@ export default function CommunityHubPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-            <div className="p-6 bg-[#f8fafc] rounded-2xl border border-gray-200/80 space-y-2">
+            <div className="p-6 bg-[#f8fafc] rounded-[6px] border border-gray-200/80 space-y-2">
               <h4 className="font-bold text-[#0f172a] text-base">Knowledge Sharing</h4>
               <p className="text-xs text-gray-600 leading-relaxed">
                 We believe when one freelancer succeeds, the whole community elevates. Share playbooks and support peers.
               </p>
             </div>
-            <div className="p-6 bg-[#f8fafc] rounded-2xl border border-gray-200/80 space-y-2">
+            <div className="p-6 bg-[#f8fafc] rounded-[6px] border border-gray-200/80 space-y-2">
               <h4 className="font-bold text-[#0f172a] text-base">Inclusivity & Safety</h4>
               <p className="text-xs text-gray-600 leading-relaxed">
                 A harassment-free space welcoming creators of all backgrounds, countries, and experience levels.
               </p>
             </div>
-            <div className="p-6 bg-[#f8fafc] rounded-2xl border border-gray-200/80 space-y-2">
+            <div className="p-6 bg-[#f8fafc] rounded-[6px] border border-gray-200/80 space-y-2">
               <h4 className="font-bold text-[#0f172a] text-base">High Craft Standards</h4>
               <p className="text-xs text-gray-600 leading-relaxed">
                 Encouraging lifelong craft mastery, ethical pricing, and uncompromised client delivery excellence.

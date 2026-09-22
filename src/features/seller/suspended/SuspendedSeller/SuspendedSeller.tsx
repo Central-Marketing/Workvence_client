@@ -85,13 +85,13 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
 
       {/* Main Container */}
       <div className="container mx-auto px-4 md:px-6 pt-10">
-        
+
         {/* TOP SECTION: 2-Column Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
+
           {/* LEFT COLUMN: Suspended Seller Card */}
           <div className="lg:col-span-4 bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-7 shadow-[0_4px_25px_rgba(0,0,0,0.035)]">
-            
+
             {/* Blank Gray Avatar & Name */}
             <div className="flex flex-col items-center border-b border-gray-100 pb-6 mb-6">
               <div className="w-24 h-24 rounded-full bg-gray-200/90 relative mb-3.5 flex items-center justify-center shadow-inner">
@@ -114,14 +114,14 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
               <div className="flex items-center justify-center gap-2.5 mt-3.5 flex-wrap">
                 <span className="bg-gray-100 text-gray-500 font-semibold px-3.5 py-1 rounded-full text-[12px] flex items-center gap-1.5">
                   <svg className="w-3.5 h-3.5 text-gray-400 fill-current" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317-4.66-1.647-8-6.092-8-11.317 0-.68.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317-4.66-1.647-8-6.092-8-11.317 0-.68.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   <span>Level 2 Seller</span>
                 </span>
 
                 <span className="bg-gray-100 text-gray-500 font-semibold px-3.5 py-1 rounded-full text-[12px] flex items-center gap-1.5">
                   <svg className="w-3.5 h-3.5 text-gray-400 fill-current" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd"/>
+                    <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
                   </svg>
                   <span>1h Response</span>
                 </span>
@@ -141,8 +141,8 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-2.5 text-gray-400">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   <span>From</span>
                 </span>
@@ -152,7 +152,7 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-2.5 text-gray-400">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   <span>Member since</span>
                 </span>
@@ -162,7 +162,7 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-2.5 text-gray-400">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
                   </svg>
                   <span>Languages</span>
                 </span>
@@ -172,7 +172,7 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-2.5 text-gray-400">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
                   <span>Last delivery</span>
                 </span>
@@ -182,7 +182,7 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-2.5 text-gray-400">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span>Price</span>
                 </span>
@@ -194,25 +194,25 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
           {/* RIGHT COLUMN: Unavailable Message Card */}
           <div className="lg:col-span-8">
             <div className="bg-white border border-gray-200/90 rounded-3xl p-10 sm:p-16 shadow-[0_4px_30px_rgba(0,0,0,0.025)] text-center flex flex-col items-center justify-center min-h-[440px]">
-              
+
               <h2 className="text-2xl sm:text-[32px] font-semibold text-gray-900 mb-3.5 tracking-tight">
                 This seller is currently unavailable
               </h2>
-              
+
               <p className="text-base text-gray-500 max-w-md mx-auto leading-relaxed font-normal mb-10">
                 This seller profile is temporarily unavailable and cannot accept new orders at this time.
               </p>
-              
+
               <div className="flex flex-wrap items-center justify-center gap-4 w-full">
                 <Link
                   href="/packages?category=Digital%20Marketing"
-                  className="px-7 py-3.5 bg-brand-green hover:bg-brand-green text-white font-semibold rounded-xl transition-all shadow-sm text-sm"
+                  className="px-7 py-3.5 bg-brand-green hover:bg-brand-green text-white font-semibold rounded-[6px] transition-all shadow-sm text-sm"
                 >
                   Browse other sellers
                 </Link>
                 <Link
                   href="/"
-                  className="px-7 py-3.5 bg-white hover:bg-gray-50 text-gray-700 font-semibold border border-gray-200/90 rounded-xl transition-all shadow-2xs text-sm"
+                  className="px-7 py-3.5 bg-white hover:bg-gray-50 text-gray-700 font-semibold border border-gray-200/90 rounded-[6px] transition-all shadow-2xs text-sm"
                 >
                   Back to marketplace
                 </Link>
@@ -225,7 +225,7 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
 
         {/* BOTTOM SECTION: Recommended Sellers */}
         <div className="mt-14 mb-10">
-          
+
           <div className="flex items-center justify-between gap-4 mb-6">
             <h3 className="text-xl sm:text-[22px] font-semibold text-gray-900 tracking-tight">
               Recommended sellers
@@ -243,7 +243,7 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
             {recommendedSellers.map((seller, idx) => (
               <div
                 key={idx}
-                className="bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 shadow-[0_2px_15px_rgba(0,0,0,0.025)] hover:border-gray-300 transition-all flex flex-col items-center text-center"
+                className="bg-white border border-gray-200/90 rounded-[6px] p-5 sm:p-6 shadow-[0_2px_15px_rgba(0,0,0,0.025)] hover:border-gray-300 transition-all flex flex-col items-center text-center"
               >
                 {/* Green bordered circular avatar */}
                 <div className="w-16 h-16 rounded-full border-2 border-brand-green p-0.5 mb-3.5 overflow-hidden shadow-2xs flex-shrink-0">
@@ -273,7 +273,7 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
                 {/* View Profile Button */}
                 <Link
                   href={`/seller/${seller.name}`}
-                  className="w-full py-2.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 font-semibold rounded-xl text-xs transition-colors block text-center"
+                  className="w-full py-2.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 font-semibold rounded-[6px] text-xs transition-colors block text-center"
                 >
                   View Profile
                 </Link>

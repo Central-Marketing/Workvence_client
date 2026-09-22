@@ -323,7 +323,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
 
         {/* TOP BANNER: When Delivered, Prominently Prompt Buyer Review (Fiverr Style) */}
         {isDelivered && (
-          <div className="bg-gradient-to-r from-teal-50 via-emerald-50 to-teal-50 border-2 border-teal-300/80 rounded-2xl p-6 sm:p-7 shadow-sm mb-6">
+          <div className="bg-gradient-to-r from-teal-50 via-emerald-50 to-teal-50 border-2 border-teal-300/80 rounded-[6px] p-6 sm:p-7 shadow-sm mb-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
               <div className="space-y-1">
                 <span className="text-xs font-bold uppercase tracking-wider text-teal-700 bg-teal-100 px-3 py-1 rounded-full">
@@ -366,7 +366,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
 
         {/* Pending Extension Request from Seller */}
         {isExtPending && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-6">
+          <div className="bg-amber-50 border border-amber-200 rounded-[6px] p-6 mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3">
                 <FiClock className="text-amber-600 text-xl shrink-0 mt-1" />
@@ -415,7 +415,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
           <div className="lg:col-span-8 space-y-6">
 
             {/* CARD 1: Deliverables from Seller */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-7">
+            <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-sm p-6 sm:p-7">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
                 <div>
                   <h3 className="font-bold text-base text-slate-900">Files &amp; Attachments from Freelancer</h3>
@@ -430,7 +430,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
 
               {/* Delivery Note from Freelancer */}
               {deliveryText && (
-                <div className="mb-5 p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200/80">
+                <div className="mb-5 p-4 sm:p-5 rounded-[6px] bg-slate-50 border border-slate-200/80">
                   <div className="flex items-center gap-2 mb-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
                     <FiFileText className="text-emerald-600 text-sm" />
                     <span>Delivery Note from Freelancer</span>
@@ -471,7 +471,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
 
             {/* CARD 2: Share Feedback & Reviews (When Order is Completed) */}
             {isCompleted && (
-              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-7">
+              <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-sm p-6 sm:p-7">
                 <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
                   <h3 className="font-bold text-base text-slate-900">
                     {isAlreadyReviewed ? "Your Feedback & Review" : "Share Feedback & Review"}
@@ -496,7 +496,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                 </div>
 
                 {isAlreadyReviewed ? (
-                  <div className="p-6 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
+                  <div className="p-6 rounded-[6px] bg-emerald-50 border border-emerald-200 text-center space-y-3">
                     <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-lg shadow-xs">
                       <FiCheck />
                     </div>
@@ -508,7 +508,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     </div>
 
                     {(existingReview?.description || reviewDescription) && (
-                      <div className="bg-white/90 border border-emerald-200/80 rounded-xl p-4 mt-3 w-full max-w-lg mx-auto text-center flex flex-col items-center justify-center shadow-2xs">
+                      <div className="bg-white/90 border border-emerald-200/80 rounded-[6px] p-4 mt-3 w-full max-w-lg mx-auto text-center flex flex-col items-center justify-center shadow-2xs">
                         <div className="flex items-center justify-center gap-1 text-sm mb-2">
                           {[1, 2, 3, 4, 5].map((s) => (
                             <span
@@ -543,7 +543,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                       ].map((crit) => (
                         <div
                           key={crit.key}
-                          className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100"
+                          className="flex items-center justify-between p-3 rounded-[6px] bg-slate-50 border border-slate-100"
                         >
                           <span className="text-xs font-semibold text-slate-800">{crit.label}</span>
                           <div className="flex items-center gap-1">
@@ -603,14 +603,14 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
             )}
 
             {/* CARD 3: Project Requirements */}
-            {/* <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-7">
+            {/* <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-sm p-6 sm:p-7">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
                 <h3 className="font-bold text-base text-slate-900">Project Requirements</h3>
                 <span className="text-xs text-slate-400">For {order.seller.name}</span>
               </div>
 
               {requirementsSubmitted ? (
-                <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-2">
+                <div className="p-5 rounded-[6px] bg-emerald-50 border border-emerald-200 text-center space-y-2">
                   <FiCheck className="text-2xl text-emerald-600 mx-auto" />
                   <p className="text-sm font-bold text-emerald-900">Requirements Successfully Submitted</p>
                   <p className="text-xs text-emerald-700">The freelancer has your project answers and is fulfilling your order.</p>
@@ -681,7 +681,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
           <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-20 self-start">
 
             {/* Seller Profile Card */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6">
+            <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-sm p-6">
               <h3 className="font-bold text-base text-slate-900 mb-4">About the Seller</h3>
 
               <div className="flex items-center gap-3.5 pb-4 border-b border-slate-100">
@@ -741,7 +741,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
             </div>
 
             {/* Order Summary Card */}
-            <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6">
+            <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-base text-slate-900">Order Details</h3>
                 <span className="text-[11px] font-semibold text-slate-600 border border-slate-200 rounded-md px-2 py-0.5">
@@ -753,7 +753,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                 <img
                   src={order.coverImage}
                   alt={order.packageTitle}
-                  className="w-20 h-14 rounded-xl object-cover border border-slate-200 shrink-0 bg-slate-100"
+                  className="w-20 h-14 rounded-[6px] object-cover border border-slate-200 shrink-0 bg-slate-100"
                 />
                 <p className="font-bold text-xs sm:text-sm text-slate-900 line-clamp-2">
                   {order.packageTitle}
@@ -779,7 +779,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                 </div>
               </div>
 
-              <div className="pt-4 flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50/70 p-3 rounded-xl border border-emerald-100">
+              <div className="pt-4 flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50/70 p-3 rounded-[6px] border border-emerald-100">
                 <FiCheck className="text-base shrink-0" />
                 <span>Payment held safely in escrow until you approve the work.</span>
               </div>

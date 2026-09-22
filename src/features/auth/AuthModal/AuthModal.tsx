@@ -244,7 +244,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       aria-labelledby="auth-modal-title"
     >
       <div
-        className="relative w-full max-w-[860px] max-h-[92vh] bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100 flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-[860px] max-h-[92vh] bg-white rounded-[6px] sm:rounded-3xl shadow-2xl border border-gray-100 flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -350,8 +350,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 setError(null);
               }}
               className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative ${mode === "login"
-                  ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
-                  : "text-gray-400 hover:text-gray-600"
+                ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
+                : "text-gray-400 hover:text-gray-600"
                 }`}
             >
               Sign In
@@ -363,8 +363,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 setError(null);
               }}
               className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative ${mode === "register"
-                  ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
-                  : "text-gray-400 hover:text-gray-600"
+                ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
+                : "text-gray-400 hover:text-gray-600"
                 }`}
             >
               Join Workvence
@@ -391,7 +391,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* Error Banner */}
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200/80 text-red-600 text-xs sm:text-[13px] font-medium flex items-center gap-2">
+            <div className="mb-4 p-3 rounded-[6px] bg-red-50 border border-red-200/80 text-red-600 text-xs sm:text-[13px] font-medium flex items-center gap-2">
               <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
                 !
               </span>
@@ -479,7 +479,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                       setLoginInput((prev) => ({ ...prev, identifier: e.target.value }))
                     }
                     required
-                    className="w-full px-3.5 py-2.5 sm:py-3 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-xl text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                    className="w-full px-3.5 py-2.5 sm:py-3 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
                   />
                 </div>
 
@@ -504,7 +504,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                         setLoginInput((prev) => ({ ...prev, password: e.target.value }))
                       }
                       required
-                      className="w-full px-3.5 py-2.5 sm:py-3 pr-10 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-xl text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                      className="w-full px-3.5 py-2.5 sm:py-3 pr-10 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
                     />
                     <Button
                       type="button"
@@ -561,9 +561,9 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: true }))}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${registerInput.isSeller
-                        ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
-                        : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
+                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${registerInput.isSeller
+                      ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
+                      : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
                       }`}
                   >
                     <Briefcase className="w-3.5 h-3.5" />
@@ -573,9 +573,9 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: false }))}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${!registerInput.isSeller
-                        ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
-                        : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
+                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${!registerInput.isSeller
+                      ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
+                      : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
                       }`}
                   >
                     <User className="w-3.5 h-3.5" />
@@ -595,7 +595,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     setRegisterInput((prev) => ({ ...prev, username: e.target.value }))
                   }
                   required
-                  className="w-full px-3.5 py-2 sm:py-2.5 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-xl text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                  className="w-full px-3.5 py-2 sm:py-2.5 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
                 />
               </div>
 
@@ -610,7 +610,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     setRegisterInput((prev) => ({ ...prev, email: e.target.value }))
                   }
                   required
-                  className="w-full px-3.5 py-2 sm:py-2.5 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-xl text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                  className="w-full px-3.5 py-2 sm:py-2.5 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
                 />
               </div>
 
@@ -627,7 +627,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                         setRegisterInput((prev) => ({ ...prev, password: e.target.value }))
                       }
                       required
-                      className="w-full px-3.5 py-2 sm:py-2.5 pr-8 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-xl text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                      className="w-full px-3.5 py-2 sm:py-2.5 pr-8 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
                     />
                     <Button
                       type="button"
@@ -653,7 +653,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                         setRegisterInput((prev) => ({ ...prev, confirmPassword: e.target.value }))
                       }
                       required
-                      className="w-full px-3.5 py-2 sm:py-2.5 pr-8 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-xl text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                      className="w-full px-3.5 py-2 sm:py-2.5 pr-8 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
                     />
                     <Button
                       type="button"

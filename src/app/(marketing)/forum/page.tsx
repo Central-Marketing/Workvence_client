@@ -195,10 +195,10 @@ export default function ForumPage() {
       {/* Main Container */}
       <div className="container mx-auto px-4 md:px-6 pt-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
+
           {/* Left Sidebar: Categories & Stats (3 cols) */}
           <div className="lg:col-span-3 space-y-6">
-            <div className="bg-white p-5 rounded-2xl border border-gray-200/90 shadow-xs space-y-3">
+            <div className="bg-white p-5 rounded-[6px] border border-gray-200/90 shadow-xs space-y-3">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Categories</h3>
               <div className="space-y-1">
                 {categories.map((cat) => (
@@ -210,11 +210,10 @@ export default function ForumPage() {
                     radius="xl"
                     fullWidth
                     rightIcon={<ChevronRight className="w-3.5 h-3.5 opacity-60" />}
-                    className={`justify-between text-left font-medium ${
-                      selectedCat === cat
-                        ? "font-semibold"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
+                    className={`justify-between text-left font-medium ${selectedCat === cat
+                      ? "font-semibold"
+                      : "text-gray-600 hover:bg-gray-100"
+                      }`}
                   >
                     <span>{cat}</span>
                   </Button>
@@ -222,7 +221,7 @@ export default function ForumPage() {
               </div>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-gray-200/90 shadow-xs space-y-3 text-xs text-gray-600">
+            <div className="bg-white p-5 rounded-[6px] border border-gray-200/90 shadow-xs space-y-3 text-xs text-gray-600">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Forum Rules</h3>
               <p>• Be constructive and respectful.</p>
               <p>• No spamming or self-promotion outside showcase.</p>
@@ -232,7 +231,7 @@ export default function ForumPage() {
 
           {/* Right Column: Search + Discussion Threads (9 cols) */}
           <div className="lg:col-span-9 space-y-4">
-            
+
             {/* Search Input Bar */}
             <div className="bg-white p-3 rounded-[6px] border border-gray-200/90 shadow-xs flex items-center gap-3">
               <Search className="w-4 h-4 text-gray-400 ml-2" />
@@ -250,7 +249,7 @@ export default function ForumPage() {
               {filteredThreads.map((thread) => (
                 <div
                   key={thread.id}
-                  className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-[#327C73] hover:shadow-sm transition duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  className="bg-white border border-gray-200 rounded-[6px] p-5 hover:border-[#327C73] hover:shadow-sm transition duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                 >
                   <div className="space-y-2 max-w-2xl">
                     <div className="flex flex-wrap items-center gap-2 text-[11px]">
@@ -348,7 +347,7 @@ export default function ForumPage() {
                 <select
                   value={newPost.category}
                   onChange={(e) => setNewPost({ ...newPost, category: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                 >
                   {categories.filter((c) => c !== "All Categories").map((c) => (
                     <option key={c} value={c}>{c}</option>
@@ -364,7 +363,7 @@ export default function ForumPage() {
                   value={newPost.title}
                   onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
                   placeholder="e.g. What are your tips for increasing conversion on gig thumbnails?"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                 />
               </div>
 
@@ -387,7 +386,7 @@ export default function ForumPage() {
                   value={newPost.tags}
                   onChange={(e) => setNewPost({ ...newPost, tags: e.target.value })}
                   placeholder="e.g. Design, Packages, Conversions"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                 />
               </div>
 

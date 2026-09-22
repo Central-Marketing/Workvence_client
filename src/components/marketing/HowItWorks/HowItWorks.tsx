@@ -119,7 +119,7 @@ const HowItWorks = () => {
           </div>
 
           {/* Toggle Tabs (Buyer / Seller) */}
-          <div className="flex items-center w-[214px] h-[46px] bg-[#F4F4F6] p-[4px] rounded-[10px] border border-gray-200/50">
+          <div className="flex items-center w-[214px] h-[46px] bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50">
             <Button
               type="button"
               onClick={() => setActiveTab('buyer')}

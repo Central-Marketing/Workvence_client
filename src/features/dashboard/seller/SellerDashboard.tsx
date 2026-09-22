@@ -65,17 +65,17 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
   // Find the last uploaded / created draft gig
   const latestDraftPackage = draftPackages.length > 0
     ? [...draftPackages].sort((a: any, b: any) => {
-        const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
-        const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
-        return timeB - timeA;
-      })[0]
+      const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
+      const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
+      return timeB - timeA;
+    })[0]
     : null;
 
   const draftEditUrl = latestDraftPackage?._id
     ? `/organize/${latestDraftPackage._id}`
     : latestDraftPackage?.id
-    ? `/organize/${latestDraftPackage.id}`
-    : "/organize";
+      ? `/organize/${latestDraftPackage.id}`
+      : "/organize";
 
   // Condition specified by user:
   // "this image ui will be for seller dashboard when profile is complete 100% and package length is >0"
@@ -133,7 +133,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
 
           {/* Top Hero Banner: Draft Package Notification */}
           {latestDraftPackage && (
-            <div className="relative overflow-hidden rounded-[10px] bg-[#0F0F12] bg-[radial-gradient(ellipse_65%_130%_at_82%_50%,_#7C3AED_0%,_#531A85_38%,_#1D0933_68%,_#0F0F12_100%)] p-7 sm:p-[22px] text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+            <div className="relative overflow-hidden rounded-[6px] bg-[#0F0F12] bg-[radial-gradient(ellipse_65%_130%_at_82%_50%,_#7C3AED_0%,_#531A85_38%,_#1D0933_68%,_#0F0F12_100%)] p-7 sm:p-[22px] text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
               {/* Ellipse 15017 ambient glow */}
               <div
                 className="absolute -right-16 -top-24 w-[620px] h-[440px] rounded-full pointer-events-none blur-[80px] opacity-80"
@@ -173,7 +173,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           )}
 
           {/* 4-Metric Stats Bar */}
-          <div className="bg-white rounded-xl border border-gray-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 gap-y-5 sm:gap-y-0">
+          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 gap-y-5 sm:gap-y-0">
             <div className="sm:pr-6">
               <span className="text-xs font-normal text-gray-500 block mb-1">Total Revenue</span>
               <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
@@ -217,7 +217,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           </div>
 
           {/* Recent Orders Card */}
-          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <h2 className="text-xl sm:text-[22px] font-bold text-gray-900 tracking-tight">
                 Recent Orders
@@ -234,18 +234,17 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                   icon={<FiCalendar className="text-sm" />}
                 />
 
-                <div className="bg-white border border-gray-200/90 rounded-lg p-0.5 flex items-center gap-0.5">
+                <div className="inline-flex items-center h-[46px] bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50">
                   <Button
                     type="button"
                     onClick={() => setOrderTypeFilter("all")}
                     variant={orderTypeFilter === "all" ? "brand" : "ghost"}
-                    size="xs"
+                    size="sm"
                     radius="fiverr"
-                    className={
-                      orderTypeFilter === "all"
-                        ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
-                        : "text-gray-600 hover:text-gray-900"
-                    }
+                    className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${orderTypeFilter === "all"
+                        ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                        : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                      }`}
                   >
                     All
                   </Button>
@@ -253,13 +252,12 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                     type="button"
                     onClick={() => setOrderTypeFilter("package")}
                     variant={orderTypeFilter === "package" ? "brand" : "ghost"}
-                    size="xs"
+                    size="sm"
                     radius="fiverr"
-                    className={
-                      orderTypeFilter === "package"
-                        ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
-                        : "text-gray-600 hover:text-gray-900"
-                    }
+                    className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${orderTypeFilter === "package"
+                        ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                        : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                      }`}
                   >
                     Packages
                   </Button>
@@ -267,13 +265,12 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                     type="button"
                     onClick={() => setOrderTypeFilter("brief")}
                     variant={orderTypeFilter === "brief" ? "brand" : "ghost"}
-                    size="xs"
+                    size="sm"
                     radius="fiverr"
-                    className={
-                      orderTypeFilter === "brief"
-                        ? "bg-[#0B3A33] hover:bg-[#0B3A33] text-white shadow-2xs"
-                        : "text-gray-600 hover:text-gray-900"
-                    }
+                    className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${orderTypeFilter === "brief"
+                        ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                        : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                      }`}
                   >
                     Briefs
                   </Button>
@@ -462,11 +459,10 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
             </div>
             <div className="w-[170px] sm:w-[200px] h-[5px] bg-[#E9EBEF] rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all duration-500 ${
-                  isProfileCompleted
-                    ? "bg-emerald-500 w-full"
-                    : "bg-gradient-to-r from-[#00E575] to-[#00E3A2]"
-                }`}
+                className={`h-full rounded-full transition-all duration-500 ${isProfileCompleted
+                  ? "bg-emerald-500 w-full"
+                  : "bg-gradient-to-r from-[#00E575] to-[#00E3A2]"
+                  }`}
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
@@ -475,7 +471,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
 
         {/* Draft Package Notification (if draft exists during onboarding) */}
         {latestDraftPackage && (
-          <div className="relative overflow-hidden rounded-[10px] bg-[#0F0F12] bg-[radial-gradient(ellipse_65%_130%_at_82%_50%,_#7C3AED_0%,_#531A85_38%,_#1D0933_68%,_#0F0F12_100%)] p-7 sm:p-[22px] text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+          <div className="relative overflow-hidden rounded-[6px] bg-[#0F0F12] bg-[radial-gradient(ellipse_65%_130%_at_82%_50%,_#7C3AED_0%,_#531A85_38%,_#1D0933_68%,_#0F0F12_100%)] p-7 sm:p-[22px] text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
             <div
               className="absolute -right-16 -top-24 w-[620px] h-[440px] rounded-full pointer-events-none blur-[80px] opacity-80"
               style={{
@@ -578,7 +574,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                       router.push(`/package/${pkg._id}`);
                     }
                   }}
-                  className="bg-white rounded-xl border border-slate-100 shadow-xs hover:shadow-md transition-all overflow-hidden cursor-pointer group flex flex-col"
+                  className="bg-white rounded-[6px] border border-slate-100 shadow-xs hover:shadow-md transition-all overflow-hidden cursor-pointer group flex flex-col"
                 >
                   <div className="relative aspect-[16/10] w-full bg-slate-100 overflow-hidden">
                     <img
@@ -631,7 +627,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
               </p>
               <Link
                 href="/organize"
-                className="px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-[#74F2C7] to-[#70B2F8] hover:opacity-95 text-[#111827] text-xs sm:text-[13.5px] font-semibold transition-all shadow-xs"
+                className="px-6 py-2.5 sm:py-3 rounded-[6px] bg-gradient-to-r from-[#74F2C7] to-[#70B2F8] hover:opacity-95 text-[#111827] text-xs sm:text-[13.5px] font-semibold transition-all shadow-xs"
               >
                 Create Your First Package
               </Link>

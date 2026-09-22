@@ -79,7 +79,7 @@ export default function CommunityStandardsPage() {
               <h3 className="text-xl font-bold text-[#0f172a]">{s.title}</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-emerald-50/60 border border-emerald-200/80 rounded-2xl p-5 space-y-2">
+                <div className="bg-emerald-50/60 border border-emerald-200/80 rounded-[6px] p-5 space-y-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 uppercase tracking-wider">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     <span>What We Encourage (Do)</span>
@@ -87,7 +87,7 @@ export default function CommunityStandardsPage() {
                   <p className="text-xs text-emerald-900 leading-relaxed font-normal">{s.do}</p>
                 </div>
 
-                <div className="bg-rose-50/60 border border-rose-200/80 rounded-2xl p-5 space-y-2">
+                <div className="bg-rose-50/60 border border-rose-200/80 rounded-[6px] p-5 space-y-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-rose-800 uppercase tracking-wider">
                     <XCircle className="w-4 h-4 text-rose-600" />
                     <span>Strictly Prohibited (Don't)</span>
@@ -107,7 +107,7 @@ export default function CommunityStandardsPage() {
             <div className="pt-2 flex flex-wrap items-center gap-4">
               <Link
                 href="/support"
-                className="px-6 py-2.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs transition active:scale-95 cursor-pointer"
+                className="px-6 py-2.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs transition active:scale-95 cursor-pointer"
               >
                 Report a Violation / Contact Trust Operations
               </Link>

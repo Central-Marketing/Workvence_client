@@ -43,14 +43,14 @@ export default function BecomeASellerPage() {
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <Link
                 href="/register"
-                className="px-8 py-4 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-8 py-4 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Become a Seller Free</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <a
                 href="#calculator"
-                className="px-8 py-4 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-8 py-4 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
               >
                 Estimate Earnings
               </a>
@@ -95,7 +95,7 @@ export default function BecomeASellerPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-[#f8fafc] border border-gray-200/90 rounded-3xl p-8 space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#10b981]/10 text-[#327C73] font-bold text-lg flex items-center justify-center">
+              <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-bold text-lg flex items-center justify-center">
                 1
               </div>
               <h3 className="text-xl font-bold text-[#0f172a]">Create a Free Package</h3>
@@ -105,7 +105,7 @@ export default function BecomeASellerPage() {
             </div>
 
             <div className="bg-[#f8fafc] border border-gray-200/90 rounded-3xl p-8 space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#10b981]/10 text-[#327C73] font-bold text-lg flex items-center justify-center">
+              <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-bold text-lg flex items-center justify-center">
                 2
               </div>
               <h3 className="text-xl font-bold text-[#0f172a]">Deliver Great Work</h3>
@@ -115,7 +115,7 @@ export default function BecomeASellerPage() {
             </div>
 
             <div className="bg-[#f8fafc] border border-gray-200/90 rounded-3xl p-8 space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#10b981]/10 text-[#327C73] font-bold text-lg flex items-center justify-center">
+              <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-bold text-lg flex items-center justify-center">
                 3
               </div>
               <h3 className="text-xl font-bold text-[#0f172a]">Get Paid On Time</h3>
@@ -145,7 +145,7 @@ export default function BecomeASellerPage() {
                   <select
                     value={selectedSkill}
                     onChange={(e) => setSelectedSkill(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   >
                     <option value="Web & Mobile Development">Web & Mobile Development</option>
                     <option value="UI/UX & Brand Design">UI/UX & Brand Design</option>
@@ -188,7 +188,7 @@ export default function BecomeASellerPage() {
                 </div>
               </div>
 
-              <div className="bg-[#0f172a] text-white rounded-2xl p-8 text-center space-y-4">
+              <div className="bg-[#0f172a] text-white rounded-[6px] p-8 text-center space-y-4">
                 <span className="text-xs text-gray-300 uppercase tracking-wider font-semibold block">
                   Estimated Monthly Income
                 </span>
@@ -200,7 +200,7 @@ export default function BecomeASellerPage() {
                 </span>
                 <Link
                   href="/register"
-                  className="w-full py-3 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs shadow-md transition active:scale-95 inline-flex items-center justify-center gap-2 cursor-pointer mt-2"
+                  className="w-full py-3 rounded-[6px] bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs shadow-md transition active:scale-95 inline-flex items-center justify-center gap-2 cursor-pointer mt-2"
                 >
                   <span>Start Selling Now</span>
                   <ArrowRight className="w-4 h-4" />

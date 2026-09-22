@@ -60,7 +60,7 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
       onClick={onClose}
     >
       <div
-        className="bg-white w-full max-w-[620px] max-h-[calc(100vh-40px)] rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="bg-white w-full max-w-[620px] max-h-[calc(100vh-40px)] rounded-[6px] shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -89,7 +89,7 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
         </div>
 
         {errorMsg && (
-          <div className="mx-6 mt-4 bg-red-50 text-red-600 p-3 rounded-xl text-xs sm:text-[13px] border border-red-200 font-medium">
+          <div className="mx-6 mt-4 bg-red-50 text-red-600 p-3 rounded-[6px] text-xs sm:text-[13px] border border-red-200 font-medium">
             {errorMsg}
           </div>
         )}
@@ -111,7 +111,7 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
                 placeholder="e.g. 250"
                 required
                 min={1}
-                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl pl-8 pr-4 py-2.5 sm:py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-medium"
+                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] pl-8 pr-4 py-2.5 sm:py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-medium"
               />
             </div>
           </div>
@@ -128,7 +128,7 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
               placeholder="e.g. 4"
               required
               min={1}
-              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-2.5 sm:py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-medium"
+              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-4 py-2.5 sm:py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-medium"
             />
           </div>
 
@@ -157,7 +157,7 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
               value={attachmentUrl}
               onChange={(e) => setAttachmentUrl(e.target.value)}
               placeholder="https://example.com/portfolio.pdf"
-              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-2.5 sm:py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-normal"
+              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-4 py-2.5 sm:py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-normal"
             />
           </div>
 

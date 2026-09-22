@@ -20,15 +20,14 @@ export default function HowToSellFaq({ faqs }: HowToSellFaqProps) {
       {faqs.map((faq, i) => (
         <div
           key={i}
-          className="bg-white border border-gray-200/90 rounded-2xl p-5 cursor-pointer"
+          className="bg-white border border-gray-200/90 rounded-[6px] p-5 cursor-pointer"
           onClick={() => setOpenFaq(openFaq === i ? null : i)}
         >
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-bold text-[#0f172a]">{faq.q}</h4>
             <ChevronDown
-              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
-                openFaq === i ? "rotate-180 text-[#327C73]" : ""
-              }`}
+              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${openFaq === i ? "rotate-180 text-[#327C73]" : ""
+                }`}
             />
           </div>
           {openFaq === i && (

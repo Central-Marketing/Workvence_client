@@ -32,7 +32,7 @@ const RecommendedSellers = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="animate-pulse bg-gray-50 h-[240px] rounded-xl border border-gray-100"></div>
+              <div key={i} className="animate-pulse bg-gray-50 h-[240px] rounded-[6px] border border-gray-100"></div>
             ))}
           </div>
         </div>
@@ -56,11 +56,11 @@ const RecommendedSellers = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {sellers.map((seller: any) => (
-            <div key={seller._id || Math.random()} className="flex flex-col items-center bg-white rounded-xl border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.04)] p-6 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300">
+            <div key={seller._id || Math.random()} className="flex flex-col items-center bg-white rounded-[6px] border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.04)] p-6 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300">
               <div className="relative mb-3">
-                <img 
-                  src={seller.image || seller.img || "/media/noavatar.png"} 
-                  alt={seller.username} 
+                <img
+                  src={seller.image || seller.img || "/media/noavatar.png"}
+                  alt={seller.username}
                   className="w-[72px] h-[72px] rounded-full object-cover border-[3px] border-brand-green/80"
                 />
               </div>
@@ -75,8 +75,8 @@ const RecommendedSellers = () => {
                 <span>{(seller.avgRating || 4.9).toFixed(1)}</span>
                 <span className="text-brand-green/80">({seller.totalStars || seller.reviews || 124} reviews)</span>
               </div>
-              
-              <Link 
+
+              <Link
                 href={`/seller/${seller._id}`}
                 className="w-full py-2 text-center text-[13px] font-medium text-gray-500 border border-gray-200 rounded-md hover:border-brand-green hover:text-brand-green transition-colors"
               >

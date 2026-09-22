@@ -57,8 +57,8 @@ const FAQ = () => {
               </p>
             </div>
 
-            <div className="bg-[#f9f9f9] rounded-2xl p-8 border border-gray-100">
-              <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 flex items-center justify-center mb-6 shadow-sm">
+            <div className="bg-[#f9f9f9] rounded-[6px] p-8 border border-gray-100">
+              <div className="w-12 h-12 rounded-[6px] bg-white border border-gray-100 flex items-center justify-center mb-6 shadow-sm">
                 <img src="/all-icons/customer-service-01.svg" alt="Support" className="w-6 h-6 object-contain" />
               </div>
               <h3 className="text-[20px] font-semibold text-gray-900 mb-3">Still Have Questions?</h3>
@@ -83,7 +83,7 @@ const FAQ = () => {
             {faqData.map((item, index) => (
               <div
                 key={index}
-                className={`border border-gray-200 rounded-xl bg-white transition-all duration-200 hover:border-gray-300 hover:shadow-sm ${openIndex === index ? 'border-gray-300 shadow-sm' : ''}`}
+                className={`border border-gray-200 rounded-[6px] bg-white transition-all duration-200 hover:border-gray-300 hover:shadow-sm ${openIndex === index ? 'border-gray-300 shadow-sm' : ''}`}
               >
                 <div
                   className="flex items-center justify-between p-6 cursor-pointer"
@@ -114,9 +114,8 @@ const FAQ = () => {
                   </Button>
                 </div>
                 <div
-                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                    openIndex === index ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'
-                  }`}
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${openIndex === index ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'
+                    }`}
                 >
                   <p className="px-6 pb-6 text-[14.5px] text-gray-500 leading-relaxed m-0 pt-0">
                     {item.answer}

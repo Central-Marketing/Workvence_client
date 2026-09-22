@@ -40,7 +40,7 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
   const hasCategoryScores = Boolean(categoryScores?.communication || categoryScores?.quality || categoryScores?.value);
 
   return (
-    <div id="section-reviews" className="scroll-mt-36 bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
+    <div id="section-reviews" className="scroll-mt-36 bg-white border border-gray-100 rounded-[6px] p-6 sm:p-8 mb-10 shadow-2xs">
       {/* 1. Section Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <h2 className="text-xl sm:text-2xl font-bold font-sf-pro text-gray-900 tracking-tight">
@@ -121,7 +121,7 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
           return (
             <div
               key={rev.id}
-              className="bg-[#FBFBFB] border border-gray-100 rounded-xl p-5 sm:p-6 transition-all"
+              className="bg-[#FBFBFB] border border-gray-100 rounded-[6px] p-5 sm:p-6 transition-all"
             >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 {/* Reviewer Details */}

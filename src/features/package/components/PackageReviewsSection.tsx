@@ -38,7 +38,7 @@ export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
 
   if (reviews.length === 0) {
     return (
-      <div id="section-reviews" className="scroll-mt-36 bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
+      <div id="section-reviews" className="scroll-mt-36 bg-white border border-gray-100 rounded-[6px] p-6 sm:p-8 mb-10 shadow-2xs">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
             Reviews from Clients
@@ -47,7 +47,7 @@ export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
             0 Reviews
           </span>
         </div>
-        <div className="p-10 text-center bg-gray-50/60 rounded-xl border border-dashed border-gray-200">
+        <div className="p-10 text-center bg-gray-50/60 rounded-[6px] border border-dashed border-gray-200">
           <FaStar className="w-8 h-8 text-amber-300 fill-amber-300 mx-auto mb-2 opacity-60" />
           <h3 className="text-sm font-bold text-gray-800 mb-1">No reviews yet for this package</h3>
           <p className="text-xs text-gray-500 max-w-sm mx-auto leading-relaxed">
@@ -59,7 +59,7 @@ export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
   }
 
   return (
-    <div id="section-reviews" className="scroll-mt-36 bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
+    <div id="section-reviews" className="scroll-mt-36 bg-white border border-gray-100 rounded-[6px] p-6 sm:p-8 mb-10 shadow-2xs">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h2 className="text-[20px] font-bold font-sf-pro text-gray-900">
@@ -135,7 +135,7 @@ export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
           return (
             <div
               key={review.id}
-              className="p-5 sm:p-6 rounded-2xl bg-gray-50/70 border border-gray-100 transition-all hover:bg-gray-50"
+              className="p-5 sm:p-6 rounded-[6px] bg-gray-50/70 border border-gray-100 transition-all hover:bg-gray-50"
             >
               {/* Review Card Header */}
               <div className="flex items-start justify-between gap-4 mb-3">

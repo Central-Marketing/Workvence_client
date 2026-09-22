@@ -49,7 +49,7 @@ const EmptyGigsState: React.FC<EmptyGigsStateProps> = ({
   return (
     <div className="py-6 w-full animate-fadeIn">
       {/* Coral-900 Empty State Banner */}
-      <div className="w-full rounded-[10px] bg-[var(--coral-900,#683733)] py-16 sm:py-24 md:py-32 px-6 text-center flex flex-col items-center justify-center shadow-md mb-12">
+      <div className="w-full rounded-[6px] bg-[var(--coral-900,#683733)] py-16 sm:py-24 md:py-32 px-6 text-center flex flex-col items-center justify-center shadow-md mb-12">
         {/* Breadcrumb */}
         <div className="flex items-center justify-center gap-2 text-white/60 text-xs sm:text-[13px] font-light mb-3 select-none">
           <FiHome className="w-3.5 h-3.5 text-white/70" />
@@ -865,7 +865,7 @@ const Packages = () => {
                   setSortBy(e.target.value);
                   syncUrlWithFilters({ sortBy: e.target.value, resetPage: true });
                 }}
-                className="bg-white border border-gray-200 text-xs font-semibold text-gray-800 rounded-xl px-3.5 py-2 focus:outline-none focus:border-gray-900 cursor-pointer shadow-2xs"
+                className="bg-white border border-gray-200 text-xs font-semibold text-gray-800 rounded-[6px] px-3.5 py-2 focus:outline-none focus:border-gray-900 cursor-pointer shadow-2xs"
               >
                 <option value="">Recommended (Default)</option>
                 <option value="best-selling">Best Selling</option>
@@ -1212,7 +1212,7 @@ const Packages = () => {
                   setSortBy(e.target.value);
                   syncUrlWithFilters({ sortBy: e.target.value, resetPage: true });
                 }}
-                className="bg-white border border-gray-200 text-xs font-semibold text-gray-800 rounded-xl px-3.5 py-2 focus:outline-none focus:border-gray-900 cursor-pointer shadow-2xs"
+                className="bg-white border border-gray-200 text-xs font-semibold text-gray-800 rounded-[6px] px-3.5 py-2 focus:outline-none focus:border-gray-900 cursor-pointer shadow-2xs"
               >
                 <option value="">Recommended (Default)</option>
                 <option value="best-selling">Best Selling</option>
@@ -1231,7 +1231,7 @@ const Packages = () => {
             </div>
           ) : isError || error ? (
             <div className="py-16 w-full animate-fadeIn flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-5 border border-red-100 shadow-sm">
+              <div className="w-16 h-16 bg-red-50 text-red-500 rounded-[6px] flex items-center justify-center mb-5 border border-red-100 shadow-sm">
                 <FiAlertCircle className="w-8 h-8" />
               </div>
               <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2 tracking-tight">

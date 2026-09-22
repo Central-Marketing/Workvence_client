@@ -21,7 +21,7 @@ export const SellerFaqSection: React.FC<SellerFaqSectionProps> = ({ faqs = [] })
   };
 
   return (
-    <div id="section-faq" className="scroll-mt-36 bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 mb-16 shadow-2xs">
+    <div id="section-faq" className="scroll-mt-36 bg-white border border-gray-100 rounded-[6px] p-6 sm:p-8 mb-16 shadow-2xs">
       {/* Header */}
       <div className="flex items-center justify-between gap-4 mb-6 pb-2 border-b border-gray-100">
         <h2 className="text-xl sm:text-2xl font-bold font-sf-pro text-gray-900 tracking-tight">

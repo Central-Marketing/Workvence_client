@@ -75,37 +75,37 @@ const CreateBrief = () => {
   const rawFormatted =
     rootCategoriesList.length > 0
       ? rootCategoriesList.map((cat: any) =>
-          typeof cat === "string"
-            ? {
-                name: cat,
-                slug: cat
-                  .toLowerCase()
-                  .trim()
-                  .replace(/&/g, "and")
-                  .replace(/\s+/g, "-")
-                  .replace(/[^a-z0-9-]/g, ""),
-              }
-            : {
-                name: cat.name || cat.title || String(cat),
-                slug:
-                  cat.slug ||
-                  (cat.name || cat.title || "")
-                    .toLowerCase()
-                    .trim()
-                    .replace(/&/g, "and")
-                    .replace(/\s+/g, "-")
-                    .replace(/[^a-z0-9-]/g, ""),
-              }
-        )
+        typeof cat === "string"
+          ? {
+            name: cat,
+            slug: cat
+              .toLowerCase()
+              .trim()
+              .replace(/&/g, "and")
+              .replace(/\s+/g, "-")
+              .replace(/[^a-z0-9-]/g, ""),
+          }
+          : {
+            name: cat.name || cat.title || String(cat),
+            slug:
+              cat.slug ||
+              (cat.name || cat.title || "")
+                .toLowerCase()
+                .trim()
+                .replace(/&/g, "and")
+                .replace(/\s+/g, "-")
+                .replace(/[^a-z0-9-]/g, ""),
+          }
+      )
       : CATEGORIES.map((c) => ({
-          name: c,
-          slug: c
-            .toLowerCase()
-            .trim()
-            .replace(/&/g, "and")
-            .replace(/\s+/g, "-")
-            .replace(/[^a-z0-9-]/g, ""),
-        }));
+        name: c,
+        slug: c
+          .toLowerCase()
+          .trim()
+          .replace(/&/g, "and")
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z0-9-]/g, ""),
+      }));
 
   const categories = [
     ...rawFormatted.filter(
@@ -326,7 +326,7 @@ const CreateBrief = () => {
     return (
       <div className="min-h-[85vh] bg-[#FAFAFA] flex items-center justify-center px-4 py-16">
         <div className="bg-white border border-slate-200/80 rounded-3xl shadow-sm p-8 sm:p-12 max-w-lg w-full text-center flex flex-col items-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#D8F5ED] text-[#0D6B5D] border border-[#BCE8DE] flex items-center justify-center text-3xl mb-5 shadow-2xs">
+          <div className="w-16 h-16 rounded-[6px] bg-[#D8F5ED] text-[#0D6B5D] border border-[#BCE8DE] flex items-center justify-center text-3xl mb-5 shadow-2xs">
             <FiCheckCircle />
           </div>
           <h1 className="text-2xl sm:text-[26px] font-bold text-slate-900 mb-2.5 font-sf-pro">
@@ -407,9 +407,9 @@ const CreateBrief = () => {
 
         {/* AI Draft Banner (Displayed after AI generates or when draft is ready) */}
         {aiGeneratedSuccess && (
-          <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-emerald-50/90 border border-emerald-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm animate-fadeIn">
+          <div className="mb-6 p-4 sm:p-5 rounded-[6px] bg-emerald-50/90 border border-emerald-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm animate-fadeIn">
             <div className="flex items-center gap-2.5 text-emerald-900 font-medium">
-              <span className="w-7 h-7 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+              <span className="w-7 h-7 rounded-[6px] bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
                 <HiSparkles className="text-base" />
               </span>
               <span>
@@ -432,7 +432,7 @@ const CreateBrief = () => {
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-6 sm:p-10 shadow-2xs space-y-6 sm:space-y-8"
+          className="bg-white border border-slate-200/90 rounded-[6px] sm:rounded-3xl p-6 sm:p-10 shadow-2xs space-y-6 sm:space-y-8"
         >
           {/* Header row inside form */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
@@ -469,7 +469,7 @@ const CreateBrief = () => {
               value={form.title}
               onChange={(e) => updateField("title", e.target.value)}
               required
-              className="w-full px-4 py-3 sm:py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
+              className="w-full px-4 py-3 sm:py-3.5 rounded-[6px] border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
             />
           </div>
 
@@ -489,7 +489,7 @@ const CreateBrief = () => {
                   categoryName: found?.name || selectedSlug,
                 }));
               }}
-              className="w-full px-4 py-3 sm:py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10 cursor-pointer"
+              className="w-full px-4 py-3 sm:py-3.5 rounded-[6px] border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10 cursor-pointer"
             >
               <option value="">Select a category</option>
               {categories.map((c: any) => (
@@ -563,7 +563,7 @@ const CreateBrief = () => {
                     handleAddSkill();
                   }
                 }}
-                className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-xs sm:text-sm outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
+                className="flex-1 px-3.5 py-2.5 rounded-[6px] border border-slate-200 bg-white text-slate-900 text-xs sm:text-sm outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
               />
               <Button
                 type="button"
@@ -596,7 +596,7 @@ const CreateBrief = () => {
                   placeholder="e.g. 150"
                   value={form.budget}
                   onChange={(e) => updateField("budget", e.target.value)}
-                  className="w-full pl-9 pr-4 py-3 sm:py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
+                  className="w-full pl-9 pr-4 py-3 sm:py-3.5 rounded-[6px] border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
                 />
               </div>
             </div>
@@ -615,7 +615,7 @@ const CreateBrief = () => {
                   placeholder="e.g. 5"
                   value={form.deliveryTime}
                   onChange={(e) => updateField("deliveryTime", e.target.value)}
-                  className="w-full pl-9 pr-4 py-3 sm:py-3.5 rounded-xl border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
+                  className="w-full pl-9 pr-4 py-3 sm:py-3.5 rounded-[6px] border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
                 />
               </div>
             </div>
@@ -655,7 +655,7 @@ const CreateBrief = () => {
           onClick={() => !aiGenerate.isPending && setIsAiModalOpen(false)}
         >
           <div
-            className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl max-w-xl w-full max-h-[calc(100dvh-2rem)] flex flex-col p-6 sm:p-8 shadow-2xl relative overflow-y-auto select-text"
+            className="bg-white border border-slate-200 rounded-[6px] sm:rounded-3xl max-w-xl w-full max-h-[calc(100dvh-2rem)] flex flex-col p-6 sm:p-8 shadow-2xl relative overflow-y-auto select-text"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top Close Button */}
@@ -674,7 +674,7 @@ const CreateBrief = () => {
 
             {/* Modal Header */}
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center justify-center text-xl shadow-xs">
+              <div className="w-10 h-10 rounded-[6px] bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center justify-center text-xl shadow-xs">
                 <HiSparkles />
               </div>
               <div>

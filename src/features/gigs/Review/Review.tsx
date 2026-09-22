@@ -65,7 +65,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
   const duration = review?.duration || null;
 
   return (
-    <div className="bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 shadow-2xs hover:border-gray-300 transition-all flex flex-col justify-between h-full w-full overflow-hidden">
+    <div className="bg-white border border-gray-200/90 rounded-[6px] p-5 sm:p-6 shadow-2xs hover:border-gray-300 transition-all flex flex-col justify-between h-full w-full overflow-hidden">
       <div>
         {/* User profile and stars header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-1">

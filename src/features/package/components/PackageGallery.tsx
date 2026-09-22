@@ -68,7 +68,7 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
 
   if (allImages.length === 0) {
     return (
-      <div className="w-full h-[280px] sm:h-[340px] rounded-2xl bg-gray-100 border border-gray-200 flex flex-col items-center justify-center text-gray-400 mb-8 p-6 text-center">
+      <div className="w-full h-[280px] sm:h-[340px] rounded-[6px] bg-gray-100 border border-gray-200 flex flex-col items-center justify-center text-gray-400 mb-8 p-6 text-center">
         <span className="text-sm font-semibold">{title}</span>
         <span className="text-xs text-gray-400 mt-1">No cover image uploaded</span>
       </div>
@@ -82,7 +82,7 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
         {/* Main Hero Image */}
         <div
           onClick={() => setIsLightboxOpen(true)}
-          className="flex-1 h-full rounded-[10px] overflow-hidden bg-gray-950 border border-gray-100 relative group cursor-pointer shadow-xs"
+          className="flex-1 h-full rounded-[6px] overflow-hidden bg-gray-950 border border-gray-100 relative group cursor-pointer shadow-xs"
         >
           <img
             src={activeImage || heroImage}
@@ -169,7 +169,7 @@ export const PackageGallery: React.FC<PackageGalleryProps> = ({
             <img
               src={activeImage || heroImage}
               alt="Fullscreen Preview"
-              className="max-w-full max-h-[80vh] object-contain rounded-xl shadow-2xl"
+              className="max-w-full max-h-[80vh] object-contain rounded-[6px] shadow-2xl"
             />
           </div>
 

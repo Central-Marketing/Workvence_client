@@ -80,7 +80,7 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
   const pkgUrl = `/package/${currentPkg.slug || currentPkg._id || currentPkg.id}`;
 
   return (
-    <div id="section-seller-packages" className="scroll-mt-36 bg-[#F5F5F5] border border-gray-100 rounded-2xl p-4 sm:p-6 lg:p-8 mb-10 shadow-2xs">
+    <div id="section-seller-packages" className="scroll-mt-36 bg-[#F5F5F5] border border-gray-100 rounded-[6px] p-4 sm:p-6 lg:p-8 mb-10 shadow-2xs">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap min-w-0">
@@ -126,7 +126,7 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
 
       {/* Main Active Package Showcase Card */}
       <Link href={pkgUrl} className="block group">
-        <div className="relative aspect-[16/9] sm:aspect-[2.1/1] w-full rounded-2xl overflow-hidden mb-4 shadow-sm bg-gray-950">
+        <div className="relative aspect-[16/9] sm:aspect-[2.1/1] w-full rounded-[6px] overflow-hidden mb-4 shadow-sm bg-gray-950">
           {coverImage && (
             <img
               src={coverImage}
@@ -140,14 +140,10 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
 
           {/* Text Content */}
           <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-7 text-white">
-            <h3 className="text-lg sm:text-xl font-bold mb-1.5 drop-shadow-sm group-hover:text-brand-green transition-colors">
+            <h3 className="text-lg sm:text-xl font-bold mb-1.5 drop-shadow-sm group-hover:text-fuchsia-400 transition-colors">
               {currentPkg.title}
             </h3>
-            {currentPkg.shortDesc && (
-              <p className="text-xs sm:text-sm text-gray-200 line-clamp-2 max-w-2xl mb-4 leading-relaxed font-normal">
-                {currentPkg.shortDesc}
-              </p>
-            )}
+
 
             <div className="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-white/15">
               <div className="flex items-center gap-6 text-xs sm:text-sm">

@@ -246,7 +246,7 @@ const Reviews: React.FC<ReviewsProps> = ({
 
             {/* Review Cards Grid (2 columns) */}
             {displayedReviews.length === 0 ? (
-                <div className="text-center py-10 bg-gray-50 rounded-2xl border border-gray-100 text-gray-400 font-medium">
+                <div className="text-center py-10 bg-gray-50 rounded-[6px] border border-gray-100 text-gray-400 font-medium">
                     {totalReviewsCount === 0
                         ? "There are no reviews yet for this package."
                         : `No reviews matching "${searchTerm}" found.`}

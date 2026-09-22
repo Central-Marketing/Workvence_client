@@ -22,25 +22,25 @@ export const PackageDetailSkeleton: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Main Gallery */}
           <div className="lg:col-span-8 space-y-4">
-            <Skeleton className="w-full aspect-[16/9] rounded-2xl" />
+            <Skeleton className="w-full aspect-[16/9] rounded-[6px]" />
             <div className="grid grid-cols-4 gap-3">
               {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="w-full aspect-[16/9] rounded-xl" />
+                <Skeleton key={i} className="w-full aspect-[16/9] rounded-[6px]" />
               ))}
             </div>
           </div>
 
           {/* Pricing Sidebar */}
           <div className="lg:col-span-4 space-y-4">
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-6">
-              <Skeleton className="w-full h-12 rounded-xl" />
+            <div className="bg-white rounded-[6px] border border-slate-200 p-6 space-y-6">
+              <Skeleton className="w-full h-12 rounded-[6px]" />
               <div className="flex justify-between items-center">
                 <Skeleton className="w-24 h-6" />
                 <Skeleton className="w-20 h-8" />
               </div>
-              <Skeleton className="w-full h-16 rounded-xl" />
-              <Skeleton className="w-full h-12 rounded-xl" />
-              <Skeleton className="w-full h-12 rounded-xl" />
+              <Skeleton className="w-full h-16 rounded-[6px]" />
+              <Skeleton className="w-full h-12 rounded-[6px]" />
+              <Skeleton className="w-full h-12 rounded-[6px]" />
             </div>
           </div>
         </div>

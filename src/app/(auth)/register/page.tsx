@@ -324,7 +324,7 @@ const RegisterContent = () => {
                       placeholder="Enter your user name"
                       onChange={handleChange}
                       value={formInput.username}
-                      className={`w-full py-3 px-3.5 pr-10 border rounded-xl text-sm bg-white transition-colors focus:outline-none ${usernameStatus.available === true
+                      className={`w-full py-3 px-3.5 pr-10 border rounded-[6px] text-sm bg-white transition-colors focus:outline-none ${usernameStatus.available === true
                         ? 'border-emerald-500 focus:border-emerald-500'
                         : usernameStatus.available === false
                           ? 'border-red-500 focus:border-red-500'
@@ -353,7 +353,7 @@ const RegisterContent = () => {
                       placeholder="Enter your email address"
                       onChange={handleChange}
                       value={formInput.email}
-                      className={`w-full py-3 px-3.5 pr-10 border rounded-xl text-sm bg-white transition-colors focus:outline-none ${emailStatus.available === true
+                      className={`w-full py-3 px-3.5 pr-10 border rounded-[6px] text-sm bg-white transition-colors focus:outline-none ${emailStatus.available === true
                         ? 'border-emerald-500 focus:border-emerald-500'
                         : emailStatus.available === false
                           ? 'border-red-500 focus:border-red-500'
@@ -382,7 +382,7 @@ const RegisterContent = () => {
                       placeholder="***********"
                       value={formInput.password}
                       onChange={handleChange}
-                      className="w-full py-3 px-3.5 pr-11 border border-gray-200 rounded-xl text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500"
+                      className="w-full py-3 px-3.5 pr-11 border border-gray-200 rounded-[6px] text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500"
                     />
                     <Button
                       type="button"
@@ -424,7 +424,7 @@ const RegisterContent = () => {
                       placeholder="***********"
                       value={formInput.confirmPassword}
                       onChange={handleChange}
-                      className={`w-full py-3 px-3.5 pr-11 border rounded-xl text-sm bg-white transition-colors focus:outline-none ${formInput.confirmPassword && formInput.password !== formInput.confirmPassword
+                      className={`w-full py-3 px-3.5 pr-11 border rounded-[6px] text-sm bg-white transition-colors focus:outline-none ${formInput.confirmPassword && formInput.password !== formInput.confirmPassword
                         ? 'border-red-500 focus:border-red-500'
                         : formInput.confirmPassword && formInput.password === formInput.confirmPassword
                           ? 'border-emerald-500 focus:border-emerald-500'
@@ -503,7 +503,7 @@ const RegisterContent = () => {
 
       {/* Right Pane */}
       <div className="hidden lg:flex flex-1 p-3 sm:p-4 lg:p-5 h-screen sticky top-0">
-        <div className="relative w-full h-full rounded-2xl lg:rounded-3xl overflow-hidden bg-[#0a0f1d] shadow-sm">
+        <div className="relative w-full h-full rounded-[6px] lg:rounded-3xl overflow-hidden bg-[#0a0f1d] shadow-sm">
           <Image
             src="/media/loginImage.png"
             alt="Workvence"

@@ -80,7 +80,7 @@ export default function ClearVoicePage() {
               </Button>
               <Link
                 href="/packages?category=writing-and-translation"
-                className="px-8 py-4 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-8 py-4 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
               >
                 Explore Copywriting Packages
               </Link>
@@ -107,7 +107,7 @@ export default function ClearVoicePage() {
                   key={idx}
                   className="bg-white border border-gray-200/90 rounded-3xl p-8 space-y-4 shadow-xs hover:border-[#327C73] hover:shadow-md transition duration-300"
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
                     <Icon className="w-6 h-6" />
                   </div>
                   <h3 className="text-xl font-bold text-[#0f172a]">{sol.title}</h3>
@@ -148,7 +148,7 @@ export default function ClearVoicePage() {
                   value={contentForm.name}
                   onChange={(e) => setContentForm({ ...contentForm, name: e.target.value })}
                   placeholder="e.g. Sarah Connor"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                 />
               </div>
 
@@ -160,7 +160,7 @@ export default function ClearVoicePage() {
                   value={contentForm.email}
                   onChange={(e) => setContentForm({ ...contentForm, email: e.target.value })}
                   placeholder="sarah@company.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                 />
               </div>
 
@@ -169,7 +169,7 @@ export default function ClearVoicePage() {
                 <select
                   value={contentForm.volume}
                   onChange={(e) => setContentForm({ ...contentForm, volume: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                 >
                   <option value="2-4 articles/month">2 - 4 articles / month</option>
                   <option value="4-8 articles/month">4 - 8 articles / month</option>

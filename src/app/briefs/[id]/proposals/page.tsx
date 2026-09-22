@@ -112,7 +112,7 @@ const Proposals = () => {
         </Link>
 
         {/* Header */}
-        <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-6 sm:p-7 md:px-8 rounded-xl text-white shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-6 sm:p-7 md:px-8 rounded-[6px] text-white shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold mb-1">Proposals ({proposals.length})</h1>
             <p className="text-slate-400 text-sm">Review submitted proposals and find the best seller</p>
@@ -137,7 +137,7 @@ const Proposals = () => {
 
         {/* AI Loading */}
         {aiMutation.isPending && (
-          <div className="bg-white border-2 border-[#0D6D5F]/20 rounded-xl p-10 sm:p-12 text-center flex flex-col items-center gap-4 shadow-xs">
+          <div className="bg-white border-2 border-[#0D6D5F]/20 rounded-[6px] p-10 sm:p-12 text-center flex flex-col items-center gap-4 shadow-xs">
             <div className="w-12 h-12 rounded-full bg-[#0D6D5F]/10 text-[#0D6D5F] flex items-center justify-center text-2xl animate-pulse">
               <HiSparkles />
             </div>
@@ -153,7 +153,7 @@ const Proposals = () => {
 
         {/* AI Recommendation Results */}
         {aiResult && !aiMutation.isPending && (
-          <div className="bg-white border border-[#0D6D5F]/25 rounded-2xl shadow-xs overflow-hidden">
+          <div className="bg-white border border-[#0D6D5F]/25 rounded-[6px] shadow-xs overflow-hidden">
             <div className="bg-gradient-to-r from-[#0D6D5F]/10 via-[#0D6D5F]/5 to-transparent p-5 px-6 sm:px-8 border-b border-[#0D6D5F]/15 flex items-center justify-between gap-2.5">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F]">
@@ -191,7 +191,7 @@ const Proposals = () => {
                 return (
                   <div
                     key={proposal._id || index}
-                    className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 rounded-2xl border transition-all ${index === 0 ? "border-[#0D6D5F]/40 ring-2 ring-[#0D6D5F]/10 bg-white" : "border-slate-200 bg-white hover:border-slate-300"
+                    className={`flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 rounded-[6px] border transition-all ${index === 0 ? "border-[#0D6D5F]/40 ring-2 ring-[#0D6D5F]/10 bg-white" : "border-slate-200 bg-white hover:border-slate-300"
                       }`}
                   >
                     <div
@@ -218,7 +218,7 @@ const Proposals = () => {
                       {(item.pros?.length > 0 || item.cons?.length > 0) && (
                         <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                           {item.pros && item.pros.length > 0 && (
-                            <div className="bg-[#0D6D5F]/5 p-3 rounded-xl border border-[#0D6D5F]/20">
+                            <div className="bg-[#0D6D5F]/5 p-3 rounded-[6px] border border-[#0D6D5F]/20">
                               <div className="flex items-center gap-1.5 mb-1.5">
                                 <div className="w-4 h-4 rounded-full bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F] shrink-0">
                                   <FiCheck className="text-[10px] stroke-[2.5]" />
@@ -236,7 +236,7 @@ const Proposals = () => {
                             </div>
                           )}
                           {item.cons && item.cons.length > 0 && (
-                            <div className="bg-rose-50/70 p-3 rounded-xl border border-rose-200/70">
+                            <div className="bg-rose-50/70 p-3 rounded-[6px] border border-rose-200/70">
                               <div className="flex items-center gap-1.5 mb-1.5">
                                 <div className="w-4 h-4 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 shrink-0">
                                   <FiAlertTriangle className="text-[10px] stroke-[2.5]" />
@@ -284,7 +284,7 @@ const Proposals = () => {
             <Loader size={45} />
           </div>
         ) : proposals.length === 0 ? (
-          <div className="text-center py-16 px-6 bg-white rounded-xl border border-slate-200 shadow-xs flex flex-col items-center">
+          <div className="text-center py-16 px-6 bg-white rounded-[6px] border border-slate-200 shadow-xs flex flex-col items-center">
             <div className="text-5xl mb-4">📭</div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">No proposals yet</h3>
             <p className="text-slate-500 text-sm max-w-md">
@@ -312,7 +312,7 @@ const Proposals = () => {
               return (
                 <div
                   key={proposal._id}
-                  className={`bg-white rounded-xl p-5 sm:p-6 transition-all shadow-xs hover:shadow-md relative overflow-hidden ${isRecommended ? "border-2 border-indigo-400 bg-indigo-50/20" : "border border-slate-200 hover:border-emerald-500/30"
+                  className={`bg-white rounded-[6px] p-5 sm:p-6 transition-all shadow-xs hover:shadow-md relative overflow-hidden ${isRecommended ? "border-2 border-indigo-400 bg-indigo-50/20" : "border border-slate-200 hover:border-emerald-500/30"
                     }`}
                 >
                   {isRecommended && (

@@ -441,7 +441,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Section Pill Tabs */}
-          <div className="bg-white border border-slate-200/80 rounded-xl p-1 flex items-center gap-1 self-start md:self-auto overflow-x-auto max-w-full">
+          <div className="bg-white border border-slate-200/80 rounded-[6px] p-1 flex items-center gap-1 self-start md:self-auto overflow-x-auto max-w-full">
             <Button
               type="button"
               size="sm"
@@ -451,8 +451,8 @@ export default function ProfilePage() {
                 scrollToSection("section-personal");
               }}
               className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "personal"
-                  ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
-                  : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
+                : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                 }`}
             >
               Personal Info
@@ -466,8 +466,8 @@ export default function ProfilePage() {
                 scrollToSection("section-professional");
               }}
               className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "professional"
-                  ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
-                  : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
+                : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                 }`}
             >
               Professional Details
@@ -481,8 +481,8 @@ export default function ProfilePage() {
                 scrollToSection("section-experience");
               }}
               className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "experience"
-                  ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
-                  : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
+                : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                 }`}
             >
               Experience &amp; Education
@@ -497,8 +497,8 @@ export default function ProfilePage() {
                   scrollToSection("section-portfolio");
                 }}
                 className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "portfolio"
-                    ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
-                    : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
+                  : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`}
               >
                 Portfolio
@@ -514,8 +514,8 @@ export default function ProfilePage() {
                   scrollToSection("section-verification");
                 }}
                 className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "verification"
-                    ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
-                    : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
+                  : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`}
               >
                 Verification
@@ -525,10 +525,10 @@ export default function ProfilePage() {
         </div>
 
         {/* HERO BANNER CARD */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-4 sm:p-5 mb-7">
+        <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-4 sm:p-5 mb-7">
           {/* Cover image banner */}
           <div
-            className="h-36 sm:h-44 md:h-48 rounded-xl overflow-hidden relative bg-slate-900 bg-cover bg-center"
+            className="h-36 sm:h-44 md:h-48 rounded-[6px] overflow-hidden relative bg-slate-900 bg-cover bg-center"
             style={{ backgroundImage: `url(${coverImageUrl})` }}
           >
             {/* Top Right Banner Controls */}
@@ -652,7 +652,7 @@ export default function ProfilePage() {
         {/* SECTION 1: PERSONAL INFO */}
         <div
           id="section-personal"
-          className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-6"
+          className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-6"
         >
           <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
             <h2 className="text-base sm:text-lg font-bold text-slate-900">Personal Info</h2>
@@ -678,7 +678,7 @@ export default function ProfilePage() {
                 type="text"
                 value={user?.username || ""}
                 disabled
-                className="w-full px-4 py-2.5 bg-slate-50/70 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-600 cursor-not-allowed"
+                className="w-full px-4 py-2.5 bg-slate-50/70 border border-slate-200 rounded-[6px] text-xs sm:text-sm text-slate-600 cursor-not-allowed"
               />
             </div>
 
@@ -691,7 +691,7 @@ export default function ProfilePage() {
                 type="email"
                 value={user?.email || ""}
                 disabled
-                className="w-full px-4 py-2.5 bg-slate-50/70 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-600 cursor-not-allowed"
+                className="w-full px-4 py-2.5 bg-slate-50/70 border border-slate-200 rounded-[6px] text-xs sm:text-sm text-slate-600 cursor-not-allowed"
               />
             </div>
 
@@ -705,7 +705,7 @@ export default function ProfilePage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+1 555-0199"
-                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
+                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-[6px] text-xs sm:text-sm text-slate-800 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
               />
             </div>
 
@@ -720,7 +720,7 @@ export default function ProfilePage() {
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
                   placeholder="e.g. Bangladesh, United States"
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all pr-9"
+                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-[6px] text-xs sm:text-sm text-slate-800 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all pr-9"
                 />
                 <FiChevronDown className="absolute right-3.5 top-3.5 text-slate-400 pointer-events-none text-sm" />
               </div>
@@ -731,7 +731,7 @@ export default function ProfilePage() {
         {/* SECTION 2: PROFESSIONAL DETAILS */}
         <div
           id="section-professional"
-          className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-6"
+          className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-6"
         >
           <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
             <h2 className="text-base sm:text-lg font-bold text-slate-900">
@@ -759,7 +759,7 @@ export default function ProfilePage() {
               value={shortTitle}
               onChange={(e) => setShortTitle(e.target.value)}
               placeholder="e.g Expert Digital Marketer & Specialist"
-              className="w-full px-4 py-2.5 bg-[#F1F3F5] border border-transparent rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
+              className="w-full px-4 py-2.5 bg-[#F1F3F5] border border-transparent rounded-[6px] text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
             />
           </div>
 
@@ -954,7 +954,7 @@ export default function ProfilePage() {
         {/* SECTION 3: EXPERIENCE & EDUCATION */}
         <div
           id="section-experience"
-          className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-7"
+          className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-7"
         >
           <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
             <h2 className="text-base sm:text-lg font-bold text-slate-900">
@@ -984,7 +984,7 @@ export default function ProfilePage() {
                 {experience.map((exp, idx) => (
                   <div
                     key={idx}
-                    className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 flex items-start justify-between gap-3"
+                    className="p-3.5 bg-slate-50 rounded-[6px] border border-slate-200/80 flex items-start justify-between gap-3"
                   >
                     <div>
                       <h4 className="font-bold text-xs sm:text-sm text-slate-900">{exp.title}</h4>
@@ -1012,7 +1012,7 @@ export default function ProfilePage() {
 
             {/* Add Experience Dashed Box / Inline Form */}
             {isAddingExperience ? (
-              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
+              <div className="p-4 rounded-[6px] border border-slate-200 bg-slate-50/50 space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input
                     type="text"
@@ -1076,7 +1076,7 @@ export default function ProfilePage() {
             ) : (
               <div
                 onClick={() => setIsAddingExperience(true)}
-                className="border border-dashed border-slate-200 rounded-xl p-5 text-center hover:bg-slate-50/70 hover:border-slate-300 transition-colors cursor-pointer"
+                className="border border-dashed border-slate-200 rounded-[6px] p-5 text-center hover:bg-slate-50/70 hover:border-slate-300 transition-colors cursor-pointer"
               >
                 <span className="text-xs font-bold text-[#0D9488] inline-flex items-center gap-1.5">
                   <span>Add Experiences</span>
@@ -1098,7 +1098,7 @@ export default function ProfilePage() {
                 {education.map((ed, idx) => (
                   <div
                     key={idx}
-                    className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 flex items-start justify-between gap-3"
+                    className="p-3.5 bg-slate-50 rounded-[6px] border border-slate-200/80 flex items-start justify-between gap-3"
                   >
                     <div>
                       <h4 className="font-bold text-xs sm:text-sm text-slate-900">
@@ -1125,7 +1125,7 @@ export default function ProfilePage() {
 
             {/* Add Education Dashed Box / Inline Form */}
             {isAddingEducation ? (
-              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
+              <div className="p-4 rounded-[6px] border border-slate-200 bg-slate-50/50 space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input
                     type="text"
@@ -1182,7 +1182,7 @@ export default function ProfilePage() {
             ) : (
               <div
                 onClick={() => setIsAddingEducation(true)}
-                className="border border-dashed border-slate-200 rounded-xl p-5 text-center hover:bg-slate-50/70 hover:border-slate-300 transition-colors cursor-pointer"
+                className="border border-dashed border-slate-200 rounded-[6px] p-5 text-center hover:bg-slate-50/70 hover:border-slate-300 transition-colors cursor-pointer"
               >
                 <span className="text-xs font-bold text-[#0D9488] inline-flex items-center gap-1.5">
                   <span>Add Education</span>
@@ -1199,7 +1199,7 @@ export default function ProfilePage() {
             {/* SECTION: PORTFOLIO */}
             <div
               id="section-portfolio"
-              className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-7"
+              className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-7"
             >
               <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
                 <div>
@@ -1223,7 +1223,7 @@ export default function ProfilePage() {
 
               {editingProjectIdx !== null ? (
                 /* Interactive Project Form Editor */
-                <div className="bg-slate-50/70 border border-slate-200/90 rounded-2xl p-5 sm:p-6 space-y-5">
+                <div className="bg-slate-50/70 border border-slate-200/90 rounded-[6px] p-5 sm:p-6 space-y-5">
                   <div className="flex justify-between items-center pb-3 border-b border-slate-200/70">
                     <h3 className="text-sm font-bold text-slate-900">
                       {portfolio[editingProjectIdx]?.title
@@ -1254,7 +1254,7 @@ export default function ProfilePage() {
                         placeholder="e.g. E-Commerce Web & Mobile App Redesign"
                         value={portfolio[editingProjectIdx]?.title || ""}
                         onChange={(e) => handleUpdatePortfolio(editingProjectIdx, "title", e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-teal-600 outline-none transition-colors"
+                        className="w-full px-3.5 py-2.5 bg-white rounded-[6px] border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-teal-600 outline-none transition-colors"
                       />
                     </div>
 
@@ -1277,7 +1277,7 @@ export default function ProfilePage() {
                       </label>
                       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                         {portfolio[editingProjectIdx]?.image ? (
-                          <div className="relative w-32 h-20 rounded-xl overflow-hidden border border-slate-200 group shrink-0 bg-slate-100 shadow-xs">
+                          <div className="relative w-32 h-20 rounded-[6px] overflow-hidden border border-slate-200 group shrink-0 bg-slate-100 shadow-xs">
                             <img
                               src={portfolio[editingProjectIdx].image}
                               alt="Preview"
@@ -1305,7 +1305,7 @@ export default function ProfilePage() {
                               onChange={(e) => handlePortfolioImageUpload(editingProjectIdx, e)}
                               disabled={uploadingPortfolioIdx === editingProjectIdx}
                             />
-                            <div className="flex items-center justify-center gap-2 px-4 py-3 bg-white hover:bg-teal-50/60 text-teal-800 border border-teal-200 rounded-xl text-xs font-bold transition-colors shadow-2xs">
+                            <div className="flex items-center justify-center gap-2 px-4 py-3 bg-white hover:bg-teal-50/60 text-teal-800 border border-teal-200 rounded-[6px] text-xs font-bold transition-colors shadow-2xs">
                               {uploadingPortfolioIdx === editingProjectIdx ? (
                                 <>
                                   <Loader size={16} />
@@ -1335,7 +1335,7 @@ export default function ProfilePage() {
                         placeholder="e.g. https://myproject-demo.com or Behance/Dribbble URL"
                         value={portfolio[editingProjectIdx]?.link || ""}
                         onChange={(e) => handleUpdatePortfolio(editingProjectIdx, "link", e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-white rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-teal-600 outline-none transition-colors"
+                        className="w-full px-3.5 py-2.5 bg-white rounded-[6px] border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-teal-600 outline-none transition-colors"
                       />
                     </div>
 
@@ -1378,7 +1378,7 @@ export default function ProfilePage() {
                 /* Portfolio Projects Cards Grid or Empty State */
                 <div>
                   {portfolio.length === 0 ? (
-                    <div className="text-center py-12 px-4 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50 space-y-3">
+                    <div className="text-center py-12 px-4 border-2 border-dashed border-slate-200 rounded-[6px] bg-slate-50/50 space-y-3">
                       <Folder className="w-10 h-10 text-teal-700/70 mx-auto" />
                       <h4 className="text-sm font-bold text-slate-800">No Portfolio Projects Added Yet</h4>
                       <p className="text-xs text-slate-500 max-w-sm mx-auto">
@@ -1401,7 +1401,7 @@ export default function ProfilePage() {
                       {portfolio.map((item, idx) => (
                         <div
                           key={idx}
-                          className="group relative bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-2xs hover:shadow-md hover:border-teal-500/40 transition-all flex flex-col"
+                          className="group relative bg-white border border-slate-200/90 rounded-[6px] overflow-hidden shadow-2xs hover:shadow-md hover:border-teal-500/40 transition-all flex flex-col"
                         >
                           {/* Card Cover Image */}
                           <div className="relative h-44 w-full bg-slate-100 overflow-hidden border-b border-slate-100">
@@ -1494,7 +1494,7 @@ export default function ProfilePage() {
             {/* SECTION: ID VERIFICATION */}
             <div
               id="section-verification"
-              className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-7"
+              className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-7"
             >
               <div className="pb-5 border-b border-slate-100 mb-6">
                 <h2 className="text-base sm:text-lg font-bold text-slate-900">ID Verification</h2>

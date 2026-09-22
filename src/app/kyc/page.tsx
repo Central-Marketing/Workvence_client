@@ -28,12 +28,12 @@ export default function KycPage() {
     kyc?.documentType === "passport"
       ? "Passport"
       : kyc?.documentType === "nid"
-      ? "National ID"
-      : kyc?.documentType === "driving_license"
-      ? "Driver's License"
-      : kyc?.documentType
-      ? kyc.documentType.charAt(0).toUpperCase() + kyc.documentType.slice(1)
-      : "Passport";
+        ? "National ID"
+        : kyc?.documentType === "driving_license"
+          ? "Driver's License"
+          : kyc?.documentType
+            ? kyc.documentType.charAt(0).toUpperCase() + kyc.documentType.slice(1)
+            : "Passport";
 
   const lastDigits = kyc?.documentNumber
     ? kyc.documentNumber.slice(-4)
@@ -46,8 +46,8 @@ export default function KycPage() {
   const verifiedDateStr = kyc?.reviewedAt
     ? moment(kyc.reviewedAt).format("MMM D, YYYY")
     : kyc?.updatedAt
-    ? moment(kyc.updatedAt).format("MMM D, YYYY")
-    : "Aug 22, 2026";
+      ? moment(kyc.updatedAt).format("MMM D, YYYY")
+      : "Aug 22, 2026";
 
   const submittedDateStr = kyc?.createdAt
     ? moment(kyc.createdAt).format("MMM D, YYYY")
@@ -85,7 +85,7 @@ export default function KycPage() {
 
         {/* 3. Main Content Area */}
         {isLoading ? (
-          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-12 flex flex-col items-center justify-center min-h-[320px]">
+          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-12 flex flex-col items-center justify-center min-h-[320px]">
             <Loader size={40} />
             <p className="mt-4 text-xs font-medium text-gray-500">
               Checking verification status...
@@ -93,7 +93,7 @@ export default function KycPage() {
           </div>
         ) : isKycVerified ? (
           /* ── STATE A: VERIFIED (Design Screenshot Match) ── */
-          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
             {/* Card Header */}
             <div className="flex items-center justify-between gap-4 pb-2">
               <div className="flex items-baseline flex-wrap gap-2.5">
@@ -111,7 +111,7 @@ export default function KycPage() {
             </div>
 
             {/* 3-Column Info Box */}
-            <div className="border border-gray-200/90 rounded-2xl p-5 sm:p-6 bg-white">
+            <div className="border border-gray-200/90 rounded-[6px] p-5 sm:p-6 bg-white">
               <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100 gap-5 md:gap-0">
                 {/* Legal Name */}
                 <div className="md:pr-6 space-y-1">
@@ -146,7 +146,7 @@ export default function KycPage() {
             </div>
 
             {/* Bottom Privilege Box */}
-            <div className="bg-[#F4FBF9] border border-[#D5EFEA] rounded-xl p-5 space-y-1">
+            <div className="bg-[#F4FBF9] border border-[#D5EFEA] rounded-[6px] p-5 space-y-1">
               <div className="flex items-center gap-2 text-gray-900">
                 <CheckCircle2 className="w-4 h-4 text-[#0D6D5F] shrink-0 stroke-[2.2]" />
                 <h4 className="text-xs sm:text-sm font-bold">
@@ -160,7 +160,7 @@ export default function KycPage() {
           </div>
         ) : isPending ? (
           /* ── STATE B: PENDING REVIEW ── */
-          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
             <div className="flex items-center justify-between gap-4 pb-2">
               <div className="flex items-baseline flex-wrap gap-2.5">
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-950">
@@ -177,7 +177,7 @@ export default function KycPage() {
             </div>
 
             {/* 3-Column Info Box */}
-            <div className="border border-gray-200/90 rounded-2xl p-5 sm:p-6 bg-white">
+            <div className="border border-gray-200/90 rounded-[6px] p-5 sm:p-6 bg-white">
               <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100 gap-5 md:gap-0">
                 <div className="md:pr-6 space-y-1">
                   <span className="text-xs font-medium text-gray-500 block">
@@ -207,7 +207,7 @@ export default function KycPage() {
             </div>
 
             {/* Pending Alert Box */}
-            <div className="bg-[#FFFBF2] border border-[#FDE6B8] rounded-xl p-5 space-y-1">
+            <div className="bg-[#FFFBF2] border border-[#FDE6B8] rounded-[6px] p-5 space-y-1">
               <div className="flex items-center gap-2 text-gray-900">
                 <Clock className="w-4 h-4 text-[#D97706] shrink-0" />
                 <h4 className="text-xs sm:text-sm font-bold">
@@ -221,8 +221,8 @@ export default function KycPage() {
           </div>
         ) : user && !user.isSeller ? (
           /* ── STATE C: BUYER ONLY PROMPT ── */
-          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-8 text-center max-w-xl mx-auto space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#0D6D5F] mx-auto">
+          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-8 text-center max-w-xl mx-auto space-y-4">
+            <div className="w-14 h-14 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#0D6D5F] mx-auto">
               <Sparkles className="w-6 h-6" />
             </div>
             <h2 className="text-xl font-bold text-gray-900">Seller Verification</h2>
@@ -232,13 +232,13 @@ export default function KycPage() {
             <div className="flex justify-center gap-3 pt-2">
               <Link
                 href="/register?seller=true"
-                className="px-6 py-2.5 bg-black hover:bg-gray-900 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-2xs"
+                className="px-6 py-2.5 bg-black hover:bg-gray-900 text-white text-xs sm:text-sm font-semibold rounded-[6px] transition-all shadow-2xs"
               >
                 Become a Seller
               </Link>
               <Link
                 href="/profile"
-                className="px-5 py-2.5 border border-gray-200 text-gray-700 hover:bg-gray-50 text-xs sm:text-sm font-semibold rounded-xl transition-all"
+                className="px-5 py-2.5 border border-gray-200 text-gray-700 hover:bg-gray-50 text-xs sm:text-sm font-semibold rounded-[6px] transition-all"
               >
                 Back to Profile
               </Link>
@@ -246,7 +246,7 @@ export default function KycPage() {
           </div>
         ) : (
           /* ── STATE D: UNVERIFIED / REJECTED FORM ── */
-          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
             <KycVerificationForm />
           </div>
         )}

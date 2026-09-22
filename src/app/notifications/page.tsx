@@ -330,22 +330,22 @@ const NotificationsPage = () => {
         </div>
 
         {/* Filters & Search Control Bar */}
-        <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-xs mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-white rounded-[6px] p-3 sm:p-4 border border-slate-200/80 shadow-xs mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           {/* Segmented Filter Tabs */}
-          <div className="bg-[#F3F4F6] p-1 rounded-xl flex items-center gap-1 shrink-0">
+          <div className="flex items-center h-[46px] bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 shrink-0">
             <Button
               type="button"
               variant={activeTab === "all" ? "brand" : "ghost"}
-              size="xs"
-              radius="lg"
+              size="sm"
+              radius="fiverr"
               onClick={() => setActiveTab("all")}
-              className={`px-4 py-2 text-xs font-semibold gap-1.5 ${activeTab === "all"
-                ? "bg-[#0E3834] hover:bg-[#0E3834] text-white shadow-xs"
-                : "text-slate-600 hover:text-slate-900"
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 gap-1.5 ${activeTab === "all"
+                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                 }`}
             >
               <span>All</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${activeTab === "all" ? "bg-white/20 text-white" : "bg-slate-200/70 text-slate-600"
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${activeTab === "all" ? "bg-white/20 text-white" : "bg-gray-200/80 text-gray-700"
                 }`}>
                 {notifications.length}
               </span>
@@ -354,17 +354,17 @@ const NotificationsPage = () => {
             <Button
               type="button"
               variant={activeTab === "unread" ? "brand" : "ghost"}
-              size="xs"
-              radius="lg"
+              size="sm"
+              radius="fiverr"
               onClick={() => setActiveTab("unread")}
-              className={`px-4 py-2 text-xs font-semibold gap-1.5 ${activeTab === "unread"
-                ? "bg-[#0E3834] hover:bg-[#0E3834] text-white shadow-xs"
-                : "text-slate-600 hover:text-slate-900"
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 gap-1.5 ${activeTab === "unread"
+                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                 }`}
             >
               <span>Unread</span>
               {unreadCount > 0 && (
-                <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${activeTab === "unread" ? "bg-white/20 text-white" : "bg-amber-100 text-amber-800"
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${activeTab === "unread" ? "bg-white/20 text-white" : "bg-amber-100 text-amber-800"
                   }`}>
                   {unreadCount}
                 </span>
@@ -374,16 +374,16 @@ const NotificationsPage = () => {
             <Button
               type="button"
               variant={activeTab === "read" ? "brand" : "ghost"}
-              size="xs"
-              radius="lg"
+              size="sm"
+              radius="fiverr"
               onClick={() => setActiveTab("read")}
-              className={`px-4 py-2 text-xs font-semibold gap-1.5 ${activeTab === "read"
-                ? "bg-[#0E3834] hover:bg-[#0E3834] text-white shadow-xs"
-                : "text-slate-600 hover:text-slate-900"
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 gap-1.5 ${activeTab === "read"
+                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                 }`}
             >
               <span>Read</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${activeTab === "read" ? "bg-white/20 text-white" : "bg-slate-200/70 text-slate-600"
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${activeTab === "read" ? "bg-white/20 text-white" : "bg-gray-200/80 text-gray-700"
                 }`}>
                 {readCount}
               </span>
@@ -422,9 +422,9 @@ const NotificationsPage = () => {
             {[1, 2, 3, 4].map((n) => (
               <div
                 key={n}
-                className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs flex items-start gap-4 animate-pulse"
+                className="bg-white rounded-[6px] p-5 border border-slate-200/80 shadow-2xs flex items-start gap-4 animate-pulse"
               >
-                <div className="w-11 h-11 rounded-xl bg-slate-100 shrink-0" />
+                <div className="w-11 h-11 rounded-[6px] bg-slate-100 shrink-0" />
                 <div className="flex-1 flex flex-col gap-2">
                   <div className="flex items-center justify-between">
                     <div className="h-4 bg-slate-100 rounded-md w-1/3" />
@@ -438,7 +438,7 @@ const NotificationsPage = () => {
         ) : filteredNotifications.length === 0 ? (
           /* Empty State */
           <div className="bg-white rounded-3xl p-12 sm:p-16 border border-slate-200/80 shadow-xs flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 rounded-2xl bg-teal-50 text-[#0E3834] flex items-center justify-center mb-4 shadow-2xs">
+            <div className="w-16 h-16 rounded-[6px] bg-teal-50 text-[#0E3834] flex items-center justify-center mb-4 shadow-2xs">
               <Inbox className="w-8 h-8" />
             </div>
             <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-1">
@@ -504,14 +504,14 @@ const NotificationsPage = () => {
                         <div
                           key={n._id}
                           onClick={() => handleNotificationClick(n)}
-                          className={`relative rounded-2xl p-4 sm:p-5 border transition-all duration-200 cursor-pointer group flex items-start gap-3.5 sm:gap-4 shadow-2xs hover:shadow-md hover:border-slate-300 ${!n.isRead
+                          className={`relative rounded-[6px] p-4 sm:p-5 border transition-all duration-200 cursor-pointer group flex items-start gap-3.5 sm:gap-4 shadow-2xs hover:shadow-md hover:border-slate-300 ${!n.isRead
                             ? "bg-white border-slate-200/90 ring-1 ring-[#0E3834]/5"
                             : "bg-white/80 hover:bg-white border-slate-200/60 opacity-85 hover:opacity-100"
                             }`}
                         >
                           {/* Category Icon Badge */}
                           <div
-                            className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${category.iconBg} shadow-2xs mt-0.5`}
+                            className={`w-11 h-11 rounded-[6px] flex items-center justify-center shrink-0 border ${category.iconBg} shadow-2xs mt-0.5`}
                           >
                             {category.icon}
                           </div>

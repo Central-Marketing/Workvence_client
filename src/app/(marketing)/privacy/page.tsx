@@ -107,7 +107,7 @@ export default function PrivacyPage() {
         </header>
 
         {/* 2. Hero Banner Image */}
-        <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-12 w-full aspect-[16/8] sm:aspect-[2.2/1] md:aspect-[44/15] rounded-[10px] overflow-hidden bg-gray-100 shadow-xs border border-black/[0.04] shrink-0">
+        <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-12 w-full aspect-[16/8] sm:aspect-[2.2/1] md:aspect-[44/15] rounded-[6px] overflow-hidden bg-gray-100 shadow-xs border border-black/[0.04] shrink-0">
           <img
             src={DUMMY_IMAGE}
             alt="Privacy and Data Security Banner"

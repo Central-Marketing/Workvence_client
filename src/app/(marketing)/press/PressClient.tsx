@@ -147,7 +147,7 @@ export default function PressClient() {
               </Button>
               <a
                 href="#media-inquiries"
-                className="px-6 py-3 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-xs transition"
+                className="px-6 py-3 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-xs transition"
               >
                 Press Inquiries
               </a>
@@ -160,7 +160,7 @@ export default function PressClient() {
       <section className="py-16 lg:py-24 bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            
+
             {/* Left Column: Press Releases (8 cols) */}
             <div className="lg:col-span-8 space-y-8">
               <div className="flex items-center justify-between border-b border-gray-200 pb-4">
@@ -172,7 +172,7 @@ export default function PressClient() {
                 {pressReleases.map((pr) => (
                   <article
                     key={pr.id}
-                    className="bg-white border border-gray-200/90 rounded-2xl p-7 hover:border-[#327C73] hover:shadow-md transition-all duration-200 space-y-3"
+                    className="bg-white border border-gray-200/90 rounded-[6px] p-7 hover:border-[#327C73] hover:shadow-md transition-all duration-200 space-y-3"
                   >
                     <div className="flex items-center gap-3 text-xs">
                       <span className="px-2.5 py-1 rounded-md font-bold bg-[#10b981]/10 text-[#327C73]">
@@ -222,7 +222,7 @@ export default function PressClient() {
                   {mediaCoverage.map((item, idx) => (
                     <div
                       key={idx}
-                      className="bg-[#f8fafc] border border-gray-200/80 rounded-2xl p-5 space-y-2 hover:bg-white hover:border-[#327C73] hover:shadow-xs transition"
+                      className="bg-[#f8fafc] border border-gray-200/80 rounded-[6px] p-5 space-y-2 hover:bg-white hover:border-[#327C73] hover:shadow-xs transition"
                     >
                       <div className="flex items-center justify-between text-xs">
                         <span className="font-bold text-[#327C73]">{item.outlet}</span>
@@ -239,7 +239,7 @@ export default function PressClient() {
 
             {/* Right Column: Media Kit & Inquiries (4 cols) */}
             <div className="lg:col-span-4 space-y-8">
-              
+
               {/* Media Kit Card */}
               <div className="bg-[#f8fafc] border border-gray-200 rounded-3xl p-6 space-y-5">
                 <h3 className="text-lg font-bold text-[#0f172a]">Official Brand Assets</h3>
@@ -248,21 +248,21 @@ export default function PressClient() {
                 </p>
 
                 <div className="space-y-3">
-                  <div className="p-3 bg-white rounded-xl border border-gray-200 flex items-center justify-between text-xs font-semibold text-gray-700">
+                  <div className="p-3 bg-white rounded-[6px] border border-gray-200 flex items-center justify-between text-xs font-semibold text-gray-700">
                     <span className="flex items-center gap-2">
                       <FileText className="w-4 h-4 text-[#327C73]" />
                       Workvence Logos (.SVG, .PNG)
                     </span>
                     <span className="text-gray-400">4.2 MB</span>
                   </div>
-                  <div className="p-3 bg-white rounded-xl border border-gray-200 flex items-center justify-between text-xs font-semibold text-gray-700">
+                  <div className="p-3 bg-white rounded-[6px] border border-gray-200 flex items-center justify-between text-xs font-semibold text-gray-700">
                     <span className="flex items-center gap-2">
                       <FileText className="w-4 h-4 text-[#327C73]" />
                       Brand Identity Guidelines (.PDF)
                     </span>
                     <span className="text-gray-400">8.1 MB</span>
                   </div>
-                  <div className="p-3 bg-white rounded-xl border border-gray-200 flex items-center justify-between text-xs font-semibold text-gray-700">
+                  <div className="p-3 bg-white rounded-[6px] border border-gray-200 flex items-center justify-between text-xs font-semibold text-gray-700">
                     <span className="flex items-center gap-2">
                       <FileText className="w-4 h-4 text-[#327C73]" />
                       Product & Executive Photos (.ZIP)
@@ -303,7 +303,7 @@ export default function PressClient() {
                       value={inquiryForm.name}
                       onChange={(e) => setInquiryForm({ ...inquiryForm, name: e.target.value })}
                       placeholder="e.g. Alex Morgan"
-                      className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] focus:ring-1 focus:ring-[#327C73] outline-none"
+                      className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] focus:ring-1 focus:ring-[#327C73] outline-none"
                     />
                   </div>
                   <div>
@@ -314,7 +314,7 @@ export default function PressClient() {
                       value={inquiryForm.outlet}
                       onChange={(e) => setInquiryForm({ ...inquiryForm, outlet: e.target.value })}
                       placeholder="e.g. Tech Report"
-                      className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] focus:ring-1 focus:ring-[#327C73] outline-none"
+                      className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] focus:ring-1 focus:ring-[#327C73] outline-none"
                     />
                   </div>
                   <div>
@@ -325,7 +325,7 @@ export default function PressClient() {
                       value={inquiryForm.email}
                       onChange={(e) => setInquiryForm({ ...inquiryForm, email: e.target.value })}
                       placeholder="alex@publication.com"
-                      className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] focus:ring-1 focus:ring-[#327C73] outline-none"
+                      className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] focus:ring-1 focus:ring-[#327C73] outline-none"
                     />
                   </div>
                   <div>
@@ -335,7 +335,7 @@ export default function PressClient() {
                       value={inquiryForm.deadline}
                       onChange={(e) => setInquiryForm({ ...inquiryForm, deadline: e.target.value })}
                       placeholder="e.g. Today 5 PM EST"
-                      className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] focus:ring-1 focus:ring-[#327C73] outline-none"
+                      className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] focus:ring-1 focus:ring-[#327C73] outline-none"
                     />
                   </div>
                   <div>

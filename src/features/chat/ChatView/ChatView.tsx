@@ -302,7 +302,7 @@ const ChatMessageAttachmentItem = ({
             handleOpenInNewTab(e);
           }
         }}
-        className={`mt-1 overflow-hidden rounded-xl border border-slate-200/90 shadow-sm max-w-[280px] bg-slate-50 cursor-pointer group hover:border-[#327C73]/50 transition-all ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}
+        className={`mt-1 overflow-hidden rounded-[6px] border border-slate-200/90 shadow-sm max-w-[280px] bg-slate-50 cursor-pointer group hover:border-[#327C73]/50 transition-all ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}
         title="Click to preview image"
       >
         <img
@@ -318,12 +318,12 @@ const ChatMessageAttachmentItem = ({
   // Video attachment view
   if (isVideo) {
     return (
-      <div className={`mt-1 overflow-hidden rounded-xl border border-slate-200 shadow-sm max-w-[340px] bg-black ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}>
+      <div className={`mt-1 overflow-hidden rounded-[6px] border border-slate-200 shadow-sm max-w-[340px] bg-black ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}>
         <video
           src={currentUrl}
           controls
           preload="metadata"
-          className="w-full max-h-[280px] rounded-xl object-contain"
+          className="w-full max-h-[280px] rounded-[6px] object-contain"
         />
       </div>
     );
@@ -333,7 +333,7 @@ const ChatMessageAttachmentItem = ({
   return (
     <div
       onClick={handleOpenInNewTab}
-      className={`flex items-center gap-2.5 px-3.5 py-2.5 mt-1 bg-slate-100 hover:bg-slate-200/80 text-slate-800 rounded-xl transition-all border border-slate-200/90 text-xs font-semibold cursor-pointer select-none max-w-[280px] group shadow-2xs ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}
+      className={`flex items-center gap-2.5 px-3.5 py-2.5 mt-1 bg-slate-100 hover:bg-slate-200/80 text-slate-800 rounded-[6px] transition-all border border-slate-200/90 text-xs font-semibold cursor-pointer select-none max-w-[280px] group shadow-2xs ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}
       title="Click to open file in a new tab"
     >
       <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-base shadow-2xs shrink-0 group-hover:scale-105 transition-transform">
@@ -1771,7 +1771,7 @@ const ChatView = () => {
         <main className="flex-1 flex flex-col overflow-hidden bg-white min-w-0">
           {!conversationID || (!isValidId && conversations.length === 0) ? (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white gap-3 select-none">
-              <div className="w-16 h-16 rounded-2xl bg-[#E6F7F3] text-[#0D6D5F] flex items-center justify-center shadow-2xs mb-1">
+              <div className="w-16 h-16 rounded-[6px] bg-[#E6F7F3] text-[#0D6D5F] flex items-center justify-center shadow-2xs mb-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="32"
@@ -2086,7 +2086,7 @@ const ChatView = () => {
               {/* Messages */}
               <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 flex flex-col gap-4 bg-[#F0F0F0] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full">
                 {msgsError ? (
-                  <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-red-50/50 dark:bg-red-950/20 m-6 rounded-2xl border border-red-200 dark:border-red-900/50 shadow-sm">
+                  <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-red-50/50 dark:bg-red-950/20 m-6 rounded-[6px] border border-red-200 dark:border-red-900/50 shadow-sm">
                     <div className="w-16 h-16 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center text-3xl mb-4 font-bold">🚫</div>
                     <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-2">Access Denied (403)</h3>
                     <p className="text-slate-600 dark:text-slate-400 max-w-md text-sm leading-relaxed">
@@ -2193,7 +2193,7 @@ const ChatView = () => {
                             )}
 
                             {isAccepted && (
-                              <div className="w-full flex items-center justify-between gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200/80 rounded-xl px-3.5 py-2 text-xs font-bold">
+                              <div className="w-full flex items-center justify-between gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200/80 rounded-[6px] px-3.5 py-2 text-xs font-bold">
                                 <span>✓ Custom Proposal Accepted</span>
                                 {targetOrderId && (
                                   <span className="text-[11px] font-mono text-emerald-700">
@@ -2380,7 +2380,7 @@ const ChatView = () => {
 
                             {/* Credentials Row: ID & Passcode pills */}
                             <div className="w-full flex items-center gap-3">
-                              <div className="flex-1 bg-[#F0F0F0] rounded-[10px] px-3.5 py-2.5 flex items-center justify-between gap-2 min-w-0">
+                              <div className="flex-1 bg-[#F0F0F0] rounded-[6px] px-3.5 py-2.5 flex items-center justify-between gap-2 min-w-0">
                                 <span className="text-sm font-medium text-slate-700 truncate">
                                   ID- {meeting.meetingId || (meeting.roomUrl ? String(meeting.roomUrl).split('/').pop() : '81346682237')}
                                 </span>
@@ -2402,7 +2402,7 @@ const ChatView = () => {
                                 />
                               </div>
 
-                              <div className="flex-1 bg-[#F0F0F0] rounded-[10px] px-3.5 py-2.5 flex items-center justify-between gap-2 min-w-0">
+                              <div className="flex-1 bg-[#F0F0F0] rounded-[6px] px-3.5 py-2.5 flex items-center justify-between gap-2 min-w-0">
                                 <span className="text-sm font-medium text-slate-700 truncate">
                                   Pass- {meeting.password || meeting.passcode || 'i4Rs8N'}
                                 </span>
@@ -2500,7 +2500,7 @@ const ChatView = () => {
               {/* Compose Area */}
               <div className="p-4 sm:px-5 sm:py-4 bg-[#f0f0f0] relative max-md:p-3">
                 {attachment && (
-                  <div className="flex items-center gap-3 mb-3 p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 shadow-sm max-w-sm">
+                  <div className="flex items-center gap-3 mb-3 p-2.5 bg-slate-50 dark:bg-slate-900 rounded-[6px] border border-slate-200 shadow-sm max-w-sm">
                     {attachment.type?.includes('image') || /\.(png|jpe?g|gif|webp|svg)/i.test(attachment.name) || attachment.url?.includes('/image/upload/') ? (
                       <div className="relative group flex-shrink-0">
                         <img
@@ -2543,7 +2543,7 @@ const ChatView = () => {
                 {!msgsError && (
                   <form
                     onSubmit={handleSend}
-                    className="relative flex items-end gap-2 p-2 bg-white border border-gray-200 rounded-2xl shadow-sm max-md:px-2 max-md:py-1.5 max-md:gap-1.5"
+                    className="relative flex items-end gap-2 p-2 bg-white border border-gray-200 rounded-[6px] shadow-sm max-md:px-2 max-md:py-1.5 max-md:gap-1.5"
                   >
                     <input
                       type="file"
@@ -2632,8 +2632,8 @@ const ChatView = () => {
             return (
               <aside className={`w-[320px] min-w-[280px] xl:w-[340px] xl:min-w-[320px] h-full max-h-full min-h-0 border-l border-[rgba(0, 0, 0, 0.10)] bg-[#F8F8F8] overflow-y-auto overflow-x-hidden p-4 xl:p-5 flex flex-col shrink-0 box-border max-xl:fixed max-xl:top-0 max-xl:bottom-0 max-xl:right-0 max-xl:z-40 max-xl:shadow-2xl max-xl:h-full max-xl:flex max-xl:transform max-xl:transition-transform max-xl:duration-300 max-xl:ease-in-out ${isRightSideOpen ? 'max-xl:translate-x-0' : 'max-xl:translate-x-full'}`}>
                 <div className="flex flex-col gap-4">
-                  <Skeleton className="w-full h-44 rounded-2xl" />
-                  <Skeleton className="w-full h-36 rounded-2xl" />
+                  <Skeleton className="w-full h-44 rounded-[6px]" />
+                  <Skeleton className="w-full h-36 rounded-[6px]" />
                 </div>
               </aside>
             );
@@ -2860,7 +2860,7 @@ const ChatView = () => {
                 {contactSidebarTab === 'profile' ? (
                   <>
                     {/* ── Card 1: About Contact ── */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col gap-3 relative">
+                    <div className="bg-white rounded-[6px] p-5 border border-slate-200/80 shadow-xs flex flex-col gap-3 relative">
                       <h3 className="text-base sm:text-[17px] font-bold text-slate-800 tracking-tight">
                         About {finalRecipientUser.username || finalRecipientUser.name || 'Contact'}
                       </h3>
@@ -2975,7 +2975,7 @@ const ChatView = () => {
                     </div>
 
                     {/* ── Card 2: Order History ── */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col gap-3">
+                    <div className="bg-white rounded-[6px] p-5 border border-slate-200/80 shadow-xs flex flex-col gap-3">
                       <div
                         className="flex items-center justify-between cursor-pointer select-none"
                         onClick={() => setIsOrdersExpanded(!isOrdersExpanded)}
@@ -3112,7 +3112,7 @@ const ChatView = () => {
       {/* Custom Offer Modal */}
       {showOfferModal && (
         <div className="fixed inset-0 bg-slate-900/45 backdrop-blur-xs flex items-center justify-center z-50 p-4 transition-opacity" onClick={() => setShowOfferModal(false)}>
-          <div className="bg-white w-[92%] max-w-[460px] max-h-[calc(100vh-40px)] flex flex-col overflow-hidden rounded-2xl shadow-2xl border border-slate-100 max-md:w-[96%] max-md:max-h-[95vh]" onClick={e => e.stopPropagation()}>
+          <div className="bg-white w-[92%] max-w-[460px] max-h-[calc(100vh-40px)] flex flex-col overflow-hidden rounded-[6px] shadow-2xl border border-slate-100 max-md:w-[96%] max-md:max-h-[95vh]" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center px-5 py-4 border-b border-slate-200 bg-slate-50/80 shrink-0">
               <h3 className="text-[15px] font-bold text-slate-900 m-0">Create Custom Offer</h3>
               <Button
@@ -3235,7 +3235,7 @@ const ChatView = () => {
           <div className="w-[92%] max-w-md p-6 bg-white rounded-3xl shadow-2xl border border-slate-100 max-h-[calc(100vh-40px)] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center pb-4 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold border border-emerald-100">
+                <div className="w-9 h-9 rounded-[6px] bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold border border-emerald-100">
                   <RiVideoChatLine className="w-5 h-5 text-brand-green" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">Create Video Meeting</h3>
@@ -3264,7 +3264,7 @@ const ChatView = () => {
                   placeholder="e.g. Freelancer Job Discussion"
                   value={meetingTitle}
                   onChange={(e) => setMeetingTitle(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-brand-green bg-slate-50/50"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-slate-200 text-sm focus:outline-none focus:border-brand-green bg-slate-50/50"
                   required
                   autoFocus
                 />
@@ -3328,7 +3328,7 @@ const ChatView = () => {
               </Button>
             </div>
 
-            <div className="flex justify-between items-center bg-emerald-50/70 border border-emerald-200/60 rounded-2xl p-4">
+            <div className="flex justify-between items-center bg-emerald-50/70 border border-emerald-200/60 rounded-[6px] p-4">
               <div>
                 <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Price</span>
                 <span className="text-2xl font-bold text-emerald-700">${viewingOfferDetails.offer?.price}</span>
@@ -3345,7 +3345,7 @@ const ChatView = () => {
 
             <div className="space-y-2">
               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Full Description</h4>
-              <div className="bg-slate-50 border border-slate-200/70 rounded-2xl p-4 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto">
+              <div className="bg-slate-50 border border-slate-200/70 rounded-[6px] p-4 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto">
                 {renderMessageTextWithLinks(viewingOfferDetails.offer?.desc || 'No description provided.')}
               </div>
             </div>

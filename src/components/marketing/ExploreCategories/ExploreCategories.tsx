@@ -161,10 +161,10 @@ const ExploreCategories = () => {
               <Link
                 href={`/packages?category=${encodeURIComponent(path)}`}
                 key={category._id || category.id || index}
-                className="group flex-1 min-w-[130px] sm:min-w-[145px] lg:min-w-[150px] xl:min-w-0 bg-white hover:bg-[#004316] border border-gray-100 hover:border-brand-green rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-[0_1px_4px_rgba(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer min-h-[140px] sm:min-h-[150px]"
+                className="group flex-1 min-w-[130px] sm:min-w-[145px] lg:min-w-[150px] xl:min-w-0 bg-white hover:bg-[#004316] border border-gray-100 hover:border-brand-green rounded-[6px] p-4 sm:p-5 flex flex-col justify-between shadow-[0_1px_4px_rgba(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer min-h-[140px] sm:min-h-[150px]"
               >
                 {/* Icon Container: Inverts from #F5F5F7 to white on card hover */}
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#F5F5F7] group-hover:bg-white flex items-center justify-center mb-3 sm:mb-4 transition-all duration-300 shrink-0">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-[6px] bg-[#F5F5F7] group-hover:bg-white flex items-center justify-center mb-3 sm:mb-4 transition-all duration-300 shrink-0">
                   {renderCategoryIcon(
                     category.icon,
                     title,

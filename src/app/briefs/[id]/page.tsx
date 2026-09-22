@@ -549,7 +549,7 @@ const BriefDetail = () => {
           <p className="text-slate-500 mb-6">This project may have been removed or the link is invalid.</p>
           <Link
             href="/briefs"
-            className="px-5 py-2.5 rounded-xl bg-black text-white text-sm font-semibold"
+            className="px-5 py-2.5 rounded-[6px] bg-black text-white text-sm font-semibold"
           >
             ← Browse All Projects
           </Link>
@@ -666,10 +666,10 @@ const BriefDetail = () => {
         </div>
 
         {/* 5-Column Specification Metric Card */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-4 sm:p-5 my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+        <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-2xs p-4 sm:p-5 my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
           {/* Spec 1: Location */}
           <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-3 first:pl-0">
-            <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-[6px] bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0">
               <FiMapPin className="text-rose-500 text-base" />
             </div>
             <div className="min-w-0">
@@ -684,7 +684,7 @@ const BriefDetail = () => {
 
           {/* Spec 2: Hourly/Budget */}
           <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-[6px] bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
               <FiClock className="text-amber-500 text-base" />
             </div>
             <div className="min-w-0">
@@ -699,7 +699,7 @@ const BriefDetail = () => {
 
           {/* Spec 3: Duration */}
           <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-[6px] bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
               <FiCalendar className="text-emerald-500 text-base" />
             </div>
             <div className="min-w-0">
@@ -714,7 +714,7 @@ const BriefDetail = () => {
 
           {/* Spec 4: Experience Level */}
           <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-[6px] bg-purple-50 border border-purple-100 flex items-center justify-center shrink-0">
               <FiBarChart2 className="text-purple-500 text-base" />
             </div>
             <div className="min-w-0">
@@ -730,7 +730,7 @@ const BriefDetail = () => {
           {/* Spec 5: Project Type / Status */}
           <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-3">
             <div
-              className={`w-10 h-10 rounded-xl ${isClosed
+              className={`w-10 h-10 rounded-[6px] ${isClosed
                 ? "bg-rose-50 border border-rose-100"
                 : "bg-amber-50 border border-amber-100"
                 } flex items-center justify-center shrink-0`}
@@ -794,7 +794,7 @@ const BriefDetail = () => {
                   href={att}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:border-teal-600 text-xs font-semibold text-slate-700 hover:text-teal-700 transition-colors shadow-2xs"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-[6px] bg-white border border-slate-200 hover:border-teal-600 text-xs font-semibold text-slate-700 hover:text-teal-700 transition-colors shadow-2xs"
                 >
                   <FiFileText className="text-teal-600 text-sm" />
                   <span className="truncate max-w-[220px]">Attachment #{idx + 1}</span>
@@ -979,7 +979,7 @@ const BriefDetail = () => {
 
         {/* Bottom Banner: "Find the Right Project" - Only visible to Freelancers / Guest Users (NOT Project Owner) */}
         {!isOwner && (
-          <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden mt-12 mb-6 bg-[#042823] min-h-[300px] sm:min-h-[360px] md:min-h-[420px] flex items-center shadow-lg">
+          <div className="relative w-full rounded-[6px] sm:rounded-3xl overflow-hidden mt-12 mb-6 bg-[#042823] min-h-[300px] sm:min-h-[360px] md:min-h-[420px] flex items-center shadow-lg">
             {/* Background 3D Layered Cards Image */}
             <div className="absolute inset-0 z-0">
               <Image
@@ -1041,7 +1041,7 @@ const BriefDetail = () => {
           onClick={() => setShowProposalsModal(false)}
         >
           <div
-            className={`bg-white rounded-2xl w-full ${modalView === "ai" ? "max-w-2xl" : "max-w-xl"
+            className={`bg-white rounded-[6px] w-full ${modalView === "ai" ? "max-w-2xl" : "max-w-xl"
               } max-h-[90vh] flex flex-col overflow-hidden relative transition-all ${modalView === "ai"
                 ? "border-2 border-[#0D6D5F]/30 ring-4 ring-[#0D6D5F]/10 shadow-2xl"
                 : "border border-slate-100 shadow-2xl"
@@ -1134,7 +1134,7 @@ const BriefDetail = () => {
                     return (
                       <div
                         key={item.id}
-                        className="bg-white border rounded-2xl p-4 sm:p-5 transition-all shadow-2xs border-slate-200/90 hover:border-slate-300"
+                        className="bg-white border rounded-[6px] p-4 sm:p-5 transition-all shadow-2xs border-slate-200/90 hover:border-slate-300"
                       >
                         {/* Sender Profile Header */}
                         <div className="flex items-start justify-between gap-3 mb-2">
@@ -1275,7 +1275,7 @@ const BriefDetail = () => {
                   <>
                     {/* Analysis Summary Banner */}
                     {(aiResult?.summary || aiResult?.recommendation?.summary) && (
-                      <div className="bg-gradient-to-br from-[#0D6D5F]/5 via-[#0D6D5F]/10 to-slate-50/50 border border-[#0D6D5F]/20 rounded-2xl p-4 sm:p-5 shadow-2xs">
+                      <div className="bg-gradient-to-br from-[#0D6D5F]/5 via-[#0D6D5F]/10 to-slate-50/50 border border-[#0D6D5F]/20 rounded-[6px] p-4 sm:p-5 shadow-2xs">
                         <div className="flex items-center justify-between gap-2 mb-2">
                           <div className="flex items-center gap-2">
                             <div className="w-7 h-7 rounded-lg bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F]">
@@ -1315,7 +1315,7 @@ const BriefDetail = () => {
                         return (
                           <div
                             key={displayItem.id || `ai-rec-${index}`}
-                            className={`bg-white border rounded-2xl p-4 sm:p-5 transition-all shadow-2xs ${rank === 1
+                            className={`bg-white border rounded-[6px] p-4 sm:p-5 transition-all shadow-2xs ${rank === 1
                               ? "border-[#0D6D5F]/40 ring-2 ring-[#0D6D5F]/10 hover:border-[#0D6D5F]/60"
                               : "border-slate-200/90 hover:border-slate-300"
                               }`}
@@ -1415,7 +1415,7 @@ const BriefDetail = () => {
 
                             {/* AI Summary Rationale */}
                             {summaryRationale && (
-                              <div className="mb-3 bg-slate-50 border border-slate-200/80 rounded-xl p-3 text-xs text-slate-700 leading-relaxed">
+                              <div className="mb-3 bg-slate-50 border border-slate-200/80 rounded-[6px] p-3 text-xs text-slate-700 leading-relaxed">
                                 <span className="font-semibold text-slate-900 block mb-0.5">
                                   AI Match Analysis:
                                 </span>
@@ -1427,7 +1427,7 @@ const BriefDetail = () => {
                             {(pros.length > 0 || cons.length > 0) && (
                               <div className="mt-3.5 grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 {/* PROS */}
-                                <div className="bg-[#0D6D5F]/5 border border-[#0D6D5F]/20 rounded-xl p-3 sm:p-3.5 flex flex-col">
+                                <div className="bg-[#0D6D5F]/5 border border-[#0D6D5F]/20 rounded-[6px] p-3 sm:p-3.5 flex flex-col">
                                   <div className="flex items-center gap-1.5 mb-2">
                                     <div className="w-5 h-5 rounded-full bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F] shrink-0">
                                       <FiCheck className="text-xs stroke-[2.5]" />
@@ -1451,7 +1451,7 @@ const BriefDetail = () => {
                                 </div>
 
                                 {/* CONS */}
-                                <div className="bg-rose-50/70 border border-rose-200/70 rounded-xl p-3 sm:p-3.5 flex flex-col">
+                                <div className="bg-rose-50/70 border border-rose-200/70 rounded-[6px] p-3 sm:p-3.5 flex flex-col">
                                   <div className="flex items-center gap-1.5 mb-2">
                                     <div className="w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 shrink-0">
                                       <FiAlertTriangle className="text-xs stroke-[2.5]" />
@@ -1616,7 +1616,7 @@ const BriefDetail = () => {
                 </div>
 
                 {/* Budget & Delivery Time */}
-                <div className="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-100">
+                <div className="flex items-center justify-between bg-slate-50 p-4 rounded-[6px] border border-slate-100">
                   <div>
                     <span className="text-xs font-semibold text-slate-400 block mb-1">Budget</span>
                     <p className="text-xl sm:text-2xl font-extrabold text-emerald-600">
@@ -1660,7 +1660,7 @@ const BriefDetail = () => {
                 {/* Contact Box */}
                 <div>
                   <h3 className="font-bold text-sm text-slate-900 mb-2">Contact</h3>
-                  <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-2xs">
+                  <div className="bg-white border border-slate-200 rounded-[6px] p-4 space-y-3 shadow-2xs">
                     <div>
                       <p className="font-bold text-sm text-slate-900">{detailedProposal.name}</p>
                       <p className="text-xs text-slate-400 mt-0.5 flex items-center">
@@ -1705,7 +1705,7 @@ const BriefDetail = () => {
                             href={att}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors"
+                            className="flex items-center gap-2 p-3 rounded-[6px] bg-slate-50 border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors"
                           >
                             <FiFileText className="text-teal-600 text-base shrink-0" />
                             <span className="truncate">{filename}</span>
@@ -1730,7 +1730,7 @@ const BriefDetail = () => {
           onClick={() => setShowMyProposalModal(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden relative"
+            className="bg-white rounded-[6px] shadow-2xl w-full max-w-xl max-h-[85vh] flex flex-col overflow-hidden relative"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-white shrink-0">
@@ -1748,7 +1748,7 @@ const BriefDetail = () => {
             </div>
 
             <div className="p-6 flex flex-col gap-5 overflow-y-auto">
-              <div className="flex justify-between border-b border-slate-100 pb-4 bg-slate-50 p-4 rounded-xl">
+              <div className="flex justify-between border-b border-slate-100 pb-4 bg-slate-50 p-4 rounded-[6px]">
                 <div>
                   <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                     Your Price
@@ -1771,7 +1771,7 @@ const BriefDetail = () => {
                 <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                   Cover Letter
                 </div>
-                <div className="text-[15px] text-slate-800 whitespace-pre-wrap leading-relaxed bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+                <div className="text-[15px] text-slate-800 whitespace-pre-wrap leading-relaxed bg-slate-50/50 p-4 rounded-[6px] border border-slate-100">
                   {activeProposal.coverLetter}
                 </div>
               </div>

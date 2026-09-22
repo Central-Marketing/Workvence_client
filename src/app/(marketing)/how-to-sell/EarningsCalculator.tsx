@@ -70,7 +70,7 @@ export default function EarningsCalculator() {
               </div>
             </div>
 
-            <div className="bg-white/10 border border-white/10 rounded-2xl p-6 text-center space-y-4">
+            <div className="bg-white/10 border border-white/10 rounded-[6px] p-6 text-center space-y-4">
               <div className="space-y-1">
                 <span className="text-xs text-gray-300 uppercase tracking-wider font-semibold">
                   Estimated Monthly Take-Home
@@ -85,7 +85,7 @@ export default function EarningsCalculator() {
 
               <Link
                 href="/become-a-seller"
-                className="w-full py-3 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs shadow-md transition active:scale-95 inline-flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3 rounded-[6px] bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs shadow-md transition active:scale-95 inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Open Your Free Seller Account</span>
                 <ArrowRight className="w-4 h-4" />

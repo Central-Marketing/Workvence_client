@@ -210,7 +210,7 @@ export default function BuyerOrdersPage() {
 
         {/* Top Hero Banner: Shown when there is an active brief project */}
         {activeBrief && (
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0C1E30] via-[#09323B] to-[#0D5B5A] text-white shadow-sm p-7 sm:p-9 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="relative overflow-hidden rounded-[6px] bg-gradient-to-r from-[#0C1E30] via-[#09323B] to-[#0D5B5A] text-white shadow-sm p-7 sm:p-9 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="max-w-xl z-10">
               <h2 className="text-2xl sm:text-3xl lg:text-[32px] font-normal tracking-tight text-white leading-tight">
                 Your <span className="font-bold">brief</span> project is currently{" "}
@@ -234,7 +234,7 @@ export default function BuyerOrdersPage() {
                 alt="In Progress Project"
                 width={160}
                 height={160}
-                className="object-contain filter drop-shadow-[0_0_30px_rgba(45,212,191,0.25)] rounded-2xl"
+                className="object-contain filter drop-shadow-[0_0_30px_rgba(45,212,191,0.25)] rounded-[6px]"
                 priority
               />
             </div>
@@ -253,7 +253,7 @@ export default function BuyerOrdersPage() {
           </div>
 
           {/* 4-Stat Metric Bar */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.03)] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 overflow-hidden">
+          <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.03)] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 overflow-hidden">
 
             {/* 1. Total Spend */}
             <div className="p-5 sm:p-6 flex items-center justify-between">
@@ -264,7 +264,7 @@ export default function BuyerOrdersPage() {
                 </p>
                 <p className="text-xs text-slate-400 mt-1">Across all {totalOrdersCount} placed orders</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl border border-[#FFE8D1] bg-[#FFF9F2] flex items-center justify-center text-[#E07A24] shrink-0">
+              <div className="w-12 h-12 rounded-[6px] border border-[#FFE8D1] bg-[#FFF9F2] flex items-center justify-center text-[#E07A24] shrink-0">
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
                   <path d="M16 8l-5 5" />
@@ -284,7 +284,7 @@ export default function BuyerOrdersPage() {
                 </p>
                 <p className="text-xs text-slate-400 mt-1">Currently in progress</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl border border-[#F0DCFF] bg-[#FBF5FF] flex items-center justify-center text-[#9747FF] shrink-0">
+              <div className="w-12 h-12 rounded-[6px] border border-[#F0DCFF] bg-[#FBF5FF] flex items-center justify-center text-[#9747FF] shrink-0">
                 <FiPackage className="text-2xl" />
               </div>
             </div>
@@ -298,7 +298,7 @@ export default function BuyerOrdersPage() {
                 </p>
                 <p className="text-xs text-slate-400 mt-1">Packages successfully closed</p>
               </div>
-              <div className="w-12 h-12 rounded-2xl border border-[#CCFBF1] bg-[#F0FDFB] flex items-center justify-center text-[#0D9488] shrink-0">
+              <div className="w-12 h-12 rounded-[6px] border border-[#CCFBF1] bg-[#F0FDFB] flex items-center justify-center text-[#0D9488] shrink-0">
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
                   <line x1="3" y1="6" x2="21" y2="6" />
@@ -329,7 +329,7 @@ export default function BuyerOrdersPage() {
                   {favGigsCount} packages and {favSellersCount} sellers saved
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-2xl border border-[#FFE0E0] bg-[#FFF5F5] group-hover:bg-[#FFEBEB] flex items-center justify-center text-[#EF4444] shrink-0 transition-colors">
+              <div className="w-12 h-12 rounded-[6px] border border-[#FFE0E0] bg-[#FFF5F5] group-hover:bg-[#FFEBEB] flex items-center justify-center text-[#EF4444] shrink-0 transition-colors">
                 <FiHeart className="text-2xl" />
               </div>
             </Link>
@@ -338,7 +338,7 @@ export default function BuyerOrdersPage() {
         </div>
 
         {/* Recent Orders Section */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.03)] p-6 sm:p-7">
+        <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.03)] p-6 sm:p-7">
 
           {/* Header Row */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
@@ -361,7 +361,7 @@ export default function BuyerOrdersPage() {
 
             <div className="flex items-center gap-5 justify-between sm:justify-end">
               {/* Pill Switcher */}
-              <div className="bg-[#F1F3F5] p-1 rounded-[10px] flex items-center gap-1 overflow-x-auto scrollbar-none">
+              <div className="flex items-center h-[46px] bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 overflow-x-auto scrollbar-none">
                 {(["All", "Packages", "Briefs"] as const).map((tab) => (
                   <Button
                     key={tab}
@@ -369,12 +369,11 @@ export default function BuyerOrdersPage() {
                     onClick={() => setActiveTab(tab)}
                     variant={activeTab === tab ? "brand" : "ghost"}
                     size="sm"
-                    radius="lg"
-                    className={
-                      activeTab === tab
-                        ? "bg-[#113E37] hover:bg-[#113E37] text-white shadow-xs"
-                        : "text-slate-600 hover:text-slate-900"
-                    }
+                    radius="fiverr"
+                    className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${activeTab === tab
+                        ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                        : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                      }`}
                   >
                     {tab}
                   </Button>
@@ -427,7 +426,7 @@ export default function BuyerOrdersPage() {
                           {/* Order Name */}
                           <td className="py-4 px-3 align-middle max-w-[380px]">
                             <div className="flex items-center gap-4">
-                              <div className="relative w-24 sm:w-28 h-14 sm:h-16 rounded-xl overflow-hidden border border-slate-200 shrink-0 bg-slate-100">
+                              <div className="relative w-24 sm:w-28 h-14 sm:h-16 rounded-[6px] overflow-hidden border border-slate-200 shrink-0 bg-slate-100">
                                 <Image
                                   src={order.coverImage}
                                   alt={order.title}

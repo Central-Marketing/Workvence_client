@@ -120,7 +120,7 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
   };
 
   return (
-    <aside className={`w-full bg-white lg:bg-transparent rounded-2xl lg:rounded-none p-5 lg:p-0 space-y-6 ${className}`}>
+    <aside className={`w-full bg-white lg:bg-transparent rounded-[6px] lg:rounded-none p-5 lg:p-0 space-y-6 ${className}`}>
       {/* 1. Header: Filter Title + Reset Button */}
       {!hideHeader && (
         <div className="flex items-center justify-between pb-1">
@@ -170,9 +170,8 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
                     {selectedCategoryObj ? selectedCategoryObj.name : "Select Category"}
                   </span>
                   <FiChevronDown
-                    className={`w-4 h-4 text-gray-500 transition-transform duration-200 shrink-0 ml-2 ${
-                      categoryDropdownOpen ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 text-gray-500 transition-transform duration-200 shrink-0 ml-2 ${categoryDropdownOpen ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -196,11 +195,10 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
                           setCategoryDropdownOpen(false);
                         }}
                         rightIcon={!selectedCategory ? <FiCheck className="w-4 h-4 text-teal-600 shrink-0 ml-2" /> : undefined}
-                        className={`w-full text-left justify-between px-3.5 py-2.5 text-sm transition-colors border-none shadow-none h-auto min-h-0 cursor-pointer ${
-                          !selectedCategory
-                            ? "bg-teal-50/70 text-teal-800 font-semibold hover:bg-teal-50"
-                            : "text-gray-700 hover:bg-gray-50"
-                        }`}
+                        className={`w-full text-left justify-between px-3.5 py-2.5 text-sm transition-colors border-none shadow-none h-auto min-h-0 cursor-pointer ${!selectedCategory
+                          ? "bg-teal-50/70 text-teal-800 font-semibold hover:bg-teal-50"
+                          : "text-gray-700 hover:bg-gray-50"
+                          }`}
                       >
                         <span className="truncate">All Categories</span>
                       </Button>
@@ -220,11 +218,10 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
                               setCategoryDropdownOpen(false);
                             }}
                             rightIcon={isSelected ? <FiCheck className="w-4 h-4 text-teal-600 shrink-0 ml-2" /> : undefined}
-                            className={`w-full text-left justify-between px-3.5 py-2.5 text-sm transition-colors border-none shadow-none h-auto min-h-0 cursor-pointer ${
-                              isSelected
-                                ? "bg-teal-50/70 text-teal-800 font-semibold hover:bg-teal-50"
-                                : "text-gray-700 hover:bg-gray-50"
-                            }`}
+                            className={`w-full text-left justify-between px-3.5 py-2.5 text-sm transition-colors border-none shadow-none h-auto min-h-0 cursor-pointer ${isSelected
+                              ? "bg-teal-50/70 text-teal-800 font-semibold hover:bg-teal-50"
+                              : "text-gray-700 hover:bg-gray-50"
+                              }`}
                           >
                             <span className="truncate">{cat.name}</span>
                           </Button>
@@ -358,7 +355,7 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
         {/* Min / Max Inputs Box */}
         <div className="flex items-center gap-2">
           {/* Min Input */}
-          <div className="flex-1 flex items-center border border-gray-200 rounded-xl px-3 py-2 bg-white focus-within:border-gray-900 transition-colors">
+          <div className="flex-1 flex items-center border border-gray-200 rounded-[6px] px-3 py-2 bg-white focus-within:border-gray-900 transition-colors">
             <span className="text-gray-400 text-xs font-semibold mr-1">$</span>
             <input
               type="number"
@@ -373,7 +370,7 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
           <span className="text-gray-300 font-bold">-</span>
 
           {/* Max Input */}
-          <div className="flex-1 flex items-center border border-gray-200 rounded-xl px-3 py-2 bg-white focus-within:border-gray-900 transition-colors">
+          <div className="flex-1 flex items-center border border-gray-200 rounded-[6px] px-3 py-2 bg-white focus-within:border-gray-900 transition-colors">
             <span className="text-gray-400 text-xs font-semibold mr-1">$</span>
             <input
               type="number"

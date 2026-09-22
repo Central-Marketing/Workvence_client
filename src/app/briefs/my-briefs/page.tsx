@@ -451,8 +451,8 @@ const MyBriefs = () => {
             <Loader size={45} />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16 px-6 bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col items-center">
-            <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-2xl mb-4 text-slate-400">
+          <div className="text-center py-16 px-6 bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col items-center">
+            <div className="w-14 h-14 rounded-[6px] bg-slate-50 border border-slate-200 flex items-center justify-center text-2xl mb-4 text-slate-400">
               📁
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-1.5">
@@ -502,7 +502,7 @@ const MyBriefs = () => {
                 <div
                   key={brief._id}
                   onClick={() => router.push(`/briefs/${brief._id}`)}
-                  className="relative overflow-hidden bg-white rounded-[10px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[10px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-5 sm:p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer"
+                  className="relative overflow-hidden bg-white rounded-[6px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-5 sm:p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer"
                 >
                   {/* Ambient Purple Glow (appears on card hover) */}
                   <div
@@ -763,7 +763,7 @@ const MyProposals = () => {
           </div>
           <Link
             href="/briefs"
-            className="inline-flex items-center justify-center gap-2 px-4.5 py-2.5 rounded-xl bg-[#0B0F19] hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs shrink-0 self-start sm:self-center"
+            className="inline-flex items-center justify-center gap-2 px-4.5 py-2.5 rounded-[6px] bg-[#0B0F19] hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs shrink-0 self-start sm:self-center"
           >
             <span>Browse Open Projects</span>
           </Link>
@@ -775,8 +775,8 @@ const MyProposals = () => {
             <Loader size={45} />
           </div>
         ) : proposalsArray.length === 0 ? (
-          <div className="text-center py-16 px-6 bg-white rounded-2xl border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col items-center">
-            <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-2xl mb-4 text-slate-400">
+          <div className="text-center py-16 px-6 bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col items-center">
+            <div className="w-14 h-14 rounded-[6px] bg-slate-50 border border-slate-200 flex items-center justify-center text-2xl mb-4 text-slate-400">
               📝
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-1.5">No proposals submitted</h3>
@@ -785,7 +785,7 @@ const MyProposals = () => {
             </p>
             <Link
               href="/briefs"
-              className="px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-[#0B0F19] hover:bg-black text-white transition-colors cursor-pointer shadow-xs"
+              className="px-5 py-2.5 rounded-[6px] font-semibold text-xs sm:text-sm bg-[#0B0F19] hover:bg-black text-white transition-colors cursor-pointer shadow-xs"
             >
               Browse Open Projects
             </Link>
@@ -800,7 +800,7 @@ const MyProposals = () => {
                 <div
                   key={proposal._id}
                   onClick={() => router.push(`/briefs/${briefId}`)}
-                  className="relative overflow-hidden bg-white rounded-[10px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[10px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer"
+                  className="relative overflow-hidden bg-white rounded-[6px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer"
                 >
                   {/* Ambient Purple Glow (appears on card hover) */}
                   <div

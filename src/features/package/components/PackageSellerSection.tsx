@@ -21,7 +21,7 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
   )}&background=0D9488&color=fff&bold=true`;
 
   return (
-    <div id="section-seller" className="scroll-mt-36 bg-[#F5F5F5] border border-gray-100 rounded-2xl p-6 sm:p-8 mb-10 shadow-2xs">
+    <div id="section-seller" className="scroll-mt-36 bg-[#F5F5F5] border border-gray-100 rounded-[6px] p-6 sm:p-8 mb-10 shadow-2xs">
       {/* Header */}
       <div className="flex items-center justify-between gap-4 mb-6">
         <h2 className="text-xl font-bold text-gray-900 ">
@@ -87,7 +87,7 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
       )}
 
       {/* Stat Boxes Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 p-4 bg-gray-50/70 border border-gray-100 rounded-xl">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 p-4 bg-gray-50/70 border border-gray-100 rounded-[6px]">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center shrink-0">
             <FiMapPin className="w-4 h-4" />

@@ -7,16 +7,8 @@ import { FiArrowLeft, FiArrowRight, FiCheckCircle } from "react-icons/fi";
 import { Button } from "@/components/ui";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
-import BuyerDashboardCard from "../components/BuyerDashboardCard";
-import {
-  MOCK_RECOMMENDED_PACKAGES,
-  MOCK_POPULAR_PACKAGES,
-  DashboardPackageItem,
-} from "../data/mockBuyerDashboard";
-import {
-  normalizeDashboardPackageList,
-  calculateProfileCompletion,
-} from "../utils/dashboardNormalizer";
+import { PackageCard } from "@/features/gigs";
+import { calculateProfileCompletion } from "../utils/dashboardNormalizer";
 
 interface BuyerDashboardProps {
   user: any;
@@ -26,12 +18,12 @@ interface BuyerDashboardProps {
 export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchToSeller }) => {
   const popularScrollRef = useRef<HTMLDivElement>(null);
 
-  // Fetch dynamic packages from backend API
-  const { data: apiPackages } = useQuery({
-    queryKey: ["buyer-dashboard-packages"],
+  // 1. Fetch Recommended Packages from backend API
+  const { data: recommendedData } = useQuery({
+    queryKey: ["buyer-recommended-packages"],
     queryFn: async () => {
       try {
-        const { data } = await axiosFetch.get("/gigs?limit=12");
+        const { data } = await axiosFetch.get("/gigs?limit=4");
         return data;
       } catch {
         return null;
@@ -40,15 +32,41 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
     staleTime: 60000,
   });
 
-  const recommendedList: DashboardPackageItem[] = normalizeDashboardPackageList(
-    apiPackages,
-    MOCK_RECOMMENDED_PACKAGES
-  );
+  // 2. Fetch Most Popular Packages sorted by sales from backend API
+  const { data: popularData } = useQuery({
+    queryKey: ["buyer-popular-packages"],
+    queryFn: async () => {
+      try {
+        const { data } = await axiosFetch.get("/gigs?sort=sales&limit=8");
+        return data;
+      } catch {
+        return null;
+      }
+    },
+    staleTime: 60000,
+  });
 
-  const popularList: DashboardPackageItem[] = normalizeDashboardPackageList(
-    apiPackages ? apiPackages.slice(4) : null,
-    MOCK_POPULAR_PACKAGES
-  );
+  const recommendedList = React.useMemo(() => {
+    if (Array.isArray(recommendedData)) return recommendedData;
+    if (Array.isArray(recommendedData?.gigs)) return recommendedData.gigs;
+    if (Array.isArray(recommendedData?.packages)) return recommendedData.packages;
+    if (Array.isArray(recommendedData?.data)) return recommendedData.data;
+    return [];
+  }, [recommendedData]);
+
+  const popularList = React.useMemo(() => {
+    const list = Array.isArray(popularData)
+      ? popularData
+      : Array.isArray(popularData?.gigs)
+      ? popularData.gigs
+      : Array.isArray(popularData?.packages)
+      ? popularData.packages
+      : Array.isArray(popularData?.data)
+      ? popularData.data
+      : [];
+    // If backend returns popular gigs, use them; otherwise fallback to recommended list
+    return list.length > 0 ? list : recommendedList;
+  }, [popularData, recommendedList]);
 
   const completionPercentage = calculateProfileCompletion(user);
 
@@ -182,8 +200,8 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-            {recommendedList.slice(0, 4).map((pkg) => (
-              <BuyerDashboardCard key={pkg.id} pkg={pkg} />
+            {recommendedList.map((pkg: any) => (
+              <PackageCard key={pkg._id || pkg.id} data={pkg} />
             ))}
           </div>
         </section>
@@ -222,9 +240,9 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
             ref={popularScrollRef}
             className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 overflow-x-auto scrollbar-none scroll-smooth pb-2"
           >
-            {popularList.slice(0, 4).map((pkg) => (
-              <div key={pkg.id} className="min-w-[270px] sm:min-w-0 flex-1">
-                <BuyerDashboardCard pkg={pkg} />
+            {popularList.map((pkg: any) => (
+              <div key={pkg._id || pkg.id} className="min-w-[270px] sm:min-w-0 flex-1">
+                <PackageCard data={pkg} />
               </div>
             ))}
           </div>

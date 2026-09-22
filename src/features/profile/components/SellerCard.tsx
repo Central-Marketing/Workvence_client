@@ -11,7 +11,7 @@ interface SellerCardProps {
 
 export const SellerCard: React.FC<SellerCardProps> = ({ seller }) => {
   return (
-    <div className="bg-white border border-gray-200/70 rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-gray-300 transition-all group">
+    <div className="bg-white border border-gray-200/70 rounded-[6px] p-4 sm:p-5 flex flex-col justify-between shadow-2xs hover:shadow-md hover:border-gray-300 transition-all group">
       <div>
         {/* Top Row: Avatar on Left + Rating on Right */}
         <div className="flex items-start justify-between gap-3 mb-4">
@@ -66,7 +66,7 @@ export const SellerCard: React.FC<SellerCardProps> = ({ seller }) => {
       {/* Bottom Button: View Profile */}
       <Link
         href={`/seller/${seller.username}`}
-        className="w-full py-2.5 bg-[#EEEEEE] hover:bg-gray-200 text-gray-700 text-xs sm:text-[13px] font-semibold font-sf-pro rounded-xl text-center transition-colors block cursor-pointer active:scale-[0.98]"
+        className="w-full py-2.5 bg-[#EEEEEE] hover:bg-gray-200 text-gray-700 text-xs sm:text-[13px] font-semibold font-sf-pro rounded-[6px] text-center transition-colors block cursor-pointer active:scale-[0.98]"
       >
         View Profile
       </Link>

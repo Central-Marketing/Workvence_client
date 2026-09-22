@@ -19,7 +19,7 @@ import { Loader, Button } from "@/components";
 const ReactQuill = dynamic(() => import("react-quill-new"), {
   ssr: false,
   loading: () => (
-    <div className="h-44 flex flex-col items-center justify-center space-y-2 border border-gray-200 bg-gray-50 rounded-xl">
+    <div className="h-44 flex flex-col items-center justify-center space-y-2 border border-gray-200 bg-gray-50 rounded-[6px]">
       <span className="text-xs font-semibold text-gray-400">Loading Rich Text Editor...</span>
     </div>
   ),
@@ -593,8 +593,8 @@ const OrganizePage = () => {
 
   const categoryBadgeLabel = selectedCategoryObj
     ? [selectedCategoryObj.name, selectedSubcategoryObj?.name, selectedNicheObj?.name]
-        .filter(Boolean)
-        .join(" › ")
+      .filter(Boolean)
+      .join(" › ")
     : "Blog, Business House";
 
   // Real uploaded gallery items (cover banner + sub-images)
@@ -610,7 +610,7 @@ const OrganizePage = () => {
         {/* 1. Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-[32px] font-bold tracking-tight text-gray-950">
+            <h1 className="text-2xl 2xl:text-[32px] font-bold tracking-tight text-gray-950">
               Create New Package
             </h1>
             <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-2xl leading-relaxed">
@@ -649,7 +649,7 @@ const OrganizePage = () => {
 
         {/* 2. Top Navigation Tabs (Sticky & Scroll-Based) */}
         <div className="sticky top-[69px] z-30 py-3 bg-[#F8F9FA]/95 backdrop-blur-md -my-1">
-          <div className="bg-white border border-gray-200/90 rounded-xl p-1 inline-flex items-center gap-1 shadow-sm">
+          <div className="bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 inline-flex items-center h-[46px] shadow-sm">
             {(["about", "packages", "seller", "faq"] as SectionTab[]).map((tab) => {
               const labelMap: Record<SectionTab, string> = {
                 about: "About",
@@ -662,12 +662,13 @@ const OrganizePage = () => {
                 <Button
                   key={tab}
                   type="button"
+                  variant={isActive ? "brand" : "ghost"}
                   size="sm"
                   radius="fiverr"
                   onClick={() => scrollToSection(tab)}
-                  className={`px-4 sm:px-5 py-1.5 font-semibold transition-all ${isActive
-                    ? "bg-[#0B3A33] text-white shadow-2xs hover:bg-[#0B3A33]"
-                    : "bg-transparent text-gray-600 hover:text-gray-900 hover:bg-transparent"
+                  className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 sm:px-5 transition-all ${isActive
+                    ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                    : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                     }`}
                 >
                   {labelMap[tab]}
@@ -681,7 +682,7 @@ const OrganizePage = () => {
         <div id="section-about" className="scroll-mt-36 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
           {/* Left Column: About this packages */}
-          <div className="lg:col-span-8 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <div className="lg:col-span-8 bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
             <div className="flex items-center justify-between gap-3 border-b border-gray-100 pb-4">
               <h2 className="text-lg sm:text-xl font-bold text-gray-950">
                 About this packages
@@ -702,7 +703,7 @@ const OrganizePage = () => {
                 value={state.title || ""}
                 onChange={handleInputChange}
                 placeholder="e.g I will do something i am really good at"
-                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all"
+                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all"
               />
             </div>
 
@@ -711,7 +712,7 @@ const OrganizePage = () => {
               <label className="text-xs font-semibold text-gray-700 block">
                 Package description
               </label>
-              <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
+              <div className="bg-white rounded-[6px] overflow-hidden border border-gray-200">
                 <ReactQuill
                   theme="snow"
                   value={state.description || ""}
@@ -741,7 +742,7 @@ const OrganizePage = () => {
                     name="category"
                     value={state.category || ""}
                     onChange={handleCategoryChange}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
                   >
                     <option value="" disabled>Select Category</option>
                     {parentCategories.map((c: any) => (
@@ -768,14 +769,14 @@ const OrganizePage = () => {
                     value={state.subcategory || ""}
                     onChange={handleSubcategoryChange}
                     disabled={!state.category || currentSubcategories.length === 0}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
                   >
                     <option value="">
                       {!state.category
                         ? "Select category first"
                         : currentSubcategories.length === 0
-                        ? "No subcategories available"
-                        : "Select Subcategory (Optional)"}
+                          ? "No subcategories available"
+                          : "Select Subcategory (Optional)"}
                     </option>
                     {currentSubcategories.map((sub: any) => (
                       <option key={sub._id || sub.id || sub.slug} value={sub.slug || sub.name || sub._id}>
@@ -801,14 +802,14 @@ const OrganizePage = () => {
                     value={state.niche || ""}
                     onChange={handleNicheChange}
                     disabled={!state.subcategory || currentNiches.length === 0}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
                   >
                     <option value="">
                       {!state.subcategory
                         ? "Select subcategory first"
                         : currentNiches.length === 0
-                        ? "No niches available"
-                        : "Select Niche (Optional)"}
+                          ? "No niches available"
+                          : "Select Niche (Optional)"}
                     </option>
                     {currentNiches.map((n: any) => (
                       <option key={n._id || n.id || n.slug} value={n.slug || n.name || n._id}>
@@ -972,10 +973,10 @@ const OrganizePage = () => {
           </div>
 
           {/* Right Column: Pricing Tier Card (Sticky) */}
-          <div className="lg:col-span-4 lg:sticky lg:top-[140px] self-start bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-5 space-y-4">
+          <div className="lg:col-span-4 lg:sticky lg:top-[140px] self-start bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-5 space-y-4">
 
             {/* Tier Pills Tabs: Basic, Silver (standard), Platinum (premium) */}
-            <div className="bg-[#F4F5F7] rounded-xl p-1 flex items-center gap-1">
+            <div className="bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 flex items-center h-[46px]">
               {(["basic", "standard", "premium"] as TierKey[]).map((tierKey) => {
                 const displayLabels: Record<TierKey, string> = {
                   basic: "Basic",
@@ -989,7 +990,8 @@ const OrganizePage = () => {
                   <Button
                     key={tierKey}
                     type="button"
-                    size="xs"
+                    variant={isCurrent ? "brand" : "ghost"}
+                    size="sm"
                     radius="fiverr"
                     onClick={() => {
                       setActiveTier(tierKey);
@@ -1000,9 +1002,9 @@ const OrganizePage = () => {
                         });
                       }
                     }}
-                    className={`flex-1 py-1.5 font-semibold text-center transition-all ${isCurrent
-                      ? "bg-[#0B3A33] text-white shadow-2xs hover:bg-[#0B3A33]"
-                      : "bg-transparent text-gray-600 hover:text-gray-900 hover:bg-transparent"
+                    className={`flex-1 h-full font-sf-pro font-medium text-[14px] sm:text-[15px] text-center transition-all ${isCurrent
+                      ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                      : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                       }`}
                   >
                     {label}
@@ -1021,7 +1023,7 @@ const OrganizePage = () => {
                 value={currentTierData.title || ""}
                 onChange={(e) => handleTierInputChange("title", e.target.value)}
                 placeholder="e.g I will do something i am really good at"
-                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
+                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
               />
             </div>
 
@@ -1050,7 +1052,7 @@ const OrganizePage = () => {
                   <select
                     value={currentTierData.deliveryTime || ""}
                     onChange={(e) => handleTierInputChange("deliveryTime", e.target.value)}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
                   >
                     <option value="" disabled>e.g 12 days</option>
                     <option value="1">1 day</option>
@@ -1080,7 +1082,7 @@ const OrganizePage = () => {
                   <select
                     value={currentTierData.revisionNumber !== undefined ? String(currentTierData.revisionNumber) : ""}
                     onChange={(e) => handleTierInputChange("revisionNumber", e.target.value)}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
+                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
                   >
                     <option value="">Select Revisions</option>
                     <option value="0">0 Revisions</option>
@@ -1169,7 +1171,7 @@ const OrganizePage = () => {
                   value={currentTierData.price || ""}
                   onChange={(e) => handleTierInputChange("price", e.target.value)}
                   placeholder="e.g $200"
-                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-xl px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
+                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
                 />
               </div>
             </div>
@@ -1178,7 +1180,7 @@ const OrganizePage = () => {
         </div>
 
         {/* 4. Section: Packages Media & Upload */}
-        <div id="section-packages" className="scroll-mt-36 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+        <div id="section-packages" className="scroll-mt-36 bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
 
           {/* Header: Packages title & arrow controls */}
           <div className="flex items-center justify-between">
@@ -1229,11 +1231,11 @@ const OrganizePage = () => {
           />
 
           {/* Upload Box Container */}
-          <div className="border border-gray-200/90 rounded-2xl p-6 sm:p-8 space-y-4 bg-white">
+          <div className="border border-gray-200/90 rounded-[6px] p-6 sm:p-8 space-y-4 bg-white">
             {/* Add Banner Dropzone */}
             <div
               onClick={() => coverInputRef.current?.click()}
-              className="border border-dashed border-gray-300 hover:border-[#0D6D5F] rounded-xl py-6 text-center cursor-pointer transition-all bg-white hover:bg-gray-50/70 flex items-center justify-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0D6D5F]"
+              className="border border-dashed border-gray-300 hover:border-[#0D6D5F] rounded-[6px] py-6 text-center cursor-pointer transition-all bg-white hover:bg-gray-50/70 flex items-center justify-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0D6D5F]"
             >
               <span>Add Banner</span>
               <Plus className="w-4 h-4" />
@@ -1242,7 +1244,7 @@ const OrganizePage = () => {
             {/* Add Sub Images Dropzone */}
             <div
               onClick={() => subImagesInputRef.current?.click()}
-              className="border border-dashed border-gray-300 hover:border-[#0D6D5F] rounded-xl py-6 text-center cursor-pointer transition-all bg-white hover:bg-gray-50/70 flex items-center justify-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0D6D5F]"
+              className="border border-dashed border-gray-300 hover:border-[#0D6D5F] rounded-[6px] py-6 text-center cursor-pointer transition-all bg-white hover:bg-gray-50/70 flex items-center justify-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0D6D5F]"
             >
               <span>Add Sub Images</span>
               <Plus className="w-4 h-4" />
@@ -1258,7 +1260,7 @@ const OrganizePage = () => {
               {galleryItems.map((imgUrl, idx) => (
                 <div
                   key={idx}
-                  className="relative shrink-0 w-44 sm:w-52 aspect-[16/10] rounded-xl overflow-hidden border border-gray-200 bg-gray-100 shadow-2xs group"
+                  className="relative shrink-0 w-44 sm:w-52 aspect-[16/10] rounded-[6px] overflow-hidden border border-gray-200 bg-gray-100 shadow-2xs group"
                 >
                   <img
                     src={imgUrl}
@@ -1309,7 +1311,7 @@ const OrganizePage = () => {
         </div>
 
         {/* 5. Section: Seller Info */}
-        <div id="section-seller" className="scroll-mt-36 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+        <div id="section-seller" className="scroll-mt-36 bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
           <h2 className="text-lg sm:text-xl font-bold text-gray-950 border-b border-gray-100 pb-3">
             Seller Information
           </h2>
@@ -1325,13 +1327,13 @@ const OrganizePage = () => {
               <p className="text-xs text-gray-400 mt-0.5">{user?.country || user?.location || "Worldwide"}</p>
             </div>
           </div>
-          <div className="bg-[#F8F9FA] rounded-xl p-4 text-xs text-gray-600 leading-relaxed">
+          <div className="bg-[#F8F9FA] rounded-[6px] p-4 text-xs text-gray-600 leading-relaxed">
             {user?.description || user?.bio || "No bio entered yet. You can complete your detailed profile under Account Settings."}
           </div>
         </div>
 
         {/* 6. Section: Frequently asked questions */}
-        <div id="section-faq" className="scroll-mt-36 bg-white rounded-2xl border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+        <div id="section-faq" className="scroll-mt-36 bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
           <div className="flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-950">
               Frequently asked questions
@@ -1373,7 +1375,7 @@ const OrganizePage = () => {
           )}
 
           {/* New FAQ Input Card */}
-          <div className="bg-white rounded-2xl border border-gray-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
+          <div className="bg-white rounded-[6px] border border-gray-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
             <div className="space-y-1.5">
               <label className="text-xs sm:text-sm font-bold text-gray-900 block">
                 Question
@@ -1383,7 +1385,7 @@ const OrganizePage = () => {
                 value={faqQuestion}
                 onChange={(e) => setFaqQuestion(e.target.value)}
                 placeholder="Write here"
-                className="w-full bg-[#ECEEF1]/70 hover:bg-[#ECEEF1] focus:bg-white border border-transparent focus:border-gray-300 rounded-xl px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all"
+                className="w-full bg-[#ECEEF1]/70 hover:bg-[#ECEEF1] focus:bg-white border border-transparent focus:border-gray-300 rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all"
               />
             </div>
 

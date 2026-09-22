@@ -77,7 +77,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
         {/* Tier Segmented Tabs (only if multiple tiers exist) */}
         {availableTiers.length > 1 && (
           <div
-            className="grid gap-1 bg-[var(--Foundation-White-white-300,#F5F5F5)] p-[10px] rounded-[10px] border border-[rgba(0,0,0,0.10)] text-center mb-5"
+            className="grid gap-1 bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 text-center mb-5  items-center"
             style={{
               gridTemplateColumns: `repeat(${availableTiers.length}, minmax(0, 1fr))`,
             }}
@@ -90,13 +90,13 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
                 <Button
                   key={tierKey}
                   type="button"
-                  variant={isSelected ? "dark" : "ghost"}
-                  size="xs"
+                  variant={isSelected ? "brand" : "ghost"}
+                  size="sm"
                   radius="fiverr"
                   onClick={() => onSelectTier(tierKey)}
-                  className={`!h-auto !min-h-0 !px-2 !py-2 sm:!px-3 sm:!py-2.5 2xl:!px-[20px] 2xl:!py-[10px] rounded-[10px] font-inter font-normal not-italic text-[16px] transition-all cursor-pointer ${isSelected
-                    ? "!bg-[var(--Foundation-Green-green-900,#0B403F)] !text-[var(--Foundation-White-white-50,#FFF)] shadow-xs"
-                    : "!text-[var(--Foundation-Grey-grey-400,#6E6E6E)] hover:!text-gray-900"
+                  className={`flex-1 h-full font-inter font-medium text-[14px] sm:text-[15px] transition-all cursor-pointer ${isSelected
+                    ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                    : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                     }`}
                 >
                   {pkg.name}
@@ -108,13 +108,13 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
 
         {/* Custom Tier Title / Tagline */}
         {(activePkg.tagline || activePkg.title) && (
-          <h4 className="font-sf-pro font-[510] not-italic text-[12px] text-[var(--Foundation-Grey-grey-400,#6E6E6E)] leading-normal mb-1">
+          <h4 className="font-inter font-[510] not-italic text-[12px] text-[var(--Foundation-Grey-grey-400,#6E6E6E)] leading-normal mb-1">
             {activePkg.tagline || activePkg.title}
           </h4>
         )}
 
         {/* Price Display */}
-        <div className="flex items-baseline mb-4 pb-4 border-b border-gray-100 font-sf-pro font-semibold text-[26px] min-[400px]:text-[28px] sm:text-[20px] md:text-[22px] lg:text-[24px] xl:text-[26px]  not-italic">
+        <div className="flex items-baseline mb-4 pb-4 border-b border-gray-100 font-inter font-semibold text-[26px] min-[400px]:text-[28px] sm:text-[20px] md:text-[22px] lg:text-[24px] xl:text-[26px]  not-italic">
           <span className="text-[000]">$</span>
           <span className="text-[#000]">{activePkg.price}</span>
         </div>
@@ -122,8 +122,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
         {/* Short Description */}
         {activePkg.shortDesc && (
           <p className="
-            font-sf-pro
-            font-normal
+            font-inter
             not-italic
             text-[14px]
             leading-[1.3]
@@ -182,7 +181,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
                     strokeLinejoin="round"
                   />
                 </svg>
-                <span className="font-sf-pro font-[510] not-italic text-[13px] text-[#6E6E6E] leading-normal">
+                <span className="not-italic text-[13px] font-inter text-[#6E6E6E] leading-normal">
                   {item}
                 </span>
               </div>

@@ -138,14 +138,14 @@ export default function InvestorRelationsPage() {
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <a
                 href="#filings"
-                className="px-7 py-3.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-7 py-3.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Financial Disclosures</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
                 href="#contact"
-                className="px-7 py-3.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-7 py-3.5 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
               >
                 Investor Contact
               </a>
@@ -161,7 +161,7 @@ export default function InvestorRelationsPage() {
             {highlights.map((h, i) => {
               const Icon = h.icon;
               return (
-                <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-2">
+                <div key={i} className="bg-white/5 border border-white/10 rounded-[6px] p-6 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-400 font-medium">{h.label}</span>
                     <Icon className="w-4 h-4 text-[#6ad724]" />
@@ -191,7 +191,7 @@ export default function InvestorRelationsPage() {
             {financialReports.map((report, idx) => (
               <div
                 key={idx}
-                className="bg-white border border-gray-200 rounded-2xl p-6 hover:border-[#327C73] hover:shadow-md transition-all duration-200 flex items-center justify-between gap-4 group"
+                className="bg-white border border-gray-200 rounded-[6px] p-6 hover:border-[#327C73] hover:shadow-md transition-all duration-200 flex items-center justify-between gap-4 group"
               >
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs">
@@ -227,7 +227,7 @@ export default function InvestorRelationsPage() {
       <section id="contact" className="py-20 bg-[#f8fafc] border-t border-gray-100">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            
+
             {/* FAQ Accordion (6 cols) */}
             <div className="lg:col-span-6 space-y-6">
               <div className="space-y-2">
@@ -239,15 +239,14 @@ export default function InvestorRelationsPage() {
                 {investorFaqs.map((faq, i) => (
                   <div
                     key={i}
-                    className="bg-white border border-gray-200/90 rounded-2xl p-5 cursor-pointer"
+                    className="bg-white border border-gray-200/90 rounded-[6px] p-5 cursor-pointer"
                     onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   >
                     <div className="flex items-center justify-between">
                       <h4 className="text-sm font-bold text-[#0f172a]">{faq.q}</h4>
                       <ChevronDown
-                        className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
-                          openFaq === i ? "rotate-180 text-[#327C73]" : ""
-                        }`}
+                        className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${openFaq === i ? "rotate-180 text-[#327C73]" : ""
+                          }`}
                       />
                     </div>
                     {openFaq === i && (
@@ -280,7 +279,7 @@ export default function InvestorRelationsPage() {
                         value={irForm.name}
                         onChange={(e) => setIrForm({ ...irForm, name: e.target.value })}
                         placeholder="e.g. Michael Stone"
-                        className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                        className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                       />
                     </div>
                     <div>
@@ -290,7 +289,7 @@ export default function InvestorRelationsPage() {
                         value={irForm.fund}
                         onChange={(e) => setIrForm({ ...irForm, fund: e.target.value })}
                         placeholder="e.g. Apex Ventures"
-                        className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                        className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                       />
                     </div>
                   </div>
@@ -304,7 +303,7 @@ export default function InvestorRelationsPage() {
                         value={irForm.email}
                         onChange={(e) => setIrForm({ ...irForm, email: e.target.value })}
                         placeholder="m.stone@apex.com"
-                        className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                        className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                       />
                     </div>
                     <div>
@@ -312,7 +311,7 @@ export default function InvestorRelationsPage() {
                       <select
                         value={irForm.inquiryType}
                         onChange={(e) => setIrForm({ ...irForm, inquiryType: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                        className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                       >
                         <option value="Institutional Investor">Institutional Investor</option>
                         <option value="Sell-Side Analyst">Sell-Side Analyst</option>

@@ -61,7 +61,7 @@ const OTPModal: React.FC<OTPModalProps> = ({
         />
 
         {/* Mail Icon */}
-        <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 border border-emerald-100">
+        <div className="w-14 h-14 rounded-[6px] bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 border border-emerald-100">
           <Mail size={26} strokeWidth={2} />
         </div>
 
@@ -83,7 +83,7 @@ const OTPModal: React.FC<OTPModalProps> = ({
                 setOtp(e.target.value.replace(/\D/g, ''));
                 if (error) setError('');
               }}
-              className="w-full text-center text-2xl tracking-[0.5em] font-bold py-3.5 px-4 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"
+              className="w-full text-center text-2xl tracking-[0.5em] font-bold py-3.5 px-4 border border-slate-200 rounded-[6px] bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all"
               autoFocus
             />
             {error && (

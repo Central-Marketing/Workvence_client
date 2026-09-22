@@ -39,7 +39,7 @@ export const PackageSectionNav: React.FC<PackageSectionNavProps> = ({
       style={{
         top: `calc(var(--navbar-height, ${isUserSeller ? "82px" : "136px"}) + 10px)`,
       }}
-      className={`w-full bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-[10px] p-1.5 mb-8 flex items-center gap-1.5 overflow-x-auto no-scrollbar sticky z-30 shadow-xs transition-[top] duration-200 ${fallbackTopClass}`}
+      className={`w-full bg-white/95 backdrop-blur-md border border-gray-200/90 rounded-[6px] p-1.5 mb-8 flex items-center gap-1.5 overflow-x-auto no-scrollbar sticky z-30 shadow-xs transition-[top] duration-200 ${fallbackTopClass}`}
     >
       {sections.map((sec) => {
         const isActive = activeSection === sec.id;

@@ -108,14 +108,14 @@ export default function HowToBuyPage() {
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <Link
                 href="/packages?category=ai-services"
-                className="px-7 py-3.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-7 py-3.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Explore Packages</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <a
                 href="#guarantees"
-                className="px-7 py-3.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-7 py-3.5 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
               >
                 Buyer Guarantees
               </a>
@@ -141,7 +141,7 @@ export default function HowToBuyPage() {
             {buyerSteps.map((s, idx) => (
               <div
                 key={idx}
-                className="bg-[#f8fafc] border border-gray-200/90 rounded-2xl p-6 space-y-4 hover:border-[#327C73] transition duration-200"
+                className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-6 space-y-4 hover:border-[#327C73] transition duration-200"
               >
                 <div className="text-2xl font-extrabold text-[#327C73] font-mono">{s.step}</div>
                 <h3 className="text-lg font-bold text-[#0f172a]">{s.title}</h3>
@@ -171,9 +171,9 @@ export default function HowToBuyPage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white border border-gray-200 rounded-2xl p-8 space-y-4 shadow-xs hover:shadow-md transition"
+                  className="bg-white border border-gray-200 rounded-[6px] p-8 space-y-4 shadow-xs hover:shadow-md transition"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
                     <Icon className="w-6 h-6" />
                   </div>
                   <h3 className="text-xl font-bold text-[#0f172a]">{g.title}</h3>
@@ -198,7 +198,7 @@ export default function HowToBuyPage() {
           <div className="mt-12 text-center">
             <Link
               href="/packages?category=ai-services"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-md transition active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-md transition active:scale-95 cursor-pointer"
             >
               <span>Explore Marketplace Packages</span>
               <ArrowRight className="w-4 h-4" />

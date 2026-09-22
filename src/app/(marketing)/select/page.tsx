@@ -135,7 +135,7 @@ export default function WorkvenceSelectPage() {
                     value={selectForm.name}
                     onChange={(e) => setSelectForm({ ...selectForm, name: e.target.value })}
                     placeholder="e.g. David Vance"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
                 <div>
@@ -146,7 +146,7 @@ export default function WorkvenceSelectPage() {
                     value={selectForm.email}
                     onChange={(e) => setSelectForm({ ...selectForm, email: e.target.value })}
                     placeholder="david@company.com"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
               </div>
@@ -156,7 +156,7 @@ export default function WorkvenceSelectPage() {
                 <select
                   value={selectForm.spend}
                   onChange={(e) => setSelectForm({ ...selectForm, spend: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                 >
                   <option value="$3k-$5k/month">$3,000 - $5,000 / month</option>
                   <option value="$5k-$20k/month">$5,000 - $20,000 / month</option>

@@ -108,7 +108,7 @@ export default function ProTalentPage() {
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <Link
                 href="/packages?pro=true"
-                className="px-8 py-4 rounded-xl bg-brand-green hover:bg-[#022c22] text-[#ffffff] font-bold text-sm transition shadow-lg hover:shadow-xl active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-8 py-4 rounded-[6px] bg-brand-green hover:bg-[#022c22] text-[#ffffff] font-bold text-sm transition shadow-lg hover:shadow-xl active:scale-95 inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Browse Pro Packages</span>
                 <ArrowRight className="w-4 h-4" />
@@ -173,7 +173,7 @@ export default function ProTalentPage() {
                   key={idx}
                   className="bg-white border border-gray-200 rounded-3xl p-8 space-y-4 shadow-xs hover:border-[#327C73] hover:shadow-md transition duration-300"
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
                     <Icon className="w-6 h-6" />
                   </div>
                   <h3 className="text-xl font-bold text-[#0f172a]">{c.title}</h3>
@@ -215,7 +215,7 @@ export default function ProTalentPage() {
                     value={proForm.name}
                     onChange={(e) => setProForm({ ...proForm, name: e.target.value })}
                     placeholder="e.g. Thomas Becker"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
                 <div>
@@ -226,7 +226,7 @@ export default function ProTalentPage() {
                     value={proForm.email}
                     onChange={(e) => setProForm({ ...proForm, email: e.target.value })}
                     placeholder="thomas@studio.com"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
               </div>
@@ -239,7 +239,7 @@ export default function ProTalentPage() {
                   value={proForm.portfolio}
                   onChange={(e) => setProForm({ ...proForm, portfolio: e.target.value })}
                   placeholder="https://thomasbecker.design"
-                  className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                 />
               </div>
 
@@ -249,7 +249,7 @@ export default function ProTalentPage() {
                   <select
                     value={proForm.primarySkill}
                     onChange={(e) => setProForm({ ...proForm, primarySkill: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   >
                     <option value="Software Engineering">Software Engineering</option>
                     <option value="UI/UX & Product Design">UI/UX & Product Design</option>
@@ -262,7 +262,7 @@ export default function ProTalentPage() {
                   <select
                     value={proForm.experienceYears}
                     onChange={(e) => setProForm({ ...proForm, experienceYears: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   >
                     <option value="3-5 years">3 - 5 Years</option>
                     <option value="5-8 years">5 - 8 Years</option>

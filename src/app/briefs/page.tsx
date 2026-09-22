@@ -314,7 +314,7 @@ function BriefsContent() {
 
         {/* Collapsible Search Drawer */}
         {isFilterOpen && (
-          <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 mb-8 shadow-xs animate-fadeIn">
+          <div className="bg-white border border-gray-200 rounded-[6px] p-4 sm:p-5 mb-8 shadow-xs animate-fadeIn">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="relative flex-1">
                 <RiSearchLine className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-base" />
@@ -366,7 +366,7 @@ function BriefsContent() {
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-gray-200/90 p-6 sm:p-7 h-[260px] flex flex-col justify-between"
+                className="bg-white rounded-[6px] border border-gray-200/90 p-6 sm:p-7 h-[260px] flex flex-col justify-between"
               >
                 <div>
                   <div className="flex justify-between items-start mb-3">
@@ -391,7 +391,7 @@ function BriefsContent() {
             ))}
           </div>
         ) : filteredBriefs.length === 0 ? (
-          <div className="py-20 text-center flex flex-col items-center justify-center bg-white rounded-2xl border border-gray-200/90 p-8 shadow-2xs">
+          <div className="py-20 text-center flex flex-col items-center justify-center bg-white rounded-[6px] border border-gray-200/90 p-8 shadow-2xs">
             <div className="w-14 h-14 rounded-full bg-emerald-50 text-[#327C73] flex items-center justify-center mb-4 border border-emerald-100 shadow-2xs">
               <FiBriefcase className="w-6 h-6" />
             </div>
@@ -465,7 +465,7 @@ function BriefsContent() {
                   <div
                     key={briefId}
                     onClick={() => router.push(`/briefs/${briefId}`)}
-                    className="relative overflow-hidden bg-white rounded-[10px] border border-gray-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[10px] p-6 sm:p-7 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer group select-none"
+                    className="relative overflow-hidden bg-white rounded-[6px] border border-gray-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] p-6 sm:p-7 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer group select-none"
                   >
                     {/* Ambient Purple Glow (appears on card hover) */}
                     <div

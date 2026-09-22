@@ -131,7 +131,7 @@ export default function PartnershipsClient() {
               </Button>
               <a
                 href="#tracks"
-                className="px-7 py-3.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-7 py-3.5 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
               >
                 Explore Partner Tracks
               </a>
@@ -162,12 +162,12 @@ export default function PartnershipsClient() {
                   className="bg-white rounded-3xl p-8 border border-gray-200/90 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 space-y-6 flex flex-col justify-between"
                 >
                   <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
                       <Icon className="w-6 h-6" />
                     </div>
                     <h3 className="text-2xl font-bold text-[#0f172a]">{track.title}</h3>
                     <p className="text-sm text-gray-600 leading-relaxed">{track.desc}</p>
-                    
+
                     <div className="pt-2 space-y-2.5 border-t border-gray-100">
                       <span className="text-xs font-bold text-gray-900 uppercase tracking-wider block">
                         Key Benefits
@@ -215,7 +215,7 @@ export default function PartnershipsClient() {
             {ecosystemLogos.map((item, idx) => (
               <div
                 key={idx}
-                className="bg-[#f8fafc] border border-gray-200/80 rounded-2xl p-4 text-center space-y-1 hover:bg-white hover:border-[#327C73] transition"
+                className="bg-[#f8fafc] border border-gray-200/80 rounded-[6px] p-4 text-center space-y-1 hover:bg-white hover:border-[#327C73] transition"
               >
                 <div className="font-bold text-base text-[#0f172a]">{item.name}</div>
                 <div className="text-[11px] text-gray-500">{item.category}</div>
@@ -258,7 +258,7 @@ export default function PartnershipsClient() {
                 <select
                   value={partnerForm.track}
                   onChange={(e) => setPartnerForm({ ...partnerForm, track: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] outline-none"
                 >
                   <option value="Agency & Solutions Partners">Agency & Solutions Partners</option>
                   <option value="Technology & API Partners">Technology & API Partners</option>
@@ -278,7 +278,7 @@ export default function PartnershipsClient() {
                     value={partnerForm.companyName}
                     onChange={(e) => setPartnerForm({ ...partnerForm, companyName: e.target.value })}
                     placeholder="Acme Corp"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
                 <div>
@@ -291,7 +291,7 @@ export default function PartnershipsClient() {
                     value={partnerForm.contactName}
                     onChange={(e) => setPartnerForm({ ...partnerForm, contactName: e.target.value })}
                     placeholder="e.g. Sarah Jenkins"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
               </div>
@@ -307,7 +307,7 @@ export default function PartnershipsClient() {
                     value={partnerForm.email}
                     onChange={(e) => setPartnerForm({ ...partnerForm, email: e.target.value })}
                     placeholder="sarah@acme.com"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
                 <div>
@@ -319,7 +319,7 @@ export default function PartnershipsClient() {
                     value={partnerForm.website}
                     onChange={(e) => setPartnerForm({ ...partnerForm, website: e.target.value })}
                     placeholder="https://acme.com"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
               </div>

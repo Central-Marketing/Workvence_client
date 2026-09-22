@@ -207,26 +207,26 @@ const ManageOrders = () => {
           </div>
 
           {/* Main Card Container */}
-          <div className="bg-white rounded-[10px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
 
             {/* Top Toolbar: Filter Tabs on Left + Calendar & Search on Right */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
 
               {/* Segmented Filter Tab Pills */}
-              <div className="bg-white border border-gray-200/90 rounded-[10px] p-1 inline-flex items-center gap-1 overflow-x-auto scrollbar-none max-w-full">
+              <div className="bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 inline-flex items-center h-[46px] overflow-x-auto scrollbar-none max-w-full">
                 {tabs.map((tab) => {
                   const isActive = activeTab === tab.id;
                   return (
                     <Button
                       key={tab.id}
                       type="button"
-                      variant={isActive ? "dark" : "ghost"}
-                      size="xs"
-                      radius="lg"
+                      variant={isActive ? "brand" : "ghost"}
+                      size="sm"
+                      radius="fiverr"
                       onClick={() => setActiveTab(tab.id)}
-                      className={`px-4 py-1.5 whitespace-nowrap transition-all cursor-pointer ${isActive
-                        ? "!bg-[#0B3A33] !text-white shadow-2xs"
-                        : "!text-gray-600 hover:!text-gray-900"
+                      className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 whitespace-nowrap transition-all cursor-pointer ${isActive
+                        ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                        : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                         }`}
                     >
                       {tab.label}

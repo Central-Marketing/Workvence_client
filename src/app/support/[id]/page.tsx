@@ -66,7 +66,7 @@ function AttachmentDisplayItem({ att, ticketId }: { att: any; ticketId: string }
           href={url}
           target="_blank"
           rel="noreferrer"
-          className="block group overflow-hidden rounded-xl border border-black/10 dark:border-white/10 max-w-sm bg-black/5 hover:opacity-95 transition"
+          className="block group overflow-hidden rounded-[6px] border border-black/10 dark:border-white/10 max-w-sm bg-black/5 hover:opacity-95 transition"
         >
           {loadingUrl ? (
             <div className="p-6 text-center text-xs text-gray-500 flex items-center justify-center gap-2">
@@ -77,7 +77,7 @@ function AttachmentDisplayItem({ att, ticketId }: { att: any; ticketId: string }
             <img
               src={url}
               alt={name}
-              className="max-h-60 w-auto object-cover rounded-xl group-hover:scale-105 transition-transform duration-200"
+              className="max-h-60 w-auto object-cover rounded-[6px] group-hover:scale-105 transition-transform duration-200"
               onError={(e) => {
                 (e.target as HTMLElement).style.display = "none";
               }}
@@ -96,7 +96,7 @@ function AttachmentDisplayItem({ att, ticketId }: { att: any; ticketId: string }
       href={url}
       target="_blank"
       rel="noreferrer"
-      className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-black/5 hover:bg-black/10 text-xs font-semibold underline truncate max-w-xs transition font-inter"
+      className="inline-flex items-center gap-2 px-3 py-2 rounded-[6px] bg-black/5 hover:bg-black/10 text-xs font-semibold underline truncate max-w-xs transition font-inter"
     >
       <FileText className="w-4 h-4 flex-shrink-0 text-[#327C73]" />
       <span className="truncate">{name}</span>
@@ -318,7 +318,7 @@ export default function TicketDetailsPage() {
   if (error || !ticket) {
     return (
       <div className="min-h-screen bg-[#f8fafc] py-16 px-4">
-        <div className="max-w-xl mx-auto bg-white p-8 rounded-2xl border border-[#e2e8f0] text-center space-y-4 shadow-xs">
+        <div className="max-w-xl mx-auto bg-white p-8 rounded-[6px] border border-[#e2e8f0] text-center space-y-4 shadow-xs">
           <AlertCircle className="w-10 h-10 mx-auto text-rose-600" />
           <h2 className="text-lg font-bold text-[#0f172a] font-sf-pro">Ticket Not Found</h2>
           <p className="text-xs text-[#64748b] font-inter">{error || "The requested support ticket could not be found."}</p>
@@ -367,7 +367,7 @@ export default function TicketDetailsPage() {
         </div>
 
         {/* Ticket Header Details */}
-        <div className="bg-white p-6 md:p-8 rounded-2xl border border-[#e2e8f0] shadow-xs space-y-4">
+        <div className="bg-white p-6 md:p-8 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#e2e8f0] pb-4">
             <div className="space-y-1.5">
               <div className="flex items-center gap-3 flex-wrap">
@@ -398,7 +398,7 @@ export default function TicketDetailsPage() {
 
           {/* Linked Order Banner */}
           {ticket.order && (
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-[#327C73]/5 border border-[#327C73]/20 text-xs font-inter">
+            <div className="flex items-center gap-3 p-4 rounded-[6px] bg-[#327C73]/5 border border-[#327C73]/20 text-xs font-inter">
               <ShoppingBag className="w-5 h-5 text-[#327C73] flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <span className="font-bold text-[#0f172a] block truncate">
@@ -413,7 +413,7 @@ export default function TicketDetailsPage() {
         </div>
 
         {/* Conversation Stream */}
-        <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-xs overflow-hidden flex flex-col min-h-[500px]">
+        <div className="bg-white rounded-[6px] border border-[#e2e8f0] shadow-xs overflow-hidden flex flex-col min-h-[500px]">
 
           {/* Chat Header */}
           <div className="px-6 py-4 border-b border-[#e2e8f0] bg-[#f8fafc] flex items-center justify-between">
@@ -459,9 +459,9 @@ export default function TicketDetailsPage() {
                       </div>
 
                       <div
-                        className={`p-4 rounded-2xl text-xs leading-relaxed ${isAdmin
-                            ? "bg-white text-[#0f172a] rounded-tl-none border border-[#e2e8f0] shadow-2xs"
-                            : "bg-[#327C73] text-white rounded-tr-none shadow-2xs"
+                        className={`p-4 rounded-[6px] text-xs leading-relaxed ${isAdmin
+                          ? "bg-white text-[#0f172a] rounded-tl-none border border-[#e2e8f0] shadow-2xs"
+                          : "bg-[#327C73] text-white rounded-tr-none shadow-2xs"
                           }`}
                       >
                         <p className="whitespace-pre-wrap">{msg.message}</p>

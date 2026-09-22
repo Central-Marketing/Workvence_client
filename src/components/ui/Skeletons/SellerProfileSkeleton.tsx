@@ -17,7 +17,7 @@ export const SellerProfileSkeleton: React.FC = () => {
               <Skeleton className="w-full h-4" />
               <Skeleton className="w-full h-4" />
               <Skeleton className="w-full h-4" />
-              <Skeleton className="w-full h-11 rounded-xl" />
+              <Skeleton className="w-full h-11 rounded-[6px]" />
             </div>
           </div>
 

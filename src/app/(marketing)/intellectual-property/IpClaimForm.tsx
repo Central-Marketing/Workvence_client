@@ -66,7 +66,7 @@ export default function IpClaimForm() {
                 value={claimForm.claimantName}
                 onChange={(e) => setClaimForm({ ...claimForm, claimantName: e.target.value })}
                 placeholder="e.g. Robert Vance"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
               />
             </div>
             <div>
@@ -79,7 +79,7 @@ export default function IpClaimForm() {
                 value={claimForm.rightsHolder}
                 onChange={(e) => setClaimForm({ ...claimForm, rightsHolder: e.target.value })}
                 placeholder="Self or Company Name"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
               />
             </div>
           </div>
@@ -95,7 +95,7 @@ export default function IpClaimForm() {
                 value={claimForm.email}
                 onChange={(e) => setClaimForm({ ...claimForm, email: e.target.value })}
                 placeholder="legal@company.com"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
               />
             </div>
             <div>
@@ -107,7 +107,7 @@ export default function IpClaimForm() {
                 value={claimForm.phone}
                 onChange={(e) => setClaimForm({ ...claimForm, phone: e.target.value })}
                 placeholder="+1 (555) 000-0000"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
               />
             </div>
           </div>
@@ -122,7 +122,7 @@ export default function IpClaimForm() {
               value={claimForm.infringingUrl}
               onChange={(e) => setClaimForm({ ...claimForm, infringingUrl: e.target.value })}
               placeholder="https://workvence.com/package/..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+              className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
             />
           </div>
 
@@ -135,7 +135,7 @@ export default function IpClaimForm() {
               value={claimForm.originalWorkUrl}
               onChange={(e) => setClaimForm({ ...claimForm, originalWorkUrl: e.target.value })}
               placeholder="https://yourwebsite.com/original-art..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+              className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
             />
           </div>
 
@@ -192,7 +192,7 @@ export default function IpClaimForm() {
               value={claimForm.signature}
               onChange={(e) => setClaimForm({ ...claimForm, signature: e.target.value })}
               placeholder="/s/ Full Legal Name"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none font-mono"
+              className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none font-mono"
             />
           </div>
 

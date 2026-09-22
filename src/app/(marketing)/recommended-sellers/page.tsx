@@ -51,7 +51,7 @@ const RecommendedSellers = () => {
               <Link
                 href={`/seller/${seller._id}`}
                 key={seller._id}
-                className="flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 group"
+                className="flex flex-col bg-white rounded-[6px] overflow-hidden border border-gray-100 shadow-[0_2px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 group"
               >
                 <div className="h-28 bg-gradient-to-r from-brand-green/20 to-[#389115]/20 w-full relative"></div>
                 <div className="px-6 pb-6 pt-0 relative flex-1 flex flex-col">
@@ -113,7 +113,7 @@ const RecommendedSellers = () => {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[6px] border border-gray-100 shadow-sm">
             <img src="/media/no-data.svg" alt="No Sellers" className="w-40 opacity-50 mb-6" />
             <h3 className="text-xl font-bold text-gray-900 mb-2">No recommendations found</h3>
             <p className="text-gray-500 text-center max-w-md">

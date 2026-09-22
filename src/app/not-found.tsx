@@ -17,7 +17,7 @@ const NotFound = () => {
   return (
     <div id="not-found-page" className="w-full flex justify-center items-center p-4 md:p-8 lg:p-10 bg-slate-50 dark:bg-slate-950">
       {/* 404 Container */}
-      <div className="w-full max-w-[1760px] h-[clamp(650px,85vh,1000px)] min-h-[620px] rounded-[10px] bg-[var(--warning-900,#650000)] relative overflow-hidden flex flex-col items-center justify-center shadow-2xl">
+      <div className="w-full max-w-[1760px] h-[clamp(650px,85vh,1000px)] min-h-[620px] rounded-[6px] bg-[var(--warning-900,#650000)] relative overflow-hidden flex flex-col items-center justify-center shadow-2xl">
         {/* SVG Repeating Pattern Background */}
         <div
           className="absolute inset-0 w-full h-full bg-[url('/media/not-found-pattern.svg')] bg-repeat [background-size:150px_102px] opacity-55 pointer-events-none z-1"

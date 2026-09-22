@@ -20,7 +20,7 @@ export const BuyerDashboardCard: React.FC<BuyerDashboardCardProps> = ({ pkg }) =
   return (
     <Link
       href={`/package/${pkg.id}`}
-      className="group bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-lg hover:border-gray-200 hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between"
+      className="group bg-white border border-gray-100 rounded-[6px] overflow-hidden hover:shadow-lg hover:border-gray-200 hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between"
     >
       <div>
         {/* Cover Image */}

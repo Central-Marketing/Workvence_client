@@ -79,7 +79,7 @@ const TopRatedSellers = () => {
           >
             {sellers.slice(0, 6).map((seller: any) => (
               <SwiperSlide key={seller._id} className="pb-4">
-                <Link href={`/package/${seller._id}`} className="flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 group cursor-pointer h-full">
+                <Link href={`/package/${seller._id}`} className="flex flex-col bg-white rounded-[6px] overflow-hidden border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 group cursor-pointer h-full">
                   <div className="w-full h-52 md:h-56 overflow-hidden flex-shrink-0">
                     <img
                       src={seller.cover || seller.images?.[0] || "/PackageImages.png"}

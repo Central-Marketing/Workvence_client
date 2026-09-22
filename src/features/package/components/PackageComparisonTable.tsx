@@ -50,7 +50,7 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
 
   return (
     <div id="section-packages" className="scroll-mt-32 mb-10">
-      <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-2xs">
+      <div className="rounded-[6px] border border-gray-200 bg-white overflow-hidden shadow-2xs">
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-7 border-b border-gray-200">
           <div>

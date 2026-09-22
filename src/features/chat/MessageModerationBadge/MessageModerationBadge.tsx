@@ -45,7 +45,7 @@ export const MessageModerationBadge: React.FC<MessageModerationBadgeProps> = ({
         <div
           onMouseEnter={() => setIsOpen(true)}
           onMouseLeave={() => setIsOpen(false)}
-          className={`absolute bottom-full mb-2 z-50 w-64 p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-800 dark:text-slate-100 text-xs transition-all pointer-events-auto ${isOwner ? 'right-0' : 'left-0'
+          className={`absolute bottom-full mb-2 z-50 w-64 p-3.5 rounded-[6px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-800 dark:text-slate-100 text-xs transition-all pointer-events-auto ${isOwner ? 'right-0' : 'left-0'
             }`}
           style={{
             boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08)',

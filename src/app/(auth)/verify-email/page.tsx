@@ -198,7 +198,7 @@ const VerifyEmailContent = () => {
                     inputMode="numeric"
                     maxLength={1}
                     placeholder="0"
-                    className="flex-1 min-w-0 max-w-[56px] aspect-square text-center text-xl sm:text-2xl font-bold border border-gray-200 rounded-2xl bg-[#f9fafb] text-gray-900 placeholder:text-[#868686] placeholder:font-normal placeholder:text-[24px] placeholder:leading-none placeholder:tracking-[0px] font-['SF_Pro',-apple-system,BlinkMacSystemFont,sans-serif] focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                    className="flex-1 min-w-0 max-w-[56px] aspect-square text-center text-xl sm:text-2xl font-bold border border-gray-200 rounded-[6px] bg-[#f9fafb] text-gray-900 placeholder:text-[#868686] placeholder:font-normal placeholder:text-[24px] placeholder:leading-none placeholder:tracking-[0px] font-['SF_Pro',-apple-system,BlinkMacSystemFont,sans-serif] focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
                     value={digit}
                     onChange={(e) => handleOtpChange(index, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(index, e)}
@@ -253,7 +253,7 @@ const VerifyEmailContent = () => {
 
       {/* Right Pane */}
       <div className="hidden lg:flex flex-1 p-3 sm:p-4 lg:p-5 h-screen sticky top-0">
-        <div className="relative w-full h-full rounded-2xl lg:rounded-3xl overflow-hidden bg-[#0a0f1d] shadow-sm">
+        <div className="relative w-full h-full rounded-[6px] lg:rounded-3xl overflow-hidden bg-[#0a0f1d] shadow-sm">
           <Image
             src="/media/loginImage.png"
             alt="Workvence"

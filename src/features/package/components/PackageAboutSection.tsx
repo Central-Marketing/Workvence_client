@@ -22,7 +22,7 @@ export const PackageAboutSection: React.FC<PackageAboutSectionProps> = ({
   return (
     <div
       id="section-about"
-      className="scroll-mt-36 w-full max-w-full overflow-hidden bg-[#F5F5F5] border border-gray-100 rounded-2xl p-5 sm:p-6 md:p-8 mb-10 shadow-2xs break-words [overflow-wrap:anywhere]"
+      className="scroll-mt-36 w-full max-w-full overflow-hidden bg-[#F5F5F5] border border-gray-100 rounded-[6px] p-5 sm:p-6 md:p-8 mb-10 shadow-2xs break-words [overflow-wrap:anywhere]"
     >
       {/* Section Header */}
       <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 mb-6 pb-2">

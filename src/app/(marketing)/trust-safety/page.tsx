@@ -85,7 +85,7 @@ export default function TrustSafetyPage() {
         {/* 1. Hero Banner Card */}
         <section
           aria-label="Trust and Safety Banner"
-          className="w-full bg-[#22172A] rounded-[10px] py-16 sm:py-20 md:py-24 lg:py-28 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs"
+          className="w-full bg-[#22172A] rounded-[6px] py-16 sm:py-20 md:py-24 lg:py-28 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs"
         >
           {/* Breadcrumb */}
           <nav
@@ -131,7 +131,7 @@ export default function TrustSafetyPage() {
 
               {/* Right Column: Image Card */}
               <div className="md:col-span-7 lg:col-span-7">
-                <div className="relative w-full aspect-[16/9] sm:aspect-[1.85/1] rounded-[10px] overflow-hidden bg-gray-100 shadow-xs border border-black/[0.04]">
+                <div className="relative w-full aspect-[16/9] sm:aspect-[1.85/1] rounded-[6px] overflow-hidden bg-gray-100 shadow-xs border border-black/[0.04]">
                   <img
                     src={section.imageUrl}
                     alt={section.alt}

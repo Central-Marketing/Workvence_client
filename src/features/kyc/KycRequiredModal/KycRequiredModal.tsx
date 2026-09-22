@@ -23,11 +23,11 @@ export const KycRequiredModal: React.FC<KycRequiredModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn select-none"
       onClick={onClose}
     >
-      <div 
+      <div
         className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col items-center text-center relative overflow-hidden transform transition-all animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
@@ -43,7 +43,7 @@ export const KycRequiredModal: React.FC<KycRequiredModalProps> = ({
         />
 
         {/* Header Icon */}
-        <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center mb-5 text-amber-600 shadow-xs">
+        <div className="w-16 h-16 rounded-[6px] bg-amber-50 border border-amber-200 flex items-center justify-center mb-5 text-amber-600 shadow-xs">
           <ShieldAlert size={32} strokeWidth={2.2} />
         </div>
 

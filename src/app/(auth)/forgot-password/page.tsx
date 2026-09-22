@@ -44,7 +44,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4 md:p-10 box-border">
-      <div className="flex w-full max-w-[1200px] md:h-[800px] bg-white rounded-2xl overflow-hidden">
+      <div className="flex w-full max-w-[1200px] md:h-[800px] bg-white rounded-[6px] overflow-hidden">
         {/* Left Pane */}
         <div className="flex-1 flex flex-col p-6 md:p-10 lg:px-20 overflow-y-auto [&::-webkit-scrollbar]:w-0">
           <div className="flex flex-col h-full">

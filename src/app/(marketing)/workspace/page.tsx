@@ -26,7 +26,7 @@ const workspaceTabs = [
     title: "Get Paid Faster with Multi-Currency Invoicing",
     desc: "Generate professional recurring and milestone invoices with automatic payment reminders, Stripe/PayPal checkout links, and tax calculation.",
     mockup: (
-      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-xs space-y-4 text-xs">
+      <div className="bg-white p-6 rounded-[6px] border border-gray-200 shadow-xs space-y-4 text-xs">
         <div className="flex justify-between items-center border-b border-gray-100 pb-3">
           <div>
             <span className="font-bold text-gray-900 block text-sm">Invoice #WV-2026-89</span>
@@ -54,12 +54,12 @@ const workspaceTabs = [
     title: "Ironclad Standard Contracts in Seconds",
     desc: "Protect your IP and payment rights with legally vetted freelancer agreements, custom milestones, and one-click digital e-signatures.",
     mockup: (
-      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-xs space-y-4 text-xs">
+      <div className="bg-white p-6 rounded-[6px] border border-gray-200 shadow-xs space-y-4 text-xs">
         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
           <span className="font-bold text-gray-900 text-sm">Independent Contractor Agreement</span>
           <span className="px-2.5 py-1 rounded-full font-bold bg-blue-50 text-blue-700">E-Signed by Both Parties</span>
         </div>
-        <div className="p-3 bg-gray-50 rounded-xl space-y-1 text-gray-600">
+        <div className="p-3 bg-gray-50 rounded-[6px] space-y-1 text-gray-600">
           <p>• Full intellectual property transfer upon final escrow milestone payout.</p>
           <p>• Standard 2-round revision window with 48h turnaround.</p>
         </div>
@@ -73,7 +73,7 @@ const workspaceTabs = [
     title: "Track Hours & Milestone Deliverables",
     desc: "Log project hours with our lightweight desktop and web timer. Attach work logs directly to invoices for instant client verification.",
     mockup: (
-      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-xs space-y-4 text-xs">
+      <div className="bg-white p-6 rounded-[6px] border border-gray-200 shadow-xs space-y-4 text-xs">
         <div className="flex items-center justify-between">
           <span className="font-bold text-gray-900 text-sm">Active Session: Brand UI Sprint</span>
           <span className="font-mono font-bold text-emerald-600 text-base">03:42:18</span>
@@ -115,7 +115,7 @@ export default function WorkspacePage() {
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <Link
                 href="/register"
-                className="px-8 py-4 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-8 py-4 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Get Workspace Free</span>
                 <ArrowRight className="w-4 h-4" />
@@ -139,9 +139,8 @@ export default function WorkspacePage() {
                   size="md"
                   radius="2xl"
                   leftIcon={<Icon className="w-4 h-4" />}
-                  className={`px-6 py-3 text-xs font-semibold whitespace-nowrap ${
-                    activeTab === tab.id ? "shadow-md" : ""
-                  }`}
+                  className={`px-6 py-3 text-xs font-semibold whitespace-nowrap ${activeTab === tab.id ? "shadow-md" : ""
+                    }`}
                 >
                   {tab.name}
                 </Button>

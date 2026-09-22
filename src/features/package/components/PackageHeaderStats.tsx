@@ -174,7 +174,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
       </div>
 
       {/* 4. Seller Stats */}
-      <div className="w-full mb-6 overflow-hidden rounded-[10px] border border-[#DADADA] bg-[#F5F5F5] grid grid-cols-2 xl:grid-cols-4">
+      <div className="w-full mb-6 overflow-hidden rounded-[6px] border border-[#DADADA] bg-[#F5F5F5] grid grid-cols-2 xl:grid-cols-4">
 
         {/* Card 1: Profile Status */}
         <div className="
@@ -209,7 +209,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
             lg:w-8 lg:h-8
             xl:w-9 xl:h-9
             2xl:w-10 2xl:h-10
-            rounded-[10px]
+            rounded-[6px]
             border border-[#0000001A]
             bg-[#FAFAFA]
             text-[#5568AB]
@@ -282,7 +282,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
             lg:w-8 lg:h-8
             xl:w-9 xl:h-9
             2xl:w-10 2xl:h-10
-            rounded-[10px]
+            rounded-[6px]
             border border-[#0000001A]
             bg-[#FAFAFA]
             text-[#F57727]
@@ -357,7 +357,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
             lg:w-8 lg:h-8
             xl:w-9 xl:h-9
             2xl:w-10 2xl:h-10
-            rounded-[10px]
+            rounded-[6px]
             border border-[#0000001A]
             bg-[#FAFAFA]
             text-[#54AA54]
@@ -434,7 +434,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
             lg:w-8 lg:h-8
             xl:w-9 xl:h-9
             2xl:w-10 2xl:h-10
-            rounded-[10px]
+            rounded-[6px]
             border border-[#0000001A]
             bg-[#FAFAFA]
             text-[#9654F4]

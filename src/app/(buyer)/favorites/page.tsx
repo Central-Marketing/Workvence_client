@@ -34,10 +34,10 @@ const FavoritesPage = () => {
               item.gig && typeof item.gig === "object"
                 ? item.gig
                 : item.package && typeof item.package === "object"
-                ? item.package
-                : item.gigId && typeof item.gigId === "object"
-                ? item.gigId
-                : item;
+                  ? item.package
+                  : item.gigId && typeof item.gigId === "object"
+                    ? item.gigId
+                    : item;
             return {
               ...rawGig,
               isFavorited: true,
@@ -56,10 +56,10 @@ const FavoritesPage = () => {
             return seller.seller && typeof seller.seller === "object"
               ? seller.seller
               : seller.sellerId && typeof seller.sellerId === "object"
-              ? seller.sellerId
-              : seller.user && typeof seller.user === "object"
-              ? seller.user
-              : seller;
+                ? seller.sellerId
+                : seller.user && typeof seller.user === "object"
+                  ? seller.user
+                  : seller;
           });
           setFavoriteSellers(normalizedSellers);
         }
@@ -195,20 +195,22 @@ const FavoritesPage = () => {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-3 border-b border-gray-200 mb-8 pb-3">
+        <div className="inline-flex items-center h-[46px] bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 mb-8">
           <Button
             type="button"
             onClick={() => setActiveTab("gigs")}
-            variant={activeTab === "gigs" ? "dark" : "outline"}
+            variant={activeTab === "gigs" ? "brand" : "ghost"}
             size="sm"
             radius="fiverr"
-            className="flex items-center gap-2"
+            className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 flex items-center gap-2 ${activeTab === "gigs"
+                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+              }`}
           >
             <span>Saved Services</span>
             <span
-              className={`text-xs px-2 py-0.5 rounded-full font-bold ml-1.5 ${
-                activeTab === "gigs" ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
-              }`}
+              className={`text-[10px] px-2 py-0.5 rounded-full font-bold ml-1.5 ${activeTab === "gigs" ? "bg-white/20 text-white" : "bg-gray-200/80 text-gray-700"
+                }`}
             >
               {favoriteGigs.length}
             </span>
@@ -217,16 +219,18 @@ const FavoritesPage = () => {
           <Button
             type="button"
             onClick={() => setActiveTab("sellers")}
-            variant={activeTab === "sellers" ? "dark" : "outline"}
+            variant={activeTab === "sellers" ? "brand" : "ghost"}
             size="sm"
             radius="fiverr"
-            className="flex items-center gap-2"
+            className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 flex items-center gap-2 ${activeTab === "sellers"
+                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+              }`}
           >
             <span>Favorite Sellers</span>
             <span
-              className={`text-xs px-2 py-0.5 rounded-full font-bold ml-1.5 ${
-                activeTab === "sellers" ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
-              }`}
+              className={`text-[10px] px-2 py-0.5 rounded-full font-bold ml-1.5 ${activeTab === "sellers" ? "bg-white/20 text-white" : "bg-gray-200/80 text-gray-700"
+                }`}
             >
               {favoriteSellers.length}
             </span>
@@ -237,7 +241,7 @@ const FavoritesPage = () => {
         {activeTab === "gigs" && (
           <div>
             {favoriteGigs.length === 0 ? (
-              <div className="bg-white border border-gray-200 rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm min-h-[380px]">
+              <div className="bg-white border border-gray-200 rounded-[6px] p-12 flex flex-col items-center justify-center text-center shadow-sm min-h-[380px]">
                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100">
                   <span className="text-4xl filter grayscale opacity-40">📦</span>
                 </div>
@@ -268,7 +272,7 @@ const FavoritesPage = () => {
         {activeTab === "sellers" && (
           <div>
             {favoriteSellers.length === 0 ? (
-              <div className="bg-white border border-gray-200 rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm min-h-[380px]">
+              <div className="bg-white border border-gray-200 rounded-[6px] p-12 flex flex-col items-center justify-center text-center shadow-sm min-h-[380px]">
                 <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100">
                   <span className="text-4xl filter grayscale opacity-40">👤</span>
                 </div>
@@ -298,7 +302,7 @@ const FavoritesPage = () => {
                   return (
                     <div
                       key={sellerId}
-                      className="bg-white border border-gray-200/90 rounded-2xl p-6 flex flex-col items-center text-center shadow-xs hover:shadow-md transition-all duration-200 relative group"
+                      className="bg-white border border-gray-200/90 rounded-[6px] p-6 flex flex-col items-center text-center shadow-xs hover:shadow-md transition-all duration-200 relative group"
                     >
                       {/* Favorite Seller Heart Button */}
                       <div className="absolute top-4 right-4 z-10">

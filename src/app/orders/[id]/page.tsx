@@ -232,7 +232,7 @@ export default function OrderDetailPage() {
         </p>
         <Link
           href={user?.isSeller ? "/manage-orders" : "/orders"}
-          className="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-xs sm:text-sm font-semibold hover:bg-slate-800 transition-colors"
+          className="px-5 py-2.5 rounded-[6px] bg-slate-900 text-white text-xs sm:text-sm font-semibold hover:bg-slate-800 transition-colors"
         >
           Back to Orders
         </Link>

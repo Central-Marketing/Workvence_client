@@ -94,7 +94,7 @@ export default function BusinessSolutionsPage() {
               </Button>
               <Link
                 href="/pro"
-                className="px-8 py-4 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-8 py-4 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
               >
                 Explore Pro Talent
               </Link>
@@ -121,7 +121,7 @@ export default function BusinessSolutionsPage() {
                   key={idx}
                   className="bg-white border border-gray-200/90 rounded-3xl p-8 space-y-4 shadow-xs hover:border-[#327C73] hover:shadow-md transition duration-300"
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
                     <Icon className="w-6 h-6" />
                   </div>
                   <h3 className="text-xl font-bold text-[#0f172a]">{f.title}</h3>
@@ -163,7 +163,7 @@ export default function BusinessSolutionsPage() {
                     value={demoForm.name}
                     onChange={(e) => setDemoForm({ ...demoForm, name: e.target.value })}
                     placeholder="e.g. Rachel Adams"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
                 <div>
@@ -174,7 +174,7 @@ export default function BusinessSolutionsPage() {
                     value={demoForm.company}
                     onChange={(e) => setDemoForm({ ...demoForm, company: e.target.value })}
                     placeholder="e.g. Acme Corp"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
               </div>
@@ -188,7 +188,7 @@ export default function BusinessSolutionsPage() {
                     value={demoForm.workEmail}
                     onChange={(e) => setDemoForm({ ...demoForm, workEmail: e.target.value })}
                     placeholder="rachel@acmecorp.com"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
                 <div>
@@ -196,7 +196,7 @@ export default function BusinessSolutionsPage() {
                   <select
                     value={demoForm.teamSize}
                     onChange={(e) => setDemoForm({ ...demoForm, teamSize: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   >
                     <option value="1-20 employees">1-20 employees</option>
                     <option value="20-50 employees">20-50 employees</option>

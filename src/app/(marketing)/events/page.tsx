@@ -131,11 +131,10 @@ export default function EventsPage() {
                   variant={filterType === t ? "brand" : "soft"}
                   size="xs"
                   radius="xl"
-                  className={`font-semibold transition cursor-pointer ${
-                    filterType === t
+                  className={`font-semibold transition cursor-pointer ${filterType === t
                       ? "shadow-xs"
                       : "hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   {t === "All" ? "All Events" : `${t}s`}
                 </Button>
@@ -242,7 +241,7 @@ export default function EventsPage() {
                   value={rsvpForm.name}
                   onChange={(e) => setRsvpForm({ ...rsvpForm, name: e.target.value })}
                   placeholder="e.g. Jordan Miller"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                 />
               </div>
 
@@ -254,7 +253,7 @@ export default function EventsPage() {
                   value={rsvpForm.email}
                   onChange={(e) => setRsvpForm({ ...rsvpForm, email: e.target.value })}
                   placeholder="jordan@example.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                 />
               </div>
 

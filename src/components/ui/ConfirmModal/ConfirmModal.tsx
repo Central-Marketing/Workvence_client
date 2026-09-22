@@ -78,7 +78,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         />
 
         {/* Icon Header */}
-        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border ${iconBg}`}>
+        <div className={`w-14 h-14 rounded-[6px] flex items-center justify-center mb-4 border ${iconBg}`}>
           <Icon size={26} strokeWidth={2} />
         </div>
 

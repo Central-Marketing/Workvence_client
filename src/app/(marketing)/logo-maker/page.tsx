@@ -34,7 +34,7 @@ export default function LogoMakerPage() {
       name: "Minimalist Geometric",
       render: (
         <div className="flex flex-col items-center justify-center p-6 space-y-3">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg" style={{ backgroundColor: primaryColor }}>
+          <div className="w-14 h-14 rounded-[6px] flex items-center justify-center text-white font-bold text-2xl shadow-lg" style={{ backgroundColor: primaryColor }}>
             {brandName.slice(0, 1).toUpperCase()}
           </div>
           <div className="text-center">
@@ -81,7 +81,7 @@ export default function LogoMakerPage() {
       name: "Editorial Serif",
       render: (
         <div className="flex flex-col items-center justify-center p-6 space-y-3">
-          <div className="w-12 h-12 rounded-xl bg-gray-900 text-white flex items-center justify-center font-serif text-3xl font-bold">
+          <div className="w-12 h-12 rounded-[6px] bg-gray-900 text-white flex items-center justify-center font-serif text-3xl font-bold">
             {brandName.slice(0, 1).toUpperCase()}
           </div>
           <div className="text-center">
@@ -151,7 +151,7 @@ export default function LogoMakerPage() {
       {/* Main Studio Interface */}
       <div className="container mx-auto px-4 md:px-6 pt-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
+
           {/* Left Controls Sidebar (4 cols) */}
           <div className="lg:col-span-4 space-y-6">
             <div className="bg-[#f8fafc] border border-gray-200 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xs">
@@ -169,7 +169,7 @@ export default function LogoMakerPage() {
                   value={brandName}
                   onChange={(e) => setBrandName(e.target.value)}
                   placeholder="e.g. Veloce"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-xs font-bold focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 bg-white text-xs font-bold focus:border-[#327C73] outline-none"
                 />
               </div>
 
@@ -180,7 +180,7 @@ export default function LogoMakerPage() {
                   value={slogan}
                   onChange={(e) => setSlogan(e.target.value)}
                   placeholder="e.g. Scale with speed"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 bg-white text-xs focus:border-[#327C73] outline-none"
                 />
               </div>
 
@@ -189,7 +189,7 @@ export default function LogoMakerPage() {
                 <select
                   value={industry}
                   onChange={(e) => setIndustry(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 bg-white text-xs focus:border-[#327C73] outline-none"
                 >
                   <option value="Tech & AI">Tech & AI</option>
                   <option value="Creative Agency">Creative Agency</option>
@@ -209,9 +209,8 @@ export default function LogoMakerPage() {
                       variant="ghost"
                       size="icon"
                       radius="full"
-                      className={`w-8 h-8 transition-transform cursor-pointer p-0 ${
-                        primaryColor === c ? "scale-125 ring-2 ring-offset-2 ring-gray-400" : "hover:scale-110"
-                      }`}
+                      className={`w-8 h-8 transition-transform cursor-pointer p-0 ${primaryColor === c ? "scale-125 ring-2 ring-offset-2 ring-gray-400" : "hover:scale-110"
+                        }`}
                       style={{ backgroundColor: c }}
                       aria-label={`Select color ${c}`}
                     />
@@ -228,7 +227,7 @@ export default function LogoMakerPage() {
               </p>
               <Link
                 href="/packages?category=graphics-and-design"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition"
               >
                 <span>Browse Logo Designers</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -254,7 +253,7 @@ export default function LogoMakerPage() {
                     <span>Concept #{item.id}</span>
                   </div>
 
-                  <div className="min-h-[160px] flex items-center justify-center bg-[#fafafa] rounded-2xl border border-gray-100/80 group-hover:bg-white transition">
+                  <div className="min-h-[160px] flex items-center justify-center bg-[#fafafa] rounded-[6px] border border-gray-100/80 group-hover:bg-white transition">
                     {item.render}
                   </div>
 

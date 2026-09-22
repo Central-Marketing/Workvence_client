@@ -135,7 +135,7 @@ export default function SupportDashboardPage() {
       <div className="max-w-6xl mx-auto space-y-8">
 
         {/* Header Banner */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 md:p-8 rounded-2xl border border-[#e2e8f0] shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 md:p-8 rounded-[6px] border border-[#e2e8f0] shadow-xs">
           <div className="space-y-1.5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#327C73]/10 text-[#327C73] flex items-center justify-center">
@@ -161,7 +161,7 @@ export default function SupportDashboardPage() {
 
         {/* KPI Counter Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-[#e2e8f0] shadow-xs space-y-2">
+          <div className="bg-white p-5 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-[#64748b]">
               Total Tickets
             </span>
@@ -173,7 +173,7 @@ export default function SupportDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-amber-50/50 p-5 rounded-2xl border border-amber-200 shadow-xs space-y-2">
+          <div className="bg-amber-50/50 p-5 rounded-[6px] border border-amber-200 shadow-xs space-y-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-amber-700">
               Open Tickets
             </span>
@@ -185,7 +185,7 @@ export default function SupportDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-blue-50/50 p-5 rounded-2xl border border-blue-200 shadow-xs space-y-2">
+          <div className="bg-blue-50/50 p-5 rounded-[6px] border border-blue-200 shadow-xs space-y-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-blue-700">
               In Progress
             </span>
@@ -197,7 +197,7 @@ export default function SupportDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-emerald-50/50 p-5 rounded-2xl border border-emerald-200 shadow-xs space-y-2">
+          <div className="bg-emerald-50/50 p-5 rounded-[6px] border border-emerald-200 shadow-xs space-y-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-[#327C73]">
               Resolved / Closed
             </span>
@@ -211,7 +211,7 @@ export default function SupportDashboardPage() {
         </div>
 
         {/* Filter and Search Bar */}
-        <div className="bg-white p-6 rounded-2xl border border-[#e2e8f0] shadow-xs space-y-4">
+        <div className="bg-white p-6 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-4">
 
           {/* Category Tabs */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
@@ -272,12 +272,12 @@ export default function SupportDashboardPage() {
         {/* Tickets Grid / List */}
         <div className="space-y-4">
           {loading ? (
-            <div className="bg-white p-12 rounded-2xl border border-[#e2e8f0] text-center space-y-3">
+            <div className="bg-white p-12 rounded-[6px] border border-[#e2e8f0] text-center space-y-3">
               <Loader2 className="w-8 h-8 mx-auto animate-spin text-[#327C73]" />
               <p className="text-xs font-semibold text-[#64748b]">Loading your support tickets...</p>
             </div>
           ) : error ? (
-            <div className="bg-rose-50 p-8 rounded-2xl border border-rose-200 text-center space-y-4">
+            <div className="bg-rose-50 p-8 rounded-[6px] border border-rose-200 text-center space-y-4">
               <AlertTriangle className="w-10 h-10 mx-auto text-rose-600" />
               <div className="space-y-1">
                 <h3 className="text-base font-bold text-rose-900">Unable to load tickets</h3>
@@ -295,7 +295,7 @@ export default function SupportDashboardPage() {
               </Button>
             </div>
           ) : filteredTickets.length === 0 ? (
-            <div className="bg-white p-12 rounded-2xl border border-[#e2e8f0] text-center space-y-4">
+            <div className="bg-white p-12 rounded-[6px] border border-[#e2e8f0] text-center space-y-4">
               <MessageSquare className="w-12 h-12 mx-auto text-[#cbd5e1]" />
               <div className="space-y-1">
                 <h3 className="text-base font-bold text-[#0f172a] font-sf-pro">No support tickets found</h3>
@@ -318,7 +318,7 @@ export default function SupportDashboardPage() {
               {filteredTickets.map((ticket) => (
                 <div
                   key={ticket.id}
-                  className="bg-white p-6 rounded-2xl border border-[#e2e8f0] shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-200 space-y-4 group"
+                  className="bg-white p-6 rounded-[6px] border border-[#e2e8f0] shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-200 space-y-4 group"
                 >
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="space-y-1.5">

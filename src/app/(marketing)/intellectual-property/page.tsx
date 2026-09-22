@@ -45,8 +45,8 @@ export default function IntellectualPropertyPage() {
       <section className="py-14 bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-2xl p-6 space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
+            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-6 space-y-3">
+              <div className="w-10 h-10 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
                 <FileCheck className="w-5 h-5" />
               </div>
               <h3 className="text-lg font-bold text-[#0f172a]">Commercial Rights Transfer</h3>
@@ -55,8 +55,8 @@ export default function IntellectualPropertyPage() {
               </p>
             </div>
 
-            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-2xl p-6 space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
+            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-6 space-y-3">
+              <div className="w-10 h-10 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
                 <ShieldAlert className="w-5 h-5" />
               </div>
               <h3 className="text-lg font-bold text-[#0f172a]">Zero Tolerance for Piracy</h3>
@@ -65,8 +65,8 @@ export default function IntellectualPropertyPage() {
               </p>
             </div>
 
-            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-2xl p-6 space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
+            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-6 space-y-3">
+              <div className="w-10 h-10 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
                 <Lock className="w-5 h-5" />
               </div>
               <h3 className="text-lg font-bold text-[#0f172a]">Fair Counter-Notice Process</h3>
@@ -78,7 +78,7 @@ export default function IntellectualPropertyPage() {
 
           {/* Form & Guidelines Section */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            
+
             {/* Left Column: Guidelines & FAQ (5 cols) */}
             <div className="lg:col-span-5 space-y-6">
               <div className="space-y-3">
@@ -88,7 +88,7 @@ export default function IntellectualPropertyPage() {
                 </p>
               </div>
 
-              <div className="space-y-4 text-xs text-gray-700 bg-[#f8fafc] p-6 rounded-2xl border border-gray-200">
+              <div className="space-y-4 text-xs text-gray-700 bg-[#f8fafc] p-6 rounded-[6px] border border-gray-200">
                 <div className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-[#327C73] shrink-0 mt-0.5" />
                   <span>Exact URL(s) of the gig, package, or user profile on Workvence hosting the disputed material.</span>
@@ -107,7 +107,7 @@ export default function IntellectualPropertyPage() {
                 </div>
               </div>
 
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 space-y-2 text-xs text-amber-800">
+              <div className="bg-amber-50 border border-amber-200 rounded-[6px] p-5 space-y-2 text-xs text-amber-800">
                 <div className="flex items-center gap-2 font-bold text-amber-900">
                   <AlertTriangle className="w-4 h-4 text-amber-600" />
                   <span>Important Legal Notice</span>

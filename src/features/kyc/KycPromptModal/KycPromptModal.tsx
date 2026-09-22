@@ -40,11 +40,11 @@ export const KycPromptModal: React.FC = () => {
     const isVerified = currentUser.isKycVerified === true;
 
     // Don't show modal if already on kyc, auth, or admin pages
-    const isExcludedPage = 
-      pathname === "/kyc" || 
-      pathname === "/settings/verification" || 
-      pathname.startsWith("/admin") || 
-      pathname === "/login" || 
+    const isExcludedPage =
+      pathname === "/kyc" ||
+      pathname === "/settings/verification" ||
+      pathname.startsWith("/admin") ||
+      pathname === "/login" ||
       pathname === "/register" ||
       pathname === "/forgot-password" ||
       pathname === "/reset-password";
@@ -77,7 +77,7 @@ export const KycPromptModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn select-none">
-      <div 
+      <div
         className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col items-center text-center relative overflow-hidden transform transition-all animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
@@ -100,7 +100,7 @@ export const KycPromptModal: React.FC = () => {
         )}
 
         {/* Header Icon */}
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-50 to-emerald-100 border border-emerald-200 flex items-center justify-center mb-5 text-brand-green shadow-xs">
+        <div className="w-16 h-16 rounded-[6px] bg-gradient-to-tr from-emerald-50 to-emerald-100 border border-emerald-200 flex items-center justify-center mb-5 text-brand-green shadow-xs">
           <ShieldAlert size={32} strokeWidth={2.2} />
         </div>
 
@@ -115,7 +115,7 @@ export const KycPromptModal: React.FC = () => {
         </p>
 
         {/* Benefits List */}
-        <div className="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-6 text-left space-y-2.5">
+        <div className="w-full bg-slate-50 border border-slate-100 rounded-[6px] p-4 mb-6 text-left space-y-2.5">
           <div className="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700 font-medium">
             <CheckCircle2 size={16} className="text-brand-green shrink-0" />
             <span>Unlocks earnings withdrawals and Stripe payouts</span>

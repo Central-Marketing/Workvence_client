@@ -266,7 +266,7 @@ export default function BuyerManageOrdersPage() {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-slate-100">
 
             {/* Pill Tabs */}
-            <div className="bg-white border border-slate-200 rounded-xl p-1 flex items-center gap-1 overflow-x-auto scrollbar-none">
+            <div className="bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 inline-flex items-center h-[46px] overflow-x-auto scrollbar-none max-w-full">
               {(["Priority", "Active", "Late", "Delivered", "Completed", "Cancelled", "Starred"] as const).map((tab) => (
                 <Button
                   key={tab}
@@ -275,11 +275,10 @@ export default function BuyerManageOrdersPage() {
                   variant={activeTab === tab ? "brand" : "ghost"}
                   size="sm"
                   radius="fiverr"
-                  className={`whitespace-nowrap ${
-                    activeTab === tab
-                      ? "bg-[#0D3B34] hover:bg-[#0D3B34] text-white shadow-xs"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                  }`}
+                  className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 whitespace-nowrap ${activeTab === tab
+                      ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                      : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                    }`}
                 >
                   {tab}
                 </Button>
@@ -436,7 +435,7 @@ export default function BuyerManageOrdersPage() {
       {/* Notes Modal Popup */}
       {activeNotesOrder && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 relative animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-[6px] max-w-md w-full p-6 shadow-xl border border-slate-100 relative animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
               <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
                 <FiFileText className="text-teal-600" />
@@ -467,7 +466,7 @@ export default function BuyerManageOrdersPage() {
 
               <div>
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Note / Instructions</p>
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 text-xs sm:text-sm text-slate-700 leading-relaxed max-h-48 overflow-y-auto whitespace-pre-wrap">
+                <div className="p-3.5 bg-slate-50 rounded-[6px] border border-slate-100 text-xs sm:text-sm text-slate-700 leading-relaxed max-h-48 overflow-y-auto whitespace-pre-wrap">
                   {activeNotesOrder.notes}
                 </div>
               </div>

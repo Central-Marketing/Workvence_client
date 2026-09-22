@@ -176,7 +176,7 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
             <button
               type="button"
               onClick={onMessage || onContact}
-              className="w-full py-2.5 bg-[#EEEEEE] hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded-[10px] flex items-center justify-center transition-colors cursor-pointer active:scale-[0.98]"
+              className="w-full py-2.5 bg-[#EEEEEE] hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded-[6px] flex items-center justify-center transition-colors cursor-pointer active:scale-[0.98]"
             >
               Message
             </button>

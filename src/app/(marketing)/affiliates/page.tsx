@@ -102,7 +102,7 @@ export default function AffiliatesPage() {
               </Button>
               <a
                 href="#calculator"
-                className="px-7 py-3.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-7 py-3.5 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
               >
                 Calculate Potential Earnings
               </a>
@@ -122,8 +122,8 @@ export default function AffiliatesPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-2xl p-7 space-y-4">
-              <div className="w-10 h-10 rounded-xl bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
+            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-7 space-y-4">
+              <div className="w-10 h-10 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
                 1
               </div>
               <h3 className="text-lg font-bold text-[#0f172a]">Join & Get Your Link</h3>
@@ -132,8 +132,8 @@ export default function AffiliatesPage() {
               </p>
             </div>
 
-            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-2xl p-7 space-y-4">
-              <div className="w-10 h-10 rounded-xl bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
+            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-7 space-y-4">
+              <div className="w-10 h-10 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
                 2
               </div>
               <h3 className="text-lg font-bold text-[#0f172a]">Promote Workvence</h3>
@@ -142,8 +142,8 @@ export default function AffiliatesPage() {
               </p>
             </div>
 
-            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-2xl p-7 space-y-4">
-              <div className="w-10 h-10 rounded-xl bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
+            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-7 space-y-4">
+              <div className="w-10 h-10 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-extrabold flex items-center justify-center text-base">
                 3
               </div>
               <h3 className="text-lg font-bold text-[#0f172a]">Earn Monthly Payouts</h3>
@@ -241,7 +241,7 @@ export default function AffiliatesPage() {
                 </div>
               </div>
 
-              <div className="bg-white/10 border border-white/10 rounded-2xl p-6 text-center space-y-4">
+              <div className="bg-white/10 border border-white/10 rounded-[6px] p-6 text-center space-y-4">
                 <div className="space-y-1">
                   <span className="text-xs text-gray-300 uppercase tracking-wider font-semibold">
                     Estimated Monthly Commission
@@ -301,7 +301,7 @@ export default function AffiliatesPage() {
                     value={affiliateForm.name}
                     onChange={(e) => setAffiliateForm({ ...affiliateForm, name: e.target.value })}
                     placeholder="e.g. Samuel Green"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
                 <div>
@@ -312,7 +312,7 @@ export default function AffiliatesPage() {
                     value={affiliateForm.email}
                     onChange={(e) => setAffiliateForm({ ...affiliateForm, email: e.target.value })}
                     placeholder="sam@affiliate.com"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
               </div>
@@ -324,7 +324,7 @@ export default function AffiliatesPage() {
                   value={affiliateForm.website}
                   onChange={(e) => setAffiliateForm({ ...affiliateForm, website: e.target.value })}
                   placeholder="https://yourblog.com"
-                  className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                 />
               </div>
 
@@ -334,7 +334,7 @@ export default function AffiliatesPage() {
                   <select
                     value={affiliateForm.trafficSource}
                     onChange={(e) => setAffiliateForm({ ...affiliateForm, trafficSource: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   >
                     <option value="Blog / Content Site">Blog / Content Site</option>
                     <option value="YouTube / Video">YouTube / Video</option>
@@ -348,7 +348,7 @@ export default function AffiliatesPage() {
                   <select
                     value={affiliateForm.payoutMethod}
                     onChange={(e) => setAffiliateForm({ ...affiliateForm, payoutMethod: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   >
                     <option value="PayPal / Bank">Direct Bank / PayPal</option>
                     <option value="Stripe Connect">Stripe Connect</option>

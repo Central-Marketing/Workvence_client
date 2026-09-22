@@ -121,11 +121,10 @@ export default function SuccessStoriesPage() {
                   variant={filterType === t ? "brand" : "soft"}
                   size="xs"
                   radius="xl"
-                  className={`font-semibold transition cursor-pointer ${
-                    filterType === t
-                      ? "shadow-xs"
-                      : "hover:bg-gray-200"
-                  }`}
+                  className={`font-semibold transition cursor-pointer ${filterType === t
+                    ? "shadow-xs"
+                    : "hover:bg-gray-200"
+                    }`}
                 >
                   {t === "All" ? "All Stories" : `${t} Stories`}
                 </Button>
@@ -159,7 +158,7 @@ export default function SuccessStoriesPage() {
                     {story.headline}
                   </h3>
 
-                  <div className="p-4 bg-[#f8fafc] rounded-2xl border border-gray-100 italic text-xs text-gray-700 leading-relaxed relative">
+                  <div className="p-4 bg-[#f8fafc] rounded-[6px] border border-gray-100 italic text-xs text-gray-700 leading-relaxed relative">
                     <Quote className="w-4 h-4 text-[#327C73] absolute top-2 right-2 opacity-40" />
                     "{story.quote}"
                   </div>
@@ -194,13 +193,13 @@ export default function SuccessStoriesPage() {
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
                 href="/packages?category=ai-services"
-                className="px-6 py-3 rounded-xl bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs shadow-md transition active:scale-95"
+                className="px-6 py-3 rounded-[6px] bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs shadow-md transition active:scale-95"
               >
                 Hire Top Talent
               </Link>
               <Link
                 href="/become-a-seller"
-                className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/20 transition"
+                className="px-6 py-3 rounded-[6px] bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/20 transition"
               >
                 Become a Seller
               </Link>
@@ -236,7 +235,7 @@ export default function SuccessStoriesPage() {
               </div>
             </div>
 
-            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between mb-6">
+            <div className="bg-emerald-50 border border-emerald-200 rounded-[6px] p-4 flex items-center justify-between mb-6">
               <span className="text-xs font-semibold text-emerald-800">{selectedStory.statLabel}</span>
               <span className="text-2xl font-extrabold text-emerald-700">{selectedStory.statValue}</span>
             </div>

@@ -135,11 +135,10 @@ export default function LearnPage() {
                   variant={selectedCat === cat ? "brand" : "soft"}
                   size="xs"
                   radius="xl"
-                  className={`font-semibold transition cursor-pointer ${
-                    selectedCat === cat
+                  className={`font-semibold transition cursor-pointer ${selectedCat === cat
                       ? "shadow-xs"
                       : "hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   {cat}
                 </Button>
@@ -244,7 +243,7 @@ export default function LearnPage() {
               <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400">Curriculum Syllabus:</h4>
               <div className="space-y-2">
                 {selectedCourse.syllabus.map((s, i) => (
-                  <div key={i} className="p-3 bg-[#f8fafc] rounded-xl text-xs font-medium text-gray-800 border border-gray-100 flex items-center gap-2">
+                  <div key={i} className="p-3 bg-[#f8fafc] rounded-[6px] text-xs font-medium text-gray-800 border border-gray-100 flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-[#10b981] shrink-0" />
                     <span>{s}</span>
                   </div>

@@ -584,7 +584,7 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
                       if (val && val !== 'All services') setActiveCategory(val);
                       else setActiveCategory('All services');
                     }}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-[6px] text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
                   >
                     <option value="">Select category</option>
                     {categories.map((c: any) => {
@@ -639,7 +639,7 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
 
                   {/* Min / Max Inputs */}
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 relative flex items-center border border-gray-200 rounded-xl px-3.5 py-2 bg-white focus-within:border-brand-green transition-colors">
+                    <div className="flex-1 relative flex items-center border border-gray-200 rounded-[6px] px-3.5 py-2 bg-white focus-within:border-brand-green transition-colors">
                       <span className="text-gray-700 font-medium text-sm mr-1.5">$</span>
                       <input
                         type="number"
@@ -652,7 +652,7 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
                       <span className="absolute right-3 text-xs text-gray-400 select-none">min</span>
                     </div>
                     <span className="text-gray-400 font-medium">-</span>
-                    <div className="flex-1 relative flex items-center border border-gray-200 rounded-xl px-3.5 py-2 bg-white focus-within:border-brand-green transition-colors">
+                    <div className="flex-1 relative flex items-center border border-gray-200 rounded-[6px] px-3.5 py-2 bg-white focus-within:border-brand-green transition-colors">
                       <span className="text-gray-700 font-medium text-sm mr-1.5">$</span>
                       <input
                         type="number"
@@ -673,7 +673,7 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
                   <select
                     value={englishLevel}
                     onChange={(e) => setEnglishLevel(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-[6px] text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
                   >
                     <option value="">Select english level</option>
                     <option value="basic">Basic / Conversational</option>
@@ -688,7 +688,7 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
                   <select
                     value={clientLocation}
                     onChange={(e) => setClientLocation(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-[6px] text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
                   >
                     <option value="">Select client location</option>
                     <option value="US">United States</option>
@@ -736,7 +736,7 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
           </div>
         ) : isError || error ? (
           <div className="py-16 w-full animate-fadeIn flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-5 border border-red-100 shadow-sm">
+            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-[6px] flex items-center justify-center mb-5 border border-red-100 shadow-sm">
               <FiAlertCircle className="w-8 h-8" />
             </div>
             <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2 tracking-tight">

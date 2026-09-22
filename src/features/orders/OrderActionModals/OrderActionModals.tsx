@@ -53,7 +53,7 @@ export const RevisionModal: React.FC<RevisionModalProps> = ({
         />
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
+          <div className="w-12 h-12 rounded-[6px] bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
             <FileText size={24} strokeWidth={2} />
           </div>
           <div>
@@ -165,7 +165,7 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
         />
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 shrink-0">
+          <div className="w-12 h-12 rounded-[6px] bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 shrink-0">
             <Calendar size={24} strokeWidth={2} />
           </div>
           <div>
@@ -185,7 +185,7 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
               placeholder="e.g. 2"
               value={days}
               onChange={(e) => setDays(e.target.value)}
-              className="w-full p-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none text-slate-800 text-sm transition-all"
+              className="w-full p-3 border border-slate-200 rounded-[6px] bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none text-slate-800 text-sm transition-all"
             />
           </div>
 

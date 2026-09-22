@@ -21,7 +21,7 @@ const CTA = () => {
 
         {/* Main Background Frame (1760x800 with 10px Radius) */}
         <div
-          className="relative w-full max-w-[1760px] mx-auto rounded-[10px] px-6 sm:px-10 md:px-14 lg:px-16 py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
+          className="relative w-full max-w-[1760px] mx-auto rounded-[6px] px-6 sm:px-10 md:px-14 lg:px-16 py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
           style={{
             background: '#052121',
           }}

@@ -184,8 +184,8 @@ export default function BlogPage() {
                   radius="xl"
                   onClick={() => setSelectedCat(cat)}
                   className={`px-4 py-2 whitespace-nowrap ${selectedCat === cat
-                      ? "bg-[#327C73] hover:bg-[#2b6b63] text-white shadow-xs"
-                      : "bg-[#f1f5f9] text-gray-600 hover:bg-gray-200"
+                    ? "bg-[#327C73] hover:bg-[#2b6b63] text-white shadow-xs"
+                    : "bg-[#f1f5f9] text-gray-600 hover:bg-gray-200"
                     }`}
                 >
                   {cat}
@@ -255,7 +255,7 @@ export default function BlogPage() {
                 value={subscribeEmail}
                 onChange={(e) => setSubscribeEmail(e.target.value)}
                 placeholder="Enter your work email"
-                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#10b981]"
+                className="w-full px-4 py-3 rounded-[6px] bg-white/10 border border-white/20 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#10b981]"
               />
               <Button
                 type="submit"

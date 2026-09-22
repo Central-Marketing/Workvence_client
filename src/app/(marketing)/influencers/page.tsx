@@ -114,7 +114,7 @@ export default function InfluencersPage() {
               </Button>
               <a
                 href="#tiers"
-                className="px-7 py-3.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-7 py-3.5 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
               >
                 View Program Tiers
               </a>
@@ -147,7 +147,7 @@ export default function InfluencersPage() {
                     {t.tier}
                   </span>
                   <div className="text-xl font-bold text-[#0f172a]">{t.audience}</div>
-                  
+
                   <div className="space-y-2.5 pt-4 border-t border-gray-100">
                     <span className="text-xs font-bold text-gray-900 uppercase tracking-wider block">
                       Creator Perks:
@@ -208,7 +208,7 @@ export default function InfluencersPage() {
                     value={influencerForm.name}
                     onChange={(e) => setInfluencerForm({ ...influencerForm, name: e.target.value })}
                     placeholder="e.g. Maya Lin"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
                 <div>
@@ -219,7 +219,7 @@ export default function InfluencersPage() {
                     value={influencerForm.email}
                     onChange={(e) => setInfluencerForm({ ...influencerForm, email: e.target.value })}
                     placeholder="maya@creators.com"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
               </div>
@@ -230,7 +230,7 @@ export default function InfluencersPage() {
                   <select
                     value={influencerForm.platform}
                     onChange={(e) => setInfluencerForm({ ...influencerForm, platform: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   >
                     <option value="YouTube">YouTube</option>
                     <option value="TikTok">TikTok</option>
@@ -247,7 +247,7 @@ export default function InfluencersPage() {
                     value={influencerForm.handle}
                     onChange={(e) => setInfluencerForm({ ...influencerForm, handle: e.target.value })}
                     placeholder="@maya_creates or link"
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   />
                 </div>
               </div>
@@ -258,7 +258,7 @@ export default function InfluencersPage() {
                   <select
                     value={influencerForm.followerCount}
                     onChange={(e) => setInfluencerForm({ ...influencerForm, followerCount: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   >
                     <option value="5k-50k">5k - 50k Followers</option>
                     <option value="50k-250k">50k - 250k Followers</option>
@@ -270,7 +270,7 @@ export default function InfluencersPage() {
                   <select
                     value={influencerForm.niche}
                     onChange={(e) => setInfluencerForm({ ...influencerForm, niche: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
                   >
                     <option value="Tech & Coding">Tech & Coding</option>
                     <option value="Design & 3D">Design & 3D</option>

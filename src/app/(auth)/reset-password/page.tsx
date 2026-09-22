@@ -94,7 +94,7 @@ const ResetPasswordContent = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4 md:p-10 box-border">
-      <div className="flex w-full max-w-[1200px] md:h-[800px] bg-white rounded-2xl overflow-hidden">
+      <div className="flex w-full max-w-[1200px] md:h-[800px] bg-white rounded-[6px] overflow-hidden">
         {/* Left Pane */}
         <div className="flex-1 flex flex-col p-6 md:p-10 lg:px-20 overflow-y-auto [&::-webkit-scrollbar]:w-0">
           {step === 1 ? (
@@ -130,7 +130,7 @@ const ResetPasswordContent = () => {
                         type="text"
                         inputMode="numeric"
                         maxLength={1}
-                        className="flex-1 min-w-0 max-w-[55px] aspect-square text-center text-xl sm:text-2xl font-bold border border-gray-200 rounded-xl bg-white transition-colors focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
+                        className="flex-1 min-w-0 max-w-[55px] aspect-square text-center text-xl sm:text-2xl font-bold border border-gray-200 rounded-[6px] bg-white transition-colors focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
                         value={digit}
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleOtpKeyDown(index, e)}

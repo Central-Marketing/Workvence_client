@@ -203,14 +203,14 @@ export default function CareersClient() {
             <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
               <a
                 href="#open-roles"
-                className="px-7 py-3.5 rounded-xl bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-7 py-3.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>View Open Positions</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
                 href="#values"
-                className="px-7 py-3.5 rounded-xl bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition-all"
+                className="px-7 py-3.5 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition-all"
               >
                 Our Values & Culture
               </a>
@@ -262,9 +262,9 @@ export default function CareersClient() {
               return (
                 <div
                   key={i}
-                  className="bg-white p-8 rounded-2xl border border-gray-200/80 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 space-y-4"
+                  className="bg-white p-8 rounded-[6px] border border-gray-200/80 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 space-y-4"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
                     <Icon className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-bold text-[#0f172a]">{perk.title}</h3>
@@ -296,11 +296,10 @@ export default function CareersClient() {
                   variant={selectedDept === dept ? "brand" : "soft"}
                   size="xs"
                   radius="xl"
-                  className={`font-semibold whitespace-nowrap transition cursor-pointer ${
-                    selectedDept === dept
-                      ? "shadow-xs"
-                      : "hover:bg-gray-200"
-                  }`}
+                  className={`font-semibold whitespace-nowrap transition cursor-pointer ${selectedDept === dept
+                    ? "shadow-xs"
+                    : "hover:bg-gray-200"
+                    }`}
                 >
                   {dept}
                 </Button>
@@ -313,7 +312,7 @@ export default function CareersClient() {
             {filteredJobs.map((job) => (
               <div
                 key={job.id}
-                className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-7 hover:border-[#327C73] hover:shadow-md transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6 group"
+                className="bg-white border border-gray-200 rounded-[6px] p-6 sm:p-7 hover:border-[#327C73] hover:shadow-md transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6 group"
               >
                 <div className="space-y-3 max-w-2xl">
                   <div className="flex flex-wrap items-center gap-2">
@@ -360,7 +359,7 @@ export default function CareersClient() {
           </div>
 
           {/* General Application Callout */}
-          <div className="mt-12 bg-gradient-to-r from-[#f2fbf6] to-[#e6f8ef] border border-[#ceefe0] rounded-2xl p-8 text-center max-w-3xl mx-auto space-y-4">
+          <div className="mt-12 bg-gradient-to-r from-[#f2fbf6] to-[#e6f8ef] border border-[#ceefe0] rounded-[6px] p-8 text-center max-w-3xl mx-auto space-y-4">
             <h3 className="text-xl font-bold text-[#0f172a]">Don't see your role?</h3>
             <p className="text-sm text-gray-600 max-w-xl mx-auto">
               We're always looking for exceptional engineers, designers, and operators. Send us your portfolio and tell us how you can make an impact.
@@ -429,7 +428,7 @@ export default function CareersClient() {
                   value={applicantForm.fullName}
                   onChange={(e) => setApplicantForm({ ...applicantForm, fullName: e.target.value })}
                   placeholder="e.g. Jane Doe"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none"
                 />
               </div>
 
@@ -443,7 +442,7 @@ export default function CareersClient() {
                   value={applicantForm.email}
                   onChange={(e) => setApplicantForm({ ...applicantForm, email: e.target.value })}
                   placeholder="e.g. jane@example.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none"
                 />
               </div>
 
@@ -457,7 +456,7 @@ export default function CareersClient() {
                     value={applicantForm.linkedin}
                     onChange={(e) => setApplicantForm({ ...applicantForm, linkedin: e.target.value })}
                     placeholder="https://linkedin.com/in/..."
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none"
                   />
                 </div>
                 <div>
@@ -469,7 +468,7 @@ export default function CareersClient() {
                     value={applicantForm.portfolio}
                     onChange={(e) => setApplicantForm({ ...applicantForm, portfolio: e.target.value })}
                     placeholder="https://yourwork.com"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none"
                   />
                 </div>
               </div>
@@ -487,7 +486,7 @@ export default function CareersClient() {
                 />
               </div>
 
-              <div className="border border-dashed border-gray-300 rounded-xl p-4 text-center bg-gray-50/50 hover:bg-gray-50 transition cursor-pointer">
+              <div className="border border-dashed border-gray-300 rounded-[6px] p-4 text-center bg-gray-50/50 hover:bg-gray-50 transition cursor-pointer">
                 <UploadCloud className="w-6 h-6 text-gray-400 mx-auto mb-1" />
                 <span className="text-xs font-semibold text-gray-700 block">Attach Resume (PDF, DOCX)</span>
                 <span className="text-[11px] text-gray-400">Max size 10MB</span>

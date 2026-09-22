@@ -502,10 +502,8 @@ const ChatView = () => {
         });
       });
 
-      // 2. Patch backend
-      axiosFetch.patch(`/conversations/${conversationID}/mark-read`)
-        .then(() => queryClient.invalidateQueries({ queryKey: ['conversations'] }))
-        .catch(console.error);
+      // 2. Patch backend silently without re-sorting the list
+      axiosFetch.patch(`/conversations/${conversationID}/mark-read`).catch(console.error);
     }
   }, [isValidId, conversationID, queryClient]);
 

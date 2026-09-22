@@ -61,12 +61,12 @@ const SubcategoryCard: React.FC<SubcategoryCardProps> = ({
   };
 
   return (
-    <div className="bg-white border border-gray-100 rounded-[10px] overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col">
+    <div className="bg-white border border-gray-100 rounded-[6px] overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col">
       {/* Inset Rounded Banner Image with Padding */}
       <div className="p-3 pb-0">
         <div
           onClick={handleCardClick}
-          className="relative w-full aspect-[385/190] bg-gray-50 rounded-[5px] overflow-hidden cursor-pointer group/banner"
+          className="relative w-full aspect-[385/190] bg-gray-50 rounded-[6px] overflow-hidden cursor-pointer group/banner"
           title={title}
         >
           <Image

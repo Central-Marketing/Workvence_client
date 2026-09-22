@@ -34,14 +34,14 @@ const PromoSection = () => {
           </p>
         </div>
 
-        {/* Main Background Frame (1760x800 with 20px Radius) */}
+        {/* Main Background Frame */}
         <div
-          className="relative w-full max-w-[1760px] mx-auto rounded-[20px] p-3 sm:p-6 md:p-[50px] overflow-hidden"
+          className="relative w-full mx-auto rounded-[6px]  p-3 sm:p-5 md:p-8 lg:p-10 xl:p-[50px] overflow-hidden"
           style={{
             background: 'var(--teal-100, #CCF6F1)',
           }}
         >
-          {/* Circular Glow Layer (1267x1267 starting from top, 40% hidden at bottom) */}
+          {/* Circular Glow Layer */}
           <div
             className="absolute top-0 left-1/2 -translate-x-1/2 w-[72%] max-w-[1267px] aspect-square rounded-full pointer-events-none z-0"
             style={{
@@ -50,24 +50,22 @@ const PromoSection = () => {
             }}
           />
 
-          {/* Inner Video Container */}
+          {/* Inner Video Container with exact 163/76 aspect ratio */}
           <div
             onClick={togglePlay}
-            className="relative z-10 w-full aspect-[16/9] md:aspect-[1660/640] min-h-[320px] sm:min-h-[440px] md:min-h-[520px] lg:h-[620px] rounded-[10px] overflow-hidden bg-black cursor-pointer shadow-md group"
+            className="relative z-10 w-full aspect-[163/76] rounded-[6px] overflow-hidden bg-black cursor-pointer shadow-md group"
           >
             <video
               ref={videoRef}
               className="w-full h-full object-cover"
               autoPlay
-              preload='true'
+              preload="auto"
               controls={false}
               muted
               loop
               playsInline
               src="https://res.cloudinary.com/cqtrqtyu/video/upload/v1786602492/WhatsApp_Video_2026-08-13_at_12.22.47_PM_odf8xi.mp4"
             />
-
-
           </div>
         </div>
 

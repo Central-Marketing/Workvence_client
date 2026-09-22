@@ -480,14 +480,14 @@ const Featured = ({
             </div>
 
             {/* Search Now Button */}
-            <button
+            {/* <button
               type="button"
               onClick={handleSearch}
               className="bg-black hover:bg-[#0B403F] hover:shadow-[inset_0_0_8px_0_rgba(255,255,255,0.65)] text-white rounded-[6px] px-4 sm:px-6 py-[14px] sm:py-[18px] h-[52px] sm:h-[60px] flex items-center justify-center gap-[10px] shrink-0 font-medium text-xs sm:text-sm md:text-[15px] font-sf-pro transition-all duration-200 cursor-pointer shadow-md active:scale-95"
             >
               <span className="whitespace-nowrap">Search Now</span>
               <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white shrink-0" strokeWidth={2} />
-            </button>
+            </button> */}
           </div>
 
           {/* Row 2: Dynamic Category Pills + More 200+ */}

@@ -83,12 +83,12 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
   return (
     <Link
       href={packageUrl}
-      className="group flex flex-col w-full h-full bg-white rounded-[10px] border border-[#DADADA] p-[10px] shadow-none hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-shadow duration-300"
+      className="group flex flex-col w-full h-full bg-white rounded-[6px] border border-[#DADADA] p-[10px] shadow-none hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-shadow duration-300"
     >
       {/* Top Image + Overlapping Avatar */}
       <div className="relative w-full aspect-[405/220] shrink-0">
         {/* Thumbnail */}
-        <div className="absolute inset-0 rounded-[5px] overflow-hidden bg-gray-100">
+        <div className="absolute inset-0 rounded-[6px] overflow-hidden bg-gray-100">
           <Image
             src={imgSrc}
             alt={data.title || data.desc || "Package Cover"}

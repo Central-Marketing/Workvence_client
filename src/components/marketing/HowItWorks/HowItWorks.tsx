@@ -113,7 +113,7 @@ const HowItWorks = () => {
               <br />
               in Four Simple Steps
             </h2>
-            <p className="font-inter font-normal text-base sm:text-[15px] text-[#6E6E6E] mt-2.5">
+            <p className="font-inter font-normal text-base text-[#6E6E6E] mt-2.5">
               Every step is kept safe and transparent.
             </p>
           </div>
@@ -126,11 +126,10 @@ const HowItWorks = () => {
               variant={activeTab === 'buyer' ? 'brand' : 'ghost'}
               size="sm"
               radius="fiverr"
-              className={`flex-1 h-full font-sf-pro font-medium text-[14px] sm:text-[15px] ${
-                activeTab === 'buyer'
-                  ? 'bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm'
-                  : 'text-[#6E6E6E] hover:text-[#222427]'
-              }`}
+              className={`flex-1 h-full font-sf-pro font-medium text-[14px] sm:text-[15px] ${activeTab === 'buyer'
+                ? 'bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm'
+                : 'text-[#6E6E6E] hover:text-[#222427]'
+                }`}
             >
               Buyer
             </Button>
@@ -140,11 +139,10 @@ const HowItWorks = () => {
               variant={activeTab === 'seller' ? 'brand' : 'ghost'}
               size="sm"
               radius="fiverr"
-              className={`flex-1 h-full font-sf-pro font-medium text-[14px] sm:text-[15px] ${
-                activeTab === 'seller'
-                  ? 'bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm'
-                  : 'text-[#6E6E6E] hover:text-[#222427]'
-              }`}
+              className={`flex-1 h-full font-sf-pro font-medium text-[14px] sm:text-[15px] ${activeTab === 'seller'
+                ? 'bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm'
+                : 'text-[#6E6E6E] hover:text-[#222427]'
+                }`}
             >
               Seller
             </Button>
@@ -165,7 +163,7 @@ const HowItWorks = () => {
               <h3 className="font-sf-pro font-bold text-[16px] sm:text-[17px] md:text-[24px] text-[#434343] mb-2 sm:mb-2.5">
                 {step.title}
               </h3>
-              <p className="font-inter font-normal text-[13px] sm:text-[14px] md:text-[20px] text-[#868686] leading-6 tracking-wide">
+              <p className="font-inter font-normal text-[13px] sm:text-[14px] md:text-[16px] text-[#868686] leading-6 tracking-wide">
                 {step.desc}
               </p>
             </div>

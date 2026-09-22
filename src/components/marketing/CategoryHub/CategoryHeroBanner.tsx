@@ -18,7 +18,7 @@ const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
 }) => {
   return (
     <div className="container mx-auto my-5 sm:my-7">
-      <div className="relative w-full h-[180px] sm:h-[220px] md:h-[240px] rounded-2xl overflow-hidden bg-[#3a1b08] flex items-center justify-center text-center shadow-xs select-none">
+      <div className="relative w-full h-[180px] sm:h-[220px] md:h-[240px] rounded-[6px] overflow-hidden bg-[#3a1b08] flex items-center justify-center text-center shadow-xs select-none">
         {/* Exact Architectural 3-Step Pillars Matching Screenshot */}
         <div className="absolute inset-0 pointer-events-none flex justify-between">
           {/* Left Step Pillars */}

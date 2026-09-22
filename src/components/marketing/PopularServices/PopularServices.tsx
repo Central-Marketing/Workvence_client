@@ -134,13 +134,16 @@ const PopularServices = () => {
             return (
               <SwiperSlide key={card._id || card.id || card.slug || card.name}>
                 <Link href={`/packages?category=${cardSlug}`}>
-                  <div className="flex flex-col bg-[#EBFEC5] rounded-[10px] overflow-hidden group cursor-pointer border border-transparent hover:border-[#DAEFAF] transition-all duration-300">
-                    <div className="h-[160px] sm:h-[200px] md:h-[260px] overflow-hidden m-1.5 md:m-2 rounded-[5px] md:rounded-[5px] bg-blue-100/50 flex items-center justify-center">
+                  <div className="flex flex-col bg-[#EBFEC5] rounded-[6px] overflow-hidden group cursor-pointer border border-transparent hover:border-[#DAEFAF] transition-all duration-300">
+                    <div className="w-auto aspect-[315/300] overflow-hidden m-1.5 md:m-2 rounded-[6px] bg-blue-100/50 flex items-center justify-center relative">
                       <Image
                         src={imageUrl}
                         alt={card.name || card.title || "Service"}
                         width={315}
                         height={300}
+                        quality={100}
+                        unoptimized
+                        sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, (max-width: 1279px) 25vw, 260px"
                         className="w-full h-full object-cover"
                       />
                     </div>

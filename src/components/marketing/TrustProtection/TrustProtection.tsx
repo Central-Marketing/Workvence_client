@@ -39,7 +39,7 @@ const TrustProtection = () => {
 
             {/* Description & CTA */}
             <div className="mt-8 sm:mt-10 lg:mt-14 space-y-6 sm:space-y-7">
-              <p className="font-inter font-normal text-base sm:text-[15px] text-[#6E6E6E] mt-2.5">
+              <p className="font-inter font-normal text-base text-[#6E6E6E] mt-2.5">
                 When you order, your payment goes into secure escrow — the seller can&apos;t
                 touch it until you approve the delivery. If the work isn&apos;t delivered or
                 doesn&apos;t match what was agreed, you&apos;re protected by our money-back

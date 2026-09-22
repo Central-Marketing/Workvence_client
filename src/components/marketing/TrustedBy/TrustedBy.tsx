@@ -111,7 +111,7 @@ const TrustedBy = () => {
                 <h3 className="font-sf-pro font-bold text-[18px] sm:text-[20px] lg:text-[18px] xl:text-[21px] 2xl:text-[24px] text-[#434343] leading-normal mb-2 sm:mb-3 2xl:mb-4 text-center">
                   {feature.title}
                 </h3>
-                <p className="font-inter font-normal text-[14px] sm:text-[15px] lg:text-[14px] xl:text-[17px] 2xl:text-[20px] text-[#868686] leading-normal text-center">
+                <p className="font-inter font-normal text-[16px] text-[#868686] leading-normal text-center">
                   {feature.description}
                 </p>
               </div>

@@ -10,20 +10,23 @@ const PostProject = () => {
 
                     {/* Left Column: Image Mockup */}
                     <div className="w-full flex items-center justify-center">
-                        <div className="w-full relative overflow-hidden rounded-[20px] sm:rounded-[24px]">
+                        <div className="w-full relative overflow-hidden rounded-[6px]  aspect-[1017/750]">
                             <Image
                                 src="/media/postproject.png"
                                 alt="Describe What You Need. Our AI Finds The Right Talent."
                                 width={1017}
                                 height={750}
                                 priority
-                                className="w-full h-[380px] sm:h-[500px] md:h-[580px] lg:h-[750px] object-cover rounded-[20px] sm:rounded-[24px]"
+                                quality={100}
+                                unoptimized
+                                sizes="(max-width: 1023px) 100vw, 50vw"
+                                className="w-full h-full object-contain rounded-[6px] "
                             />
                         </div>
                     </div>
 
                     {/* Right Column: Typography & Action */}
-                    <div className="w-full flex flex-col justify-between self-stretch py-2 lg:py-4">
+                    <div className="w-full flex flex-col justify-center">
                         {/* Main Headline */}
                         <div>
                             <h2 className="font-sf-pro font-[510] not-italic text-[26px] min-[400px]:text-[28px] sm:text-[34px] md:text-[38px] lg:text-[42px] macbook:text-[46px] 2xl:text-[48px] text-[var(--Foundation-Grey-grey-800,#292929)] leading-tight sm:leading-[1.18] tracking-tight sm:tracking-normal">
@@ -34,8 +37,8 @@ const PostProject = () => {
                         </div>
 
                         {/* Description & CTA */}
-                        <div className="mt-8 sm:mt-10 lg:mt-14 space-y-6 sm:space-y-7">
-                            <p className="font-inter font-normal not-italic text-[16px] sm:text-[18px] lg:text-[20px] leading-[26px] sm:leading-[28px] lg:leading-[30px] text-[var(--Foundation-Grey-grey-400,#6E6E6E)] mt-2.5">
+                        <div className="mt-4 sm:mt-5 md:mt-6 space-y-6 sm:space-y-8">
+                            <p className="font-inter font-normal not-italic text-[15px] sm:text-[16px] text-[var(--Foundation-Grey-grey-400,#6E6E6E)] leading-relaxed">
                                 Search the way you&apos;d actually explain it &ldquo;someone to redesign my
                                 Shopify store&rdquo; or &ldquo;edit a 3-minute YouTube video.&rdquo; Our AI understands
                                 what you mean, not just the words you type, and matches you to the

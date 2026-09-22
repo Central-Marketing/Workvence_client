@@ -16,6 +16,8 @@ export { default as NextArrow } from "./ui/Arrows/NextArrow";
 export { default as AiGradientButton, GradientButton } from "./ui/AiGradientButton/AiGradientButton";
 export type { AiGradientButtonProps } from "./ui/AiGradientButton/AiGradientButton";
 export { Button } from "./ui/Button";
+export { Breadcrumb } from "./ui/Breadcrumb/Breadcrumb";
+export type { BreadcrumbProps, BreadcrumbItem } from "./ui/Breadcrumb/Breadcrumb";
 export * from "./ui/Skeletons";
 export { SearchSuggestionsDropdown } from "./ui/SearchSuggestions/SearchSuggestionsDropdown";
 

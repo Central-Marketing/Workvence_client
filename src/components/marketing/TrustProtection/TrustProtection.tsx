@@ -14,14 +14,17 @@ const TrustProtection = () => {
 
           {/* Left Column: Escrow Image Mockup */}
           <div className="w-full flex items-center justify-center">
-            <div className="w-full relative overflow-hidden rounded-[20px] sm:rounded-[24px] shadow-sm">
+            <div className="w-full max-w-[500px] relative overflow-hidden rounded-[6px] shadow-sm">
               <Image
-                src="/media/escrow.png"
+                src="/media/escrow1.png"
                 alt="Your Money Stays Yours Until The Work Is Right."
-                width={680}
-                height={460}
+                width={470}
+                height={307}
                 priority
-                className="w-full h-auto object-cover rounded-[20px] sm:rounded-[24px]"
+                quality={100}
+                unoptimized
+                sizes="(max-width: 768px) 100vw, 500px"
+                className="w-full h-auto object-contain rounded-[6px]"
               />
             </div>
           </div>

@@ -21,8 +21,23 @@ import { RiSearchLine } from "react-icons/ri";
 import { axiosFetch } from "@/utils";
 import useAdminCategories from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
-import { Loader, Button } from "@/components";
+import { Loader, Button, Breadcrumb } from "@/components";
 import { ClientBrief } from "@/types";
+
+interface ProjectSubcategoryCard {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+}
+
+interface ProjectCategorySection {
+  id: string;
+  name: string;
+  slug: string;
+  subtitle: string;
+  subcategories: ProjectSubcategoryCard[];
+}
 
 function formatCategoryName(cat?: string): string {
   if (!cat) return "";
@@ -57,6 +72,24 @@ function BriefsContent() {
 
   const initialSearch = searchParams?.get("search") || "";
   const initialCategory = searchParams?.get("category") || "";
+  const initialView = searchParams?.get("view") || "";
+  const initialExplore = searchParams?.get("explore") || "";
+
+  // Dual view mode: 'categories' hub view by default, or 'feed' when exploring all / filtering
+  const [viewMode, setViewMode] = useState<"categories" | "feed">(() => {
+    if (
+      initialView === "all" ||
+      initialView === "feed" ||
+      initialExplore === "true" ||
+      Boolean(initialCategory) ||
+      Boolean(initialSearch)
+    ) {
+      return "feed";
+    }
+    return "categories";
+  });
+
+  const [hubActivePill, setHubActivePill] = useState<string>("all");
 
   const [activePill, setActivePill] = useState<string>(
     initialCategory
@@ -76,12 +109,187 @@ function BriefsContent() {
   useEffect(() => {
     const qSearch = searchParams?.get("search") || "";
     const qCat = searchParams?.get("category") || "";
+    const qView = searchParams?.get("view") || "";
+    const qExplore = searchParams?.get("explore") || "";
+
     if (qSearch) setSearch(qSearch);
     if (qCat) setActivePill(qCat.toLowerCase().replace(/&/g, "and").replace(/\s+/g, "-"));
+
+    if (
+      qView === "all" ||
+      qView === "feed" ||
+      qExplore === "true" ||
+      Boolean(qCat) ||
+      Boolean(qSearch)
+    ) {
+      setViewMode("feed");
+    } else if (!qView && !qCat && !qSearch && !qExplore) {
+      setViewMode("categories");
+    }
   }, [searchParams]);
 
-  // Fetch categories dynamically from backend
-  const { categoryList } = useAdminCategories();
+  // Fetch real categories directly from backend API
+  const { categoryList, parentCategories } = useAdminCategories();
+
+  // Dynamically map real categories & subcategories from API
+  const apiCategories = useMemo<ProjectCategorySection[]>(() => {
+    if (!parentCategories || parentCategories.length === 0) return [];
+
+    return parentCategories.map((cat: any) => {
+      const rawName = cat.name || cat.title || "";
+      const slug = (cat.slug || rawName)
+        .toLowerCase()
+        .trim()
+        .replace(/&/g, "and")
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+
+      // Get real subcategories from children
+      let children: any[] = [];
+      if (Array.isArray(cat.children) && cat.children.length > 0) {
+        children = cat.children;
+      } else if (Array.isArray(cat.subCategories) && cat.subCategories.length > 0) {
+        children = cat.subCategories;
+      } else if (Array.isArray(cat.subcategories) && cat.subcategories.length > 0) {
+        children = cat.subcategories;
+      } else if (Array.isArray(categoryList)) {
+        children = categoryList.filter(
+          (c: any) =>
+            c.parentId &&
+            (c.parentId === cat.id ||
+              c.parentId === cat._id ||
+              c.parentName?.toLowerCase() === rawName.toLowerCase())
+        );
+      }
+
+      let subcategories: ProjectSubcategoryCard[] = [];
+
+      if (children.length > 0) {
+        children.forEach((ch: any) => {
+          const chTitle = ch.name || ch.title || String(ch);
+          const chSlug = (ch.slug || chTitle)
+            .toLowerCase()
+            .trim()
+            .replace(/&/g, "and")
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "");
+
+          subcategories.push({
+            id: ch.id || ch._id || chSlug,
+            title: chTitle,
+            slug: chSlug,
+            description:
+              ch.description && ch.description !== "No description provided."
+                ? ch.description
+                : `Explore ${chTitle} projects and opportunities`,
+          });
+
+          // Check if child has deeper nested children (e.g. N8N -> Automation)
+          const nested = ch.children || ch.subCategories || ch.subcategories;
+          if (Array.isArray(nested) && nested.length > 0) {
+            nested.forEach((n: any) => {
+              const nTitle = n.name || n.title || String(n);
+              const nSlug = (n.slug || nTitle)
+                .toLowerCase()
+                .trim()
+                .replace(/&/g, "and")
+                .replace(/\s+/g, "-")
+                .replace(/[^a-z0-9-]/g, "");
+
+              if (!subcategories.some((s) => s.slug === nSlug)) {
+                subcategories.push({
+                  id: n.id || n._id || nSlug,
+                  title: nTitle,
+                  slug: nSlug,
+                  description:
+                    n.description && n.description !== "No description provided."
+                      ? n.description
+                      : `Explore ${nTitle} projects and opportunities`,
+                });
+              }
+            });
+          }
+        });
+      } else {
+        // If no subcategories exist yet in backend, provide a single card for the category
+        subcategories = [
+          {
+            id: cat.id || cat._id || slug,
+            title: rawName,
+            slug: slug,
+            description:
+              cat.description && cat.description !== "No description provided."
+                ? cat.description
+                : `Explore open briefs, tasks, and requests in ${rawName}.`,
+          },
+        ];
+      }
+
+      return {
+        id: cat.id || cat._id || slug,
+        name: rawName,
+        slug,
+        subtitle:
+          cat.description && cat.description !== "No description provided."
+            ? cat.description
+            : `Browse ${rawName} projects and start earning by bidding on work that matches your skills.`,
+        subcategories,
+      };
+    });
+  }, [parentCategories, categoryList]);
+
+  // Categories displayed in hub view (filterable by hubActivePill)
+  const displayedCategories = useMemo(() => {
+    if (hubActivePill === "all") return apiCategories;
+    const filtered = apiCategories.filter((c) => c.slug === hubActivePill);
+    return filtered.length > 0 ? filtered : apiCategories;
+  }, [apiCategories, hubActivePill]);
+
+  const handleHubPillClick = (slug: string) => {
+    setHubActivePill(slug);
+    if (slug === "all") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      const el = document.getElementById(`cat-section-${slug}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  };
+
+  const handleExploreAll = () => {
+    router.push("/briefs?view=all", { scroll: false });
+    setViewMode("feed");
+    setActivePill("all");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSelectSubcategory = (catSlug: string, subcatTitle: string) => {
+    router.push(
+      `/briefs?category=${catSlug}&search=${encodeURIComponent(subcatTitle)}`,
+      { scroll: false }
+    );
+    setActivePill(catSlug);
+    setSearch(subcatTitle);
+    setCurrentPage(1);
+    setViewMode("feed");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSelectCategory = (catSlug: string) => {
+    router.push(`/briefs?category=${catSlug}`, { scroll: false });
+    setActivePill(catSlug);
+    setSearch("");
+    setCurrentPage(1);
+    setViewMode("feed");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleBackToCategories = () => {
+    router.push("/briefs", { scroll: false });
+    setViewMode("categories");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Fetch real client briefs from backend
   const { isLoading, data: apiResponse } = useQuery<BriefsApiResponse>({
@@ -218,205 +426,447 @@ function BriefsContent() {
   return (
     <div className="min-h-screen bg-[#F5F5F5] text-gray-800 pt-5 sm:pt-7 pb-[80px] min-[1400px]:pb-[100px]">
       <div className="container mx-auto">
-
-        {/* Main Title & Subtitle Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-7">
-          <div>
-            <h1 className="text-xl sm:text-[32px] font-bold text-gray-900 tracking-tight font-sf-pro leading-tight">
-              Find Your Next Briefs
-            </h1>
-            <p className="text-[12px] sm:text-[15px] text-gray-500 mt-1.5 max-w-2xl font-normal leading-relaxed">
-              Explore briefs from clients looking for the right talent, skills, and expertise to bring their ideas to life.
-            </p>
-          </div>
-
-          {/* Action Button for Buyers / Clients */}
-          {user && !user.isSeller && (
-            <Link
-              href="/briefs/create"
-              className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-[6px] bg-[#327C73] hover:bg-[#256059] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors shrink-0"
+        {viewMode === "categories" ? (
+          /* ============================================================ */
+          /* CATEGORY HUB VIEW (Default View)                             */
+          /* ============================================================ */
+          <div className="animate-fadeIn">
+            {/* Project Category Hub Hero Banner */}
+            <div
+              className="relative w-full h-[180px] sm:h-[220px] md:h-[240px] rounded-[6px] overflow-hidden bg-[#130d2a] bg-cover bg-center bg-no-repeat flex items-center justify-center text-center shadow-xs select-none mb-7"
+              style={{ backgroundImage: "url('/media/ProjectBg.png')" }}
             >
-              + Post a Project
-            </Link>
-          )}
-        </div>
+              {/* Center Content: Breadcrumb + Italic Projects Title */}
+              <div className="relative z-10 flex flex-col items-center justify-center px-4">
+                <Breadcrumb
+                  variant="inverted"
+                  className="mb-2 sm:mb-3 select-none [&>ol]:justify-center text-xs"
+                  items={[
+                    {
+                      name: "Find Projects",
+                      isLast: true,
+                    },
+                  ]}
+                />
+                <h1 className="italic text-4xl sm:text-5xl md:text-[54px] lg:text-[58px] leading-tight text-white font-normal tracking-tight drop-shadow-2xs font-sf-pro">
+                  Projects
+                </h1>
+              </div>
+            </div>
 
-        {/* Category Filter Pills & Search Bar Row */}
-        <div className="flex items-center justify-between gap-3 mb-7 pb-2 border-b border-gray-200/60">
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0">
-            {/* Filter Drawer Toggle */}
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              radius="lg"
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              leftIcon={<FiSliders className="w-3.5 h-3.5 text-gray-600" />}
-              className="text-gray-700 font-medium text-xs sm:text-[13px] hover:text-black transition-colors px-3 py-1.5 hover:bg-gray-200/50 shrink-0 mr-1 border-none shadow-none"
-            >
-              Filter
-            </Button>
-
-            {/* Dynamic Category Pills */}
-            {pillFilters.map((pill) => {
-              const isActive = activePill === pill.id;
-              return (
+            {/* Category Hub Filter Toolbar */}
+            <div className="flex items-center justify-between gap-3 mb-8 pb-3 border-b border-gray-200/80">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0">
+                {/* Filter Button */}
                 <Button
-                  key={pill.id}
                   type="button"
-                  variant={isActive ? "dark" : "outline"}
+                  variant="ghost"
+                  size="sm"
+                  radius="lg"
+                  onClick={() => {
+                    setViewMode("feed");
+                    setIsFilterOpen(true);
+                  }}
+                  leftIcon={<FiSliders className="w-3.5 h-3.5 text-gray-600" />}
+                  className="text-gray-700 font-medium text-xs sm:text-[13px] hover:text-black transition-colors px-3 py-1.5 hover:bg-gray-200/50 shrink-0 mr-1 border-none shadow-none"
+                >
+                  Filter
+                </Button>
+
+                {/* Dynamic Category Hub Pills */}
+                <Button
+                  type="button"
+                  variant={hubActivePill === "all" ? "dark" : "outline"}
                   size="sm"
                   radius="full"
-                  onClick={() => {
-                    setActivePill(pill.id);
-                    setCurrentPage(1);
-                  }}
-                  className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${isActive ? "shadow-xs border-gray-900" : "hover:border-gray-900 hover:text-black"
-                    }`}
+                  onClick={() => handleHubPillClick("all")}
+                  className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${
+                    hubActivePill === "all"
+                      ? "shadow-xs border-gray-900 bg-black text-white"
+                      : "hover:border-gray-900 hover:text-black bg-white"
+                  }`}
                 >
-                  {pill.title}
+                  All Projects
                 </Button>
-              );
-            })}
-          </div>
 
-          {/* Reset Action */}
-          {(activePill !== "all" || search) && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setActivePill("all");
-                setSearch("");
-                setCurrentPage(1);
-              }}
-              rightIcon={<FiArrowRight className="w-3.5 h-3.5 text-[#327C73]" />}
-              className="shrink-0 text-[#327C73] hover:text-[#256059] font-semibold text-xs sm:text-[13px] transition-colors pl-3 border-none shadow-none p-0 h-auto hover:bg-transparent"
-            >
-              View All
-            </Button>
-          )}
-        </div>
-
-        {/* Collapsible Search Drawer */}
-        {isFilterOpen && (
-          <div className="bg-white border border-gray-200 rounded-[6px] p-4 sm:p-5 mb-8 shadow-xs animate-fadeIn">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <div className="relative flex-1">
-                <RiSearchLine className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-base" />
-                <input
-                  type="text"
-                  placeholder="Search projects by title, client, or keywords..."
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:border-[#327C73] focus:bg-white transition-colors"
-                />
-                {search && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    radius="full"
-                    onClick={() => {
-                      setSearch("");
-                      setCurrentPage(1);
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0 w-6 h-6 h-auto min-h-0 border-none shadow-none hover:bg-transparent"
-                  >
-                    <FiX className="w-4 h-4" />
-                  </Button>
-                )}
+                {apiCategories.map((cat) => {
+                  const isActive = hubActivePill === cat.slug;
+                  return (
+                    <Button
+                      key={cat.id || cat.slug}
+                      type="button"
+                      variant={isActive ? "dark" : "outline"}
+                      size="sm"
+                      radius="full"
+                      onClick={() => handleHubPillClick(cat.slug)}
+                      className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${
+                        isActive
+                          ? "shadow-xs border-gray-900 bg-black text-white"
+                          : "hover:border-gray-900 hover:text-black bg-white"
+                      }`}
+                    >
+                      {cat.name}
+                    </Button>
+                  );
+                })}
               </div>
-              <Button
+
+              {/* Right: Explore All Projects */}
+              <button
                 type="button"
-                variant="brand"
-                size="md"
-                radius="xl"
-                onClick={() => setIsFilterOpen(false)}
-                className="font-medium text-xs sm:text-sm px-5 py-2.5 shrink-0 shadow-xs"
+                onClick={handleExploreAll}
+                className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-semibold text-gray-800 hover:text-[#0D6D5F] transition-colors shrink-0 pl-3 group whitespace-nowrap cursor-pointer"
               >
-                Done
-              </Button>
+                <span>Explore All Projects</span>
+                <FiArrowRight className="w-3.5 h-3.5 text-gray-600 group-hover:text-[#0D6D5F] group-hover:translate-x-0.5 transition-all" />
+              </button>
             </div>
-          </div>
-        )}
 
-        {/* ============================================================ */}
-        {/* CARDS GRID: 2 COLUMNS (100% REAL DATA FROM BACKEND)           */}
-        {/* ============================================================ */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 animate-pulse">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div
-                key={i}
-                className="bg-white rounded-[6px] border border-gray-200/90 p-6 sm:p-7 h-[260px] flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-                    <div className="flex gap-2">
-                      <div className="h-6 bg-gray-200 rounded-full w-20"></div>
-                      <div className="h-6 bg-gray-200 rounded-full w-28"></div>
-                    </div>
+            {/* Category Sections & 4-Column Card Grids */}
+            <div className="space-y-12 sm:space-y-14">
+              {displayedCategories.map((cat) => (
+                <section key={cat.id || cat.slug} id={`cat-section-${cat.slug}`} className="scroll-mt-6">
+                  {/* Category Title & Subtitle */}
+                  <div className="mb-4">
+                    <h2 className="text-xl sm:text-[22px] font-bold text-gray-900 font-sf-pro tracking-tight">
+                      {cat.name}
+                    </h2>
+                    {cat.subtitle && (
+                      <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-3xl leading-relaxed">
+                        {cat.subtitle}
+                      </p>
+                    )}
                   </div>
-                  <div className="h-3 bg-gray-100 rounded w-1/3 mb-5"></div>
-                  <div className="h-4 bg-gray-100 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-100 rounded w-4/5 mb-5"></div>
-                </div>
-                <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-200"></div>
-                    <div className="h-3 bg-gray-200 rounded w-24"></div>
+
+                  {/* 4-Column Subcategory Cards Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4">
+                    {cat.subcategories.map((subcat) => (
+                      <div
+                        key={subcat.id || subcat.slug}
+                        onClick={() => handleSelectSubcategory(cat.slug, subcat.title)}
+                        className="group bg-white rounded-[6px] border border-gray-200/80 hover:border-gray-400/80 p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 min-h-[86px]"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm sm:text-[15px] font-semibold text-gray-900 group-hover:text-[#0D6D5F] transition-colors leading-snug truncate">
+                            {subcat.title}
+                          </h3>
+                          <p className="text-xs text-gray-500 mt-1 leading-relaxed line-clamp-2">
+                            {subcat.description}
+                          </p>
+                        </div>
+
+                        {/* Clean arrow with NO background, vertically centered without text overlap */}
+                        <div
+                          className="shrink-0 text-gray-400 group-hover:text-gray-900 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-200"
+                          aria-hidden="true"
+                        >
+                          <FiArrowRight className="w-4 h-4" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="h-3 bg-gray-200 rounded w-20"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : filteredBriefs.length === 0 ? (
-          <div className="py-20 text-center flex flex-col items-center justify-center bg-white rounded-[6px] border border-gray-200/90 p-8 shadow-2xs">
-            <div className="w-14 h-14 rounded-full bg-emerald-50 text-[#327C73] flex items-center justify-center mb-4 border border-emerald-100 shadow-2xs">
-              <FiBriefcase className="w-6 h-6" />
+                </section>
+              ))}
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-1">
-              No briefs currently found
-            </h3>
-            <p className="text-sm text-gray-500 max-w-md mb-6 leading-relaxed">
-              {search
-                ? `No open briefs match "${search}". Try another keyword or clear your filters.`
-                : "There are currently no open projects in this category. Check back soon or post your own project!"}
-            </p>
-            <div className="flex items-center gap-3">
-              {(search || activePill !== "all") && (
+          </div>
+        ) : (
+          /* ============================================================ */
+          /* FEED VIEW (Search, Filters, Project Brief Cards, Pagination)  */
+          /* ============================================================ */
+          <div className="animate-fadeIn">
+            {/* Main Title & Subtitle Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-7">
+              <div>
+                <h1 className="text-xl sm:text-[32px] font-bold text-gray-900 tracking-tight font-sf-pro leading-tight">
+                  Find Your Next Briefs
+                </h1>
+                <p className="text-[12px] sm:text-[15px] text-gray-500 mt-1.5 max-w-2xl font-normal leading-relaxed">
+                  Explore briefs from clients looking for the right talent, skills, and expertise to bring their ideas to life.
+                </p>
+              </div>
+
+              {/* Action Buttons: Browse by Category & Post a Project */}
+              <div className="flex items-center gap-2.5 shrink-0">
                 <Button
                   type="button"
                   variant="outline"
-                  size="md"
-                  radius="xl"
+                  size="sm"
+                  radius="lg"
+                  onClick={handleBackToCategories}
+                  leftIcon={<FiChevronLeft className="w-3.5 h-3.5" />}
+                  className="text-xs sm:text-sm font-semibold bg-white border-gray-300 hover:bg-gray-50 text-gray-700 shadow-2xs"
+                >
+                  Browse by Category
+                </Button>
+
+                {user && !user.isSeller && (
+                  <Link
+                    href="/briefs/create"
+                    className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-[6px] bg-[#327C73] hover:bg-[#256059] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors shrink-0"
+                  >
+                    + Post a Project
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            {/* Category Filter Pills & Search Bar Row */}
+            <div className="flex items-center justify-between gap-3 mb-7 pb-2 border-b border-gray-200/60">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0">
+                {/* Filter Drawer Toggle */}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  radius="lg"
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  leftIcon={<FiSliders className="w-3.5 h-3.5 text-gray-600" />}
+                  className="text-gray-700 font-medium text-xs sm:text-[13px] hover:text-black transition-colors px-3 py-1.5 hover:bg-gray-200/50 shrink-0 mr-1 border-none shadow-none"
+                >
+                  Filter
+                </Button>
+
+                {/* Dynamic Category Pills */}
+                {pillFilters.map((pill) => {
+                  const isActive = activePill === pill.id;
+                  return (
+                    <Button
+                      key={pill.id}
+                      type="button"
+                      variant={isActive ? "dark" : "outline"}
+                      size="sm"
+                      radius="full"
+                      onClick={() => {
+                        setActivePill(pill.id);
+                        setCurrentPage(1);
+                      }}
+                      className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${
+                        isActive
+                          ? "shadow-xs border-gray-900"
+                          : "hover:border-gray-900 hover:text-black"
+                      }`}
+                    >
+                      {pill.title}
+                    </Button>
+                  );
+                })}
+              </div>
+
+              {/* Reset Action */}
+              {(activePill !== "all" || search) && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => {
-                    setSearch("");
                     setActivePill("all");
+                    setSearch("");
                     setCurrentPage(1);
                   }}
-                  className="px-5 py-2.5 text-xs font-semibold shadow-2xs"
+                  rightIcon={<FiArrowRight className="w-3.5 h-3.5 text-[#327C73]" />}
+                  className="shrink-0 text-[#327C73] hover:text-[#256059] font-semibold text-xs sm:text-[13px] transition-colors pl-3 border-none shadow-none p-0 h-auto hover:bg-transparent"
                 >
-                  Clear Filters
+                  View All
                 </Button>
               )}
-              {user && !user.isSeller && (
-                <Link
-                  href="/briefs/create"
-                  className="px-5 py-2.5 bg-[#327C73] text-white text-xs font-semibold rounded-[6px] hover:bg-[#256059] transition shadow-xs"
-                >
-                  + Post a Project
-                </Link>
-              )}
             </div>
-          </div>
+
+            {/* Collapsible Search Drawer */}
+            {isFilterOpen && (
+              <div className="bg-white border border-gray-200 rounded-[6px] p-4 sm:p-5 mb-8 shadow-xs animate-fadeIn">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <div className="relative flex-1">
+                    <RiSearchLine className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-base" />
+                    <input
+                      type="text"
+                      placeholder="Search projects by title, client, or keywords..."
+                      value={search}
+                      onChange={(e) => {
+                        setSearch(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:border-[#327C73] focus:bg-white transition-colors"
+                    />
+                    {search && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        radius="full"
+                        onClick={() => {
+                          setSearch("");
+                          setCurrentPage(1);
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 !p-1 !h-6 !w-6 !min-h-0 border-none shadow-none"
+                        aria-label="Clear search input"
+                      >
+                        <FiX className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="brand"
+                    size="sm"
+                    radius="lg"
+                    onClick={() => setIsFilterOpen(false)}
+                    className="px-5 py-2 font-medium text-xs sm:text-[13px]"
+                  >
+                    Apply Filters
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Active Filters Display */}
+            {(activePill !== "all" || search) && (
+              <div className="flex flex-wrap items-center gap-2 mb-6 animate-fadeIn">
+                <span className="text-xs text-gray-500 font-medium">Active filters:</span>
+                {activePill !== "all" && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-700 shadow-2xs">
+                    Category:{" "}
+                    {pillFilters.find((p) => p.id === activePill)?.title || activePill}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      radius="full"
+                      onClick={() => {
+                        setActivePill("all");
+                        setCurrentPage(1);
+                      }}
+                      className="hover:text-red-500 transition-colors p-0.5 !h-auto !w-auto !min-h-0 border-none shadow-none"
+                      aria-label="Remove category filter"
+                    >
+                      <FiX className="w-3 h-3" />
+                    </Button>
+                  </span>
+                )}
+                {search && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-700 shadow-2xs">
+                    Search: &ldquo;{search}&rdquo;
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      radius="full"
+                      onClick={() => {
+                        setSearch("");
+                        setCurrentPage(1);
+                      }}
+                      className="hover:text-red-500 transition-colors p-0.5 !h-auto !w-auto !min-h-0 border-none shadow-none"
+                      aria-label="Clear active search keyword"
+                    >
+                      <FiX className="w-3 h-3" />
+                    </Button>
+                  </span>
+                )}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setActivePill("all");
+                    setSearch("");
+                    setCurrentPage(1);
+                  }}
+                  className="text-xs text-gray-400 hover:text-red-500 underline ml-2 border-none shadow-none p-0 !h-auto"
+                >
+                  Clear all
+                </Button>
+              </div>
+            )}
+
+            {/* Results Count Summary */}
+            <div className="flex items-center justify-between mb-5">
+              <span className="text-xs sm:text-[13px] text-gray-500 font-medium">
+                Showing {filteredBriefs.length}{" "}
+                {filteredBriefs.length === 1 ? "project" : "projects"} available
+              </span>
+            </div>
+
+            {/* ============================================================ */}
+            {/* Project Brief Cards Grid                                    */}
+            {/* ============================================================ */}
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 animate-pulse">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-white rounded-[6px] border border-gray-200/90 p-6 sm:p-7 h-[260px] flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                        <div className="flex gap-2">
+                          <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+                          <div className="h-6 bg-gray-200 rounded-full w-28"></div>
+                        </div>
+                      </div>
+                      <div className="h-3 bg-gray-100 rounded w-1/3 mb-5"></div>
+                      <div className="h-4 bg-gray-100 rounded w-full mb-2"></div>
+                      <div className="h-4 bg-gray-100 rounded w-4/5 mb-5"></div>
+                    </div>
+                    <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gray-200"></div>
+                        <div className="h-3 bg-gray-200 rounded w-24"></div>
+                      </div>
+                      <div className="h-3 bg-gray-200 rounded w-20"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredBriefs.length === 0 ? (
+              <div className="py-20 text-center flex flex-col items-center justify-center bg-white rounded-[6px] border border-gray-200/90 p-8 shadow-2xs">
+                <div className="w-14 h-14 rounded-full bg-emerald-50 text-[#327C73] flex items-center justify-center mb-4 border border-emerald-100 shadow-2xs">
+                  <FiBriefcase className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-1">
+                  No briefs currently found
+                </h3>
+                <p className="text-sm text-gray-500 max-w-md mb-6 leading-relaxed">
+                  {search
+                    ? `No open briefs match "${search}". Try another keyword or clear your filters.`
+                    : "There are currently no open projects in this category. Check back soon or post your own project!"}
+                </p>
+                <div className="flex items-center gap-3">
+                  {(search || activePill !== "all") && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="md"
+                      radius="xl"
+                      onClick={() => {
+                        setSearch("");
+                        setActivePill("all");
+                        setCurrentPage(1);
+                      }}
+                      className="px-5 py-2.5 text-xs font-semibold shadow-2xs"
+                    >
+                      Clear Filters
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="md"
+                    radius="xl"
+                    onClick={handleBackToCategories}
+                    className="px-5 py-2.5 text-xs font-semibold shadow-2xs"
+                  >
+                    Browse Categories
+                  </Button>
+                  {user && !user.isSeller && (
+                    <Link
+                      href="/briefs/create"
+                      className="px-5 py-2.5 bg-[#327C73] text-white text-xs font-semibold rounded-[6px] hover:bg-[#256059] transition shadow-xs"
+                    >
+                      + Post a Project
+                    </Link>
+                  )}
+                </div>
+              </div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
@@ -648,6 +1098,8 @@ function BriefsContent() {
               </div>
             )}
           </>
+        )}
+          </div>
         )}
       </div>
     </div>

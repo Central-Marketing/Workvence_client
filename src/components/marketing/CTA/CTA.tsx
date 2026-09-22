@@ -1,8 +1,6 @@
 "use client";
 
 import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components';
 
@@ -19,21 +17,13 @@ const CTA = () => {
     <section className="w-full pt-12 sm:pt-16 md:pt-20 lg:pt-24 pb-[80px] min-[1400px]:pb-[100px] bg-white">
       <div className="container mx-auto px-4 md:px-6">
 
-        {/* Main Background Frame (1760x800 with 10px Radius) */}
+        {/* Main Background Frame */}
         <div
-          className="relative w-full max-w-[1760px] mx-auto rounded-[6px] px-6 sm:px-10 md:px-14 lg:px-16 py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden"
+          className="relative w-full max-w-[1760px] mx-auto rounded-[6px] px-6 sm:px-10 md:px-14 lg:px-16 py-12 sm:py-16 md:py-20 lg:py-24 overflow-hidden bg-cover bg-center bg-no-repeat shadow-xs"
           style={{
-            background: '#052121',
+            backgroundImage: "url('/media/AFreelancerBG.png')",
           }}
         >
-          {/* Bottom Ellipse Glow (1610x997, 40% top part visible rising from bottom) */}
-          <div
-            className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[60%] w-[95%] max-w-[1610px] h-[550px] sm:h-[750px] lg:h-[997px] rounded-[50%] pointer-events-none z-0"
-            style={{
-              background: 'radial-gradient(ellipse at center, #004443 0%, #004443 45%, rgba(0, 68, 67, 0.7) 70%, transparent 90%)',
-              filter: 'blur(50px)',
-            }}
-          />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
 
@@ -72,20 +62,6 @@ const CTA = () => {
                 </Button>
               </div>
 
-            </div>
-
-            {/* Right 3D Graphic Column */}
-            <div className="lg:col-span-5 flex items-center justify-center lg:justify-end">
-              <div className="w-full max-w-[380px] sm:max-w-[440px] lg:max-w-[500px] flex items-center justify-center">
-                <Image
-                  src="/media/cta.png"
-                  alt="Workvence - Are You A Freelancer? Earn Globally."
-                  width={560}
-                  height={560}
-                  priority
-                  className="w-full h-auto object-contain drop-shadow-2xl"
-                />
-              </div>
             </div>
 
           </div>

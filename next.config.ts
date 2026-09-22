@@ -40,6 +40,11 @@ const nextConfig: NextConfig = {
         destination: '/packages?category=ai-services',
         permanent: true,
       },
+      {
+        source: '/brief',
+        destination: '/briefs',
+        permanent: true,
+      },
     ];
   },
   async rewrites() {

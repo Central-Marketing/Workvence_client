@@ -329,7 +329,7 @@ const LoginForm = () => {
       <div className="hidden lg:flex flex-1 p-3 sm:p-4 lg:p-5 h-screen sticky top-0">
         <div className="relative w-full h-full rounded-[6px] lg:rounded-3xl overflow-hidden bg-[#0a0f1d] shadow-sm">
           <Image
-            src="/media/loginImage.png"
+            src="/images/auth/loginImage.png"
             alt="Workvence"
             fill
             priority

@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { Search, X, MessageSquare, Ticket, LifeBuoy } from "lucide-react";
-import { Button } from "@/components";
+import { Button, Breadcrumb } from "@/components";
 
 interface HelpTopic {
   title: string;
@@ -121,16 +121,28 @@ export default function HelpCenterPage() {
         {/* 1. Hero Section */}
         <section
           aria-label="Help Center Banner"
-          className="w-full bg-[#152232] rounded-[20px] sm:rounded-[24px] py-14 sm:py-16 md:py-20 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs"
+          className="w-full bg-[#152232] bg-cover bg-center bg-no-repeat rounded-[6px] py-12 sm:py-14 md:py-16 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden"
+          style={{ backgroundImage: "url('/media/HelpyouBG.png')" }}
         >
+          {/* Breadcrumb Navigation */}
+          <Breadcrumb
+            variant="inverted"
+            className="mb-3 sm:mb-4 select-none [&>ol]:justify-center"
+            items={[
+              {
+                name: "Help Center",
+                isLast: true,
+              },
+            ]}
+          />
 
           {/* Headline */}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[64px] font-normal italic tracking-tight text-[#79B5E8] leading-[1.12] sm:leading-[1.08] select-none">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[64px] font-normal italic tracking-tight text-[#fff] leading-[1.12] sm:leading-[1.08] select-none">
             How Can We Help you?
           </h1>
 
           {/* Subtitle */}
-          <p className="mt-3 sm:mt-4 text-xs sm:text-[13px] md:text-sm text-[#94A3B8] max-w-xl leading-relaxed">
+          <p className="mt-3 sm:mt-4 text-xs sm:text-[13px] md:text-sm text-[#fff]/60 max-w-xl leading-relaxed">
             Search our knowledge base or browse support categories to quickly find answers.
           </p>
 
@@ -165,7 +177,7 @@ export default function HelpCenterPage() {
         {/* 2. Knowledge Base Topics: 2-Column Cards */}
         <div className="mt-8 sm:mt-10 md:mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {/* Left Card: For Freelancers */}
-          <div className="bg-white rounded-[6px] md:rounded-[20px] border border-[#E5E7EB] shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-7 sm:p-9 md:p-10 flex flex-col">
+          <div className="bg-white rounded-[6px] border border-[#E5E7EB] shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-7 sm:p-9 md:p-10 flex flex-col">
             <header>
               <h2 className="font-sf-pro font-normal text-[#292929] text-2xl sm:text-3xl md:text-[34px] tracking-tight leading-snug">
                 For Freelancers
@@ -198,7 +210,7 @@ export default function HelpCenterPage() {
           </div>
 
           {/* Right Card: For Clients */}
-          <div className="bg-white rounded-[6px] md:rounded-[20px] border border-[#E5E7EB] shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-7 sm:p-9 md:p-10 flex flex-col">
+          <div className="bg-white rounded-[6px] border border-[#E5E7EB] shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-7 sm:p-9 md:p-10 flex flex-col">
             <header>
               <h2 className="font-sf-pro font-normal text-[#292929] text-2xl sm:text-3xl md:text-[34px] tracking-tight leading-snug">
                 For Clients

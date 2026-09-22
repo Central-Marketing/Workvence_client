@@ -83,11 +83,12 @@ export default function TrustSafetyPage() {
         {/* 1. Hero Banner Card */}
         <section
           aria-label="Trust and Safety Banner"
-          className="w-full bg-[#22172A] rounded-[6px] py-16 sm:py-20 md:py-24 lg:py-28 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs"
+          className="w-full bg-[#22172A] bg-cover bg-center bg-no-repeat rounded-[6px] py-16 sm:py-20 md:py-24 lg:py-28 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden"
+          style={{ backgroundImage: "url('/media/WorkwithBG.png')" }}
         >
 
           {/* Heading */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[68px] font-normal italic tracking-tight text-[#D8B4E2] leading-[1.12] sm:leading-[1.08] select-none">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[68px] font-normal italic tracking-tight text-[#fff] leading-[1.12] sm:leading-[1.08] select-none">
             Work with
             <br />
             Confidence

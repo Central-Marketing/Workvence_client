@@ -45,6 +45,7 @@ export interface SellerDetails {
   skills: string[];
   isOnline?: boolean;
   lastSeen?: string;
+  lastActiveAt?: string;
 }
 
 export interface PortfolioProject {
@@ -156,7 +157,8 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
     sellerUsername;
   const sellerAvatar = rawUser.image || rawUser.img || rawUser.avatar || "";
   const isOnline = Boolean(rawUser.isOnline ?? raw.isOnline ?? false);
-  const lastSeen = rawUser.lastSeen || rawUser.updatedAt || raw.updatedAt || raw.createdAt || "";
+  const lastActiveAt = rawUser.lastActiveAt || raw.lastActiveAt || rawUser.lastSeen || rawUser.updatedAt || raw.updatedAt || raw.createdAt || "";
+  const lastSeen = lastActiveAt;
   const isPro = Boolean(
     rawUser.isPro ||
     (typeof rawUser.sellerLevel === "string" &&
@@ -219,6 +221,7 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
     skills: sellerSkills,
     isOnline,
     lastSeen,
+    lastActiveAt,
   };
 
   // Real gallery images only

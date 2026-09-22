@@ -224,7 +224,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
               text-xs
   macbook:text-[13px]
   2xl:text-[13px]
-  font-sf-pro
+  font-inter
   font-normal
   leading-tight
   text-[#6E6E6E]
@@ -237,7 +237,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
             <span className="
               text-base
   
-  font-sf-pro
+  font-inter
   font-bold
   leading-tight
   text-black
@@ -302,7 +302,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
               xl:text-xs
               macbook:text-[13px]
               2xl:text-sm
-              font-sf-pro
+              font-inter
               text-[#6E6E6E]
               block
               font-normal
@@ -314,7 +314,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
 
             <span className="
               text-base
-  font-sf-pro
+  font-inter
   font-bold
   leading-tight
   text-black
@@ -377,7 +377,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
               xl:text-xs
               macbook:text-[13px]
               2xl:text-sm
-              font-sf-pro
+              font-inter
               text-[#6E6E6E]
               block
               font-normal
@@ -391,7 +391,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
               className="
                 text-base
   
-  font-sf-pro
+  font-inter
   font-bold
   leading-tight
   text-black
@@ -454,7 +454,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
               xl:text-xs
               macbook:text-[13px]
               2xl:text-sm
-              font-sf-pro
+              font-inter
               text-[#6E6E6E]
               block
               font-normal
@@ -467,7 +467,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
             <span className="
               text-base
   
-  font-sf-pro
+  font-inter
   font-bold
   leading-tight
   text-black

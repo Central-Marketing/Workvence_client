@@ -93,8 +93,8 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
             <FiMapPin className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[11px] text-gray-400 block font-medium">From</span>
-            <span className="text-sm font-bold text-gray-900">{seller.country || "—"}</span>
+            <span className="text-[11px] text-gray-400 block font-medium font-inter">From</span>
+            <span className="text-sm font-semibold font-inter text-gray-900">{seller.country || "—"}</span>
           </div>
         </div>
 
@@ -103,8 +103,8 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
             <FiClock className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[11px] text-gray-400 block font-medium">Response Time</span>
-            <span className="text-sm font-bold text-gray-900">{seller.responseTime || "—"}</span>
+            <span className="text-[11px] text-gray-400 block font-medium font-inter">Response Time</span>
+            <span className="text-sm font-semibold font-inter text-gray-900">{seller.responseTime || "—"}</span>
           </div>
         </div>
 
@@ -113,8 +113,8 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
             <FiPackage className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[11px] text-gray-400 block font-medium">Order Delivery</span>
-            <span className="text-sm font-bold text-gray-900">{seller.onTimeDelivery || "—"}</span>
+            <span className="text-[11px] text-gray-400 block font-medium font-inter">Order Delivery</span>
+            <span className="text-sm font-semibold font-inter text-gray-900">{seller.onTimeDelivery || "—"}</span>
           </div>
         </div>
       </div>

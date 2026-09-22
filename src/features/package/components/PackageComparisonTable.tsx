@@ -48,6 +48,11 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
   const standardFeatures = getFeatures(standardPkg);
   const premiumFeatures = getFeatures(premiumPkg);
 
+  const hasAnyFeatures =
+    basicFeatures.length > 0 ||
+    standardFeatures.length > 0 ||
+    premiumFeatures.length > 0;
+
   return (
     <div id="section-packages" className="scroll-mt-32 mb-10">
       <div className="rounded-[6px] border border-gray-200 bg-white overflow-hidden shadow-2xs">
@@ -250,116 +255,103 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
               </div>
 
               {/* Features */}
-              <div className="grid grid-cols-3">
-                {/* Basic Features */}
-                {basicPkg ? (
-                  <div className="px-3.5 py-4 sm:px-5 sm:py-5 xl:px-6 xl:py-6 border-r border-gray-200 bg-white">
-                    <div className="space-y-0">
-                      {basicFeatures.map((f: string, i: number) => (
-                        <div
-                          key={i}
-                          className="flex items-center justify-between gap-2 sm:gap-4 py-2.5 sm:py-3 border-b border-gray-100 last:border-b-0"
-                        >
-                          <span className="text-xs sm:text-[13px] text-gray-600 leading-5 break-words">
-                            {f}
-                          </span>
-
-                          <svg
-                            className="shrink-0 text-brand-green"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
+              {hasAnyFeatures && (
+                <div className="grid grid-cols-3 border-b border-gray-200">
+                  {/* Basic Features */}
+                  {basicPkg ? (
+                    <div className="px-3.5 py-4 sm:px-5 sm:py-5 xl:px-6 xl:py-6 border-r border-gray-200 bg-white">
+                      <div className="space-y-0">
+                        {basicFeatures.map((f: string, i: number) => (
+                          <div
+                            key={i}
+                            className="flex items-center justify-between gap-2 sm:gap-4 py-2.5 sm:py-3 border-b border-gray-100 last:border-b-0"
                           >
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                          </svg>
-                        </div>
-                      ))}
-                      {basicFeatures.length === 0 && (
-                        <div className="py-4 text-center text-xs text-gray-400">
-                          Standard deliverable
-                        </div>
-                      )}
+                            <span className="text-xs sm:text-[13px] text-gray-600 leading-5 break-words">
+                              {f}
+                            </span>
+
+                            <svg
+                              className="shrink-0 text-brand-green"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                            >
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                            </svg>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="border-r border-gray-200 bg-gray-50" />
-                )}
+                  ) : (
+                    <div className="border-r border-gray-200 bg-gray-50" />
+                  )}
 
-                {/* Standard Features */}
-                {standardPkg ? (
-                  <div className="px-3.5 py-4 sm:px-5 sm:py-5 xl:px-6 xl:py-6 border-r border-gray-200 bg-[#f7fffc]">
-                    <div className="space-y-0">
-                      {standardFeatures.map((f: string, i: number) => (
-                        <div
-                          key={i}
-                          className="flex items-center justify-between gap-2 sm:gap-4 py-2.5 sm:py-3 border-b border-gray-100 last:border-b-0"
-                        >
-                          <span className="text-xs sm:text-[13px] font-medium text-gray-700 leading-5 break-words">
-                            {f}
-                          </span>
-
-                          <svg
-                            className="shrink-0 text-brand-green"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
+                  {/* Standard Features */}
+                  {standardPkg ? (
+                    <div className="px-3.5 py-4 sm:px-5 sm:py-5 xl:px-6 xl:py-6 border-r border-gray-200 bg-[#f7fffc]">
+                      <div className="space-y-0">
+                        {standardFeatures.map((f: string, i: number) => (
+                          <div
+                            key={i}
+                            className="flex items-center justify-between gap-2 sm:gap-4 py-2.5 sm:py-3 border-b border-gray-100 last:border-b-0"
                           >
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                          </svg>
-                        </div>
-                      ))}
-                      {standardFeatures.length === 0 && (
-                        <div className="py-4 text-center text-xs text-gray-400">
-                          Standard deliverable
-                        </div>
-                      )}
+                            <span className="text-xs sm:text-[13px] font-medium text-gray-700 leading-5 break-words">
+                              {f}
+                            </span>
+
+                            <svg
+                              className="shrink-0 text-brand-green"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                            >
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                            </svg>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="border-r border-gray-200 bg-gray-50" />
-                )}
+                  ) : (
+                    <div className="border-r border-gray-200 bg-gray-50" />
+                  )}
 
-                {/* Premium Features */}
-                {premiumPkg ? (
-                  <div className="px-3.5 py-4 sm:px-5 sm:py-5 xl:px-6 xl:py-6 bg-white">
-                    <div className="space-y-0">
-                      {premiumFeatures.map((f: string, i: number) => (
-                        <div
-                          key={i}
-                          className="flex items-center justify-between gap-2 sm:gap-4 py-2.5 sm:py-3 border-b border-gray-100 last:border-b-0"
-                        >
-                          <span className="text-xs sm:text-[13px] text-gray-600 leading-5 break-words">
-                            {f}
-                          </span>
-
-                          <svg
-                            className="shrink-0 text-brand-green"
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
+                  {/* Premium Features */}
+                  {premiumPkg ? (
+                    <div className="px-3.5 py-4 sm:px-5 sm:py-5 xl:px-6 xl:py-6 bg-white">
+                      <div className="space-y-0">
+                        {premiumFeatures.map((f: string, i: number) => (
+                          <div
+                            key={i}
+                            className="flex items-center justify-between gap-2 sm:gap-4 py-2.5 sm:py-3 border-b border-gray-100 last:border-b-0"
                           >
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                          </svg>
-                        </div>
-                      ))}
-                      {premiumFeatures.length === 0 && (
-                        <div className="py-4 text-center text-xs text-gray-400">
-                          Turnkey deliverable
-                        </div>
-                      )}
+                            <span className="text-xs sm:text-[13px] text-gray-600 leading-5 break-words">
+                              {f}
+                            </span>
+
+                            <svg
+                              className="shrink-0 text-brand-green"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                            >
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                            </svg>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="bg-gray-50" />
-                )}
-              </div>
+                  ) : (
+                    <div className="bg-gray-50" />
+                  )}
+                </div>
+              )}
 
               {/* Select Package Action Row */}
-              <div className="grid grid-cols-3 border-t border-gray-200 p-3 sm:p-4 xl:p-5 bg-gray-50/50">
-                <div className="px-1.5 sm:px-2">
+              <div className="grid grid-cols-3 bg-gray-50/50">
+                <div className="p-3 sm:p-4 xl:p-5 border-r border-gray-200">
                   {basicPkg && (
                     <Button
                       type="button"
@@ -376,7 +368,7 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
                     </Button>
                   )}
                 </div>
-                <div className="px-1.5 sm:px-2">
+                <div className="p-3 sm:p-4 xl:p-5 border-r border-gray-200">
                   {standardPkg && (
                     <Button
                       type="button"
@@ -393,7 +385,7 @@ export const PackageComparisonTable: React.FC<PackageComparisonTableProps> = ({
                     </Button>
                   )}
                 </div>
-                <div className="px-1.5 sm:px-2">
+                <div className="p-3 sm:p-4 xl:p-5">
                   {premiumPkg && (
                     <Button
                       type="button"

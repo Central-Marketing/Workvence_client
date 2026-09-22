@@ -6,6 +6,7 @@ import { PackageTierDetails, SellerDetails } from "../utils/packageDetailsNormal
 import { Button } from "@/components/ui";
 
 const formatLastSeenDate = (dateVal?: string | Date): string => {
+  if (!dateVal) return "";
   const monthNames: Record<number, string> = {
     0: "Jan.",
     1: "Feb.",
@@ -21,11 +22,11 @@ const formatLastSeenDate = (dateVal?: string | Date): string => {
     11: "Dec.",
   };
 
-  const d = dateVal ? new Date(dateVal) : new Date();
-  const validDate = isNaN(d.getTime()) ? new Date() : d;
-  const day = validDate.getDate();
-  const month = monthNames[validDate.getMonth()] || validDate.toLocaleString("en-US", { month: "short" });
-  const year = validDate.getFullYear();
+  const d = new Date(dateVal);
+  if (isNaN(d.getTime())) return "";
+  const day = d.getDate();
+  const month = monthNames[d.getMonth()] || d.toLocaleString("en-US", { month: "short" });
+  const year = d.getFullYear();
   return `${day}. ${month} ${year}`;
 };
 
@@ -229,7 +230,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
             onContact();
           }
         }}
-        className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2.5 sm:gap-3 bg-white hover:bg-[#FAFAFA] border border-gray-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.10)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.16)] px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-full cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:scale-95 select-none animate-fadeIn"
+        className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2.5 sm:gap-3 bg-white hover:bg-[#FAFAFA] border border-gray-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.10)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.16)] px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-[6px] cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:scale-95 select-none animate-fadeIn"
         title={`Message ${seller.name || seller.username || "Seller"}`}
       >
         {/* Emerald Lightning Bolt */}
@@ -284,7 +285,9 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
           <div className="text-[10px] sm:text-[11.5px] text-gray-500 font-normal leading-tight mt-0.5">
             {seller.isOnline
               ? "Online"
-              : `Offline · Last seen ${formatLastSeenDate(seller.lastSeen)}`}
+              : formatLastSeenDate(seller.lastActiveAt || seller.lastSeen)
+              ? `Offline · Last seen ${formatLastSeenDate(seller.lastActiveAt || seller.lastSeen)}`
+              : "Offline"}
           </div>
         </div>
       </div>

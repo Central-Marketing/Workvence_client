@@ -336,22 +336,35 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
     "";
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-8 font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] pt-6 sm:pt-8 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 ">
 
         {/* Top Breadcrumb & Seller Badge */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-            <Link
-              href="/manage-orders"
-              className="text-slate-600 hover:text-slate-900 flex items-center gap-1 font-semibold transition-colors"
-            >
-              <FiChevronLeft className="text-sm" />
-              <span>Back to Manage Orders</span>
-            </Link>
-            <span className="text-slate-300">/</span>
-            <span className="text-slate-800 font-semibold font-mono">Order #{order.orderCode}</span>
-          </div>
+          <nav aria-label="Breadcrumb" className="mb-0">
+            <ol className="flex items-center gap-2 text-[13px] text-gray-500 flex-wrap list-none p-0 m-0">
+              <li className="inline-flex items-center">
+                <Link
+                  href="/manage-orders"
+                  className="text-gray-600 hover:text-gray-900 hover:underline transition-colors font-normal inline-flex items-center gap-1 p-0 h-auto bg-transparent border-0 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 rounded-xs"
+                >
+                  <FiChevronLeft className="w-4 h-4 shrink-0" aria-hidden="true" />
+                  <span>Back to Manage Orders</span>
+                </Link>
+              </li>
+              <li className="inline-flex items-center gap-2">
+                <span className="text-gray-300 select-none" aria-hidden="true">
+                  /
+                </span>
+                <span
+                  aria-current="page"
+                  className="text-gray-900 font-medium font-mono truncate max-w-[200px] sm:max-w-xs"
+                >
+                  Order #{order.orderCode}
+                </span>
+              </li>
+            </ol>
+          </nav>
 
           <div className="flex items-center gap-2">
             <Button

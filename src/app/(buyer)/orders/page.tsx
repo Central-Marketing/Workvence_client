@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
-  FiHome,
   FiCalendar,
   FiChevronDown,
   FiPackage,
@@ -184,20 +183,11 @@ export default function BuyerOrdersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-8 font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] pt-6 sm:pt-8 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-7 sm:space-y-8">
 
-        {/* Top Breadcrumb */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
-            <Link href="/" className="text-slate-500 hover:text-slate-800 transition-colors flex items-center">
-              <FiHome className="text-sm" />
-            </Link>
-            <span className="text-slate-400">/</span>
-            <span className="text-slate-700 font-medium">Orders</span>
-          </div>
-
-          {user?.isSeller && (
+        {user?.isSeller && (
+          <div className="flex justify-end">
             <Link
               href="/manage-orders"
               className="text-xs font-semibold text-[#327C73] hover:underline flex items-center gap-1"
@@ -205,8 +195,8 @@ export default function BuyerOrdersPage() {
               <span>Go to Seller Manage Orders</span>
               <span>→</span>
             </Link>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Top Hero Banner: Shown when there is an active brief project */}
         {activeBrief && (

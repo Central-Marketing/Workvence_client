@@ -97,7 +97,7 @@ export default function GuidesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-white text-[#112131] font-sans pb-24">
+    <div className="min-h-screen bg-white text-[#112131] font-sans pb-[80px] min-[1400px]:pb-[100px]">
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-16 lg:py-24">
         <div className="container mx-auto px-4 md:px-6">

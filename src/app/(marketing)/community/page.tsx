@@ -117,7 +117,7 @@ export default function CommunityHubPage() {
       </section>
 
       {/* Community Values */}
-      <section className="py-20 bg-white">
+      <section className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl text-center space-y-12">
           <div className="space-y-3">
             <span className="text-xs font-bold text-[#327C73] uppercase tracking-wider">Our Community Values</span>

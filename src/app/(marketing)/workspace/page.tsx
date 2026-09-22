@@ -96,7 +96,7 @@ export default function WorkspacePage() {
   const currentTab = workspaceTabs.find((t) => t.id === activeTab) || workspaceTabs[0];
 
   return (
-    <div className="min-h-screen bg-white text-[#112131] font-sans pb-24">
+    <div className="min-h-screen bg-white text-[#112131] font-sans">
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-20 lg:py-28">
         <div className="container mx-auto px-4 md:px-6">
@@ -126,7 +126,7 @@ export default function WorkspacePage() {
       </section>
 
       {/* Interactive Feature Tour Tabs */}
-      <section className="py-20 bg-white">
+      <section className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-5xl">
           <div className="flex items-center justify-center gap-2 overflow-x-auto pb-4 mb-12 scrollbar-none">
             {workspaceTabs.map((tab) => {

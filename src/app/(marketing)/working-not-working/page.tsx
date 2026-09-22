@@ -106,7 +106,7 @@ export default function WorkingNotWorkingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-[#112131] font-sans pb-24">
+    <div className="min-h-screen bg-white text-[#112131] font-sans pb-[80px] min-[1400px]:pb-[100px]">
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-[#0f172a] via-[#112131] to-[#0f172a] text-white py-20 lg:py-28">
         <div className="container mx-auto px-4 md:px-6">

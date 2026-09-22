@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch, socket } from "@/utils";
+import { Breadcrumb } from "@/components/ui";
 import toast from "react-hot-toast";
 import moment from "moment";
 import {
@@ -263,20 +264,22 @@ const NotificationsPage = () => {
   const dashboardRoute = user?.isSeller ? "/dashboard/seller" : "/dashboard/buyer";
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] pb-20 pt-6 sm:pt-8 font-sans">
+    <div className="min-h-screen bg-[#F8F9FA] pt-6 sm:pt-8 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb Navigation */}
-        <div className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-4 select-none">
-          <Link href="/" className="hover:text-slate-700 transition-colors">
-            Home
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <Link href={dashboardRoute} className="hover:text-slate-700 transition-colors">
-            Dashboard
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-[#0E3834] font-semibold">Notifications</span>
-        </div>
+        <Breadcrumb
+          className="mb-4 select-none"
+          items={[
+            {
+              name: "Dashboard",
+              href: dashboardRoute,
+            },
+            {
+              name: "Notifications",
+              isLast: true,
+            },
+          ]}
+        />
 
         {/* Page Header */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">

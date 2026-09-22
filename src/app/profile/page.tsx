@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import {
-  FiHome,
   FiCamera,
   FiEdit2,
   FiPlus,
@@ -415,19 +414,8 @@ export default function ProfilePage() {
   const isSeller = Boolean(user?.isSeller || user?.role === "seller");
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-10 font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] pt-6 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6">
-        {/* Top Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-3">
-          <Link
-            href="/"
-            className="text-teal-600 hover:text-teal-700 transition-colors flex items-center gap-1"
-          >
-            <FiHome className="text-sm" />
-          </Link>
-          <span className="text-slate-300">/</span>
-          <span className="text-slate-600 font-medium">Profile</span>
-        </div>
 
         {/* Page Title & Navigation Tabs */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-7">

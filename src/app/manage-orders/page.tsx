@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader, Button } from "@/components";
+import { Breadcrumb } from "@/components/ui";
 import { FiHome, FiCalendar, FiSearch } from "react-icons/fi";
 
 
@@ -168,7 +169,7 @@ const ManageOrders = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       {isLoading ? (
         <div className="w-full flex justify-center items-center py-24">
           <Loader size={45} />
@@ -181,20 +182,18 @@ const ManageOrders = () => {
         <div className="container mx-auto px-4 md:px-6 space-y-6">
 
           {/* Breadcrumb Navigation */}
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <Link
-              href="/"
-              className="text-[#0D6D5F] hover:text-[#094d43] transition-colors flex items-center gap-1"
-            >
-              <FiHome className="text-sm" />
-            </Link>
-            <span>/</span>
-            <Link href="/orders" className="hover:text-gray-700 transition-colors">
-              Orders
-            </Link>
-            <span>/</span>
-            <span className="text-gray-600 font-medium">Manage Orders</span>
-          </div>
+          <Breadcrumb
+            items={[
+              {
+                name: "Orders",
+                href: "/orders",
+              },
+              {
+                name: "Manage Orders",
+                isLast: true,
+              },
+            ]}
+          />
 
           {/* Page Heading */}
           <div>

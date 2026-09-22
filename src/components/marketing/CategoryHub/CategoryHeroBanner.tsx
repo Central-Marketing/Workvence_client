@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 
 interface CategoryHeroBannerProps {
   title: string;
@@ -44,29 +43,6 @@ const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
 
         {/* Center Content */}
         <div className="relative z-10 flex flex-col items-center justify-center px-4">
-          {/* Breadcrumb Navigation */}
-          <div className="inline-flex items-center gap-1.5 text-[11.5px] sm:text-[12.5px] text-[#b8a096] mb-2 sm:mb-3 font-normal tracking-wide">
-            <Link
-              href="/"
-              className="hover:text-white transition-colors flex items-center gap-1"
-            >
-              <svg
-                className="w-3.5 h-3.5 text-[#b8a096] stroke-[1.5]"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                />
-              </svg>
-            </Link>
-            <span className="text-[#8f7469]">/</span>
-            <span>{categoryName.replace('& Design', '').replace('and Design', '').trim()}</span>
-          </div>
 
           {/* Title in Oblique Sans-Serif Orange */}
           <h1 className="italic text-3xl sm:text-4xl md:text-[46px] lg:text-[50px] leading-tight text-[#ea580c] font-normal tracking-tight drop-shadow-2xs">

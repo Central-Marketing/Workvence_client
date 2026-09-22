@@ -186,7 +186,7 @@ export default function HowToBuyPage() {
       </section>
 
       {/* Buyer FAQ Section */}
-      <section className="py-20 bg-white">
+      <section className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-3xl">
           <div className="text-center mb-12 space-y-2">
             <span className="text-xs font-bold text-[#327C73] uppercase tracking-wider">Help & Answers</span>

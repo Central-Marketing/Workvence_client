@@ -131,7 +131,7 @@ export default function SupportDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8fafc] pt-10 pb-[80px] min-[1400px]:pb-[100px] px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-8">
 
         {/* Header Banner */}

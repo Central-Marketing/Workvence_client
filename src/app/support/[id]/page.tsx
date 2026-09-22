@@ -345,7 +345,7 @@ export default function TicketDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8fafc] pt-8 pb-[80px] min-[1400px]:pb-[100px] px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-6">
 
         {/* Top Navigation */}

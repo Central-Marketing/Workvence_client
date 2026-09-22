@@ -104,7 +104,7 @@ const Proposals = () => {
   };
 
   return (
-    <div className="flex justify-center bg-slate-50 py-10 min-h-[80vh] px-4">
+    <div className="flex justify-center bg-slate-50 pt-10 pb-[80px] min-[1400px]:pb-[100px] min-h-[80vh] px-4">
       <div className="w-full max-w-[1000px] flex flex-col gap-6 mx-auto">
         {/* Back */}
         <Link href={`/briefs/${briefId}`} className="inline-flex items-center gap-1.5 text-slate-500 hover:text-emerald-500 font-semibold text-sm transition-colors">

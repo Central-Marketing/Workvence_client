@@ -186,7 +186,7 @@ export default function AffiliatesPage() {
       </section>
 
       {/* Interactive Calculator */}
-      <section id="calculator" className="py-20 bg-[#0f172a] text-white">
+      <section id="calculator" className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-[#0f172a] text-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-3xl p-8 sm:p-12 shadow-2xl space-y-8">
             <div className="text-center space-y-2">

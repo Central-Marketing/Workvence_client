@@ -6,7 +6,7 @@ import { FiHome, FiHeart, FiShare2, FiMoreVertical, FiShield, FiClock, FiAward, 
 import { FaAward } from "react-icons/fa";
 import { SellerDetails } from "../utils/packageDetailsNormalizer";
 import { BadgeCheck } from "lucide-react";
-import { Button } from "@/components/ui";
+import { Button, Breadcrumb } from "@/components/ui";
 
 interface PackageHeaderStatsProps {
   title: string;
@@ -36,30 +36,23 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
   return (
     <div className="w-full mb-6">
       {/* 1. Breadcrumbs */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] text-gray-500 mb-3.5 flex-wrap">
-        <Link
-          href="/"
-          className="text-teal-600 hover:text-teal-700 transition-colors flex items-center"
-          title="Home"
-        >
-          <FiHome className="w-4 h-4" />
-        </Link>
-        <span className="text-gray-300">/</span>
-        <Link
-          href={`/packages?category=${encodeURIComponent(categoryName.toLowerCase().replace(/&/g, 'and').replace(/\s+/g, '-'))}`}
-          className="text-gray-600 hover:text-gray-900 transition-colors font-normal"
-        >
-          {categoryName}
-        </Link>
-        {subcategoryName && (
-          <>
-            <span className="text-gray-300">/</span>
-            <span className="text-gray-500 font-normal truncate">
-              {subcategoryName}
-            </span>
-          </>
-        )}
-      </nav>
+      <Breadcrumb
+        items={[
+          {
+            name: categoryName,
+            href: `/packages?category=${encodeURIComponent(categoryName.toLowerCase().replace(/&/g, 'and').replace(/\s+/g, '-'))}`,
+            isLast: !subcategoryName,
+          },
+          ...(subcategoryName
+            ? [
+                {
+                  name: subcategoryName,
+                  isLast: true,
+                },
+              ]
+            : []),
+        ]}
+      />
 
       {/* 2. Main Title */}
       <h1

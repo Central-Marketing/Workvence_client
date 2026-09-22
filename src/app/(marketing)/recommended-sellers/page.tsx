@@ -30,7 +30,7 @@ const RecommendedSellers = () => {
   }, []);
 
   return (
-    <div className="w-full min-h-[80vh] bg-gray-50 py-16">
+    <div className="w-full min-h-[80vh] bg-gray-50 pt-16 pb-[80px] min-[1400px]:pb-[100px]">
       <div className="container mx-auto px-4 md:px-8">
         <div className="mb-12 text-center md:text-left">
           <h1 className="text-3xl md:text-4xl lg:text-[42px] font-bold text-gray-900 mb-4">

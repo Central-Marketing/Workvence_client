@@ -224,7 +224,7 @@ const PackageContent = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-gray-800 pb-28 pt-4 sm:pt-6">
+    <div className="min-h-screen bg-[#FAFAFA] text-gray-800 pt-4 sm:pt-6 pb-[80px] min-[1400px]:pb-[100px]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Main Two-Column Layout (Left Content + Right Sticky Sidebar) */}

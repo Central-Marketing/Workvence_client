@@ -341,13 +341,8 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 md:px-6 py-8">
-        {/* Breadcrumb + Filter Button Row */}
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <p className="text-sm text-gray-500">
-              Home / <span className="text-gray-800 font-medium">Search Result</span>
-            </p>
-          </div>
+        {/* Filter Button Row */}
+        <div className="flex items-center justify-end mb-5">
           <Button
             type="button"
             variant="brand"

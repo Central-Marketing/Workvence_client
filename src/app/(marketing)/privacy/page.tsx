@@ -1,7 +1,5 @@
 import React from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Home } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Privacy & Data Security | Workvence",
@@ -71,24 +69,9 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-white text-[#171717] font-sans antialiased">
       {/* Page Container */}
-      <div className="w-full container mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-12">
+      <div className="w-full container mx-auto px-4 sm:px-6 md:px-8 pt-6 sm:pt-8 md:pt-12 pb-0">
         {/* 1. Header Section */}
         <header className="flex flex-col items-start">
-          {/* Breadcrumbs */}
-          <nav
-            aria-label="Breadcrumb"
-            className="inline-flex items-center gap-2 text-xs sm:text-[13px] text-[#6E6E6E] tracking-wide"
-          >
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 hover:text-[#292929] transition-colors"
-              aria-label="Home"
-            >
-              <Home className="w-3.5 h-3.5 stroke-[1.8]" />
-            </Link>
-            <span className="text-[#A1A1AA] text-xs select-none">/</span>
-            <span className="font-normal text-[#6E6E6E]">Privacy Policy</span>
-          </nav>
 
           {/* Last Updated Badge */}
           <div className="mt-3.5 sm:mt-4 md:mt-5 inline-flex items-center px-2.5 py-1 rounded-[4px] bg-[#F4F4F5] border border-[#E4E4E7] text-[11px] sm:text-[12px] font-normal text-[#6E6E6E]">
@@ -117,7 +100,7 @@ export default function PrivacyPage() {
         </div>
 
         {/* 3. Policy Q&A Items */}
-        <div className="mt-8 sm:mt-10 md:mt-14 lg:mt-16 divide-y divide-[#E5E7EB] pb-16 sm:pb-20 md:pb-28">
+        <div className="mt-8 sm:mt-10 md:mt-14 lg:mt-16 divide-y divide-[#E5E7EB] pb-[80px] min-[1400px]:pb-[100px]">
           {POLICY_ITEMS.map((item) => (
             <section
               key={item.id}

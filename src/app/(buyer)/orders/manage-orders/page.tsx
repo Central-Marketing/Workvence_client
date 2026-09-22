@@ -17,6 +17,7 @@ import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { ManageOrderItem } from "@/features/dashboard/data/mockBuyerDashboard";
 import { Loader, Button } from "@/components";
+import { Breadcrumb } from "@/components/ui";
 
 export default function BuyerManageOrdersPage() {
   const router = useRouter();
@@ -237,17 +238,18 @@ export default function BuyerManageOrdersPage() {
     <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-8 font-sans">
       <div className="container mx-auto px-4 md:px-6">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mb-3">
-          <Link href="/" className="text-slate-500 hover:text-slate-800 transition-colors flex items-center">
-            <FiHome className="text-sm" />
-          </Link>
-          <span className="text-slate-400">/</span>
-          <Link href="/orders" className="text-slate-500 hover:text-slate-800 transition-colors">
-            Orders
-          </Link>
-          <span className="text-slate-400">/</span>
-          <span className="text-slate-700 font-medium">Manage Orders</span>
-        </div>
+        <Breadcrumb
+          items={[
+            {
+              name: "Orders",
+              href: "/orders",
+            },
+            {
+              name: "Manage Orders",
+              isLast: true,
+            },
+          ]}
+        />
 
         {/* Page Title & Subtitle */}
         <div className="mb-6">

@@ -50,7 +50,7 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
         <hr className="my-2" />
 
         {/* Bio Paragraph */}
-        <p className="text-[13.5px] sm:text-sm text-gray-600 leading-relaxed font-normal mb-6">
+        <p className="text-[13px] font-inter text-[#4A4A4A] leading-relaxed font-normal mb-6">
           {bio || "This seller hasn't added a bio yet."}
         </p>
 

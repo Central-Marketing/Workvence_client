@@ -955,7 +955,7 @@ const EditPackagePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-7">
 
         {/* 1. Header Section */}
@@ -1218,24 +1218,23 @@ const EditPackagePage = () => {
                     placeholder="e.g. Figma, Illustrator"
                     value={newToolInput}
                     onChange={(e) => setNewToolInput(e.target.value)}
-                    className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-800 outline-none w-48 sm:w-56"
+                    className="bg-[#F4F5F7] border border-gray-200 rounded-[6px] px-3.5 text-xs sm:text-[13px] text-gray-800 outline-none w-52 sm:w-60 h-[40px] focus:bg-white focus:border-gray-300 transition-colors"
                     autoFocus
                   />
                   <Button
                     type="submit"
-                    size="xs"
+                    variant="brand"
                     radius="fiverr"
-                    className="bg-[#0B3A33] hover:bg-[#0B3A33]/90 text-white font-semibold"
+                    className="bg-[#0B3A33] hover:bg-[#0B3A33]/90 text-white font-semibold h-[40px] px-4 text-xs sm:text-[13px]"
                   >
                     Add
                   </Button>
                   <Button
                     type="button"
-                    variant="ghost"
-                    size="xs"
+                    variant="soft"
                     radius="fiverr"
                     onClick={() => setShowAddTool(false)}
-                    className="text-gray-400 hover:text-gray-600 px-2"
+                    className="h-[40px] px-3.5 text-xs sm:text-[13px] text-gray-700 hover:text-gray-900"
                   >
                     Cancel
                   </Button>
@@ -1292,27 +1291,26 @@ const EditPackagePage = () => {
                     placeholder="e.g. Logo Design, Minimalist"
                     value={newKeywordInput}
                     onChange={(e) => setNewKeywordInput(e.target.value)}
-                    className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-3 py-1.5 text-xs text-gray-800 outline-none w-48 sm:w-56"
+                    className="bg-[#F4F5F7] border border-gray-200 rounded-[6px] px-3.5 text-xs sm:text-[13px] text-gray-800 outline-none w-52 sm:w-60 h-[40px] focus:bg-white focus:border-gray-300 transition-colors"
                     autoFocus
                   />
                   <Button
                     type="submit"
-                    size="xs"
+                    variant="brand"
                     radius="fiverr"
-                    className="bg-[#0B3A33] hover:bg-[#0B3A33]/90 text-white font-semibold"
+                    className="bg-[#0B3A33] hover:bg-[#0B3A33]/90 text-white font-semibold h-[40px] px-4 text-xs sm:text-[13px]"
                   >
                     Add
                   </Button>
                   <Button
                     type="button"
-                    variant="ghost"
-                    size="xs"
+                    variant="soft"
                     radius="fiverr"
                     onClick={() => {
                       setShowAddKeyword(false);
                       setNewKeywordInput("");
                     }}
-                    className="text-gray-400 hover:text-gray-600 px-2"
+                    className="h-[40px] px-3.5 text-xs sm:text-[13px] text-gray-700 hover:text-gray-900"
                   >
                     Cancel
                   </Button>
@@ -1501,29 +1499,28 @@ const EditPackagePage = () => {
                     placeholder="e.g. Responsive design"
                     value={newFeatureInput}
                     onChange={(e) => setNewFeatureInput(e.target.value)}
-                    className="bg-[#F4F5F7] border border-gray-200 rounded-lg px-2.5 py-1 text-xs text-gray-800 outline-none flex-1 focus:bg-white"
+                    className="bg-[#F4F5F7] border border-gray-200 rounded-[6px] px-3 text-xs sm:text-[13px] text-gray-800 outline-none flex-1 min-w-0 h-[40px] focus:bg-white focus:border-gray-300 transition-colors"
                     autoFocus
                   />
                   <Button
                     type="submit"
-                    size="xs"
+                    variant="brand"
                     radius="fiverr"
-                    className="bg-[#0B3A33] hover:bg-[#0B3A33]/90 text-white font-semibold px-2.5 py-1"
+                    className="bg-[#0B3A33] hover:bg-[#0B3A33]/90 text-white font-semibold h-[40px] px-3.5 text-xs sm:text-[13px] shrink-0"
                   >
                     Add
                   </Button>
                   <Button
                     type="button"
-                    variant="ghost"
-                    size="xs"
+                    variant="soft"
                     radius="fiverr"
                     onClick={() => {
                       setShowAddFeature(false);
                       setNewFeatureInput("");
                     }}
-                    className="text-gray-400 hover:text-gray-600 px-1 hover:bg-transparent"
+                    className="h-[40px] px-3 text-xs sm:text-[13px] text-gray-700 hover:text-gray-900 shrink-0"
                   >
-                    ✕
+                    Cancel
                   </Button>
                 </form>
               ) : (

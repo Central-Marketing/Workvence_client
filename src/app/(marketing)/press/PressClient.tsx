@@ -157,7 +157,7 @@ export default function PressClient() {
       </section>
 
       {/* Main Content Grid */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="pt-16 lg:pt-24 pb-[80px] min-[1400px]:pb-[100px] bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 

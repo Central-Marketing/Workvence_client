@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { axiosFetch, getAvatarUrl } from "@/utils";
 import { PackageCard, Loader, FavoriteSellerButton, Button } from "@/components";
+import { Breadcrumb } from "@/components/ui";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -169,20 +170,22 @@ const FavoritesPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/30 py-10 md:py-12">
+    <div className="min-h-screen bg-gray-50/30 pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px]">
       <div className="container mx-auto px-4 md:px-6">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mb-6">
-          <Link href="/" className="text-slate-500 hover:text-slate-800 transition-colors flex items-center">
-            <FiHome className="text-sm" />
-          </Link>
-          <span className="text-slate-400">/</span>
-          <Link href="/orders" className="text-slate-500 hover:text-slate-800 transition-colors">
-            Orders
-          </Link>
-          <span className="text-slate-400">/</span>
-          <span className="text-slate-700 font-medium">Favorites</span>
-        </div>
+        <Breadcrumb
+          className="mb-6"
+          items={[
+            {
+              name: "Orders",
+              href: "/orders",
+            },
+            {
+              name: "Favorites",
+              isLast: true,
+            },
+          ]}
+        />
 
         {/* Header */}
         <div className="mb-8">

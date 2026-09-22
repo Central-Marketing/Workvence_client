@@ -24,7 +24,7 @@ interface SubcategoryHeaderProps {
 
 const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
   categoryName,
-  categorySlug,
+  categorySlug: _categorySlug,
   subcategories = [],
   activeSubcategory,
   breadcrumbTrail,
@@ -45,69 +45,86 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Normalize trail items into a uniform list
+  const breadcrumbItems =
+    breadcrumbTrail && breadcrumbTrail.length > 0
+      ? breadcrumbTrail.map((crumb, idx) => ({
+        name: crumb.name,
+        onClick: () =>
+          onNavigateBreadcrumb ? onNavigateBreadcrumb(crumb) : onSelectCategory(),
+        isLast: idx === breadcrumbTrail.length - 1,
+      }))
+      : [
+        ...(categoryName
+          ? [
+            {
+              name: categoryName.replace(" & Design", "") || categoryName,
+              onClick: onSelectCategory,
+              isLast: !activeSubcategory,
+            },
+          ]
+          : []),
+        ...(activeSubcategory
+          ? [
+            {
+              name: activeSubcategory.title,
+              isLast: true,
+            },
+          ]
+          : []),
+      ];
+
   return (
     <div className="w-full mb-6">
-      {/* Breadcrumb Navigation */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] text-gray-500 mb-3 flex-wrap">
-        <Button
-          type="button"
-          variant="ghost"
-          size="xs"
-          onClick={onSelectCategory}
-          className="text-teal-600 hover:text-teal-700 transition-colors p-0 h-auto hover:bg-transparent"
-          title="All services"
-        >
-          <FiHome className="w-4 h-4" />
-        </Button>
-
-        {breadcrumbTrail && breadcrumbTrail.length > 0 ? (
-          breadcrumbTrail.map((crumb, idx) => {
-            const isLast = idx === breadcrumbTrail.length - 1;
-            return (
-              <React.Fragment key={idx}>
-                <span className="text-gray-300">/</span>
-                {isLast ? (
-                  <span className="text-gray-900 font-medium truncate">
-                    {crumb.name}
-                  </span>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="xs"
-                    onClick={() => (onNavigateBreadcrumb ? onNavigateBreadcrumb(crumb) : onSelectCategory())}
-                    className="text-gray-600 hover:text-gray-900 hover:underline transition-colors font-normal p-0 h-auto hover:bg-transparent"
-                  >
-                    {crumb.name}
-                  </Button>
-                )}
-              </React.Fragment>
-            );
-          })
-        ) : (
-          <>
-            <span className="text-gray-300">/</span>
-            <Button
+      {/* Semantic Breadcrumb Navigation */}
+      <nav aria-label="Breadcrumb" className="mb-3">
+        <ol className="flex items-center gap-2 text-[13px] text-gray-500 flex-wrap list-none p-0 m-0">
+          {/* Home Icon */}
+          <li className="inline-flex items-center">
+            <button
               type="button"
-              variant="ghost"
-              size="xs"
               onClick={onSelectCategory}
-              className="text-gray-600 hover:text-gray-900 transition-colors font-normal p-0 h-auto hover:bg-transparent"
+              className="inline-flex items-center text-teal-600 hover:text-teal-700 transition-colors p-0 h-auto bg-transparent border-0 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-teal-600 rounded-xs"
+              title="All services"
+              aria-label="All services"
             >
-              {categoryName.replace(" & Design", "") || categoryName}
-            </Button>
-            <span className="text-gray-300">/</span>
-            <span className="text-gray-500 font-normal truncate">
-              {activeSubcategory.title}
-            </span>
-          </>
-        )}
+              <FiHome className="w-4 h-4 shrink-0" aria-hidden="true" />
+            </button>
+          </li>
+
+          {/* Dynamic Breadcrumbs */}
+          {breadcrumbItems.map((item, idx) => (
+            <li key={idx} className="inline-flex items-center gap-2">
+              <span className="text-gray-300 select-none" aria-hidden="true">
+                /
+              </span>
+
+              {item.isLast ? (
+                <span
+                  aria-current="page"
+                  className="text-gray-900 font-medium truncate max-w-[200px] sm:max-w-xs"
+                  title={item.name}
+                >
+                  {item.name}
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={item.onClick}
+                  className="text-gray-600 hover:text-gray-900 hover:underline transition-colors font-normal p-0 h-auto bg-transparent border-0 cursor-pointer text-left focus:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 rounded-xs"
+                >
+                  {item.name}
+                </button>
+              )}
+            </li>
+          ))}
+        </ol>
       </nav>
 
       {/* Main Subcategory Title + Chevron Dropdown */}
       <div className="relative inline-block" ref={dropdownRef}>
         <div className="flex items-center gap-2.5">
-          <h1 className="text-2xl  font-bold text-gray-900 ">
+          <h1 className="text-2xl font-bold text-gray-900">
             {activeSubcategory.title}
           </h1>
 
@@ -119,6 +136,7 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
             radius="full"
             onClick={() => setDropdownOpen((prev) => !prev)}
             aria-label="Switch Subcategory"
+            aria-expanded={dropdownOpen}
             className="w-7 h-7 aspect-square border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-50,#FFF)] hover:bg-gray-50 shadow-xs active:scale-95 shrink-0 p-0"
           >
             <svg
@@ -164,10 +182,14 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
                       onSelectSubcategory(subcat);
                       setDropdownOpen(false);
                     }}
-                    rightIcon={isSelected ? <FiCheck className="w-4 h-4 text-teal-600 shrink-0 ml-2" /> : undefined}
+                    rightIcon={
+                      isSelected ? (
+                        <FiCheck className="w-4 h-4 text-teal-600 shrink-0 ml-2" />
+                      ) : undefined
+                    }
                     className={`w-full text-left justify-between px-3.5 py-2.5 text-sm transition-colors border-none shadow-none h-auto min-h-0 ${isSelected
-                      ? "bg-teal-50/70 text-teal-800 font-semibold hover:bg-teal-50"
-                      : "text-gray-700 hover:bg-gray-50"
+                        ? "bg-teal-50/70 text-teal-800 font-semibold hover:bg-teal-50"
+                        : "text-gray-700 hover:bg-gray-50"
                       }`}
                   >
                     <span className="truncate">{subcat.title}</span>

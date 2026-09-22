@@ -41,6 +41,7 @@ const Navbar = () => {
   const isBuyer = Boolean(effectiveUser && !effectiveUser.isSeller);
   const isSeller = Boolean(effectiveUser?.isSeller);
   const isBriefsRoute = Boolean(pathname && (pathname === "/briefs" || pathname.startsWith("/briefs/")));
+  const isMyBriefsRoute = Boolean(pathname && (pathname === "/briefs/my-briefs" || pathname.startsWith("/briefs/my-briefs/")));
 
   // Fetch real categories from backend
   const { categoryList: rawCats, parentCategories } = useAdminCategories();
@@ -246,6 +247,21 @@ const Navbar = () => {
     };
   }, [isSeller, showCategoryBar, pathname]);
 
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
   const handleLogout = async () => {
     try {
       await axiosFetch.post("/auth/logout");
@@ -262,17 +278,22 @@ const Navbar = () => {
   };
 
   return (
-    <nav
-      ref={navRef}
-      style={pathname === "/" && !showMenu ? { background: "#EDEDED", opacity: "0.96" } : undefined}
-      className={`w-full sticky top-0 z-50 transition-all duration-300 ${pathname === "/"
-        ? showMenu
-          ? "bg-white/75 backdrop-blur-md backdrop-saturate-150 border-b border-white/20 shadow-xs text-gray-800"
-          : "bg-[#EDEDED] border-b border-gray-200/40 text-gray-800"
-        : "bg-white/70 backdrop-blur-md border-b border-gray-100 shadow-sm text-gray-800"
-        }`}
-    >
-      <div className="w-full container mx-auto flex justify-between items-center px-4 sm:px-6 md:px-8 xl:px-10 py-3.5 sm:py-4 md:py-5">
+    <>
+      <nav
+        ref={navRef}
+        style={pathname === "/" && !showMenu && !isMobileMenuOpen ? { background: "#EDEDED", opacity: "0.96" } : undefined}
+        className={`w-full sticky top-0 z-50 transition-all duration-300 ${isMobileMenuOpen
+          ? pathname === "/" && !showMenu
+            ? "bg-[#EDEDED] border-b border-gray-200/40 text-gray-800"
+            : "bg-white border-b border-gray-100 shadow-sm text-gray-800"
+          : pathname === "/"
+            ? showMenu
+              ? "bg-white/75 backdrop-blur-md backdrop-saturate-150 border-b border-white/20 shadow-xs text-gray-800"
+              : "bg-[#EDEDED] border-b border-gray-200/40 text-gray-800"
+            : "bg-white/70 backdrop-blur-md border-b border-gray-100 shadow-sm text-gray-800"
+          }`}
+      >
+      <div className="w-full container mx-auto flex justify-between items-center px-4 sm:px-6 md:px-8 xl:px-10 py-3.5 sm:py-4 md:py-4 border-b border-white">
 
         {/* Left Section: Logo + Fluid Responsive Search Box */}
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-6 xl:gap-8 flex-1 min-w-0 mr-3 sm:mr-4 lg:mr-6">
@@ -451,13 +472,15 @@ const Navbar = () => {
                 iconClassName="text-[17px] xl:text-[19px]"
               />
 
-              <AiGradientButton
-                href="/briefs/create"
-                text="Post a Project with AI"
-                px="px-3 xl:px-4"
-                py="py-2"
-                className="h-[40px] rounded-[6px] text-[16px] font-semibold text-[#112131] shadow-none shrink-0 whitespace-nowrap"
-              />
+              {!isMyBriefsRoute && (
+                <AiGradientButton
+                  href="/briefs/create"
+                  text="Post a Project with AI"
+                  px="px-3 xl:px-4"
+                  py="py-2"
+                  className="h-[40px] rounded-[6px] text-[16px] font-semibold text-[#112131] shadow-none shrink-0 whitespace-nowrap"
+                />
+              )}
 
               <div className="relative profile-dropdown-container">
                 <div
@@ -622,21 +645,22 @@ const Navbar = () => {
 
       {/* Sticky Bottom Category Bar (Appears when scrolled past Featured section) */}
       {!isSeller && !isBriefsRoute && <CategoryBar visible={showCategoryBar} />}
+    </nav>
 
-      {/* Mobile Menu Sidebar Overlay */}
-      <div
-        className={`fixed inset-0 bg-black/50 z-[60] transition-all duration-300 lg:hidden ${isMobileMenuOpen ? "opacity-100 visible pointer-events-auto" : "opacity-0 invisible pointer-events-none"
-          }`}
-        onClick={() => setIsMobileMenuOpen(false)}
-      ></div>
+    {/* Mobile Menu Sidebar Overlay */}
+    <div
+      className={`fixed inset-0 bg-black/50 z-[60] transition-all duration-300 lg:hidden ${isMobileMenuOpen ? "opacity-100 visible pointer-events-auto" : "opacity-0 invisible pointer-events-none"
+        }`}
+      onClick={() => setIsMobileMenuOpen(false)}
+    ></div>
 
-      {/* Mobile Menu Sidebar */}
-      <div
-        className={`fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] shadow-2xl transform transition-all duration-300 ease-in-out lg:hidden flex flex-col ${isMobileMenuOpen
-          ? "translate-x-0 opacity-100 visible pointer-events-auto"
-          : "translate-x-full opacity-0 invisible pointer-events-none"
-          }`}
-      >
+    {/* Mobile Menu Sidebar */}
+    <div
+      className={`fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] shadow-2xl transform transition-all duration-300 ease-in-out lg:hidden flex flex-col ${isMobileMenuOpen
+        ? "translate-x-0 opacity-100 visible pointer-events-auto"
+        : "translate-x-full opacity-0 invisible pointer-events-none"
+        }`}
+    >
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <Image src="/Workvence-logo-Horizontal3.png" width={140} height={32} alt="Workvence" className="h-8 w-auto object-contain" style={{ width: "auto", height: "auto" }} />
           <Button
@@ -746,14 +770,16 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
-                  <div className="my-1">
-                    <AiGradientButton
-                      href="/briefs/create"
-                      text="Post a Project with AI"
-                      className="w-full h-11 rounded-[6px] text-[14px] font-medium"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    />
-                  </div>
+                  {!isMyBriefsRoute && (
+                    <div className="my-1">
+                      <AiGradientButton
+                        href="/briefs/create"
+                        text="Post a Project with AI"
+                        className="w-full h-11 rounded-[6px] text-[14px] font-medium"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      />
+                    </div>
+                  )}
                   <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a Seller</Link>
                 </>
               )}
@@ -773,8 +799,7 @@ const Navbar = () => {
           )}
         </div>
       </div>
-
-    </nav>
+    </>
   );
 };
 

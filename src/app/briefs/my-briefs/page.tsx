@@ -7,7 +7,6 @@ import Link from "next/link";
 import moment from "moment";
 import toast from "react-hot-toast";
 import {
-  FiHome,
   FiMoreVertical,
   FiPlus,
   FiEye,
@@ -16,11 +15,12 @@ import {
   FiArrowRight,
   FiSearch,
   FiX,
+  FiChevronDown,
 } from "react-icons/fi";
 
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader, Button } from "@/components";
+import { Loader, Button, AiGradientButton } from "@/components";
 
 const DEFAULT_AVATARS = [
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
@@ -267,19 +267,8 @@ const MyBriefs = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] py-6 sm:py-10 font-sans">
+    <div className="min-h-screen bg-[#F5F5F5] pt-6 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6">
-        {/* Top Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs font-medium mb-3">
-          <Link
-            href="/"
-            className="text-teal-600 hover:text-teal-700 transition-colors flex items-center gap-1"
-          >
-            <FiHome className="text-sm" />
-          </Link>
-          <span className="text-slate-300">/</span>
-          <span className="text-slate-600">Projects</span>
-        </div>
 
         {/* Title Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -292,28 +281,13 @@ const MyBriefs = () => {
             </p>
           </div>
           {!user?.isSeller && (
-            <Link
+            <AiGradientButton
               href="/briefs/create"
-              className="
-    inline-flex items-center justify-center
-    gap-2
-    px-3 sm:px-4.5
-    py-2 sm:py-2.5
-    rounded-[6px]
-    bg-[#0B0F19]
-    hover:bg-black
-    text-white
-    text-xs sm:text-sm
-    font-semibold
-    transition-colors
-    shadow-xs
-    shrink-0
-    self-start sm:self-center
-  "
-            >
-              <FiPlus className="text-sm" />
-              <span>Post New Project</span>
-            </Link>
+              text="Post a Project with AI"
+              px="px-3.5 sm:px-4.5"
+              py="py-2 sm:py-2.5"
+              className="h-[40px] rounded-[6px] text-xs sm:text-sm md:text-[15px] font-semibold text-[#112131] shadow-none shrink-0 whitespace-nowrap self-start sm:self-center"
+            />
           )}
         </div>
 
@@ -347,9 +321,7 @@ const MyBriefs = () => {
                   }`}
               >
                 <span className="inline-flex items-center gap-1.5 shrink-0 whitespace-nowrap">
-                  {counts.new_proposals > 0 && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0 inline-block" />
-                  )}
+
                   <span>New Proposals</span>
                 </span>
                 <span className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold shrink-0 whitespace-nowrap ${filter === "new_proposals" ? "bg-white/20 text-white" : "bg-emerald-50 text-emerald-700"
@@ -435,12 +407,13 @@ const MyBriefs = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="w-full sm:w-auto px-3 py-2 bg-white border border-slate-200 focus:border-[#0D6D5F] rounded-[6px] text-xs sm:text-[13px] text-slate-700 font-medium outline-none cursor-pointer shadow-2xs h-[38px]"
+                className="appearance-none w-full sm:w-auto pl-3 pr-8 py-2 bg-white border border-slate-200 focus:border-[#0D6D5F] rounded-[6px] text-xs sm:text-[13px] text-slate-700 font-medium outline-none cursor-pointer shadow-2xs h-[38px]"
               >
                 <option value="newest">Sort: Newest</option>
                 <option value="proposals">Sort: Most Proposals</option>
                 <option value="budget">Sort: Budget</option>
               </select>
+              <FiChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
             </div>
           </div>
         </div>
@@ -530,25 +503,9 @@ const MyBriefs = () => {
                         </h2>
                         <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-400 mt-1">
                           <span>Posted {moment(brief.createdAt).fromNow()}</span>
-                          <span>•</span>
                           <span>{workType}</span>
-                          {isNew && !isClosed && (
-                            <>
-                              <span>•</span>
-                              <span className="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                                New
-                              </span>
-                            </>
-                          )}
-                          {!isClosed && proposalCount > 0 && (
-                            <>
-                              <span>•</span>
-                              <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[11px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                {proposalCount} {proposalCount === 1 ? "New Proposal" : "New Proposals"}
-                              </span>
-                            </>
-                          )}
+
+
                           {isClosed && (
                             <>
                               <span>•</span>
@@ -737,19 +694,8 @@ const MyProposals = () => {
   const proposalsArray = Array.isArray(proposals) ? proposals : [];
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] py-6 sm:py-10 font-sans">
+    <div className="min-h-screen bg-[#F5F5F5] pt-6 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6">
-        {/* Top Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs font-medium mb-3">
-          <Link
-            href="/"
-            className="text-teal-600 hover:text-teal-700 transition-colors flex items-center gap-1"
-          >
-            <FiHome className="text-sm" />
-          </Link>
-          <span className="text-slate-300">/</span>
-          <span className="text-slate-600">Proposals</span>
-        </div>
 
         {/* Title Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">

@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { Home, CheckCircle2, Clock, Sparkles } from "lucide-react";
+import { CheckCircle2, Clock, Sparkles } from "lucide-react";
 import moment from "moment";
 import { KycVerificationForm, Loader } from "@/components";
 import { useUserStore } from "@/store/userStore";
@@ -54,16 +54,8 @@ export default function KycPage() {
     : moment().format("MMM D, YYYY");
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-7">
-        {/* 1. Breadcrumb */}
-        <div className="flex items-center gap-1.5 text-xs text-gray-400">
-          <Link href="/" className="hover:text-gray-600 flex items-center">
-            <Home className="w-3.5 h-3.5 text-[#0D6D5F]" />
-          </Link>
-          <span>/</span>
-          <span className="text-gray-500 font-medium">Verification</span>
-        </div>
 
         {/* 2. Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

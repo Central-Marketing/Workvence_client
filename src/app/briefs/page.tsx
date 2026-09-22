@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import moment from "moment";
 import {
-  FiHome,
   FiSliders,
   FiArrowRight,
   FiSearch,
@@ -217,20 +216,8 @@ function BriefsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] text-gray-800 pb-28 pt-5 sm:pt-7">
+    <div className="min-h-screen bg-[#F5F5F5] text-gray-800 pt-5 sm:pt-7 pb-[80px] min-[1400px]:pb-[100px]">
       <div className="container mx-auto">
-        {/* Top Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] text-gray-500 mb-3 select-none">
-          <Link
-            href="/"
-            className="text-[#327C73] hover:text-[#256059] transition-colors flex items-center gap-1"
-            title="Home"
-          >
-            <FiHome className="w-3.5 h-3.5 text-[#327C73]" />
-          </Link>
-          <span className="text-gray-300">/</span>
-          <span className="text-gray-600 font-normal">Projects</span>
-        </nav>
 
         {/* Main Title & Subtitle Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-7">

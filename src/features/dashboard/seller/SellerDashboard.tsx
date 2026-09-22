@@ -128,7 +128,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
     const displayUnreadMessages = unreadMessagesCount;
 
     return (
-      <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
+      <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
         <div className="container mx-auto px-4 md:px-6 space-y-7">
 
           {/* Top Hero Banner: Draft Package Notification */}
@@ -426,7 +426,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
   // 2. ONBOARDING SELLER DASHBOARD (Profile < 100% or packages == 0)
   // -------------------------------------------------------------
   return (
-    <div className="min-h-screen bg-[#F8F8F8] py-8 sm:py-10 font-sans">
+    <div className="min-h-screen bg-[#F8F8F8] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
 
         {/* 1. Header: Welcome & Profile Completion */}

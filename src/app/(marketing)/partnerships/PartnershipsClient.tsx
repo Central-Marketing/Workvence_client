@@ -204,7 +204,7 @@ export default function PartnershipsClient() {
       </section>
 
       {/* Ecosystem Section */}
-      <section className="py-16 bg-white border-y border-gray-100">
+      <section className="pt-16 pb-[80px] min-[1400px]:pb-[100px] bg-white border-t border-gray-100">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center max-w-xl mx-auto mb-10 space-y-2">
             <span className="text-xs font-bold text-[#327C73] uppercase tracking-wider">Integrated Ecosystem</span>

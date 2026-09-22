@@ -99,7 +99,7 @@ export default function PodcastPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-[#112131] font-sans pb-32">
+    <div className="min-h-screen bg-white text-[#112131] font-sans">
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-20 lg:py-28">
         <div className="container mx-auto px-4 md:px-6">
@@ -243,7 +243,7 @@ export default function PodcastPage() {
       </section>
 
       {/* Episode Archive List */}
-      <section className="py-12 bg-white">
+      <section className="pt-12 pb-[80px] min-[1400px]:pb-[100px] bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl space-y-6">
           <div className="flex items-center justify-between border-b border-gray-200 pb-4">
             <h3 className="text-2xl font-bold text-[#0f172a]">All Episodes</h3>

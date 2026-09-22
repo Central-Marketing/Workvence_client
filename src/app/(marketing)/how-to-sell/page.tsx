@@ -204,7 +204,7 @@ export default function HowToSellPage() {
       </section>
 
       {/* Seller FAQ */}
-      <section className="py-20 bg-[#f8fafc] border-t border-gray-100">
+      <section className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-[#f8fafc] border-t border-gray-100">
         <div className="container mx-auto px-4 md:px-6 max-w-3xl">
           <div className="text-center mb-12 space-y-2">
             <span className="text-xs font-bold text-[#327C73] uppercase tracking-wider">Questions & Answers</span>

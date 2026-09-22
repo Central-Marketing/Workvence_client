@@ -14,6 +14,7 @@ import {
   LeftFilterSidebar,
   Button,
 } from '@/components';
+import { Breadcrumb } from '@/components/ui';
 import { getCategoryTaxonomy, SubcategoryItem } from '@/data/categoryTaxonomy';
 import { STATIC_SUBCATEGORY_GIGS, getStaticSubcategoryGigs } from '@/data/staticSubcategoryGigs';
 import { useQuery } from "@tanstack/react-query";
@@ -51,11 +52,18 @@ const EmptyGigsState: React.FC<EmptyGigsStateProps> = ({
       {/* Coral-900 Empty State Banner */}
       <div className="w-full rounded-[6px] bg-[var(--coral-900,#683733)] py-16 sm:py-24 md:py-32 px-6 text-center flex flex-col items-center justify-center shadow-md mb-12">
         {/* Breadcrumb */}
-        <div className="flex items-center justify-center gap-2 text-white/60 text-xs sm:text-[13px] font-light mb-3 select-none">
-          <FiHome className="w-3.5 h-3.5 text-white/70" />
-          <span>/</span>
-          <span>{categoryName ? `${categoryName}` : "Search result"}</span>
-        </div>
+        {categoryName && (
+          <Breadcrumb
+            variant="coral"
+            className="mb-3 flex justify-center"
+            items={[
+              {
+                name: categoryName,
+                isLast: true,
+              },
+            ]}
+          />
+        )}
 
         {/* Main Heading */}
         <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-[54px] font-normal italic text-white tracking-tight leading-tight my-3 select-none">
@@ -731,7 +739,7 @@ const Packages = () => {
 
       {/* Main Content Area: Subcategory Hub, Subcategory Services, or General Gigs Listing */}
       {currentTaxonomy && activeCategory !== 'All services' && viewTab === 'hub' ? (
-        <div className="container mx-auto pb-16 animate-fadeIn">
+        <div className="container mx-auto pb-[80px] min-[1400px]:pb-[100px] animate-fadeIn">
           {/* Subcategory Grid - only rendered if category has subcategories */}
           {currentTaxonomy.subcategories && currentTaxonomy.subcategories.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
@@ -941,7 +949,7 @@ const Packages = () => {
 
                   {/* Pagination Controls */}
                   {displayPackages.length > 0 && (
-                    <div className="flex justify-center items-center gap-4 mt-12 mb-4">
+                    <div className="flex justify-center items-center gap-4 mt-12 mb-0">
                       <Button
                         type="button"
                         variant="outline"
@@ -980,66 +988,40 @@ const Packages = () => {
         </div>
       ) : (
         /* Main Content - Gigs Listing View */
-        <div className="container mx-auto py-8">
+        <div className="container mx-auto pt-8 pb-[80px] min-[1400px]:pb-[100px]">
           {/* Breadcrumb + Filter Button Row */}
           <div className="flex items-center justify-between mb-5">
             <div>
-              <p className="text-sm text-gray-500 flex items-center flex-wrap gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="xs"
-                  onClick={handleReset}
-                  leftIcon={<FiHome className="w-4 h-4 mr-0.5" />}
-                  className="text-teal-600 hover:text-teal-700 transition-colors p-0 h-auto hover:bg-transparent font-normal"
-                  title="All services"
+              {categoryAncestry && categoryAncestry.length > 0 ? (
+                <Breadcrumb
+                  className="mb-0"
+                  onHomeClick={handleReset}
+                  homeTitle="All services"
+                  items={categoryAncestry.map((crumb, idx) => ({
+                    name: crumb.name,
+                    isLast: idx === categoryAncestry.length - 1,
+                    onClick: () => handleCategoryClick(crumb.name || crumb.slug),
+                  }))}
                 >
-                  Home
-                </Button>
-                {categoryAncestry && categoryAncestry.length > 0 ? (
-                  categoryAncestry.map((crumb, idx) => {
-                    const isLast = idx === categoryAncestry.length - 1;
-                    return (
-                      <span key={idx} className="flex items-center gap-2">
-                        <span className="text-gray-300">/</span>
-                        {isLast ? (
-                          <span className="text-gray-800 font-medium">{crumb.name}</span>
-                        ) : (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="xs"
-                            onClick={() => handleCategoryClick(crumb.name || crumb.slug)}
-                            className="text-gray-600 hover:text-gray-900 hover:underline transition-colors p-0 h-auto hover:bg-transparent font-normal"
-                          >
-                            {crumb.name}
-                          </Button>
-                        )}
-                      </span>
-                    );
-                  })
-                ) : (
-                  <>
-                    <span className="text-gray-300">/</span>
-                    <span className="text-gray-800 font-medium">All services</span>
-                  </>
-                )}
-                {categoryAncestry.length > 0 && categoryAncestry[0].isRoot && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="xs"
-                    leftIcon={<FiArrowLeft className="w-3.5 h-3.5" />}
-                    onClick={() => {
-                      setViewTab('hub');
-                      syncUrlWithFilters({ category: categoryAncestry[0].name || categoryAncestry[0].slug, view: 'hub' });
-                    }}
-                    className="text-xs text-brand-green hover:underline font-semibold ml-2 p-0 h-auto hover:bg-transparent"
-                  >
-                    <span>Explore {categoryAncestry[0].name} Hub</span>
-                  </Button>
-                )}
-              </p>
+                  {categoryAncestry[0].isRoot && (
+                    <li className="inline-flex items-center ml-2">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="xs"
+                        leftIcon={<FiArrowLeft className="w-3.5 h-3.5" />}
+                        onClick={() => {
+                          setViewTab('hub');
+                          syncUrlWithFilters({ category: categoryAncestry[0].name || categoryAncestry[0].slug, view: 'hub' });
+                        }}
+                        className="text-xs text-brand-green hover:underline font-semibold p-0 h-auto hover:bg-transparent"
+                      >
+                        <span>Explore {categoryAncestry[0].name} Hub</span>
+                      </Button>
+                    </li>
+                  )}
+                </Breadcrumb>
+              ) : null}
             </div>
             <Button
               type="button"
@@ -1267,7 +1249,7 @@ const Packages = () => {
 
           {/* Pagination Controls */}
           {packagesList && packagesList.length > 0 && (
-            <div className="flex justify-center items-center gap-4 mt-12 mb-4">
+            <div className="flex justify-center items-center gap-4 mt-12 mb-0">
               <Button
                 type="button"
                 variant="outline"

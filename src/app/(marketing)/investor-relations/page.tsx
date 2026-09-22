@@ -224,7 +224,7 @@ export default function InvestorRelationsPage() {
       </section>
 
       {/* Investor FAQ & Contact Section */}
-      <section id="contact" className="py-20 bg-[#f8fafc] border-t border-gray-100">
+      <section id="contact" className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-[#f8fafc] border-t border-gray-100">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 

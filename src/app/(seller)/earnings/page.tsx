@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
 import { Loader, KycRequiredModal, PayoneerLogo, PayoneerIcon, Button } from "@/components";
+import { Breadcrumb } from "@/components/ui";
 import { FaStripe } from "react-icons/fa";
 import moment from "moment";
 import toast from "react-hot-toast";
@@ -434,21 +435,22 @@ const Earnings = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-7">
 
         {/* 1. Breadcrumb */}
-        <div className="flex items-center gap-1.5 text-xs text-gray-400">
-          <Link href="/" className="hover:text-gray-600 flex items-center">
-            <Home className="w-3.5 h-3.5 text-[#0D6D5F]" />
-          </Link>
-          <span>/</span>
-          <span className="text-gray-600 font-medium">Earnings</span>
-          <span>/</span>
-          <span className="text-gray-400 capitalize">
-            {activeTab === "payout" ? "Payout" : "Order Clearance"}
-          </span>
-        </div>
+        <Breadcrumb
+          items={[
+            {
+              name: "Earnings",
+              onClick: () => setActiveTab("payout"),
+            },
+            {
+              name: activeTab === "payout" ? "Payout" : "Order Clearance",
+              isLast: true,
+            },
+          ]}
+        />
 
         {/* 2. Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -628,8 +630,8 @@ const Earnings = () => {
             radius="fiverr"
             variant={activeTab === "payout" ? "brand" : "ghost"}
             className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 ${activeTab === "payout"
-                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+              ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+              : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
               }`}
           >
             Payout Request
@@ -641,8 +643,8 @@ const Earnings = () => {
             radius="fiverr"
             variant={activeTab === "clearance" ? "brand" : "ghost"}
             className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 ${activeTab === "clearance"
-                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+              ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+              : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
               }`}
           >
             Order Clearance
@@ -678,7 +680,7 @@ const Earnings = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="What are you looking for"
-                  className="w-full bg-white border border-gray-200 rounded-[6px] pl-9 pr-3.5 py-2 text-xs text-gray-800 placeholder-gray-400 outline-none focus:border-gray-400 transition-colors"
+                  className="w-full bg-white border border-gray-200 rounded-[6px] pl-9 pr-3.5 py-3 text-xs text-gray-800 placeholder-gray-400 outline-none focus:border-gray-400 transition-colors"
                 />
               </div>
 

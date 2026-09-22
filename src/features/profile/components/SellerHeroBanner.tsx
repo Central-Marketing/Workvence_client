@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { FiHome } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
+import { Breadcrumb } from "@/components/ui";
 import { SELLER_FALLBACK_IMAGES } from "../utils/sellerProfileNormalizer";
 
 interface SellerHeroBannerProps {
@@ -36,34 +37,25 @@ export const SellerHeroBanner: React.FC<SellerHeroBannerProps> = ({
   return (
     <div className="w-full mb-8">
       {/* 1. Breadcrumbs */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-[13px] text-gray-500 mb-4">
-        <Link
-          href="/"
-          className="text-teal-600 hover:text-teal-700 transition-colors flex items-center"
-          title="Home"
-        >
-          <FiHome className="w-4 h-4" />
-        </Link>
-        <span className="text-gray-300">/</span>
-        <Link
-          href={`/packages?category=${encodeURIComponent(categoryName.toLowerCase().replace(/&/g, "and").replace(/\s+/g, "-"))}`}
-          className="text-gray-600 hover:text-gray-900 transition-colors font-normal"
-        >
-          {categoryName}
-        </Link>
-        {subcategoryName && (
-          <>
-            <span className="text-gray-300">/</span>
-            <span className="text-gray-600 font-normal truncate">
-              {subcategoryName}
-            </span>
-          </>
-        )}
-        <span className="text-gray-300">/</span>
-        <span className="text-gray-900 font-medium truncate">
-          {name}
-        </span>
-      </nav>
+      <Breadcrumb
+        items={[
+          {
+            name: categoryName,
+            href: `/packages?category=${encodeURIComponent(categoryName.toLowerCase().replace(/&/g, "and").replace(/\s+/g, "-"))}`,
+          },
+          ...(subcategoryName
+            ? [
+                {
+                  name: subcategoryName,
+                },
+              ]
+            : []),
+          {
+            name,
+            isLast: true,
+          },
+        ]}
+      />
 
       {/* 2. Panoramic Hero Banner */}
       <div className="relative w-full h-[160px] sm:h-[190px] md:h-[220px] rounded-[6px]  overflow-hidden bg-gray-950 shadow-xs border border-gray-900/10">

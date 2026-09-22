@@ -20,7 +20,7 @@ import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
 import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
-import { Button } from "@/components/ui";
+import { Button, Breadcrumb } from "@/components/ui";
 
 const CATEGORIES = [
   "AI",
@@ -361,23 +361,22 @@ const CreateBrief = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-slate-800 pb-20 pt-6 sm:pt-8 font-sans">
+    <div className="min-h-screen bg-[#FAFAFA] text-slate-800 pt-6 sm:pt-8 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Top Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-6 select-none">
-          <Link
-            href="/"
-            className="text-[#327C73] hover:text-[#256059] transition-colors flex items-center gap-1"
-          >
-            <FiHome className="text-sm text-[#327C73]" />
-          </Link>
-          <span className="text-slate-300">/</span>
-          <Link href="/briefs" className="hover:text-slate-800 transition-colors">
-            Briefs
-          </Link>
-          <span className="text-slate-300">/</span>
-          <span className="text-slate-700 font-normal">Post a Job</span>
-        </div>
+        <Breadcrumb
+          className="mb-6 select-none"
+          items={[
+            {
+              name: "Briefs",
+              href: "/briefs",
+            },
+            {
+              name: "Post a Job",
+              isLast: true,
+            },
+          ]}
+        />
 
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">

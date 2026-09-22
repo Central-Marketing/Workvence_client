@@ -22,6 +22,7 @@ interface SellerPublicProfileProps {
 const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) => {
   const router = useRouter();
   const { user } = useUserStore((state: any) => state);
+  const isSeller = Boolean(user?.isSeller);
 
   const [isLoading, setIsLoading] = useState(true);
   const [rawUserData, setRawUserData] = useState<any>(null);
@@ -157,7 +158,7 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-gray-800 pb-28 pt-4 sm:pt-6">
+    <div className="min-h-screen bg-[#FAFAFA] text-gray-800 pt-4 sm:pt-6 pb-[80px] min-[1400px]:pb-[100px]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* 1. Panoramic Hero Banner & Overlapping Profile Header */}
         <SellerHeroBanner
@@ -177,7 +178,14 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
         {/* 2. Main Two-Column Grid: Left (About & Contact) + Right (Gigs Grid) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start mb-12">
           {/* Left Column (lg:col-span-4) */}
-          <div className="lg:col-span-4 lg:sticky lg:top-8 self-start">
+          <div
+            style={{
+              top: `calc(var(--navbar-height, ${isSeller ? "82px" : "136px"}) + 12px)`,
+            }}
+            className={`lg:col-span-4 sticky self-start z-20 transition-[top] duration-200 ${
+              isSeller ? "top-[74px] md:top-[94px]" : "top-[122px] md:top-[148px]"
+            }`}
+          >
             <SellerAboutSidebar
               name={profileData.name}
               memberSince={profileData.memberSince}

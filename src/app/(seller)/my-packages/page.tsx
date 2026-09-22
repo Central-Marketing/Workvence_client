@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Trash2, X } from "lucide-react";
-import { FiHome, FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader, Button } from "@/components";
@@ -74,7 +74,7 @@ const MyPackages = () => {
   const currentPackages = activeTab === "published" ? publishedPackages : draftPackages;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] py-8 sm:py-10 font-sans">
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       {isLoading ? (
         <div className="w-full flex justify-center items-center py-24">
           <Loader size={45} />
@@ -86,17 +86,6 @@ const MyPackages = () => {
       ) : (
         <div className="container mx-auto px-4 md:px-6 space-y-6">
 
-          {/* Breadcrumb Navigation */}
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <Link
-              href="/"
-              className="text-[#0D6D5F] hover:text-[#094d43] transition-colors flex items-center gap-1"
-            >
-              <FiHome className="text-sm" />
-            </Link>
-            <span>/</span>
-            <span className="text-gray-600 font-medium">Packages</span>
-          </div>
 
           {/* Page Heading & Create New Package Button */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

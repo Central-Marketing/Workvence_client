@@ -1,7 +1,5 @@
 import React from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Home } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Trust & Safety | Workvence",
@@ -81,27 +79,12 @@ export default function TrustSafetyPage() {
   return (
     <div className="min-h-screen bg-white text-[#171717] font-sans antialiased">
       {/* Page Container */}
-      <div className="w-full container mx-auto px-4 md:px-6 py-6 sm:py-8 md:py-10">
+      <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10 pb-0">
         {/* 1. Hero Banner Card */}
         <section
           aria-label="Trust and Safety Banner"
           className="w-full bg-[#22172A] rounded-[6px] py-16 sm:py-20 md:py-24 lg:py-28 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs"
         >
-          {/* Breadcrumb */}
-          <nav
-            aria-label="Breadcrumb"
-            className="inline-flex items-center gap-2.5 text-xs sm:text-[13px] text-[#C2A9D6]/80 tracking-wide mb-6 sm:mb-8"
-          >
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 hover:text-white transition-colors"
-              aria-label="Home"
-            >
-              <Home className="w-3.5 h-3.5 stroke-[1.8]" />
-            </Link>
-            <span className="text-[#C2A9D6]/40 text-xs select-none">/</span>
-            <span className="font-normal text-[#C2A9D6]">Trust &amp; Safety</span>
-          </nav>
 
           {/* Heading */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[68px] font-normal italic tracking-tight text-[#D8B4E2] leading-[1.12] sm:leading-[1.08] select-none">
@@ -112,7 +95,7 @@ export default function TrustSafetyPage() {
         </section>
 
         {/* 2. Feature Rows */}
-        <div className="mt-16 sm:mt-20 md:mt-24 lg:mt-28 space-y-16 sm:space-y-20 md:space-y-24 lg:space-y-28 pb-20 sm:pb-28 md:pb-36">
+        <div className="mt-16 sm:mt-20 md:mt-24 lg:mt-28 space-y-16 sm:space-y-20 md:space-y-24 lg:space-y-28 pb-[80px] min-[1400px]:pb-[100px]">
           {TRUST_SECTIONS.map((section) => (
             <section
               key={section.id}

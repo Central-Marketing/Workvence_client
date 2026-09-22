@@ -277,7 +277,7 @@ export default function CareersClient() {
       </section>
 
       {/* Open Roles Job Board */}
-      <section id="open-roles" className="py-20 lg:py-28 bg-white">
+      <section id="open-roles" className="pt-20 lg:pt-28 pb-[80px] min-[1400px]:pb-[100px] bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div className="space-y-2">

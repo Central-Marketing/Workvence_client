@@ -128,7 +128,7 @@ export default function BecomeASellerPage() {
       </section>
 
       {/* Earnings Estimator */}
-      <section id="calculator" className="py-20 bg-[#f8fafc] border-y border-gray-100">
+      <section id="calculator" className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-[#f8fafc] border-y border-gray-100">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl">
           <div className="bg-white border border-gray-200 rounded-3xl p-8 sm:p-12 shadow-sm space-y-8">
             <div className="text-center space-y-2">

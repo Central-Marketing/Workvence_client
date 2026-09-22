@@ -89,7 +89,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-8 sm:py-10 md:py-12">
+    <div className="min-h-screen bg-[#FAFAFA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px]">
       <div className="container mx-auto px-4 md:px-6 space-y-10 md:space-y-12">
 
         {/* Top Header Row */}
@@ -238,7 +238,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
 
           <div
             ref={popularScrollRef}
-            className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 overflow-x-auto scrollbar-none scroll-smooth pb-2"
+            className="flex sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 overflow-x-auto scrollbar-none scroll-smooth pb-0"
           >
             {popularList.map((pkg: any) => (
               <div key={pkg._id || pkg.id} className="min-w-[270px] sm:min-w-0 flex-1">

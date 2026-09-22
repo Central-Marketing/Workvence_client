@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import { Home, Search, X, MessageSquare, Ticket, LifeBuoy } from "lucide-react";
+import { Search, X, MessageSquare, Ticket, LifeBuoy } from "lucide-react";
 import { Button } from "@/components";
 
 interface HelpTopic {
@@ -117,27 +117,12 @@ export default function HelpCenterPage() {
   return (
     <div className="min-h-screen bg-white text-[#171717] font-sans antialiased">
       {/* Page Container */}
-      <div className="w-full container mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-12">
+      <div className="w-full container mx-auto px-4 sm:px-6 md:px-8 pt-6 sm:pt-8 md:pt-12 pb-[80px] min-[1400px]:pb-[100px]">
         {/* 1. Hero Section */}
         <section
           aria-label="Help Center Banner"
           className="w-full bg-[#152232] rounded-[20px] sm:rounded-[24px] py-14 sm:py-16 md:py-20 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs"
         >
-          {/* Breadcrumb */}
-          <nav
-            aria-label="Breadcrumb"
-            className="inline-flex items-center gap-2 text-xs sm:text-[13px] text-[#8DA4BE] tracking-wide mb-6 sm:mb-8"
-          >
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 hover:text-white transition-colors"
-              aria-label="Home"
-            >
-              <Home className="w-3.5 h-3.5 stroke-[1.8]" />
-            </Link>
-            <span className="text-[#8DA4BE]/40 text-xs select-none">/</span>
-            <span className="font-normal text-[#8DA4BE]">Help Center</span>
-          </nav>
 
           {/* Headline */}
           <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[64px] font-normal italic tracking-tight text-[#79B5E8] leading-[1.12] sm:leading-[1.08] select-none">

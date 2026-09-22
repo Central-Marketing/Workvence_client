@@ -124,7 +124,7 @@ export default function InfluencersPage() {
       </section>
 
       {/* Program Tiers Grid */}
-      <section id="tiers" className="py-20 bg-[#f8fafc]">
+      <section id="tiers" className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-[#f8fafc]">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
             <span className="text-xs font-bold uppercase tracking-widest text-[#327C73]">Creator Tiers</span>

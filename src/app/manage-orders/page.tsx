@@ -197,7 +197,7 @@ const ManageOrders = () => {
 
           {/* Page Heading */}
           <div>
-            <h1 className="text-[20px] font-bold text-slate-900">
+            <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
               Manage Orders
             </h1>
             <p className="text-xs sm:text-[13px] text-gray-500 mt-1.5 leading-relaxed">

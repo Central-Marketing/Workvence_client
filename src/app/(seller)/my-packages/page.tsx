@@ -90,7 +90,7 @@ const MyPackages = () => {
           {/* Page Heading & Create New Package Button */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-[32px] font-bold tracking-tight text-gray-950">
+              <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
                 My Packages
               </h1>
               <p className="text-xs sm:text-[13px] text-gray-500 mt-1.5 leading-relaxed max-w-2xl">
@@ -118,15 +118,15 @@ const MyPackages = () => {
               radius="fiverr"
               variant={activeTab === "published" ? "brand" : "ghost"}
               className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 ${activeTab === "published"
-                  ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                  : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                 }`}
             >
               <span>Published</span>
               <span
                 className={`text-[10px] px-2 py-0.5 rounded-full font-bold ml-1.5 ${activeTab === "published"
-                    ? "bg-white/20 text-white"
-                    : "bg-gray-200/80 text-gray-700"
+                  ? "bg-white/20 text-white"
+                  : "bg-gray-200/80 text-gray-700"
                   }`}
               >
                 {publishedPackages.length}
@@ -140,15 +140,15 @@ const MyPackages = () => {
               radius="fiverr"
               variant={activeTab === "draft" ? "brand" : "ghost"}
               className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 ${activeTab === "draft"
-                  ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                  : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                 }`}
             >
               <span>Draft</span>
               <span
                 className={`text-[10px] px-2 py-0.5 rounded-full font-bold ml-1.5 ${activeTab === "draft"
-                    ? "bg-white/20 text-white"
-                    : "bg-amber-100 text-amber-800"
+                  ? "bg-white/20 text-white"
+                  : "bg-amber-100 text-amber-800"
                   }`}
               >
                 {draftPackages.length}

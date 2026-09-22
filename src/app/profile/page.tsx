@@ -420,7 +420,7 @@ export default function ProfilePage() {
         {/* Page Title & Navigation Tabs */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-7">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
               Edit Profile Settings
             </h1>
             <p className="text-slate-500 text-xs sm:text-sm mt-1">

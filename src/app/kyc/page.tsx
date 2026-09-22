@@ -60,10 +60,10 @@ export default function KycPage() {
         {/* 2. Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-[32px] font-bold tracking-tight text-gray-950">
+            <h1 className="text-2xl sm:text-[28px] font-inter font-medium text-[#292929]">
               ID Verification
             </h1>
-            <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-2xl font-inter">
               Update your personal information, professional details, and portfolio.
             </p>
           </div>

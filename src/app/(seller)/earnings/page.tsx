@@ -455,17 +455,7 @@ const Earnings = () => {
         {/* 2. Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex flex-col gap-[10px]">
-            <h1 className="text-[28px]
-  sm:text-[30px]
-  md:text-[36px]
-  lg:text-[40px]
-  xl:text-[44px]
-  2xl:text-[48px]
-  font-normal
-  font-sf-pro
-  leading-none
-  tracking-normal
-  text-[#292929]">
+            <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
               My Earnings
             </h1>
             <p className="text-[14px]

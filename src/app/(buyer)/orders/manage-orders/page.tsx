@@ -253,7 +253,7 @@ export default function BuyerManageOrdersPage() {
 
         {/* Page Title & Subtitle */}
         <div className="mb-6">
-          <h1 className="text-3xl sm:text-[34px] font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl  font-normal font-inter text-[#292929]">
             Manage Orders
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1 font-normal">
@@ -278,8 +278,8 @@ export default function BuyerManageOrdersPage() {
                   size="sm"
                   radius="fiverr"
                   className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 whitespace-nowrap ${activeTab === tab
-                      ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                      : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                    ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                    : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                     }`}
                 >
                   {tab}

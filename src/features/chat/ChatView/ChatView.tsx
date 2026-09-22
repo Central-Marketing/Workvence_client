@@ -2269,7 +2269,7 @@ const ChatView = () => {
                                     if (targetOrderId) navigate.push(`/orders/${targetOrderId}`);
                                     else navigate.push('/orders');
                                   }}
-                                  className="h-12 font-semibold shadow-xs"
+                                  className="h-10 font-semibold shadow-xs"
                                 >
                                   View Order
                                 </Button>

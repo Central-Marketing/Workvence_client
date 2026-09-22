@@ -479,7 +479,7 @@ export default function BuyerManageOrdersPage() {
                 type="button"
                 onClick={() => setActiveNotesOrder(null)}
                 variant="dark"
-                size="sm"
+                size="md"
                 radius="fiverr"
               >
                 Close

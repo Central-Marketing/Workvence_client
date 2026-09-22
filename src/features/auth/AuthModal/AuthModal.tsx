@@ -422,7 +422,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     data-testid="modal-login-email-btn"
                     type="button"
                     variant="outline"
-                    size="lg"
+                    size="md"
                     fullWidth
                     radius="fiverr"
                     leftIcon={<MdOutlineEmail className="text-[20px] text-[#374151]" />}

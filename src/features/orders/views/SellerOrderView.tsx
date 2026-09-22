@@ -366,7 +366,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             </ol>
           </nav>
 
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <Button
               type="button"
               variant="soft"
@@ -379,7 +379,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
               Escrow Ledger
             </Button>
 
-          </div>
+          </div> */}
         </div>
 
         {/* Order Main Title */}
@@ -978,7 +978,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                 </div>
               </div>
 
-              <Button
+              {/* <Button
                 type="button"
                 variant="outline"
                 size="md"
@@ -989,7 +989,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                 className="mt-4"
               >
                 View Escrow Ledger
-              </Button>
+              </Button> */}
 
               {/* Delivery Duration & Dates */}
               <div className="pt-4 space-y-2 text-xs text-slate-600">

@@ -96,7 +96,7 @@ const OTPModal: React.FC<OTPModalProps> = ({
           <Button
             type="submit"
             variant="brand"
-            size="lg"
+            size="md"
             fullWidth
             radius="fiverr"
             disabled={isLoading || otp.length !== 6}

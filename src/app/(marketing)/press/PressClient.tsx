@@ -410,14 +410,14 @@ export default function PressClient() {
               <Button
                 type="button"
                 variant="soft"
-                size="xs"
+                size="md"
                 radius="xl"
                 leftIcon={<Share2 className="w-3.5 h-3.5" />}
                 onClick={() => {
                   navigator.clipboard?.writeText(window.location.href);
                   toast.success("Article link copied to clipboard!");
                 }}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 font-semibold text-gray-700"
+                className="bg-gray-100 hover:bg-gray-200 font-semibold text-gray-700"
               >
                 Share Release
               </Button>

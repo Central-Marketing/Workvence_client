@@ -248,7 +248,7 @@ export default function SuccessStoriesPage() {
               <Button
                 onClick={() => setSelectedStory(null)}
                 variant="soft"
-                size="sm"
+                size="md"
                 radius="xl"
                 className="font-semibold text-gray-700 px-6"
               >

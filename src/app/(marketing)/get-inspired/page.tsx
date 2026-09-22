@@ -362,7 +362,7 @@ export default function GetInspiredPage() {
 
                 <Link
                   href={selectedProject.packageUrl}
-                  className="w-full sm:w-auto px-7 py-3 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-6 h-[40px] rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-bold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>Order a Package from {selectedProject.creator.split(" ")[0]}</span>
                   <ArrowRight className="w-4 h-4" />

@@ -234,9 +234,9 @@ export default function GuidesPage() {
               <Button
                 onClick={() => toast.success("Downloading Guide Checklist PDF...")}
                 variant="brand"
-                size="sm"
+                size="md"
                 radius="xl"
-                leftIcon={<Download className="w-3.5 h-3.5" />}
+                leftIcon={<Download className="w-4 h-4" />}
                 className="font-semibold"
               >
                 Download Checklist PDF
@@ -244,7 +244,7 @@ export default function GuidesPage() {
               <Button
                 onClick={() => setSelectedGuide(null)}
                 variant="ghost"
-                size="sm"
+                size="md"
                 radius="xl"
                 className="text-xs font-semibold text-gray-500 hover:text-gray-800"
               >

@@ -585,6 +585,9 @@ const Navbar = () => {
                     <Link href="/manage-orders" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                       Orders
                     </Link>
+                    <Link href="/briefs/my-proposals" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
+                      My Proposals
+                    </Link>
                     <hr className="my-1 border-gray-100" />
                     <Link href="/my-packages" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                       My Packages
@@ -756,6 +759,7 @@ const Navbar = () => {
               {effectiveUser.isSeller ? (
                 <>
                   <Link href="/manage-orders" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Manage Orders</Link>
+                  <Link href="/briefs/my-proposals" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Proposals</Link>
                   <Link href="/my-packages" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">My Packages</Link>
                   <Link href="/organize" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Add New Package</Link>
                   <Link href="/earnings" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Earnings</Link>

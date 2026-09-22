@@ -524,12 +524,18 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           <p className="text-[#6B7280] text-xs sm:text-[13px] max-w-[480px] mx-auto leading-relaxed mb-6">
             Showcase your expertise, connect with the right clients, and turn your skills into meaningful opportunities on WorkVench.
           </p>
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-3 flex-wrap">
             <Link
               href="/briefs"
               className="px-5 py-2.5 rounded-lg bg-[#EFEFEF] hover:bg-[#E5E5E5] text-[#1F2937] text-xs sm:text-[13px] font-semibold transition-colors"
             >
               Explore Projects
+            </Link>
+            <Link
+              href="/briefs/my-proposals"
+              className="px-5 py-2.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0D6D5F] border border-teal-200 text-xs sm:text-[13px] font-semibold transition-colors"
+            >
+              My Proposals
             </Link>
             <Link
               href="/profile"

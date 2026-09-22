@@ -836,6 +836,14 @@ const MyProposals = () => {
 
 export default function MyBriefsPage() {
   const user = useUserStore((state) => state.user);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user?.isSeller) {
+      router.replace("/briefs/my-proposals");
+    }
+  }, [user?.isSeller, router]);
 
   return user?.isSeller ? <MyProposals /> : <MyBriefs />;
 }
+

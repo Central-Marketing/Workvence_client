@@ -137,6 +137,7 @@ export function handleAuthExpired(redirectPath?: string): void {
     "/organize",
     "/briefs/create",
     "/briefs/my-briefs",
+    "/briefs/my-proposals",
     "/earnings",
     "/my-packages",
     "/kyc",

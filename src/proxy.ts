@@ -48,6 +48,7 @@ const GENERAL_PROTECTED_ROUTES = [
   "/organize",
   "/briefs/create",
   "/briefs/my-briefs",
+  "/briefs/my-proposals",
   "/support",
 ];
 

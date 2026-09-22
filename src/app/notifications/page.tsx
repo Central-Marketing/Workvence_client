@@ -153,8 +153,10 @@ const NotificationsPage = () => {
       router.push(n.link);
     } else if (n.orderID) {
       router.push(`/orders/${n.orderID}`);
+    } else if (n.briefID) {
+      router.push(`/briefs/${n.briefID}`);
     } else if (n.proposalID) {
-      router.push(`/proposals/${n.proposalID}`);
+      router.push("/briefs/my-proposals");
     }
   };
 

@@ -2943,7 +2943,7 @@ const ChatView = () => {
                               toast.success('AI Profile Analysis: Verified user profile.');
                             }
                           }}
-                          className="w-full text-xs font-bold py-3 rounded-xl shadow-xs"
+                          className="w-full text-xs font-bold py-3 rounded-[6px] shadow-xs"
                           text="View Profile"
                           icon={
                             <svg

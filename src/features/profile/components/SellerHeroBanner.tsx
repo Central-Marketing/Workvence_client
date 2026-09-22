@@ -66,7 +66,7 @@ export const SellerHeroBanner: React.FC<SellerHeroBannerProps> = ({
       </nav>
 
       {/* 2. Panoramic Hero Banner */}
-      <div className="relative w-full h-[160px] sm:h-[190px] md:h-[220px] rounded-[10px]  overflow-hidden bg-gray-950 shadow-xs border border-gray-900/10">
+      <div className="relative w-full h-[160px] sm:h-[190px] md:h-[220px] rounded-[6px]  overflow-hidden bg-gray-950 shadow-xs border border-gray-900/10">
         <img
           src={banner || SELLER_FALLBACK_IMAGES.banner}
           alt={name}
@@ -98,12 +98,12 @@ export const SellerHeroBanner: React.FC<SellerHeroBannerProps> = ({
               {name}
             </h1>
             {isSeller && sellerLevel && (
-              <span className="bg-[#360083] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-[4px] tracking-wide">
+              <span className="bg-[#360083] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-[6px] tracking-wide">
                 {sellerLevel}
               </span>
             )}
             {isPro && (
-              <span className="bg-[#360083] text-white text-[10px] font-bold px-2 py-0.5 rounded-[4px] tracking-wide uppercase">
+              <span className="bg-[#360083] text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] tracking-wide uppercase">
                 Pro
               </span>
             )}

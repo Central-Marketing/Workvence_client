@@ -99,24 +99,27 @@ const TrustedBy = () => {
   ];
 
   return (
-    <section className="w-full bg-[#fafafa]">
-      <div className="w-full container mx-auto px-4 md:px-6">
-        <div className="w-full bg-white rounded-2xl border-r border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.02)] overflow-hidden">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
-            {trustFeatures.map((feature, index) => (
-              <div key={index} className="flex flex-col items-center text-center p-6 sm:p-8 lg:p-6 xl:p-10 2xl:p-[60px]">
-                <div className="w-[37.5px] h-[37.5px] flex items-center justify-center mb-4 sm:mb-5 2xl:mb-6 text-[#1E293B]">
-                  {feature.icon}
-                </div>
-                <h3 className="font-sf-pro font-bold text-[18px] sm:text-[20px] lg:text-[18px] xl:text-[21px] 2xl:text-[24px] text-[#434343] leading-normal mb-2 sm:mb-3 2xl:mb-4 text-center">
-                  {feature.title}
-                </h3>
-                <p className="font-inter font-normal text-[16px] text-[#868686] leading-normal text-center">
-                  {feature.description}
-                </p>
+    <section className="w-full bg-white border-y border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
+      <div className="w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
+          {trustFeatures.map((feature, index) => (
+            <div
+              key={index}
+              className={`flex flex-col items-center text-center p-6 sm:p-8 lg:p-6 xl:p-8 2xl:p-10 ${
+                index >= 2 ? 'sm:border-t sm:border-gray-100 lg:border-t-0' : ''
+              }`}
+            >
+              <div className="w-[37.5px] h-[37.5px] flex items-center justify-center mb-4 sm:mb-5 2xl:mb-6 text-[#1E293B]">
+                {feature.icon}
               </div>
-            ))}
-          </div>
+              <h3 className="font-sf-pro font-bold text-[18px] sm:text-[20px] lg:text-[18px] xl:text-[21px] 2xl:text-[24px] text-[#434343] leading-normal mb-2 sm:mb-3 2xl:mb-4 text-center">
+                {feature.title}
+              </h3>
+              <p className="font-inter font-normal text-[16px] text-[#868686] leading-normal text-center max-w-[320px]">
+                {feature.description}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>

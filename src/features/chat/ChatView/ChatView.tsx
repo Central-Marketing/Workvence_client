@@ -553,23 +553,10 @@ const ChatView = () => {
     };
   }, [user?._id, queryClient]);
 
-  // Fetch messages history for active conversation with dual endpoint fallbacks
+  // Fetch messages history for active conversation
   const { isLoading: msgsLoading, isError: msgsError, error: msgsQueryError, data: messages = [] } = useQuery({
     queryKey: ['messages', conversationID],
     queryFn: async () => {
-      const candidateIds = Array.from(
-        new Set(
-          [
-            activeConvRef.current?._id,
-            activeConvRef.current?.uuid,
-            activeConvRef.current?.conversationID,
-            conversationID,
-          ]
-            .filter(Boolean)
-            .map((id) => String(id).trim())
-        )
-      );
-
       const extractMessages = (data: any): any[] | null => {
         if (!data) return null;
         if (Array.isArray(data) && data.length > 0) return data;
@@ -580,36 +567,25 @@ const ChatView = () => {
         return null;
       };
 
-      for (const id of candidateIds) {
-        // 1. Try /conversations/:id/messages
-        try {
-          const { data } = await axiosFetch.get(`/conversations/${id}/messages`);
-          const extracted = extractMessages(data);
-          if (extracted) return extracted;
-        } catch {
-          // fallback to next route
-        }
+      const targetId = conversationID || activeConvRef.current?.uuid || activeConvRef.current?._id;
+      if (!targetId) return [];
 
-        // 2. Try /messages/:id
-        try {
-          const { data } = await axiosFetch.get(`/messages/${id}`);
-          const extracted = extractMessages(data);
-          if (extracted) return extracted;
-        } catch {
-          // fallback to next route
+      try {
+        const { data } = await axiosFetch.get(`/conversations/${targetId}/messages`);
+        return extractMessages(data) || [];
+      } catch (err: any) {
+        // Fallback to alternative ObjectId if available on the conversation model
+        const altId = activeConvRef.current?._id;
+        if (altId && String(altId) !== String(targetId)) {
+          try {
+            const { data } = await axiosFetch.get(`/conversations/${altId}/messages`);
+            return extractMessages(data) || [];
+          } catch {
+            // End of attempts
+          }
         }
-
-        // 3. Try /messages/history/:id
-        try {
-          const { data } = await axiosFetch.get(`/messages/history/${id}`);
-          const extracted = extractMessages(data);
-          if (extracted) return extracted;
-        } catch {
-          // fallback
-        }
+        return [];
       }
-
-      return [];
     },
     enabled: isValidId,
     retry: false,

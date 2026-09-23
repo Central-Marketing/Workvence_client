@@ -17,6 +17,7 @@ import CategoryBar from "../CategoryBar/CategoryBar";
 
 const Navbar = () => {
   const navRef = useRef<HTMLElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showCategoryBar, setShowCategoryBar] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
@@ -31,7 +32,7 @@ const Navbar = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
-  const { items, isOpen, setIsOpen, isLoading: isSuggestionsLoading } = useSearchSuggestions(searchQuery, { limit: 8 });
+  const { items, isOpen, setIsOpen, isLoading: isSuggestionsLoading, close: closeSuggestions } = useSearchSuggestions(searchQuery, { limit: 8 });
 
   useEffect(() => {
     setIsMounted(true);
@@ -62,9 +63,10 @@ const Navbar = () => {
 
   const handleSelectSuggestion = (item: SuggestionItem | { text: string; type: 'query' }) => {
     const text = item.text.trim();
+    closeSuggestions();
     setSearchQuery(text);
-    setIsOpen(false);
     setSelectedIndex(-1);
+    searchInputRef.current?.blur();
     if (item.type === 'category') {
       router.push(`/packages?category=${encodeURIComponent((item as SuggestionItem).slug || text)}`);
     } else {
@@ -91,8 +93,9 @@ const Navbar = () => {
     }
 
     if (e.key === "Escape") {
-      setIsOpen(false);
+      closeSuggestions();
       setSelectedIndex(-1);
+      searchInputRef.current?.blur();
       return;
     }
 
@@ -106,7 +109,9 @@ const Navbar = () => {
         return;
       }
       if (searchQuery.trim()) {
-        setIsOpen(false);
+        closeSuggestions();
+        setSelectedIndex(-1);
+        searchInputRef.current?.blur();
         router.push(`/packages?search=${encodeURIComponent(searchQuery.trim())}`);
       }
     }
@@ -204,7 +209,7 @@ const Navbar = () => {
         setIsCategoryDropdownOpen(false);
       }
       if (!e.target.closest('.search-container')) {
-        setIsOpen(false);
+        closeSuggestions();
         setSelectedIndex(-1);
       }
     };
@@ -216,7 +221,15 @@ const Navbar = () => {
       window.removeEventListener("resize", isActive);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [pathname, user]);
+  }, [pathname, user, closeSuggestions]);
+
+  // Cleanly close all dropdowns when navigating between pages
+  useEffect(() => {
+    closeSuggestions();
+    setIsProfileDropdownOpen(false);
+    setIsCategoryDropdownOpen(false);
+    setIsMobileMenuOpen(false);
+  }, [pathname, closeSuggestions]);
 
   // Keep --navbar-height CSS variable on :root dynamically synced across all devices and roles
   useEffect(() => {
@@ -314,12 +327,15 @@ const Navbar = () => {
                   className="text-gray-400 text-base sm:text-lg mr-2 sm:mr-2.5 group-focus-within:text-brand-green transition-colors shrink-0 cursor-pointer"
                   onClick={() => {
                     if (searchQuery.trim()) {
-                      setIsOpen(false);
+                      closeSuggestions();
+                      setSelectedIndex(-1);
+                      searchInputRef.current?.blur();
                       router.push(`/packages?search=${encodeURIComponent(searchQuery.trim())}`);
                     }
                   }}
                 />
                 <input
+                  ref={searchInputRef}
                   type="text"
                   placeholder="What you are looking for"
                   className="bg-transparent border-none outline-none w-full text-xs sm:text-[13px] xl:text-[14px] font-medium text-gray-800 placeholder-gray-400 min-w-0 truncate"

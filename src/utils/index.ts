@@ -7,3 +7,4 @@ export { default as socket } from './socket';
 export { default as getAvatarUrl } from './avatar';
 export { default as getOrderStatusInfo } from './orderStatus';
 export * from './tokenRefresh';
+export * from './revision';

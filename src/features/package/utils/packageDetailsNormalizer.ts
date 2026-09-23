@@ -253,6 +253,10 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
 
   const formatRevisions = (val: any) => {
     if (val === undefined || val === null || val === "" || val === 0 || val === "0") return "";
+    const parsed = parseInt(String(val), 10);
+    if (!isNaN(parsed)) {
+      return parsed === 1 ? "1 Revision" : `${parsed} Revisions`;
+    }
     return `${val} Revisions`;
   };
 

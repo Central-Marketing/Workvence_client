@@ -510,7 +510,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
         )}
 
         {/* 2. Card 1: Ready to Grow Your Business? */}
-        <div className="bg-white rounded-[18px] sm:rounded-[22px] border border-[#EBECEF] p-8 sm:py-12 sm:px-12 flex flex-col items-center justify-center text-center shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+        <div className="bg-white rounded-[6px] border border-[#EBECEF] p-8 sm:py-12 sm:px-12 flex flex-col items-center justify-center text-center shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
           <div className="w-[140px] sm:w-[165px] h-auto mb-3.5 flex items-center justify-center">
             <img
               src="/images/dashboard/seller_grow_exact.png"
@@ -617,7 +617,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
               Packages
             </h2>
 
-            <div className="bg-white rounded-[18px] sm:rounded-[22px] border border-[#EBECEF] p-8 sm:py-14 sm:px-12 flex flex-col items-center justify-center text-center shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+            <div className="bg-white rounded-[6px] border border-[#EBECEF] p-8 sm:py-14 sm:px-12 flex flex-col items-center justify-center text-center shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
               <div className="w-[160px] sm:w-[195px] h-auto mb-4 flex items-center justify-center">
                 <img
                   src="/images/dashboard/seller_skills_exact.png"

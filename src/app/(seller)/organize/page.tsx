@@ -562,8 +562,8 @@ const OrganizePage = () => {
 
     form.revisionNumber = form.packages?.basic?.revisionNumber ?? 1;
 
-    if (form.title && form.title.trim().length > 60) {
-      toast.error("Package title must not exceed 60 characters");
+    if (form.title && form.title.trim().length > 80) {
+      toast.error("Package title must not exceed 80 characters");
       return;
     }
 
@@ -723,12 +723,12 @@ const OrganizePage = () => {
                 </label>
                 <span
                   className={`text-[11px] font-medium transition-colors ${
-                    (state.title?.length || 0) > 60
+                    (state.title?.length || 0) > 80
                       ? "text-red-500 font-semibold"
                       : "text-gray-400"
                   }`}
                 >
-                  {state.title?.length || 0}/60
+                  {state.title?.length || 0}/80
                 </span>
               </div>
               <input
@@ -738,14 +738,14 @@ const OrganizePage = () => {
                 onChange={handleInputChange}
                 placeholder="e.g I will do something i am really good at"
                 className={`w-full bg-[#F4F5F7] border rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all ${
-                  (state.title?.length || 0) > 60
+                  (state.title?.length || 0) > 80
                     ? "border-red-400 focus:border-red-500 bg-red-50/10"
                     : "border-transparent focus:border-gray-300 focus:bg-white"
                 }`}
               />
-              {(state.title?.length || 0) > 60 && (
+              {(state.title?.length || 0) > 80 && (
                 <p className="text-[11px] text-red-500 font-medium">
-                  Package title cannot exceed 60 characters
+                  Package title cannot exceed 80 characters
                 </p>
               )}
             </div>
@@ -1062,12 +1062,12 @@ const OrganizePage = () => {
                 </label>
                 <span
                   className={`text-[11px] font-medium transition-colors ${
-                    (currentTierData.title?.length || 0) > 60
+                    (currentTierData.title?.length || 0) > 80
                       ? "text-red-500 font-semibold"
                       : "text-gray-400"
                   }`}
                 >
-                  {currentTierData.title?.length || 0}/60
+                  {currentTierData.title?.length || 0}/80
                 </span>
               </div>
               <input
@@ -1076,14 +1076,14 @@ const OrganizePage = () => {
                 onChange={(e) => handleTierInputChange("title", e.target.value)}
                 placeholder="e.g I will do something i am really good at"
                 className={`w-full bg-[#F4F5F7] border rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all ${
-                  (currentTierData.title?.length || 0) > 60
+                  (currentTierData.title?.length || 0) > 80
                     ? "border-red-400 focus:border-red-500 bg-red-50/10"
                     : "border-transparent focus:border-gray-300 focus:bg-white"
                 }`}
               />
-              {(currentTierData.title?.length || 0) > 60 && (
+              {(currentTierData.title?.length || 0) > 80 && (
                 <p className="text-[11px] text-red-500 font-medium">
-                  Package title cannot exceed 60 characters
+                  Package title cannot exceed 80 characters
                 </p>
               )}
             </div>

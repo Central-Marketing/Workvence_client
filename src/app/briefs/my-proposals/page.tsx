@@ -367,8 +367,8 @@ export default function MyProposalsPage() {
 
                       {/* Cover Letter Excerpt */}
                       {proposal.coverLetter && (
-                        <p className="text-xs sm:text-[13px] text-gray-600 line-clamp-3 leading-relaxed mb-4 bg-gray-50/60 p-3 rounded-[6px] border border-gray-100 font-normal">
-                          {proposal.coverLetter}
+                        <p className="text-xs sm:text-[13px] text-[#4A4A4A] my-6 line-clamp-3 leading-relaxed mb-4 font-normal">
+                          {proposal.coverLetter.slice(0, 100) + "..."}
                         </p>
                       )}
 
@@ -471,7 +471,7 @@ export default function MyProposalsPage() {
           </div>
 
           {/* Drawer Body Content */}
-          <div className="p-6 flex flex-col gap-5 overflow-y-auto flex-1 text-xs sm:text-[13px]">
+          <div className="p-6 flex flex-col gap-5 overflow-y-auto scrollbar-hide flex-1 text-xs sm:text-[13px]">
             {/* Price & Delivery Highlights */}
             <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-[6px] border border-gray-100">
               <div>

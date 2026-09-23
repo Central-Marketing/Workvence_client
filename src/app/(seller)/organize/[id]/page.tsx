@@ -853,8 +853,8 @@ const EditPackagePage = () => {
       delete payload[prop];
     });
 
-    if (payload.title && payload.title.trim().length > 60) {
-      toast.error("Package title must not exceed 60 characters");
+    if (payload.title && payload.title.trim().length > 80) {
+      toast.error("Package title must not exceed 80 characters");
       return;
     }
 
@@ -1069,12 +1069,12 @@ const EditPackagePage = () => {
                 </label>
                 <span
                   className={`text-[11px] font-medium transition-colors ${
-                    (state.title?.length || 0) > 60
+                    (state.title?.length || 0) > 80
                       ? "text-red-500 font-semibold"
                       : "text-gray-400"
                   }`}
                 >
-                  {state.title?.length || 0}/60
+                  {state.title?.length || 0}/80
                 </span>
               </div>
               <input
@@ -1084,14 +1084,14 @@ const EditPackagePage = () => {
                 onChange={handleInputChange}
                 placeholder="e.g I will do something i am really good at"
                 className={`w-full bg-[#F4F5F7] border rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all ${
-                  (state.title?.length || 0) > 60
+                  (state.title?.length || 0) > 80
                     ? "border-red-400 focus:border-red-500 bg-red-50/10"
                     : "border-transparent focus:border-gray-300 focus:bg-white"
                 }`}
               />
-              {(state.title?.length || 0) > 60 && (
+              {(state.title?.length || 0) > 80 && (
                 <p className="text-[11px] text-red-500 font-medium">
-                  Package title cannot exceed 60 characters
+                  Package title cannot exceed 80 characters
                 </p>
               )}
             </div>
@@ -1413,7 +1413,7 @@ const EditPackagePage = () => {
                   activeTier === "basic"
                     ? currentTierData.title || state.title || currentTierData.shortTitle || ""
                     : currentTierData.title || "";
-                const isExceeded = currentTierTitle.length > 60;
+                const isExceeded = currentTierTitle.length > 80;
                 return (
                   <>
                     <div className="flex items-center justify-between">
@@ -1427,7 +1427,7 @@ const EditPackagePage = () => {
                             : "text-gray-400"
                         }`}
                       >
-                        {currentTierTitle.length}/60
+                        {currentTierTitle.length}/80
                       </span>
                     </div>
                     <input
@@ -1443,7 +1443,7 @@ const EditPackagePage = () => {
                     />
                     {isExceeded && (
                       <p className="text-[11px] text-red-500 font-medium">
-                        Package title cannot exceed 60 characters
+                        Package title cannot exceed 80 characters
                       </p>
                     )}
                   </>

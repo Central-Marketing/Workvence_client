@@ -2926,7 +2926,7 @@ const ChatView = () => {
                 </div>
 
                 {/* Top Segmented Controls: Profile | Media */}
-                <div className="bg-[#f0f2f5] p-1 rounded-[6px] flex items-center border border-slate-200/70 shadow-xs">
+                <div className="sticky top-0 z-10 bg-[#f0f2f5] p-1 rounded-[6px] flex items-center border border-slate-200/70 shadow-xs">
                   <Button
                     type="button"
                     variant={contactSidebarTab === 'profile' ? 'dark' : 'ghost'}

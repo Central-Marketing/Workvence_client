@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -10,9 +10,26 @@ import { Loader, Button } from "@/components";
 import { Breadcrumb } from "@/components/ui";
 import { FiHome, FiCalendar, FiSearch } from "react-icons/fi";
 
+const getOrderDeadlineTime = (item: any): number | null => {
+  const deadlineStr = item.deadline || item.raw?.deadline;
+  if (deadlineStr) {
+    const parsed = new Date(deadlineStr).getTime();
+    if (!isNaN(parsed)) return parsed;
+  }
+  const createdAtStr = item.createdAt || item.raw?.createdAt;
+  const deliveryDays = Number(item.deliveryTime ?? item.raw?.deliveryTime);
+  if (createdAtStr && !isNaN(deliveryDays) && deliveryDays > 0) {
+    const created = new Date(createdAtStr).getTime();
+    if (!isNaN(created)) {
+      return created + deliveryDays * 86400000;
+    }
+  }
+  return null;
+};
 
 
-type FilterTab = "priority" | "active" | "late" | "delivered" | "completed" | "cancelled" | "starred";
+
+type FilterTab = "priority" | "active" | "late" | "delivered" | "completed" | "cancelled";
 
 const ManageOrders = () => {
   const router = useRouter();
@@ -117,7 +134,11 @@ const ManageOrders = () => {
   const tabFilteredOrders = ordersList.filter((item: any) => {
     const isCompleted = item.status === "completed" || item.isCompleted === true;
     const st = (item.status || "inprogress").toLowerCase();
-    if (activeTab === "priority") return true;
+    if (activeTab === "priority") {
+      if (isCompleted) return false;
+      if (st === "cancelled" || st === "failed") return false;
+      return true;
+    }
     if (activeTab === "active") {
       if (isCompleted) return false;
       if (st === "cancelled" || st === "failed") return false;
@@ -138,12 +159,11 @@ const ManageOrders = () => {
     if (activeTab === "delivered") return st === "delivered";
     if (activeTab === "completed") return isCompleted;
     if (activeTab === "cancelled") return st === "cancelled" || st === "failed";
-    if (activeTab === "starred") return Boolean(item.starred);
     return true;
   });
 
   // Filter orders by search query
-  const displayedOrders = tabFilteredOrders.filter((item: any) => {
+  const filteredOrders = tabFilteredOrders.filter((item: any) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     const buyerName = item.buyer?.name || item.buyerID?.username || item.buyerID?.name || "";
@@ -158,6 +178,28 @@ const ManageOrders = () => {
     );
   });
 
+  // Sort orders based on active tab:
+  // "priority" tab sorts by deadline ascending (closest/earliest deadline first)
+  const displayedOrders = useMemo(() => {
+    if (activeTab === "priority") {
+      return [...filteredOrders].sort((a: any, b: any) => {
+        const timeA = getOrderDeadlineTime(a);
+        const timeB = getOrderDeadlineTime(b);
+
+        const validA = timeA !== null && !isNaN(timeA);
+        const validB = timeB !== null && !isNaN(timeB);
+
+        if (validA && validB) {
+          return (timeA as number) - (timeB as number);
+        }
+        if (validA && !validB) return -1;
+        if (!validA && validB) return 1;
+        return 0;
+      });
+    }
+    return filteredOrders;
+  }, [filteredOrders, activeTab]);
+
   const tabs: { id: FilterTab; label: string }[] = [
     { id: "priority", label: "Priority" },
     { id: "active", label: "Active" },
@@ -165,7 +207,6 @@ const ManageOrders = () => {
     { id: "delivered", label: "Delivered" },
     { id: "completed", label: "Completed" },
     { id: "cancelled", label: "Cancelled" },
-    { id: "starred", label: "Starred" },
   ];
 
   return (

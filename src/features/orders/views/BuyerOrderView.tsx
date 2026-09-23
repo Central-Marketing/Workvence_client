@@ -783,7 +783,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                   <span className="font-semibold text-slate-900">{order.startedOn}</span>
                 </div>
                 <div className="flex justify-between text-slate-600">
-                  <span>Expected Delivery</span>
+                  <span>Deadline</span>
                   <span className="font-semibold text-slate-900">{order.deliveryTime}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-slate-100 text-sm font-bold text-slate-900">

@@ -1,7 +1,7 @@
 "use client";
 
 import toast from 'react-hot-toast';
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Flag, ArrowRight, Download, Eye } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -29,7 +29,7 @@ import {
 } from "react-icons/ri";
 
 import axios from 'axios';
-import { axiosFetch, socket, getAvatarUrl } from "@/utils";
+import { axiosFetch, socket, getAvatarUrl, parseRevisionNumber } from "@/utils";
 import supportService from "@/utils/supportService";
 import { getOtherUser, isConversationUnread, isTargetConversation, renderMessageTextWithLinks } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
@@ -372,7 +372,7 @@ const ChatView = () => {
   const [offerDesc, setOfferDesc] = useState("");
   const [offerPrice, setOfferPrice] = useState("");
   const [offerDelivery, setOfferDelivery] = useState("");
-  const [offerRevisions, setOfferRevisions] = useState("0 revision");
+  const [offerRevisions, setOfferRevisions] = useState<number | string>(0);
   const [messageText, setMessageText] = useState("");
   const [isRecipientTyping, setIsRecipientTyping] = useState(false);
   const [partnerUsername, setPartnerUsername] = useState("");
@@ -389,6 +389,10 @@ const ChatView = () => {
   const isTypingRef = useRef(false);
   const isSendingRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const isNearBottomRef = useRef(true);
+  const prevMessageCountRef = useRef(0);
+  const lastConversationIdRef = useRef<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -463,10 +467,30 @@ const ChatView = () => {
     }
   };
 
-  // Auto-scroll on new messages
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  });
+  // Scroll management: direct container scroll with fallback to element scrollIntoView
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    if (messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      if (behavior === 'auto') {
+        container.scrollTop = container.scrollHeight;
+      } else {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
+    } else if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior, block: 'end' });
+    }
+  }, []);
+
+  const handleMessagesScroll = useCallback(() => {
+    if (!messagesContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+    // User is considered near bottom if within 150px
+    const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
+    isNearBottomRef.current = distanceFromBottom <= 150;
+  }, []);
 
   // Fetch all conversations
   const { isLoading: convsLoading, data: conversations = [] } = useQuery({
@@ -1116,7 +1140,7 @@ const ChatView = () => {
       price: Number(offerPrice),
       desc: offerDesc,
       delivery: Number(offerDelivery),
-      revisions: offerRevisions?.trim() ? offerRevisions : "0 revision",
+      revisions: parseRevisionNumber(offerRevisions, 0),
       sellerID: user._id
     };
     if (selectedPackageId) {
@@ -1197,7 +1221,7 @@ const ChatView = () => {
       socket.emit("sendMessage", msgPayload);
     }
 
-    setSelectedPackageId(""); setSelectedBriefId(""); setOfferDesc(""); setOfferPrice(""); setOfferDelivery(""); setOfferRevisions("0 revision");
+    setSelectedPackageId(""); setSelectedBriefId(""); setOfferDesc(""); setOfferPrice(""); setOfferDelivery(""); setOfferRevisions(0);
     setShowOfferModal(false);
     toast.success("Custom offer sent!");
   };
@@ -1531,6 +1555,70 @@ const ChatView = () => {
       const text = (msg.description || msg.desc || msg.text || msg.message || '').toLowerCase();
       return text.includes(msgSearchQuery.toLowerCase());
     });
+
+  // Auto-scroll on initial load, conversation switch, or new messages
+  useEffect(() => {
+    if (!isValidId) return;
+
+    const isNewConv = lastConversationIdRef.current !== conversationID;
+    if (isNewConv) {
+      lastConversationIdRef.current = conversationID;
+      isNearBottomRef.current = true;
+    }
+
+    if (!msgsLoading && filteredMessages.length > 0) {
+      if (isNewConv) {
+        // Instant jump to bottom when switching conversation or initial load
+        scrollToBottom('auto');
+        requestAnimationFrame(() => scrollToBottom('auto'));
+        const timer = setTimeout(() => scrollToBottom('auto'), 100);
+        return () => clearTimeout(timer);
+      } else {
+        const prevCount = prevMessageCountRef.current;
+        const newCount = filteredMessages.length;
+        if (newCount > prevCount) {
+          const lastMsg = filteredMessages[filteredMessages.length - 1];
+          const senderId = String(
+            (typeof lastMsg?.sender === 'object' && (lastMsg.sender?._id || lastMsg.sender?.id)) ||
+            (typeof lastMsg?.user === 'object' && (lastMsg.user?._id || lastMsg.user?.id)) ||
+            (typeof lastMsg?.userID === 'object' && (lastMsg.userID?._id || lastMsg.userID?.id)) ||
+            lastMsg?.sender || lastMsg?.user || lastMsg?.userID || ''
+          );
+          const isOwnMessage = Boolean(user?._id && String(user._id) === senderId);
+
+          if (isOwnMessage || isNearBottomRef.current) {
+            scrollToBottom('smooth');
+            requestAnimationFrame(() => scrollToBottom('smooth'));
+          }
+        }
+      }
+    }
+    prevMessageCountRef.current = filteredMessages.length;
+  }, [conversationID, isValidId, msgsLoading, filteredMessages, scrollToBottom, user?._id]);
+
+  // Handle dynamic height changes (images, attachments, custom proposals loading asynchronously)
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    let prevHeight = container.scrollHeight;
+
+    const ro = new ResizeObserver(() => {
+      if (!messagesContainerRef.current) return;
+      const currentHeight = messagesContainerRef.current.scrollHeight;
+      if (currentHeight !== prevHeight) {
+        prevHeight = currentHeight;
+        if (isNearBottomRef.current) {
+          messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
+      }
+    });
+
+    Array.from(container.children).forEach((child) => ro.observe(child));
+    ro.observe(container);
+
+    return () => ro.disconnect();
+  }, [filteredMessages.length, msgsLoading]);
 
   const renderMessageAttachment = (msg: any) => {
     return <ChatMessageAttachmentItem msg={msg} onImagePreview={(url: string) => setLightboxImage(url)} />;
@@ -2058,7 +2146,11 @@ const ChatView = () => {
                 )}
               </div>
               {/* Messages */}
-              <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 flex flex-col gap-4 bg-[#F0F0F0] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full">
+              <div
+                ref={messagesContainerRef}
+                onScroll={handleMessagesScroll}
+                className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 flex flex-col gap-4 bg-[#F0F0F0] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full"
+              >
                 {msgsError ? (
                   <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-red-50/50 dark:bg-red-950/20 m-6 rounded-[6px] border border-red-200 dark:border-red-900/50 shadow-sm">
                     <div className="w-16 h-16 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center text-3xl mb-4 font-bold">🚫</div>
@@ -2238,7 +2330,11 @@ const ChatView = () => {
                                     <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
                                     <path d="M21 21v-5h-5" />
                                   </svg>
-                                  <span>{offer.revision || offer.revisions || "0 revision"}</span>
+                                  <span>
+                                    {parseRevisionNumber(offer.revision ?? offer.revisions, 0) === 1
+                                      ? "1 Revision"
+                                      : `${parseRevisionNumber(offer.revision ?? offer.revisions, 0)} Revisions`}
+                                  </span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#292929" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -2468,11 +2564,11 @@ const ChatView = () => {
                     💬 {partnerUsername || recipientUser?.username || 'User'} is typing...
                   </div>
                 )}
-                <div ref={messagesEndRef} />
+                <div ref={messagesEndRef} className="h-3 shrink-0" aria-hidden="true" />
               </div>
 
               {/* Compose Area */}
-              <div className="p-4 sm:px-5 sm:py-4 bg-[#f0f0f0] relative max-md:p-3">
+              <div className="p-4 sm:px-5 sm:py-4 bg-[#f0f0f0] relative max-md:p-3 shrink-0">
                 {attachment && (
                   <div className="flex items-center gap-3 mb-3 p-2.5 bg-slate-50 dark:bg-slate-900 rounded-[6px] border border-slate-200 shadow-sm max-w-sm">
                     {attachment.type?.includes('image') || /\.(png|jpe?g|gif|webp|svg)/i.test(attachment.name) || attachment.url?.includes('/image/upload/') ? (
@@ -3169,8 +3265,10 @@ const ChatView = () => {
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-bold text-slate-600">Revisions</label>
                   <input
-                    type="text"
-                    placeholder="0 revision"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="0"
                     value={offerRevisions}
                     onChange={e => setOfferRevisions(e.target.value)}
                     className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
@@ -3309,7 +3407,11 @@ const ChatView = () => {
               </div>
               <div className="text-center">
                 <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Revisions</span>
-                <span className="text-base font-bold text-slate-800">{viewingOfferDetails.offer?.revision || viewingOfferDetails.offer?.revisions || "0 revision"}</span>
+                <span className="text-base font-bold text-slate-800">
+                  {parseRevisionNumber(viewingOfferDetails.offer?.revision ?? viewingOfferDetails.offer?.revisions, 0) === 1
+                    ? "1 Revision"
+                    : `${parseRevisionNumber(viewingOfferDetails.offer?.revision ?? viewingOfferDetails.offer?.revisions, 0)} Revisions`}
+                </span>
               </div>
               <div className="text-right">
                 <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Delivery Time</span>

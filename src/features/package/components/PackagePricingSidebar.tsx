@@ -233,9 +233,8 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
             }}
           />
           <span
-            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white ${
-              sellerStatus.isOnline ? "bg-[#10B981]" : "bg-slate-300"
-            }`}
+            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white ${sellerStatus.isOnline ? "bg-[#10B981]" : "bg-slate-300"
+              }`}
           />
         </div>
 
@@ -264,7 +263,6 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
           <div className="text-[10px] sm:text-[11.5px] text-gray-500 font-normal leading-tight mt-0.5">
             {sellerStatus.isOnline ? (
               <span className="text-emerald-600 font-medium flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full shrink-0" />
                 Online
               </span>
             ) : sellerStatus.lastSeenText ? (

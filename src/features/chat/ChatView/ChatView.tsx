@@ -3094,21 +3094,7 @@ const ChatView = () => {
 
                       {/* Details: Status, From & Language */}
                       <div className="flex flex-col gap-2 text-xs">
-                        <div className="grid grid-cols-[75px_1fr] items-center">
-                          <span className="text-slate-500">Status</span>
-                          <span className="text-slate-800 font-medium">
-                            {isRecipientOnline ? (
-                              <span className="text-emerald-600 font-medium flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full shrink-0" />
-                                Online
-                              </span>
-                            ) : recipientLastSeenText ? (
-                              <span>Last seen {recipientLastSeenText}</span>
-                            ) : (
-                              'Offline'
-                            )}
-                          </span>
-                        </div>
+
                         <div className="grid grid-cols-[75px_1fr] items-center">
                           <span className="text-slate-500">From</span>
                           <span className="text-slate-800 font-medium">

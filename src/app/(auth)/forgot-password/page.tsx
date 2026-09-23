@@ -78,7 +78,7 @@ const ForgotPassword = () => {
                     placeholder="Enter your email address"
                     value={email}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                    className="py-3 px-3 border border-gray-200 rounded-lg text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full"
+                    className="py-3 px-3 border border-gray-200 rounded-[6px] text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full"
                   />
                 </div>
                 {
@@ -88,7 +88,7 @@ const ForgotPassword = () => {
                 <Button
                   type="submit"
                   variant="brand"
-                  size="lg"
+                  size="md"
                   fullWidth
                   radius="fiverr"
                   disabled={loading}

@@ -228,7 +228,7 @@ const PackageContent = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Main Two-Column Layout (Left Content + Right Sticky Sidebar) */}
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] xl:grid-cols-[minmax(0,1fr)_460px] 2xl:grid-cols-[minmax(0,1fr)_500px] gap-6 lg:gap-8 xl:gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] xl:grid-cols-[minmax(0,1fr)_460px] 2xl:grid-cols-[minmax(0,1fr)_400px] gap-6 lg:gap-8 xl:gap-10 items-start">
 
           {/* LEFT CONTENT COLUMN */}
           <div className="w-full min-w-0">

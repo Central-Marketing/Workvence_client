@@ -706,9 +706,9 @@ const ChatView = () => {
           const incomingText = (newMsg.description || newMsg.desc || newMsg.text || newMsg.message || '').trim();
           const incomingFile = newMsg.file || (Array.isArray(newMsg.attachments) && newMsg.attachments[0]) || '';
 
-          // 1. If already in cache by ID, skip
+          // 1. If already in cache by ID, update existing message in place (e.g., status/withdrawal update)
           if (newMsgId && arr.some((m: any) => String(m._id || m.id) === String(newMsgId))) {
-            return arr;
+            return arr.map((m: any) => String(m._id || m.id) === String(newMsgId) ? { ...m, ...newMsg } : m);
           }
 
           // 2. If a non-temp message with identical text and file already exists, skip duplicate socket echo
@@ -1227,6 +1227,10 @@ const ChatView = () => {
   };
 
   const handleAcceptOffer = async (offer: any) => {
+    if (offer?.withdrawn || offer?.offerStatus === 'withdrawn') {
+      toast.error("This proposal has been withdrawn by the seller.");
+      return;
+    }
     try {
       const { data } = await axiosFetch.post('/orders/create-payment-intent/custom', {
         packageID: offer.packageID,
@@ -1242,10 +1246,21 @@ const ChatView = () => {
 
   const handleWithdraw = async (msgId: string) => {
     try {
-      await axiosFetch.patch(`/messages/withdraw/${msgId}`);
-      toast.success("Offer withdrawn.");
+      const res = await axiosFetch.patch(`/messages/withdraw/${msgId}`);
+      const updatedMsg = res.data?.messageDoc;
+      toast.success(res.data?.message || "Custom offer withdrawn successfully.");
+      queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.map((m: any) =>
+          String(m._id || m.id) === String(msgId)
+            ? { ...m, ...(updatedMsg || {}), withdrawn: true, offerStatus: 'withdrawn' }
+            : m
+        );
+      });
       queryClient.invalidateQueries({ queryKey: ['messages', conversationID] });
-    } catch { toast.error("Failed to withdraw."); }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to withdraw.");
+    }
   };
 
   const parseOffer = (desc?: any) => {
@@ -2303,6 +2318,7 @@ const ChatView = () => {
                                     msgId: msg._id || msg.id,
                                     acceptedOrder: isAccepted ? (targetOrderId || true) : null,
                                     isOwner,
+                                    isWithdrawn,
                                   });
                                 }}
                                 className="text-[14px] font-medium text-[#007A64] hover:text-[#005c4b] hover:!bg-transparent !p-0 !min-h-0 !h-auto flex items-center gap-1.5 w-fit mt-0.5"
@@ -2352,7 +2368,7 @@ const ChatView = () => {
                                 <Button
                                   type="button"
                                   variant="dark"
-                                  size="lg"
+                                  size="md"
                                   fullWidth
                                   radius="fiverr"
                                   rightIcon={
@@ -2370,14 +2386,14 @@ const ChatView = () => {
                                   View Order
                                 </Button>
                               ) : isWithdrawn ? (
-                                <div className="w-full h-12 rounded-[6px] font-semibold text-[15px] bg-[#F3F4F6] text-slate-400 flex items-center justify-center select-none">
+                                <div className="w-full h-10 rounded-[6px] font-semibold text-[15px] bg-[#F3F4F6] text-slate-400 flex items-center justify-center select-none">
                                   Withdrawn
                                 </div>
                               ) : !isOwner ? (
                                 <Button
                                   type="button"
                                   variant="dark"
-                                  size="lg"
+                                  size="md"
                                   fullWidth
                                   radius="fiverr"
                                   rightIcon={
@@ -2387,7 +2403,7 @@ const ChatView = () => {
                                     </svg>
                                   }
                                   onClick={() => handleAcceptOffer(offer)}
-                                  className="h-12 font-semibold shadow-xs"
+                                  className="h-10 font-semibold shadow-xs"
                                 >
                                   Accept Offer
                                 </Button>
@@ -2395,11 +2411,11 @@ const ChatView = () => {
                                 <Button
                                   type="button"
                                   variant="soft"
-                                  size="lg"
+                                  size="md"
                                   fullWidth
                                   radius="fiverr"
                                   onClick={() => handleWithdraw(msg._id || msg.id)}
-                                  className="h-12 font-semibold text-[#1E293B] shadow-xs"
+                                  className="h-10 font-semibold text-[#1E293B] shadow-xs"
                                 >
                                   Withdraw
                                 </Button>
@@ -3376,120 +3392,145 @@ const ChatView = () => {
       )}
 
       {/* Full Proposal Details Modal */}
-      {viewingOfferDetails && (
-        <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
-          onClick={() => setViewingOfferDetails(null)}
-        >
+      {viewingOfferDetails && (() => {
+        const targetMsg = (messages || []).find((m: any) => String(m._id || m.id) === String(viewingOfferDetails.msgId));
+        const isOfferWithdrawn = Boolean(
+          viewingOfferDetails.isWithdrawn ||
+          targetMsg?.withdrawn ||
+          targetMsg?.offerStatus === 'withdrawn'
+        );
+
+        return (
           <div
-            className="bg-white rounded-[6px] border border-slate-200 max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 animate-fadeIn"
-            onClick={e => e.stopPropagation()}
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+            onClick={() => setViewingOfferDetails(null)}
           >
-            <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-              <h3 className="text-xl font-bold text-slate-900">Custom Proposal Details</h3>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                radius="full"
-                onClick={() => setViewingOfferDetails(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold text-lg"
-                aria-label="Close modal"
-              >
-                ✕
-              </Button>
-            </div>
-
-            <div className="flex justify-between items-center bg-emerald-50/70 border border-emerald-200/60 rounded-[6px] p-4">
-              <div>
-                <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Price</span>
-                <span className="text-2xl font-bold text-emerald-700">${viewingOfferDetails.offer?.price}</span>
-              </div>
-              <div className="text-center">
-                <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Revisions</span>
-                <span className="text-base font-bold text-slate-800">
-                  {parseRevisionNumber(viewingOfferDetails.offer?.revision ?? viewingOfferDetails.offer?.revisions, 0) === 1
-                    ? "1 Revision"
-                    : `${parseRevisionNumber(viewingOfferDetails.offer?.revision ?? viewingOfferDetails.offer?.revisions, 0)} Revisions`}
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Delivery Time</span>
-                <span className="text-base font-bold text-slate-800">{viewingOfferDetails.offer?.delivery} Days</span>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Full Description</h4>
-              <div className="bg-slate-50 border border-slate-200/70 rounded-[6px] p-4 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto">
-                {renderMessageTextWithLinks(viewingOfferDetails.offer?.desc || 'No description provided.')}
-              </div>
-            </div>
-
-            <div className="pt-2 flex gap-3">
-              {viewingOfferDetails.acceptedOrder ? (
+            <div
+              className="bg-white rounded-[6px] border border-slate-200 max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 animate-fadeIn"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+                <h3 className="text-xl font-bold text-slate-900">Custom Proposal Details</h3>
                 <Button
-                  variant="brand"
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  radius="full"
+                  onClick={() => setViewingOfferDetails(null)}
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold text-lg"
+                  aria-label="Close modal"
+                >
+                  ✕
+                </Button>
+              </div>
+
+              {isOfferWithdrawn && (
+                <div className="w-full flex items-center gap-2 bg-red-50 text-red-700 border border-red-200/80 rounded-[6px] px-3.5 py-2.5 text-xs font-semibold">
+                  ↩ This offer was withdrawn by the seller.
+                </div>
+              )}
+
+              <div className="flex justify-between items-center bg-emerald-50/70 border border-emerald-200/60 rounded-[6px] p-4">
+                <div>
+                  <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Price</span>
+                  <span className="text-2xl font-bold text-emerald-700">${viewingOfferDetails.offer?.price}</span>
+                </div>
+                <div className="text-center">
+                  <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Revisions</span>
+                  <span className="text-base font-bold text-slate-800">
+                    {parseRevisionNumber(viewingOfferDetails.offer?.revision ?? viewingOfferDetails.offer?.revisions, 0) === 1
+                      ? "1 Revision"
+                      : `${parseRevisionNumber(viewingOfferDetails.offer?.revision ?? viewingOfferDetails.offer?.revisions, 0)} Revisions`}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider block">Delivery Time</span>
+                  <span className="text-base font-bold text-slate-800">{viewingOfferDetails.offer?.delivery} Days</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Full Description</h4>
+                <div className="bg-slate-50 border border-slate-200/70 rounded-[6px] p-4 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto">
+                  {renderMessageTextWithLinks(viewingOfferDetails.offer?.desc || 'No description provided.')}
+                </div>
+              </div>
+
+              <div className="pt-2 flex gap-3">
+                {viewingOfferDetails.acceptedOrder ? (
+                  <Button
+                    variant="brand"
+                    size="md"
+                    radius="fiverr"
+                    className="flex-1 font-bold shadow-sm"
+                    onClick={() => {
+                      const orderId = typeof viewingOfferDetails.acceptedOrder === 'string' ? viewingOfferDetails.acceptedOrder : viewingOfferDetails.acceptedOrder?._id;
+                      setViewingOfferDetails(null);
+                      if (orderId && orderId !== true) navigate.push(`/orders/${orderId}`);
+                      else navigate.push('/orders');
+                    }}
+                  >
+                    View Order
+                  </Button>
+                ) : isOfferWithdrawn ? (
+                  <Button
+                    disabled
+                    variant="outline"
+                    size="md"
+                    radius="fiverr"
+                    className="flex-1 font-semibold text-slate-400 bg-slate-100 border-slate-200 cursor-not-allowed select-none"
+                  >
+                    Withdrawn
+                  </Button>
+                ) : (
+                  <>
+                    {!viewingOfferDetails.isOwner && (
+                      <Button
+                        variant="brand"
+                        size="md"
+                        radius="fiverr"
+                        className="flex-1 font-bold shadow-sm"
+                        onClick={() => {
+                          const offer = viewingOfferDetails.offer;
+                          setViewingOfferDetails(null);
+                          handleAcceptOffer(offer);
+                        }}
+                      >
+                        Accept & Proceed to Checkout
+                      </Button>
+                    )}
+                    {viewingOfferDetails.isOwner && (
+                      <Button
+                        variant="danger"
+                        size="md"
+                        radius="fiverr"
+                        className="flex-1 font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
+                        onClick={() => {
+                          const msgId = viewingOfferDetails.msgId;
+                          setViewingOfferDetails(null);
+                          handleWithdraw(msgId);
+                        }}
+                      >
+                        Withdraw Proposal
+                      </Button>
+                    )}
+                  </>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
                   size="md"
                   radius="fiverr"
-                  className="flex-1 font-bold shadow-sm"
-                  onClick={() => {
-                    const orderId = typeof viewingOfferDetails.acceptedOrder === 'string' ? viewingOfferDetails.acceptedOrder : viewingOfferDetails.acceptedOrder?._id;
-                    setViewingOfferDetails(null);
-                    if (orderId && orderId !== true) navigate.push(`/orders/${orderId}`);
-                    else navigate.push('/orders');
-                  }}
+                  className="font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200"
+                  onClick={() => setViewingOfferDetails(null)}
                 >
-                  View Order
+                  Close
                 </Button>
-              ) : (
-                <>
-                  {!viewingOfferDetails.isOwner && (
-                    <Button
-                      variant="brand"
-                      size="md"
-                      radius="fiverr"
-                      className="flex-1 font-bold shadow-sm"
-                      onClick={() => {
-                        const offer = viewingOfferDetails.offer;
-                        setViewingOfferDetails(null);
-                        handleAcceptOffer(offer);
-                      }}
-                    >
-                      Accept & Proceed to Checkout
-                    </Button>
-                  )}
-                  {viewingOfferDetails.isOwner && (
-                    <Button
-                      variant="danger"
-                      size="md"
-                      radius="fiverr"
-                      className="flex-1 font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100"
-                      onClick={() => {
-                        const msgId = viewingOfferDetails.msgId;
-                        setViewingOfferDetails(null);
-                        handleWithdraw(msgId);
-                      }}
-                    >
-                      Withdraw Proposal
-                    </Button>
-                  )}
-                </>
-              )}
-              <Button
-                type="button"
-                variant="outline"
-                size="md"
-                radius="fiverr"
-                className="font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200"
-                onClick={() => setViewingOfferDetails(null)}
-              >
-                Close
-              </Button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Lightbox Image Modal */}
       {lightboxImage && (

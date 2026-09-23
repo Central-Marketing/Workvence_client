@@ -116,7 +116,7 @@ export default function ProTalentPage() {
               <Button
                 onClick={() => setIsApplyingPro(true)}
                 variant="outline"
-                size="lg"
+                size="md"
                 radius="xl"
                 className="bg-white/10 border-white/20 hover:bg-white/20 text-white font-semibold text-sm"
               >

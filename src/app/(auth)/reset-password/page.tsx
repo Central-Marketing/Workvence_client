@@ -141,7 +141,7 @@ const ResetPasswordContent = () => {
                   <Button
                     type="submit"
                     variant="brand"
-                    size="lg"
+                    size="md"
                     fullWidth
                     radius="fiverr"
                     disabled={loading}
@@ -232,7 +232,7 @@ const ResetPasswordContent = () => {
                   <Button
                     type="submit"
                     variant="brand"
-                    size="lg"
+                    size="md"
                     fullWidth
                     radius="fiverr"
                     disabled={loading}

@@ -1023,7 +1023,7 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                     disabled={submitMutation.isPending || frontUploading || backUploading || selfieUploading || noteUploading}
                     isLoading={submitMutation.isPending}
                     variant="brand"
-                    size="lg"
+                    size="md"
                     radius="fiverr"
                     leftIcon={!submitMutation.isPending ? <Check size={18} strokeWidth={2.5} /> : undefined}
                   >

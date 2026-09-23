@@ -277,7 +277,7 @@ const RegisterContent = () => {
                 data-testid="continue-email-btn"
                 type="button"
                 variant="outline"
-                size="lg"
+                size="md"
                 fullWidth
                 radius="fiverr"
                 leftIcon={<MdOutlineEmail className="text-[20px] text-[#374151]" />}
@@ -480,7 +480,7 @@ const RegisterContent = () => {
                   data-testid="signup-submit-btn"
                   type="submit"
                   variant="brand"
-                  size="lg"
+                  size="md"
                   fullWidth
                   radius="fiverr"
                   disabled={isFormDisabled}

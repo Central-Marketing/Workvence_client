@@ -62,7 +62,7 @@ export default function WorkvenceSelectPage() {
               <Button
                 onClick={() => setIsJoining(true)}
                 variant="brand"
-                size="lg"
+                size="md"
                 radius="xl"
                 rightIcon={<ArrowRight className="w-4 h-4" />}
                 className="font-bold text-sm shadow-lg hover:shadow-xl"

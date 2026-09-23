@@ -61,7 +61,7 @@ export const buttonSizeStyles: Record<ButtonSize, string> = {
   md:
     "text-[16px] px-4 sm:px-5 h-[40px] gap-2 leading-none",
   lg:
-    "text-sm sm:text-base macbook:text-base 2xl:text-[17px] px-5 sm:px-6 py-2.5 sm:py-3 min-h-[46px] sm:min-h-[48px] gap-2 leading-tight",
+    "text-sm sm:text-base macbook:text-base 2xl:text-[17px] px-5 sm:px-6 h-[40px] gap-2 leading-none",
   xl:
     "text-base sm:text-lg macbook:text-lg 2xl:text-xl px-6 sm:px-7 py-3 sm:py-3.5 min-h-[52px] sm:min-h-[56px] gap-2.5 leading-tight",
   icon:

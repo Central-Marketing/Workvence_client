@@ -196,7 +196,7 @@ const LoginForm = () => {
                 data-testid="login-email-btn"
                 type="button"
                 variant="outline"
-                size="lg"
+                size="md"
                 fullWidth
                 radius="fiverr"
                 leftIcon={<MdOutlineEmail className="text-[20px] text-[#374151]" />}
@@ -304,7 +304,7 @@ const LoginForm = () => {
                   data-testid="login-submit-btn"
                   type="submit"
                   variant="dark"
-                  size="lg"
+                  size="md"
                   fullWidth
                   radius="fiverr"
                   disabled={loading}

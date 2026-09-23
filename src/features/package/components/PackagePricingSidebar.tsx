@@ -72,9 +72,9 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
   )}&background=0D9488&color=fff&bold=true`;
 
   return (
-    <div className={`w-full max-w-[500px] space-y-6 ${className}`.trim()}>
+    <div className={`w-full max-w-[400px] space-y-6 ${className}`.trim()}>
       {/* 1. Top Card: Packages Pricing Tier Card */}
-      <div className="bg-[#FFF] border border-[rgba(0,0,0,0.10)] rounded-[6px] p-[10px] shadow-2xs">
+      <div className="bg-[#FFF] border border-[rgba(0,0,0,0.10)] rounded-[6px] p-[20px] shadow-2xs">
         {/* Tier Segmented Tabs (only if multiple tiers exist) */}
         {availableTiers.length > 1 && (
           <div
@@ -286,8 +286,8 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
             {seller.isOnline
               ? "Online"
               : formatLastSeenDate(seller.lastActiveAt || seller.lastSeen)
-              ? `Offline · Last seen ${formatLastSeenDate(seller.lastActiveAt || seller.lastSeen)}`
-              : "Offline"}
+                ? `Offline · Last seen ${formatLastSeenDate(seller.lastActiveAt || seller.lastSeen)}`
+                : "Offline"}
           </div>
         </div>
       </div>

@@ -32,7 +32,7 @@ const CTA = () => {
             <div className="lg:col-span-7 flex flex-col items-start justify-center">
 
               {/* Moneyback Guarantee Badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[6px] bg-[#EAFDC6] text-[#244E18] font-sf-pro font-medium text-[12px] sm:text-[13px] mb-5 sm:mb-6 shadow-sm">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[6px] bg-[#EAFDC6] text-[#244E18] font-sf-pro font-medium text-[12px] sm:text-[13px] shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path d="M3 11C3 8.23571 5.23571 6 8 6L7 8.5" stroke="#1F1F1F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="M21 13C21 15.7643 18.7643 18 16 18L17 15.5" stroke="#1F1F1F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -45,14 +45,14 @@ const CTA = () => {
               </div>
 
               {/* Main Headline */}
-              <h2 className="font-sf-pro font-[510] text-3xl sm:text-4xl lg:text-[44px] xl:text-[48px] text-white mb-4 sm:mb-5 leading-none">
+              <h2 className="font-sf-pro font-[510] text-3xl leading-[normal] sm:text-4xl sm:leading-[normal] lg:text-[44px] lg:leading-[normal] xl:text-[48px] xl:leading-[normal] text-white mb-4 sm:mb-5 my-4">
                 Are You A Freelancer?
                 <br />
                 Earn Globally.
               </h2>
 
               {/* Description Paragraph */}
-              <p className="font-inter font-normal text-base sm:text-[15px] text-[#C7C7C7] mb-5 sm:mb-6 max-w-xl leading-relaxed">
+              <p className="font-inter font-normal text-base sm:text-[15px] text-[#C7C7C7] mb-5 sm:mb-10 max-w-xl leading-relaxed">
                 Reach international buyers, get paid in full with fast, secure payouts, and grow your
                 business on a platform built on trust. Applications are reviewed to keep quality high.
               </p>

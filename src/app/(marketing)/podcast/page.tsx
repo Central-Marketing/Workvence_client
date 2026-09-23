@@ -207,13 +207,13 @@ export default function PodcastPage() {
                   size="icon"
                   radius="2xl"
                   onClick={() => togglePlay(activeEpisode.id)}
-                  className="w-12 h-12 shadow-lg active:scale-95 p-0"
+                  className="w-10 h-10 shadow-lg active:scale-95 p-0"
                   aria-label={isPlaying && playingId === activeEpisode.id ? "Pause" : "Play"}
                 >
                   {isPlaying && playingId === activeEpisode.id ? (
-                    <Pause className="w-6 h-6" />
+                    <Pause className="w-5 h-5" />
                   ) : (
-                    <Play className="w-6 h-6 ml-0.5" />
+                    <Play className="w-5 h-5 ml-0.5" />
                   )}
                 </Button>
                 <span className="text-xs font-semibold text-gray-300">

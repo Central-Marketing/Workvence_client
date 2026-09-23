@@ -231,7 +231,7 @@ const VerifyEmailContent = () => {
                 data-testid="verify-email-btn"
                 type="submit"
                 variant="brand"
-                size="lg"
+                size="md"
                 fullWidth
                 radius="fiverr"
                 disabled={loading || otp.join('').length < 6}

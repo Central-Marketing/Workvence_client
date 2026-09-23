@@ -89,7 +89,7 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
       {/* Stat Boxes Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 p-4 bg-gray-50/70 border border-gray-100 rounded-[6px]">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-[6px] bg-red-50 text-red-500 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-[6px] bg-[#FAFAFA] border border-[rgba(0, 0, 0, 0.10)] text-[#F00000] flex items-center justify-center shrink-0">
             <FiMapPin className="w-4 h-4" />
           </div>
           <div>
@@ -99,7 +99,7 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
         </div>
 
         <div className="flex items-center gap-3 border-t sm:border-t-0 sm:border-l border-gray-200/60 pt-2.5 sm:pt-0 sm:pl-3">
-          <div className="w-8 h-8 rounded-[6px] bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-[6px] bg-[#FAFAFA] border border-[rgba(0, 0, 0, 0.10)] text-[#F57727] flex items-center justify-center shrink-0">
             <FiClock className="w-4 h-4" />
           </div>
           <div>
@@ -109,7 +109,7 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
         </div>
 
         <div className="flex items-center gap-3 border-t sm:border-t-0 sm:border-l border-gray-200/60 pt-2.5 sm:pt-0 sm:pl-3">
-          <div className="w-8 h-8 rounded-[6px] bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-[6px] bg-[#FAFAFA] border border-[rgba(0, 0, 0, 0.10)] text-[#54AA54] flex items-center justify-center shrink-0">
             <FiPackage className="w-4 h-4" />
           </div>
           <div>

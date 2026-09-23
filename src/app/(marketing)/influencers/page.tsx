@@ -105,7 +105,7 @@ export default function InfluencersPage() {
               <Button
                 onClick={() => setIsApplying(true)}
                 variant="brand"
-                size="lg"
+                size="md"
                 radius="xl"
                 rightIcon={<ArrowRight className="w-4 h-4" />}
                 className="font-semibold text-sm shadow-md hover:shadow-lg"

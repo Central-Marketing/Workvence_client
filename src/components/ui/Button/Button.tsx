@@ -76,7 +76,6 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
     const isFixed40Variant =
       !isIconOnly &&
       standardActionVariants.includes(variant) &&
-      size !== "lg" &&
       size !== "xl";
 
     let effectiveSizeClasses = rawSize;

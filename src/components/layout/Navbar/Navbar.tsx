@@ -494,7 +494,7 @@ const Navbar = () => {
                     text="Post a Project with AI"
                     icon={
                       <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
-                        <path d="M0.75 7.60886C3.56875 4.84296 10.19 -0.808996 12.025 1.15511C14.3438 3.63702 2.15937 9.91366 4.03854 12.6791C6.0234 15.6001 12.9646 5.30336 15.3135 7.14726C17.6625 8.99126 9.676 13.1401 11.5552 15.4451C12.3069 16.367 14.3739 14.9841 15.3135 14.0621" stroke="#292929" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M0.75 7.60886C3.56875 4.84296 10.19 -0.808996 12.025 1.15511C14.3438 3.63702 2.15937 9.91366 4.03854 12.6791C6.0234 15.6001 12.9646 5.30336 15.3135 7.14726C17.6625 8.99126 9.676 13.1401 11.5552 15.4451C12.3069 16.367 14.3739 14.9841 15.3135 14.0621" stroke="#292929" stroke-width="1.5" stroke-linecap="round" strokeLinejoin="round" />
                       </svg>
                     }
                     px="px-3 xl:px-4"
@@ -809,7 +809,7 @@ const Navbar = () => {
                             <path d="M0.75 7.60886C3.56875 4.84296 10.19 -0.808996 12.025 1.15511C14.3438 3.63702 2.15937 9.91366 4.03854 12.6791C6.0234 15.6001 12.9646 5.30336 15.3135 7.14726C17.6625 8.99126 9.676 13.1401 11.5552 15.4451C12.3069 16.367 14.3739 14.9841 15.3135 14.0621" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         }
-                        className="w-full h-11 rounded-[6px] text-[14px] font-medium"
+                        className="w-full h-11 rounded-[6px] text-[16px] font-medium"
                         onClick={() => setIsMobileMenuOpen(false)}
                       />
                     </div>

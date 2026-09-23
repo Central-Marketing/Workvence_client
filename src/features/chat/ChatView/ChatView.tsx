@@ -5,6 +5,8 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Flag, ArrowRight, Download, Eye } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { BsThreeDotsVertical } from "react-icons/bs";
+
 import {
   RiSearchLine,
   RiCheckboxCircleFill,
@@ -880,6 +882,15 @@ const ChatView = () => {
     (fetchedProfileUser && typeof fetchedProfileUser === 'object' ? { ...recipientUser, ...fetchedProfileUser } : null) ||
     recipientUser ||
     (targetOtherUsername || resolveUserId ? { username: targetOtherUsername || 'User', _id: resolveUserId } : null);
+
+  const isRecipientOnline = Boolean(
+    finalRecipientUser &&
+    onlineUsers?.some((u: any) => {
+      const uId = String(typeof u === 'string' ? u : u?.userId || u?._id || u?.id || '');
+      const rId = String(finalRecipientUser?._id || finalRecipientUser?.id || '');
+      return Boolean(uId && rId && uId === rId);
+    })
+  );
 
   useEffect(() => {
     activeConvRef.current = activeConversation;
@@ -1951,12 +1962,15 @@ const ChatView = () => {
                       onClick={() => setIsRightSideOpen(true)}
                     >
                       {/* Avatar */}
-                      <div className="shrink-0">
+                      <div className="relative shrink-0">
                         <img
                           src={finalRecipientUser.image || '/media/noavatar.png'}
                           alt=""
                           className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border border-slate-200"
                         />
+                        {isRecipientOnline && (
+                          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
+                        )}
                       </div>
 
                       {/* User Info */}
@@ -1971,6 +1985,11 @@ const ChatView = () => {
                               <span className="w-1.5 h-1.5 bg-brand-green rounded-full shrink-0" />
                               typing...
                             </span>
+                          ) : isRecipientOnline ? (
+                            <span className="text-emerald-600 font-medium flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full shrink-0" />
+                              Online
+                            </span>
                           ) : (
                             'Contact'
                           )}
@@ -1981,7 +2000,7 @@ const ChatView = () => {
                     {/* Actions */}
                     <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-1 sm:ml-2">
 
-                      {/* Create Offer */}
+                      {/* Create Offer - Visible on desktop, moved to 3-dots drawer on mobile */}
                       {user?.isSeller && (
                         <Button
                           type="button"
@@ -1989,7 +2008,7 @@ const ChatView = () => {
                           size="md"
                           radius="fiverr"
                           onClick={() => setShowOfferModal(true)}
-                          className="h-10 text-[16px] font-semibold px-4 whitespace-nowrap shrink-0"
+                          className="hidden xl:inline-flex h-10 text-[16px] font-semibold px-4 whitespace-nowrap shrink-0"
                         >
                           Create Offer
                         </Button>
@@ -2132,23 +2151,7 @@ const ChatView = () => {
                         onClick={() => setIsRightSideOpen(true)}
                         aria-label="Open contact info"
                         icon={
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            className="sm:w-6 sm:h-6"
-                          >
-                            <path
-                              d="M12 11C12.5523 11 13 11.4477 13 12V16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16V12C11 11.4477 11.4477 11 12 11Z"
-                              stroke="#292929"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                            />
-                            <circle cx="12" cy="7.5" r="1" fill="#292929" />
-                            <circle cx="12" cy="12" r="9" stroke="#292929" strokeWidth="1.5" />
-                          </svg>
+                          <BsThreeDotsVertical />
                         }
                       />
 
@@ -2559,7 +2562,7 @@ const ChatView = () => {
                                 title={msg.moderation?.flagReason || "Flagged content"}
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                  <path d="M5.0249 21C5.04385 19.2643 5.04366 17.5541 5.0366 15.9209M5.0366 15.9209C5.01301 10.4614 4.91276 5.86186 5.19475 4.04271C5.5611 1.67939 9.39301 3.82993 13.9703 5.59842L16.0328 6.48729C17.5508 7.1415 19.7187 8.30352 18.7662 9.66084C18.3738 10.22 17.56 10.8596 16.0575 11.567L5.0366 15.9209Z" stroke="#DA0000" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round" />
+                                  <path d="M5.0249 21C5.04385 19.2643 5.04366 17.5541 5.0366 15.9209M5.0366 15.9209C5.01301 10.4614 4.91276 5.86186 5.19475 4.04271C5.5611 1.67939 9.39301 3.82993 13.9703 5.59842L16.0328 6.48729C17.5508 7.1415 19.7187 8.30352 18.7662 9.66084C18.3738 10.22 17.56 10.8596 16.0575 11.567L5.0366 15.9209Z" stroke="#DA0000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                               </div>
                             )}
@@ -2710,13 +2713,13 @@ const ChatView = () => {
           )}
         </main>
 
-        <div className={`xl:hidden fixed inset-0 bg-black/20 z-30 transition-opacity duration-300 ease-in-out ${isRightSideOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsRightSideOpen(false)}></div>
+        <div className={`xl:hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 transition-opacity duration-300 ease-in-out ${isRightSideOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setIsRightSideOpen(false)}></div>
 
         {/* ── RIGHT: About This Contact ── */}
         {isValidId && (() => {
           if (!finalRecipientUser && isFetchingTargetUser) {
             return (
-              <aside className={`w-[320px] min-w-[280px] xl:w-[340px] xl:min-w-[320px] h-full max-h-full min-h-0 border-l border-[rgba(0, 0, 0, 0.10)] bg-[#F8F8F8] overflow-y-auto overflow-x-hidden p-4 xl:p-5 flex flex-col shrink-0 box-border max-xl:fixed max-xl:top-0 max-xl:bottom-0 max-xl:right-0 max-xl:z-40 max-xl:shadow-2xl max-xl:h-full max-xl:flex max-xl:transform max-xl:transition-transform max-xl:duration-300 max-xl:ease-in-out ${isRightSideOpen ? 'max-xl:translate-x-0' : 'max-xl:translate-x-full'}`}>
+              <aside className={`w-[320px] min-w-[280px] xl:w-[340px] xl:min-w-[320px] h-full max-h-full min-h-0 border-l border-[rgba(0, 0, 0, 0.10)] bg-[#F8F8F8] overflow-y-auto overflow-x-hidden p-4 xl:p-5 flex flex-col shrink-0 box-border max-xl:fixed max-xl:top-0 max-xl:bottom-0 max-xl:right-0 max-xl:z-50 max-xl:shadow-2xl max-xl:h-full max-xl:flex max-xl:transform max-xl:transition-transform max-xl:duration-300 max-xl:ease-in-out max-sm:w-[85vw] max-sm:max-w-[340px] ${isRightSideOpen ? 'max-xl:translate-x-0' : 'max-xl:translate-x-full'}`}>
                 <div className="flex flex-col gap-4">
                   <Skeleton className="w-full h-44 rounded-[6px]" />
                   <Skeleton className="w-full h-36 rounded-[6px]" />
@@ -2900,18 +2903,22 @@ const ChatView = () => {
           };
 
           return (
-            <aside className={`w-[320px] min-w-[280px] xl:w-[340px] xl:min-w-[320px] h-full max-h-full min-h-0 border-l border-[rgba(0, 0, 0, 0.10)] bg-[#F8F8F8] overflow-y-auto overflow-x-hidden p-4 xl:p-5 flex flex-col shrink-0 box-border [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full max-xl:fixed max-xl:top-0 max-xl:bottom-0 max-xl:right-0 max-xl:z-40 max-xl:shadow-2xl max-xl:h-full max-xl:flex max-xl:transform max-xl:transition-transform max-xl:duration-300 max-xl:ease-in-out ${isRightSideOpen ? 'max-xl:translate-x-0' : 'max-xl:translate-x-full'}`}>
+            <aside className={`w-[320px] min-w-[280px] xl:w-[340px] xl:min-w-[320px] h-full max-h-full min-h-0 border-l border-[rgba(0, 0, 0, 0.10)] bg-[#F8F8F8] overflow-y-auto overflow-x-hidden p-4 xl:p-5 flex flex-col shrink-0 box-border [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full max-xl:fixed max-xl:top-0 max-xl:bottom-0 max-xl:right-0 max-xl:z-50 max-xl:shadow-2xl max-xl:h-full max-xl:flex max-xl:transform max-xl:transition-transform max-xl:duration-300 max-xl:ease-in-out max-sm:w-[85vw] max-sm:max-w-[340px] ${isRightSideOpen ? 'max-xl:translate-x-0' : 'max-xl:translate-x-full'}`}>
               <div className="w-full flex flex-col gap-4 pb-20">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  radius="full"
-                  className="xl:hidden self-end text-gray-500 hover:text-gray-800 text-2xl -mb-2"
-                  onClick={() => setIsRightSideOpen(false)}
-                  aria-label="Close sidebar"
-                  icon={<RiCloseLine />}
-                />
+                {/* Mobile Drawer Top Bar */}
+                <div className="xl:hidden flex items-center justify-between pb-3 border-b border-slate-200/80 -mt-1">
+                  <span className="font-bold text-slate-900 text-base">Contact Details</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    radius="full"
+                    className="w-8 h-8 rounded-full text-slate-500 hover:text-slate-800 hover:bg-slate-200/60"
+                    onClick={() => setIsRightSideOpen(false)}
+                    aria-label="Close sidebar"
+                    icon={<RiCloseLine className="w-5 h-5" />}
+                  />
+                </div>
 
                 {/* Top Segmented Controls: Profile | Media */}
                 <div className="bg-[#f0f2f5] p-1 rounded-[6px] flex items-center border border-slate-200/70 shadow-xs">
@@ -2945,6 +2952,75 @@ const ChatView = () => {
 
                 {contactSidebarTab === 'profile' ? (
                   <>
+                    {/* ── Quick Actions (Fiverr Style: Create Offer & Video Meeting) ── */}
+                    <div className="bg-white rounded-[6px] p-4 border border-slate-200/80 shadow-xs flex flex-col gap-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-base sm:text-[17px] font-bold text-slate-800 tracking-tight">Quick Actions</span>
+                        {/* {user?.isSeller && (
+                          <span className="text-[10px] font-semibold text-[#0D6D5F] bg-[#0D6D5F]/10 px-2 py-0.5 rounded-full">
+                            Seller Tools
+                          </span>
+                        )} */}
+                      </div>
+
+                      {user?.isSeller && (
+                        <Button
+                          type="button"
+                          variant="brand"
+                          size="md"
+                          radius="fiverr"
+                          fullWidth
+                          onClick={() => {
+                            setIsRightSideOpen(false);
+                            setShowOfferModal(true);
+                          }}
+                          leftIcon={
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                              <polyline points="14 2 14 8 20 8"></polyline>
+                              <line x1="12" y1="18" x2="12" y2="12"></line>
+                              <line x1="9" y1="15" x2="15" y2="15"></line>
+                            </svg>
+                          }
+                          className="font-bold shadow-xs justify-center gap-2"
+                        >
+                          Create an Offer
+                        </Button>
+                      )}
+
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="md"
+                        radius="fiverr"
+                        fullWidth
+                        onClick={() => {
+                          setIsRightSideOpen(false);
+                          setMeetingTitle(`Job Discussion with @${finalRecipientUser?.username || 'Client'}`);
+                          setShowMeetingModal(true);
+                        }}
+                        leftIcon={
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M9 4H10C13.3 4 15 4 16 5C17 6 17 7.7 17 11V13C17 16.3 17 18 16 19C15 20 13.3 20 10 20H9C5.7 20 4 20 3 19C2 18 2 16.3 2 13V11C2 7.7 2 6 3 5C4 4 5.7 4 9 4Z" />
+                            <path d="M17 8.9L17.13 8.8C19.24 7.06 20.3 6.18 21.15 6.6C22 7.03 22 8.42 22 11.22V12.78C22 15.58 22 16.97 21.15 17.4C20.3 17.82 19.24 16.94 17.13 15.2L17 15.1" />
+                          </svg>
+                        }
+                        className="font-semibold text-slate-700 hover:text-slate-900 justify-center shadow-2xs"
+                      >
+                        Start Video Meeting
+                      </Button>
+                    </div>
+
                     {/* ── Card 1: About Contact ── */}
                     <div className="bg-white rounded-[6px] p-5 border border-slate-200/80 shadow-xs flex flex-col gap-3 relative">
                       <h3 className="text-base sm:text-[17px] font-bold text-slate-800 tracking-tight">
@@ -2953,11 +3029,16 @@ const ChatView = () => {
 
                       {/* Avatar & Contact Info */}
                       <div className="flex items-center gap-3 pt-1">
-                        <img
-                          src={getAvatarUrl(finalRecipientUser?.image || finalRecipientUser?.img || finalRecipientUser?.avatar || '/media/noavatar.png')}
-                          alt={finalRecipientUser.username || 'Contact'}
-                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover shrink-0 border border-slate-100 shadow-xs"
-                        />
+                        <div className="relative shrink-0">
+                          <img
+                            src={getAvatarUrl(finalRecipientUser?.image || finalRecipientUser?.img || finalRecipientUser?.avatar || '/media/noavatar.png')}
+                            alt={finalRecipientUser.username || 'Contact'}
+                            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover shrink-0 border border-slate-100 shadow-xs"
+                          />
+                          {isRecipientOnline && (
+                            <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
+                          )}
+                        </div>
                         <div className="flex flex-col min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-bold text-slate-900 text-sm sm:text-base leading-tight truncate">
@@ -2967,6 +3048,7 @@ const ChatView = () => {
                               {finalRecipientUser.badge || (finalRecipientUser.isSeller ? 'Seller' : 'Buyer')}
                             </span>
                           </div>
+                          <span className="text-xs text-slate-500 font-medium">@{finalRecipientUser.username}</span>
                           <div className="flex items-center gap-1.5 text-xs text-slate-600 mt-1 flex-wrap">
                             {(finalRecipientUser.shortTitle || finalRecipientUser.occupation || finalRecipientUser.title) && (
                               <span className="font-medium text-slate-600">
@@ -3029,7 +3111,7 @@ const ChatView = () => {
                               toast.success('AI Profile Analysis: Verified user profile.');
                             }
                           }}
-                          className="w-full text-xs font-bold py-3 rounded-[6px] shadow-xs"
+                          className="w-full text-[16px] font-semibold py-3 rounded-[6px] shadow-xs"
                           text="View Profile"
                           icon={
                             <svg

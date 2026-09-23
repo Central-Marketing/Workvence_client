@@ -734,6 +734,8 @@ const Packages = () => {
         <CategoryHeroBanner
           title={currentTaxonomy.heroTitle}
           categoryName={currentTaxonomy.name}
+          subtitle={currentTaxonomy.heroSubtitle}
+          bannerImage={findCategoryInList(activeCategory)?.banner || currentTaxonomy.defaultBanner}
         />
       )}
 

@@ -29,6 +29,7 @@ import { useUserStore } from "@/store/userStore";
 import { Loader, Button, Breadcrumb, LeftFilterSidebar } from "@/components";
 import { ClientBrief } from "@/types";
 import useDebounce from "@/hooks/useDebounce";
+import useDragScroll from "@/hooks/useDragScroll";
 
 type SortOption = "" | "budget_asc" | "budget_desc" | "deadline_asc";
 
@@ -142,6 +143,19 @@ function BriefsContent() {
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [favoritedIds, setFavoritedIds] = useState<Set<string>>(new Set());
+
+  // Drag-to-scroll for category toolbars
+  const {
+    ref: hubScrollRef,
+    isDragging: isHubDragging,
+    events: hubDragEvents,
+  } = useDragScroll<HTMLDivElement>();
+
+  const {
+    ref: feedScrollRef,
+    isDragging: isFeedDragging,
+    events: feedDragEvents,
+  } = useDragScroll<HTMLDivElement>();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -641,7 +655,13 @@ function BriefsContent() {
 
             {/* Category Hub Filter Toolbar */}
             <div className="flex items-center justify-between gap-3 mb-8 pb-3 border-b border-gray-200/80">
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0">
+              <div
+                ref={hubScrollRef}
+                {...hubDragEvents}
+                className={`flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0 select-none ${
+                  isHubDragging ? "cursor-grabbing" : "cursor-grab"
+                }`}
+              >
                 {/* Filter Button */}
                 <Button
                   type="button"
@@ -795,7 +815,13 @@ function BriefsContent() {
 
             {/* Category Filter Pills & Search Bar Row */}
             <div className="flex items-center justify-between gap-3 mb-7 pb-2 border-b border-gray-200/60">
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0">
+              <div
+                ref={feedScrollRef}
+                {...feedDragEvents}
+                className={`flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0 select-none ${
+                  isFeedDragging ? "cursor-grabbing" : "cursor-grab"
+                }`}
+              >
                 {/* Filter Drawer Toggle */}
                 <Button
                   type="button"

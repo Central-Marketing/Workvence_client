@@ -26,7 +26,7 @@ export const PackageFaqSection: React.FC<PackageFaqSectionProps> = ({ faqs = [] 
         <h2 className="text-[20px] font-bold font-sf-pro text-gray-900">
           Frequently Asked Questions
         </h2>
-        <span className="text-xs font-semibold text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-md">
+        <span className="text-xs font-semibold text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-[6px]">
           {faqs.length} {faqs.length === 1 ? 'Question' : 'Questions'}
         </span>
       </div>
@@ -39,7 +39,7 @@ export const PackageFaqSection: React.FC<PackageFaqSectionProps> = ({ faqs = [] 
             <div key={idx} className="py-2 first:pt-0 last:pb-0">
               <div
                 onClick={() => toggleFaq(idx)}
-                className="w-full flex items-center justify-between gap-4 text-left cursor-pointer group py-2.5 px-3 rounded-md hover:bg-gray-50 transition-colors duration-150"
+                className="w-full flex items-center justify-between gap-4 text-left cursor-pointer group py-2.5 px-3 rounded-[6px] hover:bg-gray-50 transition-colors duration-150"
               >
                 <span
                   className={`text-[14px] font-semibold transition-colors duration-150 ${isOpen ? "text-brand-green" : "text-gray-900 group-hover:text-brand-green"

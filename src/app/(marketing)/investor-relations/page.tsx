@@ -195,7 +195,7 @@ export default function InvestorRelationsPage() {
               >
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs">
-                    <span className="px-2 py-0.5 rounded-md font-bold bg-[#10b981]/10 text-[#327C73]">
+                    <span className="px-2 py-0.5 rounded-[6px] font-bold bg-[#10b981]/10 text-[#327C73]">
                       {report.period}
                     </span>
                     <span className="text-gray-400">•</span>

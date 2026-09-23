@@ -29,7 +29,7 @@ export const PackageAboutSection: React.FC<PackageAboutSectionProps> = ({
         <h2 className="text-xl font-bold text-gray-900 ">
           About this package
         </h2>
-        <span className="text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200/80 px-3 py-1 rounded-md max-w-full truncate">
+        <span className="text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200/80 px-3 py-1 rounded-[6px] max-w-full truncate">
           {badgeText}
         </span>
       </div>

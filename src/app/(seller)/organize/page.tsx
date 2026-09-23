@@ -705,7 +705,7 @@ const OrganizePage = () => {
               <h2 className="text-lg sm:text-xl font-bold text-gray-950">
                 About this packages
               </h2>
-              {/* <span className="bg-[#F8F9FA] border border-gray-200/80 text-gray-600 text-[11px] font-medium px-3 py-1 rounded-md">
+              {/* <span className="bg-[#F8F9FA] border border-gray-200/80 text-gray-600 text-[11px] font-medium px-3 py-1 rounded-[6px]">
                   {categoryBadgeLabel}
                 </span> */}
             </div>
@@ -1355,7 +1355,7 @@ const OrganizePage = () => {
             <h2 className="text-xl sm:text-2xl font-bold text-gray-950">
               Frequently asked questions
             </h2>
-            <span className="bg-[#F8F9FA] border border-gray-200/90 text-gray-600 text-xs font-semibold px-3 py-1 rounded-md">
+            <span className="bg-[#F8F9FA] border border-gray-200/90 text-gray-600 text-xs font-semibold px-3 py-1 rounded-[6px]">
               {categoryBadgeLabel}
             </span>
           </div>

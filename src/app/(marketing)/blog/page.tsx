@@ -215,7 +215,7 @@ export default function BlogPage() {
               >
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-[11px]">
-                    <span className="px-2.5 py-0.5 rounded-md font-bold bg-[#10b981]/10 text-[#327C73]">
+                    <span className="px-2.5 py-0.5 rounded-[6px] font-bold bg-[#10b981]/10 text-[#327C73]">
                       {post.category}
                     </span>
                     <span className="text-gray-400">•</span>
@@ -288,7 +288,7 @@ export default function BlogPage() {
             </Button>
 
             <div className="space-y-3 mb-6">
-              <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-[#10b981]/10 text-[#327C73]">
+              <span className="px-2.5 py-1 rounded-[6px] text-xs font-bold bg-[#10b981]/10 text-[#327C73]">
                 {selectedPost.category}
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-[#0f172a] leading-snug">

@@ -432,10 +432,10 @@ const NotificationsPage = () => {
                 <div className="w-11 h-11 rounded-[6px] bg-slate-100 shrink-0" />
                 <div className="flex-1 flex flex-col gap-2">
                   <div className="flex items-center justify-between">
-                    <div className="h-4 bg-slate-100 rounded-md w-1/3" />
-                    <div className="h-3 bg-slate-100 rounded-md w-16" />
+                    <div className="h-4 bg-slate-100 rounded-[6px] w-1/3" />
+                    <div className="h-3 bg-slate-100 rounded-[6px] w-16" />
                   </div>
-                  <div className="h-3 bg-slate-100 rounded-md w-3/4" />
+                  <div className="h-3 bg-slate-100 rounded-[6px] w-3/4" />
                 </div>
               </div>
             ))}
@@ -526,7 +526,7 @@ const NotificationsPage = () => {
                             <div className="flex items-center justify-between gap-2 mb-1 flex-wrap">
                               <div className="flex items-center gap-2 min-w-0">
                                 <span
-                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-md border uppercase tracking-wider ${category.badgeBg}`}
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-[6px] border uppercase tracking-wider ${category.badgeBg}`}
                                 >
                                   {category.label}
                                 </span>

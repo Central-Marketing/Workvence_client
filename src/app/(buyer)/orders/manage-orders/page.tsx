@@ -153,21 +153,21 @@ export default function BuyerManageOrdersPage() {
     if (!badge) return null;
     if (badge === "Expert") {
       return (
-        <span className="bg-[#5c4928] text-[#FDE68A] text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
+        <span className="bg-[#5c4928] text-[#FDE68A] text-[10px] font-bold px-2 py-0.5 rounded-[6px] tracking-wider">
           Expert
         </span>
       );
     }
     if (badge === "Pro") {
       return (
-        <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
+        <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] tracking-wider">
           Pro
         </span>
       );
     }
     if (badge === "Legend") {
       return (
-        <span className="bg-[#EA580C] text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
+        <span className="bg-[#EA580C] text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] tracking-wider">
           Legend
         </span>
       );

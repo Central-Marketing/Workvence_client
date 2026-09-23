@@ -361,8 +361,8 @@ export default function BuyerOrdersPage() {
                     size="sm"
                     radius="fiverr"
                     className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${activeTab === tab
-                        ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                        : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                      ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                      : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                       }`}
                   >
                     {tab}
@@ -433,7 +433,7 @@ export default function BuyerOrdersPage() {
                                 >
                                   {order.title}
                                 </span>
-                                <span className="text-[11px] font-semibold text-slate-600 bg-[#F1F3F5] px-2 py-0.5 rounded-md w-fit mt-1.5 capitalize">
+                                <span className="text-[11px] font-semibold text-slate-600 bg-[#F1F3F5] px-2 py-0.5 rounded-[6px] w-fit mt-1.5 capitalize">
                                   {order.itemType}
                                 </span>
                               </div>

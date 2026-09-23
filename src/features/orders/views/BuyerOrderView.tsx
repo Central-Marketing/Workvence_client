@@ -757,7 +757,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
             <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-base text-slate-900">Order Details</h3>
-                <span className="text-[11px] font-semibold text-slate-600 border border-slate-200 rounded-md px-2 py-0.5">
+                <span className="text-[11px] font-semibold text-slate-600 border border-slate-200 rounded-[6px] px-2 py-0.5">
                   Package
                 </span>
               </div>

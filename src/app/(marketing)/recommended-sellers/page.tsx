@@ -97,12 +97,12 @@ const RecommendedSellers = () => {
                   {seller.skills && seller.skills.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-gray-100">
                       {seller.skills.slice(0, 3).map((skill: string, index: number) => (
-                        <span key={index} className="px-2.5 py-1 bg-gray-50 text-gray-600 rounded-md text-[11.5px] font-medium border border-gray-100">
+                        <span key={index} className="px-2.5 py-1 bg-gray-50 text-gray-600 rounded-[6px] text-[11.5px] font-medium border border-gray-100">
                           {skill}
                         </span>
                       ))}
                       {seller.skills.length > 3 && (
-                        <span className="px-2.5 py-1 bg-gray-50 text-gray-400 rounded-md text-[11.5px] font-medium border border-gray-100">
+                        <span className="px-2.5 py-1 bg-gray-50 text-gray-400 rounded-[6px] text-[11.5px] font-medium border border-gray-100">
                           +{seller.skills.length - 3}
                         </span>
                       )}

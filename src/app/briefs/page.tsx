@@ -480,11 +480,10 @@ function BriefsContent() {
                   size="sm"
                   radius="full"
                   onClick={() => handleHubPillClick("all")}
-                  className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${
-                    hubActivePill === "all"
+                  className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${hubActivePill === "all"
                       ? "shadow-xs border-gray-900 bg-black text-white"
                       : "hover:border-gray-900 hover:text-black bg-white"
-                  }`}
+                    }`}
                 >
                   All Projects
                 </Button>
@@ -499,11 +498,10 @@ function BriefsContent() {
                       size="sm"
                       radius="full"
                       onClick={() => handleHubPillClick(cat.slug)}
-                      className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${
-                        isActive
+                      className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${isActive
                           ? "shadow-xs border-gray-900 bg-black text-white"
                           : "hover:border-gray-900 hover:text-black bg-white"
-                      }`}
+                        }`}
                     >
                       {cat.name}
                     </Button>
@@ -640,11 +638,10 @@ function BriefsContent() {
                         setActivePill(pill.id);
                         setCurrentPage(1);
                       }}
-                      className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${
-                        isActive
+                      className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${isActive
                           ? "shadow-xs border-gray-900"
                           : "hover:border-gray-900 hover:text-black"
-                      }`}
+                        }`}
                     >
                       {pill.title}
                     </Button>
@@ -867,93 +864,93 @@ function BriefsContent() {
                   )}
                 </div>
               </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-              {filteredBriefs.map((brief) => {
-                const briefId = brief.id || brief._id;
-                const proposalsCount =
-                  brief.proposalCount ?? brief._count?.proposals ?? brief.proposalsCount ?? (brief.proposals?.length || 0);
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                  {filteredBriefs.map((brief) => {
+                    const briefId = brief.id || brief._id;
+                    const proposalsCount =
+                      brief.proposalCount ?? brief._count?.proposals ?? brief.proposalsCount ?? (brief.proposals?.length || 0);
 
-                const country = brief.user?.country;
-                const location = country || "Remote";
+                    const country = brief.user?.country;
+                    const location = country || "Remote";
 
-                const budgetDisplay =
-                  brief.budget !== undefined && brief.budget !== null
-                    ? typeof brief.budget === "number"
-                      ? `$${brief.budget.toLocaleString()}`
-                      : String(brief.budget).startsWith("$")
-                        ? brief.budget
-                        : `$${brief.budget}`
-                    : null;
+                    const budgetDisplay =
+                      brief.budget !== undefined && brief.budget !== null
+                        ? typeof brief.budget === "number"
+                          ? `$${brief.budget.toLocaleString()}`
+                          : String(brief.budget).startsWith("$")
+                            ? brief.budget
+                            : `$${brief.budget}`
+                        : null;
 
-                const categoryFormatted = formatCategoryName(brief.category);
+                    const categoryFormatted = formatCategoryName(brief.category);
 
-                const skills =
-                  Array.isArray(brief.requiredSkills) && brief.requiredSkills.length > 0
-                    ? brief.requiredSkills
-                    : Array.isArray(brief.skills) && brief.skills.length > 0
-                      ? brief.skills
-                      : [];
+                    const skills =
+                      Array.isArray(brief.requiredSkills) && brief.requiredSkills.length > 0
+                        ? brief.requiredSkills
+                        : Array.isArray(brief.skills) && brief.skills.length > 0
+                          ? brief.skills
+                          : [];
 
-                const isFav = favoritedIds.has(briefId);
+                    const isFav = favoritedIds.has(briefId);
 
-                return (
-                  <div
-                    key={briefId}
-                    onClick={() => router.push(`/briefs/${briefId}`)}
-                    className="relative overflow-hidden bg-white rounded-[6px] border border-gray-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] p-6 sm:p-7 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer group select-none"
-                  >
-                    {/* Ambient Purple Glow (appears on card hover) */}
-                    <div
-                      className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out z-0"
-                      style={{
-                        position: "absolute",
-                        right: "-210px",
-                        top: "-407px",
-                        width: "555px",
-                        height: "513px",
-                        borderRadius: "555px",
-                        transform: "rotate(-180deg)",
-                        background: "var(--purple-100, #CEB0FA)",
-                        filter: "blur(150px)",
-                      }}
-                      aria-hidden="true"
-                    />
+                    return (
+                      <div
+                        key={briefId}
+                        onClick={() => router.push(`/briefs/${briefId}`)}
+                        className="relative overflow-hidden bg-white rounded-[6px] border border-gray-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] p-6 sm:p-7 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer group select-none"
+                      >
+                        {/* Ambient Purple Glow (appears on card hover) */}
+                        <div
+                          className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out z-0"
+                          style={{
+                            position: "absolute",
+                            right: "-210px",
+                            top: "-407px",
+                            width: "555px",
+                            height: "513px",
+                            borderRadius: "555px",
+                            transform: "rotate(-180deg)",
+                            background: "var(--purple-100, #CEB0FA)",
+                            filter: "blur(150px)",
+                          }}
+                          aria-hidden="true"
+                        />
 
-                    {/* Top Content Area */}
-                    <div className="relative z-10">
-                      {/* Header Row: Title, Meta, Badges, Heart */}
-                      <div className="flex items-start justify-between gap-3 mb-2">
-                        <div className="flex-1 min-w-0 pr-2">
-                          <h3 className="text-base sm:text-[18px] font-bold text-gray-900 group-hover:text-[#327C73] transition-colors line-clamp-1 tracking-tight">
-                            {brief.title}
-                          </h3>
-                          <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mt-1">
-                            <span>Posted {moment(brief.createdAt).fromNow()}</span>
-                            <span className="text-gray-300">•</span>
-                            <span>{location}</span>
-                          </div>
-                        </div>
+                        {/* Top Content Area */}
+                        <div className="relative z-10">
+                          {/* Header Row: Title, Meta, Badges, Heart */}
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            <div className="flex-1 min-w-0 pr-2">
+                              <h3 className="text-base sm:text-[18px] font-bold text-gray-900 group-hover:text-[#327C73] transition-colors line-clamp-1 tracking-tight">
+                                {brief.title}
+                              </h3>
+                              <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mt-1">
+                                <span>Posted {moment(brief.createdAt).fromNow()}</span>
+                                <span className="text-gray-300">•</span>
+                                <span>{location}</span>
+                              </div>
+                            </div>
 
-                        {/* Right Badges & Heart Icon */}
-                        <div className="flex items-center gap-2 shrink-0">
-                          {/* Purple Budget Badge */}
-                          {budgetDisplay && (
-                            <span className="bg-[#ECEBFE] text-[#6B5AED] text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap tracking-tight">
-                              {budgetDisplay}
-                            </span>
-                          )}
+                            {/* Right Badges & Heart Icon */}
+                            <div className="flex items-center gap-2 shrink-0">
+                              {/* Purple Budget Badge */}
+                              {budgetDisplay && (
+                                <span className="bg-[#ECEBFE] text-[#6B5AED] text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap tracking-tight">
+                                  {budgetDisplay}
+                                </span>
+                              )}
 
-                          {/* Category Pill Badge */}
-                          {categoryFormatted && (
-                            <span className="bg-gray-100 text-gray-800 text-xs font-medium px-3 py-1 rounded-full whitespace-nowrap hidden sm:inline-block tracking-tight">
-                              {categoryFormatted}
-                            </span>
-                          )}
+                              {/* Category Pill Badge */}
+                              {categoryFormatted && (
+                                <span className="bg-gray-100 text-gray-800 text-xs font-medium px-3 py-1 rounded-full whitespace-nowrap hidden sm:inline-block tracking-tight">
+                                  {categoryFormatted}
+                                </span>
+                              )}
 
-                          {/* Favorite Button */}
-                          {/* <button
+                              {/* Favorite Button */}
+                              {/* <button
                             type="button"
                             onClick={(e) => toggleFavorite(e, briefId)}
                             className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-gray-50 transition-colors cursor-pointer shrink-0"
@@ -965,140 +962,140 @@ function BriefsContent() {
                               }`}
                             />
                           </button> */}
+                            </div>
+                          </div>
+
+                          {/* Brief Description */}
+                          <p className="text-[13px] text-gray-600 line-clamp-2 my-4 leading-relaxed font-normal">
+                            {brief.description}
+                          </p>
+
+                          {/* Skills / Tags Row: Only rendered if real requiredSkills exist */}
+                          {skills.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-2 mb-6">
+                              {skills.slice(0, 4).map((skill: string, idx: number) => (
+                                <span
+                                  key={idx}
+                                  className="text-xs font-medium text-gray-600 bg-[#F5F5F7] border border-gray-200/80 px-3 py-1 rounded-[6px]"
+                                >
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Divider & Bottom Client / Proposals Bar - 100% Real Backend Data */}
+                        <div className="relative z-10 border-t border-gray-100 pt-4 mt-auto flex items-center justify-between">
+                          {/* Project Owner (Anonymous like Fiverr/Upwork) */}
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200/80 shadow-2xs shrink-0">
+                              <FiUser className="w-3.5 h-3.5 text-slate-500" />
+                            </div>
+
+                            <div className="min-w-0">
+                              <p className="text-xs sm:text-[13px] font-semibold text-gray-900 leading-tight truncate">
+                                Project Owner
+                              </p>
+                              <p className="text-[11px] leading-tight mt-0.5">
+                                {brief.status === "closed" ? (
+                                  <span className="text-red-500 font-medium">Closed</span>
+                                ) : (
+                                  <span className="text-emerald-600 font-medium">Open Project</span>
+                                )}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Real Proposal Count & Delivery Time */}
+                          <div className="text-right shrink-0">
+                            <p className="text-xs sm:text-[13px] font-bold text-gray-900 leading-tight">
+                              {proposalsCount} {proposalsCount === 1 ? "proposal" : "proposals"}
+                            </p>
+                            {brief.deliveryTime ? (
+                              <p className="text-[11px] text-gray-500 leading-tight mt-0.5">
+                                {brief.deliveryTime} {brief.deliveryTime === 1 ? "day" : "days"} delivery
+                              </p>
+                            ) : null}
+                          </div>
                         </div>
                       </div>
+                    );
+                  })}
+                </div>
 
-                      {/* Brief Description */}
-                      <p className="text-[13px] text-gray-600 line-clamp-2 my-4 leading-relaxed font-normal">
-                        {brief.description}
-                      </p>
+                {/* Pagination Controls from Real Backend totalPages */}
+                {totalPages > 1 && (
+                  <div className="w-full flex justify-center mt-10">
+                    <nav
+                      aria-label="Pagination Navigation"
+                      className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 max-w-full px-2"
+                    >
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        radius="xl"
+                        onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                        disabled={currentPage === 1}
+                        className="!inline-flex !flex-row !items-center !justify-center !gap-1.5 px-3 sm:px-3.5 !h-9 !min-h-[36px] !text-xs font-semibold shadow-2xs shrink-0 whitespace-nowrap"
+                        leftIcon={<FiChevronLeft className="w-3.5 h-3.5 shrink-0" />}
+                        aria-label="Previous page"
+                      >
+                        <span className="whitespace-nowrap">Previous</span>
+                      </Button>
 
-                      {/* Skills / Tags Row: Only rendered if real requiredSkills exist */}
-                      {skills.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-2 mb-6">
-                          {skills.slice(0, 4).map((skill: string, idx: number) => (
-                            <span
-                              key={idx}
-                              className="text-xs font-medium text-gray-600 bg-[#F5F5F7] border border-gray-200/80 px-3 py-1 rounded-md"
+                      <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                        {paginationRange.map((pageNum, idx) => {
+                          if (typeof pageNum === "string") {
+                            return (
+                              <span
+                                key={`ellipsis-${idx}`}
+                                className="w-7 sm:w-9 !h-9 !min-h-[36px] flex items-center justify-center text-xs text-slate-400 font-bold select-none shrink-0"
+                              >
+                                ...
+                              </span>
+                            );
+                          }
+
+                          const isActive = currentPage === pageNum;
+                          return (
+                            <Button
+                              key={`page-${pageNum}`}
+                              type="button"
+                              variant={isActive ? "brand" : "outline"}
+                              size="sm"
+                              radius="xl"
+                              onClick={() => handlePageChange(pageNum)}
+                              className={`!w-9 !h-9 !min-h-[36px] p-0 !text-xs font-semibold shadow-2xs shrink-0 !inline-flex !items-center !justify-center ${isActive ? "pointer-events-none !bg-[#0D6D5F] text-white" : "hover:border-gray-900"
+                                }`}
+                              aria-label={`Page ${pageNum}`}
+                              aria-current={isActive ? "page" : undefined}
                             >
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Divider & Bottom Client / Proposals Bar - 100% Real Backend Data */}
-                    <div className="relative z-10 border-t border-gray-100 pt-4 mt-auto flex items-center justify-between">
-                      {/* Project Owner (Anonymous like Fiverr/Upwork) */}
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200/80 shadow-2xs shrink-0">
-                          <FiUser className="w-3.5 h-3.5 text-slate-500" />
-                        </div>
-
-                        <div className="min-w-0">
-                          <p className="text-xs sm:text-[13px] font-semibold text-gray-900 leading-tight truncate">
-                            Project Owner
-                          </p>
-                          <p className="text-[11px] leading-tight mt-0.5">
-                            {brief.status === "closed" ? (
-                              <span className="text-red-500 font-medium">Closed</span>
-                            ) : (
-                              <span className="text-emerald-600 font-medium">Open Project</span>
-                            )}
-                          </p>
-                        </div>
+                              {pageNum}
+                            </Button>
+                          );
+                        })}
                       </div>
 
-                      {/* Real Proposal Count & Delivery Time */}
-                      <div className="text-right shrink-0">
-                        <p className="text-xs sm:text-[13px] font-bold text-gray-900 leading-tight">
-                          {proposalsCount} {proposalsCount === 1 ? "proposal" : "proposals"}
-                        </p>
-                        {brief.deliveryTime ? (
-                          <p className="text-[11px] text-gray-500 leading-tight mt-0.5">
-                            {brief.deliveryTime} {brief.deliveryTime === 1 ? "day" : "days"} delivery
-                          </p>
-                        ) : null}
-                      </div>
-                    </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        radius="xl"
+                        onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                        disabled={currentPage === totalPages}
+                        className="!inline-flex !flex-row !items-center !justify-center !gap-1.5 px-3 sm:px-3.5 !h-9 !min-h-[36px] !text-xs font-semibold shadow-2xs shrink-0 whitespace-nowrap"
+                        rightIcon={<FiChevronRight className="w-3.5 h-3.5 shrink-0" />}
+                        aria-label="Next page"
+                      >
+                        <span className="whitespace-nowrap">Next</span>
+                      </Button>
+                    </nav>
                   </div>
-                );
-              })}
-            </div>
-
-            {/* Pagination Controls from Real Backend totalPages */}
-            {totalPages > 1 && (
-              <div className="w-full flex justify-center mt-10">
-                <nav
-                  aria-label="Pagination Navigation"
-                  className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 max-w-full px-2"
-                >
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    radius="xl"
-                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="!inline-flex !flex-row !items-center !justify-center !gap-1.5 px-3 sm:px-3.5 !h-9 !min-h-[36px] !text-xs font-semibold shadow-2xs shrink-0 whitespace-nowrap"
-                    leftIcon={<FiChevronLeft className="w-3.5 h-3.5 shrink-0" />}
-                    aria-label="Previous page"
-                  >
-                    <span className="whitespace-nowrap">Previous</span>
-                  </Button>
-
-                  <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-                    {paginationRange.map((pageNum, idx) => {
-                      if (typeof pageNum === "string") {
-                        return (
-                          <span
-                            key={`ellipsis-${idx}`}
-                            className="w-7 sm:w-9 !h-9 !min-h-[36px] flex items-center justify-center text-xs text-slate-400 font-bold select-none shrink-0"
-                          >
-                            ...
-                          </span>
-                        );
-                      }
-
-                      const isActive = currentPage === pageNum;
-                      return (
-                        <Button
-                          key={`page-${pageNum}`}
-                          type="button"
-                          variant={isActive ? "brand" : "outline"}
-                          size="sm"
-                          radius="xl"
-                          onClick={() => handlePageChange(pageNum)}
-                          className={`!w-9 !h-9 !min-h-[36px] p-0 !text-xs font-semibold shadow-2xs shrink-0 !inline-flex !items-center !justify-center ${isActive ? "pointer-events-none !bg-[#0D6D5F] text-white" : "hover:border-gray-900"
-                            }`}
-                          aria-label={`Page ${pageNum}`}
-                          aria-current={isActive ? "page" : undefined}
-                        >
-                          {pageNum}
-                        </Button>
-                      );
-                    })}
-                  </div>
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    radius="xl"
-                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                    disabled={currentPage === totalPages}
-                    className="!inline-flex !flex-row !items-center !justify-center !gap-1.5 px-3 sm:px-3.5 !h-9 !min-h-[36px] !text-xs font-semibold shadow-2xs shrink-0 whitespace-nowrap"
-                    rightIcon={<FiChevronRight className="w-3.5 h-3.5 shrink-0" />}
-                    aria-label="Next page"
-                  >
-                    <span className="whitespace-nowrap">Next</span>
-                  </Button>
-                </nav>
-              </div>
+                )}
+              </>
             )}
-          </>
-        )}
           </div>
         )}
       </div>

@@ -31,7 +31,7 @@ import {
 } from "react-icons/ri";
 
 import axios from 'axios';
-import { axiosFetch, socket, getAvatarUrl, parseRevisionNumber } from "@/utils";
+import { axiosFetch, socket, getAvatarUrl, parseRevisionNumber, getOnlineStatus } from "@/utils";
 import supportService from "@/utils/supportService";
 import { getOtherUser, isConversationUnread, isTargetConversation, renderMessageTextWithLinks } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
@@ -883,7 +883,7 @@ const ChatView = () => {
     recipientUser ||
     (targetOtherUsername || resolveUserId ? { username: targetOtherUsername || 'User', _id: resolveUserId } : null);
 
-  const isRecipientOnline = Boolean(
+  const socketIsRecipientOnline = Boolean(
     finalRecipientUser &&
     onlineUsers?.some((u: any) => {
       const uId = String(typeof u === 'string' ? u : u?.userId || u?._id || u?.id || '');
@@ -891,6 +891,14 @@ const ChatView = () => {
       return Boolean(uId && rId && uId === rId);
     })
   );
+
+  const recipientStatus = getOnlineStatus(
+    finalRecipientUser?.lastActiveAt || finalRecipientUser?.updatedAt || finalRecipientUser?.lastSeen,
+    socketIsRecipientOnline,
+    10
+  );
+  const isRecipientOnline = recipientStatus.isOnline;
+  const recipientLastSeenText = recipientStatus.lastSeenText;
 
   useEffect(() => {
     activeConvRef.current = activeConversation;
@@ -1990,8 +1998,10 @@ const ChatView = () => {
                               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full shrink-0" />
                               Online
                             </span>
+                          ) : recipientLastSeenText ? (
+                            <span>Last seen {recipientLastSeenText}</span>
                           ) : (
-                            'Contact'
+                            'Offline'
                           )}
                         </span>
                       </div>
@@ -2020,7 +2030,7 @@ const ChatView = () => {
                         variant="ghost"
                         size="icon"
                         radius="lg"
-                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-[6px] hover:bg-emerald-50 text-emerald-600 shrink-0"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] sm:rounded-[6px] hover:bg-emerald-50 text-emerald-600 shrink-0"
                         onClick={() => {
                           setMeetingTitle(
                             `Job Discussion with @${finalRecipientUser?.username || 'Client'}`
@@ -2110,7 +2120,7 @@ const ChatView = () => {
                           variant="ghost"
                           size="icon"
                           radius="lg"
-                          className="w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-[6px] hover:bg-slate-100 text-slate-600 shrink-0"
+                          className="w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] sm:rounded-[6px] hover:bg-slate-100 text-slate-600 shrink-0"
                           onClick={() => setIsMsgSearchActive(true)}
                           aria-label="Search messages"
                           icon={
@@ -2147,7 +2157,7 @@ const ChatView = () => {
                         variant="ghost"
                         size="icon"
                         radius="lg"
-                        className="xl:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-[6px] hover:bg-slate-100 text-slate-600 shrink-0"
+                        className="xl:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] sm:rounded-[6px] hover:bg-slate-100 text-slate-600 shrink-0"
                         onClick={() => setIsRightSideOpen(true)}
                         aria-label="Open contact info"
                         icon={
@@ -3044,7 +3054,7 @@ const ChatView = () => {
                             <span className="font-bold text-slate-900 text-sm sm:text-base leading-tight truncate">
                               {finalRecipientUser.name || finalRecipientUser.username || 'User'}
                             </span>
-                            <span className="bg-[#4c1d95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md leading-none tracking-wide">
+                            <span className="bg-[#4c1d95] text-white text-[10px] font-bold px-2 py-1 rounded-[6px] leading-none tracking-wide">
                               {finalRecipientUser.badge || (finalRecipientUser.isSeller ? 'Seller' : 'Buyer')}
                             </span>
                           </div>
@@ -3084,8 +3094,23 @@ const ChatView = () => {
 
                       <div className="border-t border-slate-100 my-0.5" />
 
-                      {/* Details: From & Language */}
+                      {/* Details: Status, From & Language */}
                       <div className="flex flex-col gap-2 text-xs">
+                        <div className="grid grid-cols-[75px_1fr] items-center">
+                          <span className="text-slate-500">Status</span>
+                          <span className="text-slate-800 font-medium">
+                            {isRecipientOnline ? (
+                              <span className="text-emerald-600 font-medium flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full shrink-0" />
+                                Online
+                              </span>
+                            ) : recipientLastSeenText ? (
+                              <span>Last seen {recipientLastSeenText}</span>
+                            ) : (
+                              'Offline'
+                            )}
+                          </span>
+                        </div>
                         <div className="grid grid-cols-[75px_1fr] items-center">
                           <span className="text-slate-500">From</span>
                           <span className="text-slate-800 font-medium">
@@ -3166,7 +3191,7 @@ const ChatView = () => {
                               {displayedOrders.map((order: any, idx: number) => (
                                 <div
                                   key={order._id || idx}
-                                  className="flex items-center justify-between py-2.5 gap-2 cursor-pointer hover:bg-slate-50/80 rounded-md px-1 transition-colors group"
+                                  className="flex items-center justify-between py-2.5 gap-2 cursor-pointer hover:bg-slate-50/80 rounded-[6px] px-1 transition-colors group"
                                   onClick={() => {
                                     if (order._id) {
                                       navigate.push(`/orders/${order._id}`);
@@ -3194,10 +3219,10 @@ const ChatView = () => {
                               size="sm"
                               radius="xl"
                               fullWidth
-                              className="mt-2 py-2.5 bg-[#f1f3f5] hover:bg-[#e4e7eb] text-slate-700 font-semibold text-xs sm:text-sm text-center"
+                              className="mt-2 py-2.5 bg-[#f1f3f5] hover:bg-[#e4e7eb] text-[#292929] font-semibold text-[16px] text-center"
                               onClick={() => navigate.push('/orders')}
                             >
-                              view all
+                              View all
                             </Button>
                           )}
                         </>

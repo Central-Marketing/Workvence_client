@@ -11,12 +11,12 @@ export const OrderSkeleton: React.FC = () => {
             {/* Header Card Skeleton */}
             <div className="bg-white rounded-[6px] border border-slate-200 p-6 flex flex-col sm:flex-row justify-between items-start gap-4 shadow-xs">
               <div className="space-y-3 flex-1 w-full">
-                <Skeleton className="w-28 h-5 rounded-md !bg-slate-200" />
+                <Skeleton className="w-28 h-5 rounded-[6px] !bg-slate-200" />
                 <Skeleton className="w-3/4 h-8 rounded-[6px] !bg-slate-200" />
-                <Skeleton className="w-1/2 h-4 rounded-md !bg-slate-200" />
+                <Skeleton className="w-1/2 h-4 rounded-[6px] !bg-slate-200" />
               </div>
               <div className="space-y-2 shrink-0">
-                <Skeleton className="w-24 h-4 rounded-md !bg-slate-200" />
+                <Skeleton className="w-24 h-4 rounded-[6px] !bg-slate-200" />
                 <Skeleton className="w-32 h-9 rounded-[6px] !bg-slate-200" />
               </div>
             </div>
@@ -25,21 +25,21 @@ export const OrderSkeleton: React.FC = () => {
             <div className="bg-emerald-50/60 rounded-[6px] border border-emerald-200 p-5 flex items-center gap-4 shadow-xs">
               <Skeleton className="w-12 h-12 rounded-full shrink-0 !bg-emerald-200/70" />
               <div className="space-y-2 flex-1">
-                <Skeleton className="w-36 h-4 rounded-md !bg-emerald-200/70" />
-                <Skeleton className="w-48 h-6 rounded-md !bg-emerald-200/70" />
+                <Skeleton className="w-36 h-4 rounded-[6px] !bg-emerald-200/70" />
+                <Skeleton className="w-48 h-6 rounded-[6px] !bg-emerald-200/70" />
               </div>
             </div>
 
             {/* Order Activity Timeline Skeleton */}
             <div className="bg-white rounded-[6px] border border-slate-200 p-6 space-y-4 shadow-xs">
-              <Skeleton className="w-48 h-6 rounded-md mb-4 !bg-slate-200" />
+              <Skeleton className="w-48 h-6 rounded-[6px] mb-4 !bg-slate-200" />
               <div className="space-y-4">
                 {[1, 2, 3].map((item) => (
                   <div key={item} className="flex items-start gap-4">
                     <Skeleton className="w-8 h-8 rounded-full shrink-0 !bg-slate-200" />
                     <div className="space-y-2 flex-1">
-                      <Skeleton className="w-40 h-5 rounded-md !bg-slate-200" />
-                      <Skeleton className="w-full h-4 rounded-md !bg-slate-200" />
+                      <Skeleton className="w-40 h-5 rounded-[6px] !bg-slate-200" />
+                      <Skeleton className="w-full h-4 rounded-[6px] !bg-slate-200" />
                     </div>
                   </div>
                 ))}
@@ -48,7 +48,7 @@ export const OrderSkeleton: React.FC = () => {
 
             {/* Delivered Work Card Skeleton */}
             <div className="bg-white rounded-[6px] border border-slate-200 p-6 space-y-4 shadow-xs">
-              <Skeleton className="w-32 h-6 rounded-md !bg-slate-200" />
+              <Skeleton className="w-32 h-6 rounded-[6px] !bg-slate-200" />
               <Skeleton className="w-full h-16 rounded-[6px] !bg-slate-200" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                 <Skeleton className="w-full h-36 rounded-[6px] !bg-slate-200" />
@@ -60,12 +60,12 @@ export const OrderSkeleton: React.FC = () => {
           {/* Sidebar Area (1 col) */}
           <div className="space-y-6">
             <div className="bg-white rounded-[6px] border border-slate-200 p-6 space-y-4 shadow-xs">
-              <Skeleton className="w-36 h-6 rounded-md !bg-slate-200" />
+              <Skeleton className="w-36 h-6 rounded-[6px] !bg-slate-200" />
               <div className="flex items-center gap-3 py-2 border-b border-slate-100">
                 <Skeleton className="w-12 h-12 rounded-full shrink-0 !bg-slate-200" />
                 <div className="space-y-1.5 flex-1">
-                  <Skeleton className="w-24 h-4 rounded-md !bg-slate-200" />
-                  <Skeleton className="w-16 h-3 rounded-md !bg-slate-200" />
+                  <Skeleton className="w-24 h-4 rounded-[6px] !bg-slate-200" />
+                  <Skeleton className="w-16 h-3 rounded-[6px] !bg-slate-200" />
                 </div>
               </div>
               <div className="space-y-3 pt-2">
@@ -110,16 +110,16 @@ export const RecentOrdersSkeleton: React.FC<{ rows?: number }> = ({ rows = 4 }) 
           {Array.from({ length: rows }).map((_, index) => (
             <tr key={index}>
               <td style={{ width: '70px' }}>
-                <Skeleton className="w-[50px] h-[38px] rounded-md !bg-slate-200" />
+                <Skeleton className="w-[50px] h-[38px] rounded-[6px] !bg-slate-200" />
               </td>
               <td>
                 <div className="flex flex-col gap-1.5 py-1">
-                  <Skeleton className={`h-4 ${titleWidths[index % titleWidths.length]} rounded-md !bg-slate-200`} />
+                  <Skeleton className={`h-4 ${titleWidths[index % titleWidths.length]} rounded-[6px] !bg-slate-200`} />
                   <Skeleton className={`h-3 ${subWidths[index % subWidths.length]} rounded-sm !bg-slate-100`} />
                 </div>
               </td>
               <td style={{ width: '100px' }}>
-                <Skeleton className="w-16 h-5 rounded-md !bg-slate-200" />
+                <Skeleton className="w-16 h-5 rounded-[6px] !bg-slate-200" />
               </td>
               <td style={{ width: '110px' }}>
                 <Skeleton className="w-20 h-6 rounded-full !bg-slate-200" />

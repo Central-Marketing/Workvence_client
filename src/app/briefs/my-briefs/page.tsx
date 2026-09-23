@@ -623,7 +623,7 @@ const MyBriefs = () => {
                       {tags.map((tag, tIdx) => (
                         <span
                           key={tIdx}
-                          className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3 py-1 rounded-md border border-slate-200/60"
+                          className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3 py-1 rounded-[6px] border border-slate-200/60"
                         >
                           {tag}
                         </span>

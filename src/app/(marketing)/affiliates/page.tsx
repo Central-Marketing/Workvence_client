@@ -174,7 +174,7 @@ export default function AffiliatesPage() {
                 <div className="space-y-3">
                   <div className="text-3xl font-extrabold text-[#327C73]">{tier.commission}</div>
                   <h3 className="text-lg font-bold text-[#0f172a]">{tier.plan}</h3>
-                  <span className="inline-block px-2.5 py-1 rounded-md text-[11px] font-semibold bg-gray-100 text-gray-700">
+                  <span className="inline-block px-2.5 py-1 rounded-[6px] text-[11px] font-semibold bg-gray-100 text-gray-700">
                     {tier.type}
                   </span>
                   <p className="text-xs text-gray-600 leading-relaxed">{tier.desc}</p>

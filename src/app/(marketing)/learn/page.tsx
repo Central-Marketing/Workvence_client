@@ -158,7 +158,7 @@ export default function LearnPage() {
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="px-2.5 py-0.5 rounded-md font-bold bg-[#10b981]/10 text-[#327C73]">
+                  <span className="px-2.5 py-0.5 rounded-[6px] font-bold bg-[#10b981]/10 text-[#327C73]">
                     {course.category}
                   </span>
                   <div className="flex items-center gap-1 font-bold text-amber-500">
@@ -228,7 +228,7 @@ export default function LearnPage() {
             </Button>
 
             <div className="space-y-2 mb-6">
-              <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-[#10b981]/10 text-[#327C73]">
+              <span className="px-2.5 py-1 rounded-[6px] text-xs font-bold bg-[#10b981]/10 text-[#327C73]">
                 {selectedCourse.category}
               </span>
               <h2 className="text-2xl font-bold text-[#0f172a] leading-tight">

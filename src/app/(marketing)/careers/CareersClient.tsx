@@ -316,10 +316,10 @@ export default function CareersClient() {
               >
                 <div className="space-y-3 max-w-2xl">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-[#10b981]/10 text-[#327C73]">
+                    <span className="px-2.5 py-1 rounded-[6px] text-[11px] font-bold bg-[#10b981]/10 text-[#327C73]">
                       {job.department}
                     </span>
-                    <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-gray-100 text-gray-600">
+                    <span className="px-2.5 py-1 rounded-[6px] text-[11px] font-semibold bg-gray-100 text-gray-600">
                       {job.level}
                     </span>
                   </div>

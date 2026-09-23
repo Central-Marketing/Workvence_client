@@ -19,7 +19,7 @@ export type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl" | "icon";
 export type ButtonRadius =
   | "fiverr"         // rounded-[6px] (Fiverr modern standard)
   | "fiverr-classic" // rounded-[4px] (Fiverr classic compact)
-  | "md"             // rounded-md (6px)
+  | "md"             // rounded-[6px] (6px)
   | "lg"             // rounded-[8px]
   | "xl"             // rounded-[6px] (12px, Workvence card standard)
   | "2xl"            // rounded-[6px] (16px)

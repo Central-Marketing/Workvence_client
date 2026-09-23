@@ -27,7 +27,7 @@ export const SellerFaqSection: React.FC<SellerFaqSectionProps> = ({ faqs = [] })
         <h2 className="text-xl sm:text-2xl font-bold font-sf-pro text-gray-900 tracking-tight">
           Frequently asked questions
         </h2>
-        <span className="text-xs font-medium text-gray-500 bg-gray-100/80 border border-gray-200/60 px-3 py-1 rounded-md">
+        <span className="text-xs font-medium text-gray-500 bg-gray-100/80 border border-gray-200/60 px-3 py-1 rounded-[6px]">
           {faqs.length} {faqs.length === 1 ? "Question" : "Questions"}
         </span>
       </div>

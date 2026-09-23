@@ -78,7 +78,7 @@ const RecommendedSellers = () => {
 
               <Link
                 href={`/seller/${seller._id}`}
-                className="w-full py-2 text-center text-[13px] font-medium text-gray-500 border border-gray-200 rounded-md hover:border-brand-green hover:text-brand-green transition-colors"
+                className="w-full py-2 text-center text-[13px] font-medium text-gray-500 border border-gray-200 rounded-[6px] hover:border-brand-green hover:text-brand-green transition-colors"
               >
                 View Profile
               </Link>

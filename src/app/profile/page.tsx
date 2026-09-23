@@ -595,7 +595,7 @@ export default function ProfilePage() {
                   <h2 className="font-bold text-base sm:text-lg text-slate-900 leading-tight">
                     {user?.username || "Nilson Norman"}
                   </h2>
-                  <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
+                  <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] tracking-wider">
                     {user?.badge || (isSeller ? "Pro" : "Client")}
                   </span>
                 </div>

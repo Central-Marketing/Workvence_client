@@ -254,11 +254,11 @@ export default function ForumPage() {
                   <div className="space-y-2 max-w-2xl">
                     <div className="flex flex-wrap items-center gap-2 text-[11px]">
                       {thread.isPinned && (
-                        <span className="px-2 py-0.5 rounded-md font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                        <span className="px-2 py-0.5 rounded-[6px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                           Pinned
                         </span>
                       )}
-                      <span className="px-2 py-0.5 rounded-md font-semibold bg-gray-100 text-gray-600">
+                      <span className="px-2 py-0.5 rounded-[6px] font-semibold bg-gray-100 text-gray-600">
                         {thread.category}
                       </span>
                       <span className="text-gray-400">•</span>
@@ -280,7 +280,7 @@ export default function ForumPage() {
                       {thread.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="px-2 py-0.5 rounded-md text-[10px] bg-[#f1f5f9] text-gray-500"
+                          className="px-2 py-0.5 rounded-[6px] text-[10px] bg-[#f1f5f9] text-gray-500"
                         >
                           #{tag}
                         </span>

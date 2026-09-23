@@ -28,7 +28,7 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
           About the Seller
         </h2>
         {seller.memberSince && (
-          <span className="text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-md">
+          <span className="text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-[6px]">
             Member since {seller.memberSince}
           </span>
         )}

@@ -165,7 +165,7 @@ export const PackagePortfolioShowcase: React.FC<PackagePortfolioShowcaseProps> =
                   {currentPkg.tags.slice(0, 3).map((tag: string, idx: number) => (
                     <span
                       key={idx}
-                      className="bg-white/15 backdrop-blur-md text-white text-xs px-2.5 py-0.5 rounded-md font-medium"
+                      className="bg-white/15 backdrop-blur-md text-white text-xs px-2.5 py-0.5 rounded-[6px] font-medium"
                     >
                       {tag}
                     </span>

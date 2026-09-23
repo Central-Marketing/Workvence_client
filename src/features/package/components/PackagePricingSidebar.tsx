@@ -4,31 +4,7 @@ import React from "react";
 import { FiClock, FiRepeat, FiArrowRight, FiMessageSquare } from "react-icons/fi";
 import { PackageTierDetails, SellerDetails } from "../utils/packageDetailsNormalizer";
 import { Button } from "@/components/ui";
-
-const formatLastSeenDate = (dateVal?: string | Date): string => {
-  if (!dateVal) return "";
-  const monthNames: Record<number, string> = {
-    0: "Jan.",
-    1: "Feb.",
-    2: "March",
-    3: "April",
-    4: "May",
-    5: "June",
-    6: "July",
-    7: "Aug.",
-    8: "Sept.",
-    9: "Oct.",
-    10: "Nov.",
-    11: "Dec.",
-  };
-
-  const d = new Date(dateVal);
-  if (isNaN(d.getTime())) return "";
-  const day = d.getDate();
-  const month = monthNames[d.getMonth()] || d.toLocaleString("en-US", { month: "short" });
-  const year = d.getFullYear();
-  return `${day}. ${month} ${year}`;
-};
+import { getOnlineStatus } from "@/utils";
 
 interface PackagePricingSidebarProps {
   packages: {
@@ -70,6 +46,8 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
   const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
     seller.name || "Seller"
   )}&background=0D9488&color=fff&bold=true`;
+
+  const sellerStatus = getOnlineStatus(seller.lastActiveAt || seller.lastSeen, seller.isOnline, 10);
 
   return (
     <div className={`w-full max-w-[400px] space-y-6 ${className}`.trim()}>
@@ -255,8 +233,9 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
             }}
           />
           <span
-            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white ${seller.isOnline ? "bg-[#10B981]" : "bg-[#E5A93C]"
-              }`}
+            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white ${
+              sellerStatus.isOnline ? "bg-[#10B981]" : "bg-slate-300"
+            }`}
           />
         </div>
 
@@ -283,11 +262,16 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
             <span>Message {seller.name || seller.username || "Seller"}</span>
           </div>
           <div className="text-[10px] sm:text-[11.5px] text-gray-500 font-normal leading-tight mt-0.5">
-            {seller.isOnline
-              ? "Online"
-              : formatLastSeenDate(seller.lastActiveAt || seller.lastSeen)
-                ? `Offline · Last seen ${formatLastSeenDate(seller.lastActiveAt || seller.lastSeen)}`
-                : "Offline"}
+            {sellerStatus.isOnline ? (
+              <span className="text-emerald-600 font-medium flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full shrink-0" />
+                Online
+              </span>
+            ) : sellerStatus.lastSeenText ? (
+              `Offline · Last seen ${sellerStatus.lastSeenText}`
+            ) : (
+              "Offline"
+            )}
           </div>
         </div>
       </div>

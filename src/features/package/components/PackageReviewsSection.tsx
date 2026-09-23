@@ -43,7 +43,7 @@ export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
             Reviews from Clients
           </h2>
-          <span className="text-xs font-semibold text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-md">
+          <span className="text-xs font-semibold text-gray-500 bg-gray-50 border border-gray-200 px-3 py-1 rounded-[6px]">
             0 Reviews
           </span>
         </div>

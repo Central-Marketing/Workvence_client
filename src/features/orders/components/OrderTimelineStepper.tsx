@@ -70,7 +70,7 @@ export const OrderTimelineStepper: React.FC<OrderTimelineStepperProps> = ({ orde
 
             {/* Urgency late badge only if status is actually late */}
             {isLate && (
-              <div className="bg-[#FFF1F2] border border-[#FECDD3] text-rose-600 text-xs font-semibold px-3 py-1 rounded-md w-fit">
+              <div className="bg-[#FFF1F2] border border-[#FECDD3] text-rose-600 text-xs font-semibold px-3 py-1 rounded-[6px] w-fit">
                 The Order is late for <span className="font-bold">{order.lateDays || 1} day</span>
               </div>
             )}

@@ -94,7 +94,7 @@ const TopRatedSellers = () => {
                         <strong className="text-gray-800 ml-1">{seller.gigRating ? seller.gigRating : "0.0"}</strong>
                         <Star className="text-[#ffb33e] fill-[#ffb33e]" size={16} />
                       </div>
-                      <div className="flex items-center gap-0.5 bg-[#ff7a00] text-white px-2.5 py-1 rounded-md text-[12px] font-bold">
+                      <div className="flex items-center gap-0.5 bg-[#ff7a00] text-white px-2.5 py-1 rounded-[6px] text-[12px] font-bold">
                         <span className="mr-1">Top Rated</span>
                         <Award size={13} strokeWidth={2.5} />
                         <Award size={13} className="-ml-1.5" strokeWidth={2.5} />

@@ -331,7 +331,7 @@ export default function SupportDashboardPage() {
                           {ticket.category || "General Support"}
                         </span>
                         {ticket.adminResponded && (
-                          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-[#327C73]/10 text-[#327C73]">
+                          <span className="px-2.5 py-1 rounded-[6px] text-[10px] font-bold bg-[#327C73]/10 text-[#327C73]">
                             Admin Responded
                           </span>
                         )}

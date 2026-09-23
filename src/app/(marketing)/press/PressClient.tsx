@@ -175,7 +175,7 @@ export default function PressClient() {
                     className="bg-white border border-gray-200/90 rounded-[6px] p-7 hover:border-[#327C73] hover:shadow-md transition-all duration-200 space-y-3"
                   >
                     <div className="flex items-center gap-3 text-xs">
-                      <span className="px-2.5 py-1 rounded-md font-bold bg-[#10b981]/10 text-[#327C73]">
+                      <span className="px-2.5 py-1 rounded-[6px] font-bold bg-[#10b981]/10 text-[#327C73]">
                         {pr.category}
                       </span>
                       <span className="text-gray-400">•</span>
@@ -390,7 +390,7 @@ export default function PressClient() {
 
             <div className="space-y-4 mb-6">
               <div className="flex items-center gap-2 text-xs">
-                <span className="px-2.5 py-1 rounded-md font-bold bg-[#10b981]/10 text-[#327C73]">
+                <span className="px-2.5 py-1 rounded-[6px] font-bold bg-[#10b981]/10 text-[#327C73]">
                   {selectedRelease.category}
                 </span>
                 <span className="text-gray-400">•</span>

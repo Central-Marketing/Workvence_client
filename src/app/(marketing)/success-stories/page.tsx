@@ -224,7 +224,7 @@ export default function SuccessStoriesPage() {
             </Button>
 
             <div className="space-y-3 mb-6">
-              <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-[#10b981]/10 text-[#327C73]">
+              <span className="px-2.5 py-1 rounded-[6px] text-xs font-bold bg-[#10b981]/10 text-[#327C73]">
                 {selectedStory.type} Case Study
               </span>
               <h3 className="text-2xl font-bold text-[#0f172a] leading-tight">

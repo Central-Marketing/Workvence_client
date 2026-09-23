@@ -1197,7 +1197,7 @@ const BriefDetail = () => {
                                 {item.name}
                               </span>
                               {item.badge && (
-                                <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
+                                <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] tracking-wider">
                                   {item.badge}
                                 </span>
                               )}
@@ -1413,7 +1413,7 @@ const BriefDetail = () => {
                                     {displayItem.name}
                                   </span>
                                   {displayItem.badge && (
-                                    <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
+                                    <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] tracking-wider">
                                       {displayItem.badge}
                                     </span>
                                   )}
@@ -1602,7 +1602,7 @@ const BriefDetail = () => {
                         {detailedProposal.name}
                       </span>
                       {detailedProposal.badge && (
-                        <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-md tracking-wider">
+                        <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] tracking-wider">
                           {detailedProposal.badge}
                         </span>
                       )}
@@ -1639,7 +1639,7 @@ const BriefDetail = () => {
 
                 {/* Member Since Badge */}
                 {detailedProposal.memberSince && (
-                  <span className="text-[11px] font-medium text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md shrink-0 whitespace-nowrap">
+                  <span className="text-[11px] font-medium text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-[6px] shrink-0 whitespace-nowrap">
                     Member since {detailedProposal.memberSince}
                   </span>
                 )}
@@ -1679,13 +1679,13 @@ const BriefDetail = () => {
                     {detailedProposal.skills.slice(0, 6).map((sk: string, sIdx: number) => (
                       <span
                         key={sIdx}
-                        className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3 py-1 rounded-md border border-slate-200/60"
+                        className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3 py-1 rounded-[6px] border border-slate-200/60"
                       >
                         {sk}
                       </span>
                     ))}
                     {detailedProposal.skills.length > 6 && (
-                      <span className="bg-[#F1F3F5] text-slate-700 text-xs font-bold px-2 py-1 rounded-md border border-slate-200/60">
+                      <span className="bg-[#F1F3F5] text-slate-700 text-xs font-bold px-2 py-1 rounded-[6px] border border-slate-200/60">
                         +{detailedProposal.skills.length - 6}
                       </span>
                     )}

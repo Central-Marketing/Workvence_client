@@ -222,7 +222,7 @@ export default function CreateSupportTicketPage() {
               value={selectedOrderID}
               onChange={(e) => setSelectedOrderID(e.target.value)}
               disabled={loadingOrders}
-              className="w-full px-4 py-3 rounded-lg border border-[#e2e8f0] bg-[#f8fafc] text-xs font-medium text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none cursor-pointer transition font-inter"
+              className="w-full px-4 py-3 rounded-[6px] border border-[#e2e8f0] bg-[#f8fafc] text-xs font-medium text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none cursor-pointer transition font-inter"
             >
               <option value="">-- No Order Linked --</option>
               {orders.map((ord: any) => (
@@ -245,7 +245,7 @@ export default function CreateSupportTicketPage() {
                 placeholder="Briefly state your issue (e.g. Need assistance with order payout)"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-[#e2e8f0] bg-[#f8fafc] text-xs font-medium text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none transition font-inter"
+                className="w-full px-4 py-3 rounded-[6px] border border-[#e2e8f0] bg-[#f8fafc] text-xs font-medium text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none transition font-inter"
               />
             </div>
 
@@ -301,7 +301,7 @@ export default function CreateSupportTicketPage() {
                   {attachments.map((att, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#327C73]/10 border border-[#327C73]/20 text-[#327C73] text-xs font-medium font-inter"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[6px] bg-[#327C73]/10 border border-[#327C73]/20 text-[#327C73] text-xs font-medium font-inter"
                     >
                       <FileText className="w-3.5 h-3.5" />
                       <span className="truncate max-w-[200px]">{att.name}</span>
@@ -327,7 +327,7 @@ export default function CreateSupportTicketPage() {
           <div className="flex items-center justify-end gap-3 pt-2">
             <Link
               href="/support"
-              className="px-6 py-3 rounded-lg border border-[#e2e8f0] bg-white text-[#475569] font-semibold text-xs hover:bg-[#f8fafc] transition cursor-pointer font-sf-pro"
+              className="px-6 py-3 rounded-[6px] border border-[#e2e8f0] bg-white text-[#475569] font-semibold text-xs hover:bg-[#f8fafc] transition cursor-pointer font-sf-pro"
             >
               Cancel
             </Link>

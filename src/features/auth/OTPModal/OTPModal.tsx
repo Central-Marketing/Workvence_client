@@ -44,7 +44,7 @@ const OTPModal: React.FC<OTPModalProps> = ({
       onClick={() => !isLoading && onClose()}
     >
       <div
-        className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col items-center text-center relative overflow-hidden"
+        className="bg-white rounded-[6px] max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col items-center text-center relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}

@@ -105,7 +105,7 @@ export default function ClearVoicePage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white border border-gray-200/90 rounded-3xl p-8 space-y-4 shadow-xs hover:border-[#327C73] hover:shadow-md transition duration-300"
+                  className="bg-white border border-gray-200/90 rounded-[6px] p-8 space-y-4 shadow-xs hover:border-[#327C73] hover:shadow-md transition duration-300"
                 >
                   <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
                     <Icon className="w-6 h-6" />
@@ -122,7 +122,7 @@ export default function ClearVoicePage() {
       {/* Request Modal */}
       {isRequestOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
             <Button
               onClick={() => setIsRequestOpen(false)}
               variant="soft"

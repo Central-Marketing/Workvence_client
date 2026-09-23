@@ -791,13 +791,13 @@ const BriefDetail = () => {
               {skills.slice(0, 5).map((skill: string, idx: number) => (
                 <span
                   key={idx}
-                  className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3.5 py-1.5 rounded-lg border border-slate-200/60"
+                  className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3.5 py-1.5 rounded-[6px] border border-slate-200/60"
                 >
                   {skill}
                 </span>
               ))}
               {skills.length > 5 && (
-                <span className="bg-[#F1F3F5] text-slate-700 text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-200/60">
+                <span className="bg-[#F1F3F5] text-slate-700 text-xs font-bold px-3 py-1.5 rounded-[6px] border border-slate-200/60">
                   +{skills.length - 5}
                 </span>
               )}
@@ -1009,7 +1009,7 @@ const BriefDetail = () => {
 
         {/* Bottom Banner: "Find the Right Project" - Only visible to Freelancers / Guest Users (NOT Project Owner) */}
         {!isOwner && (
-          <div className="relative w-full rounded-[6px] sm:rounded-3xl overflow-hidden mt-12 mb-6 bg-[#042823] min-h-[300px] sm:min-h-[360px] md:min-h-[420px] flex items-center shadow-lg">
+          <div className="relative w-full rounded-[6px] sm:rounded-[6px] overflow-hidden mt-12 mb-6 bg-[#042823] min-h-[300px] sm:min-h-[360px] md:min-h-[420px] flex items-center shadow-lg">
             {/* Background 3D Layered Cards Image */}
             <div className="absolute inset-0 z-0">
               <Image
@@ -1316,7 +1316,7 @@ const BriefDetail = () => {
                     <div className="bg-gradient-to-br from-[#0D6D5F]/5 via-[#0D6D5F]/10 to-slate-50/50 border border-[#0D6D5F]/20 rounded-[6px] p-4 sm:p-5 shadow-2xs">
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-lg bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F]">
+                          <div className="w-7 h-7 rounded-[6px] bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F]">
                             <HiSparkles className="text-base" />
                           </div>
                           <h3 className="font-bold text-sm text-slate-900">
@@ -1362,22 +1362,22 @@ const BriefDetail = () => {
                           <div className="flex items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-100">
                             <div className="flex items-center gap-2 flex-wrap">
                               {rank === 1 ? (
-                                <span className="inline-flex items-center gap-1.5 bg-[#0D6D5F] text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-2xs tracking-wide">
+                                <span className="inline-flex items-center gap-1.5 bg-[#0D6D5F] text-white text-[11px] font-bold px-2.5 py-1 rounded-[6px] shadow-2xs tracking-wide">
                                   <HiSparkles className="text-xs text-amber-300" />
                                   #1 Top Match
                                 </span>
                               ) : rank === 2 ? (
-                                <span className="inline-flex items-center gap-1 bg-slate-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">
+                                <span className="inline-flex items-center gap-1 bg-slate-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-[6px]">
                                   #2 Recommendation
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 bg-slate-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">
+                                <span className="inline-flex items-center gap-1 bg-slate-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-[6px]">
                                   #{rank} Recommendation
                                 </span>
                               )}
 
                               {score !== null && (
-                                <span className="inline-flex items-center gap-1 bg-emerald-50 text-[#0D6D5F] border border-[#0D6D5F]/20 text-[11px] font-bold px-2 py-0.5 rounded-lg">
+                                <span className="inline-flex items-center gap-1 bg-emerald-50 text-[#0D6D5F] border border-[#0D6D5F]/20 text-[11px] font-bold px-2 py-0.5 rounded-[6px]">
                                   Score: {score}/100
                                 </span>
                               )}

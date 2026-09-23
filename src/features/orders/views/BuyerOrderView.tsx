@@ -489,7 +489,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                   <h3 className="font-bold text-base text-slate-900">
                     {isAlreadyReviewed ? "Your Feedback & Review" : "Share Feedback & Review"}
                   </h3>
-                  <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200/80 rounded-lg text-xs font-semibold text-slate-700">
+                  <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200/80 rounded-[6px] text-xs font-semibold text-slate-700">
                     <span className="text-slate-500 font-medium">Rating</span>
                     <span className="font-bold text-slate-900">
                       {isAlreadyReviewed

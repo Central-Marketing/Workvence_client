@@ -159,7 +159,7 @@ export default function PodcastPage() {
       {/* Featured / Active Episode Player Banner */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl">
-          <div className="bg-[#0f172a] text-white rounded-3xl p-8 sm:p-10 shadow-2xl space-y-6">
+          <div className="bg-[#0f172a] text-white rounded-[6px] p-8 sm:p-10 shadow-2xl space-y-6">
             <div className="flex items-center justify-between">
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#6ad724]/20 text-[#6ad724]">
                 Episode #{activeEpisode.number} • Featured
@@ -254,7 +254,7 @@ export default function PodcastPage() {
             {episodes.map((ep) => (
               <div
                 key={ep.id}
-                className="bg-[#f8fafc] border border-gray-200/90 rounded-3xl p-7 hover:border-[#327C73] transition duration-200 space-y-4"
+                className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-7 hover:border-[#327C73] transition duration-200 space-y-4"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1">

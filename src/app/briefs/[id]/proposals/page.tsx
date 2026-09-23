@@ -156,7 +156,7 @@ const Proposals = () => {
           <div className="bg-white border border-[#0D6D5F]/25 rounded-[6px] shadow-xs overflow-hidden">
             <div className="bg-gradient-to-r from-[#0D6D5F]/10 via-[#0D6D5F]/5 to-transparent p-5 px-6 sm:px-8 border-b border-[#0D6D5F]/15 flex items-center justify-between gap-2.5">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F]">
+                <div className="w-8 h-8 rounded-[6px] bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F]">
                   <HiSparkles className="text-lg" />
                 </div>
                 <h2 className="text-lg font-bold text-slate-900">AI Top Recommendations</h2>

@@ -1037,7 +1037,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
           onClick={() => !isSubmittingDelivery && setShowDeliverModal(false)}
         >
           <div
-            className="bg-white rounded-3xl max-w-xl w-full max-h-[calc(100dvh-2rem)] flex flex-col overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-100 relative"
+            className="bg-white rounded-[6px] max-w-xl w-full max-h-[calc(100dvh-2rem)] flex flex-col overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-100 relative"
             onClick={(e) => e.stopPropagation()}
           >
             <Button
@@ -1109,7 +1109,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                     {uploadedFiles.map((f, i) => (
                       <div
                         key={i}
-                        className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs"
+                        className="flex items-center justify-between p-2.5 rounded-[6px] bg-slate-50 border border-slate-200 text-xs"
                       >
                         <span className="font-semibold text-slate-800 truncate max-w-[280px]">{f.name}</span>
                         <span className="text-slate-400">{f.size}</span>

@@ -92,7 +92,7 @@ export default function CommunityHubPage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white border border-gray-200/90 rounded-3xl p-8 space-y-6 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+                  className="bg-white border border-gray-200/90 rounded-[6px] p-8 space-y-6 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between"
                 >
                   <div className="space-y-4">
                     <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">

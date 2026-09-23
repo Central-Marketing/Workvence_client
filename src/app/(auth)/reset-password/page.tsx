@@ -190,7 +190,7 @@ const ResetPasswordContent = () => {
                         placeholder="***********"
                         value={passwords.newPassword}
                         onChange={handleChange}
-                        className="py-3 px-3 pr-11 border border-gray-200 rounded-lg text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full"
+                        className="py-3 px-3 pr-11 border border-gray-200 rounded-[6px] text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full"
                       />
                       <Button
                         type="button"
@@ -214,7 +214,7 @@ const ResetPasswordContent = () => {
                         placeholder="***********"
                         value={passwords.confirmPassword}
                         onChange={handleChange}
-                        className="py-3 px-3 pr-11 border border-gray-200 rounded-lg text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full"
+                        className="py-3 px-3 pr-11 border border-gray-200 rounded-[6px] text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full"
                       />
                       <Button
                         type="button"

@@ -261,7 +261,7 @@ export default function InvestorRelationsPage() {
 
             {/* Investor Inquiry Form (6 cols) */}
             <div className="lg:col-span-6">
-              <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-5">
+              <div className="bg-white border border-gray-200 rounded-[6px] p-6 sm:p-8 shadow-xs space-y-5">
                 <div className="space-y-1">
                   <h3 className="text-xl font-bold text-[#0f172a]">Investor Inquiries</h3>
                   <p className="text-xs text-gray-500">

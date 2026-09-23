@@ -241,7 +241,7 @@ export default function PressClient() {
             <div className="lg:col-span-4 space-y-8">
 
               {/* Media Kit Card */}
-              <div className="bg-[#f8fafc] border border-gray-200 rounded-3xl p-6 space-y-5">
+              <div className="bg-[#f8fafc] border border-gray-200 rounded-[6px] p-6 space-y-5">
                 <h3 className="text-lg font-bold text-[#0f172a]">Official Brand Assets</h3>
                 <p className="text-xs text-gray-600 leading-relaxed">
                   Download high-resolution logos, brand guidelines, product screenshots, and executive portraits.
@@ -286,7 +286,7 @@ export default function PressClient() {
               </div>
 
               {/* Media Inquiries Form */}
-              <div id="media-inquiries" className="bg-white border border-gray-200 rounded-3xl p-6 shadow-xs space-y-4">
+              <div id="media-inquiries" className="bg-white border border-gray-200 rounded-[6px] p-6 shadow-xs space-y-4">
                 <div className="space-y-1">
                   <h3 className="text-lg font-bold text-[#0f172a]">Media Relations</h3>
                   <p className="text-xs text-gray-500">
@@ -375,7 +375,7 @@ export default function PressClient() {
       {/* Press Release Reader Modal */}
       {selectedRelease && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
             <Button
               type="button"
               variant="soft"

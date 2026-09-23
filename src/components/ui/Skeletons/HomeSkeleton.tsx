@@ -34,7 +34,7 @@ export const TopSellersSkeleton: React.FC = () => {
             <Skeleton className="w-64 h-9" />
             <Skeleton className="w-96 h-4" />
           </div>
-          <Skeleton className="w-28 h-10 rounded-lg hidden md:block" />
+          <Skeleton className="w-28 h-10 rounded-[6px] hidden md:block" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (

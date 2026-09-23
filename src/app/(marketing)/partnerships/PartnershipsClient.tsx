@@ -159,7 +159,7 @@ export default function PartnershipsClient() {
               return (
                 <div
                   key={idx}
-                  className="bg-white rounded-3xl p-8 border border-gray-200/90 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 space-y-6 flex flex-col justify-between"
+                  className="bg-white rounded-[6px] p-8 border border-gray-200/90 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 space-y-6 flex flex-col justify-between"
                 >
                   <div className="space-y-4">
                     <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
@@ -228,7 +228,7 @@ export default function PartnershipsClient() {
       {/* Partner Application Modal */}
       {isApplying && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
             <Button
               onClick={() => setIsApplying(false)}
               variant="soft"

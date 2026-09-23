@@ -58,12 +58,12 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
     const list = Array.isArray(popularData)
       ? popularData
       : Array.isArray(popularData?.gigs)
-      ? popularData.gigs
-      : Array.isArray(popularData?.packages)
-      ? popularData.packages
-      : Array.isArray(popularData?.data)
-      ? popularData.data
-      : [];
+        ? popularData.gigs
+        : Array.isArray(popularData?.packages)
+          ? popularData.packages
+          : Array.isArray(popularData?.data)
+            ? popularData.data
+            : [];
     // If backend returns popular gigs, use them; otherwise fallback to recommended list
     return list.length > 0 ? list : recommendedList;
   }, [popularData, recommendedList]);
@@ -130,9 +130,8 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
             )}
             <div className="w-56 sm:w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all duration-700 ${
-                  completionPercentage >= 100 ? "bg-emerald-500 w-full" : "bg-[#00E599]"
-                }`}
+                className={`h-full rounded-full transition-all duration-700 ${completionPercentage >= 100 ? "bg-emerald-500 w-full" : "bg-[#00E599]"
+                  }`}
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
@@ -140,7 +139,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
         </div>
 
         {/* Hero Card: Start Your Journey */}
-        <div className="bg-white border border-gray-100 rounded-3xl p-8 sm:p-12 md:p-14 text-center shadow-[0_2px_14px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center">
+        <div className="bg-white border border-gray-100 rounded-[6px] p-8 sm:p-12 md:p-14 text-center shadow-[0_2px_14px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center">
           {/* Illustration */}
           <div className="relative w-36 h-24 mb-4 flex items-center justify-center">
             <Image

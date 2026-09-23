@@ -74,7 +74,7 @@ export default function CommunityStandardsPage() {
           {standards.map((s, idx) => (
             <div
               key={idx}
-              className="bg-[#f8fafc] border border-gray-200/90 rounded-3xl p-8 space-y-6 shadow-xs"
+              className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-8 space-y-6 shadow-xs"
             >
               <h3 className="text-xl font-bold text-[#0f172a]">{s.title}</h3>
 
@@ -99,7 +99,7 @@ export default function CommunityStandardsPage() {
           ))}
 
           {/* Violations & Enforcement Box */}
-          <div className="bg-white border border-gray-200 rounded-3xl p-8 sm:p-10 space-y-4">
+          <div className="bg-white border border-gray-200 rounded-[6px] p-8 sm:p-10 space-y-4">
             <h3 className="text-xl font-bold text-[#0f172a]">Enforcement & Reporting</h3>
             <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
               Workvence employs continuous AI risk monitoring, KYC verification, and a dedicated 24/7 trust operations team. Violations of these standards may result in warnings, gig removal, escrow hold, or permanent account termination.

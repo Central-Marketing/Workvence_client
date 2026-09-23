@@ -7,7 +7,7 @@ export const SellerProfileSkeleton: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
           {/* LEFT COLUMN Skeleton */}
-          <div className="lg:col-span-4 bg-white border border-slate-200 rounded-3xl p-6 space-y-6">
+          <div className="lg:col-span-4 bg-white border border-slate-200 rounded-[6px] p-6 space-y-6">
             <div className="flex flex-col items-center gap-3 border-b border-slate-100 pb-6">
               <Skeleton className="w-24 h-24 rounded-full" />
               <Skeleton className="w-36 h-6" />
@@ -23,7 +23,7 @@ export const SellerProfileSkeleton: React.FC = () => {
 
           {/* RIGHT COLUMN Skeleton */}
           <div className="lg:col-span-8 space-y-8">
-            <div className="bg-white border border-slate-200 rounded-3xl p-7 space-y-4">
+            <div className="bg-white border border-slate-200 rounded-[6px] p-7 space-y-4">
               <Skeleton className="w-48 h-7" />
               <Skeleton className="w-full h-4" />
               <Skeleton className="w-full h-4" />

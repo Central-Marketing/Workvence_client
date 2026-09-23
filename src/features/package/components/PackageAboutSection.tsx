@@ -36,7 +36,7 @@ export const PackageAboutSection: React.FC<PackageAboutSectionProps> = ({
 
       {/* Description Content (HTML rendered cleanly and fully responsive) */}
       <div
-        className="w-full max-w-full overflow-hidden text-[14.5px] sm:text-[15px] text-gray-700 leading-relaxed prose prose-slate max-w-none break-words [overflow-wrap:anywhere] [word-break:break-word] [&_p]:break-words [&_p]:[overflow-wrap:anywhere] [&_span]:break-words [&_span]:[overflow-wrap:anywhere] [&_a]:break-all [&>p]:mb-3 [&>ul]:list-disc [&>ul]:pl-5 [&>ol]:list-decimal [&>ol]:pl-5 [&_*]:max-w-full [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:whitespace-pre-wrap [&_pre]:break-words [&_code]:break-words [&_table]:max-w-full [&_table]:overflow-x-auto [&_table]:block [&_iframe]:max-w-full"
+        className="w-full max-w-full overflow-hidden text-[14.5px] sm:text-[15px] text-gray-700 leading-relaxed prose prose-slate max-w-none break-words [overflow-wrap:anywhere] [word-break:break-word] [&_p]:break-words [&_p]:[overflow-wrap:anywhere] [&_span]:break-words [&_span]:[overflow-wrap:anywhere] [&_a]:break-all [&>p]:mb-3 [&>ul]:list-disc [&>ul]:pl-5 [&>ol]:list-decimal [&>ol]:pl-5 [&_*]:max-w-full [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-[6px] [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:whitespace-pre-wrap [&_pre]:break-words [&_code]:break-words [&_table]:max-w-full [&_table]:overflow-x-auto [&_table]:block [&_iframe]:max-w-full"
         dangerouslySetInnerHTML={{ __html: description || "<p>No description provided.</p>" }}
       />
     </div>

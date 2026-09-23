@@ -336,7 +336,7 @@ const ChatMessageAttachmentItem = ({
       className={`flex items-center gap-2.5 px-3.5 py-2.5 mt-1 bg-slate-100 hover:bg-slate-200/80 text-slate-800 rounded-[6px] transition-all border border-slate-200/90 text-xs font-semibold cursor-pointer select-none max-w-[280px] group shadow-2xs ${!hasMsgText ? 'mb-5' : 'mb-1.5'}`}
       title="Click to open file in a new tab"
     >
-      <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-base shadow-2xs shrink-0 group-hover:scale-105 transition-transform">
+      <div className="w-8 h-8 rounded-[6px] bg-white flex items-center justify-center text-base shadow-2xs shrink-0 group-hover:scale-105 transition-transform">
         {isPdf ? '📕' : '📄'}
       </div>
       <div className="flex flex-col min-w-0 flex-1">
@@ -1986,7 +1986,7 @@ const ChatView = () => {
                         variant="ghost"
                         size="icon"
                         radius="lg"
-                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg hover:bg-emerald-50 text-emerald-600 shrink-0"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-[6px] hover:bg-emerald-50 text-emerald-600 shrink-0"
                         onClick={() => {
                           setMeetingTitle(
                             `Job Discussion with @${finalRecipientUser?.username || 'Client'}`
@@ -2076,7 +2076,7 @@ const ChatView = () => {
                           variant="ghost"
                           size="icon"
                           radius="lg"
-                          className="w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg hover:bg-slate-100 text-slate-600 shrink-0"
+                          className="w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-[6px] hover:bg-slate-100 text-slate-600 shrink-0"
                           onClick={() => setIsMsgSearchActive(true)}
                           aria-label="Search messages"
                           icon={
@@ -2113,7 +2113,7 @@ const ChatView = () => {
                         variant="ghost"
                         size="icon"
                         radius="lg"
-                        className="xl:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg hover:bg-slate-100 text-slate-600 shrink-0"
+                        className="xl:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-[6px] hover:bg-slate-100 text-slate-600 shrink-0"
                         onClick={() => setIsRightSideOpen(true)}
                         aria-label="Open contact info"
                         icon={
@@ -2576,16 +2576,16 @@ const ChatView = () => {
                         <img
                           src={attachment.previewUrl || attachment.url}
                           alt="Preview"
-                          className="w-16 h-16 rounded-lg object-cover border border-slate-300 shadow-xs"
+                          className="w-16 h-16 rounded-[6px] object-cover border border-slate-300 shadow-xs"
                         />
                       </div>
                     ) : attachment.type?.includes('video') || /\.(mp4|webm|ogg|mov|mkv|avi)/i.test(attachment.name) || attachment.url?.includes('/video/upload/') ? (
-                      <div className="w-16 h-16 bg-black rounded-lg overflow-hidden relative flex-shrink-0 flex items-center justify-center border border-slate-300 shadow-xs">
+                      <div className="w-16 h-16 bg-black rounded-[6px] overflow-hidden relative flex-shrink-0 flex items-center justify-center border border-slate-300 shadow-xs">
                         <video src={attachment.previewUrl || attachment.url} className="w-full h-full object-cover" />
                         <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-xs font-bold">▶</span>
                       </div>
                     ) : (
-                      <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 rounded-lg flex items-center justify-center font-bold text-xl flex-shrink-0">
+                      <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 rounded-[6px] flex items-center justify-center font-bold text-xl flex-shrink-0">
                         📄
                       </div>
                     )}
@@ -3203,7 +3203,7 @@ const ChatView = () => {
                 <select
                   value={selectedPackageId}
                   onChange={e => setSelectedPackageId(e.target.value)}
-                  className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
+                  className="px-3 py-2 border border-slate-300 rounded-[6px] text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
                 >
                   <option value="">-- Select one of your Packages --</option>
                   {sellerPackages.map((g: any) => <option key={g._id || g.id} value={g._id || g.id}>{g.title}</option>)}
@@ -3214,7 +3214,7 @@ const ChatView = () => {
                 <select
                   value={selectedBriefId}
                   onChange={e => setSelectedBriefId(e.target.value)}
-                  className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
+                  className="px-3 py-2 border border-slate-300 rounded-[6px] text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
                 >
                   <option value="">-- Select a Project --</option>
                   {chatBriefs.length === 0
@@ -3247,7 +3247,7 @@ const ChatView = () => {
                     onChange={e => setOfferPrice(e.target.value)}
                     required
                     min="1"
-                    className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
+                    className="px-3 py-2 border border-slate-300 rounded-[6px] text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -3259,7 +3259,7 @@ const ChatView = () => {
                     onChange={e => setOfferDelivery(e.target.value)}
                     required
                     min="1"
-                    className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
+                    className="px-3 py-2 border border-slate-300 rounded-[6px] text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -3271,7 +3271,7 @@ const ChatView = () => {
                     placeholder="0"
                     value={offerRevisions}
                     onChange={e => setOfferRevisions(e.target.value)}
-                    className="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
+                    className="px-3 py-2 border border-slate-300 rounded-[6px] text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
                   />
                 </div>
               </div>
@@ -3304,7 +3304,7 @@ const ChatView = () => {
       {/* Video Meeting Creation Modal */}
       {showMeetingModal && (
         <div className="fixed inset-0 bg-slate-900/45 backdrop-blur-xs flex items-center justify-center z-50 p-4" onClick={() => !isCreatingMeeting && setShowMeetingModal(false)}>
-          <div className="w-[92%] max-w-md p-6 bg-white rounded-3xl shadow-2xl border border-slate-100 max-h-[calc(100vh-40px)] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className="w-[92%] max-w-md p-6 bg-white rounded-[6px] shadow-2xl border border-slate-100 max-h-[calc(100vh-40px)] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center pb-4 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-[6px] bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold border border-emerald-100">
@@ -3382,7 +3382,7 @@ const ChatView = () => {
           onClick={() => setViewingOfferDetails(null)}
         >
           <div
-            className="bg-white rounded-3xl border border-slate-200 max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 animate-fadeIn"
+            className="bg-white rounded-[6px] border border-slate-200 max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 animate-fadeIn"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex justify-between items-center border-b border-slate-100 pb-4">
@@ -3498,7 +3498,7 @@ const ChatView = () => {
           onClick={() => setLightboxImage(null)}
         >
           <div className="relative max-w-4xl max-h-[90vh]" onClick={e => e.stopPropagation()}>
-            <img src={lightboxImage} alt="Enlarged preview" className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl" />
+            <img src={lightboxImage} alt="Enlarged preview" className="max-w-full max-h-[90vh] object-contain rounded-[6px] shadow-2xl" />
             <Button
               type="button"
               variant="ghost"

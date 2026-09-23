@@ -202,7 +202,7 @@ export default function GetInspiredPage() {
               <div
                 key={item.id}
                 onClick={() => setSelectedProject(item)}
-                className="bg-white border border-gray-200/90 rounded-3xl overflow-hidden hover:border-[#327C73] hover:shadow-xl transition-all duration-300 group flex flex-col justify-between cursor-pointer"
+                className="bg-white border border-gray-200/90 rounded-[6px] overflow-hidden hover:border-[#327C73] hover:shadow-xl transition-all duration-300 group flex flex-col justify-between cursor-pointer"
               >
                 {/* Visual Project Thumbnail */}
                 <div className="relative h-60 w-full overflow-hidden bg-gray-100">
@@ -272,7 +272,7 @@ export default function GetInspiredPage() {
       {/* Project Detail Modal */}
       {selectedProject && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
             <Button
               onClick={() => setSelectedProject(null)}
               variant="soft"
@@ -339,7 +339,7 @@ export default function GetInspiredPage() {
                   {selectedProject.tools.map((tool) => (
                     <span
                       key={tool}
-                      className="px-3 py-1 rounded-lg text-xs font-medium bg-[#f1f5f9] text-gray-700 border border-gray-200"
+                      className="px-3 py-1 rounded-[6px] text-xs font-medium bg-[#f1f5f9] text-gray-700 border border-gray-200"
                     >
                       {tool}
                     </span>

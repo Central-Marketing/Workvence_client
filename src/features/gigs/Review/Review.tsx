@@ -130,7 +130,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
         {(Boolean(review?.communicationRating) || Boolean(review?.qualityRating) || Boolean(review?.valueRating)) && (
           <div className="flex flex-wrap items-center gap-2 mb-3.5 pt-1">
             {review?.communicationRating !== undefined && review.communicationRating > 0 && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-200/80 text-[11px] font-medium text-gray-600">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[6px] bg-gray-50 border border-gray-200/80 text-[11px] font-medium text-gray-600">
                 <span>Communication</span>
                 <span className="font-bold text-gray-900 flex items-center">
                   <svg className="w-3 h-3 fill-current text-amber-400 mr-0.5" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -141,7 +141,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
               </span>
             )}
             {review?.qualityRating !== undefined && review.qualityRating > 0 && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-200/80 text-[11px] font-medium text-gray-600">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[6px] bg-gray-50 border border-gray-200/80 text-[11px] font-medium text-gray-600">
                 <span>Quality</span>
                 <span className="font-bold text-gray-900 flex items-center">
                   <svg className="w-3 h-3 fill-current text-amber-400 mr-0.5" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -152,7 +152,7 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
               </span>
             )}
             {review?.valueRating !== undefined && review.valueRating > 0 && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-200/80 text-[11px] font-medium text-gray-600">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[6px] bg-gray-50 border border-gray-200/80 text-[11px] font-medium text-gray-600">
                 <span>Value</span>
                 <span className="font-bold text-gray-900 flex items-center">
                   <svg className="w-3 h-3 fill-current text-amber-400 mr-0.5" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">

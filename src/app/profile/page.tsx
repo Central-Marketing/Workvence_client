@@ -774,7 +774,7 @@ export default function ProfilePage() {
               {skillsList.map((skill, idx) => (
                 <span
                   key={idx}
-                  className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200/60 inline-flex items-center gap-1.5"
+                  className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3 py-1.5 rounded-[6px] border border-slate-200/60 inline-flex items-center gap-1.5"
                 >
                   <span>{skill}</span>
                   <Button
@@ -790,7 +790,7 @@ export default function ProfilePage() {
                 </span>
               ))}
               {skillsList.length >= 5 && (
-                <span className="bg-[#F1F3F5] text-slate-700 text-xs font-bold px-2.5 py-1.5 rounded-lg border border-slate-200/60">
+                <span className="bg-[#F1F3F5] text-slate-700 text-xs font-bold px-2.5 py-1.5 rounded-[6px] border border-slate-200/60">
                   +{skillsList.length - 4}
                 </span>
               )}
@@ -810,7 +810,7 @@ export default function ProfilePage() {
                     }
                   }}
                   placeholder="Enter skill name"
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs outline-none focus:border-teal-500 flex-1"
+                  className="px-3 py-1.5 rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500 flex-1"
                   autoFocus
                 />
                 <Button
@@ -861,7 +861,7 @@ export default function ProfilePage() {
                 {languages.map((lang, idx) => (
                   <span
                     key={idx}
-                    className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200/60 inline-flex items-center gap-2"
+                    className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3 py-1.5 rounded-[6px] border border-slate-200/60 inline-flex items-center gap-2"
                   >
                     <span>
                       {lang.language || lang.name}{" "}
@@ -890,12 +890,12 @@ export default function ProfilePage() {
                   value={newLangName}
                   onChange={(e) => setNewLangName(e.target.value)}
                   placeholder="Language (e.g. English)"
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs outline-none focus:border-teal-500 flex-1 min-w-[120px]"
+                  className="px-3 py-1.5 rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500 flex-1 min-w-[120px]"
                 />
                 <select
                   value={newLangLevel}
                   onChange={(e) => setNewLangLevel(e.target.value)}
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs outline-none bg-white"
+                  className="px-3 py-1.5 rounded-[6px] border border-slate-200 text-xs outline-none bg-white"
                 >
                   <option value="Basic">Basic</option>
                   <option value="Conversational">Conversational</option>
@@ -1007,28 +1007,28 @@ export default function ProfilePage() {
                     value={newExp.title}
                     onChange={(e) => setNewExp({ ...newExp, title: e.target.value })}
                     placeholder="Job Title (e.g. Lead Designer)"
-                    className="px-3 py-2 bg-white rounded-lg border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
                   />
                   <input
                     type="text"
                     value={newExp.company}
                     onChange={(e) => setNewExp({ ...newExp, company: e.target.value })}
                     placeholder="Company Name"
-                    className="px-3 py-2 bg-white rounded-lg border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
                   />
                   <input
                     type="text"
                     value={newExp.startDate}
                     onChange={(e) => setNewExp({ ...newExp, startDate: e.target.value })}
                     placeholder="Start Year (e.g. 2021)"
-                    className="px-3 py-2 bg-white rounded-lg border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
                   />
                   <input
                     type="text"
                     value={newExp.endDate}
                     onChange={(e) => setNewExp({ ...newExp, endDate: e.target.value })}
                     placeholder="End Year or Present"
-                    className="px-3 py-2 bg-white rounded-lg border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
                   />
                 </div>
                 <textarea
@@ -1120,28 +1120,28 @@ export default function ProfilePage() {
                     value={newEd.degree}
                     onChange={(e) => setNewEd({ ...newEd, degree: e.target.value })}
                     placeholder="Degree / Certificate (e.g. B.Sc in Computer Science)"
-                    className="px-3 py-2 bg-white rounded-lg border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
                   />
                   <input
                     type="text"
                     value={newEd.university}
                     onChange={(e) => setNewEd({ ...newEd, university: e.target.value })}
                     placeholder="University / College"
-                    className="px-3 py-2 bg-white rounded-lg border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
                   />
                   <input
                     type="text"
                     value={newEd.year}
                     onChange={(e) => setNewEd({ ...newEd, year: e.target.value })}
                     placeholder="Graduation Year (e.g. 2020)"
-                    className="px-3 py-2 bg-white rounded-lg border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
                   />
                   <input
                     type="text"
                     value={newEd.country}
                     onChange={(e) => setNewEd({ ...newEd, country: e.target.value })}
                     placeholder="Country"
-                    className="px-3 py-2 bg-white rounded-lg border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
                   />
                 </div>
                 <div className="flex items-center gap-2">

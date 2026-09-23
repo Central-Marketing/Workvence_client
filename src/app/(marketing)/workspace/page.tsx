@@ -148,7 +148,7 @@ export default function WorkspacePage() {
             })}
           </div>
 
-          <div className="bg-[#f8fafc] border border-gray-200/90 rounded-3xl p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center shadow-xs">
+          <div className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center shadow-xs">
             <div className="space-y-4">
               <span className="text-xs font-bold text-[#327C73] uppercase tracking-wider">
                 {currentTab.name}

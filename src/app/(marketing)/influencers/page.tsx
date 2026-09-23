@@ -140,7 +140,7 @@ export default function InfluencersPage() {
             {creatorTiers.map((t, idx) => (
               <div
                 key={idx}
-                className="bg-white border border-gray-200/90 rounded-3xl p-8 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6"
+                className="bg-white border border-gray-200/90 rounded-[6px] p-8 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6"
               >
                 <div className="space-y-4">
                   <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${t.badge}`}>
@@ -181,7 +181,7 @@ export default function InfluencersPage() {
       {/* Creator Application Modal */}
       {isApplying && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
             <Button
               onClick={() => setIsApplying(false)}
               variant="soft"

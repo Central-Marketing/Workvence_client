@@ -144,7 +144,7 @@ export default function ProTalentPage() {
             {vettingSteps.map((s, idx) => (
               <div
                 key={idx}
-                className="bg-[#f8fafc] border border-gray-200/90 rounded-3xl p-8 space-y-4 hover:border-[#327C73] transition"
+                className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-8 space-y-4 hover:border-[#327C73] transition"
               >
                 <div className="text-2xl font-mono font-extrabold text-[#327C73]">{s.step}</div>
                 <h3 className="text-lg font-bold text-[#0f172a]">{s.title}</h3>
@@ -171,7 +171,7 @@ export default function ProTalentPage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white border border-gray-200 rounded-3xl p-8 space-y-4 shadow-xs hover:border-[#327C73] hover:shadow-md transition duration-300"
+                  className="bg-white border border-gray-200 rounded-[6px] p-8 space-y-4 shadow-xs hover:border-[#327C73] hover:shadow-md transition duration-300"
                 >
                   <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
                     <Icon className="w-6 h-6" />
@@ -188,7 +188,7 @@ export default function ProTalentPage() {
       {/* Pro Application Modal */}
       {isApplyingPro && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
             <Button
               onClick={() => setIsApplyingPro(false)}
               variant="soft"

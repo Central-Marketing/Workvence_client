@@ -132,8 +132,8 @@ export default function EventsPage() {
                   size="xs"
                   radius="xl"
                   className={`font-semibold transition cursor-pointer ${filterType === t
-                      ? "shadow-xs"
-                      : "hover:bg-gray-200"
+                    ? "shadow-xs"
+                    : "hover:bg-gray-200"
                     }`}
                 >
                   {t === "All" ? "All Events" : `${t}s`}
@@ -151,7 +151,7 @@ export default function EventsPage() {
             {filteredEvents.map((item) => (
               <div
                 key={item.id}
-                className="bg-white border border-gray-200/90 rounded-3xl p-8 hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group"
+                className="bg-white border border-gray-200/90 rounded-[6px] p-8 hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -210,7 +210,7 @@ export default function EventsPage() {
       {/* RSVP Modal */}
       {selectedEvent && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
             <Button
               onClick={() => setSelectedEvent(null)}
               variant="soft"

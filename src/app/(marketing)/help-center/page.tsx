@@ -265,14 +265,14 @@ export default function HelpCenterPage() {
           <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
             <Link
               href="/support/new"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#327C73] hover:bg-[#28635c] text-white text-xs sm:text-[13px] font-semibold transition-colors shadow-xs active:scale-95"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white text-xs sm:text-[13px] font-semibold transition-colors shadow-xs active:scale-95"
             >
               <Ticket className="w-3.5 h-3.5" />
               <span>Submit a Ticket</span>
             </Link>
             <Link
               href="/support"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white hover:bg-gray-50 border border-gray-300 text-[#334155] text-xs sm:text-[13px] font-semibold transition-colors shadow-xs active:scale-95"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[6px] bg-white hover:bg-gray-50 border border-gray-300 text-[#334155] text-xs sm:text-[13px] font-semibold transition-colors shadow-xs active:scale-95"
             >
               <MessageSquare className="w-3.5 h-3.5 text-gray-500" />
               <span>Support Dashboard</span>

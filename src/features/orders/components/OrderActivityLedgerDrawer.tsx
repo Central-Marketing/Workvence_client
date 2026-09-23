@@ -425,24 +425,21 @@ export const OrderActivityLedgerDrawer: React.FC<OrderActivityLedgerDrawerProps>
 
   return (
     <div
-      className={`fixed inset-0 z-50 transition-all duration-300 ${
-        isOpen ? "visible pointer-events-auto" : "invisible pointer-events-none delay-200"
-      }`}
+      className={`fixed inset-0 z-50 transition-all duration-300 ${isOpen ? "visible pointer-events-auto" : "invisible pointer-events-none delay-200"
+        }`}
     >
       {/* Backdrop Overlay */}
       <div
-        className={`fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 ease-out ${
-          isOpen ? "opacity-100" : "opacity-0"
-        }`}
+        className={`fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 ease-out ${isOpen ? "opacity-100" : "opacity-0"
+          }`}
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Slide-out Drawer Panel from Right */}
       <aside
-        className={`fixed inset-y-0 right-0 z-50 w-full sm:max-w-2xl bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ease-out ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed inset-y-0 right-0 z-50 w-full sm:max-w-2xl bg-white shadow-2xl flex flex-col transform transition-transform duration-300 ease-out ${isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
         role="dialog"
         aria-modal="true"
         aria-label="Order Activity and Escrow Ledger"
@@ -476,7 +473,7 @@ export const OrderActivityLedgerDrawer: React.FC<OrderActivityLedgerDrawerProps>
                 <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
                   {/* Left Column: Date Badge */}
                   <div className="shrink-0 sm:w-48">
-                    <span className="inline-block px-3.5 py-1.5 rounded-lg bg-[#EFF1F4] border border-gray-200/80 text-xs sm:text-[13px] font-medium text-gray-700 whitespace-nowrap shadow-2xs">
+                    <span className="inline-block px-3.5 py-1.5 rounded-[6px] bg-[#EFF1F4] border border-gray-200/80 text-xs sm:text-[13px] font-medium text-gray-700 whitespace-nowrap shadow-2xs">
                       {group.dateStr}
                     </span>
                   </div>

@@ -46,7 +46,7 @@ export default function IpClaimForm() {
 
   return (
     <div className="lg:col-span-7">
-      <div className="bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
+      <div className="bg-white border border-gray-200 rounded-[6px] p-6 sm:p-8 shadow-xs space-y-6">
         <div className="space-y-1">
           <h3 className="text-xl font-bold text-[#0f172a]">Submit Notice of Infringement</h3>
           <p className="text-xs text-gray-500">

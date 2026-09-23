@@ -82,7 +82,7 @@ export default function WorkvenceSelectPage() {
             <h2 className="text-3xl font-bold text-[#0f172a]">Why Leading Teams Upgrade to Select</h2>
           </div>
 
-          <div className="bg-[#f8fafc] border border-gray-200 rounded-3xl overflow-hidden shadow-xs">
+          <div className="bg-[#f8fafc] border border-gray-200 rounded-[6px] overflow-hidden shadow-xs">
             <div className="grid grid-cols-12 bg-gray-100 p-4 sm:p-5 text-xs font-bold text-gray-700 uppercase tracking-wider border-b border-gray-200">
               <div className="col-span-6 sm:col-span-6">Benefit / Feature</div>
               <div className="col-span-3 sm:col-span-3 text-center text-gray-500">Standard Buyer</div>
@@ -108,7 +108,7 @@ export default function WorkvenceSelectPage() {
       {/* Join Select Modal */}
       {isJoining && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
             <Button
               onClick={() => setIsJoining(false)}
               variant="soft"

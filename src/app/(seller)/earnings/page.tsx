@@ -854,7 +854,7 @@ const Earnings = () => {
           onClick={() => setShowWalletModal(false)}
         >
           <div
-            className="bg-white w-full max-w-[480px] sm:max-w-[500px] rounded-3xl shadow-2xl border border-gray-100 p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-200"
+            className="bg-white w-full max-w-[480px] sm:max-w-[500px] rounded-[6px] shadow-2xl border border-gray-100 p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -996,7 +996,7 @@ const Earnings = () => {
           onClick={() => setShowPayoutModal(false)}
         >
           <div
-            className="bg-white w-full max-w-[480px] sm:max-w-[500px] rounded-3xl shadow-2xl border border-gray-100 p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-200"
+            className="bg-white w-full max-w-[480px] sm:max-w-[500px] rounded-[6px] shadow-2xl border border-gray-100 p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

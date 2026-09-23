@@ -284,7 +284,7 @@ const NotificationsPage = () => {
         />
 
         {/* Page Header */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div className="bg-white rounded-[6px] p-6 sm:p-8 border border-slate-200/80 shadow-xs mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight font-sf-pro m-0">
@@ -442,7 +442,7 @@ const NotificationsPage = () => {
           </div>
         ) : filteredNotifications.length === 0 ? (
           /* Empty State */
-          <div className="bg-white rounded-3xl p-12 sm:p-16 border border-slate-200/80 shadow-xs flex flex-col items-center justify-center text-center">
+          <div className="bg-white rounded-[6px] p-12 sm:p-16 border border-slate-200/80 shadow-xs flex flex-col items-center justify-center text-center">
             <div className="w-16 h-16 rounded-[6px] bg-teal-50 text-[#0E3834] flex items-center justify-center mb-4 shadow-2xs">
               <Inbox className="w-8 h-8" />
             </div>

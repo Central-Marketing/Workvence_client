@@ -12,7 +12,7 @@ export const StripeIcon: React.FC<{ className?: string; size?: number }> = ({
   className = "w-6 h-6",
   size,
 }) => (
-  <div className={`rounded-lg bg-[#635bff] flex items-center justify-center p-1 text-white shrink-0 ${className}`}>
+  <div className={`rounded-[6px] bg-[#635bff] flex items-center justify-center p-1 text-white shrink-0 ${className}`}>
     <FaStripe size={size} className="w-full h-full text-white" />
   </div>
 );

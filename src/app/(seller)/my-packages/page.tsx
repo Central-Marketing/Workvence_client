@@ -226,7 +226,7 @@ const MyPackages = () => {
                               <img
                                 src={coverImage}
                                 alt={pkg.title || "Package Cover"}
-                                className="w-24 sm:w-28 h-14 sm:h-16 rounded-lg object-cover bg-gray-100 border border-gray-200/80 shrink-0"
+                                className="w-24 sm:w-28 h-14 sm:h-16 rounded-[6px] object-cover bg-gray-100 border border-gray-200/80 shrink-0"
                               />
                               <div className="flex flex-col gap-1 min-w-0">
                                 <span
@@ -317,7 +317,7 @@ const MyPackages = () => {
           onClick={() => !mutation.isPending && setPackageToDelete(null)}
         >
           <div
-            className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col items-center text-center relative overflow-hidden transform transition-all duration-300 scale-100"
+            className="bg-white rounded-[6px] max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col items-center text-center relative overflow-hidden transform transition-all duration-300 scale-100"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}

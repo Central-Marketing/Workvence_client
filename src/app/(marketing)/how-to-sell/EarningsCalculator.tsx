@@ -14,7 +14,7 @@ export default function EarningsCalculator() {
   return (
     <section id="calculator" className="py-20 bg-[#0f172a] text-white">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-3xl p-8 sm:p-12 shadow-2xl space-y-8">
+        <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-[6px] p-8 sm:p-12 shadow-2xl space-y-8">
           <div className="text-center space-y-2">
             <span className="text-xs font-bold text-[#6ad724] uppercase tracking-wider">
               Earnings Estimator
@@ -39,7 +39,7 @@ export default function EarningsCalculator() {
                   step={10}
                   value={ratePerProject}
                   onChange={(e) => setRatePerProject(Number(e.target.value))}
-                  className="w-full accent-[#10b981] h-2 bg-white/20 rounded-lg cursor-pointer"
+                  className="w-full accent-[#10b981] h-2 bg-white/20 rounded-[6px] cursor-pointer"
                 />
                 <div className="flex justify-between text-[10px] text-gray-400 mt-1">
                   <span>$20</span>
@@ -60,7 +60,7 @@ export default function EarningsCalculator() {
                   step={1}
                   value={projectsPerMonth}
                   onChange={(e) => setProjectsPerMonth(Number(e.target.value))}
-                  className="w-full accent-[#10b981] h-2 bg-white/20 rounded-lg cursor-pointer"
+                  className="w-full accent-[#10b981] h-2 bg-white/20 rounded-[6px] cursor-pointer"
                 />
                 <div className="flex justify-between text-[10px] text-gray-400 mt-1">
                   <span>1</span>

@@ -159,7 +159,7 @@ export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
                 </div>
 
                 {/* Rating */}
-                <div className="flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-gray-100 shadow-2xs">
+                <div className="flex items-center gap-1 bg-white px-2.5 py-1 rounded-[6px] border border-gray-100 shadow-2xs">
                   <FaStar className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                   <span className="text-xs font-bold text-gray-900">{review.rating}</span>
                 </div>
@@ -188,7 +188,7 @@ export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
                     <span>Seller response</span>
                   </Button>
                   {isResponseOpen && (
-                    <p className="mt-2 text-xs text-gray-600 bg-white p-3 rounded-lg border border-gray-100 leading-relaxed">
+                    <p className="mt-2 text-xs text-gray-600 bg-white p-3 rounded-[6px] border border-gray-100 leading-relaxed">
                       {review.sellerResponse}
                     </p>
                   )}

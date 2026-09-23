@@ -242,8 +242,8 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                     size="sm"
                     radius="fiverr"
                     className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${orderTypeFilter === "all"
-                        ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                        : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                      ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                      : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                       }`}
                   >
                     All
@@ -255,8 +255,8 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                     size="sm"
                     radius="fiverr"
                     className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${orderTypeFilter === "package"
-                        ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                        : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                      ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                      : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                       }`}
                   >
                     Packages
@@ -268,8 +268,8 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                     size="sm"
                     radius="fiverr"
                     className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${orderTypeFilter === "brief"
-                        ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                        : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                      ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                      : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                       }`}
                   >
                     Briefs
@@ -358,7 +358,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                         >
                           <td className="py-4 px-3 align-middle">
                             <div className="flex items-center gap-3.5">
-                              <div className="relative w-24 sm:w-36 md:w-[180px] lg:w-[220px] aspect-[16/9] rounded-lg overflow-hidden bg-gray-100 border border-gray-200/80 shrink-0">
+                              <div className="relative w-24 sm:w-36 md:w-[180px] lg:w-[220px] aspect-[16/9] rounded-[6px] overflow-hidden bg-gray-100 border border-gray-200/80 shrink-0">
                                 <Image
                                   src={
                                     order.image ||
@@ -527,19 +527,19 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           <div className="flex items-center justify-center gap-3 flex-wrap">
             <Link
               href="/briefs"
-              className="px-5 py-2.5 rounded-lg bg-[#EFEFEF] hover:bg-[#E5E5E5] text-[#1F2937] text-xs sm:text-[13px] font-semibold transition-colors"
+              className="px-5 py-2.5 rounded-[6px] bg-[#EFEFEF] hover:bg-[#E5E5E5] text-[#1F2937] text-xs sm:text-[13px] font-semibold transition-colors"
             >
               Explore Projects
             </Link>
             <Link
               href="/briefs/my-proposals"
-              className="px-5 py-2.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0D6D5F] border border-teal-200 text-xs sm:text-[13px] font-semibold transition-colors"
+              className="px-5 py-2.5 rounded-[6px] bg-teal-50 hover:bg-teal-100 text-[#0D6D5F] border border-teal-200 text-xs sm:text-[13px] font-semibold transition-colors"
             >
               My Proposals
             </Link>
             <Link
               href="/profile"
-              className="px-5 py-2.5 rounded-lg bg-black hover:bg-zinc-800 text-white text-xs sm:text-[13px] font-semibold transition-colors"
+              className="px-5 py-2.5 rounded-[6px] bg-black hover:bg-zinc-800 text-white text-xs sm:text-[13px] font-semibold transition-colors"
             >
               Complete Profile
             </Link>
@@ -562,7 +562,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                 </Link>
                 <Link
                   href="/organize"
-                  className="px-4 py-2 rounded-lg bg-brand-green hover:bg-brand-green/90 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
+                  className="px-4 py-2 rounded-[6px] bg-brand-green hover:bg-brand-green/90 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
                 >
                   + Add New Package
                 </Link>

@@ -262,7 +262,7 @@ export default function BuyerManageOrdersPage() {
         </div>
 
         {/* Main Card */}
-        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-8">
+        <div className="bg-white rounded-[6px] border border-slate-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-8">
 
           {/* Controls Bar: Tabs + Calendar + Search Input */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-slate-100">

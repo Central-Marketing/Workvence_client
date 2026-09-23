@@ -325,7 +325,7 @@ const CreateBrief = () => {
   if (isPublished) {
     return (
       <div className="min-h-[85vh] bg-[#FAFAFA] flex items-center justify-center px-4 py-16">
-        <div className="bg-white border border-slate-200/80 rounded-3xl shadow-sm p-8 sm:p-12 max-w-lg w-full text-center flex flex-col items-center">
+        <div className="bg-white border border-slate-200/80 rounded-[6px] shadow-sm p-8 sm:p-12 max-w-lg w-full text-center flex flex-col items-center">
           <div className="w-16 h-16 rounded-[6px] bg-[#D8F5ED] text-[#0D6B5D] border border-[#BCE8DE] flex items-center justify-center text-3xl mb-5 shadow-2xs">
             <FiCheckCircle />
           </div>
@@ -431,7 +431,7 @@ const CreateBrief = () => {
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="bg-white border border-slate-200/90 rounded-[6px] sm:rounded-3xl p-6 sm:p-10 shadow-2xs space-y-6 sm:space-y-8"
+          className="bg-white border border-slate-200/90 rounded-[6px] sm:rounded-[6px] p-6 sm:p-10 shadow-2xs space-y-6 sm:space-y-8"
         >
           {/* Header row inside form */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
@@ -525,7 +525,7 @@ const CreateBrief = () => {
               {form.requiredSkills.map((skill) => (
                 <span
                   key={skill}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-medium transition-all"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-medium transition-all"
                 >
                   <FiTag className="text-[11px] text-emerald-600" />
                   <span>{skill}</span>
@@ -654,7 +654,7 @@ const CreateBrief = () => {
           onClick={() => !aiGenerate.isPending && setIsAiModalOpen(false)}
         >
           <div
-            className="bg-white border border-slate-200 rounded-[6px] sm:rounded-3xl max-w-xl w-full max-h-[calc(100dvh-2rem)] flex flex-col p-6 sm:p-8 shadow-2xl relative overflow-y-auto select-text"
+            className="bg-white border border-slate-200 rounded-[6px] sm:rounded-[6px] max-w-xl w-full max-h-[calc(100dvh-2rem)] flex flex-col p-6 sm:p-8 shadow-2xl relative overflow-y-auto select-text"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top Close Button */}

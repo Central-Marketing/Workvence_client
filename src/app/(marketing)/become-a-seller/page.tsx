@@ -94,7 +94,7 @@ export default function BecomeASellerPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-3xl p-8 space-y-4">
+            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-8 space-y-4">
               <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-bold text-lg flex items-center justify-center">
                 1
               </div>
@@ -104,7 +104,7 @@ export default function BecomeASellerPage() {
               </p>
             </div>
 
-            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-3xl p-8 space-y-4">
+            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-8 space-y-4">
               <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-bold text-lg flex items-center justify-center">
                 2
               </div>
@@ -114,7 +114,7 @@ export default function BecomeASellerPage() {
               </p>
             </div>
 
-            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-3xl p-8 space-y-4">
+            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-8 space-y-4">
               <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-bold text-lg flex items-center justify-center">
                 3
               </div>
@@ -130,7 +130,7 @@ export default function BecomeASellerPage() {
       {/* Earnings Estimator */}
       <section id="calculator" className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-[#f8fafc] border-y border-gray-100">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl">
-          <div className="bg-white border border-gray-200 rounded-3xl p-8 sm:p-12 shadow-sm space-y-8">
+          <div className="bg-white border border-gray-200 rounded-[6px] p-8 sm:p-12 shadow-sm space-y-8">
             <div className="text-center space-y-2">
               <span className="text-xs font-bold text-[#327C73] uppercase tracking-wider">
                 Earning Potential
@@ -167,7 +167,7 @@ export default function BecomeASellerPage() {
                     step={5}
                     value={hourlyRate}
                     onChange={(e) => setHourlyRate(Number(e.target.value))}
-                    className="w-full accent-[#327C73] h-2 bg-gray-200 rounded-lg cursor-pointer"
+                    className="w-full accent-[#327C73] h-2 bg-gray-200 rounded-[6px] cursor-pointer"
                   />
                 </div>
 
@@ -183,7 +183,7 @@ export default function BecomeASellerPage() {
                     step={5}
                     value={hoursPerWeek}
                     onChange={(e) => setHoursPerWeek(Number(e.target.value))}
-                    className="w-full accent-[#327C73] h-2 bg-gray-200 rounded-lg cursor-pointer"
+                    className="w-full accent-[#327C73] h-2 bg-gray-200 rounded-[6px] cursor-pointer"
                   />
                 </div>
               </div>

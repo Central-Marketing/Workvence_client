@@ -90,7 +90,7 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
           {/* LEFT COLUMN: Suspended Seller Card */}
-          <div className="lg:col-span-4 bg-white border border-gray-200/90 rounded-3xl p-6 sm:p-7 shadow-[0_4px_25px_rgba(0,0,0,0.035)]">
+          <div className="lg:col-span-4 bg-white border border-gray-200/90 rounded-[6px] p-6 sm:p-7 shadow-[0_4px_25px_rgba(0,0,0,0.035)]">
 
             {/* Blank Gray Avatar & Name */}
             <div className="flex flex-col items-center border-b border-gray-100 pb-6 mb-6">
@@ -193,7 +193,7 @@ const SuspendedSeller = ({ username }: { username?: string }) => {
 
           {/* RIGHT COLUMN: Unavailable Message Card */}
           <div className="lg:col-span-8">
-            <div className="bg-white border border-gray-200/90 rounded-3xl p-10 sm:p-16 shadow-[0_4px_30px_rgba(0,0,0,0.025)] text-center flex flex-col items-center justify-center min-h-[440px]">
+            <div className="bg-white border border-gray-200/90 rounded-[6px] p-10 sm:p-16 shadow-[0_4px_30px_rgba(0,0,0,0.025)] text-center flex flex-col items-center justify-center min-h-[440px]">
 
               <h2 className="text-2xl sm:text-[32px] font-semibold text-gray-900 mb-3.5 tracking-tight">
                 This seller is currently unavailable

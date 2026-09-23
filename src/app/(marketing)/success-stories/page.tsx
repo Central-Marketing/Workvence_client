@@ -141,7 +141,7 @@ export default function SuccessStoriesPage() {
             {filteredStories.map((story) => (
               <div
                 key={story.id}
-                className="bg-white border border-gray-200/90 rounded-3xl p-8 hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group"
+                className="bg-white border border-gray-200/90 rounded-[6px] p-8 hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -185,7 +185,7 @@ export default function SuccessStoriesPage() {
           </div>
 
           {/* CTA Box */}
-          <div className="mt-16 bg-gradient-to-r from-[#0f172a] to-[#1e293b] rounded-3xl p-8 sm:p-12 text-white text-center space-y-6">
+          <div className="mt-16 bg-gradient-to-r from-[#0f172a] to-[#1e293b] rounded-[6px] p-8 sm:p-12 text-white text-center space-y-6">
             <h2 className="text-2xl sm:text-3xl font-bold">Ready to write your own success story?</h2>
             <p className="text-sm text-gray-300 max-w-xl mx-auto">
               Whether you need to hire top talent or sell your specialized services, Workvence gives you the tools to succeed.
@@ -211,7 +211,7 @@ export default function SuccessStoriesPage() {
       {/* Story Details Modal */}
       {selectedStory && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
             <Button
               onClick={() => setSelectedStory(null)}
               variant="soft"

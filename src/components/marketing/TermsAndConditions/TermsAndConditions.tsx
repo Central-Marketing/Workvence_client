@@ -60,7 +60,7 @@ const TermsAndConditions = () => {
       <div className="container mx-auto px-4 md:px-6 pt-10">
 
         {/* Hero Section */}
-        <div className="w-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl p-8 sm:p-12 mb-10 shadow-lg relative overflow-hidden flex flex-wrap lg:flex-nowrap items-center justify-between gap-8">
+        <div className="w-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-[6px] p-8 sm:p-12 mb-10 shadow-lg relative overflow-hidden flex flex-wrap lg:flex-nowrap items-center justify-between gap-8">
           <div className="max-w-2xl relative z-10">
             <h1 className="font-sf-pro text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-3">
               Terms & Conditions
@@ -72,7 +72,7 @@ const TermsAndConditions = () => {
         </div>
 
         {/* Dynamic Rich Text Terms Content Container */}
-        <div className="bg-white border border-gray-200/90 rounded-3xl p-8 sm:p-12 shadow-[0_2px_20px_rgba(0,0,0,0.03)] mb-0">
+        <div className="bg-white border border-gray-200/90 rounded-[6px] p-8 sm:p-12 shadow-[0_2px_20px_rgba(0,0,0,0.03)] mb-0">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-16 space-y-3">
               <Loader size={40} />

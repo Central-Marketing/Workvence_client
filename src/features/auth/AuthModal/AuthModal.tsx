@@ -244,7 +244,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       aria-labelledby="auth-modal-title"
     >
       <div
-        className="relative w-full max-w-[860px] max-h-[92vh] bg-white rounded-[6px] sm:rounded-3xl shadow-2xl border border-gray-100 flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-[860px] max-h-[92vh] bg-white rounded-[6px] sm:rounded-[6px] shadow-2xl border border-gray-100 flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}

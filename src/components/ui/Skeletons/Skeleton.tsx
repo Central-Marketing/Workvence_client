@@ -8,7 +8,7 @@ interface SkeletonProps {
 export const Skeleton: React.FC<SkeletonProps> = ({ className = '', style }) => {
   return (
     <div
-      className={`animate-pulse bg-slate-200 dark:bg-slate-300 rounded-lg ${className}`}
+      className={`animate-pulse bg-slate-200 dark:bg-slate-300 rounded-[6px] ${className}`}
       style={style}
     />
   );

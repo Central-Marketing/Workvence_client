@@ -325,7 +325,7 @@ export default function TicketDetailsPage() {
           <div className="flex items-center justify-center gap-3 pt-2">
             <Link
               href="/support"
-              className="px-5 py-2.5 rounded-lg bg-[#f1f5f9] text-[#334155] font-semibold text-xs hover:bg-[#e2e8f0] transition font-sf-pro"
+              className="px-5 py-2.5 rounded-[6px] bg-[#f1f5f9] text-[#334155] font-semibold text-xs hover:bg-[#e2e8f0] transition font-sf-pro"
             >
               Back to Dashboard
             </Link>
@@ -508,7 +508,7 @@ export default function TicketDetailsPage() {
                 {attachments.map((att, idx) => (
                   <span
                     key={idx}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#327C73]/10 border border-[#327C73]/20 text-[#327C73] text-xs font-semibold font-inter"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[6px] bg-[#327C73]/10 border border-[#327C73]/20 text-[#327C73] text-xs font-semibold font-inter"
                   >
                     <FileText className="w-3.5 h-3.5" />
                     <span>{att.name}</span>

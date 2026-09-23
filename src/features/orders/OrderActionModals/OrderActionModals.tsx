@@ -38,7 +38,7 @@ export const RevisionModal: React.FC<RevisionModalProps> = ({
       onClick={() => !isLoading && onClose()}
     >
       <div
-        className="bg-white rounded-3xl max-w-lg w-full max-h-[calc(100dvh-2rem)] flex flex-col overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-100 relative"
+        className="bg-white rounded-[6px] max-w-lg w-full max-h-[calc(100dvh-2rem)] flex flex-col overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-100 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <Button
@@ -150,7 +150,7 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
       onClick={() => !isLoading && onClose()}
     >
       <div
-        className="bg-white rounded-3xl max-w-lg w-full max-h-[calc(100dvh-2rem)] flex flex-col overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-100 relative"
+        className="bg-white rounded-[6px] max-w-lg w-full max-h-[calc(100dvh-2rem)] flex flex-col overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-100 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <Button

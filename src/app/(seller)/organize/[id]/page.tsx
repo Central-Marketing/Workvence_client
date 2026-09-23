@@ -1197,7 +1197,7 @@ const EditPackagePage = () => {
                   {toolsList.map((tool) => (
                     <span
                       key={tool}
-                      className="inline-flex items-center gap-1.5 bg-[#F4F5F7] border border-gray-200/80 px-2.5 py-1 rounded-lg text-xs font-medium text-gray-700"
+                      className="inline-flex items-center gap-1.5 bg-[#F4F5F7] border border-gray-200/80 px-2.5 py-1 rounded-[6px] text-xs font-medium text-gray-700"
                     >
                       {tool}
                       <X
@@ -1270,7 +1270,7 @@ const EditPackagePage = () => {
                   {keywordsList.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center gap-1.5 bg-[#F4F5F7] border border-gray-200/80 px-2.5 py-1 rounded-lg text-xs font-medium text-gray-700"
+                      className="inline-flex items-center gap-1.5 bg-[#F4F5F7] border border-gray-200/80 px-2.5 py-1 rounded-[6px] text-xs font-medium text-gray-700"
                     >
                       #{tag}
                       <X

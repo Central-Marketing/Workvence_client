@@ -152,7 +152,7 @@ export default function SupportDashboardPage() {
 
           <Link
             href="/support/new"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 cursor-pointer whitespace-nowrap font-sf-pro"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 cursor-pointer whitespace-nowrap font-sf-pro"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Create Support Ticket</span>
@@ -167,7 +167,7 @@ export default function SupportDashboardPage() {
             </span>
             <div className="flex items-center justify-between">
               <span className="text-3xl font-bold text-[#0f172a]">{stats.total}</span>
-              <div className="p-2.5 rounded-lg bg-[#f1f5f9] text-[#475569]">
+              <div className="p-2.5 rounded-[6px] bg-[#f1f5f9] text-[#475569]">
                 <Inbox className="w-5 h-5" />
               </div>
             </div>
@@ -179,7 +179,7 @@ export default function SupportDashboardPage() {
             </span>
             <div className="flex items-center justify-between">
               <span className="text-3xl font-bold text-amber-700">{stats.open}</span>
-              <div className="p-2.5 rounded-lg bg-amber-100 text-amber-700">
+              <div className="p-2.5 rounded-[6px] bg-amber-100 text-amber-700">
                 <AlertTriangle className="w-5 h-5" />
               </div>
             </div>
@@ -191,7 +191,7 @@ export default function SupportDashboardPage() {
             </span>
             <div className="flex items-center justify-between">
               <span className="text-3xl font-bold text-blue-700">{stats.inProgress}</span>
-              <div className="p-2.5 rounded-lg bg-blue-100 text-blue-700">
+              <div className="p-2.5 rounded-[6px] bg-blue-100 text-blue-700">
                 <Clock className="w-5 h-5" />
               </div>
             </div>
@@ -203,7 +203,7 @@ export default function SupportDashboardPage() {
             </span>
             <div className="flex items-center justify-between">
               <span className="text-3xl font-bold text-[#327C73]">{stats.resolvedClosed}</span>
-              <div className="p-2.5 rounded-lg bg-[#327C73]/10 text-[#327C73]">
+              <div className="p-2.5 rounded-[6px] bg-[#327C73]/10 text-[#327C73]">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
             </div>
@@ -307,7 +307,7 @@ export default function SupportDashboardPage() {
               </div>
               <Link
                 href="/support/new"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs transition cursor-pointer font-sf-pro shadow-xs active:scale-95"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs transition cursor-pointer font-sf-pro shadow-xs active:scale-95"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>Submit New Request</span>
@@ -344,14 +344,14 @@ export default function SupportDashboardPage() {
 
                     <Link
                       href={`/support/${ticket.id}`}
-                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#f1f5f9] hover:bg-[#327C73] hover:text-white text-[#334155] font-semibold text-xs transition cursor-pointer font-sf-pro"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[6px] bg-[#f1f5f9] hover:bg-[#327C73] hover:text-white text-[#334155] font-semibold text-xs transition cursor-pointer font-sf-pro"
                     >
                       <span>View Ticket</span>
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>
 
-                  <p className="text-xs text-[#64748b] line-clamp-2 bg-[#f8fafc] p-3 rounded-lg border border-[#e2e8f0]">
+                  <p className="text-xs text-[#64748b] line-clamp-2 bg-[#f8fafc] p-3 rounded-[6px] border border-[#e2e8f0]">
                     {ticket.message || "No preview available."}
                   </p>
 

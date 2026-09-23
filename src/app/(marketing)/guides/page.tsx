@@ -128,11 +128,10 @@ export default function GuidesPage() {
                 variant={selectedCat === cat ? "brand" : "soft"}
                 size="xs"
                 radius="xl"
-                className={`font-semibold whitespace-nowrap transition cursor-pointer ${
-                  selectedCat === cat
+                className={`font-semibold whitespace-nowrap transition cursor-pointer ${selectedCat === cat
                     ? "shadow-xs"
                     : "hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 {cat}
               </Button>
@@ -157,7 +156,7 @@ export default function GuidesPage() {
             <div
               key={guide.id}
               onClick={() => setSelectedGuide(guide)}
-              className="bg-[#f8fafc] border border-gray-200/90 rounded-3xl p-8 hover:bg-white hover:border-[#327C73] hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between space-y-6"
+              className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-8 hover:bg-white hover:border-[#327C73] hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between space-y-6"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-[11px]">
@@ -204,7 +203,7 @@ export default function GuidesPage() {
       {/* Guide Details Modal */}
       {selectedGuide && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
             <Button
               onClick={() => setSelectedGuide(null)}
               variant="soft"

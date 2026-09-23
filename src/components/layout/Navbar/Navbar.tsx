@@ -421,14 +421,14 @@ const Navbar = () => {
 
                   <Link
                     href="/register?seller=true"
-                    className="px-2 xl:px-4 py-[8px] xl:py-[10px] rounded-lg font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
+                    className="px-2 xl:px-4 py-[8px] xl:py-[10px] rounded-[6px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
                   >
                     Become a Seller
                   </Link>
 
                   <Link
                     href="/briefs"
-                    className="px-2 xl:px-4 py-[8px] xl:py-[10px] rounded-lg font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
+                    className="px-2 xl:px-4 py-[8px] xl:py-[10px] rounded-[6px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
                   >
                     Projects
                   </Link>

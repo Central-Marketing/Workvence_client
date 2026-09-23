@@ -136,8 +136,8 @@ export default function LearnPage() {
                   size="xs"
                   radius="xl"
                   className={`font-semibold transition cursor-pointer ${selectedCat === cat
-                      ? "shadow-xs"
-                      : "hover:bg-gray-200"
+                    ? "shadow-xs"
+                    : "hover:bg-gray-200"
                     }`}
                 >
                   {cat}
@@ -154,7 +154,7 @@ export default function LearnPage() {
           {filteredCourses.map((course) => (
             <div
               key={course.id}
-              className="bg-white border border-gray-200/90 rounded-3xl p-7 hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6"
+              className="bg-white border border-gray-200/90 rounded-[6px] p-7 hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-xs">
@@ -215,7 +215,7 @@ export default function LearnPage() {
       {/* Syllabus Modal */}
       {selectedCourse && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
             <Button
               onClick={() => setSelectedCourse(null)}
               variant="soft"

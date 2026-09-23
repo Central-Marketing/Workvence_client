@@ -184,8 +184,8 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
       playNotificationSound('notification');
 
       toast.custom((t) => (
-        <div className={`relative bg-white border-l-4 border-[#6ad724] shadow-xl p-4 rounded-lg max-w-[350px] flex flex-col gap-1 transition-all duration-300 ${t.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}>
-          <Button 
+        <div className={`relative bg-white border-l-4 border-[#6ad724] shadow-xl p-4 rounded-[6px] max-w-[350px] flex flex-col gap-1 transition-all duration-300 ${t.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}>
+          <Button
             type="button"
             variant="ghost"
             size="icon"
@@ -281,8 +281,8 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
       playNotificationSound('message');
 
       const displayName = senderName || 'Someone';
-      const msgPreview = newMsg.description?.startsWith('[CUSTOM_OFFER]') 
-        ? 'sent you a custom proposal' 
+      const msgPreview = newMsg.description?.startsWith('[CUSTOM_OFFER]')
+        ? 'sent you a custom proposal'
         : rawText.slice(0, 60) || (fileAttachment ? 'sent an attachment' : 'sent a message');
 
       const targetConvId = conversationId || newMsg.conversationID;
@@ -290,8 +290,8 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
 
       // Show toast for incoming message with 5s duration and unique deterministic ID
       toast.custom((t) => (
-        <div 
-          className={`relative bg-white border-l-4 border-[#6ad724] shadow-xl p-4 rounded-lg max-w-[350px] flex flex-col gap-1 transition-all duration-300 cursor-pointer pr-6 ${t.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}
+        <div
+          className={`relative bg-white border-l-4 border-[#6ad724] shadow-xl p-4 rounded-[6px] max-w-[350px] flex flex-col gap-1 transition-all duration-300 cursor-pointer pr-6 ${t.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}
           onClick={() => {
             toast.dismiss(t.id);
             if (targetConvId) {
@@ -299,7 +299,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
             }
           }}
         >
-          <Button 
+          <Button
             type="button"
             variant="ghost"
             size="icon"
@@ -330,7 +330,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
   // 3. Mark Single Notification as Read and Navigate
   const handleNotificationClick = async (n: any) => {
     setIsOpen(false);
-    
+
     // Navigate if there's a link
     if (n.link) {
       router.push(n.link);
@@ -372,12 +372,12 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
   return (
     <div className="notification-wrapper relative flex items-center" ref={dropdownRef}>
       {/* Header Bell Icon with Red Badge */}
-      <Button 
+      <Button
         type="button"
         variant="ghost"
         size="icon"
         radius="full"
-        className={triggerClassName || "bell-btn text-gray-500 hover:text-brand-green transition-colors relative p-0 w-8 h-8 h-auto min-h-0 border-none shadow-none hover:bg-transparent"} 
+        className={triggerClassName || "bell-btn text-gray-500 hover:text-brand-green transition-colors relative p-0 w-8 h-8 h-auto min-h-0 border-none shadow-none hover:bg-transparent"}
         onClick={() => setIsOpen(!isOpen)}
         title="Notifications"
       >
@@ -395,11 +395,11 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
           <div className="dropdown-header px-3.5 py-2.5 border-b border-gray-100 flex justify-between items-center bg-gray-50/70">
             <h4 className="font-bold text-gray-800 text-sm m-0">Notifications</h4>
             {unreadCount > 0 && (
-              <Button 
+              <Button
                 type="button"
                 variant="ghost"
                 size="xs"
-                className="mark-all-btn text-teal-700 hover:text-teal-800 text-xs font-semibold hover:underline p-0 h-auto border-none shadow-none hover:bg-transparent" 
+                className="mark-all-btn text-teal-700 hover:text-teal-800 text-xs font-semibold hover:underline p-0 h-auto border-none shadow-none hover:bg-transparent"
                 onClick={handleMarkAllAsRead}
               >
                 Mark all as read

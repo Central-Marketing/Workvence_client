@@ -133,8 +133,8 @@ export default function WorkingNotWorkingPage() {
                   size="xs"
                   radius="xl"
                   className={`font-semibold transition cursor-pointer ${filterStatus === st
-                      ? "bg-[#0db890] text-[#0f172a] font-bold shadow-xs hover:bg-[#0db890]"
-                      : "bg-white/10 text-gray-300 hover:bg-white/20"
+                    ? "bg-[#0db890] text-[#0f172a] font-bold shadow-xs hover:bg-[#0db890]"
+                    : "bg-white/10 text-gray-300 hover:bg-white/20"
                     }`}
                 >
                   {st === "All" ? "All Creatives" : st === "Available" ? "Available Now" : "Currently Booked"}
@@ -151,7 +151,7 @@ export default function WorkingNotWorkingPage() {
           {filteredCreatives.map((cr) => (
             <div
               key={cr.id}
-              className="bg-[#f8fafc] border border-gray-200/90 rounded-3xl p-8 hover:bg-white hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-8"
+              className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-8 hover:bg-white hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-8"
             >
               <div className="space-y-3 max-w-2xl">
                 <div className="flex flex-wrap items-center gap-3">
@@ -182,7 +182,7 @@ export default function WorkingNotWorkingPage() {
                   {cr.specialties.map((sp) => (
                     <span
                       key={sp}
-                      className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-white text-gray-700 border border-gray-200/80"
+                      className="px-2.5 py-1 rounded-[6px] text-[11px] font-medium bg-white text-gray-700 border border-gray-200/80"
                     >
                       {sp}
                     </span>
@@ -215,7 +215,7 @@ export default function WorkingNotWorkingPage() {
       {/* Booking Modal */}
       {selectedCreative && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
             <Button
               onClick={() => setSelectedCreative(null)}
               variant="soft"

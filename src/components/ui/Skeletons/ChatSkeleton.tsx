@@ -38,8 +38,8 @@ export const ChatSkeleton: React.FC = () => {
             </div>
           </div>
           <div className="flex gap-2">
-            <Skeleton className="w-8 h-8 rounded-lg" />
-            <Skeleton className="w-8 h-8 rounded-lg" />
+            <Skeleton className="w-8 h-8 rounded-[6px]" />
+            <Skeleton className="w-8 h-8 rounded-[6px]" />
           </div>
         </div>
 

@@ -92,7 +92,7 @@ export default function InviteAFriendPage() {
         <div className="container mx-auto px-4 md:px-6 max-w-3xl space-y-12">
 
           {/* Main Referral Generator Card */}
-          <div className="bg-[#f8fafc] border border-gray-200 rounded-3xl p-8 sm:p-10 shadow-xs space-y-8">
+          <div className="bg-[#f8fafc] border border-gray-200 rounded-[6px] p-8 sm:p-10 shadow-xs space-y-8">
             <div className="space-y-2 text-center">
               <h3 className="text-xl font-bold text-[#0f172a]">Your Unique Referral Link</h3>
               <p className="text-xs text-gray-500">Share this link anywhere online to automatically track your bonuses.</p>

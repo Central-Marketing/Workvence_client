@@ -96,7 +96,7 @@ export default function LogoMakerPage() {
       name: "Dynamic Speed Crest",
       render: (
         <div className="flex flex-col items-center justify-center p-6 space-y-3">
-          <div className="w-16 h-12 rounded-lg flex items-center justify-center text-white font-black text-xl italic tracking-tighter" style={{ backgroundColor: primaryColor }}>
+          <div className="w-16 h-12 rounded-[6px] flex items-center justify-center text-white font-black text-xl italic tracking-tighter" style={{ backgroundColor: primaryColor }}>
             &gt;&gt;&gt;
           </div>
           <div className="text-center">
@@ -154,7 +154,7 @@ export default function LogoMakerPage() {
 
           {/* Left Controls Sidebar (4 cols) */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-[#f8fafc] border border-gray-200 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xs">
+            <div className="bg-[#f8fafc] border border-gray-200 rounded-[6px] p-6 sm:p-7 space-y-5 shadow-xs">
               <div className="flex items-center justify-between border-b border-gray-200 pb-3">
                 <h3 className="text-base font-bold text-[#0f172a] flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-[#327C73]" />
@@ -220,7 +220,7 @@ export default function LogoMakerPage() {
             </div>
 
             {/* Custom Designer Card */}
-            <div className="bg-gradient-to-r from-[#f2fbf6] to-[#e6f8ef] border border-[#ceefe0] rounded-3xl p-6 space-y-3 text-center">
+            <div className="bg-gradient-to-r from-[#f2fbf6] to-[#e6f8ef] border border-[#ceefe0] rounded-[6px] p-6 space-y-3 text-center">
               <h4 className="font-bold text-[#0f172a] text-sm">Need a 100% bespoke custom logo?</h4>
               <p className="text-xs text-gray-600">
                 Work directly with top-rated branding freelancers starting at $50.
@@ -246,7 +246,7 @@ export default function LogoMakerPage() {
               {logoVariations.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white border border-gray-200/90 rounded-3xl p-6 hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group"
+                  className="bg-white border border-gray-200/90 rounded-[6px] p-6 hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group"
                 >
                   <div className="flex items-center justify-between text-xs text-gray-400">
                     <span className="font-semibold text-gray-700">{item.name}</span>

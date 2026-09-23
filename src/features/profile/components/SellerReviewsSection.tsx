@@ -175,7 +175,7 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
 
                 {/* Right Project Thumbnail */}
                 {rev.projectImage && (
-                  <div className="w-24 sm:w-28 aspect-[16/10] rounded-lg overflow-hidden border border-gray-200 shrink-0 bg-gray-950 shadow-2xs">
+                  <div className="w-24 sm:w-28 aspect-[16/10] rounded-[6px] overflow-hidden border border-gray-200 shrink-0 bg-gray-950 shadow-2xs">
                     <img
                       src={rev.projectImage}
                       alt="Reviewed project"
@@ -200,7 +200,7 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
               {(rev.projectPrice || rev.projectDuration) && (
                 <div className="flex items-center gap-3 mb-4">
                   {rev.projectPrice && (
-                    <div className="bg-white border border-gray-200/80 rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs shadow-2xs">
+                    <div className="bg-white border border-gray-200/80 rounded-[6px] px-3 py-1.5 flex items-center gap-2 text-xs shadow-2xs">
                       <FiTag className="w-3.5 h-3.5 text-teal-600" />
                       <span className="text-gray-400">Price</span>
                       <span className="font-bold text-gray-900">{rev.projectPrice}</span>
@@ -208,7 +208,7 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
                   )}
 
                   {rev.projectDuration && (
-                    <div className="bg-white border border-gray-200/80 rounded-lg px-3 py-1.5 flex items-center gap-2 text-xs shadow-2xs">
+                    <div className="bg-white border border-gray-200/80 rounded-[6px] px-3 py-1.5 flex items-center gap-2 text-xs shadow-2xs">
                       <FiCalendar className="w-3.5 h-3.5 text-purple-600" />
                       <span className="text-gray-400">Duration</span>
                       <span className="font-bold text-gray-900">{rev.projectDuration}</span>

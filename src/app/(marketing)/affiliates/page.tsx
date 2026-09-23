@@ -169,7 +169,7 @@ export default function AffiliatesPage() {
             {commissionTiers.map((tier, idx) => (
               <div
                 key={idx}
-                className="bg-white border border-gray-200 rounded-3xl p-8 shadow-xs space-y-5 flex flex-col justify-between"
+                className="bg-white border border-gray-200 rounded-[6px] p-8 shadow-xs space-y-5 flex flex-col justify-between"
               >
                 <div className="space-y-3">
                   <div className="text-3xl font-extrabold text-[#327C73]">{tier.commission}</div>
@@ -188,7 +188,7 @@ export default function AffiliatesPage() {
       {/* Interactive Calculator */}
       <section id="calculator" className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-[#0f172a] text-white">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-3xl p-8 sm:p-12 shadow-2xl space-y-8">
+          <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-[6px] p-8 sm:p-12 shadow-2xl space-y-8">
             <div className="text-center space-y-2">
               <span className="text-xs font-bold text-brand-green uppercase tracking-wider">
                 Affiliate Revenue Calculator
@@ -210,7 +210,7 @@ export default function AffiliatesPage() {
                     step={5}
                     value={referredUsers}
                     onChange={(e) => setReferredUsers(Number(e.target.value))}
-                    className="w-full accent-[#10b981] h-2 bg-white/20 rounded-lg cursor-pointer"
+                    className="w-full accent-[#10b981] h-2 bg-white/20 rounded-[6px] cursor-pointer"
                   />
                   <div className="flex justify-between text-[10px] text-gray-400 mt-1">
                     <span>5</span>
@@ -231,7 +231,7 @@ export default function AffiliatesPage() {
                     step={25}
                     value={avgOrderValue}
                     onChange={(e) => setAvgOrderValue(Number(e.target.value))}
-                    className="w-full accent-[#10b981] h-2 bg-white/20 rounded-lg cursor-pointer"
+                    className="w-full accent-[#10b981] h-2 bg-white/20 rounded-[6px] cursor-pointer"
                   />
                   <div className="flex justify-between text-[10px] text-gray-400 mt-1">
                     <span>$50</span>
@@ -274,7 +274,7 @@ export default function AffiliatesPage() {
       {/* Affiliate Signup Modal */}
       {isJoining && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
             <Button
               onClick={() => setIsJoining(false)}
               variant="soft"

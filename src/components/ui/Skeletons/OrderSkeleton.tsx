@@ -12,7 +12,7 @@ export const OrderSkeleton: React.FC = () => {
             <div className="bg-white rounded-[6px] border border-slate-200 p-6 flex flex-col sm:flex-row justify-between items-start gap-4 shadow-xs">
               <div className="space-y-3 flex-1 w-full">
                 <Skeleton className="w-28 h-5 rounded-md !bg-slate-200" />
-                <Skeleton className="w-3/4 h-8 rounded-lg !bg-slate-200" />
+                <Skeleton className="w-3/4 h-8 rounded-[6px] !bg-slate-200" />
                 <Skeleton className="w-1/2 h-4 rounded-md !bg-slate-200" />
               </div>
               <div className="space-y-2 shrink-0">

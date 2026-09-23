@@ -134,7 +134,7 @@ export default function BlogPage() {
             {/* Featured Article Card */}
             <div
               onClick={() => setSelectedPost(featured)}
-              className="bg-white border border-gray-200 rounded-3xl p-8 sm:p-10 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 cursor-pointer space-y-4"
+              className="bg-white border border-gray-200 rounded-[6px] p-8 sm:p-10 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 cursor-pointer space-y-4"
             >
               <div className="flex flex-wrap items-center gap-3 text-xs">
                 <span className="px-3 py-1 rounded-full font-bold bg-[#10b981]/10 text-[#327C73]">
@@ -211,7 +211,7 @@ export default function BlogPage() {
               <article
                 key={post.id}
                 onClick={() => setSelectedPost(post)}
-                className="bg-[#f8fafc] border border-gray-200/90 rounded-3xl p-7 hover:bg-white hover:border-[#327C73] hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between space-y-6"
+                className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-7 hover:bg-white hover:border-[#327C73] hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between space-y-6"
               >
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-[11px]">
@@ -243,7 +243,7 @@ export default function BlogPage() {
           </div>
 
           {/* Newsletter Box */}
-          <div className="mt-20 bg-[#0f172a] text-white rounded-3xl p-8 sm:p-12 text-center max-w-3xl mx-auto space-y-5">
+          <div className="mt-20 bg-[#0f172a] text-white rounded-[6px] p-8 sm:p-12 text-center max-w-3xl mx-auto space-y-5">
             <h3 className="text-2xl sm:text-3xl font-bold">Stay Ahead in the Creator Economy</h3>
             <p className="text-xs sm:text-sm text-gray-300 max-w-lg mx-auto">
               Get our weekly digest of top freelance playbooks, marketplace trends, and exclusive interviews delivered to your inbox.
@@ -274,7 +274,7 @@ export default function BlogPage() {
       {/* Article Reader Modal */}
       {selectedPost && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-2xl w-full p-6 sm:p-10 shadow-2xl relative border border-gray-100 my-8">
             <Button
               type="button"
               variant="soft"

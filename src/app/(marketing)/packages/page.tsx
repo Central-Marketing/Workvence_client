@@ -1023,7 +1023,7 @@ const Packages = () => {
                 </Breadcrumb>
               ) : null}
             </div>
-            <Button
+            {/* <Button
               type="button"
               variant="brand"
               size="md"
@@ -1037,7 +1037,7 @@ const Packages = () => {
               className="text-sm font-semibold px-5 py-2.5 shadow-sm"
             >
               Filter
-            </Button>
+            </Button> */}
           </div>
 
           {/* Active Filter Tags & Results Count Bar & Sort */}

@@ -34,6 +34,7 @@ export function useSearchSuggestions(
   // Monotonic request ID counter for race-condition protection on fast typing
   const requestIdRef = useRef(0);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const skipNextQueryRef = useRef(false);
 
   const clear = useCallback(() => {
     requestIdRef.current++;
@@ -47,7 +48,27 @@ export function useSearchSuggestions(
     setIsOpen(false);
   }, []);
 
+  const close = useCallback(() => {
+    requestIdRef.current++;
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+    skipNextQueryRef.current = true;
+    setSuggestions([]);
+    setItems([]);
+    setIsLoading(false);
+    setIsOpen(false);
+  }, []);
+
   useEffect(() => {
+    // If query change was triggered programmatically (e.g. user selected a suggestion or searched),
+    // skip reopening and querying for suggestions
+    if (skipNextQueryRef.current) {
+      skipNextQueryRef.current = false;
+      return;
+    }
+
     const trimmed = query.trim();
 
     // Step 2 - Empty input check:
@@ -82,7 +103,7 @@ export function useSearchSuggestions(
           },
         });
 
-        // If a newer character was typed while this request was in flight, discard response
+        // If a newer character was typed or request was closed while this request was in flight, discard response
         if (currentRequestId !== requestIdRef.current) {
           return;
         }
@@ -135,6 +156,7 @@ export function useSearchSuggestions(
     isOpen,
     setIsOpen,
     clear,
+    close,
   };
 }
 

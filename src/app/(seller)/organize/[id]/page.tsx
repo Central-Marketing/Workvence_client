@@ -8,7 +8,7 @@ import dynamic from "next/dynamic";
 import { X, Check, ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2, ArrowLeft } from "lucide-react";
 import 'react-quill-new/dist/quill.snow.css';
 import { packageReducer, initialState } from "@/reducers/packageReducer";
-import { axiosFetch, generateImageURL } from "@/utils";
+import { axiosFetch, generateImageURL, parseRevisionNumber } from "@/utils";
 import useAdminCategories from "@/hooks/useAdminCategories";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
@@ -762,7 +762,7 @@ const EditPackagePage = () => {
         shortDesc: rest.shortDesc || "",
         price: Number(rest.price || 0),
         deliveryTime: rest.deliveryTime || "7",
-        revisionNumber: rest.revisionNumber || "1",
+        revisionNumber: parseRevisionNumber(rest.revisionNumber ?? 1, 1),
         features: Array.isArray(rest.features) ? rest.features : [],
       };
     };
@@ -772,14 +772,14 @@ const EditPackagePage = () => {
       shortDesc: state.shortDesc || "",
       price: Number(state.price || 0),
       deliveryTime: state.deliveryTime || "7",
-      revisionNumber: state.revisionNumber || "1",
+      revisionNumber: parseRevisionNumber(state.revisionNumber ?? 1, 1),
       features: state.features || [],
     };
     basicTier.title = basicTier.title || state.title || "";
     basicTier.shortDesc = basicTier.shortDesc || state.shortDesc || state.description || "";
     basicTier.price = Number(basicTier.price || state.price || 0);
     basicTier.deliveryTime = basicTier.deliveryTime || state.deliveryTime || "7";
-    basicTier.revisionNumber = basicTier.revisionNumber || state.revisionNumber || "1";
+    basicTier.revisionNumber = parseRevisionNumber(basicTier.revisionNumber ?? state.revisionNumber ?? 1, 1);
 
     const standardTier = cleanTier(state.packages?.standard);
     const premiumTier = cleanTier(state.packages?.premium);
@@ -1462,8 +1462,7 @@ const EditPackagePage = () => {
                     <option value="3">3 Revisions</option>
                     <option value="5">5 Revisions</option>
                     <option value="10">10 Revisions</option>
-                    <option value="Unlimited">Unlimited Revisions</option>
-                    {currentTierData.revisionNumber && !["", "0", "1", "2", "3", "5", "10", "Unlimited"].includes(String(currentTierData.revisionNumber)) && (
+                    {currentTierData.revisionNumber && !["", "0", "1", "2", "3", "5", "10"].includes(String(currentTierData.revisionNumber)) && (
                       <option value={String(currentTierData.revisionNumber)}>{currentTierData.revisionNumber} Revisions</option>
                     )}
                   </select>

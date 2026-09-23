@@ -8,7 +8,7 @@ import dynamic from "next/dynamic";
 import { X, Check, ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2 } from "lucide-react";
 import 'react-quill-new/dist/quill.snow.css';
 import { packageReducer, initialState } from "@/reducers/packageReducer";
-import { axiosFetch, generateImageURL } from "@/utils";
+import { axiosFetch, generateImageURL, parseRevisionNumber } from "@/utils";
 import adminAxios from "@/utils/adminAxios";
 import useAdminCategories from "@/hooks/useAdminCategories";
 import supportService from "@/utils/supportService";
@@ -531,7 +531,7 @@ const OrganizePage = () => {
       // tags: keywordsList,
     };
 
-    // Ensure basic tier sync
+    // Ensure basic tier sync and integer revision numbers
     if (form.packages?.basic) {
       form.packages.basic.title =
         form.packages.basic.title || form.packages.basic.shortTitle || form.shortTitle || form.title || "";
@@ -540,9 +540,27 @@ const OrganizePage = () => {
       form.packages.basic.price = Number(form.packages.basic.price || form.price || 0);
       form.packages.basic.deliveryTime =
         form.packages.basic.deliveryTime || form.deliveryTime || "7";
-      form.packages.basic.revisionNumber =
-        form.packages.basic.revisionNumber || form.revisionNumber || "1";
+      form.packages.basic.revisionNumber = parseRevisionNumber(
+        form.packages.basic.revisionNumber ?? form.revisionNumber ?? 1,
+        1
+      );
     }
+
+    if (form.packages?.standard) {
+      form.packages.standard.revisionNumber = parseRevisionNumber(
+        form.packages.standard.revisionNumber ?? 1,
+        1
+      );
+    }
+
+    if (form.packages?.premium) {
+      form.packages.premium.revisionNumber = parseRevisionNumber(
+        form.packages.premium.revisionNumber ?? 1,
+        1
+      );
+    }
+
+    form.revisionNumber = form.packages?.basic?.revisionNumber ?? 1;
 
     if (!isDraft) {
       if (!form.title) {
@@ -1089,7 +1107,6 @@ const OrganizePage = () => {
                     <option value="3">3 Revisions</option>
                     <option value="5">5 Revisions</option>
                     <option value="10">10 Revisions</option>
-                    <option value="Unlimited">Unlimited Revisions</option>
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-3.5 h-3.5" />
                 </div>

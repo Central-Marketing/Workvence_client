@@ -214,14 +214,15 @@ const Featured = ({
     };
   }, []);
 
-  const { items, isOpen, setIsOpen, isLoading: isSuggestionsLoading } = useSearchSuggestions(search, { limit: 8 });
+  const { items, isOpen, setIsOpen, isLoading: isSuggestionsLoading, close: closeSuggestions } = useSearchSuggestions(search, { limit: 8 });
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
   const handleSelectSuggestion = (item: SuggestionItem | { text: string; type: 'query' }) => {
     const text = item.text.trim();
+    closeSuggestions();
     setSearch(text);
-    setIsOpen(false);
     setSelectedIndex(-1);
+    searchInputRef.current?.blur();
     if (item.type === 'category') {
       router.push(`/packages?category=${encodeURIComponent((item as SuggestionItem).slug || text)}`);
     } else {
@@ -248,8 +249,9 @@ const Featured = ({
     }
 
     if (e.key === "Escape") {
-      setIsOpen(false);
+      closeSuggestions();
       setSelectedIndex(-1);
+      searchInputRef.current?.blur();
       return;
     }
 
@@ -263,7 +265,9 @@ const Featured = ({
         return;
       }
       if (search.trim()) {
-        setIsOpen(false);
+        closeSuggestions();
+        setSelectedIndex(-1);
+        searchInputRef.current?.blur();
         handleSearch();
       }
     }
@@ -272,15 +276,18 @@ const Featured = ({
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
+        closeSuggestions();
         setSelectedIndex(-1);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [setIsOpen]);
+  }, [closeSuggestions]);
 
   const handleSearch = () => {
+    closeSuggestions();
+    setSelectedIndex(-1);
+    searchInputRef.current?.blur();
     if (search.trim() || category) {
       router.push(`/packages?search=${encodeURIComponent(search.trim())}&category=${encodeURIComponent(category)}`);
     }

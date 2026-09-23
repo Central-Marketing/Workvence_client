@@ -97,18 +97,33 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
       const msg = String(notif.message || notif.desc || notif.description || '').toLowerCase();
       const link = String(notif.link || notif.url || '').toLowerCase();
 
-      return (
+      // Check explicit chat types or identifiers
+      const isChatType = (
         type === 'message' ||
         type === 'chat' ||
         type === 'conversation' ||
         type === 'new_message' ||
         type === 'custom_offer' ||
-        Boolean(notif.conversationID || notif.conversationId || notif.conversationUUID || notif.conversation) ||
-        link.includes('/message') ||
-        link.includes('/messages') ||
-        /message|chat|conversation|custom proposal|custom offer/i.test(title) ||
-        /sent you a message|sent a message|new message|sent you a custom proposal|sent you an offer/i.test(msg)
+        type === 'direct_message' ||
+        type === 'dm' ||
+        type === 'inbox' ||
+        Boolean(notif.conversationID || notif.conversationId || notif.conversationUUID || notif.conversation || notif.chatId || notif.messageId || notif.messageID)
       );
+
+      if (isChatType) return true;
+
+      // Check if routing link is to messages
+      if (link.includes('/message') || link.includes('/messages')) return true;
+
+      // Check text or title indicators
+      if (/message|chat|conversation|custom proposal|custom offer/i.test(title)) return true;
+      if (/sent you a message|sent a message|new message|sent you a custom proposal|sent you an offer/i.test(msg)) return true;
+
+      // Check if sender matches any active chat message in memory
+      const senderIdStr = String(notif.senderId || notif.senderID || notif.sender?._id || notif.sender?.id || notif.from?._id || notif.from || '').trim();
+      if (senderIdStr && processedNotifMessageIds.has(senderIdStr)) return true;
+
+      return false;
     };
 
     // Listen for real-time notification broadcast from server
@@ -144,7 +159,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 2000);
 
-      // ALWAYS skip toast for chat messages (handled exclusively by handleReceiveMessage)
+      // ALWAYS skip toast and sound for chat messages (handled exclusively by handleReceiveMessage)
       if (isChatMessageNotif(newNotif)) {
         return;
       }
@@ -230,13 +245,37 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
         ''
       );
 
-      const msgId = newMsg._id || newMsg.id || newMsg.uuid;
-      const msgKey = String(msgId || `${String(senderId || '')}-${newMsg.description || newMsg.text || newMsg.message || ''}`).trim();
+      const senderIdStr = String(senderId || '').trim();
+      const convIdStr = String(conversationId || '').trim();
+      const rawText = String(newMsg.description || newMsg.desc || newMsg.text || newMsg.message || '').trim();
+      const fileAttachment = String(newMsg.file || (Array.isArray(newMsg.attachments) && newMsg.attachments[0]) || '').trim();
+      const contentSnippet = rawText.slice(0, 100);
 
-      // Deduplicate across simultaneously mounted desktop & mobile instances
-      if (processedNotifMessageIds.has(msgKey)) return;
-      processedNotifMessageIds.add(msgKey);
-      setTimeout(() => processedNotifMessageIds.delete(msgKey), 8000);
+      // Deterministic fingerprint that is identical for both instant socket emit and DB persistence emit
+      const contentFingerprint = `${senderIdStr}_${convIdStr}_${contentSnippet || fileAttachment}`;
+      const msgId = String(newMsg._id || newMsg.id || newMsg.uuid || '').trim();
+
+      // Deduplicate across simultaneously mounted desktop & mobile instances and duplicate socket broadcasts
+      if (
+        (contentFingerprint && processedNotifMessageIds.has(contentFingerprint)) ||
+        (msgId && processedNotifMessageIds.has(msgId))
+      ) {
+        return;
+      }
+
+      // Mark both fingerprint and msgId (and senderId briefly) as processed
+      if (contentFingerprint) {
+        processedNotifMessageIds.add(contentFingerprint);
+        setTimeout(() => processedNotifMessageIds.delete(contentFingerprint), 10000);
+      }
+      if (msgId) {
+        processedNotifMessageIds.add(msgId);
+        setTimeout(() => processedNotifMessageIds.delete(msgId), 10000);
+      }
+      if (senderIdStr) {
+        processedNotifMessageIds.add(senderIdStr);
+        setTimeout(() => processedNotifMessageIds.delete(senderIdStr), 3000);
+      }
 
       // Play message notification sound once
       playNotificationSound('message');
@@ -244,11 +283,12 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
       const displayName = senderName || 'Someone';
       const msgPreview = newMsg.description?.startsWith('[CUSTOM_OFFER]') 
         ? 'sent you a custom proposal' 
-        : newMsg.description?.slice(0, 60) || newMsg.text?.slice(0, 60) || newMsg.message?.slice(0, 60) || 'sent a message';
+        : rawText.slice(0, 60) || (fileAttachment ? 'sent an attachment' : 'sent a message');
 
       const targetConvId = conversationId || newMsg.conversationID;
+      const toastKey = contentFingerprint || msgId || `${senderIdStr}-${Date.now()}`;
 
-      // Show toast for incoming message with 5s duration and unique ID
+      // Show toast for incoming message with 5s duration and unique deterministic ID
       toast.custom((t) => (
         <div 
           className={`relative bg-white border-l-4 border-[#6ad724] shadow-xl p-4 rounded-lg max-w-[350px] flex flex-col gap-1 transition-all duration-300 cursor-pointer pr-6 ${t.visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'}`}
@@ -272,7 +312,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
           <strong className="text-[#333] text-sm font-bold">💬 {displayName}</strong>
           <p className="text-[#666] text-[13px] m-0 leading-snug">{msgPreview}</p>
         </div>
-      ), { id: `chat-toast-${msgKey}`, duration: 5000 });
+      ), { id: `chat-toast-${toastKey}`, duration: 5000 });
 
       // Also invalidate conversations to update the header inbox badge instantly
       window.dispatchEvent(new CustomEvent('new-message-received'));

@@ -14,8 +14,8 @@ export interface LeftFilterSidebarProps {
   selectedCategory: string;
   onCategoryChange: (cat: string) => void;
 
-  sellerLevels: { [key: string]: boolean };
-  onSellerLevelToggle: (levelKey: string) => void;
+  sellerLevels?: { [key: string]: boolean };
+  onSellerLevelToggle?: (levelKey: string) => void;
 
   deliveryDays: string;
   onDeliveryDaysChange: (days: string) => void;
@@ -237,33 +237,35 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
       </div>
 
       {/* 4. Seller Level Checkboxes */}
-      <div>
-        <label className="block text-xs font-bold text-gray-900 mb-2.5">Seller Level</label>
-        <div className="space-y-2.5">
-          {[
-            { key: "top_rated", label: "Top Rated" },
-            { key: "level_two", label: "Level 2" },
-            { key: "level_one", label: "Level 1" },
-            { key: "new_seller", label: "New Seller" },
-          ].map(({ key, label }) => {
-            const isChecked = Boolean(sellerLevels[key]);
-            return (
-              <label
-                key={key}
-                className="flex items-center gap-2.5 text-[13px] font-medium text-gray-700 hover:text-gray-900 cursor-pointer select-none"
-              >
-                <input
-                  type="checkbox"
-                  checked={isChecked}
-                  onChange={() => onSellerLevelToggle(key)}
-                  className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black accent-black cursor-pointer"
-                />
-                <span>{label}</span>
-              </label>
-            );
-          })}
+      {sellerLevels && onSellerLevelToggle && (
+        <div>
+          <label className="block text-xs font-bold text-gray-900 mb-2.5">Seller Level</label>
+          <div className="space-y-2.5">
+            {[
+              { key: "top_rated", label: "Top Rated" },
+              { key: "level_two", label: "Level 2" },
+              { key: "level_one", label: "Level 1" },
+              { key: "new_seller", label: "New Seller" },
+            ].map(({ key, label }) => {
+              const isChecked = Boolean(sellerLevels[key]);
+              return (
+                <label
+                  key={key}
+                  className="flex items-center gap-2.5 text-[13px] font-medium text-gray-700 hover:text-gray-900 cursor-pointer select-none"
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => onSellerLevelToggle(key)}
+                    className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black accent-black cursor-pointer"
+                  />
+                  <span>{label}</span>
+                </label>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 5. Delivery Time Radio Buttons */}
       <div>

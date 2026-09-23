@@ -439,7 +439,7 @@ export default function MyProposalsPage() {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Drawer Header */}
-          <div className="flex justify-between items-center px-6 py-4.5 border-b border-gray-100 bg-white shrink-0">
+          <div className="flex justify-between pt-2 items-center px-6 py-4.5 border-b border-gray-100 bg-white shrink-0">
             <div>
               <div className="flex items-center gap-2 mb-0.5">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
@@ -617,7 +617,7 @@ export default function MyProposalsPage() {
               return (
                 <Link
                   href={`/briefs/${briefId}`}
-                  className="px-4 py-2 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0B5C50] text-white text-xs font-semibold transition-colors"
+                  className="px-4 h-10 inline-flex items-center justify-center rounded-[6px] bg-[#0D6D5F] hover:bg-[#0B5C50] text-white text-xs font-semibold transition-colors"
                 >
                   View Project
                 </Link>

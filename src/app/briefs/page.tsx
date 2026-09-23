@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -16,14 +16,30 @@ import {
   FiUser,
   FiChevronLeft,
   FiChevronRight,
+  FiChevronDown,
+  FiCheck,
+  FiTag,
+  FiClock,
 } from "react-icons/fi";
 import { RiSearchLine } from "react-icons/ri";
 
 import { axiosFetch } from "@/utils";
 import useAdminCategories from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
-import { Loader, Button, Breadcrumb } from "@/components";
+import { Loader, Button, Breadcrumb, LeftFilterSidebar } from "@/components";
 import { ClientBrief } from "@/types";
+import useDebounce from "@/hooks/useDebounce";
+
+type SortOption = "" | "budget_asc" | "budget_desc" | "deadline_asc";
+
+const SORT_OPTIONS: { id: SortOption; label: string }[] = [
+  { id: "", label: "Newest" },
+  { id: "budget_asc", label: "Budget: Low to High" },
+  { id: "budget_desc", label: "Budget: High to Low" },
+  { id: "deadline_asc", label: "Shortest Deadline" },
+];
+
+
 
 interface ProjectSubcategoryCard {
   id: string;
@@ -73,6 +89,14 @@ function BriefsContent() {
 
   const initialSearch = searchParams?.get("search") || "";
   const initialCategory = searchParams?.get("category") || "";
+  const initialSkills = searchParams?.get("skills")
+    ? searchParams.get("skills")!.split(",").map((s) => s.trim()).filter(Boolean)
+    : [];
+  const initialMinBudget = searchParams?.get("minBudget") || "";
+  const initialMaxBudget = searchParams?.get("maxBudget") || "";
+  const initialMaxDeliveryTime = searchParams?.get("maxDeliveryTime") || "";
+  const initialSort = (searchParams?.get("sort") as SortOption) || "";
+  const initialPage = Math.max(1, Number(searchParams?.get("page")) || 1);
   const initialView = searchParams?.get("view") || "";
   const initialExplore = searchParams?.get("explore") || "";
 
@@ -83,7 +107,13 @@ function BriefsContent() {
       initialView === "feed" ||
       initialExplore === "true" ||
       Boolean(initialCategory) ||
-      Boolean(initialSearch)
+      Boolean(initialSearch) ||
+      initialSkills.length > 0 ||
+      Boolean(initialMinBudget) ||
+      Boolean(initialMaxBudget) ||
+      Boolean(initialMaxDeliveryTime) ||
+      Boolean(initialSort) ||
+      initialPage > 1
     ) {
       return "feed";
     }
@@ -98,33 +128,130 @@ function BriefsContent() {
       : "all"
   );
   const [search, setSearch] = useState<string>(initialSearch);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const debouncedSearch = useDebounce(search, 350);
+
+  const [selectedSkills, setSelectedSkills] = useState<string[]>(initialSkills);
+  const [minBudget, setMinBudget] = useState<string>(initialMinBudget);
+  const [maxBudget, setMaxBudget] = useState<string>(initialMaxBudget);
+  const [maxDeliveryTime, setMaxDeliveryTime] = useState<string>(initialMaxDeliveryTime);
+  const [sortOption, setSortOption] = useState<SortOption>(initialSort);
+  const [currentPage, setCurrentPage] = useState<number>(initialPage);
+
+  const [isFilterOpen, setIsFilterOpen] = useState(true);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [showFilterDrawer, setShowFilterDrawer] = useState(false);
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [favoritedIds, setFavoritedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    const checkViewport = () => {
+      setIsMobileViewport(window.innerWidth < 1024);
+    };
+    checkViewport();
+    window.addEventListener("resize", checkViewport);
+    return () => window.removeEventListener("resize", checkViewport);
   }, []);
+
+  const syncToUrl = (overrides?: {
+    search?: string;
+    category?: string;
+    skills?: string[];
+    minBudget?: string;
+    maxBudget?: string;
+    maxDeliveryTime?: string;
+    sort?: SortOption;
+    page?: number;
+    view?: "categories" | "feed";
+  }) => {
+    const params = new URLSearchParams();
+
+    const qSearch = overrides?.search !== undefined ? overrides.search : search;
+    const qCat = overrides?.category !== undefined ? overrides.category : activePill;
+    const qSkills = overrides?.skills !== undefined ? overrides.skills : selectedSkills;
+    const qMinB = overrides?.minBudget !== undefined ? overrides.minBudget : minBudget;
+    const qMaxB = overrides?.maxBudget !== undefined ? overrides.maxBudget : maxBudget;
+    const qDeliv = overrides?.maxDeliveryTime !== undefined ? overrides.maxDeliveryTime : maxDeliveryTime;
+    const qSort = overrides?.sort !== undefined ? overrides.sort : sortOption;
+    const qPage = overrides?.page !== undefined ? overrides.page : currentPage;
+    const qView = overrides?.view !== undefined ? overrides.view : viewMode;
+
+    if (qSearch.trim()) params.set("search", qSearch.trim());
+    if (qCat && qCat !== "all") params.set("category", qCat);
+    if (qSkills.length > 0) params.set("skills", qSkills.join(","));
+    if (qMinB) params.set("minBudget", qMinB);
+    if (qMaxB) params.set("maxBudget", qMaxB);
+    if (qDeliv) params.set("maxDeliveryTime", qDeliv);
+    // Sort is omitted when search keyword is present (backend auto-sorts by relevance)
+    if (qSort && !qSearch.trim()) params.set("sort", qSort);
+    if (qPage > 1) params.set("page", String(qPage));
+    if (qView === "feed") params.set("view", "feed");
+
+    const qs = params.toString();
+    router.push(qs ? `/briefs?${qs}` : "/briefs", { scroll: false });
+  };
+
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    syncToUrl({ search: debouncedSearch, page: 1 });
+  }, [debouncedSearch]);
 
   // Sync state if URL query params change externally
   useEffect(() => {
     const qSearch = searchParams?.get("search") || "";
     const qCat = searchParams?.get("category") || "";
+    const qSkills = searchParams?.get("skills")
+      ? searchParams.get("skills")!.split(",").map((s) => s.trim()).filter(Boolean)
+      : [];
+    const qMinB = searchParams?.get("minBudget") || "";
+    const qMaxB = searchParams?.get("maxBudget") || "";
+    const qDeliv = searchParams?.get("maxDeliveryTime") || "";
+    const qSort = (searchParams?.get("sort") as SortOption) || "";
+    const qPage = Math.max(1, Number(searchParams?.get("page")) || 1);
     const qView = searchParams?.get("view") || "";
     const qExplore = searchParams?.get("explore") || "";
 
-    if (qSearch) setSearch(qSearch);
+    if (qSearch !== search) setSearch(qSearch);
     if (qCat) setActivePill(qCat.toLowerCase().replace(/&/g, "and").replace(/\s+/g, "-"));
+    else if (!qCat && activePill !== "all") setActivePill("all");
+
+    setSelectedSkills(qSkills);
+    setMinBudget(qMinB);
+    setMaxBudget(qMaxB);
+    setMaxDeliveryTime(qDeliv);
+    setSortOption(qSort);
+    setCurrentPage(qPage);
 
     if (
       qView === "all" ||
       qView === "feed" ||
       qExplore === "true" ||
       Boolean(qCat) ||
-      Boolean(qSearch)
+      Boolean(qSearch) ||
+      qSkills.length > 0 ||
+      Boolean(qMinB) ||
+      Boolean(qMaxB) ||
+      Boolean(qDeliv) ||
+      Boolean(qSort) ||
+      qPage > 1
     ) {
       setViewMode("feed");
-    } else if (!qView && !qCat && !qSearch && !qExplore) {
+    } else if (
+      !qView &&
+      !qCat &&
+      !qSearch &&
+      !qExplore &&
+      qSkills.length === 0 &&
+      !qMinB &&
+      !qMaxB &&
+      !qDeliv &&
+      !qSort &&
+      qPage === 1
+    ) {
       setViewMode("categories");
     }
   }, [searchParams]);
@@ -259,30 +386,29 @@ function BriefsContent() {
   };
 
   const handleExploreAll = () => {
-    router.push("/briefs?view=all", { scroll: false });
     setViewMode("feed");
     setActivePill("all");
+    setCurrentPage(1);
+    syncToUrl({ view: "feed", category: "all", page: 1 });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleSelectSubcategory = (catSlug: string, subcatTitle: string) => {
-    router.push(
-      `/briefs?category=${catSlug}&search=${encodeURIComponent(subcatTitle)}`,
-      { scroll: false }
-    );
-    setActivePill(catSlug);
-    setSearch(subcatTitle);
+  const handleSelectSubcategory = (catSlug: string, subcatSlug?: string) => {
+    const targetCategory = subcatSlug || catSlug;
+    setActivePill(targetCategory);
+    setSearch("");
     setCurrentPage(1);
     setViewMode("feed");
+    syncToUrl({ category: targetCategory, search: "", page: 1, view: "feed" });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSelectCategory = (catSlug: string) => {
-    router.push(`/briefs?category=${catSlug}`, { scroll: false });
     setActivePill(catSlug);
     setSearch("");
     setCurrentPage(1);
     setViewMode("feed");
+    syncToUrl({ category: catSlug, search: "", page: 1, view: "feed" });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -292,13 +418,50 @@ function BriefsContent() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Fetch real client briefs from backend
+  // Fetch real client briefs from backend with all active search & filter parameters
   const { isLoading, data: apiResponse } = useQuery<BriefsApiResponse>({
-    queryKey: ["briefs-feed", currentPage],
+    queryKey: [
+      "briefs-feed",
+      currentPage,
+      debouncedSearch,
+      activePill,
+      selectedSkills.join(","),
+      minBudget,
+      maxBudget,
+      maxDeliveryTime,
+      sortOption,
+    ],
     queryFn: async () => {
-      const { data } = await axiosFetch.get("/briefs", {
-        params: { page: currentPage, limit: 10 },
-      });
+      const params: Record<string, any> = {
+        page: currentPage,
+        limit: 10,
+      };
+
+      const trimmedSearch = debouncedSearch.trim();
+      if (trimmedSearch) {
+        params.search = trimmedSearch;
+      }
+      if (activePill && activePill !== "all") {
+        params.category = activePill;
+      }
+      if (selectedSkills.length > 0) {
+        params.skills = selectedSkills.join(",");
+      }
+      if (minBudget && !isNaN(Number(minBudget))) {
+        params.minBudget = Number(minBudget);
+      }
+      if (maxBudget && !isNaN(Number(maxBudget))) {
+        params.maxBudget = Number(maxBudget);
+      }
+      if (maxDeliveryTime && !isNaN(Number(maxDeliveryTime))) {
+        params.maxDeliveryTime = Number(maxDeliveryTime);
+      }
+      // When search keyword is present, backend automatically ranks by relevance; omit sort
+      if (sortOption && !trimmedSearch) {
+        params.sort = sortOption;
+      }
+
+      const { data } = await axiosFetch.get("/briefs", { params });
       if (Array.isArray(data)) {
         return { briefs: data, total: data.length, totalPages: 1 };
       }
@@ -313,7 +476,8 @@ function BriefsContent() {
     return [];
   }, [apiResponse]);
 
-  const totalPages = apiResponse?.totalPages || 1;
+  const totalBriefsCount = apiResponse?.total ?? allBriefs.length;
+  const totalPages = Math.max(1, apiResponse?.totalPages ?? Math.ceil(totalBriefsCount / 10));
 
   // Generate smart pagination range with ellipsis to prevent responsive blowout
   const paginationRange = useMemo(() => {
@@ -380,34 +544,45 @@ function BriefsContent() {
     return [{ id: "all", title: "All Projects" }, ...pills];
   }, [categoryList, allBriefs]);
 
-  // Filter backend briefs by search and category
-  const filteredBriefs = useMemo(() => {
-    return allBriefs.filter((brief) => {
-      const q = search.trim().toLowerCase();
-      const matchesSearch =
-        !q ||
-        brief.title?.toLowerCase().includes(q) ||
-        brief.description?.toLowerCase().includes(q) ||
-        brief.category?.toLowerCase().includes(q) ||
-        brief.user?.username?.toLowerCase().includes(q) ||
-        (Array.isArray(brief.requiredSkills) &&
-          brief.requiredSkills.some((s: string) => s.toLowerCase().includes(q)));
+  // Categories formatted for LeftFilterSidebar
+  const sidebarCategories = useMemo(() => {
+    return pillFilters
+      .filter((p) => p.id !== "all")
+      .map((p) => ({ name: p.title, slug: p.id }));
+  }, [pillFilters]);
 
-      const normCat = (brief.category || "")
-        .toLowerCase()
-        .replace(/&/g, "and")
-        .replace(/\s+/g, "-")
-        .replace(/[^a-z0-9-]/g, "");
+  // Server-side filtering is executed directly by GET /api/briefs.
+  const filteredBriefs = allBriefs;
 
-      const matchesCategory =
-        activePill === "all" ||
-        normCat === activePill ||
-        normCat.includes(activePill) ||
-        activePill.includes(normCat);
+  const hasActiveFilters =
+    (activePill && activePill !== "all") ||
+    Boolean(search.trim()) ||
+    selectedSkills.length > 0 ||
+    Boolean(minBudget) ||
+    Boolean(maxBudget) ||
+    Boolean(maxDeliveryTime) ||
+    Boolean(sortOption);
 
-      return matchesSearch && matchesCategory;
+  const clearAllFilters = () => {
+    setActivePill("all");
+    setSearch("");
+    setSelectedSkills([]);
+    setMinBudget("");
+    setMaxBudget("");
+    setMaxDeliveryTime("");
+    setSortOption("");
+    setCurrentPage(1);
+    syncToUrl({
+      category: "all",
+      search: "",
+      skills: [],
+      minBudget: "",
+      maxBudget: "",
+      maxDeliveryTime: "",
+      sort: "",
+      page: 1,
     });
-  }, [allBriefs, search, activePill]);
+  };
 
   const toggleFavorite = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -421,6 +596,7 @@ function BriefsContent() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    syncToUrl({ page });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -490,8 +666,8 @@ function BriefsContent() {
                   radius="full"
                   onClick={() => handleHubPillClick("all")}
                   className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${hubActivePill === "all"
-                      ? "shadow-xs border-gray-900 bg-black text-white"
-                      : "hover:border-gray-900 hover:text-black bg-white"
+                    ? "shadow-xs border-gray-900 bg-black text-white"
+                    : "hover:border-gray-900 hover:text-black bg-white"
                     }`}
                 >
                   All Projects
@@ -508,8 +684,8 @@ function BriefsContent() {
                       radius="full"
                       onClick={() => handleHubPillClick(cat.slug)}
                       className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${isActive
-                          ? "shadow-xs border-gray-900 bg-black text-white"
-                          : "hover:border-gray-900 hover:text-black bg-white"
+                        ? "shadow-xs border-gray-900 bg-black text-white"
+                        : "hover:border-gray-900 hover:text-black bg-white"
                         }`}
                     >
                       {cat.name}
@@ -550,7 +726,7 @@ function BriefsContent() {
                     {cat.subcategories.map((subcat) => (
                       <div
                         key={subcat.id || subcat.slug}
-                        onClick={() => handleSelectSubcategory(cat.slug, subcat.title)}
+                        onClick={() => handleSelectSubcategory(cat.slug, subcat.slug)}
                         className="group bg-white rounded-[6px] border border-gray-200/80 hover:border-gray-400/80 p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 min-h-[86px]"
                       >
                         <div className="flex-1 min-w-0">
@@ -626,9 +802,19 @@ function BriefsContent() {
                   variant="ghost"
                   size="sm"
                   radius="lg"
-                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  onClick={() => {
+                    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                      setShowFilterDrawer(true);
+                    } else {
+                      setIsFilterOpen((prev) => !prev);
+                    }
+                  }}
                   leftIcon={<FiSliders className="w-3.5 h-3.5 text-gray-600" />}
-                  className="text-gray-700 font-medium text-xs sm:text-[13px] hover:text-black transition-colors px-3 py-1.5 hover:bg-gray-200/50 shrink-0 mr-1 border-none shadow-none"
+                  className={`font-medium text-xs sm:text-[13px] transition-colors px-3 py-1.5 shrink-0 mr-1 border-none shadow-none ${
+                    (isMobileViewport ? showFilterDrawer : isFilterOpen)
+                      ? "bg-gray-200/80 text-black font-semibold"
+                      : "text-gray-700 hover:text-black hover:bg-gray-200/50"
+                  }`}
                 >
                   Filter
                 </Button>
@@ -646,10 +832,11 @@ function BriefsContent() {
                       onClick={() => {
                         setActivePill(pill.id);
                         setCurrentPage(1);
+                        syncToUrl({ category: pill.id, page: 1 });
                       }}
                       className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${isActive
-                          ? "shadow-xs border-gray-900"
-                          : "hover:border-gray-900 hover:text-black"
+                        ? "shadow-xs border-gray-900"
+                        : "hover:border-gray-900 hover:text-black"
                         }`}
                     >
                       {pill.title}
@@ -659,16 +846,12 @@ function BriefsContent() {
               </div>
 
               {/* Reset Action */}
-              {(activePill !== "all" || search) && (
+              {hasActiveFilters && (
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => {
-                    setActivePill("all");
-                    setSearch("");
-                    setCurrentPage(1);
-                  }}
+                  onClick={clearAllFilters}
                   rightIcon={<FiArrowRight className="w-3.5 h-3.5 text-[#327C73]" />}
                   className="shrink-0 text-[#327C73] hover:text-[#256059] font-semibold text-xs sm:text-[13px] transition-colors pl-3 border-none shadow-none p-0 h-auto hover:bg-transparent"
                 >
@@ -677,119 +860,120 @@ function BriefsContent() {
               )}
             </div>
 
-            {/* Collapsible Search Drawer */}
-            {isFilterOpen && (
-              <div className="bg-white border border-gray-200 rounded-[6px] p-4 sm:p-5 mb-8 shadow-xs animate-fadeIn">
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                  <div className="relative flex-1">
-                    <RiSearchLine className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-base" />
-                    <input
-                      type="text"
-                      placeholder="Search projects by title, client, or keywords..."
-                      value={search}
-                      onChange={(e) => {
-                        setSearch(e.target.value);
-                        setCurrentPage(1);
-                      }}
-                      className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-[6px] text-sm focus:outline-none focus:border-[#327C73] focus:bg-white transition-colors"
-                    />
-                    {search && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        radius="full"
-                        onClick={() => {
-                          setSearch("");
-                          setCurrentPage(1);
-                        }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 !p-1 !h-6 !w-6 !min-h-0 border-none shadow-none"
-                        aria-label="Clear search input"
-                      >
-                        <FiX className="w-3.5 h-3.5" />
-                      </Button>
-                    )}
-                  </div>
-                  <Button
+            {/* Results Count Summary & Sort Bar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+              <span className="text-xs sm:text-[13px] text-gray-500 font-medium">
+                Showing {filteredBriefs.length} of {totalBriefsCount}{" "}
+                {totalBriefsCount === 1 ? "project" : "projects"} available
+              </span>
+
+              <div className="flex items-center gap-2 self-end sm:self-auto">
+                <div className="relative">
+                  <button
                     type="button"
-                    variant="brand"
-                    size="sm"
-                    radius="lg"
-                    onClick={() => setIsFilterOpen(false)}
-                    className="px-5 py-2 font-medium text-xs sm:text-[13px]"
+                    onClick={() => setIsSortDropdownOpen((prev) => !prev)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-[6px] text-xs sm:text-[13px] font-medium text-gray-700 hover:text-black hover:border-gray-300 shadow-2xs transition-all cursor-pointer"
+                    aria-label="Sort options"
                   >
-                    Apply Filters
-                  </Button>
+                    <span className="text-gray-400 font-normal">Sort:</span>
+                    <span className="font-semibold text-gray-800">
+                      {debouncedSearch.trim()
+                        ? "Relevance"
+                        : SORT_OPTIONS.find((s) => s.id === sortOption)?.label || "Newest"}
+                    </span>
+                    <FiChevronDown className="w-3.5 h-3.5 text-gray-500" />
+                  </button>
+
+                  {isSortDropdownOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-20"
+                        onClick={() => setIsSortDropdownOpen(false)}
+                      />
+                      <div className="absolute right-0 top-full mt-1.5 w-52 bg-white rounded-[6px] border border-gray-200 shadow-lg py-1 z-30 animate-fadeIn">
+                        {debouncedSearch.trim() && (
+                          <div className="px-3 py-2 text-[11px] text-amber-700 bg-amber-50 border-b border-amber-100 leading-snug">
+                            Search active: Results are ranked automatically by relevance.
+                          </div>
+                        )}
+                        {SORT_OPTIONS.map((opt) => {
+                          const isSelected = sortOption === opt.id;
+                          return (
+                            <button
+                              key={opt.id || "default"}
+                              type="button"
+                              disabled={Boolean(debouncedSearch.trim())}
+                              onClick={() => {
+                                setSortOption(opt.id);
+                                setCurrentPage(1);
+                                setIsSortDropdownOpen(false);
+                                syncToUrl({ sort: opt.id, page: 1 });
+                              }}
+                              className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between transition-colors ${isSelected
+                                ? "bg-gray-50 font-semibold text-[#0D6D5F]"
+                                : "text-gray-700 hover:bg-gray-50"
+                                } ${debouncedSearch.trim()
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : "cursor-pointer"
+                                }`}
+                            >
+                              <span>{opt.label}</span>
+                              {isSelected && <FiCheck className="w-3.5 h-3.5 text-[#0D6D5F]" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
-            )}
-
-            {/* Active Filters Display */}
-            {(activePill !== "all" || search) && (
-              <div className="flex flex-wrap items-center gap-2 mb-6 animate-fadeIn">
-                <span className="text-xs text-gray-500 font-medium">Active filters:</span>
-                {activePill !== "all" && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-700 shadow-2xs">
-                    Category:{" "}
-                    {pillFilters.find((p) => p.id === activePill)?.title || activePill}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      radius="full"
-                      onClick={() => {
-                        setActivePill("all");
-                        setCurrentPage(1);
-                      }}
-                      className="hover:text-red-500 transition-colors p-0.5 !h-auto !w-auto !min-h-0 border-none shadow-none"
-                      aria-label="Remove category filter"
-                    >
-                      <FiX className="w-3 h-3" />
-                    </Button>
-                  </span>
-                )}
-                {search && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 rounded-full text-xs font-medium text-gray-700 shadow-2xs">
-                    Search: &ldquo;{search}&rdquo;
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      radius="full"
-                      onClick={() => {
-                        setSearch("");
-                        setCurrentPage(1);
-                      }}
-                      className="hover:text-red-500 transition-colors p-0.5 !h-auto !w-auto !min-h-0 border-none shadow-none"
-                      aria-label="Clear active search keyword"
-                    >
-                      <FiX className="w-3 h-3" />
-                    </Button>
-                  </span>
-                )}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setActivePill("all");
-                    setSearch("");
-                    setCurrentPage(1);
-                  }}
-                  className="text-xs text-gray-400 hover:text-red-500 underline ml-2 border-none shadow-none p-0 !h-auto"
-                >
-                  Clear all
-                </Button>
-              </div>
-            )}
-
-            {/* Results Count Summary */}
-            <div className="flex items-center justify-between mb-5">
-              <span className="text-xs sm:text-[13px] text-gray-500 font-medium">
-                Showing {filteredBriefs.length}{" "}
-                {filteredBriefs.length === 1 ? "project" : "projects"} available
-              </span>
             </div>
+
+            {/* Main Content Layout: Left Filter Sidebar (Desktop) + Briefs Grid */}
+            <div className="flex flex-col lg:flex-row items-start gap-7">
+              {/* Desktop Left Filter Sidebar */}
+              {isFilterOpen && (
+                <div className="hidden lg:block lg:w-[270px] xl:w-[280px] shrink-0 lg:sticky lg:top-24">
+                  <LeftFilterSidebar
+                    searchVal={search}
+                    onSearchChange={(val) => {
+                      setSearch(val);
+                    }}
+                    onSearchSubmit={() => {
+                      setCurrentPage(1);
+                      syncToUrl({ search, page: 1 });
+                    }}
+                    categories={sidebarCategories}
+                    selectedCategory={activePill === "all" ? "" : activePill}
+                    onCategoryChange={(slug) => {
+                      const cat = slug || "all";
+                      setActivePill(cat);
+                      setCurrentPage(1);
+                      syncToUrl({ category: cat, page: 1 });
+                    }}
+                    deliveryDays={maxDeliveryTime}
+                    onDeliveryDaysChange={(val) => {
+                      setMaxDeliveryTime(val);
+                      setCurrentPage(1);
+                      syncToUrl({ maxDeliveryTime: val, page: 1 });
+                    }}
+                    minPrice={minBudget}
+                    maxPrice={maxBudget}
+                    onMinPriceChange={(val) => {
+                      setMinBudget(val);
+                      syncToUrl({ minBudget: val, page: 1 });
+                    }}
+                    onMaxPriceChange={(val) => {
+                      setMaxBudget(val);
+                      syncToUrl({ maxBudget: val, page: 1 });
+                    }}
+                    onReset={clearAllFilters}
+                  />
+                </div>
+              )}
+
+              {/* Right Side: Brief Cards Grid & Pagination */}
+              <div className="flex-1 min-w-0 w-full">
 
             {/* ============================================================ */}
             {/* Project Brief Cards Grid                                    */}
@@ -837,17 +1021,13 @@ function BriefsContent() {
                     : "There are currently no open projects in this category. Check back soon or post your own project!"}
                 </p>
                 <div className="flex items-center gap-3">
-                  {(search || activePill !== "all") && (
+                  {hasActiveFilters && (
                     <Button
                       type="button"
                       variant="outline"
                       size="md"
                       radius="xl"
-                      onClick={() => {
-                        setSearch("");
-                        setActivePill("all");
-                        setCurrentPage(1);
-                      }}
+                      onClick={clearAllFilters}
                       className="px-5 py-2.5 text-xs font-semibold shadow-2xs"
                     >
                       Clear Filters
@@ -1104,6 +1284,95 @@ function BriefsContent() {
                   </div>
                 )}
               </>
+            )}
+              </div>
+            </div>
+
+            {/* Mobile Filter Slide-out Drawer */}
+            {showFilterDrawer && (
+              <div className="fixed inset-0 z-50 flex justify-end lg:hidden">
+                <div
+                  className="fixed inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity animate-fadeIn"
+                  onClick={() => setShowFilterDrawer(false)}
+                />
+                <div className="relative w-full max-w-[380px] bg-white h-full shadow-2xl flex flex-col z-10 animate-slideLeft overflow-hidden">
+                  <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
+                    <div className="flex items-center gap-2">
+                      <FiSliders className="w-5 h-5 text-gray-800" />
+                      <h3 className="text-lg font-bold text-gray-900">Filters</h3>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      radius="full"
+                      onClick={() => setShowFilterDrawer(false)}
+                      className="w-8 h-8 text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+                      aria-label="Close filters"
+                    >
+                      <FiX className="w-5 h-5" />
+                    </Button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto px-5 py-5 text-left">
+                    <LeftFilterSidebar
+                      searchVal={search}
+                      onSearchChange={(val) => setSearch(val)}
+                      onSearchSubmit={() => {
+                        setCurrentPage(1);
+                        syncToUrl({ search, page: 1 });
+                        setShowFilterDrawer(false);
+                      }}
+                      categories={sidebarCategories}
+                      selectedCategory={activePill === "all" ? "" : activePill}
+                      onCategoryChange={(slug) => {
+                        const cat = slug || "all";
+                        setActivePill(cat);
+                        setCurrentPage(1);
+                        syncToUrl({ category: cat, page: 1 });
+                      }}
+                      deliveryDays={maxDeliveryTime}
+                      onDeliveryDaysChange={(val) => {
+                        setMaxDeliveryTime(val);
+                        setCurrentPage(1);
+                        syncToUrl({ maxDeliveryTime: val, page: 1 });
+                      }}
+                      minPrice={minBudget}
+                      maxPrice={maxBudget}
+                      onMinPriceChange={(val) => {
+                        setMinBudget(val);
+                        syncToUrl({ minBudget: val, page: 1 });
+                      }}
+                      onMaxPriceChange={(val) => {
+                        setMaxBudget(val);
+                        syncToUrl({ maxBudget: val, page: 1 });
+                      }}
+                      onReset={clearAllFilters}
+                      hideHeader={true}
+                    />
+                  </div>
+                  <div className="p-4 border-t border-gray-100 bg-white flex items-center justify-end gap-3 shrink-0">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearAllFilters}
+                      className="text-xs text-gray-500 hover:text-gray-900"
+                    >
+                      Reset
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="brand"
+                      size="sm"
+                      radius="xl"
+                      onClick={() => setShowFilterDrawer(false)}
+                      className="px-5 py-2 font-semibold text-xs bg-[#0D6D5F] hover:bg-[#0B5C50] text-white"
+                    >
+                      Done
+                    </Button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         )}

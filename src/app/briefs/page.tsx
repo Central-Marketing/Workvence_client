@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import moment from "moment";
 import {
   FiSliders,
@@ -433,9 +434,17 @@ function BriefsContent() {
           <div className="animate-fadeIn">
             {/* Project Category Hub Hero Banner */}
             <div
-              className="relative w-full h-[180px] sm:h-[220px] md:h-[240px] rounded-[6px] overflow-hidden bg-[#130d2a] bg-cover bg-center bg-no-repeat flex items-center justify-center text-center shadow-xs select-none mb-7"
-              style={{ backgroundImage: "url('/media/ProjectBg.png')" }}
+              className="relative w-full max-w-[1760px] mx-auto aspect-[1760/500] max-h-[500px] min-h-[200px] sm:min-h-[220px] md:min-h-[240px] rounded-[6px] overflow-hidden bg-[#130d2a] flex items-center justify-center text-center shadow-xs select-none mb-7"
             >
+              <Image
+                src="/media/ProjectBg.png"
+                alt="Find Projects"
+                fill
+                priority
+                quality={100}
+                className="object-cover object-center pointer-events-none"
+                sizes="(max-width: 1760px) 100vw, 1760px"
+              />
               {/* Center Content: Breadcrumb + Italic Projects Title */}
               <div className="relative z-10 flex flex-col items-center justify-center px-4">
                 <Breadcrumb

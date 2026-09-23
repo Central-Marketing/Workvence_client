@@ -87,10 +87,9 @@ export const getModerationNoticeContent = (
   const reason = (moderation?.flagReason || '').toLowerCase();
   const level = (moderation?.warningLevel || 'medium').toLowerCase();
 
-  const title = level === 'critical' ? 'Security alert' : 'Safety reminder';
-  const guidance = 'For your security and protection, keep communication and payments on Workvence.';
+  const isCritical = level === 'critical';
 
-  // Detect category without revealing the exact term
+  // 1. Off-Platform Payment
   if (
     word.includes('pay') ||
     word.includes('cash') ||
@@ -99,39 +98,87 @@ export const getModerationNoticeContent = (
     word.includes('transfer') ||
     word.includes('fee') ||
     word.includes('invoice') ||
-    reason.includes('pay')
+    word.includes('usd') ||
+    word.includes('dollar') ||
+    word.includes('money') ||
+    reason.includes('pay') ||
+    reason.includes('financial') ||
+    reason.includes('bank') ||
+    reason.includes('crypto')
   ) {
     return {
-      title,
+      title: 'Security Alert: Payment Outside Platform',
       category: 'Payment outside Workvence',
-      message: 'This message may contain payment or financial details.',
-      guidance,
+      message: 'This message was flagged for discussing external payments.',
+      guidance: 'To ensure escrow payment protection and prevent fraud, all transactions must remain on Workvence.',
     };
   }
 
+  // 2. Suspicious / External Links
   if (
     word.includes('http') ||
     word.includes('www.') ||
     word.includes('.com') ||
     word.includes('.io') ||
+    word.includes('.org') ||
+    word.includes('.net') ||
     word.includes('link') ||
-    reason.includes('link')
+    reason.includes('link') ||
+    reason.includes('url') ||
+    reason.includes('phishing')
   ) {
     return {
-      title,
-      category: 'Suspicious link',
-      message: 'This message may contain an external or unverified link.',
-      guidance,
+      title: isCritical ? 'Security Alert: External Link' : 'Security Notice: External Link',
+      category: 'External link',
+      message: 'This message contains an external or unverified link.',
+      guidance: 'For your safety, do not visit unknown websites or share sensitive credentials.',
     };
   }
 
-  // Default to contact information (e.g. phone number, whatsapp, telegram, email)
+  // 3. Contact Information
+  if (
+    word.includes('phone') ||
+    word.includes('email') ||
+    word.includes('mail') ||
+    word.includes('@') ||
+    word.includes('whatsapp') ||
+    word.includes('telegram') ||
+    word.includes('skype') ||
+    word.includes('contact') ||
+    word.includes('call') ||
+    word.includes('number') ||
+    word.includes('insta') ||
+    word.includes('reach') ||
+    reason.includes('contact') ||
+    reason.includes('email') ||
+    reason.includes('phone') ||
+    reason.includes('number') ||
+    reason.includes('social')
+  ) {
+    return {
+      title: isCritical ? 'Security Alert: Contact Information' : 'Safety Notice: Contact Information',
+      category: 'Contact information',
+      message: 'This message was flagged for containing potential personal contact details.',
+      guidance: 'To protect your account and stay covered by platform security, please keep all communication on Workvence.',
+    };
+  }
+
+  // 4. General / Default Policy Notice
   return {
-    title,
-    category: 'Contact information',
-    message: 'This message may contain contact information.',
-    guidance,
+    title: isCritical ? 'Security Alert' : 'Safety Notice',
+    category: 'Community Guidelines',
+    message: 'This message was flagged by automated safety filters for potential policy violations.',
+    guidance: 'Please keep all communication and transactions on Workvence to stay protected.',
   };
+};
+
+/**
+ * Returns a standardized single-string tooltip text suitable for native title attributes or tooltips.
+ */
+export const getStandardTooltipText = (moderation?: MessageModeration | null): string => {
+  if (!moderation?.flagged) return '';
+  const notice = getModerationNoticeContent(moderation);
+  return `${notice.title}: ${notice.message} ${notice.guidance}`;
 };
 
 export const getModerationConfig = (
@@ -141,3 +188,4 @@ export const getModerationConfig = (
   const level = (moderation.warningLevel || 'medium').toLowerCase();
   return MODERATION_SEVERITY_CONFIG[level] || MODERATION_SEVERITY_CONFIG.medium;
 };
+

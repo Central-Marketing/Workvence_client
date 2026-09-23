@@ -853,6 +853,11 @@ const EditPackagePage = () => {
       delete payload[prop];
     });
 
+    if (payload.title && payload.title.trim().length > 60) {
+      toast.error("Package title must not exceed 60 characters");
+      return;
+    }
+
     if (!isDraft) {
       if (!payload.title) {
         toast.error("Please enter a package title");
@@ -1058,17 +1063,37 @@ const EditPackagePage = () => {
 
             {/* Package Title */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-gray-700 block">
-                Package title
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-gray-700 block">
+                  Package title
+                </label>
+                <span
+                  className={`text-[11px] font-medium transition-colors ${
+                    (state.title?.length || 0) > 60
+                      ? "text-red-500 font-semibold"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {state.title?.length || 0}/60
+                </span>
+              </div>
               <input
                 type="text"
                 name="title"
                 value={state.title || ""}
                 onChange={handleInputChange}
                 placeholder="e.g I will do something i am really good at"
-                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all"
+                className={`w-full bg-[#F4F5F7] border rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all ${
+                  (state.title?.length || 0) > 60
+                    ? "border-red-400 focus:border-red-500 bg-red-50/10"
+                    : "border-transparent focus:border-gray-300 focus:bg-white"
+                }`}
               />
+              {(state.title?.length || 0) > 60 && (
+                <p className="text-[11px] text-red-500 font-medium">
+                  Package title cannot exceed 60 characters
+                </p>
+              )}
             </div>
 
             {/* Package Description (Rich Text Editor) */}
@@ -1383,16 +1408,47 @@ const EditPackagePage = () => {
 
             {/* Tier Title */}
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-700 block">
-                Package title
-              </label>
-              <input
-                type="text"
-                value={activeTier === "basic" ? (currentTierData.title || state.title || currentTierData.shortTitle || "") : (currentTierData.title || "")}
-                onChange={(e) => handleTierInputChange("title", e.target.value)}
-                placeholder="e.g I will do something i am really good at"
-                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
-              />
+              {(() => {
+                const currentTierTitle =
+                  activeTier === "basic"
+                    ? currentTierData.title || state.title || currentTierData.shortTitle || ""
+                    : currentTierData.title || "";
+                const isExceeded = currentTierTitle.length > 60;
+                return (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-gray-700 block">
+                        Package title
+                      </label>
+                      <span
+                        className={`text-[11px] font-medium transition-colors ${
+                          isExceeded
+                            ? "text-red-500 font-semibold"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        {currentTierTitle.length}/60
+                      </span>
+                    </div>
+                    <input
+                      type="text"
+                      value={currentTierTitle}
+                      onChange={(e) => handleTierInputChange("title", e.target.value)}
+                      placeholder="e.g I will do something i am really good at"
+                      className={`w-full bg-[#F4F5F7] border rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all ${
+                        isExceeded
+                          ? "border-red-400 focus:border-red-500 bg-red-50/10"
+                          : "border-transparent focus:border-gray-300 focus:bg-white"
+                      }`}
+                    />
+                    {isExceeded && (
+                      <p className="text-[11px] text-red-500 font-medium">
+                        Package title cannot exceed 60 characters
+                      </p>
+                    )}
+                  </>
+                );
+              })()}
             </div>
 
             {/* Tier Description */}

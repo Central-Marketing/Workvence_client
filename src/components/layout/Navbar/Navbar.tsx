@@ -43,6 +43,8 @@ const Navbar = () => {
   const isSeller = Boolean(effectiveUser?.isSeller);
   const isBriefsRoute = Boolean(pathname && (pathname === "/briefs" || pathname.startsWith("/briefs/")));
   const isMyBriefsRoute = Boolean(pathname && (pathname === "/briefs/my-briefs" || pathname.startsWith("/briefs/my-briefs/")));
+  const isCreateBriefRoute = Boolean(pathname && (pathname === "/briefs/create" || pathname.startsWith("/briefs/create/")));
+  const hidePostProjectAiButton = isMyBriefsRoute || isCreateBriefRoute;
 
   // Fetch real categories from backend
   const { categoryList: rawCats, parentCategories } = useAdminCategories();
@@ -488,13 +490,13 @@ const Navbar = () => {
                   iconClassName="text-[17px] xl:text-[19px]"
                 />
 
-                {!isMyBriefsRoute && (
+                {!hidePostProjectAiButton && (
                   <AiGradientButton
-                    href="/briefs/create"
+                    href="/briefs/create?ai=true"
                     text="Post a Project with AI"
                     icon={
                       <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
-                        <path d="M0.75 7.60886C3.56875 4.84296 10.19 -0.808996 12.025 1.15511C14.3438 3.63702 2.15937 9.91366 4.03854 12.6791C6.0234 15.6001 12.9646 5.30336 15.3135 7.14726C17.6625 8.99126 9.676 13.1401 11.5552 15.4451C12.3069 16.367 14.3739 14.9841 15.3135 14.0621" stroke="#292929" stroke-width="1.5" stroke-linecap="round" strokeLinejoin="round" />
+                        <path d="M0.75 7.60886C3.56875 4.84296 10.19 -0.808996 12.025 1.15511C14.3438 3.63702 2.15937 9.91366 4.03854 12.6791C6.0234 15.6001 12.9646 5.30336 15.3135 7.14726C17.6625 8.99126 9.676 13.1401 11.5552 15.4451C12.3069 16.367 14.3739 14.9841 15.3135 14.0621" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     }
                     px="px-3 xl:px-4"
@@ -799,10 +801,10 @@ const Navbar = () => {
                 /* Buyer Navigation Links (UX-Optimized Ordering) */
                 <div className="flex flex-col gap-4">
                   {/* 1. Hero CTA: Post a Project with AI */}
-                  {!isMyBriefsRoute && (
+                  {!hidePostProjectAiButton && (
                     <div className="my-0.5">
                       <AiGradientButton
-                        href="/briefs/create"
+                        href="/briefs/create?ai=true"
                         text="Post a Project with AI"
                         icon={
                           <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">

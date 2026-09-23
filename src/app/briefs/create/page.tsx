@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import {
@@ -20,7 +20,7 @@ import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
 import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
-import { Button, Breadcrumb } from "@/components/ui";
+import { Button, Breadcrumb, AiGradientButton } from "@/components";
 
 const CATEGORIES = [
   "AI",
@@ -43,6 +43,7 @@ const PROMPT_SUGGESTIONS = [
 
 const CreateBrief = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const user = useUserStore((state) => state.user);
 
   // Form State
@@ -227,11 +228,37 @@ const CreateBrief = () => {
   const handleOpenAiModal = () => {
     if (!user) {
       toast.error("Please sign in to use Workvence AI");
-      router.push(`/login?redirect=${encodeURIComponent("/briefs/create")}`);
+      router.push(`/login?redirect=${encodeURIComponent("/briefs/create?ai=true")}`);
       return;
     }
     setIsAiModalOpen(true);
   };
+
+  // Open AI modal automatically if redirected with ?ai=true
+  useEffect(() => {
+    const isAiRequested = searchParams?.get("ai") === "true" || searchParams?.get("ai") === "1";
+    if (isAiRequested) {
+      const timer = setTimeout(() => {
+        if (!user) {
+          toast.error("Please sign in to use Workvence AI");
+          router.push(`/login?redirect=${encodeURIComponent("/briefs/create?ai=true")}`);
+          return;
+        }
+        setIsAiModalOpen(true);
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, user, router]);
+
+  // Auto-focus prompt input when modal opens
+  useEffect(() => {
+    if (isAiModalOpen) {
+      const timer = setTimeout(() => {
+        modalPromptRef.current?.focus();
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [isAiModalOpen]);
 
   const handleGenerateFromModal = (overridePrompt?: string) => {
     const promptText = (typeof overridePrompt === "string" ? overridePrompt : aiPrompt).trim();
@@ -390,18 +417,19 @@ const CreateBrief = () => {
             </p>
           </div>
 
-          <Button
-            type="button"
+          <AiGradientButton
             onClick={handleOpenAiModal}
-            variant="brand"
-            size="md"
-            radius="fiverr"
-            leftIcon={<HiSparkles className="text-emerald-400 text-base" />}
-            className="self-start sm:self-auto shrink-0 border border-emerald-600/30 active:scale-[0.98]"
-            title="Draft project with Workvence AI"
-          >
-            Create with AI
-          </Button>
+            text="Create with AI"
+            icon={
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                <path d="M0.75 7.60886C3.56875 4.84296 10.19 -0.808996 12.025 1.15511C14.3438 3.63702 2.15937 9.91366 4.03854 12.6791C6.0234 15.6001 12.9646 5.30336 15.3135 7.14726C17.6625 8.99126 9.676 13.1401 11.5552 15.4451C12.3069 16.367 14.3739 14.9841 15.3135 14.0621" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            }
+            px="px-4"
+            py="py-2"
+            height="h-[40px]"
+            className="self-start sm:self-auto shrink-0 text-sm font-semibold rounded-[6px]"
+          />
         </div>
 
         {/* AI Draft Banner (Displayed after AI generates or when draft is ready) */}
@@ -443,18 +471,7 @@ const CreateBrief = () => {
                 Fill in the details below or use AI to generate a complete draft.
               </p>
             </div>
-            {!aiGeneratedSuccess && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="xs"
-                onClick={handleOpenAiModal}
-                leftIcon={<HiSparkles className="text-sm" />}
-                className="text-[#0D6B5D] hover:text-[#0a5247] p-0 hover:bg-transparent h-auto self-start sm:self-auto"
-              >
-                Draft with AI
-              </Button>
-            )}
+
           </div>
 
           {/* Section 1: Project Title */}
@@ -650,11 +667,11 @@ const CreateBrief = () => {
       {/* AI Draft Modal */}
       {isAiModalOpen && (
         <div
-          className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn select-none"
+          className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs select-none transition-all duration-300 ease-out animate-fadeIn"
           onClick={() => !aiGenerate.isPending && setIsAiModalOpen(false)}
         >
           <div
-            className="bg-white border border-slate-200 rounded-[6px] sm:rounded-[6px] max-w-xl w-full max-h-[calc(100dvh-2rem)] flex flex-col p-6 sm:p-8 shadow-2xl relative overflow-y-auto select-text"
+            className="bg-white border border-slate-200 rounded-[6px] sm:rounded-[6px] max-w-xl w-full max-h-[calc(100dvh-2rem)] flex flex-col p-6 sm:p-8 shadow-2xl relative overflow-y-auto select-text transition-all duration-300 ease-out transform scale-100"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top Close Button */}
@@ -771,5 +788,15 @@ const CreateBrief = () => {
 };
 
 export default function CreateBriefPage() {
-  return <CreateBrief />;
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-2 border-brand-green border-t-transparent animate-spin" />
+        </div>
+      }
+    >
+      <CreateBrief />
+    </React.Suspense>
+  );
 }

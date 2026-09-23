@@ -2962,8 +2962,8 @@ const ChatView = () => {
 
                 {contactSidebarTab === 'profile' ? (
                   <>
-                    {/* ── Quick Actions (Fiverr Style: Create Offer & Video Meeting) ── */}
-                    <div className="bg-white rounded-[6px] p-4 border border-slate-200/80 shadow-xs flex flex-col gap-2.5">
+                    {/* ── Quick Actions (Fiverr Style: Create Offer & Video Meeting - Mobile Drawer Only) ── */}
+                    <div className="flex xl:hidden bg-white rounded-[6px] p-4 border border-slate-200/80 shadow-xs flex-col gap-2.5">
                       <div className="flex items-center justify-between">
                         <span className="text-base sm:text-[17px] font-bold text-slate-800 tracking-tight">Quick Actions</span>
                         {/* {user?.isSeller && (
@@ -3220,7 +3220,18 @@ const ChatView = () => {
                               radius="xl"
                               fullWidth
                               className="mt-2 py-2.5 bg-[#f1f3f5] hover:bg-[#e4e7eb] text-[#292929] font-semibold text-[16px] text-center"
-                              onClick={() => navigate.push('/orders')}
+                              onClick={() => {
+                                const targetUserId =
+                                  finalRecipientUser?._id ||
+                                  finalRecipientUser?.id ||
+                                  recipientUser?._id ||
+                                  recipientUser?.id;
+                                if (targetUserId) {
+                                  navigate.push(`/orders/contact/${targetUserId}`);
+                                } else {
+                                  navigate.push(user?.isSeller ? '/manage-orders' : '/orders');
+                                }
+                              }}
                             >
                               View all
                             </Button>

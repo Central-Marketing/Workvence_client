@@ -175,12 +175,12 @@ export default function HowEscrowWorksPage() {
           style={{ backgroundImage: "url('/media/WorkwithBG.png')" }}
         >
           {/* Subtle dark overlay for perfect contrast */}
-          <div className="absolute inset-0 bg-[#0c1c1b]/80 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-[#0c1c1b]/50 backdrop-blur-[1px]" />
 
           <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
             {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#6AD724] text-xs font-semibold uppercase tracking-wider mb-5">
-              <ShieldCheck className="w-4 h-4 text-[#6AD724]" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#fff] text-xs font-semibold uppercase tracking-wider mb-5">
+              <ShieldCheck className="w-4 h-4 text-[#fff]" />
               <span>Workvence Escrow Protection</span>
             </div>
 
@@ -318,17 +318,15 @@ export default function HowEscrowWorksPage() {
                             {step.dualChoices.map((choice, cIdx) => (
                               <div
                                 key={cIdx}
-                                className={`p-4 rounded-[6px] border ${
-                                  choice.isPositive
-                                    ? "bg-emerald-50/60 border-emerald-200"
-                                    : "bg-amber-50/50 border-amber-200/90"
-                                }`}
+                                className={`p-4 rounded-[6px] border ${choice.isPositive
+                                  ? "bg-emerald-50/60 border-emerald-200"
+                                  : "bg-amber-50/50 border-amber-200/90"
+                                  }`}
                               >
                                 <div className="flex items-center justify-between mb-1.5">
                                   <span
-                                    className={`font-bold text-xs sm:text-sm ${
-                                      choice.isPositive ? "text-emerald-900" : "text-amber-900"
-                                    }`}
+                                    className={`font-bold text-xs sm:text-sm ${choice.isPositive ? "text-emerald-900" : "text-amber-900"
+                                      }`}
                                   >
                                     {choice.title}
                                   </span>
@@ -523,12 +521,17 @@ export default function HowEscrowWorksPage() {
       </section>
 
       {/* 7. READY TO GET STARTED? (BOTTOM CTA BANNER) */}
-      <section className="w-full py-16 sm:py-20 bg-[#F8F9FA] border-t border-gray-200/80 pb-[80px] min-[1400px]:pb-[100px]">
-        <div className="container mx-auto px-4 md:px-6 max-w-4xl">
-          <div className="bg-[#0f172a] text-white rounded-[6px] p-8 sm:p-12 text-center relative overflow-hidden shadow-md">
+      <section className="w-full py-20 bg-[#F8F9FA] border-t border-gray-200/80 pb-[80px] min-[1400px]:pb-[100px]">
+        <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+          <div
+            className="bg-[#0c1c1b] text-white rounded-[6px] py-16 sm:py-24 md:py-28 px-6 sm:px-12 min-h-[460px] sm:min-h-[480px] flex flex-col items-center justify-center text-center relative overflow-hidden shadow-md bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: "url('/media/AFreelancerBG.png')" }}
+          >
+            {/* Subtle dark overlay for contrast */}
+            <div className="absolute inset-0 bg-[#0c1c1b]/20 backdrop-blur-[1px]" />
+
             <div className="relative z-10 max-w-2xl mx-auto space-y-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-300 text-xs font-semibold">
-                <Sparkles className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold">
                 <span>Zero Risk Hiring</span>
               </span>
               <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
@@ -540,14 +543,14 @@ export default function HowEscrowWorksPage() {
               <div className="pt-4 flex flex-wrap items-center justify-center gap-3.5">
                 <Link
                   href="/packages"
-                  className="px-6 py-3.5 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs inline-flex items-center gap-2 cursor-pointer"
+                  className="px-6 h-10 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs inline-flex items-center gap-2 cursor-pointer"
                 >
                   <span>Find a Freelancer</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
                   href="/briefs/create"
-                  className="px-6 py-3.5 rounded-[6px] bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-xs sm:text-sm transition inline-flex items-center gap-2 cursor-pointer"
+                  className="px-6 h-10 rounded-[6px] bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-xs sm:text-sm transition inline-flex items-center gap-2 cursor-pointer"
                 >
                   <span>Post a Project</span>
                   <ArrowRight className="w-4 h-4" />

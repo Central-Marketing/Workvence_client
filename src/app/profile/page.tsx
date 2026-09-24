@@ -58,6 +58,75 @@ export default function ProfilePage() {
   const [shortTitle, setShortTitle] = useState(user?.shortTitle || "");
   const [description, setDescription] = useState(user?.description || "");
 
+  // Dedicated Username update states & handler (PATCH /api/users/username)
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState(user?.username || "");
+  const [isSubmittingUsername, setIsSubmittingUsername] = useState(false);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+
+  const handleUpdateUsername = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const cleanUsername = newUsername.trim();
+
+    if (!cleanUsername) {
+      setUsernameError("Username cannot be empty");
+      return;
+    }
+
+    if (cleanUsername.length < 3) {
+      setUsernameError("Username must be at least 3 characters");
+      return;
+    }
+
+    if (cleanUsername.length > 30) {
+      setUsernameError("Username cannot exceed 30 characters");
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(cleanUsername)) {
+      setUsernameError("Username can only contain letters, numbers, underscores (_), and hyphens (-)");
+      return;
+    }
+
+    if (cleanUsername.toLowerCase() === (user?.username || "").toLowerCase()) {
+      setUsernameError("New username cannot be the same as your current username");
+      return;
+    }
+
+    setIsSubmittingUsername(true);
+    setUsernameError(null);
+
+    try {
+      const { data } = await axiosFetch.patch("/users/username", {
+        username: cleanUsername,
+      });
+
+      const updatedUsername =
+        data?.user?.username || data?.username || data?.data?.username || cleanUsername;
+
+      const updatedUser = {
+        ...user,
+        ...(data?.user || data?.data || {}),
+        username: updatedUsername,
+      };
+
+      setUser(updatedUser);
+      toast.success(data?.message || "Username updated successfully!");
+      setIsEditingUsername(false);
+    } catch (err: any) {
+      const errorMsg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Failed to update username";
+      const displayMsg = Array.isArray(errorMsg) ? errorMsg[0] : errorMsg;
+      setUsernameError(displayMsg);
+      toast.error(displayMsg);
+    } finally {
+      setIsSubmittingUsername(false);
+    }
+  };
+
   // Skills as an array
   const [skillsList, setSkillsList] = useState<string[]>(() => {
     if (Array.isArray(user?.skills)) return user.skills;
@@ -144,8 +213,9 @@ export default function ProfilePage() {
       if (Array.isArray(user.education)) setEducation(user.education);
       if (Array.isArray(user.portfolio)) setPortfolio(user.portfolio);
       if (Array.isArray(user.skills) && user.skills.length > 0) setSkillsList(user.skills);
+      if (user.username && !isEditingUsername) setNewUsername(user.username);
     }
-  }, [user]);
+  }, [user, isEditingUsername]);
 
   // Handle avatar upload
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -719,16 +789,115 @@ export default function ProfilePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {/* Account Username */}
-            <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                Account username
-              </label>
-              <input
-                type="text"
-                value={user?.username || ""}
-                disabled
-                className="w-full px-4 py-2.5 bg-slate-50/70 border border-slate-200 rounded-[6px] text-xs sm:text-sm text-slate-600 cursor-not-allowed"
-              />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-slate-700">
+                  Account username
+                </label>
+                {!isEditingUsername && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditingUsername(true);
+                      setNewUsername(user?.username || "");
+                      setUsernameError(null);
+                    }}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0D6D5F] hover:text-[#0b5c50] transition-colors cursor-pointer"
+                  >
+                    <FiEdit2 className="w-3 h-3" />
+                    Change username
+                  </button>
+                )}
+              </div>
+
+              {!isEditingUsername ? (
+                <div>
+                  <div className="flex items-center w-full px-3.5 py-2.5 bg-slate-50/70 border border-slate-200 rounded-[6px] text-xs sm:text-sm text-slate-800">
+                    <span className="text-slate-400 font-medium mr-1">@</span>
+                    <span className="font-semibold text-slate-900 truncate">
+                      {user?.username || "Not set"}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Your unique public handle and profile identifier.
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-slate-50 border border-[#0D6D5F]/30 rounded-[6px] p-3 space-y-2.5">
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-semibold">
+                      @
+                    </span>
+                    <input
+                      type="text"
+                      autoFocus
+                      value={newUsername}
+                      onChange={(e) => {
+                        setNewUsername(e.target.value.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, ""));
+                        if (usernameError) setUsernameError(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleUpdateUsername();
+                        } else if (e.key === "Escape") {
+                          setIsEditingUsername(false);
+                          setUsernameError(null);
+                        }
+                      }}
+                      placeholder="new_username"
+                      disabled={isSubmittingUsername}
+                      className="w-full pl-7 pr-3 py-2 bg-white border border-slate-300 focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F]/20 rounded-[6px] text-xs sm:text-sm text-slate-900 outline-none transition disabled:opacity-50"
+                    />
+                  </div>
+
+                  {usernameError && (
+                    <p className="text-[11px] text-red-500 font-medium leading-tight">
+                      {usernameError}
+                    </p>
+                  )}
+
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Changing your username updates your public profile URL (e.g. <span className="font-mono text-slate-600">/seller/{newUsername || user?.username || "username"}</span>).
+                  </p>
+
+                  <div className="flex items-center gap-2 pt-1">
+                    <Button
+                      type="button"
+                      variant="brand"
+                      size="sm"
+                      radius="fiverr"
+                      onClick={() => handleUpdateUsername()}
+                      disabled={isSubmittingUsername}
+                      className="h-8 text-xs font-semibold px-3"
+                    >
+                      {isSubmittingUsername ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>Saving...</span>
+                        </div>
+                      ) : (
+                        "Save Username"
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      radius="fiverr"
+                      onClick={() => {
+                        setIsEditingUsername(false);
+                        setNewUsername(user?.username || "");
+                        setUsernameError(null);
+                      }}
+                      disabled={isSubmittingUsername}
+                      className="h-8 text-xs font-medium px-3 text-slate-600 hover:text-slate-900"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Email Address */}

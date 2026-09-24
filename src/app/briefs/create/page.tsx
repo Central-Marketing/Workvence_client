@@ -433,28 +433,7 @@ const CreateBrief = () => {
           />
         </div>
 
-        {/* AI Draft Banner (Displayed after AI generates or when draft is ready) */}
-        {aiGeneratedSuccess && (
-          <div className="mb-6 p-4 sm:p-5 rounded-[6px] bg-emerald-50/90 border border-emerald-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm animate-fadeIn">
-            <div className="flex items-center gap-2.5 text-emerald-900 font-medium">
-              <span className="w-7 h-7 rounded-[6px] bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                <HiSparkles className="text-base" />
-              </span>
-              <span>
-                Project draft generated with AI! Review and customize the details below before publishing.
-              </span>
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="xs"
-              onClick={handleOpenAiModal}
-              className="text-xs font-semibold text-emerald-800 hover:text-emerald-950 underline self-start sm:self-auto shrink-0 p-0 h-auto hover:bg-transparent border-none shadow-none"
-            >
-              Draft again with AI
-            </Button>
-          </div>
-        )}
+
 
         {/* Main Form Card (Review, Edit & Publish) */}
         <form
@@ -541,11 +520,11 @@ const CreateBrief = () => {
             </label>
 
             {/* Skill tags list */}
-            <div className="flex flex-wrap items-center gap-2 mb-3 min-h-[36px]">
+            <div className="flex flex-wrap items-center gap-2 mb-3 min-h-[40px]">
               {form.requiredSkills.map((skill) => (
                 <span
                   key={skill}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-medium transition-all"
+                  className="inline-flex h-10 items-center gap-1.5 px-3 rounded-[6px] bg-gray-200 text-emerald-800 border text-xs font-medium transition-all"
                 >
                   <FiTag className="text-[11px] text-emerald-600" />
                   <span>{skill}</span>
@@ -555,7 +534,7 @@ const CreateBrief = () => {
                     size="icon"
                     radius="full"
                     onClick={() => handleRemoveSkill(skill)}
-                    className="hover:text-emerald-950 p-0.5 w-4 h-4 h-auto min-h-0 hover:bg-emerald-100 transition-colors border-none shadow-none"
+                    className="hover:text-emerald-950 p-0.5 w-4 h-auto min-h-0 transition-colors border-none shadow-none"
                     title={`Remove ${skill}`}
                   >
                     <FiX className="text-xs" />

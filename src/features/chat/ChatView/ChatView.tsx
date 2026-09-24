@@ -1758,22 +1758,7 @@ const ChatView = () => {
                   >
                     All
                   </Button>
-                  <Button
-                    type="button"
-                    variant={convFilterTab === 'read' ? 'pill-tab' : 'ghost'}
-                    size="xs"
-                    radius="full"
-                    onClick={() => setConvFilterTab('read')}
-                    className={`px-3 py-1.5 text-xs font-medium border transition-colors flex items-center gap-1.5 ${convFilterTab === 'read'
-                      ? '!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold'
-                      : '!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50'
-                      }`}
-                  >
-                    <span>Read</span>
-                    <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-semibold shrink-0 leading-none">
-                      {readCount}
-                    </span>
-                  </Button>
+
                   <Button
                     type="button"
                     variant={convFilterTab === 'unread' ? 'pill-tab' : 'ghost'}

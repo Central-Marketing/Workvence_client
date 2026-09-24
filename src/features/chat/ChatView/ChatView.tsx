@@ -36,6 +36,7 @@ import supportService from "@/utils/supportService";
 import { getOtherUser, isConversationUnread, isTargetConversation, renderMessageTextWithLinks } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
 import { Loader, ChatSkeleton, Skeleton, AiGradientButton, Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 import { MessageModerationBadge } from "@/features/chat";
 import { formatFileSize } from "@/lib";
 import moment from 'moment';
@@ -3315,28 +3316,38 @@ const ChatView = () => {
             <form onSubmit={handleOfferSubmit} className="p-5 flex flex-col gap-3.5 overflow-y-auto">
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-slate-600">Package Reference <span className="text-xs text-slate-400 font-normal">(optional)</span></label>
-                <select
+                <CustomSelect
+                  size="md"
+                  options={[
+                    { value: "", label: "-- Select one of your Packages --" },
+                    ...sellerPackages.map((g: any) => ({
+                      value: g._id || g.id,
+                      label: g.title,
+                    })),
+                  ]}
                   value={selectedPackageId}
-                  onChange={e => setSelectedPackageId(e.target.value)}
-                  className="px-3 py-2 border border-slate-300 rounded-[6px] text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
-                >
-                  <option value="">-- Select one of your Packages --</option>
-                  {sellerPackages.map((g: any) => <option key={g._id || g.id} value={g._id || g.id}>{g.title}</option>)}
-                </select>
+                  onChange={(val) => setSelectedPackageId(String(val))}
+                  placeholder="-- Select one of your Packages --"
+                  ariaLabel="Package Reference"
+                />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-slate-600">Project Reference <span className="text-xs text-slate-400 font-normal">(optional)</span></label>
-                <select
+                <CustomSelect
+                  size="md"
+                  options={[
+                    { value: "", label: "-- Select a Project --" },
+                    ...chatBriefs.map((b: any) => ({
+                      value: b._id,
+                      label: `${b.title} — $${b.budget}`,
+                    })),
+                  ]}
                   value={selectedBriefId}
-                  onChange={e => setSelectedBriefId(e.target.value)}
-                  className="px-3 py-2 border border-slate-300 rounded-[6px] text-sm text-slate-800 outline-none focus:border-brand-green bg-white transition-colors"
-                >
-                  <option value="">-- Select a Project --</option>
-                  {chatBriefs.length === 0
-                    ? <option disabled>No projects available for this chat</option>
-                    : chatBriefs.map((b: any) => <option key={b._id} value={b._id}>{b.title} — ${b.budget}</option>)
-                  }
-                </select>
+                  onChange={(val) => setSelectedBriefId(String(val))}
+                  placeholder={chatBriefs.length === 0 ? "No projects available for this chat" : "-- Select a Project --"}
+                  disabled={chatBriefs.length === 0}
+                  ariaLabel="Project Reference"
+                />
               </div>
               {!selectedPackageId && !selectedBriefId && (
                 <p className="text-amber-600 text-xs mt-0.5">⚠ Please select at least a Package or a Project</p>

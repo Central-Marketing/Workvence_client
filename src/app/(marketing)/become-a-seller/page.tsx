@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 import {
   Sparkles,
   ArrowRight,
@@ -16,6 +17,14 @@ import {
   CreditCard
 } from "lucide-react";
 
+const CATEGORY_OPTIONS: CustomSelectOption[] = [
+  { value: "Web & Mobile Development", label: "Web & Mobile Development" },
+  { value: "UI/UX & Brand Design", label: "UI/UX & Brand Design" },
+  { value: "AI & Machine Learning", label: "AI & Machine Learning" },
+  { value: "Video & 3D Animation", label: "Video & 3D Animation" },
+  { value: "Digital Marketing & SEO", label: "Digital Marketing & SEO" },
+];
+
 export default function BecomeASellerPage() {
   const [selectedSkill, setSelectedSkill] = useState("Web & Mobile Development");
   const [hoursPerWeek, setHoursPerWeek] = useState(20);
@@ -29,8 +38,7 @@ export default function BecomeASellerPage() {
       <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-20 lg:py-28">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[#327C73] text-xs font-semibold">
-              <Sparkles className="w-4 h-4 text-[#10b981]" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#fff] border border-[rgba-(0,0,0,0.8)] text-[#327C73] text-xs font-semibold">
               <span>Join 1.5M+ Independent Creators</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#0f172a] leading-tight">
@@ -43,14 +51,14 @@ export default function BecomeASellerPage() {
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <Link
                 href="/register"
-                className="px-8 py-4 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-8 h-10 inline-flex justify-center items-center rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 gap-2 cursor-pointer"
               >
                 <span>Become a Seller Free</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <a
                 href="#calculator"
-                className="px-8 py-4 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-8 h-10 inline-flex items-center justify-center rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
               >
                 Estimate Earnings
               </a>
@@ -94,8 +102,8 @@ export default function BecomeASellerPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-8 space-y-4">
-              <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-bold text-lg flex items-center justify-center">
+            <div className="bg-[#fff] border border-gray-200/90 rounded-[6px] p-8 space-y-4">
+              <div className="w-12 h-12 rounded-[6px] bg-[#fff] border border-gray-200/90 text-[#327C73] font-bold text-lg flex items-center justify-center">
                 1
               </div>
               <h3 className="text-xl font-bold text-[#0f172a]">Create a Free Package</h3>
@@ -105,7 +113,7 @@ export default function BecomeASellerPage() {
             </div>
 
             <div className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-8 space-y-4">
-              <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-bold text-lg flex items-center justify-center">
+              <div className="w-12 h-12 rounded-[6px] bg-[#fff] border border-gray-200/90 font-bold text-lg flex items-center justify-center">
                 2
               </div>
               <h3 className="text-xl font-bold text-[#0f172a]">Deliver Great Work</h3>
@@ -115,7 +123,7 @@ export default function BecomeASellerPage() {
             </div>
 
             <div className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-8 space-y-4">
-              <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] font-bold text-lg flex items-center justify-center">
+              <div className="w-12 h-12 rounded-[6px] bg-[#fff] border border-gray-200/90 font-bold text-lg flex items-center justify-center">
                 3
               </div>
               <h3 className="text-xl font-bold text-[#0f172a]">Get Paid On Time</h3>
@@ -142,17 +150,12 @@ export default function BecomeASellerPage() {
               <div className="space-y-6">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-2">Your Category</label>
-                  <select
+                  <CustomSelect
                     value={selectedSkill}
-                    onChange={(e) => setSelectedSkill(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                  >
-                    <option value="Web & Mobile Development">Web & Mobile Development</option>
-                    <option value="UI/UX & Brand Design">UI/UX & Brand Design</option>
-                    <option value="AI & Machine Learning">AI & Machine Learning</option>
-                    <option value="Video & 3D Animation">Video & 3D Animation</option>
-                    <option value="Digital Marketing & SEO">Digital Marketing & SEO</option>
-                  </select>
+                    onChange={setSelectedSkill}
+                    options={CATEGORY_OPTIONS}
+                    size="md"
+                  />
                 </div>
 
                 <div>
@@ -200,7 +203,7 @@ export default function BecomeASellerPage() {
                 </span>
                 <Link
                   href="/register"
-                  className="w-full py-3 rounded-[6px] bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs shadow-md transition active:scale-95 inline-flex items-center justify-center gap-2 cursor-pointer mt-2"
+                  className="w-full py-3 rounded-[6px] bg-brand-green hover:bg-brand-green/80 text-white font-semibold text-xs shadow-md transition active:scale-95 inline-flex items-center justify-center gap-2 cursor-pointer mt-2"
                 >
                   <span>Start Selling Now</span>
                   <ArrowRight className="w-4 h-4" />

@@ -19,6 +19,7 @@ import {
   Clock
 } from "lucide-react";
 import { Button } from "@/components";
+import { CustomSelect } from "@/components/ui";
 import toast from "react-hot-toast";
 
 interface Thread {
@@ -344,15 +345,16 @@ export default function ForumPage() {
             <form onSubmit={handleCreatePost} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">Category *</label>
-                <select
+                <CustomSelect
+                  size="md"
+                  options={categories
+                    .filter((c) => c !== "All Categories")
+                    .map((c) => ({ value: c, label: c }))}
                   value={newPost.category}
-                  onChange={(e) => setNewPost({ ...newPost, category: e.target.value })}
-                  className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                >
-                  {categories.filter((c) => c !== "All Categories").map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
+                  onChange={(val) => setNewPost({ ...newPost, category: String(val) })}
+                  placeholder="Select Category"
+                  ariaLabel="Discussion Category"
+                />
               </div>
 
               <div>

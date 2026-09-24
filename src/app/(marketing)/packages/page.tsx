@@ -14,7 +14,7 @@ import {
   LeftFilterSidebar,
   Button,
 } from '@/components';
-import { Breadcrumb } from '@/components/ui';
+import { Breadcrumb, CustomSelect, CustomSelectOption } from '@/components/ui';
 import { getCategoryTaxonomy, SubcategoryItem } from '@/data/categoryTaxonomy';
 import { STATIC_SUBCATEGORY_GIGS, getStaticSubcategoryGigs } from '@/data/staticSubcategoryGigs';
 import { useQuery } from "@tanstack/react-query";
@@ -32,6 +32,15 @@ const DEFAULT_CATEGORIES = [
   "Business",
   "Music & Audio",
   "Social Media",
+];
+
+const PACKAGE_SORT_OPTIONS: CustomSelectOption[] = [
+  { value: "", label: "Recommended" },
+  { value: "best-selling", label: "Best Selling" },
+  { value: "rating", label: "Top Rated" },
+  { value: "newest", label: "Newest Arrivals" },
+  { value: "price_asc", label: "Price: Low to High" },
+  { value: "price_desc", label: "Price: High to Low" },
 ];
 
 interface EmptyGigsStateProps {
@@ -867,24 +876,6 @@ const Packages = () => {
                 `${totalResultsCount} Results`
               )}
             </p>
-            {/* <div className="flex items-center gap-2 self-start sm:self-auto">
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Sort by:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => {
-                  setSortBy(e.target.value);
-                  syncUrlWithFilters({ sortBy: e.target.value, resetPage: true });
-                }}
-                className="bg-white border border-gray-200 text-xs font-semibold text-gray-800 rounded-[6px] px-3.5 py-2 focus:outline-none focus:border-gray-900 cursor-pointer shadow-2xs"
-              >
-                <option value="">Recommended (Default)</option>
-                <option value="best-selling">Best Selling</option>
-                <option value="rating">Top Rated</option>
-                <option value="newest">Newest Arrivals</option>
-                <option value="price_asc">Price: Low to High</option>
-                <option value="price_desc">Price: High to Low</option>
-              </select>
-            </div> */}
           </div>
 
           {/* 4. Filter Sidebar (Left) + Package Cards Grid (Right) */}
@@ -1052,7 +1043,7 @@ const Packages = () => {
                           setActiveCategory('All services');
                           syncUrlWithFilters({ category: '' });
                         }}
-                        className="group inline-flex h-10 items-center gap-2 rounded-full border border-gray-200 bg-white px-4 text-base font-medium text-gray-700 shadow-2xs hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                        className="group inline-flex py-1.5 items-center gap-2 rounded-full border border-gray-200 bg-white px-4 text-base font-medium text-gray-700 shadow-2xs hover:bg-gray-50 hover:border-gray-300 transition-colors"
                       >
                         {/* Cross icon appears on hover */}
                         <span className="max-w-0 -ml-1 opacity-0 overflow-hidden text-gray-400 group-hover:max-w-[20px] group-hover:ml-0 group-hover:opacity-100 group-hover:text-red-500 transition-all duration-150 ease-out">
@@ -1151,7 +1142,7 @@ const Packages = () => {
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="group inline-flex h-10 items-center gap-2 rounded-full bg-gray-900 px-4 text-base font-medium text-white shadow-sm hover:bg-gray-800 transition-colors ml-1"
+                    className="group inline-flex py-1.5 items-center gap-2 rounded-full bg-gray-900 px-4 text-base font-medium text-white shadow-sm hover:bg-gray-800 transition-colors ml-1"
                   >
                     {/* Cross icon appears on hover */}
                     <span className="max-w-0 -ml-1 opacity-0 overflow-hidden text-gray-300 group-hover:max-w-[20px] group-hover:ml-0 group-hover:opacity-100 group-hover:text-red-400 transition-all duration-150 ease-out">
@@ -1166,22 +1157,23 @@ const Packages = () => {
 
             {/* Sort Dropdown */}
             <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Sort by:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => {
-                  setSortBy(e.target.value);
-                  syncUrlWithFilters({ sortBy: e.target.value, resetPage: true });
-                }}
-                className="bg-white border border-gray-200 text-xs font-semibold text-gray-800 rounded-[6px] px-3.5 py-2 focus:outline-none focus:border-gray-900 cursor-pointer shadow-2xs"
-              >
-                <option value="">Recommended (Default)</option>
-                <option value="best-selling">Best Selling</option>
-                <option value="rating">Top Rated</option>
-                <option value="newest">Newest Arrivals</option>
-                <option value="price_asc">Price: Low to High</option>
-                <option value="price_desc">Price: High to Low</option>
-              </select>
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:inline-block">
+                Sort by:
+              </span>
+              <div className="w-[175px] sm:w-[190px]">
+                <CustomSelect
+                  size="sm"
+                  options={PACKAGE_SORT_OPTIONS}
+                  value={sortBy}
+                  onChange={(val) => {
+                    const newSort = String(val);
+                    setSortBy(newSort);
+                    syncUrlWithFilters({ sortBy: newSort, resetPage: true });
+                  }}
+                  placeholder="Recommended"
+                  ariaLabel="Sort packages by"
+                />
+              </div>
             </div>
           </div>
 

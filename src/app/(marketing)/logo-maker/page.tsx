@@ -16,7 +16,16 @@ import {
   Maximize2
 } from "lucide-react";
 import { Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 import toast from "react-hot-toast";
+
+const INDUSTRY_OPTIONS: CustomSelectOption[] = [
+  { value: "Tech & AI", label: "Tech & AI" },
+  { value: "Creative Agency", label: "Creative Agency" },
+  { value: "E-Commerce & Retail", label: "E-Commerce & Retail" },
+  { value: "Finance & Fintech", label: "Finance & Fintech" },
+  { value: "Health & Wellness", label: "Health & Wellness" },
+];
 
 const mockups = ["All", "Business Card", "App Icon", "Storefront", "T-Shirt"];
 
@@ -186,17 +195,12 @@ export default function LogoMakerPage() {
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">Industry</label>
-                <select
+                <CustomSelect
                   value={industry}
-                  onChange={(e) => setIndustry(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 bg-white text-xs focus:border-[#327C73] outline-none"
-                >
-                  <option value="Tech & AI">Tech & AI</option>
-                  <option value="Creative Agency">Creative Agency</option>
-                  <option value="E-Commerce & Retail">E-Commerce & Retail</option>
-                  <option value="Finance & Fintech">Finance & Fintech</option>
-                  <option value="Health & Wellness">Health & Wellness</option>
-                </select>
+                  onChange={setIndustry}
+                  options={INDUSTRY_OPTIONS}
+                  size="md"
+                />
               </div>
 
               <div>

@@ -17,7 +17,22 @@ import {
   X
 } from "lucide-react";
 import { Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 import toast from "react-hot-toast";
+
+const TRAFFIC_SOURCE_OPTIONS: CustomSelectOption[] = [
+  { value: "Blog / Content Site", label: "Blog / Content Site" },
+  { value: "YouTube / Video", label: "YouTube / Video" },
+  { value: "Newsletter", label: "Email Newsletter" },
+  { value: "Social Media", label: "Social Media (Twitter/IG)" },
+  { value: "Paid Ads / PPC", label: "Paid Search / Ads" },
+];
+
+const PAYOUT_METHOD_OPTIONS: CustomSelectOption[] = [
+  { value: "PayPal / Bank", label: "Direct Bank / PayPal" },
+  { value: "Stripe Connect", label: "Stripe Connect" },
+  { value: "Wire Transfer", label: "International Wire" },
+];
 
 const commissionTiers = [
   {
@@ -331,29 +346,25 @@ export default function AffiliatesPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">Traffic Source</label>
-                  <select
+                  <CustomSelect
+                    size="md"
+                    options={TRAFFIC_SOURCE_OPTIONS}
                     value={affiliateForm.trafficSource}
-                    onChange={(e) => setAffiliateForm({ ...affiliateForm, trafficSource: e.target.value })}
-                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                  >
-                    <option value="Blog / Content Site">Blog / Content Site</option>
-                    <option value="YouTube / Video">YouTube / Video</option>
-                    <option value="Newsletter">Email Newsletter</option>
-                    <option value="Social Media">Social Media (Twitter/IG)</option>
-                    <option value="Paid Ads / PPC">Paid Search / Ads</option>
-                  </select>
+                    onChange={(val) => setAffiliateForm({ ...affiliateForm, trafficSource: String(val) })}
+                    placeholder="Select traffic source"
+                    ariaLabel="Traffic Source"
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">Payout Method</label>
-                  <select
+                  <CustomSelect
+                    size="md"
+                    options={PAYOUT_METHOD_OPTIONS}
                     value={affiliateForm.payoutMethod}
-                    onChange={(e) => setAffiliateForm({ ...affiliateForm, payoutMethod: e.target.value })}
-                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                  >
-                    <option value="PayPal / Bank">Direct Bank / PayPal</option>
-                    <option value="Stripe Connect">Stripe Connect</option>
-                    <option value="Wire Transfer">International Wire</option>
-                  </select>
+                    onChange={(val) => setAffiliateForm({ ...affiliateForm, payoutMethod: String(val) })}
+                    placeholder="Select payout method"
+                    ariaLabel="Payout Method"
+                  />
                 </div>
               </div>
 

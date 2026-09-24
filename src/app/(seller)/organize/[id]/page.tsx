@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useReducer, useState, useRef } from "react";
+import React, { useEffect, useReducer, useState, useRef, useMemo } from "react";
 import toast from "react-hot-toast";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter, useParams } from "next/navigation";
@@ -13,6 +13,7 @@ import useAdminCategories from "@/hooks/useAdminCategories";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
 import { Loader, Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 
 // Dynamically import ReactQuill to ensure SSG/SSR compatibility
 const ReactQuill = dynamic(() => import("react-quill-new"), {
@@ -51,6 +52,31 @@ const quillFormats = [
 
 type SectionTab = "about" | "packages" | "seller" | "faq";
 type TierKey = "basic" | "standard" | "premium";
+
+const DELIVERY_TIME_OPTIONS: CustomSelectOption[] = [
+  { value: "1", label: "1 day" },
+  { value: "2", label: "2 days" },
+  { value: "3", label: "3 days" },
+  { value: "5", label: "5 days" },
+  { value: "7", label: "7 days" },
+  { value: "10", label: "10 days" },
+  { value: "12", label: "12 days" },
+  { value: "14", label: "14 days" },
+  { value: "21", label: "21 days" },
+  { value: "30", label: "30 days" },
+  { value: "45", label: "45 days" },
+  { value: "60", label: "60 days" },
+  { value: "90", label: "90 days" },
+];
+
+const REVISION_OPTIONS: CustomSelectOption[] = [
+  { value: "0", label: "0 Revisions" },
+  { value: "1", label: "1 Revision" },
+  { value: "2", label: "2 Revisions" },
+  { value: "3", label: "3 Revisions" },
+  { value: "5", label: "5 Revisions" },
+  { value: "10", label: "10 Revisions" },
+];
 
 const EditPackagePage = () => {
   const { id } = useParams();
@@ -354,8 +380,8 @@ const EditPackagePage = () => {
   const currentNiches = getNiches(state.subcategory);
 
   // Dedicated handler for main category selection (resets subcategory & niche)
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedVal = e.target.value;
+  const handleCategoryChange = (valOrEvent: any) => {
+    const selectedVal = typeof valOrEvent === "object" && valOrEvent?.target ? valOrEvent.target.value : String(valOrEvent || "");
     const selectedParent = parentCategories.find(
       (p: any) =>
         (p.slug || p._id || p.id) === selectedVal ||
@@ -394,8 +420,8 @@ const EditPackagePage = () => {
   };
 
   // Dedicated handler for subcategory selection (resets niche)
-  const handleSubcategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const subVal = e.target.value;
+  const handleSubcategoryChange = (valOrEvent: any) => {
+    const subVal = typeof valOrEvent === "object" && valOrEvent?.target ? valOrEvent.target.value : String(valOrEvent || "");
     const currentSubs = getSubcategories(state.category);
     const selectedSub = currentSubs.find(
       (s: any) =>
@@ -439,8 +465,8 @@ const EditPackagePage = () => {
   };
 
   // Dedicated handler for niche selection (2nd-level child)
-  const handleNicheChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const nicheVal = e.target.value;
+  const handleNicheChange = (valOrEvent: any) => {
+    const nicheVal = typeof valOrEvent === "object" && valOrEvent?.target ? valOrEvent.target.value : String(valOrEvent || "");
     const currentNichesList = getNiches(state.subcategory);
     const selectedNiche = currentNichesList.find(
       (n: any) =>
@@ -892,6 +918,30 @@ const EditPackagePage = () => {
       features: [],
     };
 
+  const deliveryOptions = useMemo<CustomSelectOption[]>(() => {
+    const customVal = currentTierData.deliveryTime ? String(currentTierData.deliveryTime) : "";
+    const exists = DELIVERY_TIME_OPTIONS.some((o) => String(o.value) === customVal);
+    if (customVal && !exists) {
+      return [
+        ...DELIVERY_TIME_OPTIONS,
+        { value: customVal, label: `${customVal} ${Number(customVal) === 1 ? "day" : "days"}` },
+      ];
+    }
+    return DELIVERY_TIME_OPTIONS;
+  }, [currentTierData.deliveryTime]);
+
+  const revisionOptions = useMemo<CustomSelectOption[]>(() => {
+    const customVal = currentTierData.revisionNumber !== undefined && currentTierData.revisionNumber !== "" ? String(currentTierData.revisionNumber) : "";
+    const exists = REVISION_OPTIONS.some((o) => String(o.value) === customVal);
+    if (customVal && !exists) {
+      return [
+        ...REVISION_OPTIONS,
+        { value: customVal, label: `${customVal} Revisions` },
+      ];
+    }
+    return REVISION_OPTIONS;
+  }, [currentTierData.revisionNumber]);
+
   // Resilient category value resolution so that options accurately reflect selection
   const matchedCategoryVal = parentCategories.find(
     (c: any) =>
@@ -1126,22 +1176,18 @@ const EditPackagePage = () => {
                 <label className="text-xs font-semibold text-gray-700 block">
                   Category <span className="text-red-500">*</span>
                 </label>
-                <div className="relative">
-                  <select
-                    name="category"
-                    value={matchedCategoryVal}
-                    onChange={handleCategoryChange}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
-                  >
-                    <option value="" disabled>Select Category</option>
-                    {parentCategories.map((c: any) => (
-                      <option key={c._id || c.id || c.slug} value={c.name || c.slug}>
-                        {c.name || c.slug}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
-                </div>
+                <CustomSelect
+                  size="md"
+                  variant="filled"
+                  options={parentCategories.map((c: any) => ({
+                    value: c.name || c.slug,
+                    label: c.name || c.slug,
+                  }))}
+                  value={matchedCategoryVal}
+                  onChange={handleCategoryChange}
+                  placeholder="Select Category"
+                  ariaLabel="Select Category"
+                />
               </div>
 
               {/* Subcategory */}
@@ -1152,29 +1198,25 @@ const EditPackagePage = () => {
                   </label>
                   <span className="text-[11px] text-gray-400 font-normal">Optional</span>
                 </div>
-                <div className="relative">
-                  <select
-                    name="subcategory"
-                    value={matchedSubcategoryVal}
-                    onChange={handleSubcategoryChange}
-                    disabled={!matchedCategoryVal || currentSubcategories.length === 0}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
-                  >
-                    <option value="">
-                      {!matchedCategoryVal
-                        ? "Select category first"
-                        : currentSubcategories.length === 0
-                          ? "No subcategories available"
-                          : "Select Subcategory (Optional)"}
-                    </option>
-                    {currentSubcategories.map((sub: any) => (
-                      <option key={sub._id || sub.id || sub.slug} value={sub.name || sub.slug}>
-                        {sub.name || sub.slug}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
-                </div>
+                <CustomSelect
+                  size="md"
+                  variant="filled"
+                  options={currentSubcategories.map((sub: any) => ({
+                    value: sub.name || sub.slug,
+                    label: sub.name || sub.slug,
+                  }))}
+                  value={matchedSubcategoryVal}
+                  onChange={handleSubcategoryChange}
+                  disabled={!matchedCategoryVal || currentSubcategories.length === 0}
+                  placeholder={
+                    !matchedCategoryVal
+                      ? "Select category first"
+                      : currentSubcategories.length === 0
+                      ? "No subcategories available"
+                      : "Select Subcategory (Optional)"
+                  }
+                  ariaLabel="Select Subcategory"
+                />
               </div>
 
               {/* Niche (2nd-level Child) */}
@@ -1185,29 +1227,25 @@ const EditPackagePage = () => {
                   </label>
                   <span className="text-[11px] text-gray-400 font-normal">Optional</span>
                 </div>
-                <div className="relative">
-                  <select
-                    name="niche"
-                    value={matchedNicheVal}
-                    onChange={handleNicheChange}
-                    disabled={!matchedSubcategoryVal || currentNiches.length === 0}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
-                  >
-                    <option value="">
-                      {!matchedSubcategoryVal
-                        ? "Select subcategory first"
-                        : currentNiches.length === 0
-                          ? "No niches available"
-                          : "Select Niche (Optional)"}
-                    </option>
-                    {currentNiches.map((n: any) => (
-                      <option key={n._id || n.id || n.slug} value={n.name || n.slug}>
-                        {n.name || n.slug}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
-                </div>
+                <CustomSelect
+                  size="md"
+                  variant="filled"
+                  options={currentNiches.map((n: any) => ({
+                    value: n.name || n.slug,
+                    label: n.name || n.slug,
+                  }))}
+                  value={matchedNicheVal}
+                  onChange={handleNicheChange}
+                  disabled={!matchedSubcategoryVal || currentNiches.length === 0}
+                  placeholder={
+                    !matchedSubcategoryVal
+                      ? "Select subcategory first"
+                      : currentNiches.length === 0
+                      ? "No niches available"
+                      : "Select Niche (Optional)"
+                  }
+                  ariaLabel="Select Niche"
+                />
               </div>
             </div>
 
@@ -1472,32 +1510,15 @@ const EditPackagePage = () => {
                 <label className="text-xs font-semibold text-gray-700 block">
                   Add delivery time
                 </label>
-                <div className="relative">
-                  <select
-                    value={currentTierData.deliveryTime || ""}
-                    onChange={(e) => handleTierInputChange("deliveryTime", e.target.value)}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
-                  >
-                    <option value="" disabled>e.g 12 days</option>
-                    <option value="1">1 day</option>
-                    <option value="2">2 days</option>
-                    <option value="3">3 days</option>
-                    <option value="5">5 days</option>
-                    <option value="7">7 days</option>
-                    <option value="10">10 days</option>
-                    <option value="12">12 days</option>
-                    <option value="14">14 days</option>
-                    <option value="21">21 days</option>
-                    <option value="30">30 days</option>
-                    <option value="45">45 days</option>
-                    <option value="60">60 days</option>
-                    <option value="90">90 days</option>
-                    {currentTierData.deliveryTime && !["1", "2", "3", "5", "7", "10", "12", "14", "21", "30", "45", "60", "90"].includes(String(currentTierData.deliveryTime)) && (
-                      <option value={currentTierData.deliveryTime}>{currentTierData.deliveryTime} {Number(currentTierData.deliveryTime) === 1 ? "day" : "days"}</option>
-                    )}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-3.5 h-3.5" />
-                </div>
+                <CustomSelect
+                  size="md"
+                  variant="filled"
+                  options={deliveryOptions}
+                  value={currentTierData.deliveryTime || ""}
+                  onChange={(val) => handleTierInputChange("deliveryTime", String(val))}
+                  placeholder="e.g 12 days"
+                  ariaLabel="Add delivery time"
+                />
               </div>
 
               {/* Revisions */}
@@ -1505,25 +1526,15 @@ const EditPackagePage = () => {
                 <label className="text-xs font-semibold text-gray-700 block">
                   Revisions
                 </label>
-                <div className="relative">
-                  <select
-                    value={currentTierData.revisionNumber !== undefined ? String(currentTierData.revisionNumber) : ""}
-                    onChange={(e) => handleTierInputChange("revisionNumber", e.target.value)}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
-                  >
-                    <option value="">Select Revisions</option>
-                    <option value="0">0 Revisions</option>
-                    <option value="1">1 Revision</option>
-                    <option value="2">2 Revisions</option>
-                    <option value="3">3 Revisions</option>
-                    <option value="5">5 Revisions</option>
-                    <option value="10">10 Revisions</option>
-                    {currentTierData.revisionNumber && !["", "0", "1", "2", "3", "5", "10"].includes(String(currentTierData.revisionNumber)) && (
-                      <option value={String(currentTierData.revisionNumber)}>{currentTierData.revisionNumber} Revisions</option>
-                    )}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-3.5 h-3.5" />
-                </div>
+                <CustomSelect
+                  size="md"
+                  variant="filled"
+                  options={revisionOptions}
+                  value={currentTierData.revisionNumber !== undefined ? String(currentTierData.revisionNumber) : ""}
+                  onChange={(val) => handleTierInputChange("revisionNumber", String(val))}
+                  placeholder="Select Revisions"
+                  ariaLabel="Select Revisions"
+                />
               </div>
             </div>
 

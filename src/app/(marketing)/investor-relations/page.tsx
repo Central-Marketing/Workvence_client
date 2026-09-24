@@ -19,7 +19,15 @@ import {
   Building
 } from "lucide-react";
 import { Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 import toast from "react-hot-toast";
+
+const INQUIRY_TYPE_OPTIONS: CustomSelectOption[] = [
+  { value: "Institutional Investor", label: "Institutional Investor" },
+  { value: "Sell-Side Analyst", label: "Sell-Side Analyst" },
+  { value: "Individual Shareholder", label: "Individual Shareholder" },
+  { value: "M&A / Partnership", label: "Strategic M&A" },
+];
 
 const financialReports = [
   {
@@ -308,16 +316,12 @@ export default function InvestorRelationsPage() {
                     </div>
                     <div>
                       <label className="block text-[11px] font-semibold text-gray-700 mb-1">Inquiry Type</label>
-                      <select
+                      <CustomSelect
                         value={irForm.inquiryType}
-                        onChange={(e) => setIrForm({ ...irForm, inquiryType: e.target.value })}
-                        className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                      >
-                        <option value="Institutional Investor">Institutional Investor</option>
-                        <option value="Sell-Side Analyst">Sell-Side Analyst</option>
-                        <option value="Individual Shareholder">Individual Shareholder</option>
-                        <option value="M&A / Partnership">Strategic M&A</option>
-                      </select>
+                        onChange={(val) => setIrForm((prev) => ({ ...prev, inquiryType: val }))}
+                        options={INQUIRY_TYPE_OPTIONS}
+                        size="md"
+                      />
                     </div>
                   </div>
 

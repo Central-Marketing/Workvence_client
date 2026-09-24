@@ -395,15 +395,15 @@ const ManageOrders = () => {
                                   <span className="text-xs sm:text-[13px] font-semibold text-gray-950">
                                     {buyerName}
                                   </span>
-                                  {isVerified && (
+                                  {/* {isVerified && (
                                     <span className="px-1.5 py-0.2 rounded bg-[#0B3A33] text-white text-[9.5px] font-semibold tracking-wide">
                                       Verified
                                     </span>
-                                  )}
+                                  )} */}
                                 </div>
-                                <span className="text-[11px] text-gray-500 mt-0.5">
+                                {/* <span className="text-[11px] text-gray-500 mt-0.5">
                                   {buyerRole}
-                                </span>
+                                </span> */}
                               </div>
                             </div>
                           </td>

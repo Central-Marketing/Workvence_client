@@ -18,7 +18,21 @@ import {
   X
 } from "lucide-react";
 import { Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 import toast from "react-hot-toast";
+
+const DISCIPLINE_OPTIONS: CustomSelectOption[] = [
+  { value: "Software Engineering", label: "Software Engineering" },
+  { value: "UI/UX & Product Design", label: "UI/UX & Product Design" },
+  { value: "3D Motion & Video", label: "3D Motion & Video" },
+  { value: "Growth & Copywriting", label: "Growth & Copywriting" },
+];
+
+const EXPERIENCE_OPTIONS: CustomSelectOption[] = [
+  { value: "3-5 years", label: "3 - 5 Years" },
+  { value: "5-8 years", label: "5 - 8 Years" },
+  { value: "8+ years", label: "8+ Years (Principal/Lead)" },
+];
 
 const vettingSteps = [
   {
@@ -246,28 +260,21 @@ export default function ProTalentPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">Primary Discipline</label>
-                  <select
+                  <CustomSelect
                     value={proForm.primarySkill}
-                    onChange={(e) => setProForm({ ...proForm, primarySkill: e.target.value })}
-                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                  >
-                    <option value="Software Engineering">Software Engineering</option>
-                    <option value="UI/UX & Product Design">UI/UX & Product Design</option>
-                    <option value="3D Motion & Video">3D Motion & Video</option>
-                    <option value="Growth & Copywriting">Growth & Copywriting</option>
-                  </select>
+                    onChange={(val) => setProForm((prev) => ({ ...prev, primarySkill: val }))}
+                    options={DISCIPLINE_OPTIONS}
+                    size="md"
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">Experience Level</label>
-                  <select
+                  <CustomSelect
                     value={proForm.experienceYears}
-                    onChange={(e) => setProForm({ ...proForm, experienceYears: e.target.value })}
-                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                  >
-                    <option value="3-5 years">3 - 5 Years</option>
-                    <option value="5-8 years">5 - 8 Years</option>
-                    <option value="8+ years">8+ Years (Principal/Lead)</option>
-                  </select>
+                    onChange={(val) => setProForm((prev) => ({ ...prev, experienceYears: val }))}
+                    options={EXPERIENCE_OPTIONS}
+                    size="md"
+                  />
                 </div>
               </div>
 

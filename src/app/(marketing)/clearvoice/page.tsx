@@ -15,7 +15,14 @@ import {
   X
 } from "lucide-react";
 import { Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 import toast from "react-hot-toast";
+
+const VOLUME_OPTIONS: CustomSelectOption[] = [
+  { value: "2-4 articles/month", label: "2 - 4 articles / month" },
+  { value: "4-8 articles/month", label: "4 - 8 articles / month" },
+  { value: "8+ articles/month", label: "8+ articles / month (High Scale)" },
+];
 
 const contentSolutions = [
   {
@@ -80,7 +87,7 @@ export default function ClearVoicePage() {
               </Button>
               <Link
                 href="/packages?category=writing-and-translation"
-                className="px-8 py-4 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-8 h-10 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
               >
                 Explore Copywriting Packages
               </Link>
@@ -166,15 +173,12 @@ export default function ClearVoicePage() {
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">Expected Monthly Volume</label>
-                <select
+                <CustomSelect
                   value={contentForm.volume}
-                  onChange={(e) => setContentForm({ ...contentForm, volume: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                >
-                  <option value="2-4 articles/month">2 - 4 articles / month</option>
-                  <option value="4-8 articles/month">4 - 8 articles / month</option>
-                  <option value="8+ articles/month">8+ articles / month (High Scale)</option>
-                </select>
+                  onChange={(val) => setContentForm((prev) => ({ ...prev, volume: val }))}
+                  options={VOLUME_OPTIONS}
+                  size="md"
+                />
               </div>
 
               <Button

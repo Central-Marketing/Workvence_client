@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo, Suspense } from 'react';
 import { PackageCard, TopRatedSellers, GigsGridSkeleton, Skeleton, Button } from '@/components';
+import { CustomSelect, CustomSelectOption } from '@/components/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
@@ -19,6 +20,23 @@ const DEFAULT_CATEGORIES = [
   "Business",
   "Music & Audio",
   "Social Media",
+];
+
+const ENGLISH_LEVEL_OPTIONS: CustomSelectOption[] = [
+  { value: "", label: "Select english level" },
+  { value: "basic", label: "Basic / Conversational" },
+  { value: "fluent", label: "Fluent" },
+  { value: "native", label: "Native / Bilingual" },
+];
+
+const CLIENT_LOCATION_OPTIONS: CustomSelectOption[] = [
+  { value: "", label: "Select client location" },
+  { value: "US", label: "United States" },
+  { value: "UK", label: "United Kingdom" },
+  { value: "CA", label: "Canada" },
+  { value: "EU", label: "Europe" },
+  { value: "Asia", label: "Asia" },
+  { value: "Global", label: "Worldwide" },
 ];
 
 interface PackagesClientProps {
@@ -102,6 +120,14 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
 
     return [/* { name: "All services", slug: "All services" }, */ ...regularCats, ...otherCats];
   }, [categoryList]);
+
+  const categorySelectOptions = useMemo<CustomSelectOption[]>(() => {
+    const list: CustomSelectOption[] = [{ value: "", label: "Select category" }];
+    categories.forEach((c: any) => {
+      list.push({ value: c.slug, label: c.name });
+    });
+    return list;
+  }, [categories]);
 
   const getSlugFromCat = (catInput: string) => {
     if (!catInput || catInput === 'All services' || catInput === 'Results') return '';
@@ -571,25 +597,19 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
                 {/* 2. Category */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">Category</label>
-                  <select
-                    value={filterCategory || activeCategory}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setFilterCategory(val);
-                      if (val && val !== 'All services') setActiveCategory(val);
+                  <CustomSelect
+                    size="md"
+                    options={categorySelectOptions}
+                    value={filterCategory || (activeCategory !== 'All services' ? activeCategory : '')}
+                    onChange={(val) => {
+                      const strVal = String(val);
+                      setFilterCategory(strVal);
+                      if (strVal && strVal !== 'All services') setActiveCategory(strVal);
                       else setActiveCategory('All services');
                     }}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-[6px] text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
-                  >
-                    <option value="">Select category</option>
-                    {categories.map((c: any) => {
-                      const name = typeof c === 'string' ? c : c.name;
-                      const slug = typeof c === 'string' ? c : c.slug;
-                      return (
-                        <option key={slug} value={slug}>{name}</option>
-                      );
-                    })}
-                  </select>
+                    placeholder="Select category"
+                    ariaLabel="Filter by category"
+                  />
                 </div>
 
                 {/* 3. Experience Level */}
@@ -665,34 +685,27 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
                 {/* 5. English Level */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">English Level</label>
-                  <select
+                  <CustomSelect
+                    size="md"
+                    options={ENGLISH_LEVEL_OPTIONS}
                     value={englishLevel}
-                    onChange={(e) => setEnglishLevel(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-[6px] text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
-                  >
-                    <option value="">Select english level</option>
-                    <option value="basic">Basic / Conversational</option>
-                    <option value="fluent">Fluent</option>
-                    <option value="native">Native / Bilingual</option>
-                  </select>
+                    onChange={(val) => setEnglishLevel(String(val))}
+                    placeholder="Select english level"
+                    ariaLabel="Filter by english level"
+                  />
                 </div>
 
                 {/* 6. Client Location */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">Client Location</label>
-                  <select
+                  <CustomSelect
+                    size="md"
+                    options={CLIENT_LOCATION_OPTIONS}
                     value={clientLocation}
-                    onChange={(e) => setClientLocation(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-[6px] text-sm text-gray-700 focus:outline-none focus:border-brand-green bg-white transition-colors cursor-pointer"
-                  >
-                    <option value="">Select client location</option>
-                    <option value="US">United States</option>
-                    <option value="UK">United Kingdom</option>
-                    <option value="CA">Canada</option>
-                    <option value="EU">Europe</option>
-                    <option value="Asia">Asia</option>
-                    <option value="Global">Worldwide</option>
-                  </select>
+                    onChange={(val) => setClientLocation(String(val))}
+                    placeholder="Select client location"
+                    ariaLabel="Filter by client location"
+                  />
                 </div>
 
               </div>

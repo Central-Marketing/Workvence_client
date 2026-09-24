@@ -249,7 +249,7 @@ const RegisterContent = () => {
 
         {/* Center Form Card */}
         <div className="w-full max-w-[400px] mx-auto my-auto py-1">
-          <p className="text-[13px] text-[#6b7280] mb-1 text-center">
+          <p className="text-[14px] text-[#6b7280] mb-2 text-center">
             Already have an account?{' '}
             <Link href="/login" className="text-[#0D6D5F] font-semibold hover:underline">
               Sign in

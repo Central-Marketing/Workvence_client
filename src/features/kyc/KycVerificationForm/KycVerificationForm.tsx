@@ -29,6 +29,7 @@ import moment from "moment";
 import kycService, { KycRecord, KycSubmitPayload } from "@/utils/kycService";
 import countriesFlags from "@/utils/countriesFlags";
 import { Loader, Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 
 interface KycVerificationFormProps {
   initialKycData?: KycRecord | null;
@@ -40,6 +41,14 @@ const DOCUMENT_TYPES = [
   { id: "passport", label: "Passport", desc: "Government issued international passport", needBack: false },
   { id: "nid", label: "National ID (NID)", desc: "National identity or citizen card", needBack: true },
   { id: "driving_license", label: "Driver's License", desc: "Official driver's permit / license", needBack: true },
+];
+
+const COUNTRY_SELECT_OPTIONS: CustomSelectOption[] = [
+  { value: "", label: "Select country..." },
+  ...Object.keys(countriesFlags).map((c) => ({
+    value: c,
+    label: c,
+  })),
 ];
 
 export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
@@ -562,22 +571,16 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                     <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
                       Country of Issuance <span className="text-red-500">*</span>
                     </label>
-                    <div className="relative">
-                      <Globe className="absolute left-3.5 top-3.5 text-gray-400" size={18} />
-                      <select
-                        value={country}
-                        onChange={(e) => setCountry(e.target.value)}
-                        required
-                        className="w-full pl-11 pr-4 py-3 bg-gray-50 focus:bg-white border border-gray-200 focus:border-brand-green rounded-[6px] text-sm font-medium text-gray-900 outline-none transition-all appearance-none cursor-pointer"
-                      >
-                        <option value="">Select country...</option>
-                        {countriesList.map((c) => (
-                          <option key={c} value={c}>
-                            {c}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <CustomSelect
+                      size="lg"
+                      variant="filled"
+                      leftIcon={<Globe size={18} />}
+                      options={COUNTRY_SELECT_OPTIONS}
+                      value={country}
+                      onChange={(val) => setCountry(String(val))}
+                      placeholder="Select country..."
+                      ariaLabel="Select country of issuance"
+                    />
                   </div>
                 </div>
 

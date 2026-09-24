@@ -356,11 +356,11 @@ export default function BuyerManageOrdersPage() {
                                   <span className="text-sm font-bold text-slate-900 group-hover:text-[#0D3B34] transition-colors">
                                     {order.seller.name}
                                   </span>
-                                  {renderBadge(order.seller.badge)}
+                                  {/* {renderBadge(order.seller.badge)} */}
                                 </div>
-                                <span className="text-xs text-slate-500 font-normal">
+                                {/* <span className="text-xs text-slate-500 font-normal">
                                   {order.seller.role}
-                                </span>
+                                </span> */}
                               </div>
                             </div>
                           </td>

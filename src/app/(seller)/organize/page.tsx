@@ -14,6 +14,7 @@ import useAdminCategories from "@/hooks/useAdminCategories";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
 import { Loader, Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 
 // Dynamically import ReactQuill to ensure SSG/SSR compatibility
 const ReactQuill = dynamic(() => import("react-quill-new"), {
@@ -52,6 +53,31 @@ const quillFormats = [
 
 type SectionTab = "about" | "packages" | "seller" | "faq";
 type TierKey = "basic" | "standard" | "premium";
+
+const DELIVERY_TIME_OPTIONS: CustomSelectOption[] = [
+  { value: "1", label: "1 day" },
+  { value: "2", label: "2 days" },
+  { value: "3", label: "3 days" },
+  { value: "5", label: "5 days" },
+  { value: "7", label: "7 days" },
+  { value: "10", label: "10 days" },
+  { value: "12", label: "12 days" },
+  { value: "14", label: "14 days" },
+  { value: "21", label: "21 days" },
+  { value: "30", label: "30 days" },
+  { value: "45", label: "45 days" },
+  { value: "60", label: "60 days" },
+  { value: "90", label: "90 days" },
+];
+
+const REVISION_OPTIONS: CustomSelectOption[] = [
+  { value: "0", label: "0 Revisions" },
+  { value: "1", label: "1 Revision" },
+  { value: "2", label: "2 Revisions" },
+  { value: "3", label: "3 Revisions" },
+  { value: "5", label: "5 Revisions" },
+  { value: "10", label: "10 Revisions" },
+];
 
 const OrganizePage = () => {
   const user = useUserStore((state: any) => state.user);
@@ -174,8 +200,8 @@ const OrganizePage = () => {
   };
 
   // Dedicated handler for main category selection (resets subcategory & niche)
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedVal = e.target.value;
+  const handleCategoryChange = (valOrEvent: any) => {
+    const selectedVal = typeof valOrEvent === "object" && valOrEvent?.target ? valOrEvent.target.value : String(valOrEvent || "");
     const selectedParent = parentCategories.find(
       (p: any) => (p.slug || p._id || p.id) === selectedVal || p.name === selectedVal
     );
@@ -209,8 +235,8 @@ const OrganizePage = () => {
   };
 
   // Dedicated handler for subcategory selection (resets niche)
-  const handleSubcategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const subVal = e.target.value;
+  const handleSubcategoryChange = (valOrEvent: any) => {
+    const subVal = typeof valOrEvent === "object" && valOrEvent?.target ? valOrEvent.target.value : String(valOrEvent || "");
     const currentSubs = getSubcategories(state.category);
     const selectedSub = currentSubs.find(
       (s: any) => (s.slug || s._id || s.id) === subVal || s.name === subVal
@@ -247,8 +273,8 @@ const OrganizePage = () => {
   };
 
   // Dedicated handler for niche selection (2nd-level child)
-  const handleNicheChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const nicheVal = e.target.value;
+  const handleNicheChange = (valOrEvent: any) => {
+    const nicheVal = typeof valOrEvent === "object" && valOrEvent?.target ? valOrEvent.target.value : String(valOrEvent || "");
     const currentNiches = getNiches(state.subcategory);
     const selectedNiche = currentNiches.find(
       (n: any) => (n.slug || n._id || n.id) === nicheVal || n.name === nicheVal
@@ -780,22 +806,18 @@ const OrganizePage = () => {
                 <label className="text-xs font-semibold text-gray-700 block">
                   Category <span className="text-red-500">*</span>
                 </label>
-                <div className="relative">
-                  <select
-                    name="category"
-                    value={state.category || ""}
-                    onChange={handleCategoryChange}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
-                  >
-                    <option value="" disabled>Select Category</option>
-                    {parentCategories.map((c: any) => (
-                      <option key={c._id || c.id || c.slug} value={c.slug || c.name || c._id}>
-                        {c.name || c.slug}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
-                </div>
+                <CustomSelect
+                  size="md"
+                  variant="filled"
+                  options={parentCategories.map((c: any) => ({
+                    value: c.slug || c.name || c._id,
+                    label: c.name || c.slug,
+                  }))}
+                  value={state.category || ""}
+                  onChange={handleCategoryChange}
+                  placeholder="Select Category"
+                  ariaLabel="Select Category"
+                />
               </div>
 
               {/* Subcategory */}
@@ -806,29 +828,25 @@ const OrganizePage = () => {
                   </label>
                   <span className="text-[11px] text-gray-400 font-normal">Optional</span>
                 </div>
-                <div className="relative">
-                  <select
-                    name="subcategory"
-                    value={state.subcategory || ""}
-                    onChange={handleSubcategoryChange}
-                    disabled={!state.category || currentSubcategories.length === 0}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
-                  >
-                    <option value="">
-                      {!state.category
-                        ? "Select category first"
-                        : currentSubcategories.length === 0
-                          ? "No subcategories available"
-                          : "Select Subcategory (Optional)"}
-                    </option>
-                    {currentSubcategories.map((sub: any) => (
-                      <option key={sub._id || sub.id || sub.slug} value={sub.slug || sub.name || sub._id}>
-                        {sub.name || sub.slug}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
-                </div>
+                <CustomSelect
+                  size="md"
+                  variant="filled"
+                  options={currentSubcategories.map((sub: any) => ({
+                    value: sub.slug || sub.name || sub._id,
+                    label: sub.name || sub.slug,
+                  }))}
+                  value={state.subcategory || ""}
+                  onChange={handleSubcategoryChange}
+                  disabled={!state.category || currentSubcategories.length === 0}
+                  placeholder={
+                    !state.category
+                      ? "Select category first"
+                      : currentSubcategories.length === 0
+                      ? "No subcategories available"
+                      : "Select Subcategory (Optional)"
+                  }
+                  ariaLabel="Select Subcategory"
+                />
               </div>
 
               {/* Niche (2nd-level Child) */}
@@ -839,29 +857,25 @@ const OrganizePage = () => {
                   </label>
                   <span className="text-[11px] text-gray-400 font-normal">Optional</span>
                 </div>
-                <div className="relative">
-                  <select
-                    name="niche"
-                    value={state.niche || ""}
-                    onChange={handleNicheChange}
-                    disabled={!state.subcategory || currentNiches.length === 0}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 outline-none cursor-pointer appearance-none pr-10 transition-colors"
-                  >
-                    <option value="">
-                      {!state.subcategory
-                        ? "Select subcategory first"
-                        : currentNiches.length === 0
-                          ? "No niches available"
-                          : "Select Niche (Optional)"}
-                    </option>
-                    {currentNiches.map((n: any) => (
-                      <option key={n._id || n.id || n.slug} value={n.slug || n.name || n._id}>
-                        {n.name || n.slug}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-4 h-4" />
-                </div>
+                <CustomSelect
+                  size="md"
+                  variant="filled"
+                  options={currentNiches.map((n: any) => ({
+                    value: n.slug || n.name || n._id,
+                    label: n.name || n.slug,
+                  }))}
+                  value={state.niche || ""}
+                  onChange={handleNicheChange}
+                  disabled={!state.subcategory || currentNiches.length === 0}
+                  placeholder={
+                    !state.subcategory
+                      ? "Select subcategory first"
+                      : currentNiches.length === 0
+                      ? "No niches available"
+                      : "Select Niche (Optional)"
+                  }
+                  ariaLabel="Select Niche"
+                />
               </div>
             </div>
 
@@ -1109,29 +1123,15 @@ const OrganizePage = () => {
                 <label className="text-xs font-semibold text-gray-700 block">
                   Add delivery time
                 </label>
-                <div className="relative">
-                  <select
-                    value={currentTierData.deliveryTime || ""}
-                    onChange={(e) => handleTierInputChange("deliveryTime", e.target.value)}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
-                  >
-                    <option value="" disabled>e.g 12 days</option>
-                    <option value="1">1 day</option>
-                    <option value="2">2 days</option>
-                    <option value="3">3 days</option>
-                    <option value="5">5 days</option>
-                    <option value="7">7 days</option>
-                    <option value="10">10 days</option>
-                    <option value="12">12 days</option>
-                    <option value="14">14 days</option>
-                    <option value="21">21 days</option>
-                    <option value="30">30 days</option>
-                    <option value="45">45 days</option>
-                    <option value="60">60 days</option>
-                    <option value="90">90 days</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-3.5 h-3.5" />
-                </div>
+                <CustomSelect
+                  size="md"
+                  variant="filled"
+                  options={DELIVERY_TIME_OPTIONS}
+                  value={currentTierData.deliveryTime || ""}
+                  onChange={(val) => handleTierInputChange("deliveryTime", String(val))}
+                  placeholder="e.g 12 days"
+                  ariaLabel="Add delivery time"
+                />
               </div>
 
               {/* Revisions */}
@@ -1139,22 +1139,15 @@ const OrganizePage = () => {
                 <label className="text-xs font-semibold text-gray-700 block">
                   Revisions
                 </label>
-                <div className="relative">
-                  <select
-                    value={currentTierData.revisionNumber !== undefined ? String(currentTierData.revisionNumber) : ""}
-                    onChange={(e) => handleTierInputChange("revisionNumber", e.target.value)}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 outline-none cursor-pointer appearance-none pr-8"
-                  >
-                    <option value="">Select Revisions</option>
-                    <option value="0">0 Revisions</option>
-                    <option value="1">1 Revision</option>
-                    <option value="2">2 Revisions</option>
-                    <option value="3">3 Revisions</option>
-                    <option value="5">5 Revisions</option>
-                    <option value="10">10 Revisions</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none w-3.5 h-3.5" />
-                </div>
+                <CustomSelect
+                  size="md"
+                  variant="filled"
+                  options={REVISION_OPTIONS}
+                  value={currentTierData.revisionNumber !== undefined ? String(currentTierData.revisionNumber) : ""}
+                  onChange={(val) => handleTierInputChange("revisionNumber", String(val))}
+                  placeholder="Select Revisions"
+                  ariaLabel="Select Revisions"
+                />
               </div>
             </div>
 

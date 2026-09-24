@@ -18,7 +18,15 @@ import {
   X
 } from "lucide-react";
 import { Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 import toast from "react-hot-toast";
+
+const COMPANY_SIZE_OPTIONS: CustomSelectOption[] = [
+  { value: "1-20 employees", label: "1-20 employees" },
+  { value: "20-50 employees", label: "20-50 employees" },
+  { value: "50-250 employees", label: "50-250 employees" },
+  { value: "250+ employees", label: "250+ employees" },
+];
 
 const enterpriseFeatures = [
   {
@@ -94,7 +102,7 @@ export default function BusinessSolutionsPage() {
               </Button>
               <Link
                 href="/pro"
-                className="px-8 py-4 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-8 h-10 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
               >
                 Explore Pro Talent
               </Link>
@@ -193,16 +201,12 @@ export default function BusinessSolutionsPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">Company Size</label>
-                  <select
+                  <CustomSelect
                     value={demoForm.teamSize}
-                    onChange={(e) => setDemoForm({ ...demoForm, teamSize: e.target.value })}
-                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                  >
-                    <option value="1-20 employees">1-20 employees</option>
-                    <option value="20-50 employees">20-50 employees</option>
-                    <option value="50-250 employees">50-250 employees</option>
-                    <option value="250+ employees">250+ employees</option>
-                  </select>
+                    onChange={(val) => setDemoForm((prev) => ({ ...prev, teamSize: val }))}
+                    options={COMPANY_SIZE_OPTIONS}
+                    size="md"
+                  />
                 </div>
               </div>
 

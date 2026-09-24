@@ -21,6 +21,7 @@ import { axiosFetch } from "@/utils";
 import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
 import { Button, Breadcrumb, AiGradientButton } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 
 const CATEGORIES = [
   "AI",
@@ -494,10 +495,18 @@ const CreateBrief = () => {
             <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2">
               Category <span className="text-slate-400 font-normal text-xs">(Optional)</span>
             </label>
-            <select
+            <CustomSelect
+              size="lg"
+              options={[
+                { value: "", label: "Select a category" },
+                ...categories.map((c: any) => ({
+                  value: c.slug,
+                  label: c.name,
+                })),
+              ]}
               value={form.category}
-              onChange={(e) => {
-                const selectedSlug = e.target.value;
+              onChange={(val) => {
+                const selectedSlug = String(val);
                 const found = categories.find((c: any) => c.slug === selectedSlug);
                 setForm((prev) => ({
                   ...prev,
@@ -505,15 +514,9 @@ const CreateBrief = () => {
                   categoryName: found?.name || selectedSlug,
                 }));
               }}
-              className="w-full px-4 py-3 sm:py-3.5 rounded-[6px] border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10 cursor-pointer"
-            >
-              <option value="">Select a category</option>
-              {categories.map((c: any) => (
-                <option key={c.slug} value={c.slug}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+              placeholder="Select a category"
+              ariaLabel="Select a category"
+            />
           </div>
 
           {/* Section 3: Description */}

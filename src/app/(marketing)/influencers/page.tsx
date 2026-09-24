@@ -15,7 +15,30 @@ import {
   X
 } from "lucide-react";
 import { Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 import toast from "react-hot-toast";
+
+const PLATFORM_OPTIONS: CustomSelectOption[] = [
+  { value: "YouTube", label: "YouTube" },
+  { value: "TikTok", label: "TikTok" },
+  { value: "Instagram", label: "Instagram" },
+  { value: "Twitter/X", label: "Twitter / X" },
+  { value: "Podcast", label: "Podcast / Newsletter" },
+];
+
+const FOLLOWER_OPTIONS: CustomSelectOption[] = [
+  { value: "5k-50k", label: "5k - 50k Followers" },
+  { value: "50k-250k", label: "50k - 250k Followers" },
+  { value: "250k+", label: "250k+ Followers" },
+];
+
+const NICHE_OPTIONS: CustomSelectOption[] = [
+  { value: "Tech & Coding", label: "Tech & Coding" },
+  { value: "Design & 3D", label: "Design & 3D" },
+  { value: "Business & Startups", label: "Business & Startups" },
+  { value: "Video & Content Creation", label: "Video & Content Creation" },
+  { value: "Digital Marketing", label: "Digital Marketing" },
+];
 
 const creatorTiers = [
   {
@@ -227,17 +250,12 @@ export default function InfluencersPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">Primary Platform</label>
-                  <select
+                  <CustomSelect
                     value={influencerForm.platform}
-                    onChange={(e) => setInfluencerForm({ ...influencerForm, platform: e.target.value })}
-                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                  >
-                    <option value="YouTube">YouTube</option>
-                    <option value="TikTok">TikTok</option>
-                    <option value="Instagram">Instagram</option>
-                    <option value="Twitter/X">Twitter / X</option>
-                    <option value="Podcast">Podcast / Newsletter</option>
-                  </select>
+                    onChange={(val) => setInfluencerForm((prev) => ({ ...prev, platform: val }))}
+                    options={PLATFORM_OPTIONS}
+                    size="md"
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">Channel / Profile Handle *</label>
@@ -255,29 +273,21 @@ export default function InfluencersPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">Audience Size</label>
-                  <select
+                  <CustomSelect
                     value={influencerForm.followerCount}
-                    onChange={(e) => setInfluencerForm({ ...influencerForm, followerCount: e.target.value })}
-                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                  >
-                    <option value="5k-50k">5k - 50k Followers</option>
-                    <option value="50k-250k">50k - 250k Followers</option>
-                    <option value="250k+">250k+ Followers</option>
-                  </select>
+                    onChange={(val) => setInfluencerForm((prev) => ({ ...prev, followerCount: val }))}
+                    options={FOLLOWER_OPTIONS}
+                    size="md"
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">Content Niche</label>
-                  <select
+                  <CustomSelect
                     value={influencerForm.niche}
-                    onChange={(e) => setInfluencerForm({ ...influencerForm, niche: e.target.value })}
-                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                  >
-                    <option value="Tech & Coding">Tech & Coding</option>
-                    <option value="Design & 3D">Design & 3D</option>
-                    <option value="Business & Startups">Business & Startups</option>
-                    <option value="Video & Content Creation">Video & Content Creation</option>
-                    <option value="Digital Marketing">Digital Marketing</option>
-                  </select>
+                    onChange={(val) => setInfluencerForm((prev) => ({ ...prev, niche: val }))}
+                    options={NICHE_OPTIONS}
+                    size="md"
+                  />
                 </div>
               </div>
 

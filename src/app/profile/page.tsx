@@ -32,7 +32,15 @@ import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
 import supportService from "@/utils/supportService";
 import { Loader, KycVerificationForm, Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 import { calculateProfileCompletion } from "@/features/dashboard";
+
+const LANGUAGE_LEVEL_OPTIONS: CustomSelectOption[] = [
+  { value: "Basic", label: "Basic" },
+  { value: "Conversational", label: "Conversational" },
+  { value: "Fluent", label: "Fluent" },
+  { value: "Native", label: "Native" },
+];
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -945,16 +953,16 @@ export default function ProfilePage() {
                   placeholder="Language (e.g. English)"
                   className="px-3 py-1.5 rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500 flex-1 min-w-[120px]"
                 />
-                <select
-                  value={newLangLevel}
-                  onChange={(e) => setNewLangLevel(e.target.value)}
-                  className="px-3 py-1.5 rounded-[6px] border border-slate-200 text-xs outline-none bg-white"
-                >
-                  <option value="Basic">Basic</option>
-                  <option value="Conversational">Conversational</option>
-                  <option value="Fluent">Fluent</option>
-                  <option value="Native">Native</option>
-                </select>
+                <div className="w-[145px] shrink-0">
+                  <CustomSelect
+                    size="sm"
+                    options={LANGUAGE_LEVEL_OPTIONS}
+                    value={newLangLevel}
+                    onChange={(val) => setNewLangLevel(String(val))}
+                    placeholder="Level"
+                    ariaLabel="Language level"
+                  />
+                </div>
                 <Button
                   type="button"
                   variant="dark"

@@ -21,11 +21,18 @@ import {
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader, Button, AiGradientButton } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 
 const DEFAULT_AVATARS = [
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
   "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80",
   "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80",
+];
+
+const BRIEF_SORT_OPTIONS: CustomSelectOption[] = [
+  { value: "newest", label: "Sort: Newest" },
+  { value: "proposals", label: "Sort: Most Proposals" },
+  { value: "budget", label: "Sort: Budget" },
 ];
 
 const getBriefTags = (brief: any): string[] => {
@@ -405,17 +412,15 @@ const MyBriefs = () => {
             </div>
 
             {/* Sort Select */}
-            <div className="relative flex items-center w-full sm:w-auto shrink-0">
-              <select
+            <div className="w-full sm:w-[195px] shrink-0">
+              <CustomSelect
+                size="sm"
+                options={BRIEF_SORT_OPTIONS}
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="appearance-none w-full sm:w-auto pl-3 pr-8 py-2 bg-white border border-slate-200 focus:border-[#0D6D5F] rounded-[6px] text-xs sm:text-[13px] text-slate-700 font-medium outline-none cursor-pointer shadow-2xs h-[38px]"
-              >
-                <option value="newest">Sort: Newest</option>
-                <option value="proposals">Sort: Most Proposals</option>
-                <option value="budget">Sort: Budget</option>
-              </select>
-              <FiChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                onChange={(val) => setSortBy(val as any)}
+                placeholder="Sort: Newest"
+                ariaLabel="Sort briefs"
+              />
             </div>
           </div>
         </div>

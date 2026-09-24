@@ -68,7 +68,7 @@ const staticFooterColumns: FooterColumn[] = [
   {
     title: "Community",
     links: [
-      { name: "Customer Success Stories", href: "/success-stories" },
+      // { name: "Customer Success Stories", href: "/success-stories" },
       { name: "Community Hub", href: "/community" },
       { name: "Forum", href: "/forum" },
       { name: "Events", href: "/events" },

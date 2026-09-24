@@ -15,7 +15,14 @@ import {
   X
 } from "lucide-react";
 import { Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 import toast from "react-hot-toast";
+
+const SPEND_OPTIONS: CustomSelectOption[] = [
+  { value: "$3k-$5k/month", label: "$3,000 - $5,000 / month" },
+  { value: "$5k-$20k/month", label: "$5,000 - $20,000 / month" },
+  { value: "$20k+/month", label: "$20,000+ / month" },
+];
 
 const comparison = [
   { feature: "Buyer Processing Fee", standard: "Standard Fee", select: "0% Fee (Save Thousands)" },
@@ -153,15 +160,12 @@ export default function WorkvenceSelectPage() {
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">Estimated Monthly Project Spend</label>
-                <select
+                <CustomSelect
                   value={selectForm.spend}
-                  onChange={(e) => setSelectForm({ ...selectForm, spend: e.target.value })}
-                  className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                >
-                  <option value="$3k-$5k/month">$3,000 - $5,000 / month</option>
-                  <option value="$5k-$20k/month">$5,000 - $20,000 / month</option>
-                  <option value="$20k+/month">$20,000+ / month</option>
-                </select>
+                  onChange={(val) => setSelectForm((prev) => ({ ...prev, spend: val }))}
+                  options={SPEND_OPTIONS}
+                  size="md"
+                />
               </div>
 
               <Button

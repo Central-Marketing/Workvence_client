@@ -20,7 +20,7 @@ import {
   FileText,
 } from "lucide-react";
 import { supportService } from "@/utils/supportService";
-import { Button } from "@/components/ui";
+import { Button, CustomSelect, CustomSelectOption } from "@/components/ui";
 
 const CATEGORIES = [
   { id: "Account & Billing", label: "Account & Billing", icon: UserCheck, desc: "Login issues, profile settings, verification, or invoice questions." },
@@ -218,19 +218,22 @@ export default function CreateSupportTicketPage() {
               If this inquiry is related to a specific buyer or seller order, selecting it helps support agents inspect the order context immediately.
             </p>
 
-            <select
-              value={selectedOrderID}
-              onChange={(e) => setSelectedOrderID(e.target.value)}
+            <CustomSelect
+              size="md"
+              variant="filled"
               disabled={loadingOrders}
-              className="w-full px-4 py-3 rounded-[6px] border border-[#e2e8f0] bg-[#f8fafc] text-xs font-medium text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none cursor-pointer transition font-inter"
-            >
-              <option value="">-- No Order Linked --</option>
-              {orders.map((ord: any) => (
-                <option key={ord.id || ord._id} value={ord.id || ord._id}>
-                  {ord.title || `Order #${String(ord.id || ord._id).substring(0, 6)}`} ({ord.price ? `$${ord.price}` : "Active Order"})
-                </option>
-              ))}
-            </select>
+              options={[
+                { value: "", label: "-- No Order Linked --" },
+                ...orders.map((ord: any) => ({
+                  value: ord.id || ord._id,
+                  label: `${ord.title || `Order #${String(ord.id || ord._id).substring(0, 6)}`} (${ord.price ? `$${ord.price}` : "Active Order"})`,
+                })),
+              ]}
+              value={selectedOrderID}
+              onChange={(val) => setSelectedOrderID(String(val))}
+              placeholder="-- No Order Linked --"
+              ariaLabel="Link to an Order"
+            />
           </div>
 
           {/* 3. Subject and Message */}

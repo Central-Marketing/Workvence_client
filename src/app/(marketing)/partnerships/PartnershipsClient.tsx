@@ -17,7 +17,15 @@ import {
   X
 } from "lucide-react";
 import { Button } from "@/components";
+import { CustomSelect, CustomSelectOption } from "@/components/ui";
 import toast from "react-hot-toast";
+
+const PARTNER_TRACK_OPTIONS: CustomSelectOption[] = [
+  { value: "Agency & Solutions Partners", label: "Agency & Solutions Partners" },
+  { value: "Technology & API Partners", label: "Technology & API Partners" },
+  { value: "Education & Bootcamps", label: "Education & Bootcamps" },
+  { value: "Global Enterprise Resellers", label: "Global Enterprise Resellers" },
+];
 
 const partnerTracks = [
   {
@@ -255,16 +263,12 @@ export default function PartnershipsClient() {
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
                   Partnership Track *
                 </label>
-                <select
+                <CustomSelect
                   value={partnerForm.track}
-                  onChange={(e) => setPartnerForm({ ...partnerForm, track: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] outline-none"
-                >
-                  <option value="Agency & Solutions Partners">Agency & Solutions Partners</option>
-                  <option value="Technology & API Partners">Technology & API Partners</option>
-                  <option value="Education & Bootcamps">Education & Bootcamps</option>
-                  <option value="Global Enterprise Resellers">Global Enterprise Resellers</option>
-                </select>
+                  onChange={(val) => setPartnerForm((prev) => ({ ...prev, track: val }))}
+                  options={PARTNER_TRACK_OPTIONS}
+                  size="md"
+                />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

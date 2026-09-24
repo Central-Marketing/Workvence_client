@@ -12,6 +12,8 @@ import { FcGoogle } from 'react-icons/fc';
 import { MdOutlineEmail } from 'react-icons/md';
 import Image from 'next/image';
 
+import { FaApple } from 'react-icons/fa';
+
 const LoginForm = () => {
   const [formInput, setFormInput] = useState({
     username: '',
@@ -23,8 +25,6 @@ const LoginForm = () => {
   const setUser = useUserStore((state) => state.setUser);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialStep = searchParams?.get('email') ? 2 : 1;
-  const [step, setStep] = useState<1 | 2>(initialStep);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -160,167 +160,151 @@ const LoginForm = () => {
           </Link>
         </div>
 
-        {/* Center Form Content */}
-        {step === 1 ? (
-          <div className="flex flex-col items-center justify-center my-auto w-full max-w-[390px] mx-auto py-8">
-            <p className="text-[14px] text-[#6b7280] mb-2 text-center">
-              Don&apos;t have an account?{' '}
-              <Link href="/register" className="text-[#008364] font-semibold hover:underline">
-                Sign up
-              </Link>
-            </p>
+        {/* Center Form Card */}
+        <div className="w-full max-w-[420px] mx-auto my-auto py-8">
+          <p className="text-[14px] text-[#6b7280] mb-2 text-center">
+            Do not have an account?{' '}
+            <Link href="/register" className="text-[#0D6D5F] font-semibold hover:underline">
+              Sign up
+            </Link>
+          </p>
 
-            <h1 className="text-[28px] sm:text-[32px] font-bold text-[#111827] mb-8 text-center tracking-tight">
-              Sign in to Workvence
-            </h1>
+          <h1 className="text-[28px] sm:text-[32px] font-bold text-[#111827] mb-7 text-center tracking-tight">
+            Sign in to your account
+          </h1>
 
-            <div className="flex flex-col gap-3.5 w-full">
-              {/* <Button
-                data-testid="login-google-btn"
-                type="button"
-                variant="outline"
-                size="lg"
-                fullWidth
-                radius="fiverr"
-                leftIcon={<FcGoogle className="text-[20px]" />}
-                onClick={() => {
-                  const apiUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-                  window.location.href = `${apiUrl}/auth/google`;
-                }}
-                className="font-medium text-[#1f2937] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80"
-              >
-                Continue with Google
-              </Button> */}
+          {/* Social Buttons (2-column grid) */}
+          <div className="grid grid-cols-2 gap-3 w-full mb-6">
+            <button
+              data-testid="login-google-btn"
+              type="button"
+              onClick={() => {
+                const apiUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+                window.location.href = `${apiUrl}/auth/google`;
+              }}
+              className="h-10 sm:h-11 px-3 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs cursor-pointer"
+            >
+              <FcGoogle className="text-lg shrink-0" />
+              <span className="truncate">Continue with Google</span>
+            </button>
 
-              <Button
-                data-testid="login-email-btn"
-                type="button"
-                variant="outline"
-                size="md"
-                fullWidth
-                radius="fiverr"
-                leftIcon={<MdOutlineEmail className="text-[20px] text-[#374151]" />}
-                onClick={() => {
-                  setError(null);
-                  setStep(2);
-                }}
-                className="font-medium text-[#1f2937] shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
-              >
-                Continue with Email
-              </Button>
-            </div>
+            <button
+              data-testid="login-apple-btn"
+              type="button"
+              onClick={() => {
+                toast('Apple sign-in will be available soon.', { icon: '🍎' });
+              }}
+              className="h-10 sm:h-11 px-3 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs cursor-pointer"
+            >
+              <FaApple className="text-lg text-black shrink-0" />
+              <span className="truncate">Continue with Apple</span>
+            </button>
           </div>
-        ) : (
-          /* Step 2: Account Credentials */
-          <div className="flex flex-col my-auto w-full max-w-[420px] mx-auto py-8">
-            <div className="w-full mb-4">
-              <Button
-                data-testid="back-to-step1-btn"
-                type="button"
-                variant="soft"
-                size="xs"
-                radius="fiverr"
-                onClick={() => {
-                  setError(null);
-                  setStep(1);
-                }}
-                className="font-semibold text-[#374151]"
-              >
-                ← Back
-              </Button>
-            </div>
 
-            <form onSubmit={handleFormSubmit} className="flex flex-col items-start w-full">
-              <div className="w-full flex flex-col gap-4">
-                <div>
-                  <h1 className="text-[24px] sm:text-[28px] font-bold text-[#111827] tracking-tight mb-1.5">
-                    Continue with email
-                  </h1>
-                </div>
+          {/* Divider */}
+          <div className="relative flex items-center justify-center w-full mb-6">
+            <div className="w-full border-t border-gray-200/80" />
+            <span className="absolute px-3 bg-[#f8f9fa] text-xs text-gray-500 font-normal">
+              or
+            </span>
+          </div>
 
-                {/* Email or Username Input */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-base font-[510] text-[#292929]">Email or Username</label>
-                  <div className="relative flex items-center">
-                    <input
-                      data-testid="login-username-input"
-                      name="username"
-                      type="text"
-                      placeholder="Enter your email or username"
-                      value={formInput.username}
-                      onChange={handleFormInput}
-                      required
-                      className="w-full py-3 px-3.5 pr-10 border border-gray-200 rounded-[6px] text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500"
-                    />
-                  </div>
-                </div>
-
-                {/* Password Input */}
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-base font-[510] text-[#292929]">Password</label>
-                    <Link
-                      href="/forgot-password"
-                      className="text-xs text-[#6b7280] hover:text-emerald-600 hover:underline transition-colors"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <div className="relative flex items-center">
-                    <input
-                      data-testid="login-password-input"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="***********"
-                      value={formInput.password}
-                      onChange={handleFormInput}
-                      required
-                      className="w-full py-3 px-3.5 pr-11 border border-gray-200 rounded-[6px] text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      radius="full"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 text-[#888] hover:text-[#555] hover:!bg-transparent !p-0 !min-h-0 !h-auto w-auto"
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                      icon={showPassword ? <AiOutlineEyeInvisible className="text-xl" /> : <AiOutlineEye className="text-xl" />}
-                    />
-                  </div>
-
-                  {error && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="flex items-center justify-center w-4 h-4 bg-red-500 text-white rounded-full text-[11px] font-bold shrink-0">
-                        !
-                      </div>
-                      <span className="text-red-500 text-xs font-medium">{error}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Submit Button */}
-                <Button
-                  data-testid="login-submit-btn"
-                  type="submit"
-                  variant="dark"
-                  size="md"
-                  fullWidth
-                  radius="fiverr"
-                  disabled={loading}
-                  isLoading={loading}
-                  rightIcon={<AiOutlineArrowRight className="text-base" />}
-                  className="mt-2 font-semibold shadow-sm"
-                >
-                  Sign In
-                </Button>
+          {/* Credentials Form */}
+          <form onSubmit={handleFormSubmit} className="flex flex-col w-full">
+            <div className="flex flex-col gap-4 w-full">
+              {/* Email Input */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email</label>
+                <input
+                  data-testid="login-username-input"
+                  name="username"
+                  type="text"
+                  placeholder="e.g name@email.com"
+                  value={formInput.username}
+                  onChange={handleFormInput}
+                  required
+                  className="w-full h-11 px-3.5 bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-gray-400 transition-colors outline-none"
+                />
               </div>
-            </form>
-          </div>
-        )}
+
+              {/* Password Input */}
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Password</label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs text-gray-500 hover:text-[#0D6D5F] hover:underline transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="relative flex items-center">
+                  <input
+                    data-testid="login-password-input"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Set Password"
+                    value={formInput.password}
+                    onChange={handleFormInput}
+                    required
+                    className="w-full h-11 px-3.5 pr-11 bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-gray-400 transition-colors outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <AiOutlineEyeInvisible className="text-lg" /> : <AiOutlineEye className="text-lg" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Inline Error */}
+              {error && (
+                <div className="flex items-center gap-2 p-2.5 rounded-[6px] bg-red-50 border border-red-200/80 text-red-600 text-xs font-medium">
+                  <div className="flex items-center justify-center w-4 h-4 bg-red-500 text-white rounded-full text-[10px] font-bold shrink-0">
+                    !
+                  </div>
+                  <span>{error}</span>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                data-testid="login-submit-btn"
+                type="submit"
+                disabled={loading}
+                className="mt-1 w-full h-11 bg-black hover:bg-gray-900 text-white font-medium rounded-[6px] flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer text-sm"
+              >
+                {loading ? (
+                  <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>Get Started</span>
+                    <AiOutlineArrowRight className="text-sm" />
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+
+          {/* Disclaimer Note */}
+          <p className="mt-6 text-center text-[11px] sm:text-xs text-gray-500 leading-relaxed">
+            By joining, you agree to the Workvence{' '}
+            <Link href="/trust-safety" className="text-[#0D6D5F] underline font-medium hover:text-[#0b5c50]">
+              Terms of Service
+            </Link>{' '}
+            and to occasionally receive emails from us. Please read our{' '}
+            <Link href="/trust-safety" className="text-[#0D6D5F] underline font-medium hover:text-[#0b5c50]">
+              Privacy Policy
+            </Link>{' '}
+            to learn how we use your personal data.
+          </p>
+        </div>
 
         {/* Bottom Footer Copyright */}
-        <div className="w-full flex justify-start text-[13px] text-[#6b7280] font-normal pt-6">
+        <div className="w-full flex justify-start text-[13px] text-[#6b7280] font-normal pt-4">
           <p>© 2026 workvence All right reserved</p>
         </div>
       </div>

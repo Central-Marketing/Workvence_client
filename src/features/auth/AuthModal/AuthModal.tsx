@@ -17,6 +17,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
+import { FaApple } from "react-icons/fa";
 import { MdOutlineEmail } from "react-icons/md";
 import { Button } from "@/components/ui";
 import { axiosFetch } from "@/utils";
@@ -43,7 +44,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const setUser = useUserStore((state) => state.setUser);
 
   const [mode, setMode] = useState<"login" | "register">(initialMode);
-  const [loginStep, setLoginStep] = useState<"options" | "email">("options");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -78,7 +78,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setMode(initialMode);
-      setLoginStep("options");
       setError(null);
     }
   }, [isOpen, initialMode]);
@@ -280,10 +279,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
               />
             </Link>
 
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-200 text-xs font-semibold backdrop-blur-md mb-3">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
-              <span>Join Workvence Network</span>
-            </div>
+
 
             <h3 className="text-2xl font-bold font-sf-pro leading-snug tracking-tight text-white">
               Success starts here.
@@ -338,15 +334,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
               height={28}
               className="h-6 w-auto object-contain"
             />
-          </div>
-
-          {/* Mode Switcher Tabs (Fiverr Style) */}
+          </div>          {/* Mode Switcher Tabs (Fiverr Style) */}
           <div className="flex items-center border-b border-gray-100 mb-5 gap-6">
             <button
               type="button"
               onClick={() => {
                 setMode("login");
-                setLoginStep("options");
                 setError(null);
               }}
               className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative ${mode === "login"
@@ -374,17 +367,11 @@ const AuthModal: React.FC<AuthModalProps> = ({
           {/* Title and Description */}
           <div className="mb-4">
             <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-bold text-gray-900 font-sf-pro">
-              {mode === "login"
-                ? loginStep === "email"
-                  ? "Continue with Email"
-                  : "Welcome back"
-                : "Create an account"}
+              {mode === "login" ? "Sign in to your account" : "Create an account"}
             </h2>
             <p className="text-xs sm:text-[13px] text-gray-500 mt-1">
               {mode === "login"
-                ? loginStep === "email"
-                  ? "Enter your email or username to sign in."
-                  : "Welcome back! Please choose your preferred sign-in method."
+                ? "Welcome back! Enter your details to continue."
                 : "Join Workvence to discover project opportunities and submit proposals."}
             </p>
           </div>
@@ -401,85 +388,51 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* SIGN IN FORM */}
           {mode === "login" ? (
-            loginStep === "options" ? (
-              <div className="flex flex-col justify-between flex-1 py-2">
-                <div className="flex flex-col gap-3.5 my-auto w-full py-4">
-                  {/* <Button
-                    data-testid="modal-login-google-btn"
-                    type="button"
-                    variant="outline"
-                    size="lg"
-                    fullWidth
-                    radius="fiverr"
-                    leftIcon={<FcGoogle className="text-[20px]" />}
-                    onClick={handleGoogleAuth}
-                    className="font-medium text-[#1f2937] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80"
-                  >
-                    Continue with Google
-                  </Button> */}
+            <div className="flex flex-col flex-1">
+              {/* Social Buttons (2-column grid) */}
+              <div className="grid grid-cols-2 gap-2.5 w-full mb-3">
+                <button
+                  data-testid="modal-login-google-btn"
+                  type="button"
+                  onClick={handleGoogleAuth}
+                  className="h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer"
+                >
+                  <FcGoogle className="text-base shrink-0" />
+                  <span className="truncate">Continue with Google</span>
+                </button>
 
-                  <Button
-                    data-testid="modal-login-email-btn"
-                    type="button"
-                    variant="outline"
-                    size="md"
-                    fullWidth
-                    radius="fiverr"
-                    leftIcon={<MdOutlineEmail className="text-[20px] text-[#374151]" />}
-                    onClick={() => {
-                      setError(null);
-                      setLoginStep("email");
-                    }}
-                    className="font-medium text-[#1f2937] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80"
-                  >
-                    Continue with Email
-                  </Button>
-                </div>
-
-                {/* Bottom Switch */}
-                <div className="mt-4 text-center text-xs text-gray-500">
-                  Don&apos;t have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode("register");
-                      setError(null);
-                    }}
-                    className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
-                  >
-                    Join now
-                  </button>
-                </div>
+                <button
+                  data-testid="modal-login-apple-btn"
+                  type="button"
+                  onClick={() => toast('Apple sign-in will be available soon.', { icon: '🍎' })}
+                  className="h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer"
+                >
+                  <FaApple className="text-base text-black shrink-0" />
+                  <span className="truncate">Continue with Apple</span>
+                </button>
               </div>
-            ) : (
-              <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3.5 flex-1">
-                <div className="flex items-center -mt-1 mb-0.5">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setError(null);
-                      setLoginStep("options");
-                    }}
-                    className="p-0 h-auto text-xs text-gray-500 hover:text-[#0D6D5F] hover:bg-transparent"
-                  >
-                    ← Back
-                  </Button>
-                </div>
 
+              {/* Divider */}
+              <div className="relative flex items-center justify-center w-full mb-3">
+                <div className="w-full border-t border-gray-200/80" />
+                <span className="absolute px-2.5 bg-white text-[11px] text-gray-400 font-normal">
+                  or
+                </span>
+              </div>
+
+              <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3 flex-1">
                 {/* Email / Username */}
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-700">Email or Username</label>
+                  <label className="text-xs font-semibold text-gray-700">Email</label>
                   <input
                     type="text"
-                    placeholder="Enter email address or username"
+                    placeholder="e.g name@email.com"
                     value={loginInput.identifier}
                     onChange={(e) =>
                       setLoginInput((prev) => ({ ...prev, identifier: e.target.value }))
                     }
                     required
-                    className="w-full px-3.5 py-2.5 sm:py-3 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                    className="w-full px-3.5 py-2.5 bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
                   />
                 </div>
 
@@ -498,45 +451,43 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   <div className="relative flex items-center">
                     <input
                       type={showLoginPassword ? "text" : "password"}
-                      placeholder="••••••••"
+                      placeholder="Set Password"
                       value={loginInput.password}
                       onChange={(e) =>
                         setLoginInput((prev) => ({ ...prev, password: e.target.value }))
                       }
                       required
-                      className="w-full px-3.5 py-2.5 sm:py-3 pr-10 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                      className="w-full px-3.5 py-2.5 pr-10 bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
                     />
-                    <Button
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="icon"
-                      radius="full"
-                      className="absolute right-2.5 text-gray-400 hover:text-gray-600 !p-1 !h-auto !w-auto border-none"
+                      className="absolute right-2.5 text-gray-400 hover:text-gray-600 p-1 flex items-center justify-center cursor-pointer"
                       onClick={() => setShowLoginPassword(!showLoginPassword)}
                       aria-label={showLoginPassword ? "Hide password" : "Show password"}
                     >
                       {showLoginPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </Button>
+                    </button>
                   </div>
                 </div>
 
                 {/* Submit Button */}
-                <Button
+                <button
                   type="submit"
-                  variant="dark"
-                  size="md"
-                  fullWidth
-                  radius="fiverr"
                   disabled={loading}
-                  isLoading={loading}
-                  className="mt-2 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
-                  rightIcon={<ArrowRight className="w-4 h-4" />}
+                  className="mt-1 w-full h-10 bg-black hover:bg-gray-900 text-white font-medium rounded-[6px] flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer text-xs sm:text-sm"
                 >
-                  Sign In
-                </Button>
+                  {loading ? (
+                    <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <span>Get Started</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </button>
 
                 {/* Bottom Switch */}
-                <div className="mt-4 text-center text-xs text-gray-500">
+                <div className="mt-3 text-center text-xs text-gray-500">
                   Don&apos;t have an account?{" "}
                   <button
                     type="button"
@@ -550,7 +501,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   </button>
                 </div>
               </form>
-            )
+            </div>
           ) : (
             /* REGISTER FORM */
             <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-3 flex-1">
@@ -712,7 +663,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   type="button"
                   onClick={() => {
                     setMode("login");
-                    setLoginStep("options");
                     setError(null);
                   }}
                   className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"

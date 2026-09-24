@@ -35,6 +35,7 @@ export function useSearchSuggestions(
   const requestIdRef = useRef(0);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const skipNextQueryRef = useRef(false);
+  const isFirstMountRef = useRef(true);
 
   const clear = useCallback(() => {
     requestIdRef.current++;
@@ -62,6 +63,12 @@ export function useSearchSuggestions(
   }, []);
 
   useEffect(() => {
+    // Prevent dropdown from auto-opening on initial component mount (e.g. when navigating to search page with initial query from URL)
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
+      return;
+    }
+
     // If query change was triggered programmatically (e.g. user selected a suggestion or searched),
     // skip reopening and querying for suggestions
     if (skipNextQueryRef.current) {

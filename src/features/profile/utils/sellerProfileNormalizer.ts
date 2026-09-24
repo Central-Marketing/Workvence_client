@@ -54,6 +54,8 @@ export interface NormalizedSellerProfile {
   onTimeDelivery: string;
   skills: string[];
   localTimeText: string;
+  lastActiveAt?: string | Date | null;
+  isOnline?: boolean;
   categoryName?: string;
   subcategoryName?: string;
   gigs: any[];
@@ -130,6 +132,9 @@ export function normalizeSellerProfile(
   const skills = Array.isArray(sellerObj.skills) && sellerObj.skills.length > 0
     ? sellerObj.skills
     : [];
+
+  const lastActiveAt = sellerObj.lastActiveAt || sellerObj.lastSeen || sellerObj.updatedAt || null;
+  const isOnline = Boolean(sellerObj.isOnline);
 
   // Map gigs with seller details attached so PackageCard renders properly
   let gigs: any[] = [];
@@ -256,7 +261,7 @@ export function normalizeSellerProfile(
   // Format local time
   const now = new Date();
   const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-  const localTimeText = `Online • ${timeStr} local time`;
+  const localTimeText = `${timeStr} local time`;
 
   // Extract real FAQs from user object and from seller packages
   const realFaqs: SellerFaqItem[] = [];
@@ -309,6 +314,8 @@ export function normalizeSellerProfile(
     onTimeDelivery,
     skills,
     localTimeText,
+    lastActiveAt,
+    isOnline,
     categoryName,
     subcategoryName,
     gigs,

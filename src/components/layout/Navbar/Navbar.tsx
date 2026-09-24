@@ -32,7 +32,8 @@ const Navbar = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
-  const { items, isOpen, setIsOpen, isLoading: isSuggestionsLoading, close: closeSuggestions } = useSearchSuggestions(searchQuery, { limit: 8 });
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const { items, isOpen, setIsOpen, isLoading: isSuggestionsLoading, close: closeSuggestions } = useSearchSuggestions(searchQuery, { limit: 5 });
 
   useEffect(() => {
     setIsMounted(true);
@@ -72,7 +73,7 @@ const Navbar = () => {
     if (item.type === 'category') {
       router.push(`/packages?category=${encodeURIComponent((item as SuggestionItem).slug || text)}`);
     } else {
-      router.push(`/packages?search=${encodeURIComponent(text)}`);
+      router.push(`/search?q=${encodeURIComponent(text)}`);
     }
   };
 
@@ -82,14 +83,16 @@ const Navbar = () => {
       if (!isOpen && items.length > 0) {
         setIsOpen(true);
       }
-      const maxIndex = searchQuery.trim() ? items.length : items.length - 1;
+      const displayCount = Math.min(items.length, 5);
+      const maxIndex = searchQuery.trim() ? displayCount : Math.max(0, displayCount - 1);
       setSelectedIndex((prev) => (prev < maxIndex ? prev + 1 : 0));
       return;
     }
 
     if (e.key === "ArrowUp") {
       e.preventDefault();
-      const maxIndex = searchQuery.trim() ? items.length : items.length - 1;
+      const displayCount = Math.min(items.length, 5);
+      const maxIndex = searchQuery.trim() ? displayCount : Math.max(0, displayCount - 1);
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : maxIndex));
       return;
     }
@@ -102,19 +105,23 @@ const Navbar = () => {
     }
 
     if (e.key === "Enter") {
-      if (selectedIndex >= 0 && selectedIndex < items.length) {
+      const displayCount = Math.min(items.length, 5);
+      if (selectedIndex >= 0 && selectedIndex < displayCount) {
         handleSelectSuggestion(items[selectedIndex]);
         return;
       }
-      if (selectedIndex === items.length && searchQuery.trim()) {
-        handleSelectSuggestion({ text: searchQuery.trim(), type: 'query' });
+      if (selectedIndex === displayCount && searchQuery.trim()) {
+        closeSuggestions();
+        setSelectedIndex(-1);
+        searchInputRef.current?.blur();
+        router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
         return;
       }
       if (searchQuery.trim()) {
         closeSuggestions();
         setSelectedIndex(-1);
         searchInputRef.current?.blur();
-        router.push(`/packages?search=${encodeURIComponent(searchQuery.trim())}`);
+        router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       }
     }
   };
@@ -171,6 +178,7 @@ const Navbar = () => {
 
     // Dynamic crossing check for the Featured component on the homepage
     let hasCrossedFeatured = false;
+    const isSearchRoute = pathname === "/search" || pathname.startsWith("/search/");
     if (pathname === "/") {
       const featuredEl = document.getElementById("featured-section");
       if (featuredEl) {
@@ -180,6 +188,15 @@ const Navbar = () => {
       } else {
         hasCrossedFeatured = scrollPos > 650;
       }
+    } else if (isSearchRoute) {
+      const searchHeroEl = document.getElementById("search-hero-section");
+      if (searchHeroEl) {
+        const rect = searchHeroEl.getBoundingClientRect();
+        const navHeight = navRef.current ? navRef.current.offsetHeight : 80;
+        hasCrossedFeatured = rect.bottom <= navHeight;
+      } else {
+        hasCrossedFeatured = scrollPos > 380;
+      }
     } else {
       // Subpages always show search bar as they have no hero featured search
       hasCrossedFeatured = true;
@@ -187,8 +204,8 @@ const Navbar = () => {
 
     setShowSearchBar(hasCrossedFeatured);
 
-    // Suppress category bar completely for seller on all pages, or on /briefs routes
-    if (user?.isSeller || isBriefsRoute) {
+    // Suppress category bar completely for seller on all pages, /briefs routes, or /search route
+    if (user?.isSeller || isBriefsRoute || isSearchRoute) {
       setShowCategoryBar(false);
       return;
     }
@@ -228,9 +245,14 @@ const Navbar = () => {
   // Cleanly close all dropdowns when navigating between pages
   useEffect(() => {
     closeSuggestions();
+    setSelectedIndex(-1);
+    setIsSearchFocused(false);
     setIsProfileDropdownOpen(false);
     setIsCategoryDropdownOpen(false);
     setIsMobileMenuOpen(false);
+    if (pathname === "/search" || pathname.startsWith("/search/")) {
+      setSearchQuery("");
+    }
   }, [pathname, closeSuggestions]);
 
   // Keep --navbar-height CSS variable on :root dynamically synced across all devices and roles
@@ -347,7 +369,11 @@ const Navbar = () => {
                     setSelectedIndex(-1);
                   }}
                   onFocus={() => {
+                    setIsSearchFocused(true);
                     if (items.length > 0) setIsOpen(true);
+                  }}
+                  onBlur={() => {
+                    setTimeout(() => setIsSearchFocused(false), 200);
                   }}
                   onKeyDown={handleSearch}
                 />
@@ -355,10 +381,18 @@ const Navbar = () => {
                 <SearchSuggestionsDropdown
                   items={items}
                   query={searchQuery}
-                  isOpen={isOpen}
+                  isOpen={isOpen && isSearchFocused}
                   isLoading={isSuggestionsLoading}
                   selectedIndex={selectedIndex}
-                  onSelect={handleSelectSuggestion}
+                  onSelect={(item) => {
+                    setIsSearchFocused(false);
+                    handleSelectSuggestion(item);
+                  }}
+                  onSeeMore={(q) => {
+                    setIsSearchFocused(false);
+                    closeSuggestions();
+                    router.push(`/search?q=${encodeURIComponent(q)}`);
+                  }}
                 />
               </div>
             </div>

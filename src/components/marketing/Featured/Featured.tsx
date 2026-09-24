@@ -23,8 +23,212 @@ import {
   BarChart2,
   ShoppingCart,
   Star,
-  Layers
+  Layers,
+  icons,
+  LucideIcon,
 } from 'lucide-react';
+
+// Common aliases mapping backend icon identifiers to Lucide icon component names
+const ICON_ALIASES: Record<string, string> = {
+  bullhorn: 'Megaphone',
+  marketing: 'Megaphone',
+  advertising: 'Megaphone',
+  seo: 'Megaphone',
+  'file-text': 'FileText',
+  filetext: 'FileText',
+  writing: 'FileText',
+  pencil: 'Pencil',
+  music: 'Music',
+  audio: 'Music',
+  sound: 'Music',
+  palette: 'Palette',
+  design: 'Palette',
+  art: 'Palette',
+  database: 'Database',
+  data: 'Database',
+  analytics: 'BarChart2',
+  chart: 'BarChart2',
+  barchart: 'BarChart2',
+  barchart2: 'BarChart2',
+  'bar-chart': 'BarChart2',
+  'bar-chart-2': 'BarChart2',
+  video: 'Film',
+  film: 'Film',
+  animation: 'Film',
+  box: 'Box',
+  '3d': 'Box',
+  ai: 'Sparkles',
+  artificial: 'Sparkles',
+  sparkles: 'Sparkles',
+  brain: 'Brain',
+  code: 'Code',
+  programming: 'Code',
+  development: 'Code',
+  tech: 'Code',
+  web: 'Code',
+  software: 'Code',
+  business: 'Briefcase',
+  consulting: 'Briefcase',
+  briefcase: 'Briefcase',
+  ecommerce: 'ShoppingCart',
+  'e-commerce': 'ShoppingCart',
+  commerce: 'ShoppingCart',
+  shoppingcart: 'ShoppingCart',
+  'shopping-cart': 'ShoppingCart',
+  camera: 'Camera',
+  photo: 'Camera',
+  photography: 'Camera',
+  layers: 'Layers',
+  cpu: 'Cpu',
+};
+
+// Converts 'file-text' or 'bar-chart-2' into PascalCase ('FileText', 'BarChart2')
+const toPascalCase = (str: string): string =>
+  str
+    .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
+    .replace(/^[a-z]/, (c) => c.toUpperCase());
+
+// Dynamically resolves category icons supporting images, URLs, and any Lucide icon name
+const getCategoryIcon = (iconVal?: any, nameStr?: string) => {
+  let iconRaw = '';
+  if (typeof iconVal === 'string') {
+    iconRaw = iconVal.trim();
+  } else if (iconVal && typeof iconVal === 'object') {
+    iconRaw = (iconVal.url || iconVal.name || iconVal.secure_url || iconVal.src || '').trim();
+  }
+  const nameLower = (nameStr || '').toLowerCase();
+
+  // 1. If icon is an image URL (Cloudinary, CDN, HTTP, SVG, local path, etc.)
+  if (
+    iconRaw &&
+    (iconRaw.startsWith('http://') ||
+      iconRaw.startsWith('https://') ||
+      iconRaw.startsWith('/') ||
+      iconRaw.startsWith('data:') ||
+      /\.(svg|png|jpg|jpeg|webp|gif)$/i.test(iconRaw))
+  ) {
+    return (
+      <img
+        src={iconRaw}
+        alt={nameStr || 'Category Icon'}
+        className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain shrink-0"
+      />
+    );
+  }
+
+  // 2. Direct Lucide icon lookup by name / alias / case
+  if (iconRaw) {
+    // Check aliases
+    const alias = ICON_ALIASES[iconRaw.toLowerCase()];
+    if (alias && (icons as Record<string, LucideIcon>)[alias]) {
+      const IconComp = (icons as Record<string, LucideIcon>)[alias];
+      return <IconComp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    }
+
+    // Direct PascalCase check
+    if ((icons as Record<string, LucideIcon>)[iconRaw]) {
+      const IconComp = (icons as Record<string, LucideIcon>)[iconRaw];
+      return <IconComp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    }
+
+    // Converted PascalCase check
+    const pascal = toPascalCase(iconRaw);
+    if ((icons as Record<string, LucideIcon>)[pascal]) {
+      const IconComp = (icons as Record<string, LucideIcon>)[pascal];
+      return <IconComp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    }
+
+    // Case-insensitive / normalized lookup across all Lucide icons
+    const normalized = iconRaw.replace(/[-_\s]/g, '').toLowerCase();
+    const matchedKey = Object.keys(icons).find((k) => k.toLowerCase() === normalized);
+    if (matchedKey && (icons as Record<string, LucideIcon>)[matchedKey]) {
+      const IconComp = (icons as Record<string, LucideIcon>)[matchedKey];
+      return <IconComp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    }
+  }
+
+  // 3. Intelligent keyword fallback based on category name
+  if (nameLower.includes('ai') || nameLower.includes('artificial') || nameLower.includes('machine learning')) {
+    return <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+  }
+  if (
+    nameLower.includes('code') ||
+    nameLower.includes('program') ||
+    nameLower.includes('tech') ||
+    nameLower.includes('web') ||
+    nameLower.includes('develop') ||
+    nameLower.includes('software')
+  ) {
+    return <Code className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+  }
+  if (
+    nameLower.includes('design') ||
+    nameLower.includes('graphic') ||
+    nameLower.includes('art') ||
+    nameLower.includes('creative') ||
+    nameLower.includes('logo') ||
+    nameLower.includes('ui') ||
+    nameLower.includes('ux')
+  ) {
+    return <Palette className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+  }
+  if (
+    nameLower.includes('market') ||
+    nameLower.includes('digital') ||
+    nameLower.includes('seo') ||
+    nameLower.includes('social') ||
+    nameLower.includes('advertis')
+  ) {
+    return <Megaphone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+  }
+  if (
+    nameLower.includes('video') ||
+    nameLower.includes('film') ||
+    nameLower.includes('animat') ||
+    nameLower.includes('editing')
+  ) {
+    return <Film className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+  }
+  if (
+    nameLower.includes('music') ||
+    nameLower.includes('audio') ||
+    nameLower.includes('sound') ||
+    nameLower.includes('voice') ||
+    nameLower.includes('podcast')
+  ) {
+    return <Music className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+  }
+  if (
+    nameLower.includes('writ') ||
+    nameLower.includes('translat') ||
+    nameLower.includes('content') ||
+    nameLower.includes('copywrit')
+  ) {
+    return <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+  }
+  if (
+    nameLower.includes('business') ||
+    nameLower.includes('consult') ||
+    nameLower.includes('finance') ||
+    nameLower.includes('legal')
+  ) {
+    return <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+  }
+  if (
+    nameLower.includes('data') ||
+    nameLower.includes('analyt') ||
+    nameLower.includes('intelligence') ||
+    nameLower.includes('database')
+  ) {
+    return <BarChart2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+  }
+  if (nameLower.includes('commerce') || nameLower.includes('store') || nameLower.includes('shop')) {
+    return <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+  }
+
+  // 4. Default fallback icon
+  return <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+};
 
 interface FeaturedProps {
   videoSrc?: string;
@@ -214,8 +418,9 @@ const Featured = ({
     };
   }, []);
 
-  const { items, isOpen, setIsOpen, isLoading: isSuggestionsLoading, close: closeSuggestions } = useSearchSuggestions(search, { limit: 8 });
+  const { items, isOpen, setIsOpen, isLoading: isSuggestionsLoading, close: closeSuggestions } = useSearchSuggestions(search, { limit: 5 });
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const handleSelectSuggestion = (item: SuggestionItem | { text: string; type: 'query' }) => {
     const text = item.text.trim();
@@ -236,14 +441,16 @@ const Featured = ({
       if (!isOpen && items.length > 0) {
         setIsOpen(true);
       }
-      const maxIndex = search.trim() ? items.length : items.length - 1;
+      const displayCount = Math.min(items.length, 5);
+      const maxIndex = search.trim() ? displayCount : Math.max(0, displayCount - 1);
       setSelectedIndex((prev) => (prev < maxIndex ? prev + 1 : 0));
       return;
     }
 
     if (e.key === "ArrowUp") {
       e.preventDefault();
-      const maxIndex = search.trim() ? items.length : items.length - 1;
+      const displayCount = Math.min(items.length, 5);
+      const maxIndex = search.trim() ? displayCount : Math.max(0, displayCount - 1);
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : maxIndex));
       return;
     }
@@ -256,19 +463,23 @@ const Featured = ({
     }
 
     if (e.key === "Enter") {
-      if (selectedIndex >= 0 && selectedIndex < items.length) {
+      const displayCount = Math.min(items.length, 5);
+      if (selectedIndex >= 0 && selectedIndex < displayCount) {
         handleSelectSuggestion(items[selectedIndex]);
         return;
       }
-      if (selectedIndex === items.length && search.trim()) {
-        handleSelectSuggestion({ text: search.trim(), type: 'query' });
+      if (selectedIndex === displayCount && search.trim()) {
+        closeSuggestions();
+        setSelectedIndex(-1);
+        searchInputRef.current?.blur();
+        router.push(`/search?q=${encodeURIComponent(search.trim())}`);
         return;
       }
       if (search.trim()) {
         closeSuggestions();
         setSelectedIndex(-1);
         searchInputRef.current?.blur();
-        handleSearch();
+        router.push(`/search?q=${encodeURIComponent(search.trim())}`);
       }
     }
   };
@@ -294,56 +505,23 @@ const Featured = ({
   };
 
   // Fetch real categories from backend database
-  const { categoryList: rawCategories } = useAdminCategories();
+  const { categoryList: rawCategories, parentCategories } = useAdminCategories();
 
   const categoryList = useMemo(() => {
-    return rawCategories.map((cat: any) => {
+    const source = parentCategories && parentCategories.length > 0 ? parentCategories : rawCategories;
+    return source.map((cat: any) => {
       if (typeof cat === 'string') {
         const slug = cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
         return { name: cat, slug, icon: '' };
       }
       return {
+        ...cat,
         name: cat.name || cat.title || String(cat),
         slug: cat.slug || (cat.name || cat.title || '').toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-        icon: cat.icon || '',
+        icon: cat.icon || cat.iconUrl || cat.iconName || cat.image || '',
       };
     });
-  }, [rawCategories]);
-
-  const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
-    const iconKey = (iconStr || '').toLowerCase().replace(/[-_]/g, '');
-    const nameKey = (nameStr || '').toLowerCase();
-
-    if (iconKey === 'sparkles' || iconKey === 'ai' || nameKey.includes('ai') || nameKey.includes('artificial')) {
-      return <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
-    }
-    if (iconKey === 'code' || nameKey.includes('program') || nameKey.includes('tech') || nameKey.includes('code') || nameKey.includes('web') || nameKey.includes('develop')) {
-      return <Code className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
-    }
-    if (iconKey === 'palette' || nameKey.includes('design') || nameKey.includes('graphic') || nameKey.includes('art')) {
-      return <Palette className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
-    }
-    if (iconKey === 'music' || nameKey.includes('music') || nameKey.includes('audio') || nameKey.includes('sound')) {
-      return <Music className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
-    }
-    if (iconKey === 'bullhorn' || nameKey.includes('market') || nameKey.includes('digital')) {
-      return <Megaphone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
-    }
-    if (iconKey === 'video' || nameKey.includes('video') || nameKey.includes('animation')) {
-      return <Film className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
-    }
-    if (iconKey === 'briefcase' || nameKey.includes('business') || nameKey.includes('consulting')) {
-      return <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
-    }
-    if (iconKey === 'barchart' || iconKey === 'chart' || nameKey.includes('data') || nameKey.includes('analytics')) {
-      return <BarChart2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
-    }
-    if (iconKey === 'shoppingcart' || nameKey.includes('e-commerce') || nameKey.includes('commerce')) {
-      return <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
-    }
-
-    return <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
-  };
+  }, [rawCategories, parentCategories]);
 
   const displayedCategories = useMemo(() => {
     if (categoryList && categoryList.length >= 4) {
@@ -356,6 +534,10 @@ const Featured = ({
       { name: 'Music Production', slug: 'music-production', icon: 'music' },
     ];
   }, [categoryList]);
+
+  const remainingCategoriesCount = useMemo(() => {
+    return Math.max(0, (categoryList?.length || 0) - displayedCategories.length);
+  }, [categoryList, displayedCategories]);
 
   const filteredCategories = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -458,6 +640,7 @@ const Featured = ({
                       }
                     }}
                     onFocus={() => {
+                      setIsSearchFocused(true);
                       typewriterTlRef.current?.pause();
                       if (searchInputRef.current) {
                         searchInputRef.current.placeholder = "What services are you looking for...";
@@ -465,6 +648,7 @@ const Featured = ({
                       if (items.length > 0) setIsOpen(true);
                     }}
                     onBlur={() => {
+                      setTimeout(() => setIsSearchFocused(false), 200);
                       if (!search) {
                         typewriterTlRef.current?.resume();
                       }
@@ -478,10 +662,18 @@ const Featured = ({
                 <SearchSuggestionsDropdown
                   items={items}
                   query={search}
-                  isOpen={isOpen}
+                  isOpen={isOpen && isSearchFocused}
                   isLoading={isSuggestionsLoading}
                   selectedIndex={selectedIndex}
-                  onSelect={handleSelectSuggestion}
+                  onSelect={(item) => {
+                    setIsSearchFocused(false);
+                    handleSelectSuggestion(item);
+                  }}
+                  onSeeMore={(q) => {
+                    setIsSearchFocused(false);
+                    closeSuggestions();
+                    router.push(`/search?q=${encodeURIComponent(q)}`);
+                  }}
                 />
               </div>
             </div>
@@ -506,7 +698,7 @@ const Featured = ({
                 onClick={() => router.push(`/packages?category=${encodeURIComponent(cat.slug)}`)}
                 className="flex items-center gap-[10px] pl-[10px] pr-[12px] py-[6px] rounded-[4px] bg-white/10 hover:bg-white/20 backdrop-blur-[50px] text-white text-xs sm:text-[13px] font-medium transition-all cursor-pointer active:scale-95"
               >
-                {getCategoryIcon(cat.icon, cat.name)}
+                {getCategoryIcon(cat.icon || cat.iconUrl || cat.iconName, cat.name)}
                 <span>{cat.name}</span>
               </button>
             ))}
@@ -515,7 +707,7 @@ const Featured = ({
               href="/packages"
               className="inline-flex items-center text-white text-xs sm:text-[13px] font-medium underline underline-offset-4 hover:text-white/80 transition-colors ml-1.5 shrink-0 cursor-pointer"
             >
-              More 200+
+              {remainingCategoriesCount > 0 ? `+${remainingCategoriesCount} More` : 'Explore All'}
             </Link>
           </div>
         </div>

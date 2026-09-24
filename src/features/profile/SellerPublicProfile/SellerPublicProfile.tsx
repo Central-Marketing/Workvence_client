@@ -195,6 +195,8 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
               onTimeDelivery={profileData.onTimeDelivery}
               skills={profileData.skills}
               localTimeText={profileData.localTimeText}
+              lastActiveAt={profileData.lastActiveAt}
+              isOnline={profileData.isOnline}
               onContact={handleContact}
               onMessage={handleContact}
               onAnalyzeProfile={handleAnalyzeProfile}

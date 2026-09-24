@@ -1,8 +1,9 @@
 "use client";
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { RiSearchLine } from 'react-icons/ri';
-import { FiFolder, FiCornerDownLeft } from 'react-icons/fi';
+import { FiFolder, FiArrowRight } from 'react-icons/fi';
 import { SuggestionItem } from '@/hooks/useSearchSuggestions';
 
 interface SearchSuggestionsDropdownProps {
@@ -12,6 +13,7 @@ interface SearchSuggestionsDropdownProps {
   isLoading?: boolean;
   selectedIndex: number;
   onSelect: (item: SuggestionItem | { text: string; type: 'query' }) => void;
+  onSeeMore?: (query: string) => void;
   className?: string;
 }
 
@@ -22,11 +24,17 @@ export const SearchSuggestionsDropdown: React.FC<SearchSuggestionsDropdownProps>
   isLoading = false,
   selectedIndex,
   onSelect,
+  onSeeMore,
   className = '',
 }) => {
+  const router = useRouter();
+
   if (!isOpen || !query.trim()) {
     return null;
   }
+
+  // Show at most 5 suggestions as per requirement
+  const displayItems = items.slice(0, 5);
 
   const highlightMatch = (text: string, q: string) => {
     if (!q.trim()) return text;
@@ -46,13 +54,25 @@ export const SearchSuggestionsDropdown: React.FC<SearchSuggestionsDropdownProps>
     );
   };
 
+  const handleSeeMore = () => {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    if (onSeeMore) {
+      onSeeMore(trimmed);
+    } else {
+      router.push(`/search?q=${encodeURIComponent(trimmed)}`);
+    }
+  };
+
+  const isSeeMoreSelected = selectedIndex === displayItems.length;
+
   return (
     <div
       className={`absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-[6px] shadow-xl py-2 z-[70] overflow-hidden text-left animate-in fade-in slide-in-from-top-2 duration-150 ${className}`}
     >
-      {/* Suggestions List */}
+      {/* Suggestions List (maximum 5 items) */}
       <div className="max-h-[340px] overflow-y-auto divide-y divide-gray-50/60">
-        {items.map((item, index) => {
+        {displayItems.map((item, index) => {
           const isSelected = selectedIndex === index;
           const isCategory = item.type === 'category';
 
@@ -88,24 +108,32 @@ export const SearchSuggestionsDropdown: React.FC<SearchSuggestionsDropdownProps>
           );
         })}
 
-        {/* Search for exact query option */}
+        {/* Dedicated "See more" action button */}
         {query.trim() && (
-          <div
-            onMouseDown={(e) => {
-              e.preventDefault();
-              onSelect({ text: query.trim(), type: 'query' });
-            }}
-            className={`px-3.5 py-2.5 flex items-center justify-between cursor-pointer border-t border-gray-100 transition-colors ${
-              selectedIndex === items.length ? 'bg-teal-50/70 text-teal-800 font-semibold' : 'hover:bg-teal-50/50 text-[#327C73]'
-            }`}
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <RiSearchLine className="text-sm shrink-0" />
-              <span className="text-[13px] sm:text-[14px] font-semibold truncate">
-                Search for &ldquo;{query.trim()}&rdquo;
-              </span>
-            </div>
-            <FiCornerDownLeft className="text-xs opacity-60 shrink-0" />
+          <div className="p-2 border-t border-gray-100 bg-gray-50/60">
+            <button
+              type="button"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                handleSeeMore();
+              }}
+              className={`w-full py-2.5 px-3 rounded-[6px] text-xs sm:text-[13px] font-semibold flex items-center justify-between transition-all cursor-pointer ${
+                isSeeMoreSelected
+                  ? 'bg-[#0D6D5F] text-white shadow-sm'
+                  : 'text-[#0D6D5F] hover:bg-emerald-50/80 bg-white border border-gray-200/80 hover:border-emerald-300'
+              }`}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <RiSearchLine className={`text-sm shrink-0 ${isSeeMoreSelected ? 'text-white' : 'text-[#0D6D5F]'}`} />
+                <span className="truncate">
+                  See more results for &ldquo;{query.trim()}&rdquo;
+                </span>
+              </div>
+              <div className={`flex items-center gap-1 text-[11px] font-semibold shrink-0 ml-2 ${isSeeMoreSelected ? 'text-emerald-100' : 'text-[#0D6D5F]'}`}>
+                <span>See more</span>
+                <FiArrowRight className="text-xs" />
+              </div>
+            </button>
           </div>
         )}
       </div>
@@ -114,3 +142,4 @@ export const SearchSuggestionsDropdown: React.FC<SearchSuggestionsDropdownProps>
 };
 
 export default SearchSuggestionsDropdown;
+

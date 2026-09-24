@@ -403,22 +403,75 @@ export default function ProfilePage() {
     }
   };
 
-  // Scroll to section
+  // Scroll to section with sticky header offset
   const scrollToSection = (sectionId: string) => {
     const el = document.getElementById(sectionId);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      const navHeight = typeof window !== "undefined"
+        ? parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navbar-height') || '80', 10)
+        : 80;
+      const stickyTabsHeight = 65;
+      const totalOffset = (isNaN(navHeight) ? 80 : navHeight) + stickyTabsHeight;
+      const elementPosition = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({
+        top: Math.max(0, elementPosition - totalOffset),
+        behavior: "smooth",
+      });
     }
   };
 
   const isSeller = Boolean(user?.isSeller || user?.role === "seller");
 
+  // Sync active section based on scroll position
+  useEffect(() => {
+    const sectionIds = [
+      "section-personal",
+      "section-professional",
+      "section-experience",
+      ...(isSeller ? ["section-portfolio", "section-verification"] : []),
+    ];
+
+    const handleScroll = () => {
+      const navHeight = parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue("--navbar-height") || "80",
+        10
+      );
+      const offset = (isNaN(navHeight) ? 80 : navHeight) + 90;
+      const scrollPos = window.scrollY + offset;
+
+      for (let i = sectionIds.length - 1; i >= 0; i--) {
+        const id = sectionIds[i];
+        const el = document.getElementById(id);
+        if (el && el.offsetTop <= scrollPos) {
+          const rawSec = id.replace("section-", "") as
+            | "personal"
+            | "professional"
+            | "experience"
+            | "portfolio"
+            | "verification";
+          setActiveSection(rawSec);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isSeller]);
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] pt-6 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6">
 
-        {/* Page Title & Navigation Tabs */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-7">
+        {/* Page Title & Navigation Tabs (Sticky) */}
+        <div
+          style={{
+            top: `calc(var(--navbar-height, ${isSeller ? "82px" : "136px"}) + 0px)`,
+          }}
+          className={`sticky z-30 py-2.5 sm:py-3.5 -my-1 bg-[#F8FAFC]/95 backdrop-blur-md transition-[top] duration-200 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+            isSeller ? "top-[74px] md:top-[88px]" : "top-[128px] md:top-[142px]"
+          }`}
+        >
           <div>
             <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
               Edit Profile Settings
@@ -429,7 +482,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Section Pill Tabs */}
-          <div className="bg-white border border-slate-200/80 rounded-[6px] p-1 flex items-center gap-1 self-start md:self-auto overflow-x-auto max-w-full">
+          <div className="bg-white border border-slate-200/80 rounded-[6px] p-1 flex items-center gap-1 self-start md:self-auto overflow-x-auto max-w-full scrollbar-none shadow-xs shrink-0">
             <Button
               type="button"
               size="sm"
@@ -640,7 +693,7 @@ export default function ProfilePage() {
         {/* SECTION 1: PERSONAL INFO */}
         <div
           id="section-personal"
-          className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-6"
+          className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-6 scroll-mt-32 sm:scroll-mt-36"
         >
           <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
             <h2 className="text-base sm:text-lg font-bold text-slate-900">Personal Info</h2>
@@ -719,7 +772,7 @@ export default function ProfilePage() {
         {/* SECTION 2: PROFESSIONAL DETAILS */}
         <div
           id="section-professional"
-          className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-6"
+          className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-6 scroll-mt-32 sm:scroll-mt-36"
         >
           <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
             <h2 className="text-base sm:text-lg font-bold text-slate-900">
@@ -942,7 +995,7 @@ export default function ProfilePage() {
         {/* SECTION 3: EXPERIENCE & EDUCATION */}
         <div
           id="section-experience"
-          className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-7"
+          className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-7 scroll-mt-32 sm:scroll-mt-36"
         >
           <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
             <h2 className="text-base sm:text-lg font-bold text-slate-900">
@@ -1187,7 +1240,7 @@ export default function ProfilePage() {
             {/* SECTION: PORTFOLIO */}
             <div
               id="section-portfolio"
-              className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-7"
+              className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-7 scroll-mt-32 sm:scroll-mt-36"
             >
               <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
                 <div>
@@ -1482,7 +1535,7 @@ export default function ProfilePage() {
             {/* SECTION: ID VERIFICATION */}
             <div
               id="section-verification"
-              className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-7"
+              className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-7 scroll-mt-32 sm:scroll-mt-36"
             >
               <div className="pb-5 border-b border-slate-100 mb-6">
                 <h2 className="text-base sm:text-lg font-bold text-slate-900">ID Verification</h2>

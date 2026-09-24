@@ -254,7 +254,7 @@ export default function BuyerOrdersPage() {
                 </p>
                 <p className="text-xs text-slate-400 mt-1">Across all {totalOrdersCount} placed orders</p>
               </div>
-              <div className="w-12 h-12 rounded-[6px] border border-[#FFE8D1] bg-[#FFF9F2] flex items-center justify-center text-[#E07A24] shrink-0">
+              <div className="w-12 h-12 rounded-[6px] border border-[rgba(0, 0, 0, 0.10)] bg-[#fff] flex items-center justify-center text-[#E07A24] shrink-0">
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
                   <path d="M16 8l-5 5" />
@@ -274,7 +274,7 @@ export default function BuyerOrdersPage() {
                 </p>
                 <p className="text-xs text-slate-400 mt-1">Currently in progress</p>
               </div>
-              <div className="w-12 h-12 rounded-[6px] border border-[#F0DCFF] bg-[#FBF5FF] flex items-center justify-center text-[#9747FF] shrink-0">
+              <div className="w-12 h-12 rounded-[6px] border border-[rgba(0, 0, 0, 0.10)] bg-[#fff] flex items-center justify-center text-[#9747FF] shrink-0">
                 <FiPackage className="text-2xl" />
               </div>
             </div>
@@ -288,7 +288,7 @@ export default function BuyerOrdersPage() {
                 </p>
                 <p className="text-xs text-slate-400 mt-1">Packages successfully closed</p>
               </div>
-              <div className="w-12 h-12 rounded-[6px] border border-[#CCFBF1] bg-[#F0FDFB] flex items-center justify-center text-[#0D9488] shrink-0">
+              <div className="w-12 h-12 rounded-[6px] border border-[rgba(0, 0, 0, 0.10)] bg-[#fff] flex items-center justify-center text-[#0D9488] shrink-0">
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
                   <line x1="3" y1="6" x2="21" y2="6" />
@@ -319,7 +319,7 @@ export default function BuyerOrdersPage() {
                   {favGigsCount} packages and {favSellersCount} sellers saved
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-[6px] border border-[#FFE0E0] bg-[#FFF5F5] group-hover:bg-[#FFEBEB] flex items-center justify-center text-[#EF4444] shrink-0 transition-colors">
+              <div className="w-12 h-12 rounded-[6px] border border-[rgba(0, 0, 0, 0.10)] bg-[#fff] group-hover:bg-[#FFEBEB] flex items-center justify-center text-[#EF4444] shrink-0 transition-colors">
                 <FiHeart className="text-2xl" />
               </div>
             </Link>
@@ -337,16 +337,7 @@ export default function BuyerOrdersPage() {
               <h2 className="text-xl font-bold text-slate-900 ">
                 Recent Orders
               </h2>
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                radius="xl"
-                aria-label="Filter by date"
-                className="w-10 h-10 min-h-[40px] text-slate-600 shadow-xs"
-              >
-                <FiCalendar className="text-base" />
-              </Button>
+
             </div>
 
             <div className="flex items-center gap-5 justify-between sm:justify-end">

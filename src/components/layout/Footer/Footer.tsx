@@ -60,6 +60,7 @@ const staticFooterColumns: FooterColumn[] = [
     links: [
       { name: "Help & Support", href: "/help-center" },
       { name: "Trust & Safety", href: "/trust-safety" },
+      { name: "How Escrow Works", href: "/how-escrow-works" },
       { name: "Selling on Workvence", href: "/how-to-sell" },
       { name: "Buying on Workvence", href: "/how-to-buy" },
     ]

@@ -792,9 +792,18 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                 </div>
               </div>
 
-              <div className="pt-4 flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50/70 p-3 rounded-[6px] border border-emerald-100">
-                <FiCheck className="text-base shrink-0" />
-                <span>Payment held safely in escrow until you approve the work.</span>
+              <div className="pt-4 flex items-center justify-between gap-2 text-xs text-emerald-700 bg-emerald-50/70 p-3 rounded-[6px] border border-emerald-100">
+                <div className="flex items-center gap-2">
+                  <FiCheck className="text-base shrink-0" />
+                  <span>Payment held safely in escrow until you approve the work.</span>
+                </div>
+                <Link
+                  href="/how-escrow-works"
+                  target="_blank"
+                  className="font-medium underline hover:text-emerald-900 shrink-0 text-[11px] ml-1"
+                >
+                  Learn how
+                </Link>
               </div>
             </div>
 

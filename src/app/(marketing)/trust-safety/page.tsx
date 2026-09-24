@@ -1,5 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Trust & Safety | Workvence",
@@ -111,6 +112,17 @@ export default function TrustSafetyPage() {
                 <p className="mt-5 font-inter font-normal text-[#6E6E6E] text-sm sm:text-[15px] md:text-[16px] leading-[22px] max-w-[460px]">
                   {section.description}
                 </p>
+                {section.id === "secure-payments" && (
+                  <div className="mt-5">
+                    <Link
+                      href="/how-escrow-works"
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#0D6D5F] hover:text-[#0b5c50] transition-colors"
+                    >
+                      <span>How Escrow Works</span>
+                      <span aria-hidden="true">→</span>
+                    </Link>
+                  </div>
+                )}
               </div>
 
               {/* Right Column: Image Card */}

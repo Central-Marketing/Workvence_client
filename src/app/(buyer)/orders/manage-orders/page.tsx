@@ -24,7 +24,7 @@ export default function BuyerManageOrdersPage() {
   const user = useUserStore((state) => state.user);
 
   // Tab filter states
-  type TabType = "Priority" | "Active" | "Late" | "Delivered" | "Completed" | "Cancelled" | "Starred";
+  type TabType = "Priority" | "Active" | "Late" | "Delivered" | "Completed" | "Cancelled";
   const [activeTab, setActiveTab] = useState<TabType>("Priority");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -103,7 +103,6 @@ export default function BuyerManageOrdersPage() {
         notes: order.notes || order.instructions || "",
         price: Number(order.price) || 0,
         status,
-        starred: Boolean(order.starred),
       };
     });
   }, [buyerOrders]);
@@ -135,9 +134,7 @@ export default function BuyerManageOrdersPage() {
       if (activeTab === "Late") {
         return order.status === "late";
       }
-      if (activeTab === "Starred") {
-        return Boolean(order.starred);
-      }
+
       // Priority (default view: show all)
       return true;
     });
@@ -269,7 +266,7 @@ export default function BuyerManageOrdersPage() {
 
             {/* Pill Tabs */}
             <div className="bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 inline-flex items-center h-[46px] overflow-x-auto scrollbar-none max-w-full">
-              {(["Priority", "Active", "Late", "Delivered", "Completed", "Cancelled", "Starred"] as const).map((tab) => (
+              {(["Priority", "Active", "Late", "Delivered", "Completed", "Cancelled"] as const).map((tab) => (
                 <Button
                   key={tab}
                   type="button"

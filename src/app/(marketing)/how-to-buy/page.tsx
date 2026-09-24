@@ -20,7 +20,8 @@ const buyerGuarantees = [
   {
     icon: Lock,
     title: "100% Escrow Payment Protection",
-    desc: "Your payment is held safely in escrow. Sellers only get paid when you review, test, and approve the deliverable."
+    desc: "Your payment is held safely in escrow. Sellers only get paid when you review, test, and approve the deliverable.",
+    href: "/how-escrow-works",
   },
   {
     icon: Star,
@@ -178,6 +179,15 @@ export default function HowToBuyPage() {
                   </div>
                   <h3 className="text-xl font-bold text-[#0f172a]">{g.title}</h3>
                   <p className="text-sm text-gray-600 leading-relaxed">{g.desc}</p>
+                  {"href" in g && g.href && (
+                    <Link
+                      href={g.href}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#327C73] hover:text-[#235851] pt-1"
+                    >
+                      <span>Learn how escrow works</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  )}
                 </div>
               );
             })}

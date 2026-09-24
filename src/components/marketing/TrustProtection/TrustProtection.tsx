@@ -52,7 +52,7 @@ const TrustProtection = () => {
 
               <div>
                 <Button
-                  href="/faq"
+                  href="/how-escrow-works"
                   variant="dark"
                   size="md"
                   radius="fiverr"

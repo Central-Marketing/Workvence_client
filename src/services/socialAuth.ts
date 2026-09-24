@@ -132,10 +132,17 @@ export const loadAppleSDK = (): Promise<void> => {
 /**
  * Send Google ID Token to NestJS backend
  */
-export const exchangeGoogleToken = async (idToken: string): Promise<SocialAuthResponse> => {
-  const { data } = await axiosFetch.post<SocialAuthResponse>("/auth/google", {
+export const exchangeGoogleToken = async (
+  idToken: string,
+  isSeller?: boolean
+): Promise<SocialAuthResponse> => {
+  const payload: { idToken: string; isSeller?: boolean } = {
     idToken,
-  });
+  };
+  if (isSeller) {
+    payload.isSeller = true;
+  }
+  const { data } = await axiosFetch.post<SocialAuthResponse>("/auth/google", payload);
   return data;
 };
 
@@ -144,9 +151,14 @@ export const exchangeGoogleToken = async (idToken: string): Promise<SocialAuthRe
  */
 export const exchangeAppleToken = async (
   idToken: string,
-  user?: { firstName?: string; lastName?: string }
+  user?: { firstName?: string; lastName?: string },
+  isSeller?: boolean
 ): Promise<SocialAuthResponse> => {
-  const payload: { idToken: string; user?: { firstName?: string; lastName?: string } } = {
+  const payload: {
+    idToken: string;
+    user?: { firstName?: string; lastName?: string };
+    isSeller?: boolean;
+  } = {
     idToken,
   };
 
@@ -157,6 +169,10 @@ export const exchangeAppleToken = async (
     };
   }
 
+  if (isSeller) {
+    payload.isSeller = true;
+  }
+
   const { data } = await axiosFetch.post<SocialAuthResponse>("/auth/apple", payload);
   return data;
 };
@@ -164,7 +180,7 @@ export const exchangeAppleToken = async (
 /**
  * Initialize and trigger Apple Sign-in Popup
  */
-export const signInWithApple = async (): Promise<SocialAuthResponse> => {
+export const signInWithApple = async (isSeller?: boolean): Promise<SocialAuthResponse> => {
   await loadAppleSDK();
 
   if (!window.AppleID?.auth) {
@@ -196,7 +212,7 @@ export const signInWithApple = async (): Promise<SocialAuthResponse> => {
       }
     : undefined;
 
-  return exchangeAppleToken(idToken, user);
+  return exchangeAppleToken(idToken, user, isSeller);
 };
 
 export { GOOGLE_CLIENT_ID, APPLE_CLIENT_ID };

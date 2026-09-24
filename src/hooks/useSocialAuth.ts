@@ -127,7 +127,7 @@ export function useSocialAuth() {
             }
             try {
               setLoadingProvider("google");
-              const data = await exchangeGoogleToken(response.credential);
+              const data = await exchangeGoogleToken(response.credential, options?.isSeller);
               handleSuccess(data, options);
             } catch (err) {
               handleError(err);
@@ -179,7 +179,7 @@ export function useSocialAuth() {
             }
 
             try {
-              const data = await exchangeGoogleToken(response.credential);
+              const data = await exchangeGoogleToken(response.credential, options?.isSeller);
               handleSuccess(data, options);
             } catch (err) {
               handleError(err);
@@ -217,7 +217,7 @@ export function useSocialAuth() {
       setLoadingProvider("apple");
 
       try {
-        const data = await signInWithApple();
+        const data = await signInWithApple(options?.isSeller);
         handleSuccess(data, options);
       } catch (err: any) {
         handleError(err);

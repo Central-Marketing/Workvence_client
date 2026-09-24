@@ -196,7 +196,7 @@ const LoginForm = () => {
                 type="button"
                 onClick={() => handleGoogleLogin()}
                 disabled={loading || !!loadingProvider}
-                className="w-full h-10 sm:h-11 px-3 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full h-10 px-3 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loadingProvider === 'google' ? (
                   <span className="inline-block w-4 h-4 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
@@ -216,7 +216,7 @@ const LoginForm = () => {
               type="button"
               onClick={() => handleAppleLogin()}
               disabled={loading || !!loadingProvider}
-              className="h-10 sm:h-11 px-3 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              className="h-10 px-3 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loadingProvider === 'apple' ? (
                 <span className="inline-block w-4 h-4 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
@@ -249,7 +249,7 @@ const LoginForm = () => {
                   value={formInput.username}
                   onChange={handleFormInput}
                   required
-                  className="w-full h-11 px-3.5 bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-gray-400 transition-colors outline-none"
+                  className="w-full h-10 px-3.5 bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-gray-400 transition-colors outline-none"
                 />
               </div>
 
@@ -273,7 +273,7 @@ const LoginForm = () => {
                     value={formInput.password}
                     onChange={handleFormInput}
                     required
-                    className="w-full h-11 px-3.5 pr-11 bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-gray-400 transition-colors outline-none"
+                    className="w-full h-10 px-3.5 pr-11 bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-gray-400 transition-colors outline-none"
                   />
                   <button
                     type="button"
@@ -301,7 +301,7 @@ const LoginForm = () => {
                 data-testid="login-submit-btn"
                 type="submit"
                 disabled={loading}
-                className="mt-1 w-full h-11 bg-black hover:bg-gray-900 text-white font-medium rounded-[6px] flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer text-sm"
+                className="mt-1 w-full h-10 bg-black hover:bg-gray-900 text-white font-medium rounded-[6px] flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer text-sm"
               >
                 {loading ? (
                   <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

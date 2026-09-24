@@ -1,15 +1,17 @@
 "use client";
 
 import toast from 'react-hot-toast';
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { axiosFetch, generateImageURL } from '@/utils';
 import { Button } from '@/components/ui';
 import { FcGoogle } from 'react-icons/fc';
+import { FaApple } from 'react-icons/fa';
 import { MdOutlineEmail } from 'react-icons/md';
 import { AiOutlineEye, AiOutlineEyeInvisible, AiOutlineCheckCircle, AiOutlineArrowRight } from 'react-icons/ai';
 import Image from 'next/image';
+import { useSocialAuth } from '@/hooks/useSocialAuth';
 
 const RegisterContent = () => {
   const router = useRouter();
@@ -18,6 +20,14 @@ const RegisterContent = () => {
   const initialStep = searchParams.get('step') ? Number(searchParams.get('step')) : 1;
   const initialEmail = searchParams.get('email') || "";
   const isSellerParam = searchParams.get('seller') === 'true';
+
+  const {
+    loadingProvider,
+    handleGoogleLogin,
+    handleAppleLogin,
+    renderGoogleButton,
+  } = useSocialAuth();
+  const registerGoogleBtnRef = useRef<HTMLDivElement>(null);
 
   const [step, setStep] = useState(initialStep);
   const [image, setImage] = useState<File | null>(null);
@@ -52,6 +62,14 @@ const RegisterContent = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    if (step === 1 && registerGoogleBtnRef.current) {
+      renderGoogleButton(registerGoogleBtnRef.current, {
+        isSeller: isSellerParam,
+      });
+    }
+  }, [step, renderGoogleButton, isSellerParam]);
 
   // Backward compatibility: forward to /verify-email if step 3 is accessed directly
   useEffect(() => {
@@ -256,22 +274,53 @@ const RegisterContent = () => {
             </h1>
 
             <div className="flex flex-col gap-3.5 w-full">
-              {/* <Button
-                data-testid="continue-google-btn"
+              <div className="relative w-full">
+                <Button
+                  data-testid="continue-google-btn"
+                  type="button"
+                  variant="outline"
+                  size="md"
+                  fullWidth
+                  radius="fiverr"
+                  disabled={loading || !!loadingProvider}
+                  leftIcon={
+                    loadingProvider === 'google' ? (
+                      <span className="inline-block w-4 h-4 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
+                    ) : (
+                      <FcGoogle className="text-[20px]" />
+                    )
+                  }
+                  onClick={() => handleGoogleLogin({ isSeller: isSellerParam })}
+                  className="font-medium text-[#1f2937] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80 cursor-pointer"
+                >
+                  Continue with Google
+                </Button>
+                <div
+                  ref={registerGoogleBtnRef}
+                  className="absolute inset-0 overflow-hidden opacity-[0.0001] cursor-pointer pointer-events-auto [&>div]:!w-full [&>div]:!h-full [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!scale-150"
+                />
+              </div>
+
+              <Button
+                data-testid="continue-apple-btn"
                 type="button"
                 variant="outline"
-                size="lg"
+                size="md"
                 fullWidth
                 radius="fiverr"
-                leftIcon={<FcGoogle className="text-[20px]" />}
-                onClick={() => {
-                  const apiUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-                  window.location.href = `${apiUrl}/auth/google`;
-                }}
-                className="font-medium text-[#1f2937] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80"
+                disabled={loading || !!loadingProvider}
+                leftIcon={
+                  loadingProvider === 'apple' ? (
+                    <span className="inline-block w-4 h-4 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
+                  ) : (
+                    <FaApple className="text-[20px] text-black" />
+                  )
+                }
+                onClick={() => handleAppleLogin({ isSeller: isSellerParam })}
+                className="font-medium text-[#1f2937] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:bg-gray-50/80 cursor-pointer"
               >
-                Continue with Google
-              </Button> */}
+                Continue with Apple
+              </Button>
 
               <Button
                 data-testid="continue-email-btn"

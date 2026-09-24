@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,6 +22,7 @@ import { MdOutlineEmail } from "react-icons/md";
 import { Button } from "@/components/ui";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
+import { useSocialAuth } from "@/hooks/useSocialAuth";
 
 export interface AuthModalProps {
   isOpen: boolean;
@@ -47,12 +48,47 @@ const AuthModal: React.FC<AuthModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleGoogleAuth = () => {
-    const apiUrl =
-      process.env.NEXT_PUBLIC_SERVER_API_URL ||
-      process.env.NEXT_PUBLIC_API_URL ||
-      "http://localhost:8080/api";
-    window.location.href = `${apiUrl}/auth/google`;
+  const {
+    loadingProvider,
+    handleGoogleLogin,
+    handleAppleLogin,
+    renderGoogleButton,
+  } = useSocialAuth();
+  const modalGoogleBtnRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen && mode === "login" && modalGoogleBtnRef.current) {
+      renderGoogleButton(modalGoogleBtnRef.current, {
+        onSuccess: (u) => {
+          onSuccess?.(u);
+          onClose();
+          if (redirectUrl) {
+            router.push(redirectUrl);
+          }
+        },
+        redirectUrl,
+        isSeller: defaultIsSeller,
+      });
+    }
+  }, [isOpen, mode, renderGoogleButton, onSuccess, onClose, redirectUrl, defaultIsSeller, router]);
+
+  const onSocialAuthClick = (provider: "google" | "apple") => {
+    const options = {
+      onSuccess: (u: any) => {
+        onSuccess?.(u);
+        onClose();
+        if (redirectUrl) {
+          router.push(redirectUrl);
+        }
+      },
+      redirectUrl,
+      isSeller: defaultIsSeller,
+    };
+    if (provider === "google") {
+      handleGoogleLogin(options);
+    } else {
+      handleAppleLogin(options);
+    }
   };
 
   // Login Form State
@@ -391,23 +427,39 @@ const AuthModal: React.FC<AuthModalProps> = ({
             <div className="flex flex-col flex-1">
               {/* Social Buttons (2-column grid) */}
               <div className="grid grid-cols-2 gap-2.5 w-full mb-3">
-                <button
-                  data-testid="modal-login-google-btn"
-                  type="button"
-                  onClick={handleGoogleAuth}
-                  className="h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer"
-                >
-                  <FcGoogle className="text-base shrink-0" />
-                  <span className="truncate">Continue with Google</span>
-                </button>
+                <div className="relative">
+                  <button
+                    data-testid="modal-login-google-btn"
+                    type="button"
+                    onClick={() => onSocialAuthClick("google")}
+                    disabled={loading || !!loadingProvider}
+                    className="w-full h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {loadingProvider === "google" ? (
+                      <span className="inline-block w-3.5 h-3.5 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
+                    ) : (
+                      <FcGoogle className="text-base shrink-0" />
+                    )}
+                    <span className="truncate">Continue with Google</span>
+                  </button>
+                  <div
+                    ref={modalGoogleBtnRef}
+                    className="absolute inset-0 overflow-hidden opacity-[0.0001] cursor-pointer pointer-events-auto [&>div]:!w-full [&>div]:!h-full [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!scale-150"
+                  />
+                </div>
 
                 <button
                   data-testid="modal-login-apple-btn"
                   type="button"
-                  onClick={() => toast('Apple sign-in will be available soon.', { icon: '🍎' })}
-                  className="h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer"
+                  onClick={() => onSocialAuthClick("apple")}
+                  disabled={loading || !!loadingProvider}
+                  className="h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <FaApple className="text-base text-black shrink-0" />
+                  {loadingProvider === "apple" ? (
+                    <span className="inline-block w-3.5 h-3.5 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
+                  ) : (
+                    <FaApple className="text-base text-black shrink-0" />
+                  )}
                   <span className="truncate">Continue with Apple</span>
                 </button>
               </div>

@@ -1,11 +1,12 @@
 "use client";
 
 import toast from 'react-hot-toast';
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { axiosFetch } from '@/utils';
 import { useUserStore } from '@/store/userStore';
+import { useSocialAuth } from '@/hooks/useSocialAuth';
 import { Button } from '@/components/ui';
 import { AiOutlineEye, AiOutlineEyeInvisible, AiOutlineArrowRight } from 'react-icons/ai';
 import { FcGoogle } from 'react-icons/fc';
@@ -15,6 +16,14 @@ import Image from 'next/image';
 import { FaApple } from 'react-icons/fa';
 
 const LoginForm = () => {
+  const {
+    loadingProvider,
+    handleGoogleLogin,
+    handleAppleLogin,
+    renderGoogleButton,
+  } = useSocialAuth();
+  const googleBtnRef = useRef<HTMLDivElement>(null);
+
   const [formInput, setFormInput] = useState({
     username: '',
     password: ''
@@ -55,6 +64,12 @@ const LoginForm = () => {
       window.location.href = safe;
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (googleBtnRef.current) {
+      renderGoogleButton(googleBtnRef.current);
+    }
+  }, [renderGoogleButton]);
 
   const handleFormInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = event.target;
@@ -175,28 +190,39 @@ const LoginForm = () => {
 
           {/* Social Buttons (2-column grid) */}
           <div className="grid grid-cols-2 gap-3 w-full mb-6">
-            <button
-              data-testid="login-google-btn"
-              type="button"
-              onClick={() => {
-                const apiUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-                window.location.href = `${apiUrl}/auth/google`;
-              }}
-              className="h-10 sm:h-11 px-3 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs cursor-pointer"
-            >
-              <FcGoogle className="text-lg shrink-0" />
-              <span className="truncate">Continue with Google</span>
-            </button>
+            <div className="relative">
+              <button
+                data-testid="login-google-btn"
+                type="button"
+                onClick={() => handleGoogleLogin()}
+                disabled={loading || !!loadingProvider}
+                className="w-full h-10 sm:h-11 px-3 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loadingProvider === 'google' ? (
+                  <span className="inline-block w-4 h-4 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
+                ) : (
+                  <FcGoogle className="text-lg shrink-0" />
+                )}
+                <span className="truncate">Continue with Google</span>
+              </button>
+              <div
+                ref={googleBtnRef}
+                className="absolute inset-0 overflow-hidden opacity-[0.0001] cursor-pointer pointer-events-auto [&>div]:!w-full [&>div]:!h-full [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!scale-150"
+              />
+            </div>
 
             <button
               data-testid="login-apple-btn"
               type="button"
-              onClick={() => {
-                toast('Apple sign-in will be available soon.', { icon: '🍎' });
-              }}
-              className="h-10 sm:h-11 px-3 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs cursor-pointer"
+              onClick={() => handleAppleLogin()}
+              disabled={loading || !!loadingProvider}
+              className="h-10 sm:h-11 px-3 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <FaApple className="text-lg text-black shrink-0" />
+              {loadingProvider === 'apple' ? (
+                <span className="inline-block w-4 h-4 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
+              ) : (
+                <FaApple className="text-lg text-black shrink-0" />
+              )}
               <span className="truncate">Continue with Apple</span>
             </button>
           </div>
@@ -281,7 +307,7 @@ const LoginForm = () => {
                   <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>
-                    <span>Get Started</span>
+                    <span>Sign in</span>
                     <AiOutlineArrowRight className="text-sm" />
                   </>
                 )}

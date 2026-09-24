@@ -5,10 +5,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { FiArrowLeft, FiArrowRight, FiCheckCircle } from "react-icons/fi";
 import { Button } from "@/components/ui";
+import { Loader } from "@/components";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { PackageCard } from "@/features/gigs";
 import { calculateProfileCompletion } from "../utils/dashboardNormalizer";
+import { BuyerDashboardOrdersView } from "./components/BuyerDashboardOrdersView";
 
 interface BuyerDashboardProps {
   user: any;
@@ -45,6 +47,31 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
     },
     staleTime: 60000,
   });
+
+  // 3. Fetch Buyer Orders
+  const { data: apiOrders = [], isLoading: isOrdersLoading } = useQuery({
+    queryKey: ["orders"],
+    queryFn: async () => {
+      try {
+        const { data } = await axiosFetch.get("/orders");
+        return Array.isArray(data) ? data : data?.orders || [];
+      } catch {
+        return [];
+      }
+    },
+    staleTime: 60000,
+  });
+
+  const buyerOrders = React.useMemo(() => {
+    if (!apiOrders || !Array.isArray(apiOrders)) return [];
+    if (!user?._id) return apiOrders;
+    return apiOrders.filter((order: any) => {
+      const buyerId = typeof order.buyerID === "object" ? order.buyerID?._id : order.buyerID;
+      return String(buyerId) === String(user._id);
+    });
+  }, [apiOrders, user]);
+
+  const hasOrders = buyerOrders.length > 0;
 
   const recommendedList = React.useMemo(() => {
     if (Array.isArray(recommendedData)) return recommendedData;
@@ -138,50 +165,58 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
           </div>
         </div>
 
-        {/* Hero Card: Start Your Journey */}
-        <div className="bg-white border border-gray-100 rounded-[6px] p-8 sm:p-12 md:p-14 text-center shadow-[0_2px_14px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center">
-          {/* Illustration */}
-          <div className="relative w-36 h-24 mb-4 flex items-center justify-center">
-            <Image
-              src="/images/mock-dashboard/hero-journey.png"
-              alt="Start Your Journey"
-              width={140}
-              height={90}
-              className="object-contain"
-              priority
-              unoptimized
-            />
+        {/* Orders Overview (if buyer has placed orders) or Start Your Journey (if no orders) */}
+        {isOrdersLoading ? (
+          <div className="bg-white border border-gray-100 rounded-[6px] p-12 text-center shadow-[0_2px_14px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center min-h-[220px]">
+            <Loader size={36} />
           </div>
+        ) : hasOrders ? (
+          <BuyerDashboardOrdersView user={user} orders={buyerOrders} />
+        ) : (
+          <div className="bg-white border border-gray-100 rounded-[6px] p-8 sm:p-12 md:p-14 text-center shadow-[0_2px_14px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center">
+            {/* Illustration */}
+            <div className="relative w-36 h-24 mb-4 flex items-center justify-center">
+              <Image
+                src="/images/mock-dashboard/hero-journey.png"
+                alt="Start Your Journey"
+                width={140}
+                height={90}
+                className="object-contain"
+                priority
+                unoptimized
+              />
+            </div>
 
-          {/* Text Content */}
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-2.5">
-            Start Your Journey
-          </h2>
-          <p className="text-gray-500 text-sm sm:text-[15px] font-normal max-w-lg mx-auto mb-8 leading-relaxed">
-            Explore projects, connect with talented freelancers, and discover everything WorkVenc has to offer.
-          </p>
+            {/* Text Content */}
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-2.5">
+              Start Your Journey
+            </h2>
+            <p className="text-gray-500 text-sm sm:text-[15px] font-normal max-w-lg mx-auto mb-8 leading-relaxed">
+              Explore projects, connect with talented freelancers, and discover everything WorkVenc has to offer.
+            </p>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-3.5">
-            <Button
-              href="/briefs"
-              variant="soft"
-              size="md"
-              radius="fiverr"
-              className="bg-[#EFEFEF] hover:bg-gray-200 text-gray-800"
-            >
-              Explore Projects
-            </Button>
-            <Button
-              href="/packages?category=ai-services"
-              variant="dark"
-              size="md"
-              radius="fiverr"
-            >
-              Browse Packages
-            </Button>
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center justify-center gap-3.5">
+              <Button
+                href="/briefs"
+                variant="soft"
+                size="md"
+                radius="fiverr"
+                className="bg-[#EFEFEF] hover:bg-gray-200 text-gray-800"
+              >
+                Explore Projects
+              </Button>
+              <Button
+                href="/packages?category=ai-services"
+                variant="dark"
+                size="md"
+                radius="fiverr"
+              >
+                Browse Packages
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Section 1: Recommended for You */}
         <section>

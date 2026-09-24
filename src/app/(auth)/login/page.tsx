@@ -167,8 +167,8 @@ const LoginForm = () => {
             <Image
               src="/Workvence-logo-Horizontal3.png"
               alt="Workvence"
-              width={145}
-              height={36}
+              width={209}
+              height={44}
               className="h-8 md:h-9 w-auto object-contain"
               priority
             />

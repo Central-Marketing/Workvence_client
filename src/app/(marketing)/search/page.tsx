@@ -524,11 +524,10 @@ function SearchPageContent() {
             <button
               type="button"
               onClick={() => handleCategorySelect("")}
-              className={`flex items-center gap-[8px] pl-[12px] pr-[14px] py-[6px] rounded-[4px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer active:scale-95 ${
-                !selectedCategory
+              className={`flex items-center gap-[8px] pl-[12px] pr-[14px] py-[6px] rounded-[4px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer active:scale-95 ${!selectedCategory
                   ? "bg-[#0D6D5F] text-white shadow-sm ring-1 ring-emerald-400/50"
                   : "bg-white/10 hover:bg-white/20 backdrop-blur-[50px] text-white"
-              }`}
+                }`}
             >
               <Layers className="w-3.5 h-3.5 shrink-0" />
               <span>All</span>
@@ -542,11 +541,10 @@ function SearchPageContent() {
                   key={cat.slug}
                   type="button"
                   onClick={() => handleCategorySelect(isActive ? "" : cat.slug)}
-                  className={`flex items-center gap-[10px] pl-[10px] pr-[12px] py-[6px] rounded-[4px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer active:scale-95 ${
-                    isActive
+                  className={`flex items-center gap-[10px] pl-[10px] pr-[12px] py-[6px] rounded-[4px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer active:scale-95 ${isActive
                       ? "bg-[#0D6D5F] text-white shadow-sm ring-1 ring-emerald-400/50"
                       : "bg-white/10 hover:bg-white/20 backdrop-blur-[50px] text-white"
-                  }`}
+                    }`}
                 >
                   {getCategoryIcon(cat.icon, cat.name)}
                   <span>{cat.name}</span>
@@ -758,12 +756,12 @@ function SearchPageContent() {
                         typeof pkg.gigRating === "number"
                           ? pkg.gigRating
                           : typeof pkg.starRating === "number"
-                          ? pkg.starRating
-                          : pkg.starNumber > 0 && typeof pkg.totalStars === "number"
-                          ? pkg.totalStars / pkg.starNumber
-                          : typeof userObj.starRating === "number"
-                          ? userObj.starRating
-                          : null;
+                            ? pkg.starRating
+                            : pkg.starNumber > 0 && typeof pkg.totalStars === "number"
+                              ? pkg.totalStars / pkg.starNumber
+                              : typeof userObj.starRating === "number"
+                                ? userObj.starRating
+                                : null;
 
                       const reviewCount =
                         pkg.starNumber || pkg.reviews || userObj.totalReviews || pkg.sales || 0;
@@ -806,7 +804,7 @@ function SearchPageContent() {
                                   {pkg.title || "--"}
                                 </span>
                                 {categoryName && (
-                                  <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-100/80 w-fit capitalize">
+                                  <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-bold bg-[#fff] text-teal-800 border border-[rgba(0, 0, 0, 0.10)] w-fit capitalize">
                                     {categoryName}
                                   </span>
                                 )}

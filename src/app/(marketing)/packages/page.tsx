@@ -1005,41 +1005,11 @@ const Packages = () => {
                     onClick: () => handleCategoryClick(crumb.name || crumb.slug),
                   }))}
                 >
-                  {categoryAncestry[0].isRoot && (
-                    <li className="inline-flex items-center ml-2">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="xs"
-                        leftIcon={<FiArrowLeft className="w-3.5 h-3.5" />}
-                        onClick={() => {
-                          setViewTab('hub');
-                          syncUrlWithFilters({ category: categoryAncestry[0].name || categoryAncestry[0].slug, view: 'hub' });
-                        }}
-                        className="text-xs text-brand-green hover:underline font-semibold p-0 h-auto hover:bg-transparent"
-                      >
-                        <span>Explore {categoryAncestry[0].name} Hub</span>
-                      </Button>
-                    </li>
-                  )}
+
                 </Breadcrumb>
               ) : null}
             </div>
-            {/* <Button
-              type="button"
-              variant="brand"
-              size="md"
-              radius="xl"
-              onClick={() => setShowFilterDrawer(true)}
-              leftIcon={
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 6H21M7 12H17M11 18H13" stroke="white" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              }
-              className="text-sm font-semibold px-5 py-2.5 shadow-sm"
-            >
-              Filter
-            </Button> */}
+
           </div>
 
           {/* Active Filter Tags & Results Count Bar & Sort */}
@@ -1066,26 +1036,32 @@ const Packages = () => {
                       radius="full"
                       onClick={() => { setSearchVal(''); syncUrlWithFilters({ searchVal: '' }); }}
                       leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
-                      className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
+                      className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-semibold shadow-2xs group [&:not(:hover)>span:first-child]:hidden"
                     >
                       {searchVal}
                     </Button>
                   )}
 
                   {/* Active Category Tag */}
-                  {(filterCategory || (activeCategory !== 'All services' && activeCategory !== 'Results')) && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="xs"
-                      radius="full"
-                      onClick={() => { setFilterCategory(''); setActiveCategory('All services'); syncUrlWithFilters({ category: '' }); }}
-                      leftIcon={<span className="text-gray-400 group-hover:text-red-500 transition-colors font-bold">✕</span>}
-                      className="border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-3.5 py-1.5 font-medium shadow-2xs group"
-                    >
-                      {filterCategory || activeCategory}
-                    </Button>
-                  )}
+                  {(filterCategory ||
+                    (activeCategory !== 'All services' && activeCategory !== 'Results')) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFilterCategory('');
+                          setActiveCategory('All services');
+                          syncUrlWithFilters({ category: '' });
+                        }}
+                        className="group inline-flex h-10 items-center gap-2 rounded-full border border-gray-200 bg-white px-4 text-base font-medium text-gray-700 shadow-2xs hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                      >
+                        {/* Cross icon appears on hover */}
+                        <span className="max-w-0 -ml-1 opacity-0 overflow-hidden text-gray-400 group-hover:max-w-[20px] group-hover:ml-0 group-hover:opacity-100 group-hover:text-red-500 transition-all duration-150 ease-out">
+                          ✕
+                        </span>
+
+                        <span>{filterCategory || activeCategory}</span>
+                      </button>
+                    )}
 
                   {/* Price Range Tag */}
                   {(minPrice || maxPrice) && (
@@ -1172,17 +1148,18 @@ const Packages = () => {
                   )}
 
                   {/* Clear All Pill Button */}
-                  <Button
+                  <button
                     type="button"
-                    variant="dark"
-                    size="xs"
-                    radius="full"
                     onClick={handleReset}
-                    leftIcon={<span>✕</span>}
-                    className="px-4 py-1.5 font-semibold shadow-sm ml-1"
+                    className="group inline-flex h-10 items-center gap-2 rounded-full bg-gray-900 px-4 text-base font-medium text-white shadow-sm hover:bg-gray-800 transition-colors ml-1"
                   >
-                    Clear All
-                  </Button>
+                    {/* Cross icon appears on hover */}
+                    <span className="max-w-0 -ml-1 opacity-0 overflow-hidden text-gray-300 group-hover:max-w-[20px] group-hover:ml-0 group-hover:opacity-100 group-hover:text-red-400 transition-all duration-150 ease-out">
+                      ✕
+                    </span>
+
+                    <span>Clear All</span>
+                  </button>
                 </>
               )}
             </div>

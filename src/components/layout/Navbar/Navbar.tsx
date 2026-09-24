@@ -384,6 +384,7 @@ const Navbar = () => {
                   isOpen={isOpen && isSearchFocused}
                   isLoading={isSuggestionsLoading}
                   selectedIndex={selectedIndex}
+                  isNavbar={true}
                   onSelect={(item) => {
                     setIsSearchFocused(false);
                     handleSelectSuggestion(item);

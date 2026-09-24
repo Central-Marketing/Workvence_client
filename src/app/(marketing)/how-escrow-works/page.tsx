@@ -189,10 +189,7 @@ export default function HowEscrowWorksPage() {
               How Escrow Works
             </h1>
 
-            {/* Subtitle */}
-            <p className="mt-4 text-base sm:text-xl md:text-2xl text-emerald-200/90 font-medium max-w-2xl leading-snug">
-              Your payment is protected until the work is delivered.
-            </p>
+
 
             {/* Intro paragraph */}
             <p className="mt-4 font-inter text-xs sm:text-sm md:text-base text-gray-300 max-w-2xl leading-relaxed">
@@ -245,7 +242,7 @@ export default function HowEscrowWorksPage() {
                   <div className="flex flex-col md:flex-row md:items-start gap-6">
                     {/* Step Number + Icon Badge */}
                     <div className="flex items-center gap-4 md:flex-col md:items-center shrink-0">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[6px] bg-[#0D6D5F]/10 text-[#0D6D5F] flex items-center justify-center">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[6px] bg-[#fff] border border-[rgba(0, 0, 0, 0.10)] text-[#0D6D5F] flex items-center justify-center">
                         <StepIcon className="w-6 h-6 text-[#0D6D5F]" />
                       </div>
                       <span className="font-mono text-xs font-bold text-gray-400 tracking-wider">
@@ -255,11 +252,7 @@ export default function HowEscrowWorksPage() {
 
                     {/* Step Content */}
                     <div className="flex-1 space-y-3">
-                      <div className="flex flex-wrap items-center gap-3">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F] bg-[#0D6D5F]/5 px-2.5 py-1 rounded-[6px]">
-                          {step.number} — {step.label}
-                        </span>
-                      </div>
+
 
                       <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#0f172a]">
                         {step.headline}
@@ -272,7 +265,7 @@ export default function HowEscrowWorksPage() {
                       {/* Step 01 Highlight */}
                       {step.highlightBadge && (
                         <div className="pt-2">
-                          <span className="inline-flex items-center gap-2 text-xs font-medium text-[#0D6D5F] bg-emerald-50 px-3 py-1.5 rounded-[6px] border border-emerald-100">
+                          <span className="inline-flex items-center gap-2 text-xs font-medium text-[#0D6D5F] bg-white px-3 py-1.5 rounded-[6px] border border-[rgba(0, 0, 0, 0.10)]">
                             <Lock className="w-3.5 h-3.5 shrink-0" />
                             {step.highlightBadge}
                           </span>
@@ -282,7 +275,7 @@ export default function HowEscrowWorksPage() {
                       {/* Step 02 Special Callout: Paid ≠ Released */}
                       {step.specialCallout && (
                         <div className="pt-2">
-                          <div className="bg-[#f0f9f6] border border-[#0D6D5F]/20 rounded-[6px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="bg-[#fff] border border-[rgba(0, 0, 0, 0.10)]/20 rounded-[6px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div className="flex items-center gap-3">
                               <span className="text-xs font-mono font-extrabold uppercase px-2.5 py-1 rounded bg-[#0D6D5F] text-white">
                                 {step.specialCallout.tag}
@@ -301,7 +294,7 @@ export default function HowEscrowWorksPage() {
                       {/* Step 03 Milestone Note */}
                       {step.milestoneNote && (
                         <div className="pt-2">
-                          <div className="flex items-start gap-2.5 text-xs text-slate-700 bg-slate-50 p-3 rounded-[6px] border border-slate-200/80">
+                          <div className="flex items-start gap-2.5 text-xs text-slate-700 bg-[#fff] p-3 rounded-[6px] border border-[rgba(0, 0, 0, 0.10)]">
                             <Layers className="w-4 h-4 text-[#0D6D5F] shrink-0 mt-0.5" />
                             <span>{step.milestoneNote}</span>
                           </div>
@@ -319,7 +312,7 @@ export default function HowEscrowWorksPage() {
                               <div
                                 key={cIdx}
                                 className={`p-4 rounded-[6px] border ${choice.isPositive
-                                  ? "bg-emerald-50/60 border-emerald-200"
+                                  ? "bg-white border-[rgba(0, 0, 0, 0.10)]"
                                   : "bg-amber-50/50 border-amber-200/90"
                                   }`}
                               >
@@ -348,7 +341,7 @@ export default function HowEscrowWorksPage() {
                       {/* Step 05 Takeaway */}
                       {step.takeaway && (
                         <div className="pt-2">
-                          <div className="p-4 rounded-[6px] bg-gradient-to-r from-[#0D6D5F]/10 via-[#0D6D5F]/5 to-transparent border border-[#0D6D5F]/20">
+                          <div className="p-4 rounded-[6px] bg-[#fff] border border-[rgba(0, 0, 0, 0.10)]">
                             <div className="text-sm sm:text-base font-bold text-[#0D6D5F]">
                               {step.takeaway.headline}
                             </div>
@@ -444,7 +437,7 @@ export default function HowEscrowWorksPage() {
                     >
                       <td className="py-4 px-4 sm:px-6 font-semibold text-[#0f172a]">
                         <div className="flex items-center gap-2.5">
-                          <span className="w-7 h-7 rounded-[6px] bg-[#0D6D5F]/10 text-[#0D6D5F] flex items-center justify-center shrink-0">
+                          <span className="w-7 h-7 rounded-[6px] bg-[#fff] border border-[rgba(0, 0, 0, 0.10)] text-[#0D6D5F] flex items-center justify-center shrink-0">
                             <RowIcon className="w-3.5 h-3.5" />
                           </span>
                           <span>{row.stage}</span>
@@ -485,7 +478,7 @@ export default function HowEscrowWorksPage() {
                   key={pIdx}
                   className="bg-white border border-gray-200/90 rounded-[6px] p-6 sm:p-7 shadow-xs hover:border-[#0D6D5F]/40 transition duration-200"
                 >
-                  <div className="w-10 h-10 rounded-[6px] bg-[#0D6D5F]/10 text-[#0D6D5F] flex items-center justify-center mb-4">
+                  <div className="w-10 h-10 rounded-[6px] bg-[#fff] border border-[rgba(0, 0, 0, 0.10)] text-[#0D6D5F] flex items-center justify-center mb-4">
                     <PillarIcon className="w-5 h-5 text-[#0D6D5F]" />
                   </div>
                   <h3 className="text-base sm:text-lg font-bold text-[#0f172a] mb-2">
@@ -524,23 +517,23 @@ export default function HowEscrowWorksPage() {
       <section className="w-full py-20 bg-[#F8F9FA] border-t border-gray-200/80 pb-[80px] min-[1400px]:pb-[100px]">
         <div className="container mx-auto px-4 md:px-6 max-w-5xl">
           <div
-            className="bg-[#0c1c1b] text-white rounded-[6px] py-16 sm:py-24 md:py-28 px-6 sm:px-12 min-h-[460px] sm:min-h-[480px] flex flex-col items-center justify-center text-center relative overflow-hidden shadow-md bg-cover bg-center bg-no-repeat"
+            className="bg-[#0c1c1b] text-white rounded-[6px] py-16 sm:py-24 md:py-28 px-6 sm:px-12 min-h-[460px] sm:min-h-[480px] flex flex-col items-start justify-center text-left relative overflow-hidden shadow-md bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: "url('/media/AFreelancerBG.png')" }}
           >
             {/* Subtle dark overlay for contrast */}
             <div className="absolute inset-0 bg-[#0c1c1b]/20 backdrop-blur-[1px]" />
 
-            <div className="relative z-10 max-w-2xl mx-auto space-y-4">
+            <div className="relative z-10 max-w-2xl space-y-4">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold">
                 <span>Zero Risk Hiring</span>
               </span>
-              <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
+              <h2 className="font-sf-pro font-[510] text-3xl leading-[normal] sm:text-4xl sm:leading-[normal] lg:text-[44px] lg:leading-[normal] xl:text-[48px] xl:leading-[normal] text-white mb-4 sm:mb-5 my-4">
                 Ready to Get Started?
               </h2>
-              <p className="text-sm sm:text-base text-gray-300 font-normal">
+              <p className="font-inter font-normal text-base sm:text-[15px] text-[#C7C7C7] mb-5 sm:mb-10 max-w-xl leading-relaxed">
                 Work with confidence.
               </p>
-              <div className="pt-4 flex flex-wrap items-center justify-center gap-3.5">
+              <div className="pt-4 flex flex-wrap items-center justify-start gap-3.5">
                 <Link
                   href="/packages"
                   className="px-6 h-10 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs inline-flex items-center gap-2 cursor-pointer"

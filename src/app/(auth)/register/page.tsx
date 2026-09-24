@@ -239,8 +239,8 @@ const RegisterContent = () => {
             <Image
               src="/Workvence-logo-Horizontal3.png"
               alt="Workvence"
-              width={140}
-              height={34}
+              width={209}
+              height={44}
               className="h-7 sm:h-8 w-auto object-contain"
               priority
             />
@@ -256,7 +256,7 @@ const RegisterContent = () => {
             </Link>
           </p>
 
-          <h1 className="text-[22px] sm:text-[25px] font-bold text-[#111827] mb-3 text-center tracking-tight">
+          <h1 className="text-[28px] sm:text-[32px] font-bold text-[#111827] mb-7 text-center tracking-tight">
             Create a new account
           </h1>
 

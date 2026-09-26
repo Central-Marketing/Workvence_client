@@ -28,8 +28,8 @@ import { HiSparkles } from "react-icons/hi2";
 
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader, SubmitProposalModal, AuthModal } from "@/components";
-import { Button, Breadcrumb } from "@/components/ui";
+import { SubmitProposalModal, AuthModal } from "@/components";
+import { Button, Breadcrumb, BriefDetailSkeleton } from "@/components/ui";
 import { ArrowRight } from "lucide-react";
 
 function formatCategoryName(cat?: string): string {
@@ -229,7 +229,36 @@ const BriefDetail = () => {
     enabled: !!briefId,
   });
 
-  // Fetch real proposals for this brief if not included in brief payload
+  const isClosed = Boolean(brief?.isClosed || brief?.status === "closed");
+  const isSeller = Boolean(user?.isSeller);
+
+  // Robust ownership determination
+  const isOwner = useMemo(() => {
+    if (!brief || !user) return false;
+    const currentUserId = String(user?._id || user?.id || "");
+    if (!currentUserId) return false;
+
+    const briefAuthorId = String(
+      (typeof brief?.userID === "object" ? brief?.userID?._id || brief?.userID?.id : brief?.userID) ||
+      (typeof brief?.userId === "object" ? brief?.userId?._id || brief?.userId?.id : brief?.userId) ||
+      (typeof brief?.user === "object" ? brief?.user?._id || brief?.user?.id : brief?.user) ||
+      brief?.buyerId ||
+      brief?.buyer?._id ||
+      brief?.buyer?.id ||
+      ""
+    );
+
+    return Boolean(briefAuthorId && currentUserId === briefAuthorId);
+  }, [brief, user]);
+
+  // If user is not the brief owner, ensure proposals modal is closed
+  useEffect(() => {
+    if (!isOwner && showProposalsModal) {
+      setShowProposalsModal(false);
+    }
+  }, [isOwner, showProposalsModal]);
+
+  // Fetch real proposals for this brief if not included in brief payload (ONLY for verified brief owner)
   const { data: fetchedProposals = [] } = useQuery<any[]>({
     queryKey: ["brief-proposals", briefId],
     queryFn: () =>
@@ -242,10 +271,11 @@ const BriefDetail = () => {
           return [];
         })
         .catch(() => []),
-    enabled: !!briefId && (!brief?.proposals || brief.proposals.length === 0),
+    enabled: Boolean(briefId && isOwner && (!brief?.proposals || brief.proposals.length === 0)),
   });
 
   const rawProposals: any[] = useMemo(() => {
+    if (!isOwner) return [];
     if (Array.isArray(brief?.proposals) && brief.proposals.length > 0) {
       return brief.proposals;
     }
@@ -253,19 +283,7 @@ const BriefDetail = () => {
       return fetchedProposals;
     }
     return [];
-  }, [brief?.proposals, fetchedProposals]);
-
-  const isClosed = Boolean(brief?.isClosed || brief?.status === "closed");
-  const isOwner = Boolean(
-    brief &&
-    user &&
-    (brief.userID?._id === user._id ||
-      brief.userID === user._id ||
-      brief.userID === user.id ||
-      brief.user?.id === user._id ||
-      brief.user?.id === user.id)
-  );
-  const isSeller = Boolean(user?.isSeller);
+  }, [isOwner, brief?.proposals, fetchedProposals]);
 
   // Extract unique seller IDs from proposals to fetch their full live profiles
   const uniqueSellerIds: string[] = useMemo(() => {
@@ -286,7 +304,7 @@ const BriefDetail = () => {
           .get(`/users/${sid}`)
           .then(({ data }) => data?.user || data?.seller || data?.data || data)
           .catch(() => null),
-      enabled: Boolean(sid && (showProposalsModal || isOwner)),
+      enabled: Boolean(isOwner && sid && (showProposalsModal || isOwner)),
       staleTime: 5 * 60 * 1000,
     })),
   });
@@ -333,12 +351,7 @@ const BriefDetail = () => {
     });
   }, [modalView, normalizedProposals, aiRecommendedIds]);
 
-  const totalProposalsCount =
-    normalizedProposals.length ||
-    brief?.proposalCount ||
-    brief?._count?.proposals ||
-    brief?.proposalsCount ||
-    0;
+  const totalProposalsCount = brief?.proposalCount ?? 0;
 
   // Check if seller already submitted a proposal
   const { data: myProposals = [] } = useQuery({
@@ -545,13 +558,7 @@ const BriefDetail = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center bg-[#F8FAFC] py-16 min-h-[80vh]">
-        <div className="container mx-auto px-4 md:px-6 flex justify-center items-center py-20">
-          <Loader size={45} />
-        </div>
-      </div>
-    );
+    return <BriefDetailSkeleton />;
   }
 
   if (error || !brief) {
@@ -658,19 +665,20 @@ const BriefDetail = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setModalView("list");
-              setShowProposalsModal(true);
-            }}
-            className="flex items-center gap-1.5 font-inter font-medium text-brand-green text-sm sm:text-base hover:underline transition-all cursor-pointer"
-          >
-            <span>View All Proposals</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-
+          {isOwner && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setModalView("list");
+                setShowProposalsModal(true);
+              }}
+              className="flex items-center gap-1.5 font-inter font-medium text-brand-green text-sm sm:text-base hover:underline transition-all cursor-pointer"
+            >
+              <span>View All Proposals</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          )}
 
           {/* Posted Time */}
           <p className="text-xs text-slate-400 font-normal m-0">
@@ -937,6 +945,10 @@ const BriefDetail = () => {
                     <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white text-[11px] font-bold text-slate-400 flex items-center justify-center shadow-2xs">
                       0
                     </div>
+                  ) : normalizedProposals.length === 0 ? (
+                    <div className="w-8 h-8 rounded-full bg-[#E6F4F2] border-2 border-white text-[11px] font-bold text-teal-800 flex items-center justify-center shadow-2xs">
+                      {totalProposalsCount}
+                    </div>
                   ) : null}
                 </div>
 
@@ -1064,11 +1076,12 @@ const BriefDetail = () => {
         )}
       </div>
 
-      {/* PROPOSALS DRAWER (List, Details, AI Recommendations) */}
-      <div
-        className={`fixed inset-0 z-[999] transition-all duration-300 ${showProposalsModal ? "visible pointer-events-auto" : "invisible pointer-events-none delay-300"
-          }`}
-      >
+      {/* PROPOSALS DRAWER (List, Details, AI Recommendations) - Strictly restricted to Brief Owner */}
+      {isOwner && (
+        <div
+          className={`fixed inset-0 z-[999] transition-all duration-300 ${showProposalsModal ? "visible pointer-events-auto" : "invisible pointer-events-none delay-300"
+            }`}
+        >
         {/* Backdrop Overlay */}
         <div
           className={`fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity duration-300 ease-out ${showProposalsModal ? "opacity-100" : "opacity-0"
@@ -1759,6 +1772,7 @@ const BriefDetail = () => {
           )}
         </aside>
       </div>
+      )}
 
       {/* Seller Proposal Details Drawer */}
       <div

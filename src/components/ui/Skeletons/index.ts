@@ -5,3 +5,4 @@ export * from './GigsGridSkeleton';
 export * from './HomeSkeleton';
 export * from './SellerProfileSkeleton';
 export * from './OrderSkeleton';
+export * from './BriefDetailSkeleton';

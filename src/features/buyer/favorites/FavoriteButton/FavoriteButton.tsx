@@ -4,6 +4,7 @@ import { useState } from "react";
 import { axiosFetch } from "@/utils";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui";
+import { useAuthModalStore } from "@/store/authModalStore";
 
 interface FavoriteButtonProps {
   gigId: string;
@@ -27,13 +28,16 @@ const FavoriteButton = ({
   const [isFavorited, setIsFavorited] = useState(initialIsFavorited);
   const [favoriteCount, setFavoriteCount] = useState(initialFavoriteCount);
   const [loading, setLoading] = useState(false);
+  const openAuthModal = useAuthModalStore((state) => state.openAuthModal);
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!currentUser?._id) {
-      toast.error("Please sign in to favorite services!");
+      openAuthModal({
+        mode: "login",
+      });
       return;
     }
 

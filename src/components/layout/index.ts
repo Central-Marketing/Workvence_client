@@ -3,4 +3,5 @@ export { default as CategoryBar } from './CategoryBar/CategoryBar';
 export { default as Footer } from './Footer/Footer';
 export { default as NotificationBell } from './NotificationBell/NotificationBell';
 export { default as GlobalSocketListener } from './GlobalSocketListener/GlobalSocketListener';
+export { default as GlobalAuthModal } from './GlobalAuthModal/GlobalAuthModal';
 export { default as LayoutWrapper } from './LayoutWrapper/LayoutWrapper';

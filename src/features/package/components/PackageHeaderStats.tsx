@@ -7,6 +7,9 @@ import { FaAward } from "react-icons/fa";
 import { SellerDetails } from "../utils/packageDetailsNormalizer";
 import { BadgeCheck } from "lucide-react";
 import { Button, Breadcrumb } from "@/components/ui";
+import { getOnlineStatus } from "@/utils/userStatus";
+import { useUserStore } from "@/store/userStore";
+import { useAuthModalStore } from "@/store/authModalStore";
 
 interface PackageHeaderStatsProps {
   title: string;
@@ -32,6 +35,27 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
   const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
     seller.name || "Seller"
   )}&background=0D9488&color=fff&bold=true`;
+
+  const user = useUserStore((state: any) => state.user);
+  const openAuthModal = useAuthModalStore((state) => state.openAuthModal);
+  const sellerStatus = getOnlineStatus(seller.lastActiveAt || seller.lastSeen, seller.isOnline, 10);
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      openAuthModal({
+        mode: "login",
+        onSuccess: () => {
+          onToggleFavorite?.();
+        },
+      });
+      return;
+    }
+
+    onToggleFavorite?.();
+  };
 
   return (
     <div className="w-full mb-6">
@@ -129,15 +153,35 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
 
         {/* Right Actions */}
         <div className="flex items-center gap-3 sm:gap-4 text-sm text-gray-600 flex-wrap justify-between sm:justify-end w-full sm:w-auto">
-          <span className="text-[var(--Foundation-Grey-grey-500,#4A4A4A)] font-normal font-sf-pro text-base not-italic leading-normal">
-            {seller.ordersInQueue > 0 ? (
-              <>
+          <div className="flex items-center gap-2 flex-wrap">
+            {seller.ordersInQueue > 0 && (
+              <span className="text-[var(--Foundation-Grey-grey-500,#4A4A4A)] font-normal font-sf-pro text-base not-italic leading-normal">
                 <strong className="text-[#222222] font-bold">{seller.ordersInQueue} </strong> orders in queue
-              </>
-            ) : (
-              <span className="text-emerald-700 font-medium">Available now</span>
+                <span className="mx-2 text-gray-300">|</span>
+              </span>
             )}
-          </span>
+
+            <span className="inline-flex items-center gap-1.5 font-sf-pro text-base not-italic leading-normal">
+              <span
+                className={`w-2 h-2 rounded-full shrink-0 ${
+                  sellerStatus.isOnline ? "bg-[#10B981]" : "bg-gray-300"
+                }`}
+              />
+              <span
+                className={
+                  sellerStatus.isOnline
+                    ? "text-emerald-700 font-medium"
+                    : "text-[var(--Foundation-Grey-grey-500,#4A4A4A)] font-normal"
+                }
+              >
+                {sellerStatus.isOnline
+                  ? "Online"
+                  : sellerStatus.lastSeenText
+                  ? sellerStatus.lastSeenText
+                  : "Offline"}
+              </span>
+            </span>
+          </div>
 
           <div className="flex items-center gap-2 sm:gap-2.5">
             <Button
@@ -145,11 +189,12 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
               variant={isFavorited ? "danger-soft" : "outline"}
               size="icon"
               radius="full"
-              onClick={onToggleFavorite}
+              onClick={handleFavoriteClick}
               className={`w-9 h-9 sm:w-10 sm:h-10 !min-h-0 !p-0 aspect-square rounded-[60px] flex items-center justify-center transition-colors cursor-pointer hover:bg-gray-50 shrink-0 ${isFavorited ? '!text-red-500 !bg-red-50/50 !border-red-200' : 'text-gray-500 !bg-white border-gray-200'
                 }`}
-              title="Save to favorites"
-              icon={<FiHeart className={`w-4 h-4 sm:w-5 sm:h-5 ${isFavorited ? 'fill-red-500' : ''}`} />}
+              title={isFavorited ? "Remove from favorites" : "Save to favorites"}
+              aria-label={isFavorited ? "Remove from favorites" : "Save to favorites"}
+              icon={<FiHeart className={`w-4 h-4 sm:w-5 sm:h-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />}
             />
 
             <Button

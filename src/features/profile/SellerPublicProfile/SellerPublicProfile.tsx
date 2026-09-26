@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
+import { useAuthModalStore } from "@/store/authModalStore";
 import {
   SellerHeroBanner,
   SellerAboutSidebar,
@@ -22,6 +23,7 @@ interface SellerPublicProfileProps {
 const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) => {
   const router = useRouter();
   const { user } = useUserStore((state: any) => state);
+  const openAuthModal = useAuthModalStore((state) => state.openAuthModal);
   const isSeller = Boolean(user?.isSeller);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -101,13 +103,19 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
     return normalizeSellerProfile(rawUserData, rawGigsData, rawReviewsData, username);
   }, [rawUserData, rawGigsData, rawReviewsData, username]);
 
-  const handleContact = async () => {
-    if (!user) {
-      router.push("/login");
+  const handleContact = async (currentUser?: any) => {
+    const activeUser = currentUser || user;
+    if (!activeUser) {
+      openAuthModal({
+        mode: "login",
+        onSuccess: (loggedInUser) => {
+          handleContact(loggedInUser);
+        },
+      });
       return;
     }
     const sellerID = profileData.id;
-    const buyerID = user._id || user.id;
+    const buyerID = activeUser._id || activeUser.id;
 
     if (!sellerID || !buyerID) {
       toast.error("User information missing to start conversation.");

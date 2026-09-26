@@ -3,7 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { Toaster, useToasterStore, toast } from "react-hot-toast";
-import { GlobalSocketListener } from "@/components";
+import { GlobalSocketListener, GlobalAuthModal } from "@/components";
 
 function ToastLimitEnforcer({ limit = 3 }: { limit?: number }) {
   const { toasts } = useToasterStore();
@@ -37,6 +37,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <Toaster position="bottom-right" reverseOrder={false} toastOptions={{ duration: 4000 }} />
       <ToastLimitEnforcer limit={3} />
       <GlobalSocketListener />
+      <GlobalAuthModal />
       {children}
     </QueryClientProvider>
   );

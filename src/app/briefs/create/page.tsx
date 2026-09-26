@@ -20,6 +20,7 @@ import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
 import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
+import { useAuthModalStore } from "@/store/authModalStore";
 import { Button, Breadcrumb, AiGradientButton } from "@/components";
 import { CustomSelect, CustomSelectOption } from "@/components/ui";
 
@@ -46,6 +47,7 @@ const CreateBrief = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const user = useUserStore((state) => state.user);
+  const openAuthModal = useAuthModalStore((state) => state.openAuthModal);
 
   // Form State
   const [form, setForm] = useState({
@@ -228,8 +230,12 @@ const CreateBrief = () => {
 
   const handleOpenAiModal = () => {
     if (!user) {
-      toast.error("Please sign in to use Workvence AI");
-      router.push(`/login?redirect=${encodeURIComponent("/briefs/create?ai=true")}`);
+      openAuthModal({
+        mode: "login",
+        onSuccess: () => {
+          setIsAiModalOpen(true);
+        },
+      });
       return;
     }
     setIsAiModalOpen(true);
@@ -241,15 +247,19 @@ const CreateBrief = () => {
     if (isAiRequested) {
       const timer = setTimeout(() => {
         if (!user) {
-          toast.error("Please sign in to use Workvence AI");
-          router.push(`/login?redirect=${encodeURIComponent("/briefs/create?ai=true")}`);
+          openAuthModal({
+            mode: "login",
+            onSuccess: () => {
+              setIsAiModalOpen(true);
+            },
+          });
           return;
         }
         setIsAiModalOpen(true);
       }, 150);
       return () => clearTimeout(timer);
     }
-  }, [searchParams, user, router]);
+  }, [searchParams, user, openAuthModal]);
 
   // Auto-focus prompt input when modal opens
   useEffect(() => {
@@ -307,14 +317,8 @@ const CreateBrief = () => {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!user) {
-      toast.error("Please login to post a project");
-      router.push(`/login?redirect=${encodeURIComponent("/briefs/create")}`);
-      return;
-    }
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
 
     if (!form.title.trim()) {
       toast.error("Please provide a project title");
@@ -340,6 +344,16 @@ const CreateBrief = () => {
     }
     if (form.requiredSkills && form.requiredSkills.length > 0) {
       payload.requiredSkills = form.requiredSkills;
+    }
+
+    if (!user) {
+      openAuthModal({
+        mode: "login",
+        onSuccess: () => {
+          postBrief.mutate(payload);
+        },
+      });
+      return;
     }
 
     postBrief.mutate(payload);

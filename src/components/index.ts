@@ -5,6 +5,7 @@ export { default as Footer } from "./layout/Footer/Footer";
 export { default as NotificationBell } from "./layout/NotificationBell/NotificationBell";
 export { default as LayoutWrapper } from "./layout/LayoutWrapper/LayoutWrapper";
 export { default as GlobalSocketListener } from "./layout/GlobalSocketListener/GlobalSocketListener";
+export { default as GlobalAuthModal } from "./layout/GlobalAuthModal/GlobalAuthModal";
 
 // UI components
 export { default as Loader } from "./ui/Loader/Loader";

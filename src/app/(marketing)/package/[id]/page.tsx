@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
+import { useAuthModalStore } from "@/store/authModalStore";
 import { Loader, PackageDetailSkeleton } from "@/components";
 import {
   PackageHeaderStats,
@@ -30,6 +31,7 @@ const PackageContent = () => {
   const _id = typeof rawId === "string" ? rawId : Array.isArray(rawId) ? rawId[0] : undefined;
 
   const { user } = useUserStore((state: any) => state);
+  const openAuthModal = useAuthModalStore((state) => state.openAuthModal);
   const isSeller = Boolean(user?.isSeller);
   const [selectedTier, setSelectedTier] = useState<'basic' | 'standard' | 'premium'>('basic');
   const [activeSection, setActiveSection] = useState("section-about");
@@ -139,9 +141,15 @@ const PackageContent = () => {
     }
   };
 
-  const handleContact = async () => {
-    if (!user) {
-      router.push('/login');
+  const handleContact = async (currentUser?: any) => {
+    const activeUser = currentUser || user;
+    if (!activeUser) {
+      openAuthModal({
+        mode: 'login',
+        onSuccess: (loggedInUser) => {
+          handleContact(loggedInUser);
+        },
+      });
       return;
     }
 
@@ -149,8 +157,8 @@ const PackageContent = () => {
     const sellerID = sellerObj?._id || sellerObj?.id || (typeof rawApiData?.userID === 'string' ? rawApiData.userID : null) || normalizedData.seller.id;
     const sellerUser = sellerObj?.username || normalizedData.seller.username;
 
-    const buyerID = user?._id || user?.id;
-    const buyerUsername = user?.username;
+    const buyerID = activeUser?._id || activeUser?.id;
+    const buyerUsername = activeUser?.username;
 
     if (!sellerID || !buyerID) {
       toast.error('User information missing to start conversation.');
@@ -189,16 +197,22 @@ const PackageContent = () => {
     }
   };
 
-  const handleCheckout = (tier?: 'basic' | 'standard' | 'premium') => {
+  const handleCheckout = (tier?: 'basic' | 'standard' | 'premium', currentUser?: any) => {
     const activeTier = tier || selectedTier;
-    if (!user) {
-      router.push('/login');
+    const activeUser = currentUser || user;
+    if (!activeUser) {
+      openAuthModal({
+        mode: 'login',
+        onSuccess: (loggedInUser) => {
+          handleCheckout(activeTier, loggedInUser);
+        },
+      });
       return;
     }
 
     const sellerObj = typeof rawApiData?.userID === 'object' ? rawApiData.userID : null;
     const sellerID = sellerObj?._id || sellerObj?.id || normalizedData.seller.id;
-    const buyerID = user?._id || user?.id;
+    const buyerID = activeUser?._id || activeUser?.id;
 
     if (sellerID && buyerID && String(sellerID) === String(buyerID)) {
       toast.error("You cannot purchase your own package.");
@@ -208,18 +222,59 @@ const PackageContent = () => {
     router.push(`/pay/${_id}?tier=${activeTier}`);
   };
 
-  const handleToggleFavorite = async () => {
-    if (!user) {
-      toast.error("Please login to save favorites");
+  const handleToggleFavorite = async (currentUser?: any) => {
+    const activeUser = currentUser || user;
+    if (!activeUser) {
+      openAuthModal({
+        mode: 'login',
+        onSuccess: (loggedInUser) => {
+          handleToggleFavorite(loggedInUser);
+        },
+      });
       return;
     }
+
+    const targetGigId = rawApiData?._id || rawApiData?.id || _id;
+    if (!targetGigId) {
+      toast.error("Package information unavailable to favorite");
+      return;
+    }
+
+    const prevFav = isFavorited;
+    const prevCount = favoriteCount;
+
+    // Optimistic UI toggle
+    setIsFavorited(!prevFav);
+    setFavoriteCount((prev) => (!prevFav ? prev + 1 : Math.max(0, prev - 1)));
+
     try {
-      await axiosFetch.post(`/gigs/favorite/${_id}`);
-      setIsFavorited((prev) => !prev);
-      setFavoriteCount((prev) => (isFavorited ? Math.max(0, prev - 1) : prev + 1));
-      toast.success(isFavorited ? "Removed from favorites" : "Saved to favorites");
-    } catch {
-      setIsFavorited((prev) => !prev);
+      let res;
+      try {
+        res = await axiosFetch.post(`/gigs/${targetGigId}/favorite`);
+      } catch {
+        res = await axiosFetch.post(`/gigs/favorite/${targetGigId}`);
+      }
+
+      if (res?.data) {
+        if (typeof res.data.isFavorited === 'boolean') {
+          setIsFavorited(res.data.isFavorited);
+        }
+        if (typeof res.data.favoriteCount === 'number') {
+          setFavoriteCount(res.data.favoriteCount);
+        }
+        if (res.data.message) {
+          toast.success(res.data.message);
+        } else {
+          toast.success(!prevFav ? "Saved to favorites" : "Removed from favorites");
+        }
+      } else {
+        toast.success(!prevFav ? "Saved to favorites" : "Removed from favorites");
+      }
+    } catch (err: any) {
+      // Revert optimistic update on failure
+      setIsFavorited(prevFav);
+      setFavoriteCount(prevCount);
+      toast.error(err?.response?.data?.message || "Failed to update favorite status");
     }
   };
 

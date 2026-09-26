@@ -101,18 +101,18 @@ export default function PodcastPage() {
   return (
     <div className="min-h-screen bg-white text-[#112131] font-sans">
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-20 lg:py-28">
+      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-[rgba(0,0,0,0.10)] py-20 lg:py-28">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[#327C73] text-xs font-semibold">
-              <Mic className="w-4 h-4 text-[#10b981]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] text-xs font-semibold">
+              <Mic className="w-3.5 h-3.5 text-[#0D6D5F]" />
               <span>The Official Workvence Podcast</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#0f172a] leading-tight">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#0f172a] leading-tight">
               The Future of Independent <br className="hidden sm:inline" />
-              <span className="text-[#327C73]">Work & Creativity</span>
+              <span className="text-[#0D6D5F]">Work & Creativity</span>
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto font-normal">
+            <p className="text-xs sm:text-sm md:text-base text-gray-600 max-w-2xl mx-auto font-normal leading-relaxed">
               Candid conversations with the world's highest-earning freelancers, agency founders, engineers, and tech visionaries.
             </p>
 
@@ -122,7 +122,7 @@ export default function PodcastPage() {
                 type="button"
                 variant="dark"
                 size="sm"
-                radius="xl"
+                radius="fiverr"
                 onClick={() => toast.success("Opening Spotify channel...")}
                 rightIcon={<ExternalLink className="w-3 h-3 text-gray-400" />}
                 className="px-4 py-2 font-semibold text-xs"
@@ -133,7 +133,7 @@ export default function PodcastPage() {
                 type="button"
                 variant="soft"
                 size="sm"
-                radius="xl"
+                radius="fiverr"
                 onClick={() => toast.success("Opening Apple Podcasts...")}
                 rightIcon={<ExternalLink className="w-3 h-3 text-gray-400" />}
                 className="px-4 py-2 bg-[#f1f5f9] text-gray-800 hover:bg-gray-200 font-semibold text-xs"
@@ -144,7 +144,7 @@ export default function PodcastPage() {
                 type="button"
                 variant="outline"
                 size="sm"
-                radius="xl"
+                radius="fiverr"
                 onClick={() => toast.success("Opening YouTube...")}
                 rightIcon={<ExternalLink className="w-3 h-3 text-red-500" />}
                 className="px-4 py-2 bg-red-50 text-red-700 border-red-200 hover:bg-red-100 font-semibold text-xs"
@@ -159,9 +159,9 @@ export default function PodcastPage() {
       {/* Featured / Active Episode Player Banner */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl">
-          <div className="bg-[#0f172a] text-white rounded-[6px] p-8 sm:p-10 shadow-2xl space-y-6">
+          <div className="bg-[#0f172a] text-white rounded-[6px] p-8 sm:p-10 shadow-xl space-y-6 border border-[rgba(0,0,0,0.10)]">
             <div className="flex items-center justify-between">
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#6ad724]/20 text-[#6ad724]">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#0D6D5F]/20 text-[#0D6D5F] border border-[#0D6D5F]/30">
                 Episode #{activeEpisode.number} • Featured
               </span>
               <span className="text-xs text-gray-400 flex items-center gap-1">
@@ -173,7 +173,7 @@ export default function PodcastPage() {
             <div className="space-y-2">
               <h2 className="text-2xl sm:text-3xl font-bold leading-tight">{activeEpisode.title}</h2>
               <p className="text-xs sm:text-sm text-gray-300">
-                Guest: <span className="text-[#6ad724] font-semibold">{activeEpisode.guest}</span> ({activeEpisode.guestRole})
+                Guest: <span className="text-[#0D6D5F] font-semibold">{activeEpisode.guest}</span> ({activeEpisode.guestRole})
               </p>
             </div>
 
@@ -188,7 +188,7 @@ export default function PodcastPage() {
                 }}
               >
                 <div
-                  className="bg-[#10b981] h-full rounded-full transition-all duration-100"
+                  className="bg-[#0D6D5F] h-full rounded-full transition-all duration-100"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -205,9 +205,9 @@ export default function PodcastPage() {
                   type="button"
                   variant="brand"
                   size="icon"
-                  radius="2xl"
+                  radius="fiverr"
                   onClick={() => togglePlay(activeEpisode.id)}
-                  className="w-10 h-10 shadow-lg active:scale-95 p-0"
+                  className="w-10 h-10 shadow-xs active:scale-95 p-0 bg-[#0D6D5F] hover:bg-[#0b5c50] text-white"
                   aria-label={isPlaying && playingId === activeEpisode.id ? "Pause" : "Play"}
                 >
                   {isPlaying && playingId === activeEpisode.id ? (
@@ -226,12 +226,12 @@ export default function PodcastPage() {
                   type="button"
                   variant="soft"
                   size="icon"
-                  radius="xl"
+                  radius="fiverr"
                   onClick={() => {
                     navigator.clipboard?.writeText(window.location.href);
                     toast.success("Episode link copied!");
                   }}
-                  className="p-2.5 bg-white/10 hover:bg-white/20 text-gray-300"
+                  className="p-2.5 bg-white/10 hover:bg-white/20 text-gray-300 cursor-pointer"
                   aria-label="Share episode"
                 >
                   <Share2 className="w-4 h-4" />
@@ -245,8 +245,8 @@ export default function PodcastPage() {
       {/* Episode Archive List */}
       <section className="pt-12 pb-[80px] min-[1400px]:pb-[100px] bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl space-y-6">
-          <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-            <h3 className="text-2xl font-bold text-[#0f172a]">All Episodes</h3>
+          <div className="flex items-center justify-between border-b border-[rgba(0,0,0,0.10)] pb-4">
+            <h3 className="text-2xl sm:text-3xl font-bold text-[#0f172a] tracking-tight">All Episodes</h3>
             <span className="text-xs text-gray-500 font-medium">34 Available</span>
           </div>
 
@@ -254,24 +254,21 @@ export default function PodcastPage() {
             {episodes.map((ep) => (
               <div
                 key={ep.id}
-                className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-7 hover:border-[#327C73] transition duration-200 space-y-4"
+                className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-7 hover:border-[#0D6D5F]/40 shadow-xs transition duration-200 space-y-4"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1">
-                    <span className="text-xs font-bold text-[#327C73]">Episode #{ep.number}</span>
-                    <h4 className="text-xl font-bold text-[#0f172a]">{ep.title}</h4>
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">Episode #{ep.number}</span>
+                    <h4 className="text-base sm:text-lg font-bold text-[#0f172a]">{ep.title}</h4>
                     <p className="text-xs text-gray-500">
                       With {ep.guest} • {ep.date} • {ep.duration}
                     </p>
                   </div>
 
-                  <Button
+                  <button
                     type="button"
-                    variant="brand"
-                    size="icon"
-                    radius="xl"
                     onClick={() => togglePlay(ep.id)}
-                    className="w-10 h-10 shrink-0 active:scale-95 bg-[#327C73] hover:bg-[#28635c] text-white p-0"
+                    className="w-10 h-10 shrink-0 rounded-[6px] bg-[#fff] border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] hover:bg-[#0D6D5F] hover:text-white flex items-center justify-center transition duration-150 cursor-pointer"
                     aria-label={isPlaying && playingId === ep.id ? "Pause" : "Play"}
                   >
                     {isPlaying && playingId === ep.id ? (
@@ -279,22 +276,22 @@ export default function PodcastPage() {
                     ) : (
                       <Play className="w-4 h-4 ml-0.5" />
                     )}
-                  </Button>
+                  </button>
                 </div>
 
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
+                <p className="text-xs sm:text-[13px] text-gray-600 leading-relaxed font-normal">
                   {ep.summary}
                 </p>
 
                 {/* Show Notes / Timestamps */}
-                <div className="pt-3 border-t border-gray-200/70 space-y-1.5">
+                <div className="pt-3 border-t border-[rgba(0,0,0,0.06)] space-y-1.5">
                   <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block">
                     Episode Timestamps:
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-gray-600">
                     {ep.timestamps.map((t, i) => (
                       <div key={i} className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#0D6D5F]" />
                         <span>{t}</span>
                       </div>
                     ))}

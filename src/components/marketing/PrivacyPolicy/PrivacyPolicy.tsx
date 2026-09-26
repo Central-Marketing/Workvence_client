@@ -76,7 +76,7 @@ const PrivacyPolicy = () => {
         {/* 1. Header Section */}
         <header className="flex flex-col items-start">
           {/* Last Updated Badge */}
-          <div className="mt-3.5 sm:mt-4 md:mt-5 inline-flex items-center px-2.5 py-1 rounded-[4px] bg-[#F4F4F5] border border-[#E4E4E7] text-[11px] sm:text-[12px] font-normal text-[#6E6E6E]">
+          <div className="mt-3.5 sm:mt-4 md:mt-5 inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#F4F4F5] border border-[rgba(0,0,0,0.10)] text-[11px] sm:text-[12px] font-normal text-[#6E6E6E]">
             Last Updated: {formattedDate}
           </div>
 

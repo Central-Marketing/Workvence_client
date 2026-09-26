@@ -186,31 +186,31 @@ export default function CareersClient() {
   return (
     <div className="min-h-screen bg-white text-[#112131] font-sans">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-20 lg:py-28">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-[rgba(0,0,0,0.10)] py-20 lg:py-28">
         <div className="container mx-auto px-4 md:px-6 relative z-10">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[#327C73] text-xs sm:text-sm font-semibold">
-              <Sparkles className="w-4 h-4 text-[#10b981]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] text-xs font-semibold">
+              <Sparkles className="w-3.5 h-3.5 text-[#0D6D5F]" />
               <span>We're Hiring Globally</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#0f172a] leading-[1.15]">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#0f172a] leading-[1.15]">
               Build the Future of <br className="hidden sm:inline" />
-              <span className="text-[#327C73]">Independent Work</span>
+              <span className="text-[#0D6D5F]">Independent Work</span>
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl mx-auto font-normal">
+            <p className="text-xs sm:text-sm md:text-base text-gray-600 leading-relaxed max-w-2xl mx-auto font-normal">
               Join a high-caliber team empowering millions of skilled creators, developers, and businesses across 180+ countries to thrive on their own terms.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
               <a
                 href="#open-roles"
-                className="px-7 py-3.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition-all shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-6 h-10 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>View Open Positions</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
                 href="#values"
-                className="px-7 py-3.5 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition-all"
+                className="px-6 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] hover:bg-gray-50 text-[#0f172a] font-semibold text-xs sm:text-sm transition inline-flex items-center gap-2 cursor-pointer"
               >
                 Our Values & Culture
               </a>
@@ -224,7 +224,7 @@ export default function CareersClient() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-3xl sm:text-4xl font-extrabold text-[#6ad724]">180+</div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-[#0D6D5F]">180+</div>
               <div className="text-xs sm:text-sm text-gray-300 mt-1 font-medium">Countries Represented</div>
             </div>
             <div>
@@ -236,7 +236,7 @@ export default function CareersClient() {
               <div className="text-xs sm:text-sm text-gray-300 mt-1 font-medium">Employee Satisfaction</div>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl font-extrabold text-[#6ad724]">$2M+</div>
+              <div className="text-3xl sm:text-4xl font-extrabold text-[#0D6D5F]">$2M+</div>
               <div className="text-xs sm:text-sm text-gray-300 mt-1 font-medium">Annual Learning Grants</div>
             </div>
           </div>
@@ -247,11 +247,11 @@ export default function CareersClient() {
       <section id="values" className="py-20 lg:py-28 bg-[#f8fafc]">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#327C73]">Perks & Benefits</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#0f172a] tracking-tight">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">Perks & Benefits</span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">
               Designed for You to Do Your Best Work
             </h2>
-            <p className="text-sm sm:text-base text-gray-600">
+            <p className="text-xs sm:text-sm text-gray-500">
               We invest in our people so you can build a meaningful career without compromising your health, family, or life.
             </p>
           </div>
@@ -262,13 +262,13 @@ export default function CareersClient() {
               return (
                 <div
                   key={i}
-                  className="bg-white p-8 rounded-[6px] border border-gray-200/80 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 space-y-4"
+                  className="bg-white p-7 rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-xs hover:border-[#0D6D5F]/40 transition duration-200 space-y-4"
                 >
-                  <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
-                    <Icon className="w-6 h-6" />
+                  <div className="w-12 h-12 rounded-[6px] bg-[#fff] border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] flex items-center justify-center shrink-0">
+                    <Icon className="w-6 h-6 text-[#0D6D5F]" />
                   </div>
-                  <h3 className="text-lg font-bold text-[#0f172a]">{perk.title}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">{perk.desc}</p>
+                  <h3 className="text-base sm:text-lg font-bold text-[#0f172a]">{perk.title}</h3>
+                  <p className="text-xs sm:text-[13px] text-gray-600 leading-relaxed font-normal">{perk.desc}</p>
                 </div>
               );
             })}
@@ -281,8 +281,8 @@ export default function CareersClient() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#327C73]">Join Our Team</span>
-              <h2 className="text-3xl sm:text-4xl font-bold text-[#0f172a] tracking-tight">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">Join Our Team</span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">
                 Current Openings ({filteredJobs.length})
               </h2>
             </div>
@@ -295,7 +295,7 @@ export default function CareersClient() {
                   onClick={() => setSelectedDept(dept)}
                   variant={selectedDept === dept ? "brand" : "soft"}
                   size="xs"
-                  radius="xl"
+                  radius="fiverr"
                   className={`font-semibold whitespace-nowrap transition cursor-pointer ${selectedDept === dept
                     ? "shadow-xs"
                     : "hover:bg-gray-200"
@@ -312,21 +312,21 @@ export default function CareersClient() {
             {filteredJobs.map((job) => (
               <div
                 key={job.id}
-                className="bg-white border border-gray-200 rounded-[6px] p-6 sm:p-7 hover:border-[#327C73] hover:shadow-md transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6 group"
+                className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-6 sm:p-7 hover:border-[#0D6D5F]/40 hover:shadow-xs transition duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6 group"
               >
                 <div className="space-y-3 max-w-2xl">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-[6px] text-[11px] font-bold bg-[#10b981]/10 text-[#327C73]">
+                    <span className="px-2.5 py-1 rounded-[6px] text-[11px] font-bold bg-[#0D6D5F]/10 text-[#0D6D5F] border border-[#0D6D5F]/15">
                       {job.department}
                     </span>
                     <span className="px-2.5 py-1 rounded-[6px] text-[11px] font-semibold bg-gray-100 text-gray-600">
                       {job.level}
                     </span>
                   </div>
-                  <h3 className="text-xl font-bold text-[#0f172a] group-hover:text-[#327C73] transition-colors">
+                  <h3 className="text-base sm:text-lg font-bold text-[#0f172a] group-hover:text-[#0D6D5F] transition-colors">
                     {job.title}
                   </h3>
-                  <p className="text-sm text-gray-600 line-clamp-2">{job.description}</p>
+                  <p className="text-xs sm:text-[13px] text-gray-600 line-clamp-2 leading-relaxed font-normal">{job.description}</p>
                   <div className="flex items-center gap-4 text-xs text-gray-500 pt-1">
                     <span className="inline-flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5" />
@@ -347,7 +347,7 @@ export default function CareersClient() {
                     }}
                     variant="brand"
                     size="sm"
-                    radius="xl"
+                    radius="fiverr"
                     rightIcon={<ChevronRight className="w-4 h-4" />}
                     className="font-semibold shadow-xs"
                   >
@@ -359,9 +359,9 @@ export default function CareersClient() {
           </div>
 
           {/* General Application Callout */}
-          <div className="mt-12 bg-gradient-to-r from-[#f2fbf6] to-[#e6f8ef] border border-[#ceefe0] rounded-[6px] p-8 text-center max-w-3xl mx-auto space-y-4">
-            <h3 className="text-xl font-bold text-[#0f172a]">Don't see your role?</h3>
-            <p className="text-sm text-gray-600 max-w-xl mx-auto">
+          <div className="mt-12 bg-[#F8F9FA] border border-[rgba(0,0,0,0.10)] rounded-[6px] p-8 text-center max-w-3xl mx-auto space-y-4">
+            <h3 className="text-lg sm:text-xl font-bold text-[#0f172a]">Don't see your role?</h3>
+            <p className="text-xs sm:text-[13px] text-gray-600 max-w-xl mx-auto leading-relaxed font-normal">
               We're always looking for exceptional engineers, designers, and operators. Send us your portfolio and tell us how you can make an impact.
             </p>
             <Button
@@ -380,7 +380,7 @@ export default function CareersClient() {
               }}
               variant="dark"
               size="sm"
-              radius="xl"
+              radius="fiverr"
               className="font-semibold text-xs"
             >
               Submit Open Application
@@ -392,7 +392,7 @@ export default function CareersClient() {
       {/* Application Modal */}
       {isApplying && selectedJob && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-[rgba(0,0,0,0.10)] my-8">
             <Button
               onClick={() => {
                 setIsApplying(false);
@@ -401,17 +401,17 @@ export default function CareersClient() {
               variant="soft"
               size="icon"
               radius="full"
-              className="absolute top-5 right-5 w-8 h-8 text-gray-600 hover:text-black"
+              className="absolute top-5 right-5 w-8 h-8 text-gray-600 hover:text-black cursor-pointer"
               aria-label="Close modal"
             >
               <X className="w-4 h-4" />
             </Button>
 
             <div className="space-y-2 mb-6">
-              <span className="text-xs font-bold text-[#327C73] uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#0D6D5F] uppercase tracking-wider">
                 Application Form
               </span>
-              <h3 className="text-xl font-bold text-[#0f172a]">{selectedJob.title}</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-[#0f172a]">{selectedJob.title}</h3>
               <p className="text-xs text-gray-500">
                 {selectedJob.department} • {selectedJob.location}
               </p>
@@ -428,7 +428,7 @@ export default function CareersClient() {
                   value={applicantForm.fullName}
                   onChange={(e) => setApplicantForm({ ...applicantForm, fullName: e.target.value })}
                   placeholder="e.g. Jane Doe"
-                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#0D6D5F] focus:ring-2 focus:ring-[#0D6D5F]/10 outline-none"
                 />
               </div>
 
@@ -442,7 +442,7 @@ export default function CareersClient() {
                   value={applicantForm.email}
                   onChange={(e) => setApplicantForm({ ...applicantForm, email: e.target.value })}
                   placeholder="e.g. jane@example.com"
-                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#0D6D5F] focus:ring-2 focus:ring-[#0D6D5F]/10 outline-none"
                 />
               </div>
 
@@ -456,7 +456,7 @@ export default function CareersClient() {
                     value={applicantForm.linkedin}
                     onChange={(e) => setApplicantForm({ ...applicantForm, linkedin: e.target.value })}
                     placeholder="https://linkedin.com/in/..."
-                    className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#0D6D5F] focus:ring-2 focus:ring-[#0D6D5F]/10 outline-none"
                   />
                 </div>
                 <div>
@@ -468,7 +468,7 @@ export default function CareersClient() {
                     value={applicantForm.portfolio}
                     onChange={(e) => setApplicantForm({ ...applicantForm, portfolio: e.target.value })}
                     placeholder="https://yourwork.com"
-                    className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#0D6D5F] focus:ring-2 focus:ring-[#0D6D5F]/10 outline-none"
                   />
                 </div>
               </div>
@@ -482,7 +482,7 @@ export default function CareersClient() {
                   value={applicantForm.notes}
                   onChange={(e) => setApplicantForm({ ...applicantForm, notes: e.target.value })}
                   placeholder="Tell us what excites you about this role..."
-                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#327C73] focus:ring-2 focus:ring-[#10b981]/20 outline-none resize-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs text-gray-800 focus:border-[#0D6D5F] focus:ring-2 focus:ring-[#0D6D5F]/10 outline-none resize-none"
                 />
               </div>
 
@@ -496,7 +496,7 @@ export default function CareersClient() {
                 type="submit"
                 variant="brand"
                 size="md"
-                radius="xl"
+                radius="fiverr"
                 fullWidth
                 leftIcon={<Send className="w-4 h-4" />}
                 className="font-semibold shadow-md mt-2"

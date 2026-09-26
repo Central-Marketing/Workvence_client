@@ -16,10 +16,10 @@ export default function EarningsCalculator() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-[6px] p-8 sm:p-12 shadow-2xl space-y-8">
           <div className="text-center space-y-2">
-            <span className="text-xs font-bold text-[#6ad724] uppercase tracking-wider">
+            <span className="text-xs font-bold text-[#0D6D5F] uppercase tracking-wider">
               Earnings Estimator
             </span>
-            <h2 className="text-3xl font-bold text-white">Estimate Your Earning Potential</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">Estimate Your Earning Potential</h2>
             <p className="text-xs sm:text-sm text-gray-300">
               Adjust the sliders below to see what you could earn on Workvence based on your rates.
             </p>
@@ -30,7 +30,7 @@ export default function EarningsCalculator() {
               <div>
                 <div className="flex justify-between text-xs font-semibold text-gray-300 mb-2">
                   <span>Average Project / Gig Price</span>
-                  <span className="text-[#6ad724] font-bold text-sm">${ratePerProject}</span>
+                  <span className="text-[#0D6D5F] font-bold text-sm">${ratePerProject}</span>
                 </div>
                 <input
                   type="range"
@@ -39,7 +39,7 @@ export default function EarningsCalculator() {
                   step={10}
                   value={ratePerProject}
                   onChange={(e) => setRatePerProject(Number(e.target.value))}
-                  className="w-full accent-[#10b981] h-2 bg-white/20 rounded-[6px] cursor-pointer"
+                  className="w-full accent-[#0D6D5F] h-2 bg-white/20 rounded-[6px] cursor-pointer"
                 />
                 <div className="flex justify-between text-[10px] text-gray-400 mt-1">
                   <span>$20</span>
@@ -51,7 +51,7 @@ export default function EarningsCalculator() {
               <div>
                 <div className="flex justify-between text-xs font-semibold text-gray-300 mb-2">
                   <span>Completed Orders / Month</span>
-                  <span className="text-[#6ad724] font-bold text-sm">{projectsPerMonth} orders</span>
+                  <span className="text-[#0D6D5F] font-bold text-sm">{projectsPerMonth} orders</span>
                 </div>
                 <input
                   type="range"
@@ -60,7 +60,7 @@ export default function EarningsCalculator() {
                   step={1}
                   value={projectsPerMonth}
                   onChange={(e) => setProjectsPerMonth(Number(e.target.value))}
-                  className="w-full accent-[#10b981] h-2 bg-white/20 rounded-[6px] cursor-pointer"
+                  className="w-full accent-[#0D6D5F] h-2 bg-white/20 rounded-[6px] cursor-pointer"
                 />
                 <div className="flex justify-between text-[10px] text-gray-400 mt-1">
                   <span>1</span>
@@ -75,7 +75,7 @@ export default function EarningsCalculator() {
                 <span className="text-xs text-gray-300 uppercase tracking-wider font-semibold">
                   Estimated Monthly Take-Home
                 </span>
-                <div className="text-4xl sm:text-5xl font-extrabold text-[#6ad724]">
+                <div className="text-4xl sm:text-5xl font-extrabold text-[#0D6D5F]">
                   ${Math.round(estimatedMonthlyEarnings).toLocaleString()}
                 </div>
                 <span className="text-xs text-gray-400 block">
@@ -85,7 +85,7 @@ export default function EarningsCalculator() {
 
               <Link
                 href="/become-a-seller"
-                className="w-full py-3 rounded-[6px] bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs shadow-md transition active:scale-95 inline-flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs shadow-xs transition active:scale-95 inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Open Your Free Seller Account</span>
                 <ArrowRight className="w-4 h-4" />

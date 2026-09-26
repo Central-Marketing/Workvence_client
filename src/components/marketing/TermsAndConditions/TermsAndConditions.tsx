@@ -72,7 +72,7 @@ const TermsAndConditions = () => {
         </div>
 
         {/* Dynamic Rich Text Terms Content Container */}
-        <div className="bg-white border border-gray-200/90 rounded-[6px] p-8 sm:p-12 shadow-[0_2px_20px_rgba(0,0,0,0.03)] mb-0">
+        <div className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-8 sm:p-12 shadow-xs mb-0">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-16 space-y-3">
               <Loader size={40} />

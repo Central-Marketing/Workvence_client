@@ -129,31 +129,31 @@ export default function InvestorRelationsPage() {
   return (
     <div className="min-h-screen bg-white text-[#112131] font-sans">
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-20 lg:py-28">
+      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-[rgba(0,0,0,0.10)] py-20 lg:py-28">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[#327C73] text-xs font-semibold">
-              <TrendingUp className="w-4 h-4 text-[#10b981]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] text-xs font-semibold">
+              <TrendingUp className="w-3.5 h-3.5 text-[#0D6D5F]" />
               <span>Workvence Investor Relations</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#0f172a] leading-tight">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#0f172a] leading-tight">
               Powering the Global <br className="hidden sm:inline" />
-              <span className="text-[#327C73]">Independent Economy</span>
+              <span className="text-[#0D6D5F]">Independent Economy</span>
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto font-normal">
+            <p className="text-xs sm:text-sm md:text-base text-gray-600 max-w-2xl mx-auto font-normal leading-relaxed">
               Discover our financial disclosures, governance frameworks, operational performance, and long-term shareholder value creation strategy.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <a
                 href="#filings"
-                className="px-7 py-3.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-6 h-10 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Financial Disclosures</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
                 href="#contact"
-                className="px-7 py-3.5 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-6 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] hover:bg-gray-50 text-[#0f172a] font-semibold text-xs sm:text-sm transition inline-flex items-center justify-center cursor-pointer"
               >
                 Investor Contact
               </a>
@@ -172,7 +172,7 @@ export default function InvestorRelationsPage() {
                 <div key={i} className="bg-white/5 border border-white/10 rounded-[6px] p-6 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-400 font-medium">{h.label}</span>
-                    <Icon className="w-4 h-4 text-[#6ad724]" />
+                    <Icon className="w-4 h-4 text-[#0D6D5F]" />
                   </div>
                   <div className="text-3xl font-extrabold text-white">{h.value}</div>
                   <div className="text-xs text-[#10b981] font-semibold">{h.growth}</div>
@@ -188,10 +188,13 @@ export default function InvestorRelationsPage() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#327C73]">Financial Reporting</span>
-              <h2 className="text-3xl sm:text-4xl font-bold text-[#0f172a] tracking-tight">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">Financial Reporting</span>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">
                 Reports & Shareholder Letters
               </h2>
+              <p className="text-xs sm:text-sm text-gray-500">
+                Access quarterly earnings, annual reports, and corporate governance materials.
+              </p>
             </div>
           </div>
 
@@ -199,32 +202,30 @@ export default function InvestorRelationsPage() {
             {financialReports.map((report, idx) => (
               <div
                 key={idx}
-                className="bg-white border border-gray-200 rounded-[6px] p-6 hover:border-[#327C73] hover:shadow-md transition-all duration-200 flex items-center justify-between gap-4 group"
+                className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-6 hover:border-[#0D6D5F]/40 hover:shadow-xs transition duration-200 flex items-center justify-between gap-4 group"
               >
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs">
-                    <span className="px-2 py-0.5 rounded-[6px] font-bold bg-[#10b981]/10 text-[#327C73]">
+                    <span className="px-2 py-0.5 rounded-[6px] font-bold bg-[#0D6D5F]/10 text-[#0D6D5F] border border-[#0D6D5F]/15">
                       {report.period}
                     </span>
                     <span className="text-gray-400">•</span>
                     <span className="text-gray-500">{report.date}</span>
                   </div>
-                  <h3 className="text-base font-bold text-[#0f172a] group-hover:text-[#327C73] transition-colors">
+                  <h3 className="text-base font-bold text-[#0f172a] group-hover:text-[#0D6D5F] transition-colors">
                     {report.title}
                   </h3>
                   <span className="text-xs text-gray-400">{report.size} • {report.type}</span>
                 </div>
 
-                <Button
+                <button
+                  type="button"
                   onClick={() => handleDownload(report.title)}
-                  variant="soft"
-                  size="icon"
-                  radius="xl"
-                  className="w-10 h-10 group-hover:bg-[#327C73] group-hover:text-white text-gray-700 shrink-0"
+                  className="w-10 h-10 rounded-[6px] bg-[#fff] border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] hover:bg-[#0D6D5F] hover:text-white flex items-center justify-center shrink-0 transition duration-150 cursor-pointer"
                   aria-label={`Download ${report.title}`}
                 >
                   <Download className="w-4 h-4" />
-                </Button>
+                </button>
               </div>
             ))}
           </div>
@@ -232,33 +233,34 @@ export default function InvestorRelationsPage() {
       </section>
 
       {/* Investor FAQ & Contact Section */}
-      <section id="contact" className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-[#f8fafc] border-t border-gray-100">
+      <section id="contact" className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-[#f8fafc] border-t border-[rgba(0,0,0,0.10)]">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
             {/* FAQ Accordion (6 cols) */}
             <div className="lg:col-span-6 space-y-6">
               <div className="space-y-2">
-                <span className="text-xs font-bold uppercase tracking-widest text-[#327C73]">Investor FAQ</span>
-                <h3 className="text-2xl font-bold text-[#0f172a]">Frequently Asked Questions</h3>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">Investor FAQ</span>
+                <h3 className="text-2xl sm:text-3xl font-bold text-[#0f172a] tracking-tight">Frequently Asked Questions</h3>
+                <p className="text-xs sm:text-sm text-gray-500">Key metrics and operational principles for shareholders.</p>
               </div>
 
               <div className="space-y-3">
                 {investorFaqs.map((faq, i) => (
                   <div
                     key={i}
-                    className="bg-white border border-gray-200/90 rounded-[6px] p-5 cursor-pointer"
+                    className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-5 cursor-pointer shadow-xs hover:border-[#0D6D5F]/40 transition duration-200"
                     onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   >
                     <div className="flex items-center justify-between">
                       <h4 className="text-sm font-bold text-[#0f172a]">{faq.q}</h4>
                       <ChevronDown
-                        className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${openFaq === i ? "rotate-180 text-[#327C73]" : ""
+                        className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${openFaq === i ? "rotate-180 text-[#0D6D5F]" : ""
                           }`}
                       />
                     </div>
                     {openFaq === i && (
-                      <p className="text-xs text-gray-600 pt-3 mt-3 border-t border-gray-100 leading-relaxed font-normal">
+                      <p className="text-xs sm:text-[13px] text-gray-600 pt-3 mt-3 border-t border-[rgba(0,0,0,0.06)] leading-relaxed font-normal">
                         {faq.a}
                       </p>
                     )}
@@ -269,9 +271,10 @@ export default function InvestorRelationsPage() {
 
             {/* Investor Inquiry Form (6 cols) */}
             <div className="lg:col-span-6">
-              <div className="bg-white border border-gray-200 rounded-[6px] p-6 sm:p-8 shadow-xs space-y-5">
+              <div className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-6 sm:p-8 shadow-xs space-y-5">
                 <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-[#0f172a]">Investor Inquiries</h3>
+                  <span className="text-xs font-bold text-[#0D6D5F] uppercase tracking-wider">Inquiries</span>
+                  <h3 className="text-lg sm:text-xl font-bold text-[#0f172a]">Investor Inquiries</h3>
                   <p className="text-xs text-gray-500">
                     Reach out to our investor relations and corporate development team.
                   </p>
@@ -287,7 +290,7 @@ export default function InvestorRelationsPage() {
                         value={irForm.name}
                         onChange={(e) => setIrForm({ ...irForm, name: e.target.value })}
                         placeholder="e.g. Michael Stone"
-                        className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                        className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#0D6D5F] outline-none"
                       />
                     </div>
                     <div>
@@ -297,7 +300,7 @@ export default function InvestorRelationsPage() {
                         value={irForm.fund}
                         onChange={(e) => setIrForm({ ...irForm, fund: e.target.value })}
                         placeholder="e.g. Apex Ventures"
-                        className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                        className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#0D6D5F] outline-none"
                       />
                     </div>
                   </div>
@@ -311,7 +314,7 @@ export default function InvestorRelationsPage() {
                         value={irForm.email}
                         onChange={(e) => setIrForm({ ...irForm, email: e.target.value })}
                         placeholder="m.stone@apex.com"
-                        className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                        className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#0D6D5F] outline-none"
                       />
                     </div>
                     <div>
@@ -332,7 +335,7 @@ export default function InvestorRelationsPage() {
                       value={irForm.message}
                       onChange={(e) => setIrForm({ ...irForm, message: e.target.value })}
                       placeholder="Brief description of your inquiry..."
-                      className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
+                      className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#0D6D5F] outline-none resize-none"
                     />
                   </div>
 
@@ -340,7 +343,7 @@ export default function InvestorRelationsPage() {
                     type="submit"
                     variant="brand"
                     size="md"
-                    radius="xl"
+                    radius="fiverr"
                     fullWidth
                     leftIcon={<Send className="w-3.5 h-3.5" />}
                     className="font-semibold shadow-xs"

@@ -161,7 +161,7 @@ export default function IpClaimForm() {
                 required
                 checked={claimForm.statementGoodFaith}
                 onChange={(e) => setClaimForm({ ...claimForm, statementGoodFaith: e.target.checked })}
-                className="mt-0.5 rounded text-[#327C73] focus:ring-[#327C73]"
+                className="mt-0.5 rounded text-[#0D6D5F] focus:ring-[#0D6D5F]"
               />
               <span>
                 I have a good faith belief that use of the material in the manner complained of is not authorized by the copyright owner, its agent, or the law.
@@ -174,7 +174,7 @@ export default function IpClaimForm() {
                 required
                 checked={claimForm.statementAccuracy}
                 onChange={(e) => setClaimForm({ ...claimForm, statementAccuracy: e.target.checked })}
-                className="mt-0.5 rounded text-[#327C73] focus:ring-[#327C73]"
+                className="mt-0.5 rounded text-[#0D6D5F] focus:ring-[#0D6D5F]"
               />
               <span>
                 Under penalty of perjury, the information in this notification is accurate and I am authorized to act on behalf of the copyright owner.
@@ -192,7 +192,7 @@ export default function IpClaimForm() {
               value={claimForm.signature}
               onChange={(e) => setClaimForm({ ...claimForm, signature: e.target.value })}
               placeholder="/s/ Full Legal Name"
-              className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors font-mono"
+              className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-[#0D6D5F] focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors font-mono"
             />
           </div>
 
@@ -200,10 +200,10 @@ export default function IpClaimForm() {
             type="submit"
             variant="brand"
             size="md"
-            radius="xl"
+            radius="fiverr"
             fullWidth
             leftIcon={<Send className="w-4 h-4" />}
-            className="mt-2 text-xs shadow-md font-semibold"
+            className="mt-2 text-xs shadow-md font-semibold bg-[#0D6D5F] hover:bg-[#0b5c50] text-white"
           >
             Submit DMCA Takedown Notice
           </Button>

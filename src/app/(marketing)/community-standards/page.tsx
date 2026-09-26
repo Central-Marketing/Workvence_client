@@ -51,17 +51,17 @@ export default function CommunityStandardsPage() {
   return (
     <div className="min-h-screen bg-white text-[#112131] font-sans">
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-16 lg:py-24">
+      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-[rgba(0,0,0,0.10)] py-16 lg:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center space-y-5">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[#327C73] text-xs font-semibold">
-              <Scale className="w-4 h-4 text-[#10b981]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] text-xs font-semibold">
+              <Scale className="w-3.5 h-3.5 text-[#0D6D5F]" />
               <span>Platform Integrity</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#0f172a] leading-tight">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#0f172a] leading-tight">
               Workvence Community Standards
             </h1>
-            <p className="text-base text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xs sm:text-sm md:text-base text-gray-600 max-w-2xl mx-auto font-normal leading-relaxed">
               Our standards govern interactions across the marketplace to ensure a safe, fair, professional, and trustworthy environment for everyone.
             </p>
           </div>
@@ -69,45 +69,46 @@ export default function CommunityStandardsPage() {
       </section>
 
       {/* Standards List Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 md:px-6 max-w-4xl space-y-10">
+      <section className="pt-16 pb-[80px] min-[1400px]:pb-[100px] bg-white">
+        <div className="container mx-auto px-4 md:px-6 max-w-4xl space-y-8">
           {standards.map((s, idx) => (
             <div
               key={idx}
-              className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-8 space-y-6 shadow-xs"
+              className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-7 sm:p-8 space-y-6 shadow-xs"
             >
-              <h3 className="text-xl font-bold text-[#0f172a]">{s.title}</h3>
+              <h3 className="text-base sm:text-lg font-bold text-[#0f172a]">{s.title}</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-emerald-50/60 border border-emerald-200/80 rounded-[6px] p-5 space-y-2">
+                <div className="bg-emerald-50/60 border border-[rgba(0,0,0,0.10)] rounded-[6px] p-5 space-y-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 uppercase tracking-wider">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     <span>What We Encourage (Do)</span>
                   </div>
-                  <p className="text-xs text-emerald-900 leading-relaxed font-normal">{s.do}</p>
+                  <p className="text-xs sm:text-[13px] text-emerald-900 leading-relaxed font-normal">{s.do}</p>
                 </div>
 
-                <div className="bg-rose-50/60 border border-rose-200/80 rounded-[6px] p-5 space-y-2">
+                <div className="bg-rose-50/60 border border-[rgba(0,0,0,0.10)] rounded-[6px] p-5 space-y-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-rose-800 uppercase tracking-wider">
                     <XCircle className="w-4 h-4 text-rose-600" />
                     <span>Strictly Prohibited (Don't)</span>
                   </div>
-                  <p className="text-xs text-rose-900 leading-relaxed font-normal">{s.dont}</p>
+                  <p className="text-xs sm:text-[13px] text-rose-900 leading-relaxed font-normal">{s.dont}</p>
                 </div>
               </div>
             </div>
           ))}
 
           {/* Violations & Enforcement Box */}
-          <div className="bg-white border border-gray-200 rounded-[6px] p-8 sm:p-10 space-y-4">
-            <h3 className="text-xl font-bold text-[#0f172a]">Enforcement & Reporting</h3>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
+          <div className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-7 sm:p-8 space-y-4 shadow-xs">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">Enforcement Policy</span>
+            <h3 className="text-base sm:text-lg font-bold text-[#0f172a]">Enforcement & Reporting</h3>
+            <p className="text-xs sm:text-[13px] text-gray-600 leading-relaxed font-normal">
               Workvence employs continuous AI risk monitoring, KYC verification, and a dedicated 24/7 trust operations team. Violations of these standards may result in warnings, gig removal, escrow hold, or permanent account termination.
             </p>
             <div className="pt-2 flex flex-wrap items-center gap-4">
               <Link
                 href="/support"
-                className="px-6 py-2.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs transition active:scale-95 cursor-pointer"
+                className="px-6 h-10 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs inline-flex items-center cursor-pointer"
               >
                 Report a Violation / Contact Trust Operations
               </Link>

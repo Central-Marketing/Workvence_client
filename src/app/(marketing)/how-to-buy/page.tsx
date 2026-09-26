@@ -92,31 +92,31 @@ export default function HowToBuyPage() {
   return (
     <div className="min-h-screen bg-white text-[#112131] font-sans">
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-20 lg:py-28">
+      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-[rgba(0,0,0,0.10)] py-20 lg:py-28">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[#327C73] text-xs font-semibold">
-              <ShieldCheck className="w-4 h-4 text-[#10b981]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] text-xs font-semibold">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#0D6D5F]" />
               <span>Buyer Protection Guide</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#0f172a] leading-tight">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#0f172a] leading-tight">
               Hire World-Class Talent with <br className="hidden sm:inline" />
-              <span className="text-[#327C73]">Zero Risk & Total Confidence</span>
+              <span className="text-[#0D6D5F]">Zero Risk & Total Confidence</span>
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto font-normal">
+            <p className="text-xs sm:text-sm md:text-base text-gray-600 max-w-2xl mx-auto font-normal leading-relaxed">
               Find pre-vetted specialists, manage projects effortlessly, and only pay when work is completed to your exact standards.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <Link
                 href="/packages?category=ai-services"
-                className="px-7 py-3.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs gap-2 cursor-pointer"
               >
                 <span>Explore Packages</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <a
                 href="#guarantees"
-                className="px-7 py-3.5 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] hover:bg-gray-50 text-[#0f172a] font-semibold text-xs sm:text-sm transition cursor-pointer"
               >
                 Buyer Guarantees
               </a>
@@ -128,12 +128,12 @@ export default function HowToBuyPage() {
       {/* 4-Step Buyer Roadmap */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#327C73]">The Buying Process</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#0f172a] tracking-tight">
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">The Buying Process</span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">
               How Hiring Works on Workvence
             </h2>
-            <p className="text-sm sm:text-base text-gray-600">
+            <p className="text-xs sm:text-sm text-gray-500">
               From discovering top talent to project sign-off in 4 straightforward steps.
             </p>
           </div>
@@ -142,11 +142,11 @@ export default function HowToBuyPage() {
             {buyerSteps.map((s, idx) => (
               <div
                 key={idx}
-                className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-6 space-y-4 hover:border-[#327C73] transition duration-200"
+                className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-6 space-y-4 hover:border-[#0D6D5F]/40 shadow-xs transition duration-200"
               >
-                <div className="text-2xl font-extrabold text-[#327C73] font-mono">{s.step}</div>
-                <h3 className="text-lg font-bold text-[#0f172a]">{s.title}</h3>
-                <p className="text-xs text-gray-600 leading-relaxed font-normal">{s.desc}</p>
+                <div className="text-2xl font-extrabold text-[#0D6D5F] font-mono">{s.step}</div>
+                <h3 className="text-base sm:text-lg font-bold text-[#0f172a]">{s.title}</h3>
+                <p className="text-xs sm:text-[13px] text-gray-600 leading-relaxed font-normal">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -154,14 +154,14 @@ export default function HowToBuyPage() {
       </section>
 
       {/* Buyer Guarantees Section */}
-      <section id="guarantees" className="py-20 bg-[#f8fafc] border-y border-gray-100">
+      <section id="guarantees" className="py-20 bg-[#f8fafc] border-y border-[rgba(0,0,0,0.10)]">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#327C73]">Our Promise</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#0f172a] tracking-tight">
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">Our Promise</span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">
               Built-in Buyer Protections
             </h2>
-            <p className="text-sm sm:text-base text-gray-600">
+            <p className="text-xs sm:text-sm text-gray-500">
               Every single transaction is safeguarded by industry-leading security and escrow rails.
             </p>
           </div>
@@ -172,17 +172,17 @@ export default function HowToBuyPage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white border border-gray-200 rounded-[6px] p-8 space-y-4 shadow-xs hover:shadow-md transition"
+                  className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-7 sm:p-8 space-y-4 shadow-xs hover:border-[#0D6D5F]/40 transition duration-200"
                 >
-                  <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
-                    <Icon className="w-6 h-6" />
+                  <div className="w-12 h-12 rounded-[6px] bg-[#fff] border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] flex items-center justify-center shrink-0">
+                    <Icon className="w-6 h-6 text-[#0D6D5F]" />
                   </div>
-                  <h3 className="text-xl font-bold text-[#0f172a]">{g.title}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">{g.desc}</p>
+                  <h3 className="text-base sm:text-lg font-bold text-[#0f172a]">{g.title}</h3>
+                  <p className="text-xs sm:text-[13px] text-gray-600 leading-relaxed font-normal">{g.desc}</p>
                   {"href" in g && g.href && (
                     <Link
                       href={g.href}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#327C73] hover:text-[#235851] pt-1"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0D6D5F] hover:text-[#0b5c50] pt-1"
                     >
                       <span>Learn how escrow works</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -199,8 +199,11 @@ export default function HowToBuyPage() {
       <section className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-3xl">
           <div className="text-center mb-12 space-y-2">
-            <span className="text-xs font-bold text-[#327C73] uppercase tracking-wider">Help & Answers</span>
-            <h2 className="text-3xl font-bold text-[#0f172a]">Buying FAQ</h2>
+            <span className="text-xs font-bold text-[#0D6D5F] uppercase tracking-wider">Help & Answers</span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">Buying FAQ</h2>
+            <p className="text-xs sm:text-sm text-gray-500">
+              Everything you need to know about purchasing services safely.
+            </p>
           </div>
 
           <HowToBuyFaq faqs={buyerFaqs} />
@@ -208,7 +211,7 @@ export default function HowToBuyPage() {
           <div className="mt-12 text-center">
             <Link
               href="/packages?category=ai-services"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-md transition active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 h-10 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm shadow-xs transition cursor-pointer"
             >
               <span>Explore Marketplace Packages</span>
               <ArrowRight className="w-4 h-4" />

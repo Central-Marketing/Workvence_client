@@ -140,17 +140,17 @@ export default function LogoMakerPage() {
   return (
     <div className="min-h-screen bg-white text-[#112131] font-sans pb-[80px] min-[1400px]:pb-[100px]">
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-16 lg:py-24">
+      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-[rgba(0,0,0,0.10)] py-16 lg:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center space-y-5">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[#327C73] text-xs font-semibold">
-              <Sparkles className="w-4 h-4 text-[#10b981]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] text-xs font-semibold">
+              <Sparkles className="w-3.5 h-3.5 text-[#0D6D5F]" />
               <span>AI Logo Studio & Brand Generator</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#0f172a] leading-tight">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#0f172a] leading-tight">
               Create a Custom Logo in Seconds
             </h1>
-            <p className="text-base text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xs sm:text-sm md:text-base text-gray-600 max-w-2xl mx-auto font-normal leading-relaxed">
               Enter your brand name, explore instant vector variations, preview real-world mockups, or hire a top logo designer for custom refinements.
             </p>
           </div>
@@ -163,10 +163,10 @@ export default function LogoMakerPage() {
 
           {/* Left Controls Sidebar (4 cols) */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-[#f8fafc] border border-gray-200 rounded-[6px] p-6 sm:p-7 space-y-5 shadow-xs">
-              <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+            <div className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-6 sm:p-7 space-y-5 shadow-xs">
+              <div className="flex items-center justify-between border-b border-[rgba(0,0,0,0.10)] pb-3">
                 <h3 className="text-base font-bold text-[#0f172a] flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-[#327C73]" />
+                  <Sliders className="w-4 h-4 text-[#0D6D5F]" />
                   <span>Logo Customizer</span>
                 </h3>
               </div>
@@ -178,7 +178,7 @@ export default function LogoMakerPage() {
                   value={brandName}
                   onChange={(e) => setBrandName(e.target.value)}
                   placeholder="e.g. Veloce"
-                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 bg-white text-xs font-bold focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 bg-white text-xs font-bold focus:border-[#0D6D5F] outline-none"
                 />
               </div>
 
@@ -189,7 +189,7 @@ export default function LogoMakerPage() {
                   value={slogan}
                   onChange={(e) => setSlogan(e.target.value)}
                   placeholder="e.g. Scale with speed"
-                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 bg-white text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 bg-white text-xs focus:border-[#0D6D5F] outline-none"
                 />
               </div>
 
@@ -206,7 +206,7 @@ export default function LogoMakerPage() {
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-2">Color Palette Accent</label>
                 <div className="flex items-center gap-3">
-                  {["#327C73", "#10b981", "#2563eb", "#7c3aed", "#e11d48", "#0f172a"].map((c) => (
+                  {["#0D6D5F", "#10b981", "#2563eb", "#7c3aed", "#e11d48", "#0f172a"].map((c) => (
                     <Button
                       key={c}
                       onClick={() => setPrimaryColor(c)}
@@ -224,14 +224,14 @@ export default function LogoMakerPage() {
             </div>
 
             {/* Custom Designer Card */}
-            <div className="bg-gradient-to-r from-[#f2fbf6] to-[#e6f8ef] border border-[#ceefe0] rounded-[6px] p-6 space-y-3 text-center">
+            <div className="bg-[#F8F9FA] border border-[rgba(0,0,0,0.10)] rounded-[6px] p-6 space-y-3 text-center shadow-xs">
               <h4 className="font-bold text-[#0f172a] text-sm">Need a 100% bespoke custom logo?</h4>
               <p className="text-xs text-gray-600">
                 Work directly with top-rated branding freelancers starting at $50.
               </p>
               <Link
                 href="/packages?category=graphics-and-design"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs shadow-xs transition cursor-pointer"
               >
                 <span>Browse Logo Designers</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -241,7 +241,7 @@ export default function LogoMakerPage() {
 
           {/* Right Logo Variations Grid (8 cols) */}
           <div className="lg:col-span-8 space-y-6">
-            <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+            <div className="flex items-center justify-between border-b border-[rgba(0,0,0,0.10)] pb-3">
               <h3 className="text-lg font-bold text-[#0f172a]">Generated Logo Concepts</h3>
               <span className="text-xs text-gray-500 font-medium">Live Instant Preview</span>
             </div>
@@ -250,25 +250,25 @@ export default function LogoMakerPage() {
               {logoVariations.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white border border-gray-200/90 rounded-[6px] p-6 hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group"
+                  className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-6 hover:border-[#0D6D5F]/40 hover:shadow-xs transition duration-200 flex flex-col justify-between space-y-6 group"
                 >
                   <div className="flex items-center justify-between text-xs text-gray-400">
                     <span className="font-semibold text-gray-700">{item.name}</span>
                     <span>Concept #{item.id}</span>
                   </div>
 
-                  <div className="min-h-[160px] flex items-center justify-center bg-[#fafafa] rounded-[6px] border border-gray-100/80 group-hover:bg-white transition">
+                  <div className="min-h-[160px] flex items-center justify-center bg-[#fafafa] rounded-[6px] border border-[rgba(0,0,0,0.06)] group-hover:bg-white transition">
                     {item.render}
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                  <div className="flex items-center justify-between pt-2 border-t border-[rgba(0,0,0,0.06)]">
                     <Button
                       onClick={() => handleDownloadLogo(item.id)}
                       variant="ghost"
                       size="sm"
-                      radius="xl"
+                      radius="fiverr"
                       leftIcon={<Download className="w-3.5 h-3.5" />}
-                      className="text-xs font-semibold text-[#327C73] hover:text-[#28635c] p-0 h-auto"
+                      className="text-xs font-semibold text-[#0D6D5F] hover:text-[#0b5c50] p-0 h-auto cursor-pointer"
                     >
                       Download Logo Kit
                     </Button>

@@ -108,21 +108,21 @@ export default function ProTalentPage() {
       <section className="bg-gradient-to-b from-[#0f172a] via-[#112131] to-[#0f172a] text-white py-20 lg:py-28">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#6ad724]/10 border border-[#6ad724]/20 text-[#0db890] text-xs font-semibold">
-              <Crown className="w-4 h-4 text-[#0db890]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] text-xs font-semibold">
+              <Crown className="w-3.5 h-3.5 text-[#0D6D5F]" />
               <span>Workvence Pro • Top 1% Vetted Talent</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-tight">
               Exceptional Talent for <br className="hidden sm:inline" />
-              <span className="text-[#0db890]">Mission-Critical Projects</span>
+              <span className="text-[#0D6D5F]">Mission-Critical Projects</span>
             </h1>
-            <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto font-normal">
+            <p className="text-xs sm:text-sm md:text-base text-gray-300 max-w-2xl mx-auto font-normal leading-relaxed">
               Hand-vetted specialists with proven enterprise track records. Zero guesswork, guaranteed delivery excellence, and VIP concierge matching.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <Link
                 href="/packages?pro=true"
-                className="px-8 py-4 rounded-[6px] bg-brand-green hover:bg-[#022c22] text-[#ffffff] font-bold text-sm transition shadow-lg hover:shadow-xl active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-6 h-10 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Browse Pro Packages</span>
                 <ArrowRight className="w-4 h-4" />
@@ -131,8 +131,8 @@ export default function ProTalentPage() {
                 onClick={() => setIsApplyingPro(true)}
                 variant="outline"
                 size="md"
-                radius="xl"
-                className="bg-white/10 border-white/20 hover:bg-white/20 text-white font-semibold text-sm"
+                radius="fiverr"
+                className="bg-white/10 border-white/20 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm"
               >
                 Apply as a Pro Freelancer
               </Button>
@@ -144,12 +144,12 @@ export default function ProTalentPage() {
       {/* 4-Stage Vetting Process */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#327C73]">The Vetting Standard</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#0f172a] tracking-tight">
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">The Vetting Standard</span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">
               Only 1 in 100 Applicants are Accepted
             </h2>
-            <p className="text-sm sm:text-base text-gray-600">
+            <p className="text-xs sm:text-sm text-gray-500">
               Our vetting panel reviews technical skill, communication maturity, and reliability.
             </p>
           </div>
@@ -158,11 +158,11 @@ export default function ProTalentPage() {
             {vettingSteps.map((s, idx) => (
               <div
                 key={idx}
-                className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-8 space-y-4 hover:border-[#327C73] transition"
+                className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-6 space-y-4 hover:border-[#0D6D5F]/40 shadow-xs transition duration-200"
               >
-                <div className="text-2xl font-mono font-extrabold text-[#327C73]">{s.step}</div>
-                <h3 className="text-lg font-bold text-[#0f172a]">{s.title}</h3>
-                <p className="text-xs text-gray-600 leading-relaxed font-normal">{s.desc}</p>
+                <div className="text-2xl font-mono font-extrabold text-[#0D6D5F]">{s.step}</div>
+                <h3 className="text-base sm:text-lg font-bold text-[#0f172a]">{s.title}</h3>
+                <p className="text-xs sm:text-[13px] text-gray-600 leading-relaxed font-normal">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -170,13 +170,16 @@ export default function ProTalentPage() {
       </section>
 
       {/* Pro Categories Grid */}
-      <section className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-[#f8fafc] border-y border-gray-100">
+      <section className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-[#f8fafc] border-y border-[rgba(0,0,0,0.10)]">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#327C73]">Specialist Domains</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#0f172a] tracking-tight">
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">Specialist Domains</span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">
               Vetted Across Key Disciplines
             </h2>
+            <p className="text-xs sm:text-sm text-gray-500">
+              Hire hand-picked experts across software, design, marketing, and media.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -185,13 +188,13 @@ export default function ProTalentPage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white border border-gray-200 rounded-[6px] p-8 space-y-4 shadow-xs hover:border-[#327C73] hover:shadow-md transition duration-300"
+                  className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-7 sm:p-8 space-y-4 shadow-xs hover:border-[#0D6D5F]/40 transition duration-200"
                 >
-                  <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
-                    <Icon className="w-6 h-6" />
+                  <div className="w-12 h-12 rounded-[6px] bg-[#fff] border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] flex items-center justify-center shrink-0">
+                    <Icon className="w-6 h-6 text-[#0D6D5F]" />
                   </div>
-                  <h3 className="text-xl font-bold text-[#0f172a]">{c.title}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed font-normal">{c.desc}</p>
+                  <h3 className="text-base sm:text-lg font-bold text-[#0f172a]">{c.title}</h3>
+                  <p className="text-xs sm:text-[13px] text-gray-600 leading-relaxed font-normal">{c.desc}</p>
                 </div>
               );
             })}
@@ -202,20 +205,21 @@ export default function ProTalentPage() {
       {/* Pro Application Modal */}
       {isApplyingPro && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-[rgba(0,0,0,0.10)] my-8">
             <Button
               onClick={() => setIsApplyingPro(false)}
               variant="soft"
               size="icon"
               radius="full"
-              className="absolute top-5 right-5 w-8 h-8 text-gray-600 hover:text-black"
+              className="absolute top-5 right-5 w-8 h-8 text-gray-600 hover:text-black cursor-pointer"
               aria-label="Close modal"
             >
               <X className="w-4 h-4" />
             </Button>
 
             <div className="space-y-1 mb-5">
-              <h3 className="text-xl font-bold text-[#0f172a]">Apply for Workvence Pro</h3>
+              <span className="text-xs font-bold text-[#0D6D5F] uppercase tracking-wider">Workvence Pro</span>
+              <h3 className="text-lg sm:text-xl font-bold text-[#0f172a]">Apply for Workvence Pro</h3>
               <p className="text-xs text-gray-500">Join the top 1% vetted specialist tier.</p>
             </div>
 
@@ -229,7 +233,7 @@ export default function ProTalentPage() {
                     value={proForm.name}
                     onChange={(e) => setProForm({ ...proForm, name: e.target.value })}
                     placeholder="e.g. Thomas Becker"
-                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#0D6D5F] outline-none"
                   />
                 </div>
                 <div>
@@ -240,7 +244,7 @@ export default function ProTalentPage() {
                     value={proForm.email}
                     onChange={(e) => setProForm({ ...proForm, email: e.target.value })}
                     placeholder="thomas@studio.com"
-                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                    className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#0D6D5F] outline-none"
                   />
                 </div>
               </div>
@@ -253,7 +257,7 @@ export default function ProTalentPage() {
                   value={proForm.portfolio}
                   onChange={(e) => setProForm({ ...proForm, portfolio: e.target.value })}
                   placeholder="https://thomasbecker.design"
-                  className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                  className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#0D6D5F] outline-none"
                 />
               </div>
 
@@ -285,7 +289,7 @@ export default function ProTalentPage() {
                   value={proForm.notes}
                   onChange={(e) => setProForm({ ...proForm, notes: e.target.value })}
                   placeholder="Mention any high-profile clients, enterprise brands, or open-source projects..."
-                  className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
+                  className="w-full px-3 py-2 rounded-[6px] border border-gray-300 text-xs focus:border-[#0D6D5F] outline-none resize-none"
                 />
               </div>
 
@@ -293,10 +297,10 @@ export default function ProTalentPage() {
                 type="submit"
                 variant="brand"
                 size="md"
-                radius="xl"
+                radius="fiverr"
                 fullWidth
                 leftIcon={<Send className="w-4 h-4" />}
-                className="font-semibold shadow-md mt-2"
+                className="font-semibold shadow-xs mt-2"
               >
                 Submit Pro Application
               </Button>

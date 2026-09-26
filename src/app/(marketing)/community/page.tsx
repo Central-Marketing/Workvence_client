@@ -50,31 +50,31 @@ export default function CommunityHubPage() {
   return (
     <div className="min-h-screen bg-white text-[#112131] font-sans">
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-20 lg:py-28">
+      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-[rgba(0,0,0,0.10)] py-20 lg:py-28">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[#327C73] text-xs font-semibold">
-              <Users className="w-4 h-4 text-[#10b981]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] text-xs font-semibold">
+              <Users className="w-3.5 h-3.5 text-[#0D6D5F]" />
               <span>The Global Creator Collective</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#0f172a] leading-tight">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#0f172a] leading-tight">
               Where Independent <br className="hidden sm:inline" />
-              <span className="text-[#327C73]">Minds Connect</span>
+              <span className="text-[#0D6D5F]">Minds Connect</span>
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto font-normal">
+            <p className="text-xs sm:text-sm md:text-base text-gray-600 max-w-2xl mx-auto font-normal leading-relaxed">
               Join over 1.5 million designers, developers, writers, and digital entrepreneurs sharing insights, attending masterclasses, and growing together.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <Link
                 href="/forum"
-                className="px-7 py-3.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-sm transition shadow-md hover:shadow-lg active:scale-95 inline-flex items-center gap-2 cursor-pointer"
+                className="px-6 h-10 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>Visit Forum</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/events"
-                className="px-7 py-3.5 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-sm transition"
+                className="px-6 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] hover:bg-gray-50 text-[#0f172a] font-semibold text-xs sm:text-sm transition inline-flex items-center justify-center cursor-pointer"
               >
                 Upcoming Events
               </Link>
@@ -92,19 +92,19 @@ export default function CommunityHubPage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white border border-gray-200/90 rounded-[6px] p-8 space-y-6 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+                  className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-7 sm:p-8 space-y-6 shadow-xs hover:border-[#0D6D5F]/40 transition duration-200 flex flex-col justify-between"
                 >
                   <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-[6px] bg-[#10b981]/10 text-[#327C73] flex items-center justify-center">
-                      <Icon className="w-6 h-6" />
+                    <div className="w-12 h-12 rounded-[6px] bg-[#fff] border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] flex items-center justify-center shrink-0">
+                      <Icon className="w-6 h-6 text-[#0D6D5F]" />
                     </div>
-                    <h3 className="text-2xl font-bold text-[#0f172a]">{h.title}</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed font-normal">{h.desc}</p>
+                    <h3 className="text-base sm:text-lg font-bold text-[#0f172a]">{h.title}</h3>
+                    <p className="text-xs sm:text-[13px] text-gray-600 leading-relaxed font-normal">{h.desc}</p>
                   </div>
 
                   <Link
                     href={h.href}
-                    className="inline-flex items-center gap-2 text-xs font-bold text-[#327C73] hover:text-[#28635c] transition pt-2 border-t border-gray-100"
+                    className="inline-flex items-center gap-2 text-xs font-bold text-[#0D6D5F] hover:text-[#0b5c50] transition pt-2 border-t border-[rgba(0,0,0,0.06)]"
                   >
                     <span>{h.cta}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -119,27 +119,30 @@ export default function CommunityHubPage() {
       {/* Community Values */}
       <section className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl text-center space-y-12">
-          <div className="space-y-3">
-            <span className="text-xs font-bold text-[#327C73] uppercase tracking-wider">Our Community Values</span>
-            <h2 className="text-3xl font-bold text-[#0f172a]">Mutual Respect & Open Collaboration</h2>
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-[#0D6D5F] uppercase tracking-wider">Our Community Values</span>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">Mutual Respect & Open Collaboration</h2>
+            <p className="text-xs sm:text-sm text-gray-500">
+              The foundational principles guiding every interaction across the Workvence ecosystem.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-            <div className="p-6 bg-[#f8fafc] rounded-[6px] border border-gray-200/80 space-y-2">
-              <h4 className="font-bold text-[#0f172a] text-base">Knowledge Sharing</h4>
-              <p className="text-xs text-gray-600 leading-relaxed">
+            <div className="p-6 bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] space-y-2 shadow-xs hover:border-[#0D6D5F]/40 transition duration-200">
+              <h4 className="font-bold text-[#0f172a] text-sm sm:text-base">Knowledge Sharing</h4>
+              <p className="text-xs sm:text-[13px] text-gray-600 leading-relaxed font-normal">
                 We believe when one freelancer succeeds, the whole community elevates. Share playbooks and support peers.
               </p>
             </div>
-            <div className="p-6 bg-[#f8fafc] rounded-[6px] border border-gray-200/80 space-y-2">
-              <h4 className="font-bold text-[#0f172a] text-base">Inclusivity & Safety</h4>
-              <p className="text-xs text-gray-600 leading-relaxed">
+            <div className="p-6 bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] space-y-2 shadow-xs hover:border-[#0D6D5F]/40 transition duration-200">
+              <h4 className="font-bold text-[#0f172a] text-sm sm:text-base">Inclusivity & Safety</h4>
+              <p className="text-xs sm:text-[13px] text-gray-600 leading-relaxed font-normal">
                 A harassment-free space welcoming creators of all backgrounds, countries, and experience levels.
               </p>
             </div>
-            <div className="p-6 bg-[#f8fafc] rounded-[6px] border border-gray-200/80 space-y-2">
-              <h4 className="font-bold text-[#0f172a] text-base">High Craft Standards</h4>
-              <p className="text-xs text-gray-600 leading-relaxed">
+            <div className="p-6 bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] space-y-2 shadow-xs hover:border-[#0D6D5F]/40 transition duration-200">
+              <h4 className="font-bold text-[#0f172a] text-sm sm:text-base">High Craft Standards</h4>
+              <p className="text-xs sm:text-[13px] text-gray-600 leading-relaxed font-normal">
                 Encouraging lifelong craft mastery, ethical pricing, and uncompromised client delivery excellence.
               </p>
             </div>

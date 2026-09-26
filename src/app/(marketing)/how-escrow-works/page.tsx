@@ -178,11 +178,7 @@ export default function HowEscrowWorksPage() {
           <div className="absolute inset-0 bg-[#0c1c1b]/50 backdrop-blur-[1px]" />
 
           <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
-            {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#fff] text-xs font-semibold uppercase tracking-wider mb-5">
-              <ShieldCheck className="w-4 h-4 text-[#fff]" />
-              <span>Workvence Escrow Protection</span>
-            </div>
+
 
             {/* Main Headline */}
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-[1.12]">
@@ -198,17 +194,17 @@ export default function HowEscrowWorksPage() {
             </p>
 
             {/* Trust highlights */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 text-xs font-medium text-emerald-100">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-                <Lock className="w-3.5 h-3.5 text-[#6AD724]" />
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 text-xs font-medium text-[#0D6D5F]">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)]">
+                <Lock className="w-3.5 h-3.5 text-[#0D6D5F]" />
                 <span>Upfront Escrow Deposit</span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-                <Check className="w-3.5 h-3.5 text-[#6AD724]" />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)]">
+                <Check className="w-3.5 h-3.5 text-[#0D6D5F]" />
                 <span>Paid ≠ Released Separation</span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-                <Scale className="w-3.5 h-3.5 text-[#6AD724]" />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)]">
+                <Scale className="w-3.5 h-3.5 text-[#0D6D5F]" />
                 <span>Dispute Resolution Support</span>
               </div>
             </div>
@@ -220,13 +216,13 @@ export default function HowEscrowWorksPage() {
       <section className="w-full py-16 sm:py-20 md:py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-5xl">
           <div className="text-center max-w-2xl mx-auto mb-14 sm:mb-16">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#0D6D5F]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">
               Step-by-Step Payment Journey
             </span>
             <h2 className="mt-2 text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">
               From Deposit to Delivery in 5 Clear Steps
             </h2>
-            <p className="mt-3 text-xs sm:text-sm md:text-base text-gray-600">
+            <p className="mt-3 text-xs sm:text-sm text-gray-500">
               Understand the entire payment lifecycle in under a minute. Simple, safe, and transparent.
             </p>
           </div>
@@ -237,12 +233,12 @@ export default function HowEscrowWorksPage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white border border-gray-200/90 rounded-[6px] p-6 sm:p-8 hover:border-[#0D6D5F]/40 hover:shadow-xs transition duration-200"
+                  className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-6 sm:p-8 hover:border-[#0D6D5F]/40 hover:shadow-xs transition duration-200"
                 >
                   <div className="flex flex-col md:flex-row md:items-start gap-6">
                     {/* Step Number + Icon Badge */}
                     <div className="flex items-center gap-4 md:flex-col md:items-center shrink-0">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[6px] bg-[#fff] border border-[rgba(0, 0, 0, 0.10)] text-[#0D6D5F] flex items-center justify-center">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[6px] bg-[#fff] border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] flex items-center justify-center shrink-0">
                         <StepIcon className="w-6 h-6 text-[#0D6D5F]" />
                       </div>
                       <span className="font-mono text-xs font-bold text-gray-400 tracking-wider">
@@ -361,19 +357,19 @@ export default function HowEscrowWorksPage() {
       </section>
 
       {/* 3. WHAT IF SOMETHING GOES WRONG? */}
-      <section className="w-full py-16 bg-[#F8F9FA] border-y border-gray-200/80">
+      <section className="w-full py-16 bg-[#F8F9FA] border-y border-[rgba(0,0,0,0.10)]">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl">
-          <div className="bg-white border border-gray-200 rounded-[6px] p-6 sm:p-10 shadow-xs">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-gray-100">
+          <div className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-6 sm:p-10 shadow-xs">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-[rgba(0,0,0,0.06)]">
               <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-[6px] border border-amber-200">
-                  <AlertTriangle className="w-3.5 h-3.5" />
+                <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#0D6D5F] bg-white px-2.5 py-1 rounded-[6px] border border-[rgba(0,0,0,0.10)]">
+                  <AlertTriangle className="w-3.5 h-3.5 text-[#0D6D5F]" />
                   <span>Safety Net & Mediation</span>
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-[#0f172a] tracking-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">
                   What If Something Goes Wrong?
                 </h2>
-                <p className="text-sm sm:text-base font-medium text-emerald-800">
+                <p className="text-xs sm:text-sm font-medium text-emerald-800">
                   You don&apos;t have to chase anyone for your money.
                 </p>
               </div>
@@ -389,7 +385,7 @@ export default function HowEscrowWorksPage() {
               </div>
             </div>
 
-            <div className="pt-6 space-y-4 text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
+            <div className="pt-6 space-y-4 text-xs sm:text-[13px] text-gray-600 leading-relaxed font-normal">
               <p>
                 If the work isn&apos;t delivered, doesn&apos;t match the agreed requirements, or a
                 disagreement can&apos;t be resolved between both parties, you can open a dispute.
@@ -408,26 +404,26 @@ export default function HowEscrowWorksPage() {
       <section className="w-full py-16 sm:py-20 bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#0D6D5F]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">
               Comprehensive Coverage
             </span>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-[#0f172a] tracking-tight">
+            <h2 className="mt-2 text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">
               Your Protection, From Start to Finish
             </h2>
-            <p className="mt-2 text-xs sm:text-sm text-gray-600">
+            <p className="mt-2 text-xs sm:text-sm text-gray-500">
               Clear accountability at every phase of the project.
             </p>
           </div>
 
-          <div className="overflow-hidden border border-gray-200 rounded-[6px] shadow-xs">
+          <div className="overflow-hidden border border-[rgba(0,0,0,0.10)] rounded-[6px] shadow-xs">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#F8F9FA] border-b border-gray-200 text-xs sm:text-sm font-bold text-[#0f172a]">
+                <tr className="bg-[#F8F9FA] border-b border-[rgba(0,0,0,0.10)] text-xs sm:text-sm font-bold text-[#0f172a]">
                   <th className="py-3.5 px-4 sm:px-6 w-1/3">Stage</th>
                   <th className="py-3.5 px-4 sm:px-6">What Happens</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 text-xs sm:text-sm">
+              <tbody className="divide-y divide-[rgba(0,0,0,0.06)] text-xs sm:text-[13px]">
                 {PROTECTION_TABLE.map((row, rIdx) => {
                   const RowIcon = row.icon;
                   return (
@@ -456,16 +452,16 @@ export default function HowEscrowWorksPage() {
       </section>
 
       {/* 5. BUILT AROUND TRUST */}
-      <section className="w-full py-16 sm:py-20 bg-[#F8F9FA] border-t border-gray-200/80">
+      <section className="w-full py-16 sm:py-20 bg-[#F8F9FA] border-t border-[rgba(0,0,0,0.10)]">
         <div className="container mx-auto px-4 md:px-6 max-w-5xl">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#0D6D5F]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">
               Platform Pillars
             </span>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-[#0f172a] tracking-tight">
+            <h2 className="mt-2 text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">
               Built Around Trust
             </h2>
-            <p className="mt-2 text-xs sm:text-sm text-gray-600">
+            <p className="mt-2 text-xs sm:text-sm text-gray-500">
               Designed from the ground up to protect both clients and freelancers.
             </p>
           </div>
@@ -476,7 +472,7 @@ export default function HowEscrowWorksPage() {
               return (
                 <div
                   key={pIdx}
-                  className="bg-white border border-gray-200/90 rounded-[6px] p-6 sm:p-7 shadow-xs hover:border-[#0D6D5F]/40 transition duration-200"
+                  className="bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-6 sm:p-7 shadow-xs hover:border-[#0D6D5F]/40 transition duration-200"
                 >
                   <div className="w-10 h-10 rounded-[6px] bg-[#fff] border border-[rgba(0, 0, 0, 0.10)] text-[#0D6D5F] flex items-center justify-center mb-4">
                     <PillarIcon className="w-5 h-5 text-[#0D6D5F]" />
@@ -484,7 +480,7 @@ export default function HowEscrowWorksPage() {
                   <h3 className="text-base sm:text-lg font-bold text-[#0f172a] mb-2">
                     {pillar.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
+                  <p className="text-xs sm:text-[13px] text-gray-600 leading-relaxed font-normal">
                     {pillar.description}
                   </p>
                 </div>
@@ -498,13 +494,13 @@ export default function HowEscrowWorksPage() {
       <section className="w-full py-16 sm:py-20 bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#0D6D5F]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">
               Got Questions?
             </span>
-            <h2 className="mt-2 text-2xl sm:text-3xl font-bold text-[#0f172a] tracking-tight">
+            <h2 className="mt-2 text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">
               Frequently Asked Questions
             </h2>
-            <p className="mt-2 text-xs sm:text-sm text-gray-600">
+            <p className="mt-2 text-xs sm:text-sm text-gray-500">
               Everything you need to know about Workvence Escrow.
             </p>
           </div>
@@ -514,7 +510,7 @@ export default function HowEscrowWorksPage() {
       </section>
 
       {/* 7. READY TO GET STARTED? (BOTTOM CTA BANNER) */}
-      <section className="w-full py-20 bg-[#F8F9FA] border-t border-gray-200/80 pb-[80px] min-[1400px]:pb-[100px]">
+      <section className="w-full py-20 bg-[#F8F9FA] border-t border-[rgba(0,0,0,0.10)] pb-[80px] min-[1400px]:pb-[100px]">
         <div className="container mx-auto px-4 md:px-6 max-w-5xl">
           <div
             className="bg-[#0c1c1b] text-white rounded-[6px] py-16 sm:py-24 md:py-28 px-6 sm:px-12 min-h-[460px] sm:min-h-[480px] flex flex-col items-start justify-center text-left relative overflow-hidden shadow-md bg-cover bg-center bg-no-repeat"

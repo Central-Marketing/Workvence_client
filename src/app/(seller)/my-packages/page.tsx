@@ -9,7 +9,8 @@ import { Trash2, X } from "lucide-react";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader, Button } from "@/components";
+import { Button } from "@/components";
+import { GigsGridSkeleton } from "@/components/ui";
 
 const MyPackages = () => {
   const user = useUserStore((state: any) => state.user);
@@ -76,8 +77,18 @@ const MyPackages = () => {
   return (
     <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       {isLoading ? (
-        <div className="w-full flex justify-center items-center py-24">
-          <Loader size={45} />
+        <div className="container mx-auto px-4 md:px-6 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
+                My Packages
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 font-normal mt-0.5">
+                Manage, edit, and organize all your services in one place.
+              </p>
+            </div>
+          </div>
+          <GigsGridSkeleton count={6} />
         </div>
       ) : error ? (
         <div className="text-center text-red-500 font-semibold py-20">

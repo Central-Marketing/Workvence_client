@@ -22,7 +22,8 @@ import {
 
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader, Button } from "@/components";
+import { Button } from "@/components";
+import { BriefsListSkeleton } from "@/components/ui";
 
 type StatusFilter = "all" | "open" | "closed";
 
@@ -237,10 +238,7 @@ export default function MyProposalsPage() {
 
         {/* Content Section */}
         {isLoading ? (
-          <div className="w-full flex flex-col justify-center items-center py-24 bg-white rounded-[6px] border border-gray-200/80 shadow-2xs">
-            <Loader size={40} />
-            <p className="text-xs text-gray-400 mt-3 font-medium">Loading your submitted proposals...</p>
-          </div>
+          <BriefsListSkeleton />
         ) : filteredProposals.length === 0 ? (
           <div className="text-center py-16 px-6 bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] flex flex-col items-center">
             <div className="w-14 h-14 rounded-full bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-700 mb-4">

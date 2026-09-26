@@ -20,8 +20,8 @@ import {
 
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader, Button, AiGradientButton } from "@/components";
-import { CustomSelect, CustomSelectOption } from "@/components/ui";
+import { Button, AiGradientButton } from "@/components";
+import { CustomSelect, CustomSelectOption, BriefsListSkeleton } from "@/components/ui";
 
 const DEFAULT_AVATARS = [
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
@@ -265,9 +265,9 @@ const MyBriefs = () => {
 
   if (!user) {
     return (
-      <div className="flex justify-center bg-[#F8FAFC] py-12 min-h-[80vh] px-4">
-        <div className="container mx-auto px-4 md:px-6 flex justify-center items-center py-20">
-          <Loader size={45} />
+      <div className="min-h-screen bg-[#F5F5F5] pt-6 sm:pt-10 pb-[80px] font-sans">
+        <div className="container mx-auto px-4 md:px-6">
+          <BriefsListSkeleton />
         </div>
       </div>
     );
@@ -427,9 +427,7 @@ const MyBriefs = () => {
 
         {/* Content Section */}
         {isLoading ? (
-          <div className="w-full flex justify-center items-center py-24">
-            <Loader size={45} />
-          </div>
+          <BriefsListSkeleton />
         ) : filtered.length === 0 ? (
           <div className="text-center py-16 px-6 bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col items-center">
             <div className="w-14 h-14 rounded-[6px] bg-slate-50 border border-slate-200 flex items-center justify-center text-2xl mb-4 text-slate-400">
@@ -724,9 +722,7 @@ const MyProposals = () => {
 
         {/* Content Section */}
         {isLoading ? (
-          <div className="w-full flex justify-center items-center py-24">
-            <Loader size={45} />
-          </div>
+          <BriefsListSkeleton />
         ) : proposalsArray.length === 0 ? (
           <div className="text-center py-16 px-6 bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col items-center">
             <div className="w-14 h-14 rounded-[6px] bg-slate-50 border border-slate-200 flex items-center justify-center text-2xl mb-4 text-slate-400">

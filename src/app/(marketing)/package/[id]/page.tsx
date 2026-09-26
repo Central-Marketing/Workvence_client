@@ -338,7 +338,7 @@ const PackageContent = () => {
 
 export default function PackagePage() {
   return (
-    <Suspense fallback={<div className="flex justify-center items-center min-h-[60vh]"><Loader size={45} /></div>}>
+    <Suspense fallback={<PackageDetailSkeleton />}>
       <PackageContent />
     </Suspense>
   );

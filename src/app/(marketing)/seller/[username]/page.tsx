@@ -2,7 +2,8 @@
 
 import React, { Suspense } from "react";
 import { useParams } from "next/navigation";
-import { SellerPublicProfile, SuspendedSeller, Loader } from "@/components";
+import { SellerPublicProfile, SuspendedSeller } from "@/components";
+import { SellerProfileSkeleton } from "@/components/ui";
 
 export default function DynamicSellerPage() {
   const params = useParams();
@@ -10,14 +11,14 @@ export default function DynamicSellerPage() {
 
   if (username === "suspended" || username === "unavailable" || username === "banned") {
     return (
-      <Suspense fallback={<div className="flex justify-center items-center min-h-screen bg-white"><Loader size={45} /></div>}>
+      <Suspense fallback={<SellerProfileSkeleton />}>
         <SuspendedSeller username="Alex Mercer" />
       </Suspense>
     );
   }
 
   return (
-    <Suspense fallback={<div className="flex justify-center items-center min-h-screen bg-white"><Loader size={45} /></div>}>
+    <Suspense fallback={<SellerProfileSkeleton />}>
       <SellerPublicProfile username={params?.username as string || "Alex Mercer"} />
     </Suspense>
   );

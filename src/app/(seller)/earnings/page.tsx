@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
-import { Loader, KycRequiredModal, PayoneerLogo, PayoneerIcon, Button } from "@/components";
-import { Breadcrumb } from "@/components/ui";
+import { KycRequiredModal, PayoneerLogo, PayoneerIcon, Button } from "@/components";
+import { Breadcrumb, EarningsSkeleton } from "@/components/ui";
 import { FaStripe } from "react-icons/fa";
 import moment from "moment";
 import toast from "react-hot-toast";
@@ -266,11 +266,7 @@ const Earnings = () => {
   });
 
   if (isLoading) {
-    return (
-      <div className="loader-container min-h-[70vh] flex items-center justify-center">
-        <Loader size={50} />
-      </div>
-    );
+    return <EarningsSkeleton />;
   }
 
   if (error) {
@@ -1225,13 +1221,7 @@ const Earnings = () => {
 
 export default function EarningsPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="loader-container min-h-[80vh] flex items-center justify-center">
-          <Loader size={50} />
-        </div>
-      }
-    >
+    <Suspense fallback={<EarningsSkeleton />}>
       <Earnings />
     </Suspense>
   );

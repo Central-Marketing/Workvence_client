@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { axiosFetch, getAvatarUrl } from "@/utils";
-import { PackageCard, Loader, FavoriteSellerButton, Button } from "@/components";
-import { Breadcrumb } from "@/components/ui";
+import { PackageCard, FavoriteSellerButton, Button } from "@/components";
+import { Breadcrumb, GigsGridSkeleton } from "@/components/ui";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -138,8 +138,24 @@ const FavoritesPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center bg-gray-50/30">
-        <Loader size={45} />
+      <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+        <div className="container mx-auto px-4 md:px-6 space-y-6">
+          <Breadcrumb
+            items={[
+              { name: "Home", href: "/" },
+              { name: "Saved", isLast: true },
+            ]}
+          />
+          <div className="space-y-1.5">
+            <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
+              Saved
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-normal">
+              Keep track of packages and freelancers you want to work with.
+            </p>
+          </div>
+          <GigsGridSkeleton count={4} />
+        </div>
       </div>
     );
   }

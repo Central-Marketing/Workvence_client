@@ -13,7 +13,7 @@ import {
   SellerFaqSection,
   normalizeSellerProfile,
 } from "@/features/profile";
-import { Loader } from "@/components";
+import { SellerProfileSkeleton } from "@/components/ui";
 
 interface SellerPublicProfileProps {
   username?: string;
@@ -150,11 +150,7 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh] bg-[#FAFAFA]">
-        <Loader size={45} />
-      </div>
-    );
+    return <SellerProfileSkeleton />;
   }
 
   return (

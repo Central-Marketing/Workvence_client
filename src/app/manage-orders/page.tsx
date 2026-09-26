@@ -6,8 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader, Button } from "@/components";
-import { Breadcrumb } from "@/components/ui";
+import { Button } from "@/components";
+import { Breadcrumb, OrdersTableSkeleton } from "@/components/ui";
 import { FiHome, FiCalendar, FiSearch } from "react-icons/fi";
 
 const getOrderDeadlineTime = (item: any): number | null => {
@@ -212,8 +212,28 @@ const ManageOrders = () => {
   return (
     <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       {isLoading ? (
-        <div className="w-full flex justify-center items-center py-24">
-          <Loader size={45} />
+        <div className="container mx-auto px-4 md:px-6 space-y-6">
+          <Breadcrumb
+            items={[
+              {
+                name: "Orders",
+                href: "/orders",
+              },
+              {
+                name: "Manage Orders",
+                isLast: true,
+              },
+            ]}
+          />
+          <div className="space-y-1.5">
+            <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
+              Manage Orders
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-normal">
+              Track and manage all buyer orders and milestones.
+            </p>
+          </div>
+          <OrdersTableSkeleton />
         </div>
       ) : error ? (
         <div className="text-center py-20 text-red-500 font-semibold">

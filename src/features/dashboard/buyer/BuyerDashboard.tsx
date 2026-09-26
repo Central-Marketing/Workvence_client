@@ -4,8 +4,7 @@ import React, { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FiArrowLeft, FiArrowRight, FiCheckCircle } from "react-icons/fi";
-import { Button } from "@/components/ui";
-import { Loader } from "@/components";
+import { Button, Skeleton } from "@/components/ui";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { PackageCard } from "@/features/gigs";
@@ -165,10 +164,29 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
           </div>
         </div>
 
-        {/* Orders Overview (if buyer has placed orders) or Start Your Journey (if no orders) */}
         {isOrdersLoading ? (
-          <div className="bg-white border border-gray-100 rounded-[6px] p-12 text-center shadow-[0_2px_14px_rgba(0,0,0,0.03)] flex flex-col items-center justify-center min-h-[220px]">
-            <Loader size={36} />
+          <div className="bg-white border border-gray-100 rounded-[6px] p-6 shadow-[0_2px_14px_rgba(0,0,0,0.03)] space-y-4">
+            <div className="flex justify-between items-center">
+              <Skeleton className="w-36 h-6 rounded" />
+              <Skeleton className="w-20 h-4 rounded" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[1, 2].map((i) => (
+                <div key={i} className="p-4 border border-gray-100 rounded-[6px] space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="w-12 h-10 rounded-[6px]" />
+                    <div className="space-y-1.5 flex-1">
+                      <Skeleton className="w-3/4 h-4 rounded" />
+                      <Skeleton className="w-1/2 h-3 rounded" />
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center pt-2 border-t border-gray-50">
+                    <Skeleton className="w-20 h-4 rounded" />
+                    <Skeleton className="w-16 h-5 rounded-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : hasOrders ? (
           <BuyerDashboardOrdersView user={user} orders={buyerOrders} />

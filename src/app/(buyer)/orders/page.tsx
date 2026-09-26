@@ -13,7 +13,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader, Button } from "@/components";
+import { Button } from "@/components";
+import { OrdersTableSkeleton } from "@/components/ui";
 
 export default function BuyerOrdersPage() {
   const router = useRouter();
@@ -374,9 +375,7 @@ export default function BuyerOrdersPage() {
 
           {/* Orders Table */}
           {isLoading ? (
-            <div className="py-20 flex justify-center items-center">
-              <Loader size={40} />
-            </div>
+            <OrdersTableSkeleton />
           ) : (
             <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
               <table className="w-full min-w-[760px] border-collapse text-left">

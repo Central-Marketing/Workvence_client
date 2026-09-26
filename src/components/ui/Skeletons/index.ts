@@ -6,3 +6,8 @@ export * from './HomeSkeleton';
 export * from './SellerProfileSkeleton';
 export * from './OrderSkeleton';
 export * from './BriefDetailSkeleton';
+export * from './DashboardSkeleton';
+export * from './OrdersTableSkeleton';
+export * from './EarningsSkeleton';
+export * from './BriefsListSkeleton';
+export * from './OrganizeSkeleton';

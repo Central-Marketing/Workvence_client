@@ -12,8 +12,8 @@ import { axiosFetch, generateImageURL, parseRevisionNumber } from "@/utils";
 import useAdminCategories from "@/hooks/useAdminCategories";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
-import { Loader, Button } from "@/components";
-import { CustomSelect, CustomSelectOption } from "@/components/ui";
+import { Button } from "@/components";
+import { CustomSelect, CustomSelectOption, OrganizeSkeleton } from "@/components/ui";
 
 // Dynamically import ReactQuill to ensure SSG/SSR compatibility
 const ReactQuill = dynamic(() => import("react-quill-new"), {
@@ -998,11 +998,7 @@ const EditPackagePage = () => {
   ).filter(Boolean);
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh] bg-[#F8F9FA]">
-        <Loader size={45} />
-      </div>
-    );
+    return <OrganizeSkeleton />;
   }
 
   if (error || !packageData) {

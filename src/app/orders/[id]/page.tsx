@@ -8,7 +8,7 @@ import moment from "moment";
 import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";
 import { useUserStore } from "@/store/userStore";
-import { Loader } from "@/components";
+import { OrderSkeleton } from "@/components/ui";
 import { BuyerOrderView, SellerOrderView, NormalizedOrder } from "@/features/orders";
 
 export default function OrderDetailPage() {
@@ -216,11 +216,7 @@ export default function OrderDetailPage() {
   }, [rawOrder, id, user]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#F8FAFC] py-24 flex justify-center items-center font-sans">
-        <Loader size={45} />
-      </div>
-    );
+    return <OrderSkeleton />;
   }
 
   if (!normalizedOrder) {

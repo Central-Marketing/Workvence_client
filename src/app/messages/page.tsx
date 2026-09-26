@@ -9,7 +9,6 @@ import { useUserStore } from "@/store/userStore";
 import { Conversation } from "@/types";
 
 import { Loader, Skeleton } from "@/components";
-import './Messages.scss';
 
 const Messages = () => {
   const user = useUserStore((state) => state.user);
@@ -46,10 +45,10 @@ const Messages = () => {
 
   if (!user) {
     return (
-      <div className='messages'>
-        <div className="container">
-          <div className="card" style={{ padding: '60px 20px', textAlign: 'center' }}>
-            <h2>Please log in to view your messages</h2>
+      <div className="flex justify-center bg-[#f8fafc] py-10 min-h-[80vh]">
+        <div className="w-[90%] max-w-[1200px] flex flex-col gap-[30px]">
+          <div className="bg-white rounded-[12px] border border-[#e2e8f0] shadow-sm overflow-hidden p-[60px_20px] text-center">
+            <h2 className="text-xl font-semibold text-[#0f172a]">Please log in to view your messages</h2>
           </div>
         </div>
       </div>
@@ -57,12 +56,12 @@ const Messages = () => {
   }
 
   return (
-    <div className='messages'>
-      <div className="container">
+    <div className="flex justify-center bg-[#f8fafc] py-10 min-h-[80vh]">
+      <div className="w-[90%] max-w-[1200px] flex flex-col gap-[30px]">
         {
           isLoading
             ? (
-              <div className="card space-y-4 p-6">
+              <div className="bg-white rounded-[12px] border border-[#e2e8f0] shadow-sm overflow-hidden space-y-4 p-6">
                 <Skeleton className="w-48 h-8" />
                 <Skeleton className="w-64 h-4 mb-6" />
                 {[1, 2, 3, 4, 5].map((i) => (
@@ -78,21 +77,26 @@ const Messages = () => {
               </div>
             )
             : error
-              ? <div className="error-message">Something went wrong!</div>
-              : <div className="card">
-                <div className="card-header">
-                  <h1>Conversations</h1>
-                  <p>Interact with your active buyers and sellers</p>
+              ? <div className="text-red-500 font-medium">Something went wrong!</div>
+              : <div className="bg-white rounded-[12px] border border-[#e2e8f0] shadow-sm overflow-hidden">
+                <div className="p-6 sm:px-[30px] border-b border-[#e2e8f0] bg-white">
+                  <h1 className="text-[24px] font-bold text-[#0f172a] mb-1.5">Conversations</h1>
+                  <p className="text-[14px] text-[#64748b]">Interact with your active buyers and sellers</p>
                 </div>
 
-                <div className="table-responsive">
-                  <table>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse text-left">
                     <thead>
                       <tr>
-                        <th>{user?.isSeller ? 'Buyer' : 'Seller'}</th>
-                        <th>Last Message</th>
-                        <th>Date</th>
-                        {/* <th>Action</th> */}
+                        <th className="px-5 py-4 text-[#64748b] font-semibold text-[13px] uppercase border-b border-[#f1f5f9] bg-[#f8fafc]">
+                          {user?.isSeller ? 'Buyer' : 'Seller'}
+                        </th>
+                        <th className="px-5 py-4 text-[#64748b] font-semibold text-[13px] uppercase border-b border-[#f1f5f9] bg-[#f8fafc]">
+                          Last Message
+                        </th>
+                        <th className="px-5 py-4 text-[#64748b] font-semibold text-[13px] uppercase border-b border-[#f1f5f9] bg-[#f8fafc]">
+                          Date
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -108,9 +112,9 @@ const Messages = () => {
                                   navigate.push(`/message/${targetId}`);
                                 }
                               }}
-                              className={`clickable-row ${isUnread ? "unread-row" : ""}`}
+                              className={`cursor-pointer transition-colors duration-200 hover:bg-[#f8fafc] ${isUnread ? "!bg-[#f0fdf4]" : ""}`}
                             >
-                              <td className="user-cell">
+                              <td className={`p-5 border-b border-[#f1f5f9] align-middle text-[14px] text-[#1e293b] ${isUnread ? "!font-semibold !text-[#0f172a]" : "font-semibold"}`}>
                                 <div className="flex items-center gap-2">
                                   <img
                                     src={((user?.isSeller ? (conv.buyerID as any)?.image : (conv.sellerID as any)?.image) || (user?.isSeller ? (conv.buyerID as any)?.img : (conv.sellerID as any)?.img)) || "/media/noavatar.png"}
@@ -120,8 +124,8 @@ const Messages = () => {
                                   <span>{user?.isSeller ? (conv.buyerID as any)?.username : (conv.sellerID as any)?.username}</span>
                                 </div>
                               </td>
-                              <td className="msg-cell">
-                                <span className="last-msg">
+                              <td className={`p-5 border-b border-[#f1f5f9] align-middle text-[14px] max-w-[400px] ${isUnread ? "!font-semibold !text-[#0f172a]" : ""}`}>
+                                <span className="text-[#475569] block overflow-hidden text-ellipsis whitespace-nowrap">
                                   {(() => {
                                     const msg = conv?.lastMessage;
                                     if (!msg) return "No messages yet";
@@ -145,22 +149,9 @@ const Messages = () => {
                                   })()}
                                 </span>
                               </td>
-                              <td className="date-cell">{moment(conv.updatedAt).fromNow()}</td>
-                              {/* <td>
-                                {
-                                  isUnread && targetId && (
-                                    <button
-                                      className="read-btn"
-                                      onClick={(e: any) => {
-                                        e.stopPropagation();
-                                        handleMessageRead(targetId);
-                                      }}
-                                    >
-                                      Mark as read
-                                    </button>
-                                  )
-                                }
-                              </td> */}
+                              <td className={`p-5 border-b border-[#f1f5f9] align-middle text-[14px] text-[#64748b] ${isUnread ? "!font-semibold !text-[#0f172a]" : ""}`}>
+                                {moment(conv.updatedAt).fromNow()}
+                              </td>
                             </tr>
                           );
                         })

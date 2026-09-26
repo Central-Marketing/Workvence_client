@@ -19,17 +19,16 @@ import {
 
 import adminAxios from "@/utils/adminAxios";
 import { Loader, Button } from "@/components";
-import "./AdminDashboard.scss";
 
 /* ═══════════════════════════════════════════
    KPI Cards Section
    ═══════════════════════════════════════════ */
 
 const KPI_META = [
-  { key: "gmv", className: "kpi-gmv" },
-  { key: "activeOrders", className: "kpi-orders" },
-  { key: "newUsers", className: "kpi-users" },
-  { key: "openDisputes", className: "kpi-disputes" },
+  { key: "gmv", borderGradient: "before:bg-gradient-to-r before:from-[#10b981] before:to-[#34d399]" },
+  { key: "activeOrders", borderGradient: "before:bg-gradient-to-r before:from-[#3b82f6] before:to-[#60a5fa]" },
+  { key: "newUsers", borderGradient: "before:bg-gradient-to-r before:from-[#8b5cf6] before:to-[#a78bfa]" },
+  { key: "openDisputes", borderGradient: "before:bg-gradient-to-r before:from-[#ef4444] before:to-[#f87171]" },
 ];
 
 function KPICards() {
@@ -41,12 +40,12 @@ function KPICards() {
 
   if (isLoading || !data) {
     return (
-      <div className="kpi-grid">
+      <div className="grid grid-cols-1 sm:grid-cols-2 min-[1101px]:grid-cols-4 gap-5">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="kpi-skeleton">
-            <div className="skel-line short" />
-            <div className="skel-line tall" />
-            <div className="skel-line tiny" />
+          <div key={i} className="bg-white rounded-[12px] p-6 border border-[#e2e8f0] shadow-xs flex flex-col gap-3">
+            <div className="h-3.5 w-[60%] rounded bg-slate-100 animate-pulse" />
+            <div className="h-8 w-[45%] rounded bg-slate-100 animate-pulse" />
+            <div className="h-5 w-[30%] rounded bg-slate-100 animate-pulse" />
           </div>
         ))}
       </div>
@@ -54,20 +53,29 @@ function KPICards() {
   }
 
   return (
-    <div className="kpi-grid">
-      {KPI_META.map(({ key, className }) => {
+    <div className="grid grid-cols-1 sm:grid-cols-2 min-[1101px]:grid-cols-4 gap-5">
+      {KPI_META.map(({ key, borderGradient }) => {
         const kpi = data[key];
         if (!kpi) return null;
         const isPositive = kpi.change >= 0;
 
         return (
-          <div key={key} className={`kpi-card ${className}`}>
-            <span className="kpi-title">{kpi.title}</span>
-            <span className="kpi-value">{kpi.value}</span>
+          <div
+            key={key}
+            className={`bg-white rounded-[12px] p-6 border border-[#e2e8f0] shadow-xs flex flex-col gap-2 transition-all duration-250 relative overflow-hidden hover:-translate-y-0.5 hover:shadow-md before:content-[''] before:absolute before:top-0 before:inset-x-0 before:h-[3px] before:rounded-t-[12px] ${borderGradient}`}
+          >
+            <span className="text-[13px] font-semibold text-[#64748b] uppercase tracking-[0.5px]">
+              {kpi.title}
+            </span>
+            <span className="text-[30px] font-extrabold text-[#0f172a] leading-[1.1]">
+              {kpi.value}
+            </span>
             <span
-              className={`kpi-change ${isPositive ? "positive" : "negative"}`}
+              className={`inline-flex items-center gap-1 text-[13px] font-semibold px-2 py-[3px] rounded-[6px] w-fit ${
+                isPositive ? "bg-[#10b981]/10 text-[#10b981]" : "bg-[#ef4444]/10 text-[#ef4444]"
+              }`}
             >
-              <span className="arrow">{isPositive ? "↑" : "↓"}</span>
+              <span className="text-[12px]">{isPositive ? "↑" : "↓"}</span>
               {Math.abs(kpi.change)}%
             </span>
           </div>
@@ -99,17 +107,21 @@ function RevenueTrendChart() {
   });
 
   return (
-    <div className="chart-card">
-      <div className="chart-header">
-        <h3>Revenue Trend</h3>
-        <div className="period-tabs">
+    <div className="bg-white rounded-[12px] border border-[#e2e8f0] shadow-xs p-6 flex flex-col gap-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-[16px] font-bold text-[#0f172a]">Revenue Trend</h3>
+        <div className="flex gap-1 bg-[#f1f5f9] rounded-[8px] p-[3px]">
           {PERIOD_OPTIONS.map((opt) => (
             <Button
               key={opt.value}
               type="button"
               variant="ghost"
               size="xs"
-              className={period === opt.value ? "active" : ""}
+              className={`px-3.5 py-1.5 rounded-[6px] text-[12px] font-semibold transition-all duration-200 cursor-pointer !p-[6px_14px] !min-h-0 !h-auto ${
+                period === opt.value
+                  ? "!bg-white !text-[#0f172a] shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
+                  : "!bg-transparent !text-[#64748b] hover:!text-[#334155]"
+              }`}
               onClick={() => setPeriod(opt.value)}
             >
               {opt.label}
@@ -118,7 +130,7 @@ function RevenueTrendChart() {
         </div>
       </div>
 
-      <div className="chart-container">
+      <div className="w-full h-[280px] max-sm:h-[220px]">
         {isLoading ? (
           <div
             style={{
@@ -216,9 +228,9 @@ function OrderBreakdownChart() {
   const total = data?.total ?? 0;
 
   return (
-    <div className="chart-card pie-card">
-      <div className="chart-header">
-        <h3>Order Breakdown</h3>
+    <div className="bg-white rounded-[12px] border border-[#e2e8f0] shadow-xs p-6 flex flex-col gap-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-[16px] font-bold text-[#0f172a]">Order Breakdown</h3>
       </div>
 
       {isLoading ? (
@@ -234,7 +246,7 @@ function OrderBreakdownChart() {
         </div>
       ) : (
         <>
-          <div className="pie-container">
+          <div className="flex items-center justify-center h-[220px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -266,19 +278,19 @@ function OrderBreakdownChart() {
             </ResponsiveContainer>
           </div>
 
-          <div className="pie-total">
-            Total Orders: <strong>{total.toLocaleString()}</strong>
+          <div className="text-center mt-1 text-[13px] text-[#94a3b8]">
+            Total Orders: <strong className="text-[#0f172a] text-[15px]">{total.toLocaleString()}</strong>
           </div>
 
-          <div className="pie-legend">
+          <div className="flex flex-col gap-2.5 mt-2">
             {pieData.map((item: any) => (
-              <div key={item.name} className="legend-item">
+              <div key={item.name} className="flex items-center gap-2.5 text-[14px]">
                 <span
-                  className="legend-dot"
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
                   style={{ background: item.color }}
                 />
-                <span className="legend-name">{item.name}</span>
-                <span className="legend-val">
+                <span className="flex-1 text-[#64748b] font-medium">{item.name}</span>
+                <span className="font-bold text-[#0f172a]">
                   {item.value} ({item.pct}%)
                 </span>
               </div>
@@ -314,30 +326,30 @@ function PendingActions() {
 
   if (isLoading) {
     return (
-      <div className="section-loader">
+      <div className="flex justify-center items-center min-h-[200px] bg-white rounded-[12px] border border-[#e2e8f0]">
         <Loader size={35} />
       </div>
     );
   }
 
   return (
-    <div className="actions-section">
-      <div className="actions-header">
-        <h2>Pending Actions</h2>
+    <div className="flex flex-col gap-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-[18px] font-bold text-[#0f172a]">Pending Actions</h2>
         {summary && (
-          <div className="summary-pills">
+          <div className="flex gap-2.5 flex-wrap">
             {summary.totalPendingDisputes > 0 && (
-              <span className="pill disputes">
+              <span className="px-3 py-1 rounded-full text-[12px] font-semibold bg-[#ef4444]/10 text-[#ef4444]">
                 {summary.totalPendingDisputes} disputes
               </span>
             )}
             {summary.totalPendingPayoutsCount > 0 && (
-              <span className="pill payouts">
+              <span className="px-3 py-1 rounded-full text-[12px] font-semibold bg-[#10b981]/10 text-[#10b981]">
                 {summary.totalPendingPayoutsCount} payouts
               </span>
             )}
             {summary.totalUnrespondedTickets > 0 && (
-              <span className="pill tickets">
+              <span className="px-3 py-1 rounded-full text-[12px] font-semibold bg-[#f97316]/10 text-[#f97316]">
                 {summary.totalUnrespondedTickets} tickets
               </span>
             )}
@@ -347,39 +359,60 @@ function PendingActions() {
 
       {actions.length === 0 ? (
         <div
-          className="section-loader"
-          style={{ minHeight: 120, color: "#64748b", fontSize: 15 }}
+          className="flex justify-center items-center min-h-[120px] bg-white rounded-[12px] border border-[#e2e8f0] text-[#64748b] text-[15px]"
         >
           ✅ No pending actions — you're all caught up!
         </div>
       ) : (
-        <div className="actions-grid">
-          {actions.map((action: any) => (
-            <Link
-              key={action.id}
-              href={action.link || "#"}
-              className="action-card"
-            >
-              <div className={`action-icon ${action.type}`}>
-                {(ACTION_ICONS as Record<string, string>)[action.type] || "📋"}
-              </div>
-              <div className="action-content">
-                <div className="action-title">{action.title}</div>
-                <div className="action-desc">{action.description}</div>
-                {action.oldestCreatedAt && (
-                  <div
-                    className="action-desc"
-                    style={{ marginTop: 4, fontSize: 12 }}
-                  >
-                    Oldest: {moment(action.oldestCreatedAt).fromNow()}
-                  </div>
-                )}
-              </div>
-              <span className={`action-badge ${action.type}`}>
-                {action.badge}
-              </span>
-            </Link>
-          ))}
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          {actions.map((action: any) => {
+            const isDispute = action.type === "dispute";
+            const isPayout = action.type === "payout";
+            const isTicket = action.type === "ticket";
+
+            const iconBg = isDispute
+              ? "bg-[#ef4444]/[0.08]"
+              : isPayout
+              ? "bg-[#10b981]/[0.08]"
+              : isTicket
+              ? "bg-[#f97316]/[0.08]"
+              : "bg-gray-100";
+
+            const badgeBg = isDispute
+              ? "bg-[#ef4444]/10 text-[#ef4444]"
+              : isPayout
+              ? "bg-[#10b981]/10 text-[#10b981]"
+              : isTicket
+              ? "bg-[#f97316]/10 text-[#f97316]"
+              : "bg-gray-100 text-gray-700";
+
+            return (
+              <Link
+                key={action.id}
+                href={action.link || "#"}
+                className="bg-white rounded-[12px] border border-[#e2e8f0] shadow-xs p-5 sm:px-6 flex items-center gap-4 cursor-pointer transition-all duration-250 hover:-translate-y-0.5 hover:shadow-md hover:border-[#10b981]/25 text-inherit no-underline"
+              >
+                <div className={`w-12 h-12 rounded-[12px] flex items-center justify-center text-[20px] shrink-0 ${iconBg}`}>
+                  {(ACTION_ICONS as Record<string, string>)[action.type] || "📋"}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[15px] font-bold text-[#0f172a] mb-0.5">{action.title}</div>
+                  <div className="text-[13px] text-[#64748b] leading-[1.4]">{action.description}</div>
+                  {action.oldestCreatedAt && (
+                    <div
+                      className="text-[#64748b] leading-[1.4]"
+                      style={{ marginTop: 4, fontSize: 12 }}
+                    >
+                      Oldest: {moment(action.oldestCreatedAt).fromNow()}
+                    </div>
+                  )}
+                </div>
+                <span className={`px-3 py-1 rounded-full text-[14px] font-extrabold shrink-0 ${badgeBg}`}>
+                  {action.badge}
+                </span>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>
@@ -396,17 +429,17 @@ export default function AdminDashboardPage() {
   }, []);
 
   return (
-    <div className="admin-dashboard">
-      <div className="dash-header">
-        <h1>Dashboard</h1>
-        <p>Real-time analytics and metrics overview</p>
+    <div className="flex flex-col gap-7">
+      <div className="mb-1">
+        <h1 className="text-[26px] font-extrabold text-[#0f172a] mb-1">Dashboard</h1>
+        <p className="text-[15px] text-[#64748b]">Real-time analytics and metrics overview</p>
       </div>
 
       {/* KPI Cards */}
       <KPICards />
 
       {/* Charts Row */}
-      <div className="charts-row">
+      <div className="grid grid-cols-1 min-[901px]:grid-cols-[2fr_1fr] gap-5">
         <RevenueTrendChart />
         <OrderBreakdownChart />
       </div>

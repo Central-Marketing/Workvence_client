@@ -7,7 +7,6 @@ import {
   useStripe,
   useElements
 } from "@stripe/react-stripe-js";
-import './CheckoutForm.scss';
 import { Button } from "@/components/ui";
 
 const CheckoutForm: React.FC = () => {
@@ -80,7 +79,7 @@ const CheckoutForm: React.FC = () => {
   };
 
   return (
-    <form className='payment-form' id="payment-form" onSubmit={handleSubmit}>
+    <form className="h-[60vh] [&_button[type=submit]]:my-[30px] [&_button[type=submit]]:w-full" id="payment-form" onSubmit={handleSubmit}>
       <LinkAuthenticationElement
         id="link-authentication-element"
         onChange={(e: any) => setEmail(e.value?.email || '')}

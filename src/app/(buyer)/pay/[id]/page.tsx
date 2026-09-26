@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { Loader } from "@/components";
-import './Pay.scss';
 
 // Module-level deduplication set to persist across React 18/19 Suspense remounts
 const activePaymentIntents = new Set<string>();
@@ -50,9 +49,9 @@ const PayContent: React.FC = () => {
   }, [id, navigate, packageType]);
 
   return (
-    <div className='pay' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '55vh', gap: '20px' }}>
+    <div className="w-[90%] min-[901px]:w-[600px] h-[400px] mx-auto flex flex-col items-center justify-center gap-5" style={{ height: '55vh' }}>
       <Loader size={45} />
-      <h2 style={{ color: '#1e293b', fontWeight: 500 }}>Redirecting to secure payment checkout...</h2>
+      <h2 className="my-[20px] mb-[40px] text-[#1e293b] font-medium" style={{ color: '#1e293b', fontWeight: 500 }}>Redirecting to secure payment checkout...</h2>
     </div>
   );
 };

@@ -10,7 +10,6 @@ import adminAxios from "@/utils/adminAxios";
 import { useUserStore } from "@/store/userStore";
 import { Loader, Button } from "@/components";
 import AdminSidebar from "./AdminSidebar";
-import "./AdminLayout.scss";
 
 export default function AdminLayout({
   children,
@@ -90,7 +89,7 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="admin-layout">
+    <div className="flex min-h-screen bg-[#f1f5f9]">
       <AdminSidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -98,40 +97,42 @@ export default function AdminLayout({
         onLogout={() => logoutMutation.mutate()}
       />
 
-      <div className="admin-main">
+      <div className="flex-1 ml-[260px] max-[900px]:ml-0 flex flex-col min-h-screen">
         {/* Top Bar */}
-        <header className="admin-topbar">
-          <div className="topbar-left">
+        <header className="bg-white px-8 py-4 border-b border-[#e2e8f0] flex justify-between items-center sticky top-0 z-50">
+          <div className="flex items-center gap-3">
             <Button
               type="button"
               variant="ghost"
               size="xs"
-              className="mobile-menu-btn !p-0 !min-h-0 !h-auto"
+              className="hidden max-[900px]:flex bg-transparent border border-[#e2e8f0] rounded-[8px] p-2 cursor-pointer text-[#64748b] text-[20px] hover:bg-[#f1f5f9] !p-2 !min-h-0 !h-auto"
               onClick={() => setSidebarOpen(true)}
               aria-label="Toggle menu"
             >
               ☰
             </Button>
-            <span className="page-title">Admin Panel</span>
+            <span className="text-[18px] font-bold text-[#0f172a]">Admin Panel</span>
           </div>
-          <div className="topbar-right">
+          <div className="flex items-center gap-4">
             <Button
               type="button"
               variant="ghost"
               size="xs"
-              className="refresh-btn !p-0 !min-h-0 !h-auto"
+              className="px-4 py-2 rounded-[8px] text-[13px] font-semibold bg-[#f1f5f9] text-[#475569] border border-[#e2e8f0] cursor-pointer flex items-center gap-1.5 transition-all duration-200 hover:bg-[#e2e8f0] disabled:opacity-50 disabled:cursor-not-allowed !p-2 sm:!p-[8px_16px] !min-h-0 !h-auto"
               onClick={() => refreshMutation.mutate()}
               disabled={refreshMutation.isPending}
               isLoading={refreshMutation.isPending}
             >
               🔄 {refreshMutation.isPending ? "Refreshing..." : "Refresh Data"}
             </Button>
-            <span className="status-dot">System Online</span>
+            <span className="flex items-center gap-1.5 text-[13px] text-[#64748b] before:content-[''] before:w-2 before:h-2 before:rounded-full before:bg-[#10b981]">
+              System Online
+            </span>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="admin-content">{children}</main>
+        <main className="flex-1 p-7 md:px-8 max-md:p-4">{children}</main>
       </div>
     </div>
   );

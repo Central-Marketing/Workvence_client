@@ -18,7 +18,9 @@ import {
   PackageReviewsSection,
   PackageFaqSection,
   PackagePricingSidebar,
+  CustomDesignOfferModal,
   normalizePackageData,
+  usePackageModalSession,
 } from "@/features/package";
 
 const PackageContent = () => {
@@ -58,6 +60,15 @@ const PackageContent = () => {
   const normalizedData = useMemo(() => {
     return normalizePackageData(rawApiData);
   }, [rawApiData]);
+
+  // 10-second Custom Design Proposal Modal hook with per-package sessionStorage tracking
+  const isPackageReady = !isLoading && Boolean(rawApiData && (rawApiData._id || rawApiData.id || rawApiData.slug));
+  const { isOpen: isCustomModalOpen, closeModal: closeCustomModal } = usePackageModalSession(
+    _id,
+    rawApiData?.slug,
+    isPackageReady,
+    10000
+  );
 
   // Fetch seller's other real packages for the showcase section
   const sellerUsername = normalizedData.seller.username;
@@ -332,6 +343,21 @@ const PackageContent = () => {
         </div>
 
       </div>
+
+      {/* 10-Second Custom Design Proposal Modal */}
+      <CustomDesignOfferModal
+        isOpen={isCustomModalOpen}
+        onClose={closeCustomModal}
+        seller={normalizedData.seller}
+        categoryName={normalizedData.categoryName || normalizedData.subcategoryName || "Design"}
+        onCtaClick={() => {
+          closeCustomModal();
+          const catQuery = normalizedData.categorySlug || normalizedData.categoryName
+            ? `?category=${encodeURIComponent(normalizedData.categorySlug || normalizedData.categoryName)}`
+            : "";
+          router.push(`/briefs/create${catQuery}`);
+        }}
+      />
     </div>
   );
 };

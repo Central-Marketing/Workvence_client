@@ -8,3 +8,4 @@ export * from './PackageComparisonTable';
 export * from './PackageReviewsSection';
 export * from './PackageFaqSection';
 export * from './PackagePricingSidebar';
+export * from './CustomDesignOfferModal';

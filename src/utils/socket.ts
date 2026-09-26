@@ -18,8 +18,9 @@ const options = {
   withCredentials: true,
   autoConnect: false,
   reconnection: true,
-  reconnectionAttempts: 10,
+  reconnectionAttempts: Infinity,
   reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
   transports: ['websocket', 'polling'],
   path: '/socket.io/'
 };

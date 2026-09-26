@@ -2947,11 +2947,7 @@ const ChatView = () => {
                     <div className="flex xl:hidden bg-white rounded-[6px] p-4 border border-slate-200/80 shadow-xs flex-col gap-2.5">
                       <div className="flex items-center justify-between">
                         <span className="text-base sm:text-[17px] font-bold text-slate-800 tracking-tight">Quick Actions</span>
-                        {/* {user?.isSeller && (
-                          <span className="text-[10px] font-semibold text-[#0D6D5F] bg-[#0D6D5F]/10 px-2 py-0.5 rounded-full">
-                            Seller Tools
-                          </span>
-                        )} */}
+                        
                       </div>
 
                       {user?.isSeller && (
@@ -3015,7 +3011,7 @@ const ChatView = () => {
                     {/* ── Card 1: About Contact ── */}
                     <div className="bg-white rounded-[6px] p-5 border border-slate-200/80 shadow-xs flex flex-col gap-3 relative">
                       <h3 className="text-base sm:text-[17px] font-bold text-slate-800 tracking-tight">
-                        About {finalRecipientUser.username || finalRecipientUser.name || 'Contact'}
+                        About {(finalRecipientUser?.isSeller !== undefined ? finalRecipientUser.isSeller : (finalRecipientUser?.role ? finalRecipientUser.role === 'seller' : !user?.isSeller)) ? 'Seller' : 'Buyer'}
                       </h3>
 
                       {/* Avatar & Contact Info */}

@@ -13,3 +13,5 @@ export * from './Skeletons';
 export { SearchSuggestionsDropdown, default as SearchSuggestionsDropdownComponent } from './SearchSuggestions/SearchSuggestionsDropdown';
 export { Breadcrumb, default as BreadcrumbComponent } from './Breadcrumb/Breadcrumb';
 export type { BreadcrumbProps, BreadcrumbItem } from './Breadcrumb/Breadcrumb';
+export { Input, default as InputComponent } from './Input';
+export type { InputProps } from './Input';

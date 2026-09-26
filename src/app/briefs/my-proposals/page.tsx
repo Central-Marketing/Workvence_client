@@ -221,7 +221,7 @@ export default function MyProposalsPage() {
               placeholder="Search by project or keywords..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-8 py-2 text-xs sm:text-[13px] bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] transition-colors outline-hidden text-gray-900 placeholder:text-gray-400"
+              className="w-full h-10 pl-10 pr-8 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] transition-colors outline-none text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal"
             />
             {searchQuery && (
               <button

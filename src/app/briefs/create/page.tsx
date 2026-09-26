@@ -456,7 +456,7 @@ const CreateBrief = () => {
 
           {/* Section 1: Project Title */}
           <div>
-            <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2">
+            <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
               Project Title <span className="text-emerald-600">*</span>
             </label>
             <input
@@ -465,17 +465,17 @@ const CreateBrief = () => {
               value={form.title}
               onChange={(e) => updateField("title", e.target.value)}
               required
-              className="w-full px-4 py-3 sm:py-3.5 rounded-[6px] border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
+              className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
             />
           </div>
 
           {/* Section 2: Category Selection */}
           <div>
-            <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2">
+            <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
               Category <span className="text-slate-400 font-normal text-xs">(Optional)</span>
             </label>
             <CustomSelect
-              size="lg"
+              size="md"
               options={[
                 { value: "", label: "Select a category" },
                 ...categories.map((c: any) => ({
@@ -561,7 +561,7 @@ const CreateBrief = () => {
                     handleAddSkill();
                   }
                 }}
-                className="flex-1 px-3.5 py-2.5 rounded-[6px] border border-slate-200 bg-white text-slate-900 text-xs sm:text-sm outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
+                className="flex-1 h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
               />
               <Button
                 type="button"
@@ -571,7 +571,7 @@ const CreateBrief = () => {
                 onClick={handleAddSkill}
                 disabled={!newSkillInput.trim()}
                 leftIcon={<FiPlus className="text-sm" />}
-                className="shrink-0"
+                className="shrink-0 h-10"
               >
                 Add
               </Button>
@@ -581,11 +581,11 @@ const CreateBrief = () => {
           {/* Section 5: Budget & Delivery Time (2-Column Grid) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2">
+              <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
                 Budget (USD) <span className="text-slate-400 font-normal text-xs">(Optional)</span>
               </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm">
+              <div className="relative flex items-center">
+                <span className="absolute left-3.5 flex items-center text-gray-400 text-sm pointer-events-none">
                   <FiDollarSign />
                 </span>
                 <input
@@ -594,17 +594,17 @@ const CreateBrief = () => {
                   placeholder="e.g. 150"
                   value={form.budget}
                   onChange={(e) => updateField("budget", e.target.value)}
-                  className="w-full pl-9 pr-4 py-3 sm:py-3.5 rounded-[6px] border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
+                  className="w-full h-10 pl-9 pr-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2">
+              <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
                 Estimated Timeline (Days) <span className="text-slate-400 font-normal text-xs">(Optional)</span>
               </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm">
+              <div className="relative flex items-center">
+                <span className="absolute left-3.5 flex items-center text-gray-400 text-sm pointer-events-none">
                   <FiCalendar />
                 </span>
                 <input
@@ -613,7 +613,7 @@ const CreateBrief = () => {
                   placeholder="e.g. 5"
                   value={form.deliveryTime}
                   onChange={(e) => updateField("deliveryTime", e.target.value)}
-                  className="w-full pl-9 pr-4 py-3 sm:py-3.5 rounded-[6px] border border-slate-200 bg-white text-slate-900 text-sm sm:text-[15px] outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:ring-4 focus:ring-[#327C73]/10"
+                  className="w-full h-10 pl-9 pr-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                 />
               </div>
             </div>

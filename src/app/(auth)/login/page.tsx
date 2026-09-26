@@ -215,8 +215,9 @@ const LoginForm = () => {
               data-testid="login-apple-btn"
               type="button"
               onClick={() => handleAppleLogin()}
-              disabled={loading || !!loadingProvider}
-              className="h-10 px-3 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              // disabled={loading || !!loadingProvider}
+              disabled={true}
+              className="h-10 px-3 cursor-not-allowed border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs  disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loadingProvider === 'apple' ? (
                 <span className="inline-block w-4 h-4 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
@@ -249,7 +250,7 @@ const LoginForm = () => {
                   value={formInput.username}
                   onChange={handleFormInput}
                   required
-                  className="w-full h-10 px-3.5 bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-gray-400 transition-colors outline-none"
+                  className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                 />
               </div>
 
@@ -273,7 +274,7 @@ const LoginForm = () => {
                     value={formInput.password}
                     onChange={handleFormInput}
                     required
-                    className="w-full h-10 px-3.5 pr-11 bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-gray-400 transition-colors outline-none"
+                    className="w-full h-10 px-3.5 pr-11 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                   />
                   <button
                     type="button"

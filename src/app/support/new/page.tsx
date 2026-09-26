@@ -238,8 +238,8 @@ export default function CreateSupportTicketPage() {
 
           {/* 3. Subject and Message */}
           <div className="bg-white p-6 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-6">
-            <div className="space-y-2">
-              <label className="block text-xs font-semibold text-[#475569] uppercase tracking-wider font-sf-pro">
+            <div className="space-y-1.5">
+              <label className="block text-xs sm:text-[13px] font-medium text-gray-700 font-sf-pro">
                 3. Ticket Subject <span className="text-rose-500">*</span>
               </label>
               <input
@@ -248,12 +248,12 @@ export default function CreateSupportTicketPage() {
                 placeholder="Briefly state your issue (e.g. Need assistance with order payout)"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full px-4 py-3 rounded-[6px] border border-[#e2e8f0] bg-[#f8fafc] text-xs font-medium text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none transition font-inter"
+                className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors font-inter"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-xs font-semibold text-[#475569] uppercase tracking-wider font-sf-pro">
+            <div className="space-y-1.5">
+              <label className="block text-xs sm:text-[13px] font-medium text-gray-700 font-sf-pro">
                 Detailed Description <span className="text-rose-500">*</span>
               </label>
               <textarea
@@ -262,7 +262,7 @@ export default function CreateSupportTicketPage() {
                 placeholder="Please describe your question or problem in detail. Include any relevant steps or error messages..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="w-full px-4 py-3 rounded-[6px] border border-[#e2e8f0] bg-[#f8fafc] text-xs font-medium text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none transition resize-y font-inter"
+                className="w-full px-3.5 py-2.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors resize-y font-inter"
               />
             </div>
 

@@ -452,8 +452,9 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   data-testid="modal-login-apple-btn"
                   type="button"
                   onClick={() => onSocialAuthClick("apple")}
-                  disabled={loading || !!loadingProvider}
-                  className="h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  // disabled={loading || !!loadingProvider}
+                  disabled={true}
+                  className="h-10 px-2 cursor-not-allowed border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {loadingProvider === "apple" ? (
                     <span className="inline-block w-3.5 h-3.5 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
@@ -474,8 +475,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
               <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3 flex-1">
                 {/* Email / Username */}
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-700">Email</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email</label>
                   <input
                     type="text"
                     placeholder="e.g name@email.com"
@@ -484,18 +485,18 @@ const AuthModal: React.FC<AuthModalProps> = ({
                       setLoginInput((prev) => ({ ...prev, identifier: e.target.value }))
                     }
                     required
-                    className="w-full px-3.5 py-2.5 bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                    className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                   />
                 </div>
 
                 {/* Password */}
-                <div className="space-y-1">
+                <div className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-gray-700">Password</label>
+                    <label className="text-xs sm:text-[13px] font-medium text-gray-700">Password</label>
                     <Link
                       href="/forgot-password"
                       onClick={onClose}
-                      className="text-[11px] font-medium text-[#0D6D5F] hover:underline"
+                      className="text-xs text-gray-500 hover:text-[#0D6D5F] hover:underline transition-colors"
                     >
                       Forgot password?
                     </Link>
@@ -509,15 +510,15 @@ const AuthModal: React.FC<AuthModalProps> = ({
                         setLoginInput((prev) => ({ ...prev, password: e.target.value }))
                       }
                       required
-                      className="w-full px-3.5 py-2.5 pr-10 bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                      className="w-full h-10 px-3.5 pr-11 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                     />
                     <button
                       type="button"
-                      className="absolute right-2.5 text-gray-400 hover:text-gray-600 p-1 flex items-center justify-center cursor-pointer"
+                      className="absolute right-3 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
                       onClick={() => setShowLoginPassword(!showLoginPassword)}
                       aria-label={showLoginPassword ? "Hide password" : "Show password"}
                     >
-                      {showLoginPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      {showLoginPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
                 </div>
@@ -564,7 +565,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: true }))}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${registerInput.isSeller
+                    className={`flex items-center justify-center gap-1.5 h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${registerInput.isSeller
                       ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
                       : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
                       }`}
@@ -576,7 +577,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: false }))}
-                    className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${!registerInput.isSeller
+                    className={`flex items-center justify-center gap-1.5 h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${!registerInput.isSeller
                       ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
                       : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
                       }`}
@@ -588,8 +589,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
               </div>
 
               {/* Username */}
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700">Username</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700">Username</label>
                 <input
                   type="text"
                   placeholder="e.g. creative_dev"
@@ -598,13 +599,13 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     setRegisterInput((prev) => ({ ...prev, username: e.target.value }))
                   }
                   required
-                  className="w-full px-3.5 py-2 sm:py-2.5 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                  className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                 />
               </div>
 
               {/* Email */}
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700">Email Address</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email Address</label>
                 <input
                   type="email"
                   placeholder="name@example.com"
@@ -613,14 +614,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     setRegisterInput((prev) => ({ ...prev, email: e.target.value }))
                   }
                   required
-                  className="w-full px-3.5 py-2 sm:py-2.5 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                  className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                 />
               </div>
 
               {/* Password & Confirm Password Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-700">Password</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Password</label>
                   <div className="relative flex items-center">
                     <input
                       type={showRegisterPassword ? "text" : "password"}
@@ -630,23 +631,21 @@ const AuthModal: React.FC<AuthModalProps> = ({
                         setRegisterInput((prev) => ({ ...prev, password: e.target.value }))
                       }
                       required
-                      className="w-full px-3.5 py-2 sm:py-2.5 pr-8 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                      className="w-full h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                     />
-                    <Button
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="icon"
-                      radius="full"
-                      className="absolute right-2 text-gray-400 hover:text-gray-600 !p-1 !h-auto !w-auto border-none"
+                      className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
                       onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                      aria-label={showRegisterPassword ? "Hide password" : "Show password"}
                     >
-                      {showRegisterPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-                    </Button>
+                      {showRegisterPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-gray-700">Confirm Password</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Confirm Password</label>
                   <div className="relative flex items-center">
                     <input
                       type={showConfirmPassword ? "text" : "password"}
@@ -656,18 +655,16 @@ const AuthModal: React.FC<AuthModalProps> = ({
                         setRegisterInput((prev) => ({ ...prev, confirmPassword: e.target.value }))
                       }
                       required
-                      className="w-full px-3.5 py-2 sm:py-2.5 pr-8 bg-[#F8F9FA] border border-gray-200 focus:border-[#0D6D5F] focus:bg-white rounded-[6px] text-xs sm:text-[13px] text-gray-900 placeholder:text-gray-400 transition-all outline-none"
+                      className="w-full h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                     />
-                    <Button
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="icon"
-                      radius="full"
-                      className="absolute right-2 text-gray-400 hover:text-gray-600 !p-1 !h-auto !w-auto border-none"
+                      className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                     >
-                      {showConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-                    </Button>
+                      {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
                   </div>
                 </div>
               </div>

@@ -64,7 +64,7 @@ export const RevisionModal: React.FC<RevisionModalProps> = ({
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="text-xs font-semibold text-slate-700 mb-1.5 block">
+            <label className="text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5 block">
               Revision Details
             </label>
             <textarea
@@ -75,7 +75,7 @@ export const RevisionModal: React.FC<RevisionModalProps> = ({
                 setReason(e.target.value);
                 if (error) setError('');
               }}
-              className="w-full p-3.5 border border-slate-200 rounded-[6px] bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none text-slate-800 text-sm resize-y transition-all"
+              className="w-full px-3.5 py-2.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white outline-none text-gray-900 text-sm placeholder:text-[#868686] placeholder:font-normal resize-y transition-colors"
             />
             {error && <p className="text-xs text-red-500 font-medium mt-1">{error}</p>}
           </div>
@@ -176,7 +176,7 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="text-xs font-semibold text-slate-700 mb-1.5 block">
+            <label className="text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5 block">
               Additional Delivery Days
             </label>
             <input
@@ -185,12 +185,12 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
               placeholder="e.g. 2"
               value={days}
               onChange={(e) => setDays(e.target.value)}
-              className="w-full p-3 border border-slate-200 rounded-[6px] bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none text-slate-800 text-sm transition-all"
+              className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white outline-none text-gray-900 text-sm placeholder:text-[#868686] placeholder:font-normal transition-colors"
             />
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-slate-700 mb-1.5 block">
+            <label className="text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5 block">
               Reason for Extension
             </label>
             <textarea
@@ -198,7 +198,7 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
               placeholder="Explain why extra time is needed..."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full p-3 border border-slate-200 rounded-[6px] bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none text-slate-800 text-sm resize-y transition-all"
+              className="w-full px-3.5 py-2.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white outline-none text-gray-900 text-sm placeholder:text-[#868686] placeholder:font-normal resize-y transition-colors"
             />
           </div>
 

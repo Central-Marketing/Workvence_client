@@ -71,14 +71,14 @@ const ForgotPassword = () => {
                 <p className="text-sm text-[#666] leading-relaxed">Enter the email address associated with your account and we&apos;ll send you a verification code to reset your password.</p>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-[#333]">Email Address</label>
+                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email Address</label>
                   <input
                     name="email"
                     type="email"
                     placeholder="Enter your email address"
                     value={email}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                    className="py-3 px-3 border border-gray-200 rounded-[6px] text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full"
+                    className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                   />
                 </div>
                 {

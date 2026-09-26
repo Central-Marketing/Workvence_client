@@ -18,6 +18,8 @@ export type { AiGradientButtonProps } from "./ui/AiGradientButton/AiGradientButt
 export { Button } from "./ui/Button";
 export { Breadcrumb } from "./ui/Breadcrumb/Breadcrumb";
 export type { BreadcrumbProps, BreadcrumbItem } from "./ui/Breadcrumb/Breadcrumb";
+export { Input } from "./ui/Input";
+export type { InputProps } from "./ui/Input";
 export * from "./ui/Skeletons";
 export { SearchSuggestionsDropdown } from "./ui/SearchSuggestions/SearchSuggestionsDropdown";
 

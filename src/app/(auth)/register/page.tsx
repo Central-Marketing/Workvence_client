@@ -315,8 +315,9 @@ const RegisterContent = () => {
               data-testid="continue-apple-btn"
               type="button"
               onClick={() => handleAppleLogin({ isSeller: formInput.isSeller })}
-              disabled={loading || !!loadingProvider}
-              className="h-10 px-2.5 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              // disabled={loading || !!loadingProvider}
+              disabled={true}
+              className="h-10 px-2.5 cursor-not-allowed border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs sm:text-[13px] font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loadingProvider === 'apple' ? (
                 <span className="inline-block w-3.5 h-3.5 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
@@ -370,8 +371,8 @@ const RegisterContent = () => {
               </div> */}
 
               {/* Email Input */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[12px] sm:text-[12.5px] font-medium text-gray-700">Email</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email</label>
                 <div className="relative flex items-center">
                   <input
                     data-testid="email-input"
@@ -381,15 +382,15 @@ const RegisterContent = () => {
                     value={formInput.email}
                     onChange={handleChange}
                     required
-                    className={`w-full h-10 px-3 pr-9 border rounded-[6px] text-xs sm:text-sm bg-white transition-colors focus:outline-none ${emailStatus.available === true
-                      ? 'border-emerald-500 focus:border-emerald-500'
+                    className={`w-full h-10 px-3.5 pr-10 border rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none ${emailStatus.available === true
+                      ? 'border-emerald-500 bg-white focus:border-emerald-500'
                       : emailStatus.available === false
-                        ? 'border-red-500 focus:border-red-500'
-                        : 'border-gray-200 focus:border-emerald-500'
+                        ? 'border-red-500 bg-white focus:border-red-500'
+                        : 'bg-[#F0F0F0] border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white'
                       }`}
                   />
                   {emailStatus.loading && (
-                    <div className="absolute right-3 inline-block w-3.5 h-3.5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="absolute right-3.5 inline-block w-3.5 h-3.5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
                   )}
                 </div>
                 {emailStatus.message && !emailStatus.loading && (
@@ -400,8 +401,8 @@ const RegisterContent = () => {
               </div>
 
               {/* Password Input */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[12px] sm:text-[12.5px] font-medium text-gray-700">Password</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700">Password</label>
                 <div className="relative flex items-center">
                   <input
                     data-testid="password-input"
@@ -411,15 +412,15 @@ const RegisterContent = () => {
                     value={formInput.password}
                     onChange={handleChange}
                     required
-                    className="w-full h-10 px-3 pr-9 border border-gray-200 rounded-[6px] text-xs sm:text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500"
+                    className="w-full h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
+                    className="absolute right-3 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? <AiOutlineEyeInvisible className="text-base" /> : <AiOutlineEye className="text-base" />}
+                    {showPassword ? <AiOutlineEyeInvisible className="text-lg" /> : <AiOutlineEye className="text-lg" />}
                   </button>
                 </div>
 
@@ -441,8 +442,8 @@ const RegisterContent = () => {
               </div>
 
               {/* Confirm Password Input */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[12px] sm:text-[12.5px] font-medium text-gray-700">Confirm Password</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700">Confirm Password</label>
                 <div className="relative flex items-center">
                   <input
                     data-testid="confirm-password-input"
@@ -452,17 +453,17 @@ const RegisterContent = () => {
                     value={formInput.confirmPassword}
                     onChange={handleChange}
                     required
-                    className={`w-full h-10 px-3 pr-9 border rounded-[6px] text-xs sm:text-sm bg-white transition-colors focus:outline-none ${formInput.confirmPassword && formInput.password !== formInput.confirmPassword
-                      ? 'border-red-500 focus:border-red-500'
+                    className={`w-full h-10 px-3.5 pr-10 border rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none ${formInput.confirmPassword && formInput.password !== formInput.confirmPassword
+                      ? 'border-red-500 bg-white focus:border-red-500'
                       : formInput.confirmPassword && formInput.password === formInput.confirmPassword
-                        ? 'border-emerald-500 focus:border-emerald-500'
-                        : 'border-gray-200 focus:border-emerald-500'
+                        ? 'border-emerald-500 bg-white focus:border-emerald-500'
+                        : 'bg-[#F0F0F0] border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white'
                       }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
+                    className="absolute right-3 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
                     aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                   >
                     {showConfirmPassword ? <AiOutlineEyeInvisible className="text-base" /> : <AiOutlineEye className="text-base" />}

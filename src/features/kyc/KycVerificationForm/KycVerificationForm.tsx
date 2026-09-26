@@ -533,46 +533,46 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                    <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
                       Legal Full Name <span className="text-red-500">*</span>
                     </label>
-                    <div className="relative">
-                      <User className="absolute left-3.5 top-3.5 text-gray-400" size={18} />
+                    <div className="relative flex items-center">
+                      <User className="absolute left-3.5 text-gray-400 pointer-events-none" size={18} />
                       <input
                         type="text"
                         value={legalFullName}
                         onChange={(e) => setLegalFullName(e.target.value)}
                         placeholder="e.g. John Alex Doe"
                         required
-                        className="w-full pl-11 pr-4 py-3 bg-gray-50 focus:bg-white border border-gray-200 focus:border-brand-green rounded-[6px] text-sm font-medium text-gray-900 outline-none transition-all"
+                        className="w-full h-10 pl-10 pr-3.5 bg-[#F0F0F0] focus:bg-white border border-[rgba(0,0,0,0.10)] focus:border-gray-300 rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                    <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
                       Date of Birth <span className="text-red-500">*</span>
                     </label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3.5 top-3.5 text-gray-400" size={18} />
+                    <div className="relative flex items-center">
+                      <Calendar className="absolute left-3.5 text-gray-400 pointer-events-none" size={18} />
                       <input
                         type="date"
                         value={dateOfBirth}
                         onChange={(e) => setDateOfBirth(e.target.value)}
                         required
                         max={moment().subtract(18, "years").format("YYYY-MM-DD")}
-                        className="w-full pl-11 pr-4 py-3 bg-gray-50 focus:bg-white border border-gray-200 focus:border-brand-green rounded-[6px] text-sm font-medium text-gray-900 outline-none transition-all"
+                        className="w-full h-10 pl-10 pr-3.5 bg-[#F0F0F0] focus:bg-white border border-[rgba(0,0,0,0.10)] focus:border-gray-300 rounded-[6px] text-sm text-gray-900 outline-none transition-colors"
                       />
                     </div>
                     <p className="text-[11px] text-gray-400 mt-1">Must be at least 18 years old.</p>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                    <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
                       Country of Issuance <span className="text-red-500">*</span>
                     </label>
                     <CustomSelect
-                      size="lg"
+                      size="md"
                       variant="filled"
                       leftIcon={<Globe size={18} />}
                       options={COUNTRY_SELECT_OPTIONS}
@@ -637,19 +637,19 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                  <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
                     {documentType === "passport" ? "Passport Number" : documentType === "nid" ? "National ID Number" : "Driver's License Number"}{" "}
                     <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative">
-                    <FileText className="absolute left-3.5 top-3.5 text-gray-400" size={18} />
+                  <div className="relative flex items-center">
+                    <FileText className="absolute left-3.5 text-gray-400 pointer-events-none" size={18} />
                     <input
                       type="text"
                       value={documentNumber}
                       onChange={(e) => setDocumentNumber(e.target.value)}
                       placeholder="e.g. P987654321 or ID12345678"
                       required
-                      className="w-full pl-11 pr-4 py-3 bg-gray-50 focus:bg-white border border-gray-200 focus:border-brand-green rounded-[6px] text-sm font-medium text-gray-900 outline-none transition-all font-mono"
+                      className="w-full h-10 pl-10 pr-3.5 bg-[#F0F0F0] focus:bg-white border border-[rgba(0,0,0,0.10)] focus:border-gray-300 rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors font-mono"
                     />
                   </div>
                 </div>

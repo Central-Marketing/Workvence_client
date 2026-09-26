@@ -121,8 +121,8 @@ export function CustomSelect<T extends string | number = any>({
   const variantClass =
     variant === "filled"
       ? error
-        ? "bg-[#F4F5F7] border-red-400 focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-400/40"
-        : "bg-[#F4F5F7] border-transparent hover:border-gray-300 focus:bg-white focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F]/20"
+        ? "bg-[#F0F0F0] border-red-400 focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-400/40"
+        : "bg-[#F0F0F0] border-[rgba(0,0,0,0.10)] hover:border-gray-300 focus:bg-white focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F]/20"
       : error
       ? "bg-white border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-400/40"
       : "bg-white border-gray-200 hover:border-gray-300 focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F]/20";
@@ -156,7 +156,7 @@ export function CustomSelect<T extends string | number = any>({
           )}
           <span
             className={`text-[13px] font-medium truncate ${
-              selectedOption ? "text-gray-900" : "text-gray-400 font-normal"
+              selectedOption ? "text-gray-900" : "text-[#868686] font-normal"
             }`}
           >
             {selectedOption ? selectedOption.label : placeholder}

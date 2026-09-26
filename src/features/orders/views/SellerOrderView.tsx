@@ -1063,7 +1063,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
 
             <form onSubmit={handleSubmitDelivery} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5">
                   Delivery Notes / Message
                 </label>
                 <textarea
@@ -1071,13 +1071,13 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   placeholder="Describe what you completed, instructions, or notes for the buyer..."
                   value={deliveryNotes}
                   onChange={(e) => setDeliveryNotes(e.target.value)}
-                  className="w-full bg-[#F8FAFC] border border-slate-200 rounded-[6px] p-3.5 text-xs sm:text-sm outline-none focus:bg-white focus:border-emerald-500 transition-colors resize-none placeholder-slate-400"
+                  className="w-full bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors resize-y"
                 />
               </div>
 
               {/* Upload Files Section */}
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5">
                   Attach Deliverable Files
                 </label>
                 <input

@@ -663,14 +663,14 @@ const Earnings = () => {
               />
 
               {/* Search Bar */}
-              <div className="relative flex-1 sm:w-64">
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <div className="relative flex-1 sm:w-64 flex items-center">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3 pointer-events-none" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="What are you looking for"
-                  className="w-full bg-white border border-gray-200 rounded-[6px] pl-9 pr-3.5 py-3 text-xs text-gray-800 placeholder-gray-400 outline-none focus:border-gray-400 transition-colors"
+                  className="w-full h-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] rounded-[6px] pl-9 pr-3.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none focus:border-gray-300 focus:bg-white transition-colors"
                 />
               </div>
 
@@ -1117,7 +1117,7 @@ const Earnings = () => {
             <form onSubmit={handlePayoutSubmit} className="space-y-4 pt-1">
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-gray-700 block">
+                  <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
                     Amount to withdraw in <strong className="text-gray-900">USD</strong>
                   </label>
                   <div className="flex items-center gap-1.5 text-[11px]">
@@ -1144,8 +1144,8 @@ const Earnings = () => {
                   </div>
                 </div>
 
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xs sm:text-sm">$</span>
+                <div className="relative flex items-center">
+                  <span className="absolute left-3.5 text-gray-400 font-bold text-xs sm:text-sm pointer-events-none">$</span>
                   <input
                     type="number"
                     min={MIN_PAYOUT_AMOUNT}
@@ -1154,7 +1154,7 @@ const Earnings = () => {
                     value={payoutAmount}
                     onChange={(e) => setPayoutAmount(e.target.value)}
                     placeholder={`Min $${MIN_PAYOUT_AMOUNT}.00`}
-                    className="w-full bg-[#F4F5F7] border border-transparent focus:border-[#327C73] focus:bg-white rounded-[6px] pl-7 pr-4 py-3 text-xs sm:text-sm text-gray-800 placeholder-gray-400 outline-none transition-all font-medium"
+                    className="w-full h-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] pl-7 pr-3.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors font-medium"
                     required
                   />
                 </div>

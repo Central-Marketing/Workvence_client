@@ -97,11 +97,11 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-6 overflow-y-auto">
           {/* Offer Price */}
           <div className="space-y-1.5">
-            <label className="text-xs sm:text-[13px] font-semibold text-gray-700 block">
+            <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
               Your Offer Price ($)
             </label>
-            <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-semibold text-sm">
+            <div className="relative flex items-center">
+              <span className="absolute left-3.5 text-gray-400 font-semibold text-sm pointer-events-none">
                 $
               </span>
               <input
@@ -111,14 +111,14 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
                 placeholder="e.g. 250"
                 required
                 min={1}
-                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] pl-8 pr-4 py-2.5 sm:py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-medium"
+                className="w-full h-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] pl-8 pr-3.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors font-medium"
               />
             </div>
           </div>
 
           {/* Delivery Time */}
           <div className="space-y-1.5">
-            <label className="text-xs sm:text-[13px] font-semibold text-gray-700 block">
+            <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
               Delivery Time (Days)
             </label>
             <input
@@ -128,13 +128,13 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
               placeholder="e.g. 4"
               required
               min={1}
-              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-4 py-2.5 sm:py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-medium"
+              className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors font-medium"
             />
           </div>
 
           {/* Cover Letter */}
           <div className="space-y-1.5">
-            <label className="text-xs sm:text-[13px] font-semibold text-gray-700 block">
+            <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
               Cover Letter & Proposal Pitch
             </label>
             <textarea
@@ -143,13 +143,13 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
               onChange={(e) => setCoverLetter(e.target.value)}
               placeholder="Explain why you are the best fit for this project, your approach, and experience..."
               required
-              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-normal resize-y min-h-[110px]"
+              className="w-full bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors font-normal resize-y min-h-[110px]"
             />
           </div>
 
           {/* Attachment URL */}
           <div className="space-y-1.5">
-            <label className="text-xs sm:text-[13px] font-semibold text-gray-700 block">
+            <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
               Work Sample / Attachment URL <span className="text-gray-400 font-normal">(Optional)</span>
             </label>
             <input
@@ -157,7 +157,7 @@ const SubmitProposalModal = ({ brief, onClose, onSuccess }: any) => {
               value={attachmentUrl}
               onChange={(e) => setAttachmentUrl(e.target.value)}
               placeholder="https://example.com/portfolio.pdf"
-              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-4 py-2.5 sm:py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all font-normal"
+              className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors font-normal"
             />
           </div>
 

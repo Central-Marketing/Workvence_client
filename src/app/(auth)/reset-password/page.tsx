@@ -182,7 +182,7 @@ const ResetPasswordContent = () => {
                   <h1 className="text-[24px] md:text-[28px] font-bold text-[#1a1a1a]">Create New Password</h1>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-[#333]">New password</label>
+                    <label className="text-xs sm:text-[13px] font-medium text-gray-700">New password</label>
                     <div className="relative flex items-center">
                       <input
                         name="newPassword"
@@ -190,23 +190,21 @@ const ResetPasswordContent = () => {
                         placeholder="***********"
                         value={passwords.newPassword}
                         onChange={handleChange}
-                        className="py-3 px-3 pr-11 border border-gray-200 rounded-[6px] text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full"
+                        className="w-full h-10 px-3.5 pr-11 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                       />
-                      <Button
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="icon"
-                        radius="full"
                         onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-3.5 text-[#888] hover:text-[#555] hover:!bg-transparent !p-0 !min-h-0 !h-auto w-auto"
+                        className="absolute right-3 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
                         aria-label={showNewPassword ? "Hide password" : "Show password"}
-                        icon={showNewPassword ? <AiOutlineEyeInvisible className="text-xl" /> : <AiOutlineEye className="text-xl" />}
-                      />
+                      >
+                        {showNewPassword ? <AiOutlineEyeInvisible className="text-lg" /> : <AiOutlineEye className="text-lg" />}
+                      </button>
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-[#333]">Confirm password</label>
+                    <label className="text-xs sm:text-[13px] font-medium text-gray-700">Confirm password</label>
                     <div className="relative flex items-center">
                       <input
                         name="confirmPassword"
@@ -214,18 +212,16 @@ const ResetPasswordContent = () => {
                         placeholder="***********"
                         value={passwords.confirmPassword}
                         onChange={handleChange}
-                        className="py-3 px-3 pr-11 border border-gray-200 rounded-[6px] text-sm bg-white transition-colors focus:outline-none focus:border-emerald-500 w-full"
+                        className="w-full h-10 px-3.5 pr-11 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                       />
-                      <Button
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="icon"
-                        radius="full"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3.5 text-[#888] hover:text-[#555] hover:!bg-transparent !p-0 !min-h-0 !h-auto w-auto"
+                        className="absolute right-3 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
                         aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                        icon={showConfirmPassword ? <AiOutlineEyeInvisible className="text-xl" /> : <AiOutlineEye className="text-xl" />}
-                      />
+                      >
+                        {showConfirmPassword ? <AiOutlineEyeInvisible className="text-lg" /> : <AiOutlineEye className="text-lg" />}
+                      </button>
                     </div>
                   </div>
 

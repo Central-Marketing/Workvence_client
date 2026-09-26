@@ -902,20 +902,20 @@ export default function ProfilePage() {
 
             {/* Email Address */}
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1.5">
+              <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5">
                 Email Address
               </label>
               <input
                 type="email"
                 value={user?.email || ""}
                 disabled
-                className="w-full px-4 py-2.5 bg-slate-50/70 border border-slate-200 rounded-[6px] text-xs sm:text-sm text-slate-600 cursor-not-allowed"
+                className="w-full h-10 px-3.5 bg-slate-50/70 border border-slate-200 rounded-[6px] text-sm text-slate-600 cursor-not-allowed"
               />
             </div>
 
             {/* Phone Number */}
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1.5">
+              <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5">
                 Phone Number
               </label>
               <input
@@ -923,13 +923,13 @@ export default function ProfilePage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+1 555-0199"
-                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-[6px] text-xs sm:text-sm text-slate-800 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
+                className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
               />
             </div>
 
             {/* Country */}
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1.5">
+              <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5">
                 Country
               </label>
               <div className="relative">
@@ -938,9 +938,9 @@ export default function ProfilePage() {
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
                   placeholder="e.g. Bangladesh, United States"
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-[6px] text-xs sm:text-sm text-slate-800 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all pr-9"
+                  className="w-full h-10 px-3.5 pr-9 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                 />
-                <FiChevronDown className="absolute right-3.5 top-3.5 text-slate-400 pointer-events-none text-sm" />
+                <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-sm" />
               </div>
             </div>
           </div>
@@ -949,7 +949,7 @@ export default function ProfilePage() {
         {/* SECTION 2: PROFESSIONAL DETAILS */}
         <div
           id="section-professional"
-          className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-6 scroll-mt-32 sm:scroll-mt-36"
+          className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-6 sm:p-7 mb-7 scroll-mt-32 sm:scroll-mt-36"
         >
           <div className="flex items-center justify-between pb-5 border-b border-slate-100 mb-6">
             <h2 className="text-base sm:text-lg font-bold text-slate-900">
@@ -969,7 +969,7 @@ export default function ProfilePage() {
 
           {/* Professional Title */}
           <div className="mb-5">
-            <label className="text-xs font-bold text-slate-700 block mb-1.5">
+            <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5">
               Professional Title
             </label>
             <input
@@ -977,13 +977,13 @@ export default function ProfilePage() {
               value={shortTitle}
               onChange={(e) => setShortTitle(e.target.value)}
               placeholder="e.g Expert Digital Marketer & Specialist"
-              className="w-full px-4 py-2.5 bg-[#F1F3F5] border border-transparent rounded-[6px] text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
+              className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
             />
           </div>
 
           {/* Bio */}
           <div className="mb-6">
-            <label className="text-xs font-bold text-slate-700 block mb-1.5">
+            <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5">
               Bio
             </label>
             <textarea
@@ -991,13 +991,13 @@ export default function ProfilePage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Write here"
-              className="w-full p-4 bg-[#F1F3F5] border border-transparent rounded-[6px] text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none focus:bg-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all resize-none"
+              className="w-full p-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors resize-none"
             />
           </div>
 
           {/* Skills Section */}
           <div className="mb-6">
-            <label className="text-xs font-bold text-slate-700 block mb-2">
+            <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-2">
               Skills
             </label>
             <div className="flex flex-wrap items-center gap-2 mb-2.5">
@@ -1237,28 +1237,28 @@ export default function ProfilePage() {
                     value={newExp.title}
                     onChange={(e) => setNewExp({ ...newExp, title: e.target.value })}
                     placeholder="Job Title (e.g. Lead Designer)"
-                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                   />
                   <input
                     type="text"
                     value={newExp.company}
                     onChange={(e) => setNewExp({ ...newExp, company: e.target.value })}
                     placeholder="Company Name"
-                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                   />
                   <input
                     type="text"
                     value={newExp.startDate}
                     onChange={(e) => setNewExp({ ...newExp, startDate: e.target.value })}
                     placeholder="Start Year (e.g. 2021)"
-                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                   />
                   <input
                     type="text"
                     value={newExp.endDate}
                     onChange={(e) => setNewExp({ ...newExp, endDate: e.target.value })}
                     placeholder="End Year or Present"
-                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                   />
                 </div>
                 <textarea
@@ -1266,7 +1266,7 @@ export default function ProfilePage() {
                   value={newExp.description}
                   onChange={(e) => setNewExp({ ...newExp, description: e.target.value })}
                   placeholder="Key responsibilities or summary..."
-                  className="w-full p-2.5 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500 resize-none"
+                  className="w-full p-3 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors resize-none"
                 />
                 <div className="flex items-center gap-2">
                   <Button
@@ -1350,28 +1350,28 @@ export default function ProfilePage() {
                     value={newEd.degree}
                     onChange={(e) => setNewEd({ ...newEd, degree: e.target.value })}
                     placeholder="Degree / Certificate (e.g. B.Sc in Computer Science)"
-                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                   />
                   <input
                     type="text"
                     value={newEd.university}
                     onChange={(e) => setNewEd({ ...newEd, university: e.target.value })}
                     placeholder="University / College"
-                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                   />
                   <input
                     type="text"
                     value={newEd.year}
                     onChange={(e) => setNewEd({ ...newEd, year: e.target.value })}
                     placeholder="Graduation Year (e.g. 2020)"
-                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                   />
                   <input
                     type="text"
                     value={newEd.country}
                     onChange={(e) => setNewEd({ ...newEd, country: e.target.value })}
                     placeholder="Country"
-                    className="px-3 py-2 bg-white rounded-[6px] border border-slate-200 text-xs outline-none focus:border-teal-500"
+                    className="h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                   />
                 </div>
                 <div className="flex items-center gap-2">
@@ -1464,7 +1464,7 @@ export default function ProfilePage() {
                   <div className="space-y-4">
                     {/* Project Title */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-slate-700">
+                      <label className="text-xs sm:text-[13px] font-medium text-gray-700">
                         Project Title <span className="text-rose-500">*</span>
                       </label>
                       <input
@@ -1472,25 +1472,25 @@ export default function ProfilePage() {
                         placeholder="e.g. E-Commerce Web & Mobile App Redesign"
                         value={portfolio[editingProjectIdx]?.title || ""}
                         onChange={(e) => handleUpdatePortfolio(editingProjectIdx, "title", e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-white rounded-[6px] border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-teal-600 outline-none transition-colors"
+                        className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                       />
                     </div>
 
                     {/* Description */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-slate-700">Description</label>
+                      <label className="text-xs sm:text-[13px] font-medium text-gray-700">Description</label>
                       <textarea
                         placeholder="Describe your role, technologies used, deliverables, and impact..."
                         rows={3}
                         value={portfolio[editingProjectIdx]?.description || ""}
                         onChange={(e) => handleUpdatePortfolio(editingProjectIdx, "description", e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-white rounded-[6px] border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-teal-600 outline-none transition-colors resize-none"
+                        className="w-full p-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors resize-none"
                       />
                     </div>
 
                     {/* Project Cover Image */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-slate-700">
+                      <label className="text-xs sm:text-[13px] font-medium text-gray-700">
                         Project Cover Image <span className="text-rose-500">*</span>
                       </label>
                       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
@@ -1547,13 +1547,13 @@ export default function ProfilePage() {
 
                     {/* Project Live Link */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-bold text-slate-700">Project Link (Optional)</label>
+                      <label className="text-xs sm:text-[13px] font-medium text-gray-700">Project Link (Optional)</label>
                       <input
                         type="url"
                         placeholder="e.g. https://myproject-demo.com or Behance/Dribbble URL"
                         value={portfolio[editingProjectIdx]?.link || ""}
                         onChange={(e) => handleUpdatePortfolio(editingProjectIdx, "link", e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-white rounded-[6px] border border-slate-200 text-xs sm:text-sm text-slate-800 focus:border-teal-600 outline-none transition-colors"
+                        className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                       />
                     </div>
 

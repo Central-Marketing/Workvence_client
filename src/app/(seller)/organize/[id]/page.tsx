@@ -1114,7 +1114,7 @@ const EditPackagePage = () => {
             {/* Package Title */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-gray-700 block">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
                   Package title
                 </label>
                 <span
@@ -1133,10 +1133,10 @@ const EditPackagePage = () => {
                 value={state.title || ""}
                 onChange={handleInputChange}
                 placeholder="e.g I will do something i am really good at"
-                className={`w-full bg-[#F4F5F7] border rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all ${
+                className={`w-full h-10 px-3.5 bg-[#F0F0F0] border rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors ${
                   (state.title?.length || 0) > 80
                     ? "border-red-400 focus:border-red-500 bg-red-50/10"
-                    : "border-transparent focus:border-gray-300 focus:bg-white"
+                    : "border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white"
                 }`}
               />
               {(state.title?.length || 0) > 80 && (
@@ -1281,14 +1281,14 @@ const EditPackagePage = () => {
                     placeholder="e.g. Figma, Illustrator"
                     value={newToolInput}
                     onChange={(e) => setNewToolInput(e.target.value)}
-                    className="bg-[#F4F5F7] border border-gray-200 rounded-[6px] px-3.5 text-xs sm:text-[13px] text-gray-800 outline-none w-52 sm:w-60 h-[40px] focus:bg-white focus:border-gray-300 transition-colors"
+                    className="h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none w-52 sm:w-60 transition-colors"
                     autoFocus
                   />
                   <Button
                     type="submit"
                     variant="brand"
                     radius="fiverr"
-                    className="bg-[#0B3A33] hover:bg-[#0B3A33]/90 text-white font-semibold h-[40px] px-4 text-xs sm:text-[13px]"
+                    className="bg-[#0B3A33] hover:bg-[#0B3A33]/90 text-white font-semibold h-10 px-4 text-xs sm:text-[13px]"
                   >
                     Add
                   </Button>
@@ -1297,7 +1297,7 @@ const EditPackagePage = () => {
                     variant="soft"
                     radius="fiverr"
                     onClick={() => setShowAddTool(false)}
-                    className="h-[40px] px-3.5 text-xs sm:text-[13px] text-gray-700 hover:text-gray-900"
+                    className="h-10 px-3.5 text-xs sm:text-[13px] text-gray-700 hover:text-gray-900"
                   >
                     Cancel
                   </Button>
@@ -1320,7 +1320,7 @@ const EditPackagePage = () => {
             {/* Search Keywords / Tags Section */}
             <div className="space-y-3 pt-2 border-t border-gray-100">
               <div className="flex items-center justify-between">
-                <label className="text-xs sm:text-[13px] font-bold text-gray-900 block">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
                   Search Keywords / Tags
                 </label>
                 <span className="text-[11px] text-gray-400 font-medium">
@@ -1354,7 +1354,7 @@ const EditPackagePage = () => {
                     placeholder="e.g. Logo Design, Minimalist"
                     value={newKeywordInput}
                     onChange={(e) => setNewKeywordInput(e.target.value)}
-                    className="bg-[#F4F5F7] border border-gray-200 rounded-[6px] px-3.5 text-xs sm:text-[13px] text-gray-800 outline-none w-52 sm:w-60 h-[40px] focus:bg-white focus:border-gray-300 transition-colors"
+                    className="h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none w-52 sm:w-60 transition-colors"
                     autoFocus
                   />
                   <Button
@@ -1455,7 +1455,7 @@ const EditPackagePage = () => {
                 return (
                   <>
                     <div className="flex items-center justify-between">
-                      <label className="text-xs font-semibold text-gray-700 block">
+                      <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
                         Package title
                       </label>
                       <span
@@ -1473,10 +1473,10 @@ const EditPackagePage = () => {
                       value={currentTierTitle}
                       onChange={(e) => handleTierInputChange("title", e.target.value)}
                       placeholder="e.g I will do something i am really good at"
-                      className={`w-full bg-[#F4F5F7] border rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all ${
+                      className={`w-full h-10 px-3.5 bg-[#F0F0F0] border rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors ${
                         isExceeded
                           ? "border-red-400 focus:border-red-500 bg-red-50/10"
-                          : "border-transparent focus:border-gray-300 focus:bg-white"
+                          : "border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white"
                       }`}
                     />
                     {isExceeded && (
@@ -1491,7 +1491,7 @@ const EditPackagePage = () => {
 
             {/* Tier Description */}
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-700 block">
+              <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
                 Package description
               </label>
               <textarea
@@ -1499,7 +1499,7 @@ const EditPackagePage = () => {
                 onChange={(e) => handleTierInputChange("shortDesc", e.target.value)}
                 placeholder="write description"
                 rows={3}
-                className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[80px]"
+                className="w-full bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors resize-y min-h-[80px]"
               />
             </div>
 
@@ -1507,7 +1507,7 @@ const EditPackagePage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Delivery Time */}
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700 block">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
                   Add delivery time
                 </label>
                 <CustomSelect
@@ -1523,7 +1523,7 @@ const EditPackagePage = () => {
 
               {/* Revisions */}
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700 block">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
                   Revisions
                 </label>
                 <CustomSelect
@@ -1540,7 +1540,7 @@ const EditPackagePage = () => {
 
             {/* Add Features */}
             <div className="space-y-2 pt-1">
-              <label className="text-xs font-semibold text-gray-700 block">
+              <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
                 Add Features
               </label>
               <div className="flex flex-wrap gap-1.5">
@@ -1565,14 +1565,14 @@ const EditPackagePage = () => {
                     placeholder="e.g. Responsive design"
                     value={newFeatureInput}
                     onChange={(e) => setNewFeatureInput(e.target.value)}
-                    className="bg-[#F4F5F7] border border-gray-200 rounded-[6px] px-3 text-xs sm:text-[13px] text-gray-800 outline-none flex-1 min-w-0 h-[40px] focus:bg-white focus:border-gray-300 transition-colors"
+                    className="bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none flex-1 min-w-0 h-10 transition-colors"
                     autoFocus
                   />
                   <Button
                     type="submit"
                     variant="brand"
                     radius="fiverr"
-                    className="bg-[#0B3A33] hover:bg-[#0B3A33]/90 text-white font-semibold h-[40px] px-3.5 text-xs sm:text-[13px] shrink-0"
+                    className="bg-[#0B3A33] hover:bg-[#0B3A33]/90 text-white font-semibold h-10 px-3.5 text-xs sm:text-[13px] shrink-0"
                   >
                     Add
                   </Button>
@@ -1584,7 +1584,7 @@ const EditPackagePage = () => {
                       setShowAddFeature(false);
                       setNewFeatureInput("");
                     }}
-                    className="h-[40px] px-3 text-xs sm:text-[13px] text-gray-700 hover:text-gray-900 shrink-0"
+                    className="h-10 px-3 text-xs sm:text-[13px] text-gray-700 hover:text-gray-900 shrink-0"
                   >
                     Cancel
                   </Button>
@@ -1606,7 +1606,7 @@ const EditPackagePage = () => {
 
             {/* Set Price */}
             <div className="space-y-1 pt-1">
-              <label className="text-xs font-semibold text-gray-700 block">
+              <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
                 Set price ($)
               </label>
               <div className="relative">
@@ -1622,7 +1622,7 @@ const EditPackagePage = () => {
                       e.preventDefault();
                     }
                   }}
-                  className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-xs text-gray-800 placeholder-gray-400 outline-none transition-all"
+                  className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
                 />
               </div>
             </div>
@@ -1850,7 +1850,7 @@ const EditPackagePage = () => {
           {/* New FAQ Input Card */}
           <div className="bg-white rounded-[6px] border border-gray-200/90 p-5 sm:p-6 shadow-2xs space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs sm:text-sm font-bold text-gray-900 block">
+              <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
                 Question
               </label>
               <input
@@ -1858,12 +1858,12 @@ const EditPackagePage = () => {
                 value={faqQuestion}
                 onChange={(e) => setFaqQuestion(e.target.value)}
                 placeholder="Write here"
-                className="w-full bg-[#ECEEF1]/70 hover:bg-[#ECEEF1] focus:bg-white border border-transparent focus:border-gray-300 rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all"
+                className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs sm:text-sm font-bold text-gray-900 block">
+              <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
                 Answer
               </label>
               <textarea
@@ -1871,7 +1871,7 @@ const EditPackagePage = () => {
                 onChange={(e) => setFaqAnswer(e.target.value)}
                 placeholder="Write here"
                 rows={3}
-                className="w-full bg-[#ECEEF1]/70 hover:bg-[#ECEEF1] focus:bg-white border border-transparent focus:border-gray-300 rounded-[6px] px-4 py-3 text-xs sm:text-[13px] text-gray-800 placeholder-gray-400 outline-none transition-all resize-y min-h-[70px]"
+                className="w-full bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors resize-y min-h-[70px]"
               />
             </div>
           </div>

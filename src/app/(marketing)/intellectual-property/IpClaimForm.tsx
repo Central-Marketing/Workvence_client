@@ -57,7 +57,7 @@ export default function IpClaimForm() {
         <form onSubmit={handleClaimSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
+              <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
                 Your Full Legal Name *
               </label>
               <input
@@ -66,11 +66,11 @@ export default function IpClaimForm() {
                 value={claimForm.claimantName}
                 onChange={(e) => setClaimForm({ ...claimForm, claimantName: e.target.value })}
                 placeholder="e.g. Robert Vance"
-                className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
+              <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
                 Copyright / Rights Owner *
               </label>
               <input
@@ -79,14 +79,14 @@ export default function IpClaimForm() {
                 value={claimForm.rightsHolder}
                 onChange={(e) => setClaimForm({ ...claimForm, rightsHolder: e.target.value })}
                 placeholder="Self or Company Name"
-                className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
+              <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
                 Email Address *
               </label>
               <input
@@ -95,11 +95,11 @@ export default function IpClaimForm() {
                 value={claimForm.email}
                 onChange={(e) => setClaimForm({ ...claimForm, email: e.target.value })}
                 placeholder="legal@company.com"
-                className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
+              <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
                 Phone Number
               </label>
               <input
@@ -107,13 +107,13 @@ export default function IpClaimForm() {
                 value={claimForm.phone}
                 onChange={(e) => setClaimForm({ ...claimForm, phone: e.target.value })}
                 placeholder="+1 (555) 000-0000"
-                className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+                className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
               Infringing Workvence URL(s) *
             </label>
             <input
@@ -122,12 +122,12 @@ export default function IpClaimForm() {
               value={claimForm.infringingUrl}
               onChange={(e) => setClaimForm({ ...claimForm, infringingUrl: e.target.value })}
               placeholder="https://workvence.com/package/..."
-              className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+              className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
               Original Authorized Work Reference / URL
             </label>
             <input
@@ -135,12 +135,12 @@ export default function IpClaimForm() {
               value={claimForm.originalWorkUrl}
               onChange={(e) => setClaimForm({ ...claimForm, originalWorkUrl: e.target.value })}
               placeholder="https://yourwebsite.com/original-art..."
-              className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
+              className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
               Description of Infringement *
             </label>
             <textarea
@@ -149,7 +149,7 @@ export default function IpClaimForm() {
               value={claimForm.description}
               onChange={(e) => setClaimForm({ ...claimForm, description: e.target.value })}
               placeholder="Describe the copyrighted elements that have been copied without permission..."
-              className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none resize-none"
+              className="w-full px-3.5 py-2.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors resize-y"
             />
           </div>
 
@@ -183,7 +183,7 @@ export default function IpClaimForm() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">
+            <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
               Electronic Signature (Type Your Full Legal Name) *
             </label>
             <input
@@ -192,7 +192,7 @@ export default function IpClaimForm() {
               value={claimForm.signature}
               onChange={(e) => setClaimForm({ ...claimForm, signature: e.target.value })}
               placeholder="/s/ Full Legal Name"
-              className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none font-mono"
+              className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors font-mono"
             />
           </div>
 

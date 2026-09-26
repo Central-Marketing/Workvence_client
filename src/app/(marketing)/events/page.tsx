@@ -106,43 +106,45 @@ export default function EventsPage() {
 
   return (
     <div className="min-h-screen bg-white text-[#112131] font-sans">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-20 lg:py-28">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[#327C73] text-xs font-semibold">
-              <Calendar className="w-4 h-4 text-[#10b981]" />
-              <span>Workvence Live & Virtual Events</span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#0f172a] leading-tight">
-              Learn, Connect & Grow <br className="hidden sm:inline" />
-              <span className="text-[#327C73]">with Industry Masters</span>
+      {/* 1. Hero Banner Card */}
+      <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10">
+        <section
+          aria-label="Workvence Events Banner"
+          className="relative w-full rounded-[6px] py-16 sm:py-20 md:py-24 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/media/Events.png')" }}
+        >
+          {/* Subtle dark overlay for optimal text contrast */}
+          <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
+
+          <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center space-y-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-tight">
+              Learn, Connect &amp; Grow <br className="hidden sm:inline" />
+              <span className="text-[#6AD724]">with Industry Masters</span>
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto font-normal">
+            <p className="font-inter text-xs sm:text-sm md:text-base text-gray-200 max-w-2xl mx-auto font-normal leading-relaxed">
               Join interactive live workshops, seller masterclasses, and local creator meetups designed to level up your craft and business.
             </p>
 
             {/* Filter Pills */}
-            <div className="flex flex-wrap items-center justify-center gap-2 pt-4">
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
               {eventTypes.map((t) => (
-                <Button
+                <button
                   key={t}
+                  type="button"
                   onClick={() => setFilterType(t)}
-                  variant={filterType === t ? "brand" : "soft"}
-                  size="xs"
-                  radius="xl"
-                  className={`font-semibold transition cursor-pointer ${filterType === t
-                    ? "shadow-xs"
-                    : "hover:bg-gray-200"
-                    }`}
+                  className={`px-5 h-10 inline-flex items-center justify-center rounded-[6px] text-xs sm:text-sm font-semibold transition cursor-pointer ${
+                    filterType === t
+                      ? "bg-[#0D6D5F] text-white shadow-xs"
+                      : "bg-white hover:bg-gray-100 text-[#0f172a] shadow-xs"
+                  }`}
                 >
                   {t === "All" ? "All Events" : `${t}s`}
-                </Button>
+                </button>
               ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* Events Grid */}
       <section className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-white">

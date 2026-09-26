@@ -16,7 +16,7 @@ export default function EarningsCalculator() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-[6px] p-8 sm:p-12 shadow-2xl space-y-8">
           <div className="text-center space-y-2">
-            <span className="text-xs font-bold text-[#0D6D5F] uppercase tracking-wider">
+            <span className="text-xs font-bold text-[#10b981] uppercase tracking-wider">
               Earnings Estimator
             </span>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">Estimate Your Earning Potential</h2>
@@ -75,7 +75,7 @@ export default function EarningsCalculator() {
                 <span className="text-xs text-gray-300 uppercase tracking-wider font-semibold">
                   Estimated Monthly Take-Home
                 </span>
-                <div className="text-4xl sm:text-5xl font-extrabold text-[#0D6D5F]">
+                <div className="text-4xl sm:text-5xl font-extrabold text-[#10b981]">
                   ${Math.round(estimatedMonthlyEarnings).toLocaleString()}
                 </div>
                 <span className="text-xs text-gray-400 block">

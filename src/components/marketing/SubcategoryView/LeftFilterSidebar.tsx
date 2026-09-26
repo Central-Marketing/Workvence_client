@@ -50,8 +50,23 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
   hideHeader = false,
 }) => {
   // Local state for smooth real-time slider and input responsiveness
-  const [localMin, setLocalMin] = useState(minPrice);
-  const [localMax, setLocalMax] = useState(maxPrice);
+  const [localMin, setLocalMin] = useState(minPrice || "");
+  const [localMax, setLocalMax] = useState(maxPrice || "");
+
+  // Track if user actively initiated an update to prevent feedback loops with parent props
+  const isUserInteractingMin = useRef(false);
+  const isUserInteractingMax = useRef(false);
+
+  // Stable callback refs so changing parent function references don't trigger effects
+  const onMinPriceChangeRef = useRef(onMinPriceChange);
+  onMinPriceChangeRef.current = onMinPriceChange;
+
+  const onMaxPriceChangeRef = useRef(onMaxPriceChange);
+  onMaxPriceChangeRef.current = onMaxPriceChange;
+
+  // Track last known values (from props or emitted) to prevent circular cascades
+  const lastMinPropRef = useRef(minPrice || "");
+  const lastMaxPropRef = useRef(maxPrice || "");
 
   // Category custom dropdown state
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
@@ -69,13 +84,23 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
     };
   }, []);
 
-  // Sync with incoming props (e.g. on reset or URL query change)
+  // Sync with incoming props (e.g. on reset or URL query change) without feedback
   useEffect(() => {
-    setLocalMin(minPrice);
+    const safeMin = minPrice || "";
+    if (safeMin !== lastMinPropRef.current) {
+      lastMinPropRef.current = safeMin;
+      isUserInteractingMin.current = false;
+      setLocalMin(safeMin);
+    }
   }, [minPrice]);
 
   useEffect(() => {
-    setLocalMax(maxPrice);
+    const safeMax = maxPrice || "";
+    if (safeMax !== lastMaxPropRef.current) {
+      lastMaxPropRef.current = safeMax;
+      isUserInteractingMax.current = false;
+      setLocalMax(safeMax);
+    }
   }, [maxPrice]);
 
   // Debounce price changes to prevent excessive re-renders, URL pushes, and API request floods
@@ -83,19 +108,34 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
   const debouncedMax = useDebounce(localMax, 400);
 
   useEffect(() => {
-    if (debouncedMin !== minPrice) {
-      onMinPriceChange(debouncedMin);
+    if (!isUserInteractingMin.current) return;
+    const currentProp = minPrice || "";
+    if (debouncedMin !== currentProp && debouncedMin !== lastMinPropRef.current) {
+      lastMinPropRef.current = debouncedMin;
+      onMinPriceChangeRef.current?.(debouncedMin);
     }
-  }, [debouncedMin, minPrice, onMinPriceChange]);
+    if (debouncedMin === currentProp) {
+      isUserInteractingMin.current = false;
+    }
+  }, [debouncedMin, minPrice]);
 
   useEffect(() => {
-    if (debouncedMax !== maxPrice) {
-      onMaxPriceChange(debouncedMax);
+    if (!isUserInteractingMax.current) return;
+    const currentProp = maxPrice || "";
+    if (debouncedMax !== currentProp && debouncedMax !== lastMaxPropRef.current) {
+      lastMaxPropRef.current = debouncedMax;
+      onMaxPriceChangeRef.current?.(debouncedMax);
     }
-  }, [debouncedMax, maxPrice, onMaxPriceChange]);
+    if (debouncedMax === currentProp) {
+      isUserInteractingMax.current = false;
+    }
+  }, [debouncedMax, maxPrice]);
 
-  const currentMin = parseInt(localMin || "100", 10);
-  const currentMax = parseInt(localMax || "1000", 10);
+  const parsedMin = parseInt(localMin, 10);
+  const currentMin = isNaN(parsedMin) ? 100 : parsedMin;
+
+  const parsedMax = parseInt(localMax, 10);
+  const currentMax = isNaN(parsedMax) ? 1000 : parsedMax;
 
   // Range Slider boundaries
   const sliderMin = 0;
@@ -108,6 +148,7 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
   const handleMinSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value, 10);
     if (val <= currentMax) {
+      isUserInteractingMin.current = true;
       setLocalMin(String(val));
     }
   };
@@ -115,8 +156,19 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
   const handleMaxSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value, 10);
     if (val >= currentMin) {
+      isUserInteractingMax.current = true;
       setLocalMax(String(val));
     }
+  };
+
+  const handleResetFilters = () => {
+    isUserInteractingMin.current = false;
+    isUserInteractingMax.current = false;
+    lastMinPropRef.current = "";
+    lastMaxPropRef.current = "";
+    setLocalMin("");
+    setLocalMax("");
+    onReset();
   };
 
   return (
@@ -129,7 +181,7 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
             type="button"
             variant="ghost"
             size="xs"
-            onClick={onReset}
+            onClick={handleResetFilters}
             leftIcon={<FiRotateCcw className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-700" />}
             className="text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors p-0 h-auto hover:bg-transparent"
           >
@@ -362,7 +414,10 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
             <input
               type="number"
               value={localMin}
-              onChange={(e) => setLocalMin(e.target.value)}
+              onChange={(e) => {
+                isUserInteractingMin.current = true;
+                setLocalMin(e.target.value);
+              }}
               placeholder="100"
               className="w-full text-xs font-bold text-gray-900 outline-none bg-transparent"
             />
@@ -377,7 +432,10 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
             <input
               type="number"
               value={localMax}
-              onChange={(e) => setLocalMax(e.target.value)}
+              onChange={(e) => {
+                isUserInteractingMax.current = true;
+                setLocalMax(e.target.value);
+              }}
               placeholder="1000"
               className="w-full text-xs font-bold text-gray-900 outline-none bg-transparent"
             />

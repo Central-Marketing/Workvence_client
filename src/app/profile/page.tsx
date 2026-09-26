@@ -546,9 +546,8 @@ export default function ProfilePage() {
           style={{
             top: `calc(var(--navbar-height, ${isSeller ? "82px" : "136px"}) + 0px)`,
           }}
-          className={`sticky z-30 py-2.5 sm:py-3.5 -my-1 bg-[#F8FAFC]/95 backdrop-blur-md transition-[top] duration-200 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-            isSeller ? "top-[74px] md:top-[88px]" : "top-[128px] md:top-[142px]"
-          }`}
+          className={`sticky z-30 py-2.5 sm:py-3.5 -my-1 bg-[#F8FAFC]/95 backdrop-blur-md transition-[top] duration-200 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 ${isSeller ? "top-[74px] md:top-[88px]" : "top-[128px] md:top-[142px]"
+            }`}
         >
           <div>
             <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
@@ -1465,7 +1464,7 @@ export default function ProfilePage() {
                     {/* Project Title */}
                     <div className="flex flex-col gap-1.5">
                       <label className="text-xs sm:text-[13px] font-medium text-gray-700">
-                        Project Title <span className="text-rose-500">*</span>
+                        Project Title <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
@@ -1491,7 +1490,7 @@ export default function ProfilePage() {
                     {/* Project Cover Image */}
                     <div className="flex flex-col gap-1.5">
                       <label className="text-xs sm:text-[13px] font-medium text-gray-700">
-                        Project Cover Image <span className="text-rose-500">*</span>
+                        Project Cover Image <span className="text-red-500">*</span>
                       </label>
                       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                         {portfolio[editingProjectIdx]?.image ? (

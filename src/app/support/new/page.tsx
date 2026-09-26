@@ -174,7 +174,7 @@ export default function CreateSupportTicketPage() {
           {/* 1. Category Selection Grid */}
           <div className="space-y-3">
             <label className="block text-xs font-semibold text-[#475569] uppercase tracking-wider font-sf-pro">
-              1. Select Ticket Category <span className="text-rose-500">*</span>
+              1. Select Ticket Category <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {CATEGORIES.map((cat) => {
@@ -240,7 +240,7 @@ export default function CreateSupportTicketPage() {
           <div className="bg-white p-6 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-6">
             <div className="space-y-1.5">
               <label className="block text-xs sm:text-[13px] font-medium text-gray-700 font-sf-pro">
-                3. Ticket Subject <span className="text-rose-500">*</span>
+                3. Ticket Subject <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -254,7 +254,7 @@ export default function CreateSupportTicketPage() {
 
             <div className="space-y-1.5">
               <label className="block text-xs sm:text-[13px] font-medium text-gray-700 font-sf-pro">
-                Detailed Description <span className="text-rose-500">*</span>
+                Detailed Description <span className="text-red-500">*</span>
               </label>
               <textarea
                 required

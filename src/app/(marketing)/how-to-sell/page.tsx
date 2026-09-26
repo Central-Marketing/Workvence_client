@@ -73,19 +73,22 @@ export default function HowToSellPage() {
 
   return (
     <div className="min-h-screen bg-white text-[#112131] font-sans">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-[rgba(0,0,0,0.10)] py-20 lg:py-28">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5 text-[#0D6D5F]" />
-              <span>Seller Growth Guide</span>
-            </div>
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#0f172a] leading-tight">
+      {/* 1. Hero Banner Card */}
+      <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10">
+        <section
+          aria-label="How to Sell Banner"
+          className="relative w-full rounded-[6px] py-16 sm:py-20 md:py-24 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/media/SellingonWorkvence.png')" }}
+        >
+          {/* Subtle dark overlay for optimal text contrast */}
+          <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
+
+          <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center space-y-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-tight">
               Turn Your Expertise Into a <br className="hidden sm:inline" />
-              <span className="text-[#0D6D5F]">Thriving Global Business</span>
+              <span className="text-[#6AD724]">Thriving Global Business</span>
             </h1>
-            <p className="text-xs sm:text-sm md:text-base text-gray-600 max-w-2xl mx-auto font-normal leading-relaxed">
+            <p className="font-inter text-xs sm:text-sm md:text-base text-gray-200 max-w-2xl mx-auto font-normal leading-relaxed">
               Work with clients from over 180 countries. Set your own prices, work on your own schedule, and get paid with guaranteed escrow protection.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
@@ -98,14 +101,14 @@ export default function HowToSellPage() {
               </Link>
               <a
                 href="#calculator"
-                className="px-6 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] hover:bg-gray-50 text-[#0f172a] font-semibold text-xs sm:text-sm transition inline-flex items-center justify-center cursor-pointer"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white hover:bg-gray-100 text-[#0f172a] font-semibold text-xs sm:text-sm transition shadow-xs cursor-pointer"
               >
                 Calculate Potential Earnings
               </a>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* 4-Step Seller Journey */}
       <section className="py-20 bg-white">

@@ -212,20 +212,18 @@ export default function AffiliatesPage() {
               Promote the world&apos;s most trusted freelance platform. Turn your audience into recurring revenue with up to 30% commission, $100 CPA bounties, and 30-day tracking cookies.
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-              <Button
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
+              <button
+                type="button"
                 onClick={() => setIsJoining(true)}
-                variant="brand"
-                size="md"
-                radius="fiverr"
-                rightIcon={<ArrowRight className="w-4 h-4" />}
-                className="font-semibold text-sm shadow-md hover:shadow-lg bg-[#0D6D5F] hover:bg-[#0b5c50] text-white"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs gap-2 cursor-pointer"
               >
-                Become an Affiliate
-              </Button>
+                <span>Become an Affiliate</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
               <a
                 href="#commissions"
-                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-sm transition backdrop-blur-xs"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white hover:bg-gray-100 text-[#0f172a] font-semibold text-xs sm:text-sm transition shadow-xs cursor-pointer"
               >
                 View Commission Plans
               </a>

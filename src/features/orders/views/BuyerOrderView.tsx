@@ -265,6 +265,9 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
         orderID: targetOrderId,
         description: reviewDescription.trim(),
         star: avgRating,
+        communication: feedbackData.communication || avgRating,
+        quality: feedbackData.quality || avgRating,
+        service: feedbackData.service || avgRating,
       });
       toast.success("Thank you for your review!");
       setHasSubmittedReview(true);

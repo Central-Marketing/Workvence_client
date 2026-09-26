@@ -471,7 +471,7 @@ const CreateBrief = () => {
           {/* Section 1: Project Title */}
           <div>
             <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
-              Project Title <span className="text-emerald-600">*</span>
+              Project Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -514,8 +514,8 @@ const CreateBrief = () => {
 
           {/* Section 3: Description */}
           <div className="space-y-2">
-            <label className="block text-xs sm:text-sm font-bold text-slate-900 mb-2">
-              Project Description <span className="text-emerald-600">*</span>
+            <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
+              Project Description <span className="text-red-500">*</span>
             </label>
             <textarea
               placeholder="Describe your project goals, required deliverables, preferences, and any technical specifications..."

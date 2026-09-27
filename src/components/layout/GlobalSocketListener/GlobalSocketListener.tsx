@@ -27,9 +27,14 @@ export default function GlobalSocketListener() {
 
     const handleOrderUpdate = () => {
       queryClient.invalidateQueries({ queryKey: ["dashboard-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["seller-dashboard-orders"] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders-all"] });
+      queryClient.invalidateQueries({ queryKey: ["order"] });
       queryClient.invalidateQueries({ queryKey: ["seller-earnings-statement"] });
       queryClient.invalidateQueries({ queryKey: ["my-payouts"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["unread-notifications-count"] });
     };
 
     joinUser();

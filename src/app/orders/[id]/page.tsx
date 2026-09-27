@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import moment from "moment";
 import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";
@@ -13,6 +13,7 @@ import { BuyerOrderView, SellerOrderView, NormalizedOrder } from "@/features/ord
 
 export default function OrderDetailPage() {
   const { id } = useParams();
+  const queryClient = useQueryClient();
   const user = useUserStore((state: any) => state.user);
 
   useEffect(() => {
@@ -35,18 +36,62 @@ export default function OrderDetailPage() {
 
   // Real-time socket sync
   useEffect(() => {
-    if (id) {
-      socket.emit("join_order", id);
+    if (!id) return;
+
+    if (!socket.connected) {
+      socket.connect();
     }
+
+    const joinRoom = () => {
+      socket.emit("join_order", id);
+      socket.emit("join_room", `order_${id}`);
+    };
+
+    joinRoom();
+    socket.on("connect", joinRoom);
+
     const handleOrderUpdate = (data: any) => {
-      if (data?.orderId === id || data?.order?._id === id || data?.metadata?.orderId === id) {
+      const incomingId = String(
+        data?.orderID ||
+        data?.orderId ||
+        data?.order?._id ||
+        data?.order?.id ||
+        data?.metadata?.orderID ||
+        data?.metadata?.orderId ||
+        data?._id ||
+        ""
+      ).trim();
+
+      const isLinkMatch =
+        typeof data?.link === "string" && data.link.includes(String(id));
+
+      const hasOrderKeywords =
+        Boolean(
+          data?.title &&
+          /order|delivery|extension|revision/i.test(String(data.title))
+        ) ||
+        Boolean(
+          data?.message &&
+          /order|delivery extension|revision/i.test(String(data.message))
+        );
+
+      if (
+        (incomingId && incomingId === String(id)) ||
+        isLinkMatch ||
+        (!incomingId && hasOrderKeywords) ||
+        (!data || Object.keys(data).length === 0)
+      ) {
+        queryClient.invalidateQueries({ queryKey: ["order", id] });
         refetch();
       }
     };
+
     socket.on("order_updated", handleOrderUpdate);
     socket.on("new_notification", handleOrderUpdate);
     socket.on("notification", handleOrderUpdate);
+
     return () => {
+      socket.off("connect", joinRoom);
       socket.off("order_updated", handleOrderUpdate);
       socket.off("new_notification", handleOrderUpdate);
       socket.off("notification", handleOrderUpdate);

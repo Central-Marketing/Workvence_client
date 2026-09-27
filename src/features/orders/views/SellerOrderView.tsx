@@ -568,10 +568,10 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
 
         {/* Pending Extension Request Banner */}
         {hasPendingExtension && (
-          <div className="bg-sky-50 border border-sky-200 rounded-[6px] p-5 mb-6">
+          <div className="bg-white border border-[rgba(0, 0, 0, 0.10)] rounded-[6px] p-5 mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3.5">
-                <div className="w-10 h-10 rounded-[6px] bg-sky-100 text-sky-700 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0, 0, 0, 0.10)] text-sky-700 flex items-center justify-center shrink-0 mt-0.5">
                   <FiClock className="text-xl" />
                 </div>
                 <div>

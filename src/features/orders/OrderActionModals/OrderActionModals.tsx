@@ -165,7 +165,7 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
         />
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-[6px] bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 shrink-0">
+          <div className="w-12 h-12 rounded-[6px] bg-white text-amber-600 flex items-center justify-center border border-[rgba(0, 0, 0, 0.10)] shrink-0">
             <Calendar size={24} strokeWidth={2} />
           </div>
           <div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -65,6 +65,13 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
     extStatus !== "rejected" &&
     !extensionProcessed
   );
+
+  // Reset local processed state if incoming order has a fresh pending extension
+  useEffect(() => {
+    if (extStatus === "pending") {
+      setExtensionProcessed(null);
+    }
+  }, [extStatus, extensionData?.createdAt, extensionData?.extraDays, order.id]);
 
   // Review / Feedback State
   const [reviewDescription, setReviewDescription] = useState("");

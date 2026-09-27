@@ -155,7 +155,7 @@ const RegisterContent = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    const requiredFields = ['username', 'email', 'password', 'confirmPassword'];
+    const requiredFields = ['email', 'password', 'confirmPassword'];
     for (const key of requiredFields) {
       if ((formInput as any)[key] === '') {
         toast.error('Please fill all input field: ' + key);

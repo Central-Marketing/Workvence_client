@@ -658,9 +658,8 @@ function BriefsContent() {
               <div
                 ref={hubScrollRef}
                 {...hubDragEvents}
-                className={`flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0 select-none ${
-                  isHubDragging ? "cursor-grabbing" : "cursor-grab"
-                }`}
+                className={`flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0 select-none ${isHubDragging ? "cursor-grabbing" : "cursor-grab"
+                  }`}
               >
                 {/* Filter Button */}
                 <Button
@@ -781,10 +780,10 @@ function BriefsContent() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-7">
               <div>
                 <h1 className="text-xl sm:text-[32px] font-bold text-gray-900 tracking-tight font-sf-pro leading-tight">
-                  Find Your Next Briefs
+                  Find Your Next Projects
                 </h1>
                 <p className="text-[12px] sm:text-[15px] text-gray-500 mt-1.5 max-w-2xl font-normal leading-relaxed">
-                  Explore briefs from clients looking for the right talent, skills, and expertise to bring their ideas to life.
+                  Explore projects from clients looking for the right talent, skills, and expertise to bring their ideas to life.
                 </p>
               </div>
 
@@ -818,9 +817,8 @@ function BriefsContent() {
               <div
                 ref={feedScrollRef}
                 {...feedDragEvents}
-                className={`flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0 select-none ${
-                  isFeedDragging ? "cursor-grabbing" : "cursor-grab"
-                }`}
+                className={`flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0 select-none ${isFeedDragging ? "cursor-grabbing" : "cursor-grab"
+                  }`}
               >
                 {/* Filter Drawer Toggle */}
                 <Button
@@ -836,11 +834,10 @@ function BriefsContent() {
                     }
                   }}
                   leftIcon={<FiSliders className="w-3.5 h-3.5 text-gray-600" />}
-                  className={`font-medium text-xs sm:text-[13px] transition-colors px-3 py-1.5 shrink-0 mr-1 border-none shadow-none ${
-                    (isMobileViewport ? showFilterDrawer : isFilterOpen)
-                      ? "bg-gray-200/80 text-black font-semibold"
-                      : "text-gray-700 hover:text-black hover:bg-gray-200/50"
-                  }`}
+                  className={`font-medium text-xs sm:text-[13px] transition-colors px-3 py-1.5 shrink-0 mr-1 border-none shadow-none ${(isMobileViewport ? showFilterDrawer : isFilterOpen)
+                    ? "bg-gray-200/80 text-black font-semibold"
+                    : "text-gray-700 hover:text-black hover:bg-gray-200/50"
+                    }`}
                 >
                   Filter
                 </Button>
@@ -1001,171 +998,171 @@ function BriefsContent() {
               {/* Right Side: Brief Cards Grid & Pagination */}
               <div className="flex-1 min-w-0 w-full">
 
-            {/* ============================================================ */}
-            {/* Project Brief Cards Grid                                    */}
-            {/* ============================================================ */}
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 animate-pulse">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div
-                    key={i}
-                    className="bg-white rounded-[6px] border border-gray-200/90 p-6 sm:p-7 h-[260px] flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-                        <div className="flex gap-2">
-                          <div className="h-6 bg-gray-200 rounded-full w-20"></div>
-                          <div className="h-6 bg-gray-200 rounded-full w-28"></div>
+                {/* ============================================================ */}
+                {/* Project Brief Cards Grid                                    */}
+                {/* ============================================================ */}
+                {isLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 animate-pulse">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <div
+                        key={i}
+                        className="bg-white rounded-[6px] border border-gray-200/90 p-6 sm:p-7 h-[260px] flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                            <div className="flex gap-2">
+                              <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+                              <div className="h-6 bg-gray-200 rounded-full w-28"></div>
+                            </div>
+                          </div>
+                          <div className="h-3 bg-gray-100 rounded w-1/3 mb-5"></div>
+                          <div className="h-4 bg-gray-100 rounded w-full mb-2"></div>
+                          <div className="h-4 bg-gray-100 rounded w-4/5 mb-5"></div>
+                        </div>
+                        <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-gray-200"></div>
+                            <div className="h-3 bg-gray-200 rounded w-24"></div>
+                          </div>
+                          <div className="h-3 bg-gray-200 rounded w-20"></div>
                         </div>
                       </div>
-                      <div className="h-3 bg-gray-100 rounded w-1/3 mb-5"></div>
-                      <div className="h-4 bg-gray-100 rounded w-full mb-2"></div>
-                      <div className="h-4 bg-gray-100 rounded w-4/5 mb-5"></div>
+                    ))}
+                  </div>
+                ) : filteredBriefs.length === 0 ? (
+                  <div className="py-20 text-center flex flex-col items-center justify-center bg-white rounded-[6px] border border-gray-200/90 p-8 shadow-2xs">
+                    <div className="w-14 h-14 rounded-full bg-emerald-50 text-[#327C73] flex items-center justify-center mb-4 border border-emerald-100 shadow-2xs">
+                      <FiBriefcase className="w-6 h-6" />
                     </div>
-                    <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-200"></div>
-                        <div className="h-3 bg-gray-200 rounded w-24"></div>
-                      </div>
-                      <div className="h-3 bg-gray-200 rounded w-20"></div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">
+                      No briefs currently found
+                    </h3>
+                    <p className="text-sm text-gray-500 max-w-md mb-6 leading-relaxed">
+                      {search
+                        ? `No open briefs match "${search}". Try another keyword or clear your filters.`
+                        : "There are currently no open projects in this category. Check back soon or post your own project!"}
+                    </p>
+                    <div className="flex items-center gap-3">
+                      {hasActiveFilters && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="md"
+                          radius="xl"
+                          onClick={clearAllFilters}
+                          className="px-5 py-2.5 text-xs font-semibold shadow-2xs"
+                        >
+                          Clear Filters
+                        </Button>
+                      )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="md"
+                        radius="xl"
+                        onClick={handleBackToCategories}
+                        className="px-5 py-2.5 text-xs font-semibold shadow-2xs"
+                      >
+                        Browse Categories
+                      </Button>
+                      {user && !user.isSeller && (
+                        <Link
+                          href="/briefs/create"
+                          className="px-5 py-2.5 bg-[#327C73] text-white text-xs font-semibold rounded-[6px] hover:bg-[#256059] transition shadow-xs"
+                        >
+                          + Post a Project
+                        </Link>
+                      )}
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : filteredBriefs.length === 0 ? (
-              <div className="py-20 text-center flex flex-col items-center justify-center bg-white rounded-[6px] border border-gray-200/90 p-8 shadow-2xs">
-                <div className="w-14 h-14 rounded-full bg-emerald-50 text-[#327C73] flex items-center justify-center mb-4 border border-emerald-100 shadow-2xs">
-                  <FiBriefcase className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-1">
-                  No briefs currently found
-                </h3>
-                <p className="text-sm text-gray-500 max-w-md mb-6 leading-relaxed">
-                  {search
-                    ? `No open briefs match "${search}". Try another keyword or clear your filters.`
-                    : "There are currently no open projects in this category. Check back soon or post your own project!"}
-                </p>
-                <div className="flex items-center gap-3">
-                  {hasActiveFilters && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="md"
-                      radius="xl"
-                      onClick={clearAllFilters}
-                      className="px-5 py-2.5 text-xs font-semibold shadow-2xs"
-                    >
-                      Clear Filters
-                    </Button>
-                  )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="md"
-                    radius="xl"
-                    onClick={handleBackToCategories}
-                    className="px-5 py-2.5 text-xs font-semibold shadow-2xs"
-                  >
-                    Browse Categories
-                  </Button>
-                  {user && !user.isSeller && (
-                    <Link
-                      href="/briefs/create"
-                      className="px-5 py-2.5 bg-[#327C73] text-white text-xs font-semibold rounded-[6px] hover:bg-[#256059] transition shadow-xs"
-                    >
-                      + Post a Project
-                    </Link>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-                  {filteredBriefs.map((brief) => {
-                    const briefId = brief.id || brief._id;
-                    const proposalsCount =
-                      brief.proposalCount ?? brief._count?.proposals ?? brief.proposalsCount ?? (brief.proposals?.length || 0);
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                      {filteredBriefs.map((brief) => {
+                        const briefId = brief.id || brief._id;
+                        const proposalsCount =
+                          brief.proposalCount ?? brief._count?.proposals ?? brief.proposalsCount ?? (brief.proposals?.length || 0);
 
-                    const country = brief.user?.country;
-                    const location = country || "Remote";
+                        const country = brief.user?.country;
+                        const location = country || "Remote";
 
-                    const budgetDisplay =
-                      brief.budget !== undefined && brief.budget !== null
-                        ? typeof brief.budget === "number"
-                          ? `$${brief.budget.toLocaleString()}`
-                          : String(brief.budget).startsWith("$")
-                            ? brief.budget
-                            : `$${brief.budget}`
-                        : null;
+                        const budgetDisplay =
+                          brief.budget !== undefined && brief.budget !== null
+                            ? typeof brief.budget === "number"
+                              ? `$${brief.budget.toLocaleString()}`
+                              : String(brief.budget).startsWith("$")
+                                ? brief.budget
+                                : `$${brief.budget}`
+                            : null;
 
-                    const categoryFormatted = formatCategoryName(brief.category);
+                        const categoryFormatted = formatCategoryName(brief.category);
 
-                    const skills =
-                      Array.isArray(brief.requiredSkills) && brief.requiredSkills.length > 0
-                        ? brief.requiredSkills
-                        : Array.isArray(brief.skills) && brief.skills.length > 0
-                          ? brief.skills
-                          : [];
+                        const skills =
+                          Array.isArray(brief.requiredSkills) && brief.requiredSkills.length > 0
+                            ? brief.requiredSkills
+                            : Array.isArray(brief.skills) && brief.skills.length > 0
+                              ? brief.skills
+                              : [];
 
-                    const isFav = favoritedIds.has(briefId);
+                        const isFav = favoritedIds.has(briefId);
 
-                    return (
-                      <div
-                        key={briefId}
-                        onClick={() => router.push(`/briefs/${briefId}`)}
-                        className="relative overflow-hidden bg-white rounded-[6px] border border-gray-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] p-6 sm:p-7 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer group select-none"
-                      >
-                        {/* Ambient Purple Glow (appears on card hover) */}
-                        <div
-                          className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out z-0"
-                          style={{
-                            position: "absolute",
-                            right: "-210px",
-                            top: "-407px",
-                            width: "555px",
-                            height: "513px",
-                            borderRadius: "555px",
-                            transform: "rotate(-180deg)",
-                            background: "var(--purple-100, #CEB0FA)",
-                            filter: "blur(150px)",
-                          }}
-                          aria-hidden="true"
-                        />
+                        return (
+                          <div
+                            key={briefId}
+                            onClick={() => router.push(`/briefs/${briefId}`)}
+                            className="relative overflow-hidden bg-white rounded-[6px] border border-gray-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] p-6 sm:p-7 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer group select-none"
+                          >
+                            {/* Ambient Purple Glow (appears on card hover) */}
+                            <div
+                              className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out z-0"
+                              style={{
+                                position: "absolute",
+                                right: "-210px",
+                                top: "-407px",
+                                width: "555px",
+                                height: "513px",
+                                borderRadius: "555px",
+                                transform: "rotate(-180deg)",
+                                background: "var(--purple-100, #CEB0FA)",
+                                filter: "blur(150px)",
+                              }}
+                              aria-hidden="true"
+                            />
 
-                        {/* Top Content Area */}
-                        <div className="relative z-10">
-                          {/* Header Row: Title, Meta, Badges, Heart */}
-                          <div className="flex items-start justify-between gap-3 mb-2">
-                            <div className="flex-1 min-w-0 pr-2">
-                              <h3 className="text-base sm:text-[18px] font-bold text-gray-900 group-hover:text-[#327C73] transition-colors line-clamp-1 tracking-tight">
-                                {brief.title}
-                              </h3>
-                              <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mt-1">
-                                <span>Posted {moment(brief.createdAt).fromNow()}</span>
-                                <span className="text-gray-300">•</span>
-                                <span>{location}</span>
-                              </div>
-                            </div>
+                            {/* Top Content Area */}
+                            <div className="relative z-10">
+                              {/* Header Row: Title, Meta, Badges, Heart */}
+                              <div className="flex items-start justify-between gap-3 mb-2">
+                                <div className="flex-1 min-w-0 pr-2">
+                                  <h3 className="text-base sm:text-[18px] font-bold text-gray-900 group-hover:text-[#327C73] transition-colors line-clamp-1 tracking-tight">
+                                    {brief.title}
+                                  </h3>
+                                  <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mt-1">
+                                    <span>Posted {moment(brief.createdAt).fromNow()}</span>
+                                    <span className="text-gray-300">•</span>
+                                    <span>{location}</span>
+                                  </div>
+                                </div>
 
-                            {/* Right Badges & Heart Icon */}
-                            <div className="flex items-center gap-2 shrink-0">
-                              {/* Purple Budget Badge */}
-                              {budgetDisplay && (
-                                <span className="bg-[#ECEBFE] text-[#6B5AED] text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap tracking-tight">
-                                  {budgetDisplay}
-                                </span>
-                              )}
+                                {/* Right Badges & Heart Icon */}
+                                <div className="flex items-center gap-2 shrink-0">
+                                  {/* Purple Budget Badge */}
+                                  {budgetDisplay && (
+                                    <span className="bg-[#ECEBFE] text-[#6B5AED] text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap tracking-tight">
+                                      {budgetDisplay}
+                                    </span>
+                                  )}
 
-                              {/* Category Pill Badge */}
-                              {categoryFormatted && (
-                                <span className="bg-gray-100 text-gray-800 text-xs font-medium px-3 py-1 rounded-full whitespace-nowrap hidden sm:inline-block tracking-tight">
-                                  {categoryFormatted}
-                                </span>
-                              )}
+                                  {/* Category Pill Badge */}
+                                  {categoryFormatted && (
+                                    <span className="bg-gray-100 text-gray-800 text-xs font-medium px-3 py-1 rounded-full whitespace-nowrap hidden sm:inline-block tracking-tight">
+                                      {categoryFormatted}
+                                    </span>
+                                  )}
 
-                              {/* Favorite Button */}
-                              {/* <button
+                                  {/* Favorite Button */}
+                                  {/* <button
                             type="button"
                             onClick={(e) => toggleFavorite(e, briefId)}
                             className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-gray-50 transition-colors cursor-pointer shrink-0"
@@ -1177,140 +1174,140 @@ function BriefsContent() {
                               }`}
                             />
                           </button> */}
+                                </div>
+                              </div>
+
+                              {/* Brief Description */}
+                              <p className="text-[13px] text-gray-600 line-clamp-2 my-4 leading-relaxed font-normal">
+                                {brief.description}
+                              </p>
+
+                              {/* Skills / Tags Row: Only rendered if real requiredSkills exist */}
+                              {skills.length > 0 && (
+                                <div className="flex flex-wrap items-center gap-2 mb-6">
+                                  {skills.slice(0, 4).map((skill: string, idx: number) => (
+                                    <span
+                                      key={idx}
+                                      className="text-xs font-medium text-gray-600 bg-[#F5F5F7] border border-gray-200/80 px-3 py-1 rounded-[6px]"
+                                    >
+                                      {skill}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Divider & Bottom Client / Proposals Bar - 100% Real Backend Data */}
+                            <div className="relative z-10 border-t border-gray-100 pt-4 mt-auto flex items-center justify-between">
+                              {/* Project Owner (Anonymous like Fiverr/Upwork) */}
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200/80 shadow-2xs shrink-0">
+                                  <FiUser className="w-3.5 h-3.5 text-slate-500" />
+                                </div>
+
+                                <div className="min-w-0">
+                                  <p className="text-xs sm:text-[13px] font-semibold text-gray-900 leading-tight truncate">
+                                    Project Owner
+                                  </p>
+                                  <p className="text-[11px] leading-tight mt-0.5">
+                                    {brief.status === "closed" ? (
+                                      <span className="text-red-500 font-medium">Closed</span>
+                                    ) : (
+                                      <span className="text-emerald-600 font-medium">Open Project</span>
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Real Proposal Count & Delivery Time */}
+                              <div className="text-right shrink-0">
+                                <p className="text-xs sm:text-[13px] font-bold text-gray-900 leading-tight">
+                                  {proposalsCount} {proposalsCount === 1 ? "proposal" : "proposals"}
+                                </p>
+                                {brief.deliveryTime ? (
+                                  <p className="text-[11px] text-gray-500 leading-tight mt-0.5">
+                                    {brief.deliveryTime} {brief.deliveryTime === 1 ? "day" : "days"} delivery
+                                  </p>
+                                ) : null}
+                              </div>
                             </div>
                           </div>
+                        );
+                      })}
+                    </div>
 
-                          {/* Brief Description */}
-                          <p className="text-[13px] text-gray-600 line-clamp-2 my-4 leading-relaxed font-normal">
-                            {brief.description}
-                          </p>
+                    {/* Pagination Controls from Real Backend totalPages */}
+                    {totalPages > 1 && (
+                      <div className="w-full flex justify-center mt-10">
+                        <nav
+                          aria-label="Pagination Navigation"
+                          className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 max-w-full px-2"
+                        >
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            radius="xl"
+                            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                            disabled={currentPage === 1}
+                            className="!inline-flex !flex-row !items-center !justify-center !gap-1.5 px-3 sm:px-3.5 !h-9 !min-h-[36px] !text-xs font-semibold shadow-2xs shrink-0 whitespace-nowrap"
+                            leftIcon={<FiChevronLeft className="w-3.5 h-3.5 shrink-0" />}
+                            aria-label="Previous page"
+                          >
+                            <span className="whitespace-nowrap">Previous</span>
+                          </Button>
 
-                          {/* Skills / Tags Row: Only rendered if real requiredSkills exist */}
-                          {skills.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-2 mb-6">
-                              {skills.slice(0, 4).map((skill: string, idx: number) => (
-                                <span
-                                  key={idx}
-                                  className="text-xs font-medium text-gray-600 bg-[#F5F5F7] border border-gray-200/80 px-3 py-1 rounded-[6px]"
+                          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                            {paginationRange.map((pageNum, idx) => {
+                              if (typeof pageNum === "string") {
+                                return (
+                                  <span
+                                    key={`ellipsis-${idx}`}
+                                    className="w-7 sm:w-9 !h-9 !min-h-[36px] flex items-center justify-center text-xs text-slate-400 font-bold select-none shrink-0"
+                                  >
+                                    ...
+                                  </span>
+                                );
+                              }
+
+                              const isActive = currentPage === pageNum;
+                              return (
+                                <Button
+                                  key={`page-${pageNum}`}
+                                  type="button"
+                                  variant={isActive ? "brand" : "outline"}
+                                  size="sm"
+                                  radius="xl"
+                                  onClick={() => handlePageChange(pageNum)}
+                                  className={`!w-9 !h-9 !min-h-[36px] p-0 !text-xs font-semibold shadow-2xs shrink-0 !inline-flex !items-center !justify-center ${isActive ? "pointer-events-none !bg-[#0D6D5F] text-white" : "hover:border-gray-900"
+                                    }`}
+                                  aria-label={`Page ${pageNum}`}
+                                  aria-current={isActive ? "page" : undefined}
                                 >
-                                  {skill}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Divider & Bottom Client / Proposals Bar - 100% Real Backend Data */}
-                        <div className="relative z-10 border-t border-gray-100 pt-4 mt-auto flex items-center justify-between">
-                          {/* Project Owner (Anonymous like Fiverr/Upwork) */}
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200/80 shadow-2xs shrink-0">
-                              <FiUser className="w-3.5 h-3.5 text-slate-500" />
-                            </div>
-
-                            <div className="min-w-0">
-                              <p className="text-xs sm:text-[13px] font-semibold text-gray-900 leading-tight truncate">
-                                Project Owner
-                              </p>
-                              <p className="text-[11px] leading-tight mt-0.5">
-                                {brief.status === "closed" ? (
-                                  <span className="text-red-500 font-medium">Closed</span>
-                                ) : (
-                                  <span className="text-emerald-600 font-medium">Open Project</span>
-                                )}
-                              </p>
-                            </div>
+                                  {pageNum}
+                                </Button>
+                              );
+                            })}
                           </div>
 
-                          {/* Real Proposal Count & Delivery Time */}
-                          <div className="text-right shrink-0">
-                            <p className="text-xs sm:text-[13px] font-bold text-gray-900 leading-tight">
-                              {proposalsCount} {proposalsCount === 1 ? "proposal" : "proposals"}
-                            </p>
-                            {brief.deliveryTime ? (
-                              <p className="text-[11px] text-gray-500 leading-tight mt-0.5">
-                                {brief.deliveryTime} {brief.deliveryTime === 1 ? "day" : "days"} delivery
-                              </p>
-                            ) : null}
-                          </div>
-                        </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            radius="xl"
+                            onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                            disabled={currentPage === totalPages}
+                            className="!inline-flex !flex-row !items-center !justify-center !gap-1.5 px-3 sm:px-3.5 !h-9 !min-h-[36px] !text-xs font-semibold shadow-2xs shrink-0 whitespace-nowrap"
+                            rightIcon={<FiChevronRight className="w-3.5 h-3.5 shrink-0" />}
+                            aria-label="Next page"
+                          >
+                            <span className="whitespace-nowrap">Next</span>
+                          </Button>
+                        </nav>
                       </div>
-                    );
-                  })}
-                </div>
-
-                {/* Pagination Controls from Real Backend totalPages */}
-                {totalPages > 1 && (
-                  <div className="w-full flex justify-center mt-10">
-                    <nav
-                      aria-label="Pagination Navigation"
-                      className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 max-w-full px-2"
-                    >
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        radius="xl"
-                        onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                        disabled={currentPage === 1}
-                        className="!inline-flex !flex-row !items-center !justify-center !gap-1.5 px-3 sm:px-3.5 !h-9 !min-h-[36px] !text-xs font-semibold shadow-2xs shrink-0 whitespace-nowrap"
-                        leftIcon={<FiChevronLeft className="w-3.5 h-3.5 shrink-0" />}
-                        aria-label="Previous page"
-                      >
-                        <span className="whitespace-nowrap">Previous</span>
-                      </Button>
-
-                      <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-                        {paginationRange.map((pageNum, idx) => {
-                          if (typeof pageNum === "string") {
-                            return (
-                              <span
-                                key={`ellipsis-${idx}`}
-                                className="w-7 sm:w-9 !h-9 !min-h-[36px] flex items-center justify-center text-xs text-slate-400 font-bold select-none shrink-0"
-                              >
-                                ...
-                              </span>
-                            );
-                          }
-
-                          const isActive = currentPage === pageNum;
-                          return (
-                            <Button
-                              key={`page-${pageNum}`}
-                              type="button"
-                              variant={isActive ? "brand" : "outline"}
-                              size="sm"
-                              radius="xl"
-                              onClick={() => handlePageChange(pageNum)}
-                              className={`!w-9 !h-9 !min-h-[36px] p-0 !text-xs font-semibold shadow-2xs shrink-0 !inline-flex !items-center !justify-center ${isActive ? "pointer-events-none !bg-[#0D6D5F] text-white" : "hover:border-gray-900"
-                                }`}
-                              aria-label={`Page ${pageNum}`}
-                              aria-current={isActive ? "page" : undefined}
-                            >
-                              {pageNum}
-                            </Button>
-                          );
-                        })}
-                      </div>
-
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        radius="xl"
-                        onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                        disabled={currentPage === totalPages}
-                        className="!inline-flex !flex-row !items-center !justify-center !gap-1.5 px-3 sm:px-3.5 !h-9 !min-h-[36px] !text-xs font-semibold shadow-2xs shrink-0 whitespace-nowrap"
-                        rightIcon={<FiChevronRight className="w-3.5 h-3.5 shrink-0" />}
-                        aria-label="Next page"
-                      >
-                        <span className="whitespace-nowrap">Next</span>
-                      </Button>
-                    </nav>
-                  </div>
+                    )}
+                  </>
                 )}
-              </>
-            )}
               </div>
             </div>
 

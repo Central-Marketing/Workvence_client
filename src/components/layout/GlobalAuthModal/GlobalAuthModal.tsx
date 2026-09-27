@@ -21,15 +21,19 @@ const GlobalAuthModal: React.FC = () => {
     closeAuthModal();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <AuthModal
-      isOpen={isOpen}
-      onClose={closeAuthModal}
-      initialMode={mode}
-      defaultIsSeller={defaultIsSeller}
-      redirectUrl={redirectUrl}
-      onSuccess={handleSuccess}
-    />
+    <React.Suspense fallback={null}>
+      <AuthModal
+        isOpen={isOpen}
+        onClose={closeAuthModal}
+        initialMode={mode}
+        defaultIsSeller={defaultIsSeller}
+        redirectUrl={redirectUrl}
+        onSuccess={handleSuccess}
+      />
+    </React.Suspense>
   );
 };
 

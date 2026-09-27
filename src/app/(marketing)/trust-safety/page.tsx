@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Breadcrumb } from "@/components";
 
 export const metadata: Metadata = {
   title: "Trust & Safety | Workvence",
@@ -80,20 +81,34 @@ export default function TrustSafetyPage() {
   return (
     <div className="min-h-screen bg-white text-[#171717] font-sans antialiased">
       {/* Page Container */}
-      <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10 pb-0">
+      <div className="w-full container mx-auto px-4 sm:px-6 md:px-8 pt-6 sm:pt-8 md:pt-12 pb-0">
         {/* 1. Hero Banner Card */}
         <section
           aria-label="Trust and Safety Banner"
-          className="w-full bg-[#22172A] bg-cover bg-center bg-no-repeat rounded-[6px] py-16 sm:py-20 md:py-24 lg:py-28 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden"
+          className="w-full bg-[#22172A] bg-cover bg-center bg-no-repeat rounded-[6px] py-12 sm:py-14 md:py-16 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden min-h-[300px] sm:min-h-[330px] md:min-h-[350px]"
           style={{ backgroundImage: "url('/media/WorkwithBG.png')" }}
         >
+          {/* Breadcrumb Navigation */}
+          <Breadcrumb
+            variant="inverted"
+            className="mb-3 sm:mb-4 select-none [&>ol]:justify-center"
+            items={[
+              {
+                name: "Trust & Safety",
+                isLast: true,
+              },
+            ]}
+          />
 
           {/* Heading */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[68px] font-normal italic tracking-tight text-[#fff] leading-[1.12] sm:leading-[1.08] select-none">
-            Work with
-            <br />
-            Confidence
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[64px] font-normal italic tracking-tight text-[#fff] leading-[1.12] sm:leading-[1.08] select-none">
+            Work with <br className="hidden sm:inline" /> Confidence
           </h1>
+
+          {/* Subtitle */}
+          <p className="mt-3 sm:mt-4 text-xs sm:text-[13px] md:text-sm text-[#fff]/60 max-w-xl leading-relaxed">
+            Discover how Workvence safeguards buyers and talent with guaranteed escrow, identity verification, and dispute resolution.
+          </p>
         </section>
 
         {/* 2. Feature Rows */}

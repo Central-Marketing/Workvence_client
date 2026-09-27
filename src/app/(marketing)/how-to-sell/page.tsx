@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import EarningsCalculator from "./EarningsCalculator";
 import HowToSellFaq from "./HowToSellFaq";
+import { Breadcrumb } from "@/components";
 
 const sellerLevels = [
   {
@@ -77,21 +78,35 @@ export default function HowToSellPage() {
       <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10">
         <section
           aria-label="How to Sell Banner"
-          className="relative w-full rounded-[6px] py-16 sm:py-20 md:py-24 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
+          className="relative w-full rounded-[6px] py-12 sm:py-14 md:py-16 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('/media/SellingonWorkvence.png')" }}
         >
           {/* Subtle dark overlay for optimal text contrast */}
           <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
 
-          <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center space-y-6">
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-tight">
+          <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center">
+            {/* Breadcrumb Navigation */}
+            <Breadcrumb
+              variant="inverted"
+              className="mb-3 sm:mb-4 select-none [&>ol]:justify-center"
+              items={[
+                {
+                  name: "Selling on Workvence",
+                  isLast: true,
+                },
+              ]}
+            />
+
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[64px] font-normal italic tracking-tight text-[#fff] leading-[1.12] sm:leading-[1.08] select-none">
               Turn Your Expertise Into a <br className="hidden sm:inline" />
               <span className="text-[#6AD724]">Thriving Global Business</span>
             </h1>
-            <p className="font-inter text-xs sm:text-sm md:text-base text-gray-200 max-w-2xl mx-auto font-normal leading-relaxed">
+
+            <p className="mt-3 sm:mt-4 text-xs sm:text-[13px] md:text-sm text-[#fff]/60 max-w-xl leading-relaxed">
               Work with clients from over 180 countries. Set your own prices, work on your own schedule, and get paid with guaranteed escrow protection.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
+
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-4 sm:pt-6">
               <Link
                 href="/become-a-seller"
                 className="px-6 h-10 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs inline-flex items-center gap-2 cursor-pointer"

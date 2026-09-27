@@ -18,7 +18,7 @@ import {
   Send,
   Building
 } from "lucide-react";
-import { Button } from "@/components";
+import { Button, Breadcrumb } from "@/components";
 import { CustomSelect, CustomSelectOption } from "@/components/ui";
 import toast from "react-hot-toast";
 
@@ -132,21 +132,35 @@ export default function InvestorRelationsPage() {
       <div className=" pt-6 sm:pt-8 md:pt-10">
         <section
           aria-label="Workvence Investor Relations Banner"
-          className="relative w-full rounded-[6px] py-16 sm:py-20 md:py-24 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
+          className="relative w-full rounded-[6px] py-12 sm:py-14 md:py-16 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('/media/BecomeASeller.png')" }}
         >
           {/* Subtle dark overlay for optimal text contrast */}
           <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
 
-          <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center space-y-6">
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-tight">
+          <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center">
+            {/* Breadcrumb Navigation */}
+            <Breadcrumb
+              variant="inverted"
+              className="mb-3 sm:mb-4 select-none [&>ol]:justify-center"
+              items={[
+                {
+                  name: "Investor Relations",
+                  isLast: true,
+                },
+              ]}
+            />
+
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[64px] font-normal italic tracking-tight text-[#fff] leading-[1.12] sm:leading-[1.08] select-none">
               Powering the Global <br className="hidden sm:inline" />
               <span className="text-[#6AD724]">Independent Economy</span>
             </h1>
-            <p className="font-inter text-xs sm:text-sm md:text-base text-gray-200 max-w-2xl mx-auto font-normal leading-relaxed">
+
+            <p className="mt-3 sm:mt-4 text-xs sm:text-[13px] md:text-sm text-[#fff]/60 max-w-xl leading-relaxed">
               Discover our financial disclosures, governance frameworks, operational performance, and long-term shareholder value creation strategy.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
+
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-4 sm:pt-6">
               <a
                 href="#filings"
                 className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs gap-2 cursor-pointer"

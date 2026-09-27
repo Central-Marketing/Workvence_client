@@ -23,6 +23,7 @@ import {
   SiGithub,
   SiNotion
 } from "react-icons/si";
+import { Breadcrumb } from "@/components";
 import {
   FaAws,
   FaSlack
@@ -156,32 +157,49 @@ export default function PartnershipsClient() {
       <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10">
         <section
           aria-label="Partnerships Hero Banner"
-          className="relative w-full rounded-[6px] py-14 sm:py-20 md:py-24 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#102322] bg-cover bg-center bg-no-repeat"
+          className="relative w-full rounded-[6px] py-12 sm:py-14 md:py-16 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#102322] bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('/media/WorkwithBG.png')" }}
         >
-          {/* Subtle dark overlay for perfect contrast */}
+          {/* Subtle dark overlay for optimal text contrast */}
           <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
 
-          <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center space-y-6">
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-[1.12]">
+          <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center">
+            {/* Breadcrumb Navigation */}
+            <Breadcrumb
+              variant="inverted"
+              className="mb-3 sm:mb-4 select-none [&>ol]:justify-center"
+              items={[
+                {
+                  name: "Partnerships",
+                  isLast: true,
+                },
+              ]}
+            />
+
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[64px] font-normal italic tracking-tight text-[#fff] leading-[1.12] sm:leading-[1.08] select-none">
               Grow Together with the <br className="hidden sm:inline" />
-              <span className="text-[#6ad724]">World&apos;s Top Talent</span>
+              <span className="text-[#6AD724]">World&apos;s Top Talent</span>
             </h1>
-            <p className="font-inter text-xs sm:text-sm md:text-base text-gray-200 max-w-2xl leading-relaxed">
+
+            <p className="mt-3 sm:mt-4 text-xs sm:text-[13px] md:text-sm text-[#fff]/60 max-w-xl leading-relaxed">
               Whether you are an agency, technology provider, educational bootcamp, or enterprise consultancy, partnering with Workvence unlocks unprecedented scale and revenue.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-              <Button
-                onClick={() => setIsApplying(true)}
-                variant="brand"
-                size="md"
-                radius="fiverr"
-                rightIcon={<ArrowRight className="w-4 h-4" />}
-                className="font-semibold text-sm shadow-md hover:shadow-lg bg-[#0D6D5F] hover:bg-[#0b5c50] text-white"
-              >
-                Become a Partner
-              </Button>
 
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-4 sm:pt-6">
+              <button
+                type="button"
+                onClick={() => setIsApplying(true)}
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs gap-2 cursor-pointer"
+              >
+                <span>Become a Partner</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <a
+                href="#tracks"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white hover:bg-gray-100 text-[#0f172a] font-semibold text-xs sm:text-sm transition shadow-xs cursor-pointer"
+              >
+                Explore Partner Tracks
+              </a>
             </div>
           </div>
         </section>

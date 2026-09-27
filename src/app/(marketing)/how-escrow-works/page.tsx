@@ -19,6 +19,7 @@ import {
   Layers,
   HelpCircle,
 } from "lucide-react";
+import { Breadcrumb } from "@/components";
 import EscrowFaq, { FaqItem } from "./EscrowFaq";
 
 export const metadata: Metadata = {
@@ -172,49 +173,76 @@ export default function HowEscrowWorksPage() {
       <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10">
         <section
           aria-label="How Escrow Works Banner"
-          className="relative w-full rounded-[6px] py-14 sm:py-20 md:py-24 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#102322] bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/media/WorkwithBG.png')" }}
+          className="relative w-full rounded-[6px] py-12 sm:py-14 md:py-16 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/media/BecomeASeller.png')" }}
         >
-          {/* Subtle dark overlay for perfect contrast */}
+          {/* Subtle dark overlay for optimal text contrast */}
           <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
 
-          <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
+          <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center">
+            {/* Breadcrumb Navigation */}
+            <Breadcrumb
+              variant="inverted"
+              className="mb-3 sm:mb-4 select-none [&>ol]:justify-center"
+              items={[
+                {
+                  name: "How Escrow Works",
+                  isLast: true,
+                },
+              ]}
+            />
 
-
-            {/* Main Headline */}
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-[1.12]">
-              How Escrow Works
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[64px] font-normal italic tracking-tight text-[#fff] leading-[1.12] sm:leading-[1.08] select-none">
+              Protected Payments, <br className="hidden sm:inline" />
+              <span className="text-[#6AD724]">Guaranteed Delivery</span>
             </h1>
 
-
-
-            {/* Intro paragraph */}
-            <p className="mt-4 font-inter text-xs sm:text-sm md:text-base text-gray-300 max-w-2xl leading-relaxed">
+            <p className="mt-3 sm:mt-4 text-xs sm:text-[13px] md:text-sm text-[#fff]/60 max-w-xl leading-relaxed">
               Escrow keeps your money secure while the work is being completed. You pay upfront,
               but the freelancer only receives the funds after you review and approve the work.
             </p>
 
-            {/* Trust highlights */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 text-xs font-medium text-[#0D6D5F]">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)]">
-                <Lock className="w-3.5 h-3.5 text-[#0D6D5F]" />
-                <span>Upfront Escrow Deposit</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)]">
-                <Check className="w-3.5 h-3.5 text-[#0D6D5F]" />
-                <span>Paid ≠ Released Separation</span>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)]">
-                <Scale className="w-3.5 h-3.5 text-[#0D6D5F]" />
-                <span>Dispute Resolution Support</span>
-              </div>
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-4 sm:pt-6">
+              <Link
+                href="/packages"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs gap-2 cursor-pointer"
+              >
+                <span>Find a Freelancer</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <a
+                href="#steps"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white hover:bg-gray-100 text-[#0f172a] font-semibold text-xs sm:text-sm transition shadow-xs cursor-pointer"
+              >
+                See How It Works
+              </a>
             </div>
           </div>
         </section>
       </div>
 
+      {/* Trust Highlights Bar */}
+      <div className="w-full container mx-auto px-4 md:px-6 pt-8">
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 py-4 px-6 rounded-[6px] bg-[#f8fafc] border border-[rgba(0,0,0,0.08)] text-xs font-medium text-[#0D6D5F]">
+          <div className="flex items-center gap-2">
+            <Lock className="w-4 h-4 text-[#0D6D5F]" />
+            <span className="text-[#0f172a] font-semibold">Upfront Escrow Deposit</span>
+          </div>
+          <span className="hidden sm:inline text-gray-300">•</span>
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-[#0D6D5F]" />
+            <span className="text-[#0f172a] font-semibold">Paid ≠ Released Separation</span>
+          </div>
+          <span className="hidden sm:inline text-gray-300">•</span>
+          <div className="flex items-center gap-2">
+            <Scale className="w-4 h-4 text-[#0D6D5F]" />
+            <span className="text-[#0f172a] font-semibold">Dispute Resolution Support</span>
+          </div>
+        </div>
+      </div>
+
       {/* 2. FIVE VISUAL STEPS */}
-      <section className="w-full py-16 sm:py-20 md:py-24">
+      <section id="steps" className="w-full py-16 sm:py-20 md:py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-5xl">
           <div className="text-center max-w-2xl mx-auto mb-14 sm:mb-16">
             <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">

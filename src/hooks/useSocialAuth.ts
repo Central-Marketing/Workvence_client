@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useUserStore } from "@/store/userStore";
 import { User } from "@/types";
@@ -25,7 +25,6 @@ export function useSocialAuth() {
   const [error, setError] = useState<string | null>(null);
   const setUser = useUserStore((state) => state.setUser);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   // Pre-load SDKs in background on mount
   useEffect(() => {
@@ -83,7 +82,13 @@ export function useSocialAuth() {
       }
 
       // Safe redirect navigation
-      const rawRedirect = options?.redirectUrl || searchParams?.get("redirect");
+      let redirectFromQuery = "";
+      if (typeof window !== "undefined") {
+        try {
+          redirectFromQuery = new URLSearchParams(window.location.search).get("redirect") || "";
+        } catch {}
+      }
+      const rawRedirect = options?.redirectUrl || redirectFromQuery;
       let target = rawRedirect;
       if (target) {
         try {
@@ -108,7 +113,7 @@ export function useSocialAuth() {
 
       window.location.href = safeTarget;
     },
-    [setUser, searchParams]
+    [setUser]
   );
 
   const renderGoogleButton = useCallback(

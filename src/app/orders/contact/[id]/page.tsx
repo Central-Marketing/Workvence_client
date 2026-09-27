@@ -315,16 +315,7 @@ export default function ContactOrdersPage() {
 
             {/* Right Tools: Calendar button + Search box */}
             <div className="flex items-center gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                radius="xl"
-                aria-label="Calendar view"
-                className="w-10 h-10 text-slate-600 shadow-xs shrink-0"
-              >
-                <FiCalendar className="text-base" />
-              </Button>
+
 
               <div className="relative flex items-center w-full sm:w-64">
                 <RiSearchLine className="absolute left-3.5 text-slate-400 text-sm pointer-events-none" />

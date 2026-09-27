@@ -618,9 +618,7 @@ const CreateBrief = () => {
                 Estimated Timeline (Days) <span className="text-slate-400 font-normal text-xs">(Optional)</span>
               </label>
               <div className="relative flex items-center">
-                <span className="absolute left-3.5 flex items-center text-gray-400 text-sm pointer-events-none">
-                  <FiCalendar />
-                </span>
+
                 <input
                   type="number"
                   min="1"

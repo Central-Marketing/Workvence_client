@@ -222,11 +222,11 @@ const RegisterContent = () => {
     loading ||
     !isPasswordValid ||
     !passwordsMatch ||
-    !formInput.username.trim() ||
+    // !formInput.username.trim() ||
     !formInput.email.trim() ||
-    usernameStatus.available === false ||
+    // usernameStatus.available === false ||
     emailStatus.available === false ||
-    usernameStatus.loading ||
+    // usernameStatus.loading ||
     emailStatus.loading;
 
   return (
@@ -521,7 +521,7 @@ const RegisterContent = () => {
       </div>
 
       {/* Right Pane */}
-      <div className="hidden lg:flex flex-1 p-3 sm:p-4 lg:p-5 h-screen sticky top-0">
+      <div className="hidden lg:flex flex-1  h-screen sticky top-0">
         <div className="relative w-full h-full rounded-[6px] lg:rounded-[6px] overflow-hidden bg-[#0a0f1d] shadow-sm">
           <Image
             src="/images/auth/registerImage.png"

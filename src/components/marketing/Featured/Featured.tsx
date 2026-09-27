@@ -696,7 +696,7 @@ const Featured = ({
                 key={cat.slug}
                 type="button"
                 onClick={() => router.push(`/packages?category=${encodeURIComponent(cat.slug)}`)}
-                className="flex items-center gap-[10px] pl-[10px] pr-[12px] py-[6px] rounded-[4px] bg-white/10 hover:bg-white/20 backdrop-blur-[50px] text-white text-xs sm:text-[13px] font-medium transition-all cursor-pointer active:scale-95"
+                className="flex items-center gap-[10px] px-3 py-1.5 rounded-[4px] bg-white/10 hover:bg-white/20 backdrop-blur-[50px] text-white text-xs sm:text-[13px] font-medium transition-all cursor-pointer active:scale-95"
               >
                 {getCategoryIcon(cat.icon || cat.iconUrl || cat.iconName, cat.name)}
                 <span>{cat.name}</span>

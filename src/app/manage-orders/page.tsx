@@ -297,15 +297,7 @@ const ManageOrders = () => {
 
               {/* Right Side: Calendar Button + Search Box */}
               <div className="flex items-center gap-3 self-start lg:self-auto">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  radius="lg"
-                  title="Filter by date"
-                  className="w-10 h-10 min-h-[40px] border-gray-200/90 text-gray-500 hover:bg-gray-50 bg-white shrink-0 shadow-2xs"
-                  icon={<FiCalendar className="text-sm" />}
-                />
+
 
                 <div className="relative flex items-center">
                   <FiSearch className="absolute left-3 text-gray-400 text-xs pointer-events-none" />

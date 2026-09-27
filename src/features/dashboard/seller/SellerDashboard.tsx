@@ -224,15 +224,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
               </h2>
 
               <div className="flex items-center gap-3 self-start sm:self-auto flex-wrap">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  radius="lg"
-                  title="Filter by date"
-                  className="w-10 h-10 min-h-[40px] border-gray-200 text-gray-500 hover:bg-gray-50 bg-white shrink-0 shadow-2xs"
-                  icon={<FiCalendar className="text-sm" />}
-                />
+
 
                 <div className="inline-flex items-center h-[46px] bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50">
                   <Button

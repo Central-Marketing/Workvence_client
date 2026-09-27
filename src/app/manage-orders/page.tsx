@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components";
-import { Breadcrumb, OrdersTableSkeleton } from "@/components/ui";
+import { Breadcrumb, OrdersTableSkeleton, Tag } from "@/components/ui";
 import { FiHome, FiCalendar, FiSearch } from "react-icons/fi";
 
 const getOrderDeadlineTime = (item: any): number | null => {
@@ -456,11 +456,9 @@ const ManageOrders = () => {
 
                           {/* Status Column */}
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            <span
-                              className={`text-[11.5px] font-medium px-3.5 py-1 rounded-full inline-block ${statusBadge.style}`}
-                            >
+                            <Tag variant={order.status || statusBadge.label}>
                               {statusBadge.label}
-                            </span>
+                            </Tag>
                           </td>
                         </tr>
                       );

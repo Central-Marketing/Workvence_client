@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { FiCalendar, FiArrowRight, FiCheckCircle } from "react-icons/fi";
-import { Button } from "@/components/ui";
+import { Button, Tag } from "@/components/ui";
 import { calculateProfileCompletion } from "../utils/dashboardNormalizer";
 
 interface SellerDashboardProps {
@@ -98,9 +98,10 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
       o.isCompleted === false ||
       o.status === "in_progress" ||
       o.status === "inprogress" ||
+      o.status === "in_revision" ||
+      o.status === "revision" ||
       o.status === "paid" ||
       o.status === "delivered" ||
-      o.status === "revision" ||
       o.status === "pending" ||
       !o.status
     );
@@ -217,7 +218,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           </div>
 
           {/* Recent Orders Card */}
-          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <div className="bg-[#F5F5F5] rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <h2 className="text-xl sm:text-[22px] font-bold text-gray-900 tracking-tight">
                 Recent Orders
@@ -278,9 +279,9 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
             </div>
 
             {/* Orders Table */}
-            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
-              <table className="w-full text-left text-sm border-collapse min-w-[700px]">
-                <thead>
+            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] ">
+              <table className="w-full text-left text-sm border-collapse min-w-[700px] bg-white">
+                <thead className="">
                   <tr className="text-xs font-bold text-gray-700 border-b border-gray-100">
                     <th className="py-3.5 px-3 font-bold">Order Name</th>
                     <th className="py-3.5 px-4 font-bold whitespace-nowrap">Order Date</th>
@@ -310,7 +311,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                       const st = (order.status || "inprogress").toLowerCase();
                       let statusBadge = {
                         label: "Inprogress",
-                        style: "bg-[#E0F2FE] text-[#0284C7]",
+                        style: "bg-[#E6E9F2] text-[#0284C7]",
                       };
 
                       if (st === "completed" || order.isCompleted === true) {
@@ -323,14 +324,14 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                           label: "Delivered",
                           style: "bg-[#D1FAE5] text-[#059669]",
                         };
-                      } else if (st === "revision") {
+                      } else if (st === "revision" || st === "in_revision") {
                         statusBadge = {
                           label: "Revision",
                           style: "bg-[#F3E8FF] text-[#9333EA]",
                         };
                       } else if (st === "failed" || st === "cancelled") {
                         statusBadge = {
-                          label: "Failed",
+                          label: "Cancelled",
                           style: "bg-[#FEE2E2] text-[#EF4444]",
                         };
                       } else if (st === "pending") {
@@ -394,11 +395,9 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                           </td>
 
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            <span
-                              className={`text-[11.5px] font-medium px-3.5 py-1 rounded-full inline-block ${statusBadge.style}`}
-                            >
+                            <Tag variant={statusBadge.label} size="sm">
                               {statusBadge.label}
-                            </span>
+                            </Tag>
                           </td>
                         </tr>
                       );

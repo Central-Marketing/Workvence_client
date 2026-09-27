@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader, Button } from "@/components";
-import { Breadcrumb } from "@/components/ui";
+import { Breadcrumb, Tag } from "@/components/ui";
 
 type FilterTab = "priority" | "active" | "late" | "delivered" | "completed" | "cancelled" | "starred";
 
@@ -474,11 +474,9 @@ export default function ContactOrdersPage() {
 
                           {/* Status Column */}
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            <span
-                              className={`text-[11.5px] font-medium px-3.5 py-1 rounded-full inline-block ${statusBadge.style}`}
-                            >
+                            <Tag variant={order.status || statusBadge.label}>
                               {statusBadge.label}
-                            </span>
+                            </Tag>
                           </td>
                         </tr>
                       );

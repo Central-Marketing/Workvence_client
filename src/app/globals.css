@@ -194,6 +194,14 @@
     --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
     --purple-100: #CEB0FA;
     --purple-200: #B78AF7;
+    --purple-700: #4600A9;
+    --purple-50: #EFE6FD;
+    --blue-600: #021B75;
+    --blue-50: #E6E9F2;
+    --teal-900: #265F58;
+    --teal-100: #CCF6F1;
+    --alert-900: #674C00;
+    --alert-50: #FEF8E6;
 }
 
 * {

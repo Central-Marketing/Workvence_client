@@ -376,23 +376,7 @@ const NotificationsPage = () => {
               )}
             </Button>
 
-            <Button
-              type="button"
-              variant={activeTab === "read" ? "brand" : "ghost"}
-              size="sm"
-              radius="fiverr"
-              onClick={() => setActiveTab("read")}
-              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 gap-2.5 whitespace-nowrap ${activeTab === "read"
-                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
-                }`}
-            >
-              <span className="whitespace-nowrap shrink-0">Read</span>
-              <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 ${activeTab === "read" ? "bg-white/20 text-white" : "bg-gray-200/80 text-gray-700"
-                }`}>
-                {readCount}
-              </span>
-            </Button>
+
           </div>
 
           {/* Search Input Box */}

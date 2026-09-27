@@ -406,7 +406,7 @@ export default function HowEscrowWorksPage() {
               <div>
                 <Link
                   href="/support"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs whitespace-nowrap cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-6 h-10 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs whitespace-nowrap cursor-pointer"
                 >
                   <span>Open a Dispute</span>
                   <ArrowRight className="w-4 h-4" />

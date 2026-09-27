@@ -114,24 +114,48 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-white text-[#112131] font-sans">
-      {/* Hero Section / Featured Post */}
-      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-16 lg:py-24">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-4xl mx-auto space-y-8">
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[#327C73] text-xs font-semibold">
-                <BookOpen className="w-4 h-4 text-[#10b981]" />
-                <span>Workvence Insights & Blog</span>
-              </div>
-              <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#0f172a]">
-                Ideas, Playbooks & Strategies
-              </h1>
-              <p className="text-base text-gray-600 max-w-2xl mx-auto">
-                In-depth articles from top creators, engineers, and marketplace leaders.
-              </p>
-            </div>
+      {/* 1. Hero Banner Card */}
+      <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10">
+        <section
+          aria-label="Workvence Blog Banner"
+          className="relative w-full rounded-[6px] py-16 sm:py-20 md:py-24 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/media/BecomeASeller.png')" }}
+        >
+          {/* Subtle dark overlay for optimal text contrast */}
+          <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
 
-            {/* Featured Article Card */}
+          <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center space-y-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-tight">
+              Ideas, Playbooks &amp; <br className="hidden sm:inline" />
+              <span className="text-[#6AD724]">Strategies</span>
+            </h1>
+            <p className="font-inter text-xs sm:text-sm md:text-base text-gray-200 max-w-2xl mx-auto font-normal leading-relaxed">
+              In-depth articles from top creators, engineers, and marketplace leaders to help you grow your business.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
+              <a
+                href="#articles"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs gap-2 cursor-pointer"
+              >
+                <span>Explore Articles</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+              <button
+                type="button"
+                onClick={() => setSelectedPost(featured)}
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white hover:bg-gray-100 text-[#0f172a] font-semibold text-xs sm:text-sm transition shadow-xs cursor-pointer"
+              >
+                Read Featured Story
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* Featured Article Card */}
+      <section className="pt-10 sm:pt-14">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
             <div
               onClick={() => setSelectedPost(featured)}
               className="bg-white border border-gray-200 rounded-[6px] p-8 sm:p-10 shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-300 cursor-pointer space-y-4"
@@ -170,7 +194,7 @@ export default function BlogPage() {
       </section>
 
       {/* Main Blog Grid */}
-      <section className="py-16 bg-white">
+      <section id="articles" className="py-16 bg-white">
         <div className="container mx-auto px-4 md:px-6">
           {/* Controls: Search & Categories */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-12">

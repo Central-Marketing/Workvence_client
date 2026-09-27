@@ -162,39 +162,46 @@ export default function ForumPage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-[#112131] font-sans pb-[80px] min-[1400px]:pb-[100px]">
-      {/* Header Banner */}
-      <section className="bg-white border-b border-gray-200 py-12">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-1.5 max-w-2xl">
-              <div className="inline-flex items-center gap-2 text-xs font-bold text-[#327C73] uppercase tracking-wider">
-                <MessageSquare className="w-4 h-4" />
-                <span>Workvence Community Forum</span>
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-[#0f172a] tracking-tight">
-                Discussions, Knowledge & Ideas
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-500">
-                Ask questions, share workflows, get feedback from peers, and vote on platform feature requests.
-              </p>
-            </div>
+      {/* 1. Hero Banner Card */}
+      <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10">
+        <section
+          aria-label="Workvence Community Forum Banner"
+          className="relative w-full rounded-[6px] py-16 sm:py-20 md:py-24 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/media/BecomeASeller.png')" }}
+        >
+          {/* Subtle dark overlay for optimal text contrast */}
+          <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
 
-            <Button
-              onClick={() => setIsCreatingPost(true)}
-              variant="brand"
-              size="md"
-              radius="xl"
-              leftIcon={<PlusCircle className="w-4 h-4" />}
-              className="self-start md:self-auto shrink-0 font-semibold shadow-xs"
-            >
-              Start New Discussion
-            </Button>
+          <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center space-y-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-tight">
+              Discussions, Knowledge &amp; <br className="hidden sm:inline" />
+              <span className="text-[#6AD724]">Ideas</span>
+            </h1>
+            <p className="font-inter text-xs sm:text-sm md:text-base text-gray-200 max-w-2xl mx-auto font-normal leading-relaxed">
+              Ask questions, share workflows, get feedback from peers, and collaborate with creators and digital entrepreneurs worldwide.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
+              <button
+                type="button"
+                onClick={() => setIsCreatingPost(true)}
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs gap-2 cursor-pointer"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>Start New Discussion</span>
+              </button>
+              <a
+                href="#discussions"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white hover:bg-gray-100 text-[#0f172a] font-semibold text-xs sm:text-sm transition shadow-xs cursor-pointer"
+              >
+                Browse Topics
+              </a>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* Main Container */}
-      <div className="container mx-auto px-4 md:px-6 pt-8">
+      <div id="discussions" className="container mx-auto px-4 md:px-6 pt-10 sm:pt-14">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
           {/* Left Sidebar: Categories & Stats (3 cols) */}

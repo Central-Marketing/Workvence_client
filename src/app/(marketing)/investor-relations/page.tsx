@@ -127,44 +127,47 @@ export default function InvestorRelationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-[#112131] font-sans">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-[rgba(0,0,0,0.10)] py-20 lg:py-28">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] text-xs font-semibold">
-              <TrendingUp className="w-3.5 h-3.5 text-[#0D6D5F]" />
-              <span>Workvence Investor Relations</span>
-            </div>
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-[#0f172a] leading-tight">
+    <div className="min-h-screen text-[#112131] font-sans w-full container mx-auto px-4 md:px-6">
+      {/* 1. Hero Banner Card */}
+      <div className=" pt-6 sm:pt-8 md:pt-10">
+        <section
+          aria-label="Workvence Investor Relations Banner"
+          className="relative w-full rounded-[6px] py-16 sm:py-20 md:py-24 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/media/BecomeASeller.png')" }}
+        >
+          {/* Subtle dark overlay for optimal text contrast */}
+          <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
+
+          <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center space-y-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-tight">
               Powering the Global <br className="hidden sm:inline" />
-              <span className="text-[#0D6D5F]">Independent Economy</span>
+              <span className="text-[#6AD724]">Independent Economy</span>
             </h1>
-            <p className="text-xs sm:text-sm md:text-base text-gray-600 max-w-2xl mx-auto font-normal leading-relaxed">
+            <p className="font-inter text-xs sm:text-sm md:text-base text-gray-200 max-w-2xl mx-auto font-normal leading-relaxed">
               Discover our financial disclosures, governance frameworks, operational performance, and long-term shareholder value creation strategy.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
               <a
                 href="#filings"
-                className="px-6 h-10 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs inline-flex items-center gap-2 cursor-pointer"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs gap-2 cursor-pointer"
               >
                 <span>Financial Disclosures</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
                 href="#contact"
-                className="px-6 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] hover:bg-gray-50 text-[#0f172a] font-semibold text-xs sm:text-sm transition inline-flex items-center justify-center cursor-pointer"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white hover:bg-gray-100 text-[#0f172a] font-semibold text-xs sm:text-sm transition shadow-xs cursor-pointer"
               >
                 Investor Contact
               </a>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* KPI Highlights Grid */}
-      <section className="py-16 bg-[#0f172a] text-white">
-        <div className="container mx-auto px-4 md:px-6">
+      <section className="py-16 bg-[#0f172a] text-white mt-10 sm:mt-14 md:mt-16">
+        <div className="px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {highlights.map((h, i) => {
               const Icon = h.icon;
@@ -185,7 +188,7 @@ export default function InvestorRelationsPage() {
 
       {/* Financial Reports & Disclosures */}
       <section id="filings" className="py-20 bg-white">
-        <div className="container mx-auto px-4 md:px-6">
+        <div className="px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
             <div className="space-y-2">
               <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">Financial Reporting</span>

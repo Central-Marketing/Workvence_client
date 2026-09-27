@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ShieldAlert,
   FileCheck,
@@ -111,7 +112,7 @@ export default function IntellectualPropertyPage() {
           style={{ backgroundImage: "url('/media/WorkwithBG.png')" }}
         >
           {/* Subtle dark overlay for contrast */}
-          <div className="absolute inset-0 bg-[#0c1c1b]/55 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
 
           <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center space-y-6">
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-[1.12]">
@@ -132,7 +133,7 @@ export default function IntellectualPropertyPage() {
               </a>
               <a
                 href="#ownership-rules"
-                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-sm transition backdrop-blur-xs"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white hover:bg-white/20 text-black border border-white/20 font-semibold text-sm transition backdrop-blur-xs"
               >
                 View Ownership Rules
               </a>
@@ -372,37 +373,45 @@ export default function IntellectualPropertyPage() {
       </section>
 
       {/* 7. BOTTOM CTA RESOLUTION BANNER */}
-      <div className="w-full container mx-auto px-4 md:px-6 pb-[80px] min-[1400px]:pb-[100px]">
-        <section
-          aria-label="Resolution and Support"
-          className="relative w-full rounded-[6px] py-14 sm:py-16 md:py-20 px-6 sm:px-12 md:px-16 text-left flex flex-col items-start justify-center shadow-xs overflow-hidden bg-[#102322] bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/media/AFreelancerBG.png')" }}
-        >
-          <div className="absolute inset-0 bg-[#0c1c1b]/55 backdrop-blur-[1px]" />
-          <div className="relative z-10 max-w-2xl flex flex-col items-start text-left space-y-4">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-normal tracking-tight text-white leading-tight">
-              Have Questions About Rights or an Active Order?
-            </h2>
-            <p className="font-inter text-xs sm:text-sm md:text-base text-gray-200 max-w-xl leading-relaxed">
-              Our Trust & Safety team is here to assist with escrow protection, licensing questions, and dispute mediation.
-            </p>
-            <div className="flex flex-wrap items-center justify-start gap-3 pt-2">
-              <Link
-                href="/support"
-                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-sm transition shadow-sm"
-              >
-                Contact Legal Support
-              </Link>
-              <Link
-                href="/how-escrow-works"
-                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-sm transition backdrop-blur-xs"
-              >
-                How Escrow Protects You
-              </Link>
+      <section className="w-full pt-12 sm:pt-16 md:pt-20 lg:pt-24 pb-[80px] min-[1400px]:pb-[100px] bg-white">
+        <div className="w-full container mx-auto px-4 sm:px-6 md:px-8 xl:px-12 2xl:px-20">
+          <div className="relative isolate w-full max-w-[1760px] mx-auto rounded-[6px] overflow-hidden shadow-xs flex items-center min-h-[460px] sm:min-h-[500px] md:min-h-[540px] lg:aspect-[1760/800] 2xl:h-[800px] 2xl:min-h-[800px] px-6 sm:px-10 md:px-14 lg:px-16 xl:px-20 py-12 sm:py-16 md:py-20 lg:py-0">
+            <Image
+              src="/media/AFreelancerBG.png"
+              alt="Have Questions About Rights or an Active Order?"
+              fill
+              priority
+              quality={100}
+              unoptimized
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, (max-width: 1536px) 100vw, 1760px"
+              className="object-cover object-right md:object-center select-none pointer-events-none z-0"
+            />
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full relative z-10">
+              <div className="lg:col-span-7 flex flex-col items-start justify-center">
+                <h2 className="font-sf-pro font-[510] text-3xl leading-[normal] sm:text-4xl sm:leading-[normal] lg:text-[44px] lg:leading-[normal] xl:text-[48px] xl:leading-[normal] text-white mb-4 sm:mb-5 my-4">
+                  Have Questions About Rights or an Active Order?
+                </h2>
+
+                <p className="font-inter font-normal text-base sm:text-[15px] text-[#C7C7C7] mb-5 sm:mb-10 max-w-xl leading-relaxed">
+                  Our Trust &amp; Safety team is here to assist with escrow protection, licensing questions, and dispute mediation.
+                </p>
+
+                <div className="flex flex-wrap items-center justify-start gap-4">
+                  <Link
+                    href="/support"
+                    className="bg-white hover:bg-gray-100 text-[#112131] border-transparent font-semibold h-[40px] text-[16px] px-6 shadow-sm rounded-[6px] inline-flex items-center justify-center gap-2 transition"
+                  >
+                    <span>Contact Legal Support</span>
+                    <ArrowRight size={16} strokeWidth={2} />
+                  </Link>
+
+                </div>
+              </div>
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ShieldCheck,
   Lock,
@@ -175,7 +176,7 @@ export default function HowEscrowWorksPage() {
           style={{ backgroundImage: "url('/media/WorkwithBG.png')" }}
         >
           {/* Subtle dark overlay for perfect contrast */}
-          <div className="absolute inset-0 bg-[#0c1c1b]/50 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
 
           <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
 
@@ -510,40 +511,44 @@ export default function HowEscrowWorksPage() {
       </section>
 
       {/* 7. READY TO GET STARTED? (BOTTOM CTA BANNER) */}
-      <section className="w-full py-20 bg-[#F8F9FA] border-t border-[rgba(0,0,0,0.10)] pb-[80px] min-[1400px]:pb-[100px]">
-        <div className="container mx-auto px-4 md:px-6 max-w-5xl">
-          <div
-            className="bg-[#0c1c1b] text-white rounded-[6px] py-16 sm:py-24 md:py-28 px-6 sm:px-12 min-h-[460px] sm:min-h-[480px] flex flex-col items-start justify-center text-left relative overflow-hidden shadow-md bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/media/AFreelancerBG.png')" }}
-          >
-            {/* Subtle dark overlay for contrast */}
-            <div className="absolute inset-0 bg-[#0c1c1b]/20 backdrop-blur-[1px]" />
+      <section className="w-full pt-12 sm:pt-16 md:pt-20 lg:pt-24 pb-[80px] min-[1400px]:pb-[100px] bg-white">
+        <div className="w-full container mx-auto px-4 sm:px-6 md:px-8 xl:px-12 2xl:px-20">
+          <div className="relative isolate w-full max-w-[1760px] mx-auto rounded-[6px] overflow-hidden shadow-xs flex items-center min-h-[460px] sm:min-h-[500px] md:min-h-[540px] lg:aspect-[1760/800] 2xl:h-[800px] 2xl:min-h-[800px] px-6 sm:px-10 md:px-14 lg:px-16 xl:px-20 py-12 sm:py-16 md:py-20 lg:py-0">
+            <Image
+              src="/media/AFreelancerBG.png"
+              alt="Ready to Get Started?"
+              fill
+              priority
+              quality={100}
+              unoptimized
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, (max-width: 1536px) 100vw, 1760px"
+              className="object-cover object-right md:object-center select-none pointer-events-none z-0"
+            />
 
-            <div className="relative z-10 max-w-2xl space-y-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold">
-                <span>Zero Risk Hiring</span>
-              </span>
-              <h2 className="font-sf-pro font-[510] text-3xl leading-[normal] sm:text-4xl sm:leading-[normal] lg:text-[44px] lg:leading-[normal] xl:text-[48px] xl:leading-[normal] text-white mb-4 sm:mb-5 my-4">
-                Ready to Get Started?
-              </h2>
-              <p className="font-inter font-normal text-base sm:text-[15px] text-[#C7C7C7] mb-5 sm:mb-10 max-w-xl leading-relaxed">
-                Work with confidence.
-              </p>
-              <div className="pt-4 flex flex-wrap items-center justify-start gap-3.5">
-                <Link
-                  href="/packages"
-                  className="px-6 h-10 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs inline-flex items-center gap-2 cursor-pointer"
-                >
-                  <span>Find a Freelancer</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link
-                  href="/briefs/create"
-                  className="px-6 h-10 rounded-[6px] bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-xs sm:text-sm transition inline-flex items-center gap-2 cursor-pointer"
-                >
-                  <span>Post a Project</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full relative z-10">
+              <div className="lg:col-span-7 flex flex-col items-start justify-center">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-white/10 text-white text-xs font-semibold backdrop-blur-xs">
+                  <span>Zero Risk Hiring</span>
+                </div>
+
+                <h2 className="font-sf-pro font-[510] text-3xl leading-[normal] sm:text-4xl sm:leading-[normal] lg:text-[44px] lg:leading-[normal] xl:text-[48px] xl:leading-[normal] text-white mb-4 sm:mb-5 my-4">
+                  Ready to Get Started?
+                </h2>
+
+                <p className="font-inter font-normal text-base sm:text-[15px] text-[#C7C7C7] mb-5 sm:mb-10 max-w-xl leading-relaxed">
+                  Work with confidence. Get started today with automated escrow protection and verified milestone deliverables.
+                </p>
+
+                <div className="flex flex-wrap items-center justify-start gap-4">
+                  <Link
+                    href="/packages"
+                    className="bg-white hover:bg-gray-100 text-[#112131] border-transparent font-semibold h-[40px] text-[16px] px-6 shadow-sm rounded-[6px] inline-flex items-center justify-center gap-2 transition"
+                  >
+                    <span>Find a Freelancer</span>
+                    <ArrowRight size={16} strokeWidth={2} />
+                  </Link>
+
+                </div>
               </div>
             </div>
           </div>

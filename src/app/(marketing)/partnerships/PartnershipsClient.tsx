@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Handshake,
   Cpu,
@@ -159,7 +160,7 @@ export default function PartnershipsClient() {
           style={{ backgroundImage: "url('/media/WorkwithBG.png')" }}
         >
           {/* Subtle dark overlay for perfect contrast */}
-          <div className="absolute inset-0 bg-[#0c1c1b]/55 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
 
           <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center space-y-6">
             <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-[1.12]">
@@ -180,12 +181,7 @@ export default function PartnershipsClient() {
               >
                 Become a Partner
               </Button>
-              <a
-                href="#tracks"
-                className="px-7 h-10 inline-flex items-center justify-center rounded-[6px] bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-sm transition backdrop-blur-xs"
-              >
-                Explore Partner Tracks
-              </a>
+
             </div>
           </div>
         </section>
@@ -286,41 +282,47 @@ export default function PartnershipsClient() {
       </section>
 
       {/* Bottom CTA Banner */}
-      <div className="w-full container mx-auto px-4 md:px-6 pb-[80px] min-[1400px]:pb-[100px]">
-        <section
-          aria-label="Ready to Partner with Workvence"
-          className="relative w-full rounded-[6px] py-14 sm:py-16 md:py-20 px-6 sm:px-12 md:px-16 text-left flex flex-col items-start justify-center shadow-xs overflow-hidden bg-[#102322] bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/media/AFreelancerBG.png')" }}
-        >
-          <div className="absolute inset-0 bg-[#0c1c1b]/55 backdrop-blur-[1px]" />
-          <div className="relative z-10 max-w-2xl flex flex-col items-start text-left space-y-4">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-normal tracking-tight text-white leading-tight">
-              Ready to Partner with Workvence?
-            </h2>
-            <p className="font-inter text-xs sm:text-sm md:text-base text-gray-200 max-w-xl leading-relaxed">
-              Join leading tech companies, agencies, and institutions expanding their reach with our talent network.
-            </p>
-            <div className="flex flex-wrap items-center justify-start gap-3 pt-2">
-              <Button
-                onClick={() => setIsApplying(true)}
-                variant="brand"
-                size="md"
-                radius="fiverr"
-                rightIcon={<ArrowRight className="w-4 h-4" />}
-                className="font-semibold text-sm shadow-md hover:shadow-lg bg-[#0D6D5F] hover:bg-[#0b5c50] text-white"
-              >
-                Become a Partner
-              </Button>
-              <a
-                href="#tracks"
-                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-sm transition backdrop-blur-xs"
-              >
-                Explore Partner Tracks
-              </a>
+      <section className="w-full pt-12 sm:pt-16 md:pt-20 lg:pt-24 pb-[80px] min-[1400px]:pb-[100px] bg-white">
+        <div className="w-full container mx-auto px-4 sm:px-6 md:px-8 xl:px-12 2xl:px-20">
+          <div className="relative isolate w-full max-w-[1760px] mx-auto rounded-[6px] overflow-hidden shadow-xs flex items-center min-h-[460px] sm:min-h-[500px] md:min-h-[540px] lg:aspect-[1760/800] 2xl:h-[800px] 2xl:min-h-[800px] px-6 sm:px-10 md:px-14 lg:px-16 xl:px-20 py-12 sm:py-16 md:py-20 lg:py-0">
+            <Image
+              src="/media/AFreelancerBG.png"
+              alt="Ready to Partner with Workvence?"
+              fill
+              priority
+              quality={100}
+              unoptimized
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, (max-width: 1536px) 100vw, 1760px"
+              className="object-cover object-right md:object-center select-none pointer-events-none z-0"
+            />
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full relative z-10">
+              <div className="lg:col-span-7 flex flex-col items-start justify-center">
+                <h2 className="font-sf-pro font-[510] text-3xl leading-[normal] sm:text-4xl sm:leading-[normal] lg:text-[44px] lg:leading-[normal] xl:text-[48px] xl:leading-[normal] text-white mb-4 sm:mb-5 my-4">
+                  Ready to Partner with Workvence?
+                </h2>
+
+                <p className="font-inter font-normal text-base sm:text-[15px] text-[#C7C7C7] mb-5 sm:mb-10 max-w-xl leading-relaxed">
+                  Join leading tech companies, agencies, and institutions expanding their reach with our talent network.
+                </p>
+
+                <div className="flex flex-wrap items-center justify-start gap-4">
+                  <Button
+                    onClick={() => setIsApplying(true)}
+                    size="md"
+                    radius="fiverr"
+                    rightIcon={<ArrowRight size={16} strokeWidth={2} />}
+                    className="bg-white hover:bg-gray-100 text-[#112131] border-transparent font-semibold h-[40px] text-[16px] px-6 shadow-sm"
+                  >
+                    Become a Partner
+                  </Button>
+
+                </div>
+              </div>
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
       {/* Partner Application Modal */}
       {isApplying && (

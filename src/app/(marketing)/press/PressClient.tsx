@@ -119,45 +119,46 @@ export default function PressClient() {
 
   return (
     <div className="min-h-screen bg-white text-[#112131] font-sans">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[#f2fbf6] via-[#f7fdf9] to-white border-b border-gray-100 py-20 lg:py-24">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-3xl mx-auto text-center space-y-5">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[#327C73] text-xs font-semibold">
-              <Newspaper className="w-4 h-4 text-[#10b981]" />
-              <span>Workvence Newsroom</span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#0f172a] leading-tight">
-              News, Announcements & Media Resources
+      {/* 1. Hero Banner Card */}
+      <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10">
+        <section
+          aria-label="Workvence Press Banner"
+          className="relative w-full rounded-[6px] py-16 sm:py-20 md:py-24 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/media/BecomeASeller.png')" }}
+        >
+          {/* Subtle dark overlay for optimal text contrast */}
+          <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
+
+          <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center space-y-6">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white leading-tight">
+              News, Announcements &amp; <br className="hidden sm:inline" />
+              <span className="text-[#6AD724]">Media Resources</span>
             </h1>
-            <p className="text-base text-gray-600 max-w-2xl mx-auto">
+            <p className="font-inter text-xs sm:text-sm md:text-base text-gray-200 max-w-2xl mx-auto font-normal leading-relaxed">
               Stay up to date with product launches, company milestones, independent work research, and official brand assets.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-              <Button
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
+              <button
                 type="button"
-                variant="brand"
-                size="md"
-                radius="xl"
                 onClick={handleDownloadKit}
-                leftIcon={<Download className="w-4 h-4" />}
-                className="px-6 py-3 font-semibold text-xs shadow-md bg-[#327C73] hover:bg-[#28635c]"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white font-semibold text-xs sm:text-sm transition shadow-xs gap-2 cursor-pointer"
               >
-                Download Media Kit (.ZIP)
-              </Button>
+                <Download className="w-4 h-4" />
+                <span>Download Media Kit (.ZIP)</span>
+              </button>
               <a
                 href="#media-inquiries"
-                className="px-6 py-3 rounded-[6px] bg-white border border-gray-200 hover:bg-gray-50 text-[#0f172a] font-semibold text-xs transition"
+                className="px-6 h-10 inline-flex items-center justify-center rounded-[6px] bg-white hover:bg-gray-100 text-[#0f172a] font-semibold text-xs sm:text-sm transition shadow-xs cursor-pointer"
               >
                 Press Inquiries
               </a>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* Main Content Grid */}
-      <section className="pt-16 lg:pt-24 pb-[80px] min-[1400px]:pb-[100px] bg-white">
+      <section className="pt-12 sm:pt-16 lg:pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
 

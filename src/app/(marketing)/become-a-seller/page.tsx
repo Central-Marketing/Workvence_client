@@ -33,9 +33,9 @@ export default function BecomeASellerPage() {
   const estimatedMonthly = Math.round(hoursPerWeek * 4 * hourlyRate * 0.9);
 
   return (
-    <div className="min-h-screen bg-white text-[#112131] font-sans">
+    <div className="min-h-screen bg-white text-[#112131] font-sans w-full container mx-auto px-4 md:px-6">
       {/* 1. Hero Banner Card */}
-      <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10">
+      <div className=" pt-6 sm:pt-8 md:pt-10">
         <section
           aria-label="Become a Seller Banner"
           className="relative w-full rounded-[6px] py-16 sm:py-20 md:py-24 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"

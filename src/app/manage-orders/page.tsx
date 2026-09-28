@@ -313,7 +313,7 @@ const ManageOrders = () => {
             </div>
 
             {/* Orders Table */}
-            <div className="w-full bg-white shadow-sm overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
+            <div className="w-full bg-white rounded-[6px] shadow-sm overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
               <table className="w-full text-left text-sm border-collapse min-w-[800px]">
                 <thead>
                   <tr className="text-xs font-bold text-gray-800 border-b border-gray-100">

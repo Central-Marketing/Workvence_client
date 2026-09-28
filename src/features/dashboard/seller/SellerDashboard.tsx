@@ -281,8 +281,8 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
             <hr className="border-[rgba(0, 0, 0, 0.10)] my-10" />
 
             {/* Orders Table */}
-            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] ">
-              <table className="w-full text-left text-sm border-collapse min-w-[700px] bg-white">
+            <div className="w-full shadow-md overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] ">
+              <table className="w-full text-left text-sm border-collapse min-w-[700px] bg-white rounded-[6px]">
                 <thead className="">
                   <tr className="text-xs font-bold text-gray-700 border-b border-gray-100">
                     <th className="py-3.5 px-3 font-bold">Order Name</th>
@@ -300,7 +300,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                       </td>
                     </tr>
                   ) : (
-                    ordersToDisplay.slice(0, 8).map((order: any) => {
+                    ordersToDisplay.slice(0, 8).map((order: any, idx: number) => {
                       const isBrief = Boolean(order.briefID || order.type === "brief");
                       const orderDate = order.createdAt
                         ? new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
@@ -349,10 +349,8 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                           onClick={() => {
                             router.push(`/orders/${order._id}`);
                           }}
-                          className="group relative cursor-pointer transition-colors hover:bg-[#F5F5F5]
-    after:pointer-events-none after:absolute after:inset-0
-     after:border after:border-transparent
-    hover:after:border-[rgba(0,0,0,0.10)]"
+                          className={`group relative cursor-pointer transition-colors ${idx % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
+                            } after:pointer-events-none after:absolute after:inset-0`}
                         >
                           <td className="py-4 px-3 align-middle">
                             <div className="flex items-center gap-3.5">
@@ -377,7 +375,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                                 <span className="text-xs sm:text-[13px] font-normal text-gray-800 line-clamp-2 leading-snug">
                                   {order.title || "Custom Deliverable"}
                                 </span>
-                                <span className="text-[10.5px] font-medium px-2 py-0.5 rounded bg-white text-gray-700 border border-gray-200 w-fit">
+                                <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-[6px] bg-[#FAFAFA] text-[#292929] border border-[#C7C7C7] w-fit">
                                   {isBrief ? "Brief" : "Package"}
                                 </span>
                               </div>

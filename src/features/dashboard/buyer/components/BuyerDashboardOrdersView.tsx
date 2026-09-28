@@ -277,7 +277,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
         </div>
 
         {/* Orders Table */}
-        <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
+        <div className="w-full shadow-md overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] rounded-[6px]">
           <table className="w-full bg-white min-w-[760px] border-collapse text-left">
             <thead>
               <tr className="border-b border-slate-100 text-xs sm:text-sm font-bold text-slate-700">
@@ -296,7 +296,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
                   </td>
                 </tr>
               ) : (
-                displayedOrders.map((order) => {
+                displayedOrders.map((order, idx) => {
                   // Determine status pill badge style
                   const st = (order.status || "inprogress").toLowerCase();
                   let statusBadge = {
@@ -332,14 +332,11 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
                   }
 
                   return (
-
                     <tr
                       key={order.id}
                       onClick={() => handleRowClick(order.id)}
-                      className="group relative cursor-pointer transition-colors hover:bg-[#F5F5F5]
-    after:pointer-events-none after:absolute after:inset-0
-     after:border after:border-transparent
-    hover:after:border-[rgba(0,0,0,0.10)]"
+                      className={`group relative cursor-pointer transition-colors ${idx % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
+                        } after:pointer-events-none after:absolute after:inset-0`}
                     >
                       {/* Order Name */}
                       <td className="py-4 px-3 align-middle max-w-[380px]">
@@ -361,7 +358,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
                             >
                               {order.title}
                             </span>
-                            <span className="text-[11px] font-semibold text-slate-600 bg-[#F1F3F5] px-2 py-0.5 rounded-[6px] w-fit mt-1.5 capitalize">
+                            <span className="text-[11px] font-semibold rounded-[6px] bg-[#FAFAFA] text-[#292929] border border-[#C7C7C7] px-2 py-1 w-fit mt-1.5 capitalize">
                               {order.itemType}
                             </span>
                           </div>

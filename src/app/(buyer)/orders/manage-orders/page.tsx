@@ -310,8 +310,8 @@ export default function BuyerManageOrdersPage() {
               <Loader size={45} />
             </div>
           ) : (
-            <div className="w-full bg-white shadow-sm overflow-x-auto">
-              <table className="w-full min-w-[820px] border-collapse text-left">
+            <div className="w-full bg-white rounded-[6px] shadow-sm overflow-x-auto">
+              <table className="w-full  min-w-[820px] border-collapse text-left">
                 <thead>
                   <tr className="border-b border-slate-100 text-xs sm:text-sm font-bold text-slate-800">
                     <th className="py-4 px-4 font-bold">Seller</th>

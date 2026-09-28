@@ -100,10 +100,11 @@ function parseHistoryItem(item: any, idx: number, fallbackTime: string | Date): 
 
   // Specific backend action enums
   if (action === "EXTENSION_REQUESTED") {
-    const days = item.days || item.extraDays || 1;
+    const matchDays = rawText.match(/Requested\s+(\d+)\s+day/i);
+    const days = item.days || item.extraDays || (matchDays ? matchDays[1] : 1);
     const reason =
-      item.reason || item.details || rawText || "Additional time requested to deliver quality work.";
-    const cleanReason = reason.replace(/^Requested \d+ day\(s\) extension:?\s*/i, "");
+      item.reason || item.details || item.note || rawText || "Additional time requested to deliver quality work.";
+    const cleanReason = reason.replace(/^Requested\s+\d+\s+day\(s\)\s+extension:?\s*/i, "");
     return {
       id,
       timestamp,
@@ -118,9 +119,10 @@ function parseHistoryItem(item: any, idx: number, fallbackTime: string | Date): 
     action === "EXTENSION_RESPONDED" ||
     action === "EXTENSION_APPROVED"
   ) {
-    const days = item.days || item.extraDays || 1;
-    const raw = item.details || "";
-    const cleanDesc = raw.replace(/^Accepted \d+ day\(s\) extension\.?\s*/i, "").trim();
+    const matchDays = rawText.match(/Accepted\s+(\d+)\s+day/i);
+    const days = item.days || item.extraDays || (matchDays ? matchDays[1] : 1);
+    const raw = item.details || item.note || rawText || "";
+    const cleanDesc = raw.replace(/^Accepted\s+\d+\s+day\(s\)\s+extension\.?\s*/i, "").trim();
     return {
       id,
       timestamp,
@@ -131,14 +133,18 @@ function parseHistoryItem(item: any, idx: number, fallbackTime: string | Date): 
   }
 
   if (action === "EXTENSION_REJECTED") {
-    const days = item.days || item.extraDays || 1;
-    const raw = item.details || item.reason || "";
-    const cleanDesc = raw.replace(/^Rejected \d+ day\(s\) extension\.?\s*/i, "").trim();
+    const matchDays = rawText.match(/Rejected\s+(\d+)\s+day/i);
+    const days = item.days || item.extraDays || (matchDays ? matchDays[1] : null);
+    const raw = item.details || item.reason || item.note || rawText || "";
+    const cleanDesc = raw
+      .replace(/^(?:Rejected\s+\d+\s+day\(s\)\s+extension\.?|Rejected\s+delivery\s+extension\.?)\s*/i, "")
+      .trim();
+    const boldPrefix = days ? `Rejected ${days} day(s) extension.` : `Rejected delivery extension.`;
     return {
       id,
       timestamp,
       category,
-      boldPrefix: `Rejected ${days} day(s) extension.`,
+      boldPrefix,
       description: cleanDesc,
     };
   }
@@ -444,7 +450,7 @@ export const OrderActivityLedgerDrawer: React.FC<OrderActivityLedgerDrawerProps>
         aria-modal="true"
         aria-label="Order Activity and Escrow Ledger"
       >
-        <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-6 sm:py-8">
+        <div className="flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden  px-6 sm:px-8 py-6 sm:py-8">
           {/* Header */}
           <div className="flex items-center justify-between pb-3">
             <h2 className="text-2xl sm:text-[26px] font-bold text-gray-900 tracking-tight">

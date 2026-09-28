@@ -191,10 +191,10 @@ export function normalizeDashboardOrders(
   }
 
   const normalized = items.map((order: any, idx: number) => {
-    const fallback = fallbackList[idx % fallbackList.length];
+    const fallback = fallbackList.length > 0 ? fallbackList[idx % fallbackList.length] : undefined;
 
     // Format dates
-    let orderDate = fallback.orderDate;
+    let orderDate = fallback?.orderDate || "-";
     if (order.createdAt) {
       const d = new Date(order.createdAt);
       if (!isNaN(d.getTime())) {
@@ -202,7 +202,7 @@ export function normalizeDashboardOrders(
       }
     }
 
-    let dueDate = fallback.dueDate;
+    let dueDate = fallback?.dueDate || "-";
     if (order.deadline) {
       const d = new Date(order.deadline);
       if (!isNaN(d.getTime())) {
@@ -221,25 +221,16 @@ export function normalizeDashboardOrders(
       order.briefID || order.type === "brief" ? "brief" : "package";
 
     return {
-      id: String(order._id || order.id || fallback.id),
-      title: order.title || order.gigID?.title || fallback.title,
-      coverImage: order.image || order.cover || order.gigID?.cover || fallback.coverImage,
+      id: String(order._id || order.id || fallback?.id || ""),
+      title: order.title || order.gigID?.title || fallback?.title || "Custom Deliverable",
+      coverImage: order.image || order.cover || order.gigID?.cover || fallback?.coverImage || "/images/dashboard/orders/order_1.jpg",
       itemType,
       orderDate,
       dueDate,
-      price: typeof order.price === "number" ? order.price : fallback.price,
+      price: typeof order.price === "number" ? order.price : fallback?.price || 0,
       status,
     };
   });
-
-  // If fewer than 3 items, pad with fallbacks to preserve the rich pixel-perfect design
-  if (normalized.length < 3) {
-    const padded = [...normalized];
-    for (let i = normalized.length; i < 3; i++) {
-      padded.push(fallbackList[i]);
-    }
-    return padded;
-  }
 
   return normalized;
 }
@@ -264,17 +255,17 @@ export function normalizeManageOrders(
   }
 
   const normalized = items.map((order: any, idx: number) => {
-    const fallback = fallbackList[idx % fallbackList.length];
+    const fallback = fallbackList.length > 0 ? fallbackList[idx % fallbackList.length] : undefined;
 
     // Seller extraction
-    const sellerObj = typeof order.sellerID === "object" ? order.sellerID : {};
-    const sellerName = sellerObj.username || sellerObj.name || fallback.seller.name;
-    const sellerAvatar = sellerObj.image || sellerObj.avatar || fallback.seller.avatar;
-    const sellerRole = sellerObj.title || sellerObj.role || fallback.seller.role;
-    const sellerBadge = sellerObj.badge || fallback.seller.badge;
+    const sellerObj = typeof order.sellerID === "object" && order.sellerID !== null ? order.sellerID : {};
+    const sellerName = sellerObj.username || sellerObj.name || fallback?.seller?.name || "Seller";
+    const sellerAvatar = sellerObj.image || sellerObj.avatar || fallback?.seller?.avatar || "/media/noavatar.png";
+    const sellerRole = sellerObj.title || sellerObj.role || fallback?.seller?.role || "--";
+    const sellerBadge = sellerObj.badge || fallback?.seller?.badge;
 
     // Due date
-    let dueDate = fallback.dueDate;
+    let dueDate = fallback?.dueDate || "-";
     if (order.deadline) {
       const d = new Date(order.deadline);
       if (!isNaN(d.getTime())) {
@@ -283,7 +274,7 @@ export function normalizeManageOrders(
     }
 
     // Status mapping
-    let status: ManageOrderItem["status"] = fallback.status;
+    let status: ManageOrderItem["status"] = fallback?.status || "inprogress";
     if (order.status === "completed") status = "completed";
     else if (order.status === "delivered") status = "delivered";
     else if (order.status === "revision") status = "revision";
@@ -294,32 +285,23 @@ export function normalizeManageOrders(
     else status = "inprogress";
 
     return {
-      id: String(order._id || order.id || fallback.id),
+      id: String(order._id || order.id || fallback?.id || ""),
       seller: {
-        id: String(sellerObj._id || sellerObj.id || fallback.seller.id),
+        id: String(sellerObj._id || sellerObj.id || fallback?.seller?.id || ""),
         name: sellerName,
         avatar: sellerAvatar,
         role: sellerRole,
         badge: sellerBadge,
       },
-      projectTitle: order.title || order.gigID?.title || fallback.projectTitle,
-      projectDescription: order.description || order.gigID?.description || fallback.projectDescription,
+      projectTitle: order.title || order.gigID?.title || fallback?.projectTitle || "Custom Deliverable",
+      projectDescription: order.description || order.gigID?.description || fallback?.projectDescription || "",
       dueDate,
-      notes: order.notes || order.instructions || fallback.notes,
-      price: typeof order.price === "number" ? order.price : fallback.price,
+      notes: order.notes || order.instructions || fallback?.notes || "",
+      price: typeof order.price === "number" ? order.price : fallback?.price || 0,
       status,
-      starred: Boolean(order.starred ?? fallback.starred),
+      starred: Boolean(order.starred ?? fallback?.starred),
     };
   });
-
-  // Pad to at least 5 rows if fewer to keep the design pixel-perfect
-  if (normalized.length < 5) {
-    const padded = [...normalized];
-    for (let i = normalized.length; i < 5; i++) {
-      padded.push(fallbackList[i]);
-    }
-    return padded;
-  }
 
   return normalized;
 }

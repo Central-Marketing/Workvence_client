@@ -267,13 +267,13 @@ const ManageOrders = () => {
           </div>
 
           {/* Main Card Container */}
-          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <div className="bg-[#F5F5F5] rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
 
             {/* Top Toolbar: Filter Tabs on Left + Calendar & Search on Right */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
 
               {/* Segmented Filter Tab Pills */}
-              <div className="bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 inline-flex items-center h-[46px] overflow-x-auto scrollbar-none max-w-full">
+              <div className="bg-[#fff] p-[4px] rounded-[6px] border border-gray-200/50 inline-flex items-center h-[46px] overflow-x-auto scrollbar-none max-w-full">
                 {tabs.map((tab) => {
                   const isActive = activeTab === tab.id;
                   return (
@@ -313,7 +313,7 @@ const ManageOrders = () => {
             </div>
 
             {/* Orders Table */}
-            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
+            <div className="w-full bg-white shadow-sm overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
               <table className="w-full text-left text-sm border-collapse min-w-[800px]">
                 <thead>
                   <tr className="text-xs font-bold text-gray-800 border-b border-gray-100">
@@ -392,7 +392,10 @@ const ManageOrders = () => {
                           onClick={() => {
                             router.push(`/orders/${order._id}`);
                           }}
-                          className="hover:bg-slate-50/70 cursor-pointer transition-colors"
+                          className="group relative cursor-pointer transition-colors hover:bg-[#F5F5F5]
+    after:pointer-events-none after:absolute after:inset-0
+      after:border-transparent
+    hover:after:border-[rgba(0,0,0,0.10)]"
                         >
                           {/* Buyer Column */}
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
@@ -456,7 +459,7 @@ const ManageOrders = () => {
 
                           {/* Status Column */}
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            <Tag variant={order.status || statusBadge.label}>
+                            <Tag variant={order.status || statusBadge.label} size="sm">
                               {statusBadge.label}
                             </Tag>
                           </td>

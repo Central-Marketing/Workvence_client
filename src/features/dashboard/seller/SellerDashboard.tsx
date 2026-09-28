@@ -218,7 +218,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           </div>
 
           {/* Recent Orders Card */}
-          <div className="bg-[#F5F5F5] rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <div className="bg-[#F5F5F5] rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-10 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <h2 className="text-xl sm:text-[22px] font-bold text-gray-900 tracking-tight">
                 Recent Orders
@@ -227,7 +227,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
               <div className="flex items-center gap-3 self-start sm:self-auto flex-wrap">
 
 
-                <div className="inline-flex items-center h-[46px] bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50">
+                <div className="inline-flex items-center h-[46px] bg-[#fff] p-[4px] rounded-[6px] border border-gray-200/50">
                   <Button
                     type="button"
                     onClick={() => setOrderTypeFilter("all")}
@@ -277,6 +277,8 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                 </Link>
               </div>
             </div>
+
+            <hr className="border-[rgba(0, 0, 0, 0.10)] my-10" />
 
             {/* Orders Table */}
             <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] ">
@@ -347,11 +349,14 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                           onClick={() => {
                             router.push(`/orders/${order._id}`);
                           }}
-                          className="hover:bg-slate-50/70 cursor-pointer transition-colors"
+                          className="group relative cursor-pointer transition-colors hover:bg-[#F5F5F5]
+    after:pointer-events-none after:absolute after:inset-0
+     after:border after:border-transparent
+    hover:after:border-[rgba(0,0,0,0.10)]"
                         >
                           <td className="py-4 px-3 align-middle">
                             <div className="flex items-center gap-3.5">
-                              <div className="relative w-24 sm:w-36 md:w-[180px] lg:w-[220px] aspect-[16/9] rounded-[6px] overflow-hidden bg-gray-100 border border-gray-200/80 shrink-0">
+                              <div className="relative w-24 sm:w-36 md:w-[180px] lg:w-[220px] aspect-[11/6] rounded-[6px] overflow-hidden bg-gray-100 border border-gray-200/80 shrink-0">
                                 <Image
                                   src={
                                     order.image ||

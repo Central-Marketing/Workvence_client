@@ -115,8 +115,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
     if (isOpen) {
       setMode(initialMode);
       setError(null);
+      setRegisterInput((prev) => ({
+        ...prev,
+        isSeller: defaultIsSeller,
+      }));
     }
-  }, [isOpen, initialMode]);
+  }, [isOpen, initialMode, defaultIsSeller]);
 
   // Lock body scroll when modal is open
   useEffect(() => {

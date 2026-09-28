@@ -17,7 +17,7 @@ import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { ManageOrderItem } from "@/features/dashboard/data/mockBuyerDashboard";
 import { Loader, Button } from "@/components";
-import { Breadcrumb } from "@/components/ui";
+import { Breadcrumb, Tag } from "@/components/ui";
 
 export default function BuyerManageOrdersPage() {
   const router = useRouter();
@@ -99,10 +99,12 @@ export default function BuyerManageOrdersPage() {
         },
         projectTitle: order.title || order.gigID?.title || order.packageID?.title || "Custom Deliverable",
         projectDescription: order.description || order.gigID?.description || order.instructions || "",
+        description: order.description || order.gigID?.description || order.instructions || "",
         dueDate,
         notes: order.notes || order.instructions || "",
         price: Number(order.price) || 0,
         status,
+        isCompleted,
       };
     });
   }, [buyerOrders]);
@@ -259,13 +261,13 @@ export default function BuyerManageOrdersPage() {
         </div>
 
         {/* Main Card */}
-        <div className="bg-white rounded-[6px] border border-slate-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-8">
+        <div className="bg-[#F5F5F5] rounded-[6px] border border-slate-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-8">
 
           {/* Controls Bar: Tabs + Calendar + Search Input */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-slate-100">
 
             {/* Pill Tabs */}
-            <div className="bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 inline-flex items-center h-[46px] overflow-x-auto scrollbar-none max-w-full">
+            <div className="bg-[#fff] p-[4px] rounded-[6px] border border-gray-200/50 inline-flex items-center h-[46px] overflow-x-auto scrollbar-none max-w-full">
               {(["Priority", "Active", "Late", "Delivered", "Completed", "Cancelled"] as const).map((tab) => (
                 <Button
                   key={tab}
@@ -308,7 +310,7 @@ export default function BuyerManageOrdersPage() {
               <Loader size={45} />
             </div>
           ) : (
-            <div className="w-full overflow-x-auto">
+            <div className="w-full bg-white shadow-sm overflow-x-auto">
               <table className="w-full min-w-[820px] border-collapse text-left">
                 <thead>
                   <tr className="border-b border-slate-100 text-xs sm:text-sm font-bold text-slate-800">
@@ -328,11 +330,47 @@ export default function BuyerManageOrdersPage() {
                     </tr>
                   ) : (
                     filteredOrders.map((order) => {
+                      // Determine status pill badge style
+                      const st = (order.status || "inprogress").toLowerCase();
+                      let statusBadge = {
+                        label: "Inprogress",
+                        style: "bg-[#E6E9F2] text-[#0284C7]",
+                      };
+
+                      if (st === "completed" || order.isCompleted === true) {
+                        statusBadge = {
+                          label: "Completed",
+                          style: "bg-[#D1FAE5] text-[#059669]",
+                        };
+                      } else if (st === "delivered") {
+                        statusBadge = {
+                          label: "Delivered",
+                          style: "bg-[#D1FAE5] text-[#059669]",
+                        };
+                      } else if (st === "revision" || st === "in_revision") {
+                        statusBadge = {
+                          label: "Revision",
+                          style: "bg-[#F3E8FF] text-[#9333EA]",
+                        };
+                      } else if (st === "failed" || st === "cancelled") {
+                        statusBadge = {
+                          label: "Cancelled",
+                          style: "bg-[#FEE2E2] text-[#EF4444]",
+                        };
+                      } else if (st === "pending") {
+                        statusBadge = {
+                          label: "Pending",
+                          style: "bg-[#FEF3C7] text-[#D97706]",
+                        };
+                      }
                       return (
                         <tr
                           key={order.id}
                           onClick={() => handleRowClick(order.id)}
-                          className="hover:bg-slate-50/70 cursor-pointer transition-colors group"
+                          className="group relative cursor-pointer transition-colors hover:bg-[#F5F5F5]
+    after:pointer-events-none after:absolute after:inset-0
+     after:border-transparent
+    hover:after:border-[rgba(0,0,0,0.10)]"
                         >
                           {/* Seller info */}
                           <td className="py-5 px-4 align-middle whitespace-nowrap">
@@ -366,12 +404,12 @@ export default function BuyerManageOrdersPage() {
                                 >
                                   {order.projectTitle}
                                 </span>
-                                {order.projectDescription && (
+                                {order.description && (
                                   <span
                                     className="text-xs text-slate-500 line-clamp-1 mt-0.5"
-                                    title={order.projectDescription}
+                                    title={order.description}
                                   >
-                                    {order.projectDescription}
+                                    {order.description}
                                   </span>
                                 )}
                               </div>
@@ -406,8 +444,10 @@ export default function BuyerManageOrdersPage() {
                           </td>
 
                           {/* Status pill */}
-                          <td className="py-5 px-4 align-middle whitespace-nowrap">
-                            {renderStatusPill(order.status)}
+                          <td className="py-4 px-4 align-middle whitespace-nowrap">
+                            <Tag variant={order.status || statusBadge.label} size="sm">
+                              {statusBadge.label}
+                            </Tag>
                           </td>
                         </tr>
                       );

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { FiPackage, FiHeart, FiArrowRight } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
-import { Button } from "@/components/ui";
+import { Button, Tag } from "@/components/ui";
 
 interface BuyerDashboardOrdersViewProps {
   user: any;
@@ -90,6 +90,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
         dueDate,
         price: Number(order.price) || 0,
         status,
+        isCompleted,
       };
     });
   }, [orders]);
@@ -228,7 +229,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
       </div>
 
       {/* 2. Recent Orders Section */}
-      <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.03)] p-6 sm:p-7">
+      <div className="bg-[#F5F5F5] rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.03)] p-6 sm:p-7">
         {/* Header Row */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
           <div className="flex items-center gap-3">
@@ -237,7 +238,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
 
           <div className="flex items-center gap-5 justify-between sm:justify-end">
             {/* Pill Switcher */}
-            <div className="flex items-center h-[46px] bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 overflow-x-auto scrollbar-none">
+            <div className="flex items-center h-[46px] bg-[#fff] p-[4px] rounded-[6px] border border-gray-200/50 overflow-x-auto scrollbar-none">
               {(["All", "Packages", "Briefs"] as const).map((tab) => (
                 <Button
                   key={tab}
@@ -246,11 +247,10 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
                   variant={activeTab === tab ? "brand" : "ghost"}
                   size="sm"
                   radius="fiverr"
-                  className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${
-                    activeTab === tab
-                      ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                      : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
-                  }`}
+                  className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${activeTab === tab
+                    ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                    : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                    }`}
                 >
                   {tab}
                 </Button>
@@ -270,7 +270,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
 
         {/* Orders Table */}
         <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
-          <table className="w-full min-w-[760px] border-collapse text-left">
+          <table className="w-full bg-white min-w-[760px] border-collapse text-left">
             <thead>
               <tr className="border-b border-slate-100 text-xs sm:text-sm font-bold text-slate-700">
                 <th className="py-3.5 px-3 font-bold">Order Name</th>
@@ -288,80 +288,102 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
                   </td>
                 </tr>
               ) : (
-                displayedOrders.map((order) => (
-                  <tr
-                    key={order.id}
-                    onClick={() => handleRowClick(order.id)}
-                    className="hover:bg-slate-50/75 cursor-pointer transition-colors group"
-                  >
-                    {/* Order Name */}
-                    <td className="py-4 px-3 align-middle max-w-[380px]">
-                      <div className="flex items-center gap-4">
-                        <div className="relative w-24 sm:w-28 h-14 sm:h-16 rounded-[6px] overflow-hidden border border-slate-200 shrink-0 bg-slate-100">
-                          <Image
-                            src={order.coverImage}
-                            alt={order.title}
-                            fill
-                            sizes="112px"
-                            className="object-cover"
-                            unoptimized
-                          />
+                displayedOrders.map((order) => {
+                  // Determine status pill badge style
+                  const st = (order.status || "inprogress").toLowerCase();
+                  let statusBadge = {
+                    label: "Inprogress",
+                    style: "bg-[#E6E9F2] text-[#0284C7]",
+                  };
+
+                  if (st === "completed" || order.isCompleted) {
+                    statusBadge = {
+                      label: "Completed",
+                      style: "bg-[#D1FAE5] text-[#059669]",
+                    };
+                  } else if (st === "delivered") {
+                    statusBadge = {
+                      label: "Delivered",
+                      style: "bg-[#D1FAE5] text-[#059669]",
+                    };
+                  } else if (st === "revision" || st === "in_revision") {
+                    statusBadge = {
+                      label: "Revision",
+                      style: "bg-[#F3E8FF] text-[#9333EA]",
+                    };
+                  } else if (st === "failed" || st === "cancelled") {
+                    statusBadge = {
+                      label: "Cancelled",
+                      style: "bg-[#FEE2E2] text-[#EF4444]",
+                    };
+                  } else if (st === "pending") {
+                    statusBadge = {
+                      label: "Pending",
+                      style: "bg-[#FEF3C7] text-[#D97706]",
+                    };
+                  }
+
+                  return (
+
+                    <tr
+                      key={order.id}
+                      onClick={() => handleRowClick(order.id)}
+                      className="group relative cursor-pointer transition-colors hover:bg-[#F5F5F5]
+    after:pointer-events-none after:absolute after:inset-0
+     after:border after:border-transparent
+    hover:after:border-[rgba(0,0,0,0.10)]"
+                    >
+                      {/* Order Name */}
+                      <td className="py-4 px-3 align-middle max-w-[380px]">
+                        <div className="flex items-center gap-4">
+                          <div className="relative w-24 sm:w-36 md:w-[180px] lg:w-[220px] aspect-[11/6] rounded-[6px] overflow-hidden bg-gray-100 border border-gray-200/80 shrink-0">
+                            <Image
+                              src={order.coverImage}
+                              alt={order.title}
+                              fill
+                              sizes="(max-width: 640px) 96px, (max-width: 1024px) 180px, 220px"
+                              className="object-cover"
+                              unoptimized
+                            />
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                            <span
+                              className="text-[13px] font-semibold text-slate-900 leading-snug line-clamp-2 group-hover:text-[#327C73] transition-colors"
+                              title={order.title}
+                            >
+                              {order.title}
+                            </span>
+                            <span className="text-[11px] font-semibold text-slate-600 bg-[#F1F3F5] px-2 py-0.5 rounded-[6px] w-fit mt-1.5 capitalize">
+                              {order.itemType}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex flex-col min-w-0">
-                          <span
-                            className="text-[13px] font-semibold text-slate-900 leading-snug line-clamp-2 group-hover:text-[#327C73] transition-colors"
-                            title={order.title}
-                          >
-                            {order.title}
-                          </span>
-                          <span className="text-[11px] font-semibold text-slate-600 bg-[#F1F3F5] px-2 py-0.5 rounded-[6px] w-fit mt-1.5 capitalize">
-                            {order.itemType}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* Order Date */}
-                    <td className="py-4 px-3 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
-                      {order.orderDate}
-                    </td>
+                      {/* Order Date */}
+                      <td className="py-4 px-3 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
+                        {order.orderDate}
+                      </td>
 
-                    {/* Due Date */}
-                    <td className="py-4 px-3 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
-                      {order.dueDate}
-                    </td>
+                      {/* Due Date */}
+                      <td className="py-4 px-3 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
+                        {order.dueDate}
+                      </td>
 
-                    {/* Total */}
-                    <td className="py-4 px-3 align-middle text-xs sm:text-sm font-bold text-slate-900 whitespace-nowrap">
-                      {order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                    </td>
+                      {/* Total */}
+                      <td className="py-4 px-3 align-middle text-xs sm:text-sm font-bold text-slate-900 whitespace-nowrap">
+                        {order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                      </td>
 
-                    {/* Status */}
-                    <td className="py-4 px-3 align-middle whitespace-nowrap">
-                      {order.status === "revision" ? (
-                        <span className="bg-[#F5F0FF] text-[#8B5CF6] border border-[#DDD6FE] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">
-                          Revision
-                        </span>
-                      ) : order.status === "delivered" ? (
-                        <span className="bg-[#E6FFFA] text-[#0D9488] border border-[#99F6E4] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">
-                          Delivered
-                        </span>
-                      ) : order.status === "completed" ? (
-                        <span className="bg-[#ECFDF5] text-[#10B981] border border-[#A7F3D0] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">
-                          Completed
-                        </span>
-                      ) : order.status === "late" ? (
-                        <span className="bg-[#FEE2E2] text-[#DC2626] border border-[#FECACA] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">
-                          Late
-                        </span>
-                      ) : (
-                        <span className="bg-[#EEF2FF] text-[#6366F1] border border-[#C7D2FE] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">
-                          Inprogress
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))
+                      {/* Status */}
+                      <td className="py-4 px-3 align-middle whitespace-nowrap">
+                        <Tag variant={statusBadge.label} size="sm">
+                          {statusBadge.label}
+                        </Tag>
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>

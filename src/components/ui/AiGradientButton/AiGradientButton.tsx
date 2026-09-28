@@ -21,6 +21,7 @@ export interface AiGradientButtonProps {
   py?: string; // e.g. "py-3", "py-2", "py-[12px]"
   width?: string;
   height?: string;
+  fullWidth?: boolean;
 }
 
 export const AiGradientButton: React.FC<AiGradientButtonProps> = ({
@@ -40,6 +41,7 @@ export const AiGradientButton: React.FC<AiGradientButtonProps> = ({
   py = "py-2",
   width,
   height = "h-[40px]",
+  fullWidth = false,
 }) => {
   const content = text !== undefined ? text : children;
 
@@ -63,7 +65,9 @@ export const AiGradientButton: React.FC<AiGradientButtonProps> = ({
     ...style,
   };
 
-  const combinedClasses = `group relative overflow-hidden inline-flex items-center justify-center gap-[10px] rounded-[6px] text-[#112131] font-sf-pro font-semibold text-[16px] shadow-xs hover:shadow-lg hover:shadow-[#82C2FD]/30 hover:-translate-y-[1px] active:translate-y-0 active:scale-[0.98] transition-all duration-300 ease-out cursor-pointer select-none disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#82C2FD]/60 focus-visible:ring-offset-2 ${height || "h-[40px]"} ${px} ${py} ${width || ""} ${className}`.trim();
+  const displayAndWidth = fullWidth ? "w-full flex" : `${width || ""} inline-flex`.trim();
+
+  const combinedClasses = `group relative overflow-hidden ${displayAndWidth} items-center justify-center gap-[10px] rounded-[6px] text-[#112131] font-sf-pro font-semibold text-[16px] shadow-xs hover:shadow-lg hover:shadow-[#82C2FD]/30 hover:-translate-y-[1px] active:translate-y-0 active:scale-[0.98] transition-all duration-300 ease-out cursor-pointer select-none disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#82C2FD]/60 focus-visible:ring-offset-2 ${height || "h-[40px]"} ${px} ${py} ${className}`.trim();
 
   const innerContent = (
     <>
@@ -74,7 +78,7 @@ export const AiGradientButton: React.FC<AiGradientButtonProps> = ({
       />
 
       {/* Button Content */}
-      <span className="relative z-10 flex items-center justify-center gap-[10px]">
+      <span className="relative z-10 flex items-center justify-center gap-[10px] w-full">
         {showIcon && iconPosition === "left" && iconElement}
         {content && <span>{content}</span>}
         {showIcon && iconPosition === "right" && iconElement}

@@ -442,7 +442,7 @@ const CreateBrief = () => {
             }
             px="px-4"
             py="py-2"
-            height="h-[40px]"
+            
             className="self-start sm:self-auto shrink-0 text-sm font-semibold rounded-[6px]"
           />
         </div>

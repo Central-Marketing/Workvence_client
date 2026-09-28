@@ -329,10 +329,10 @@ export default function BuyerOrdersPage() {
         </div>
 
         {/* Recent Orders Section */}
-        <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.03)] p-6 sm:p-7">
+        <div className="bg-[#F5F5F5] rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.03)] p-6 sm:p-7">
 
           {/* Header Row */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100">
 
             <div className="flex items-center gap-3">
               <h2 className="text-xl font-bold text-slate-900 ">
@@ -343,7 +343,7 @@ export default function BuyerOrdersPage() {
 
             <div className="flex items-center gap-5 justify-between sm:justify-end">
               {/* Pill Switcher */}
-              <div className="flex items-center h-[46px] bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 overflow-x-auto scrollbar-none">
+              <div className="flex items-center h-[46px] bg-[#fff] p-[4px] rounded-[6px] border border-gray-200/50 overflow-x-auto scrollbar-none">
                 {(["All", "Packages", "Briefs"] as const).map((tab) => (
                   <Button
                     key={tab}
@@ -373,13 +373,15 @@ export default function BuyerOrdersPage() {
             </div>
           </div>
 
+          <hr className="border-[#rgba(0, 0, 0, 0.10)] my-10" />
+
           {/* Orders Table */}
           {isLoading ? (
             <OrdersTableSkeleton />
           ) : (
             <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
-              <table className="w-full min-w-[760px] border-collapse text-left">
-                <thead>
+              <table className="w-full bg-white min-w-[760px] border-collapse text-left">
+                <thead className="">
                   <tr className="border-b border-slate-100 text-xs sm:text-sm font-bold text-slate-700">
                     <th className="py-3.5 px-3 font-bold">Order Name</th>
                     <th className="py-3.5 px-3 font-bold whitespace-nowrap">Order Date</th>
@@ -401,17 +403,20 @@ export default function BuyerOrdersPage() {
                         <tr
                           key={order.id}
                           onClick={() => handleRowClick(order.id)}
-                          className="hover:bg-slate-50/75 cursor-pointer transition-colors group"
+                          className="group relative cursor-pointer transition-colors hover:bg-[#F5F5F5]
+    after:pointer-events-none after:absolute after:inset-0
+     after:border after:border-transparent
+    hover:after:border-[rgba(0,0,0,0.10)]"
                         >
                           {/* Order Name */}
                           <td className="py-4 px-3 align-middle max-w-[380px]">
                             <div className="flex items-center gap-4">
-                              <div className="relative w-24 sm:w-28 h-14 sm:h-16 rounded-[6px] overflow-hidden border border-slate-200 shrink-0 bg-slate-100">
+                              <div className="relative w-24 sm:w-36 md:w-[180px] lg:w-[220px] aspect-[11/6] rounded-[6px] overflow-hidden bg-gray-100 border border-gray-200/80 shrink-0">
                                 <Image
                                   src={order.coverImage}
                                   alt={order.title}
                                   fill
-                                  sizes="112px"
+                                  sizes="(max-width: 640px) 96px, (max-width: 1024px) 180px, 220px"
                                   className="object-cover"
                                   unoptimized
                                 />

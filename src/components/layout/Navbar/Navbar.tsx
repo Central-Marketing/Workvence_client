@@ -12,6 +12,7 @@ import useSearchSuggestions, { SuggestionItem } from "@/hooks/useSearchSuggestio
 import toast from 'react-hot-toast';
 import { axiosFetch, socket, handleAuthExpired, isAccessTokenExpiringSoon, refreshAccessToken, getCookie } from '@/utils';
 import { useUserStore } from "@/store/userStore";
+import { useAuthModalStore } from "@/store/authModalStore";
 import { Loader, NotificationBell, HeaderInboxIcon, AiGradientButton, Button, SearchSuggestionsDropdown } from '@/components';
 import CategoryBar from "../CategoryBar/CategoryBar";
 
@@ -28,6 +29,7 @@ const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { user, setUser } = useUserStore();
+  const openAuthModal = useAuthModalStore((state) => state.openAuthModal);
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -456,12 +458,13 @@ const Navbar = () => {
                     )}
                   </div>
 
-                  <Link
-                    href="/register?seller=true"
-                    className="px-2 xl:px-4 py-[8px] xl:py-[10px] rounded-[6px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
+                  <button
+                    type="button"
+                    onClick={() => openAuthModal({ mode: "register", defaultIsSeller: true })}
+                    className="px-2 xl:px-4 py-[8px] xl:py-[10px] rounded-[6px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0 cursor-pointer bg-transparent border-0"
                   >
                     Become a Seller
-                  </Link>
+                  </button>
 
                   <Link
                     href="/briefs"
@@ -474,22 +477,24 @@ const Navbar = () => {
                 {/* Auth Buttons Group */}
                 <div className="flex items-center gap-2 xl:gap-[10px] shrink-0">
                   <Button
-                    href="/login"
+                    type="button"
+                    onClick={() => openAuthModal({ mode: "login" })}
                     variant="soft"
                     size="md"
                     radius="fiverr"
-                    className="!bg-[#E0E0E0] hover:!bg-[#D5D5D5] h-[40px] text-[16px] px-3.5 xl:px-5 font-sf-pro font-semibold text-[#292929] whitespace-nowrap shrink-0"
+                    className="!bg-[#E0E0E0] hover:!bg-[#D5D5D5] h-[40px] text-[16px] px-3.5 xl:px-5 font-sf-pro font-semibold text-[#292929] whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     Sign in
                   </Button>
 
                   <Button
-                    href="/register"
+                    type="button"
+                    onClick={() => openAuthModal({ mode: "register", defaultIsSeller: false })}
                     variant="dark"
                     size="md"
                     radius="fiverr"
                     rightIcon={<FiArrowRight className="text-[16px]" />}
-                    className="h-[40px] text-[16px] px-3.5 xl:px-5 font-sf-pro font-semibold bg-[#0B0F19] hover:bg-black text-[#E8F5F5] shadow-sm whitespace-nowrap shrink-0"
+                    className="h-[40px] text-[16px] px-3.5 xl:px-5 font-sf-pro font-semibold bg-[#0B0F19] hover:bg-black text-[#E8F5F5] shadow-sm whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     Join Now
                   </Button>
@@ -773,24 +778,39 @@ const Navbar = () => {
                 )}
               </div>
 
-              <Link href="/register?seller=true" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Become a Seller</Link>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  openAuthModal({ mode: "register", defaultIsSeller: true });
+                }}
+                className="text-left hover:text-brand-green transition-colors cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit"
+              >
+                Become a Seller
+              </button>
               <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
               <hr className="my-2 border-gray-100" />
-              <Link
-                href="/login"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center h-[40px] bg-[#E0E0E0] hover:bg-[#D5D5D5] text-[#292929] text-[16px] font-semibold rounded-[6px] transition-colors"
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  openAuthModal({ mode: "login" });
+                }}
+                className="w-full flex items-center justify-center h-[40px] bg-[#E0E0E0] hover:bg-[#D5D5D5] text-[#292929] text-[16px] font-semibold rounded-[6px] transition-colors cursor-pointer border-0"
               >
                 Sign in
-              </Link>
-              <Link
-                href="/register"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-1.5 h-[40px] bg-[#0B0F19] hover:bg-black text-[#E8F5F5] text-[16px] font-semibold rounded-[6px] shadow-sm transition-colors"
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  openAuthModal({ mode: "register", defaultIsSeller: false });
+                }}
+                className="w-full flex items-center justify-center gap-1.5 h-[40px] bg-[#0B0F19] hover:bg-black text-[#E8F5F5] text-[16px] font-semibold rounded-[6px] shadow-sm transition-colors cursor-pointer border-0"
               >
                 <span>Join Now</span>
                 <FiArrowRight className="text-sm" />
-              </Link>
+              </button>
             </>
           ) : (
             <>

@@ -615,16 +615,12 @@ const Featured = ({
         {/* Search Bar & Dynamic Category Pills Container */}
         <div
           ref={searchRef}
-          className="relative w-full max-w-[640px] sm:max-w-[760px] md:max-w-[980px] flex flex-col items-center"
+          className="relative w-full max-w-[640px] sm:max-w-[760px] md:max-w-[1091px] flex flex-col items-center"
         >
-          {/* Row 1: Search Input Box + Search Now Button */}
           <div className="w-full flex items-center justify-center gap-2.5 sm:gap-3 my-[40px]">
-            {/* White Search Input Container with Pink, Violet, Green Gradient Border on Hover */}
-            <div className="relative group/search flex-1 w-full md:w-[800px] max-w-[800px] h-[52px] sm:h-[60px] rounded-[6px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all">
-              {/* Gradient Border Layer (Pink: #FF5E8E, Violet: #8B5CF6, Green: #10B981) */}
+            <div className="relative group/search flex-1 w-full max-w-[1091px] h-[52px] sm:h-[60px] rounded-[6px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all">
               <div className="absolute -inset-[1.5px] rounded-[7.5px] bg-gradient-to-r from-[#FF5E8E] via-[#8B5CF6] to-[#10B981] opacity-0 group-hover/search:opacity-100 group-focus-within/search:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-              {/* Inner White Box */}
               <div className="relative z-10 w-full h-full bg-white rounded-[6px] border border-black/10 group-hover/search:border-transparent group-focus-within/search:border-transparent px-4 sm:px-[20px] py-[10px] flex items-center justify-between gap-3 transition-all">
                 <div className="flex items-center gap-2.5 sm:gap-3 w-full min-w-0">
                   <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 shrink-0" strokeWidth={2} />
@@ -655,7 +651,7 @@ const Featured = ({
                     }}
                     onKeyDown={handleKeyDown}
                     placeholder="What services are you looking for..."
-                    className="w-full bg-transparent border-none outline-none text-slate-900 placeholder:text-gray-400 placeholder:text-sm sm:placeholder:text-[15px] placeholder:font-sf-pro text-sm sm:text-base font-normal font-sf-pro"
+                    className="w-full flex-1 min-w-0 bg-transparent border-none outline-none text-slate-900 placeholder:text-gray-400 placeholder:text-sm sm:placeholder:text-[15px] placeholder:font-sf-pro text-sm sm:text-base font-normal font-sf-pro"
                   />
                 </div>
 

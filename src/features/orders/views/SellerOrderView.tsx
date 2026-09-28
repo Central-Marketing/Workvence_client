@@ -26,11 +26,12 @@ import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
 import generateImageURL from "@/utils/generateImageURL";
 import { ExtensionModal } from "@/components";
-import { Button } from "@/components/ui";
+import { Button, Tag } from "@/components/ui";
 import { NormalizedOrder } from "../types";
 import { OrderTimelineStepper } from "../components/OrderTimelineStepper";
 import { OrderDeliverablesList } from "../components/OrderDeliverablesList";
 import { OrderActivityLedgerDrawer } from "../components/OrderActivityLedgerDrawer";
+import { DeliveryCountdown } from "../components/DeliveryCountdown";
 
 interface SellerOrderViewProps {
   order: NormalizedOrder;
@@ -168,6 +169,11 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  };
+
+  // Remove an attached file
+  const handleRemoveFile = (indexToRemove: number) => {
+    setUploadedFiles((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
   // Submit delivery
@@ -335,11 +341,24 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
     rawOrder.deliveryMessage ||
     "";
 
+  const deliveryDeadline =
+    order.deadline ||
+    rawOrder?.deadline ||
+    rawOrder?.deliveryDate ||
+    rawOrder?.dueDate ||
+    (order.deliveryTime && !isNaN(new Date(order.deliveryTime).getTime()) ? order.deliveryTime : null) ||
+    (rawOrder?.createdAt && rawOrder?.deliveryTime && !isNaN(Number(rawOrder.deliveryTime))
+      ? new Date(new Date(rawOrder.createdAt).getTime() + Number(rawOrder.deliveryTime) * 86400000).toISOString()
+      : null) ||
+    (order.startedOn && order.deliveryTime && !isNaN(parseInt(order.deliveryTime))
+      ? new Date(new Date(order.startedOn).getTime() + parseInt(order.deliveryTime) * 86400000).toISOString()
+      : null);
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] pt-6 sm:pt-8 pb-[80px] min-[1400px]:pb-[100px] font-sans">
-      <div className="container mx-auto px-4 md:px-6 ">
+      <div className="container mx-auto px-4 md:px-6">
 
-        {/* Top Breadcrumb & Seller Badge */}
+        {/* Top Breadcrumb */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <nav aria-label="Breadcrumb" className="mb-0">
             <ol className="flex items-center gap-2 text-[13px] text-gray-500 flex-wrap list-none p-0 m-0">
@@ -348,9 +367,21 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   href="/manage-orders"
                   className="text-gray-600 hover:text-gray-900 hover:underline transition-colors font-normal inline-flex items-center gap-1 p-0 h-auto bg-transparent border-0 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 rounded-xs"
                 >
-                  <FiChevronLeft className="w-4 h-4 shrink-0" aria-hidden="true" />
-                  <span>Back to Manage Orders</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M2.5 9.99101V12.083C2.5 14.8328 2.5 16.2078 3.35427 17.0621C4.20854 17.9163 5.58347 17.9163 8.33333 17.9163H11.6667C14.4165 17.9163 15.7914 17.9163 16.6457 17.0621C17.5 16.2078 17.5 14.8328 17.5 12.083V9.99101C17.5 8.58992 17.5 7.88945 17.2034 7.28305C16.9068 6.67665 16.3539 6.24657 15.248 5.38643L13.5813 4.09013C11.8609 2.75205 11.0007 2.08301 10 2.08301C8.99925 2.08301 8.13908 2.75205 6.41868 4.09013L4.75201 5.38643C3.64611 6.24657 3.09316 6.67665 2.79658 7.28305C2.5 7.88945 2.5 8.58992 2.5 9.99101Z" stroke="#1A9997" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </Link>
+              </li>
+              <li className="inline-flex items-center gap-2">
+                <span className="text-gray-300 select-none" aria-hidden="true">
+                  /
+                </span>
+                <span
+                  aria-current="page"
+                  className="text-gray-900 font-medium font-mono truncate max-w-[200px] sm:max-w-xs"
+                >
+                  <Link href="/manage-orders">Manage Orders</Link>
+                </span>
               </li>
               <li className="inline-flex items-center gap-2">
                 <span className="text-gray-300 select-none" aria-hidden="true">
@@ -378,339 +409,247 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             >
               Escrow Ledger
             </Button>
-
           </div> */}
         </div>
 
         {/* Order Main Title */}
-        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-6">
           {order.title || order.packageTitle}
         </h1>
 
-        {/* TOP STATUS HERO BANNER (Fiverr Style) */}
-        <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-sm p-6 mb-6">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        {/* Main Two-Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-            {/* Left: Status & Timer */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2.5">
-                <span
-                  className={`text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full ${isDisputed
-                    ? "bg-amber-100 text-amber-900 border border-amber-300"
-                    : isCancelled
-                      ? "bg-rose-100 text-rose-800 border border-rose-200"
-                      : isCompleted
-                        ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                        : isDelivered
-                          ? "bg-teal-100 text-teal-800 border border-teal-200"
-                          : isLate
-                            ? "bg-rose-100 text-rose-800 border border-rose-200"
-                            : "bg-blue-100 text-blue-800 border border-blue-200"
-                    }`}
-                >
-                  {isDisputed ? "Disputed" : isCancelled ? "Cancelled" : order.status}
-                </span>
-                <span className="text-xs text-slate-400">Order placed {order.startedOn}</span>
+          {/* LEFT COLUMN: Stepper + Timer + Order Summary + Actions + Deliveries + Reviews */}
+          <div className="lg:col-span-8 space-y-6">
+
+            {/* CARD 0: Order Activity Timeline */}
+            <OrderTimelineStepper order={order} />
+
+            {/* Delivery Countdown Banner when in progress */}
+            {!['delivered', 'completed', 'cancelled', 'failed'].includes(order.status) && !isDisputed && (
+              <div className="flex items-center gap-3.5 sm:gap-4 px-4 sm:px-5 py-3.5 bg-[rgba(239, 252, 250, 0.50)] border border-[#B8DFDF] rounded-[8px] text-neutral-800">
+                <div className="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M8.37563 3C8.16172 3.07993 7.95135 3.16712 7.74481 3.26126M20.7176 16.3011C20.8198 16.0799 20.914 15.8542 20.9999 15.6245M18.4987 19.3647C18.6704 19.2044 18.8364 19.0381 18.9962 18.866M15.2688 21.3723C15.4629 21.2991 15.654 21.22 15.842 21.1351M12.1559 21.9939C11.925 22.0019 11.6925 22.0019 11.4615 21.9939M7.7872 21.1404C7.968 21.2217 8.15172 21.2978 8.33814 21.3683M4.67244 18.9208C4.80913 19.0657 4.95018 19.2064 5.09539 19.3428M2.63259 15.6645C2.70747 15.8622 2.78856 16.0569 2.87561 16.2483M2.00486 12.5053C1.99837 12.2972 1.99839 12.0878 2.00486 11.8794M2.62534 8.73714C2.6989 8.54165 2.77853 8.34913 2.86399 8.1598M4.65591 5.47923C4.80057 5.32514 4.95014 5.17573 5.10439 5.03124" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M13.5 12C13.5 12.8284 12.8284 13.5 12 13.5C11.1716 13.5 10.5 12.8284 10.5 12C10.5 11.1716 11.1716 10.5 12 10.5M13.5 12C13.5 11.1716 12.8284 10.5 12 10.5M13.5 12H16M12 10.5V6" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" />
+                    <path d="M22 12C22 6.47715 17.5228 2 12 2" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                  <span className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
+                    Time Left Deliver
+                  </span>
+                </div>
+
+                <DeliveryCountdown deliveryDate={deliveryDeadline} />
+              </div>
+            )}
+
+            {/* CARD: Order Summary */}
+            <div className="bg-[#f5f5f5] rounded-[6px] border border-slate-200/90 shadow-sm p-5 sm:p-6">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                <h2 className="text-xl font-bold text-[#292929] font-inter">Order Summary</h2>
               </div>
 
-              {isDisputed ? (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100">
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-amber-900 flex items-center gap-2">
-                    <FiShield className="text-amber-600" />
-                    Order Under Dispute
-                  </h2>
-                  <p className="text-xs sm:text-sm text-amber-700 mt-1">
-                    Workvence administration is reviewing this order. Payouts and deliveries are temporarily paused.
-                  </p>
+                  <span className="text-xs font-semibold text-slate-600 font-inter">
+                    Order #{order.orderCode}
+                  </span>
+                  <h3 className="font-bold text-sm sm:text-base text-slate-900 line-clamp-2">
+                    {order.title || order.packageTitle}
+                  </h3>
                 </div>
-              ) : isCancelled ? (
+              </div>
+              <hr className="text-[rgba(0,0,0,0.10)] my-4" />
+              <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-rose-900 flex items-center gap-2">
-                    <FiAlertCircle className="text-rose-600" />
-                    Order Cancelled
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                    This order was cancelled. Reach out to Workvence Support if you need assistance.
-                  </p>
+                  <span className="text-xs text-slate-500 font-inter block">Your Net Earnings</span>
+                  <span className="text-base sm:text-lg font-bold text-[#0D6D5F]">
+                    ${netEarnings}
+                  </span>
                 </div>
-              ) : isCompleted ? (
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
-                    <FiCheck className="text-emerald-500" />
-                    Order Completed!
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                    Your net earnings of <span className="font-bold text-slate-900">${netEarnings}</span>{" "}
-                    {isCleared
-                      ? "have cleared to your balance."
-                      : clearsAt
-                        ? `will clear ${moment(clearsAt).fromNow()} (${moment(clearsAt).format("MMM DD, YYYY")}).`
-                        : "are currently pending clearance."}
-                  </p>
+                <div className="text-right">
+                  <span className="text-xs text-slate-500 font-inter block">Total Order Price</span>
+                  <span className="text-base sm:text-lg font-bold text-slate-900">
+                    ${Number(order.price || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
                 </div>
-              ) : isDelivered ? (
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2 text-teal-700">
-                    Work Delivered — In Review
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                    You have submitted the deliverables. Waiting for the buyer to inspect and complete the order.
-                  </p>
-                </div>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 text-slate-700 font-bold text-sm sm:text-base">
-                    <FiClock className="text-slate-500 text-lg" />
-                    <span>Time Left to Deliver:</span>
-                  </div>
-                  <div className="bg-[#F0FAF8] border border-[#2DD4BF] text-[#0D9488] font-mono font-bold text-sm sm:text-base px-3.5 py-1 rounded-full shadow-2xs">
-                    {countdown.days}D : {countdown.hours}H : {countdown.seconds}S
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
 
-            {/* Right: Primary CTAs (Deliver Now / Extend) */}
-            {!isCompleted && !isCancelled && !isDisputed && (
-              <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full lg:w-auto">
-                {!isDelivered ? (
-                  <>
+            {/* Dispute Alert Banner */}
+            {isDisputed && (
+              <div className="bg-amber-50 border border-amber-200 rounded-[6px] p-6 mb-6">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-10 h-10 rounded-[6px] bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                    <FiShield className="text-xl" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-base text-amber-950">Workvence Support is handling your dispute</h4>
+                    <p className="text-xs sm:text-sm text-amber-800 mt-1 leading-relaxed">
+                      Our Support & Administration team is actively investigating the details of this order. All payment releases
+                      and work deliveries are temporarily paused while administrators review the communication history and deliverables.
+                    </p>
+                    <div className="flex flex-wrap gap-3 mt-4">
+                      <Link
+                        href="/support"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
+                      >
+                        Go to Support Desk
+                      </Link>
+                      <a
+                        href="mailto:support@workvence.com"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-white border border-amber-300 text-amber-900 text-xs sm:text-sm font-semibold hover:bg-amber-100/50 transition-colors"
+                      >
+                        Email: support@workvence.com
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Cancelled Alert Banner */}
+            {isCancelled && (
+              <div className="bg-rose-50 border border-rose-200 rounded-[6px] p-6 mb-6">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-10 h-10 rounded-[6px] bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                    <FiAlertCircle className="text-xl" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-base text-rose-950">This Order Has Been Cancelled</h4>
+                    <p className="text-xs sm:text-sm text-rose-800 mt-1 leading-relaxed">
+                      This order was marked as cancelled. If you believe this cancellation was processed in error or need assistance
+                      with payment details, please submit an inquiry to Workvence Support.
+                    </p>
+                    <div className="flex flex-wrap gap-3 mt-4">
+                      <Link
+                        href="/support"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
+                      >
+                        Contact Support
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Pending Extension Request */}
+            {hasPendingExtension && (
+              <div className="bg-[#f5f5f5] border border-[rgba(0, 0, 0, 0.10)] rounded-[6px] p-6 mb-6">
+                <div className="flex flex-row justify-between gap-4">
+                  <h4 className="text-xl font-bold text-[#292929] font-inter">
+                    {isExtensionRequestedByBuyer
+                      ? "Buyer Requested a Delivery Extension"
+                      : "Time Extension Requested"}
+                  </h4>
+                  <span className="bg-[#EFE6FD] border border-[#CEB0FA] rounded-[6px] text-[#4600A9] text-[20px] md:text-[24px] font-[510] px-6 py-0.5 shrink-0 flex items-center justify-center">
+                    {extensionDays} days
+                  </span>
+                </div>
+                <hr className="text-[rgba(0, 0, 0, 0.10)] my-4" />
+                <p className="text-[#6E6E6E] text-xs sm:text-base font-inter">
+                  {isExtensionRequestedByBuyer
+                    ? extensionReason ? `"${extensionReason}"` : "The buyer requested additional time for this order."
+                    : `Waiting for the buyer to review your request for an additional ${extensionDays} days.`}
+                </p>
+                {isExtensionRequestedByBuyer && (
+                  <div className="flex items-center gap-3 w-full mt-5">
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="soft"
                       size="md"
                       radius="fiverr"
-                      onClick={() => setIsExtensionModalOpen(true)}
-                      className="w-full sm:w-auto"
+                      fullWidth
+                      disabled={isRespondingExtension}
+                      onClick={() => handleRespondExtension("reject")}
+                      className="flex-1 w-full"
                     >
-                      Extend Delivery Date
+                      Reject
                     </Button>
+                    <Button
+                      type="button"
+                      variant="dark"
+                      size="md"
+                      radius="fiverr"
+                      fullWidth
+                      disabled={isRespondingExtension}
+                      isLoading={isRespondingExtension}
+                      onClick={() => handleRespondExtension("accept")}
+                      className="flex-1 w-full"
+                    >
+                      {isRespondingExtension ? "Processing..." : "Approve Extension"}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Revision alert banner if buyer requested changes */}
+            {!isDelivered && order.revisionReason && (
+              <div className="bg-amber-50 border border-amber-200 rounded-[6px] p-5 mb-6 flex items-start gap-3">
+                <FiAlertCircle className="text-amber-600 text-xl shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h4 className="font-bold text-sm text-amber-900">Buyer Requested a Revision</h4>
+                  <p className="text-xs sm:text-sm text-amber-800 mt-1">{order.revisionReason}</p>
+                  <Button
+                    type="button"
+                    variant="soft"
+                    size="md"
+                    radius="fiverr"
+                    onClick={() => setShowDeliverModal(true)}
+                    rightIcon={<FiArrowRight className="text-sm" />}
+                    className="mt-3 w-full sm:w-auto bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold"
+                  >
+                    Upload Revised Files
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* CARD 1: Work Deliverables */}
+            <div className="bg-[#f5f5f5] rounded-[6px] border border-[rgba(0, 0, 0, 0.10)] shadow-sm p-6 sm:p-7">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+                <div>
+                  <h3 className="text-xl font-bold text-[#292929] font-inter">Work Deliverables</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  {!isCompleted && !isCancelled && !isDelivered && (
                     <Button
                       type="button"
                       variant="brand"
-                      size="md"
+                      size="sm"
                       radius="fiverr"
-                      leftIcon={<FiUploadCloud className="text-lg" />}
                       onClick={() => setShowDeliverModal(true)}
-                      className="w-full sm:w-auto px-6 font-bold shadow-sm"
+                      className="font-bold shadow-xs"
                     >
-                      Deliver Completed Work
+                      + Deliver Work
                     </Button>
-                  </>
-                ) : (
-                  <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[6px] bg-teal-50 border border-teal-200 text-teal-700 text-xs sm:text-sm font-semibold w-full sm:w-auto justify-center">
-                    <FiCheckCircle className="text-teal-600 text-base" />
-                    <span>Work Delivered — In Review</span>
+                  )}
+                  {isDelivered && (
+                    <span className="bg-[#CCF6F1] text-[#265F58] border border-[rgba(0, 0, 0, 0.10)] text-xs font-semibold px-3 py-1 rounded-full">
+                      Delivered
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Delivery Note / Message */}
+              {deliveryText && (
+                <div className="mb-5 p-4 sm:p-5 rounded-[6px] bg-white border border-[rgba(0, 0, 0, 0.10)]">
+                  <div className="flex items-center gap-2 mb-2 text-xs font-bold text-[#292929]">
+                    <FiFileText className="text-emerald-600 text-sm" />
+                    <span>Delivery Note</span>
                   </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Dispute Alert Banner */}
-        {isDisputed && (
-          <div className="bg-amber-50 border border-amber-200 rounded-[6px] p-6 mb-6">
-            <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-[6px] bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-                <FiShield className="text-xl" />
-              </div>
-              <div className="flex-1">
-                <h4 className="font-bold text-base text-amber-950">Workvence Support is handling your dispute</h4>
-                <p className="text-xs sm:text-sm text-amber-800 mt-1 leading-relaxed">
-                  Our Support & Administration team is actively investigating the details of this order. All payment releases
-                  and work deliveries are temporarily paused while administrators review the communication history and deliverables.
-                </p>
-                <div className="flex flex-wrap gap-3 mt-4">
-                  <Link
-                    href="/support"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
-                  >
-                    Go to Support Desk
-                  </Link>
-                  <a
-                    href="mailto:support@workvence.com"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-white border border-amber-300 text-amber-900 text-xs sm:text-sm font-semibold hover:bg-amber-100/50 transition-colors"
-                  >
-                    Email: support@workvence.com
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Cancelled Alert Banner */}
-        {isCancelled && (
-          <div className="bg-rose-50 border border-rose-200 rounded-[6px] p-6 mb-6">
-            <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-[6px] bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
-                <FiAlertCircle className="text-xl" />
-              </div>
-              <div className="flex-1">
-                <h4 className="font-bold text-base text-rose-950">This Order Has Been Cancelled</h4>
-                <p className="text-xs sm:text-sm text-rose-800 mt-1 leading-relaxed">
-                  This order was marked as cancelled. If you believe this cancellation was processed in error or need assistance
-                  with payment details, please submit an inquiry to Workvence Support.
-                </p>
-                <div className="flex flex-wrap gap-3 mt-4">
-                  <Link
-                    href="/support"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
-                  >
-                    Contact Support
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Pending Extension Request Banner */}
-        {hasPendingExtension && (
-          <div className="bg-white border border-[rgba(0, 0, 0, 0.10)] rounded-[6px] p-5 mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-start gap-3.5">
-                <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0, 0, 0, 0.10)] text-sky-700 flex items-center justify-center shrink-0 mt-0.5">
-                  <FiClock className="text-xl" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm sm:text-base text-sky-950">
-                    {isExtensionRequestedByBuyer
-                      ? `Buyer Requested a Time Extension (+${extensionDays} days)`
-                      : `Time Extension Requested (+${extensionDays} days)`}
-                  </h4>
-                  <p className="text-xs sm:text-sm text-sky-800 mt-1">
-                    {isExtensionRequestedByBuyer
-                      ? `Reason: "${extensionReason}"`
-                      : `Waiting for the buyer to review your request for an additional ${extensionDays} days.`}
+                  <p className="text-xs sm:text-[13.5px] text-slate-700 leading-relaxed whitespace-pre-wrap">
+                    {deliveryText}
                   </p>
                 </div>
-              </div>
-
-              {isExtensionRequestedByBuyer && (
-                <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0 w-full sm:w-auto">
-                  <Button
-                    type="button"
-                    variant="brand"
-                    size="md"
-                    radius="fiverr"
-                    disabled={isRespondingExtension}
-                    isLoading={isRespondingExtension}
-                    onClick={() => handleRespondExtension("accept")}
-                    className="w-full sm:w-auto font-bold shadow-xs"
-                  >
-                    Accept Extension
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="danger"
-                    size="md"
-                    radius="fiverr"
-                    disabled={isRespondingExtension}
-                    onClick={() => handleRespondExtension("reject")}
-                    className="w-full sm:w-auto font-bold bg-white border border-rose-200 text-rose-700 hover:bg-rose-50"
-                  >
-                    Reject
-                  </Button>
-                </div>
               )}
+
+              <OrderDeliverablesList files={order.deliveryFiles} />
             </div>
-          </div>
-        )}
-
-        {/* Revision alert banner if buyer requested changes */}
-        {!isDelivered && order.revisionReason && (
-          <div className="bg-amber-50 border border-amber-200 rounded-[6px] p-5 mb-6 flex items-start gap-3">
-            <FiAlertCircle className="text-amber-600 text-xl shrink-0 mt-0.5" />
-            <div>
-              <h4 className="font-bold text-sm text-amber-900">Buyer Requested a Revision</h4>
-              <p className="text-xs sm:text-sm text-amber-800 mt-1">{order.revisionReason}</p>
-              <Button
-                type="button"
-                variant="soft"
-                size="md"
-                radius="fiverr"
-                onClick={() => setShowDeliverModal(true)}
-                rightIcon={<FiArrowRight className="text-sm" />}
-                className="mt-3 w-full sm:w-auto bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold"
-              >
-                Upload Revised Files
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
-          {/* LEFT COLUMN: Review + Requirements + Deliveries + Stepper + Activity & Escrow Ledger */}
-          <div className="lg:col-span-8 space-y-6">
-
-            {/* CARD 0: Buyer Review (Fiverr Style) */}
-            {isCompleted && buyerReview && (
-              <div className="bg-white rounded-[6px] border border-amber-200/80 shadow-sm p-6 sm:p-7 relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 to-amber-500" />
-                <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100 mb-5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-[6px] bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100">
-                      <FiStar className="text-lg fill-amber-400 text-amber-500" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-base text-slate-900">Review from Buyer</h3>
-                      <p className="text-xs text-slate-400">Feedback submitted for this completed order</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
-                    <span className="text-amber-500 text-base">★</span>
-                    <span className="text-sm font-extrabold text-amber-900">
-                      {typeof buyerReview.star === "number" && buyerReview.star > 0
-                        ? Number(buyerReview.star).toFixed(1)
-                        : "0.0"}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Rating Criteria Breakdown */}
-                {(buyerReview.communicationRating || buyerReview.qualityRating || buyerReview.valueRating) && (
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-4">
-                    {buyerReview.communicationRating && (
-                      <div className="bg-slate-50 border border-slate-200/80 rounded-[6px] p-3 flex justify-between items-center text-xs">
-                        <span className="text-slate-600">Communication</span>
-                        <span className="font-bold text-slate-900 flex items-center gap-1">
-                          {Number(buyerReview.communicationRating).toFixed(1)} <FiStar className="text-amber-400 fill-amber-400 text-[11px]" />
-                        </span>
-                      </div>
-                    )}
-                    {buyerReview.qualityRating && (
-                      <div className="bg-slate-50 border border-slate-200/80 rounded-[6px] p-3 flex justify-between items-center text-xs">
-                        <span className="text-slate-600">Service Quality</span>
-                        <span className="font-bold text-slate-900 flex items-center gap-1">
-                          {Number(buyerReview.qualityRating).toFixed(1)} <FiStar className="text-amber-400 fill-amber-400 text-[11px]" />
-                        </span>
-                      </div>
-                    )}
-                    {buyerReview.valueRating && (
-                      <div className="bg-slate-50 border border-slate-200/80 rounded-[6px] p-3 flex justify-between items-center text-xs">
-                        <span className="text-slate-600">Value for Money</span>
-                        <span className="font-bold text-slate-900 flex items-center gap-1">
-                          {Number(buyerReview.valueRating).toFixed(1)} <FiStar className="text-amber-400 fill-amber-400 text-[11px]" />
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {buyerReview.description && (
-                  <div className="bg-amber-50/50 border border-amber-100 rounded-[6px] p-4">
-                    <p className="text-xs sm:text-sm text-slate-700 italic leading-relaxed">
-                      "{buyerReview.description}"
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* CARD 1: Buyer Project Requirements */}
             {/* <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-sm p-6 sm:p-7">
@@ -776,138 +715,102 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
               )}
             </div> */}
 
-            {/* CARD 2: Submitted Work Deliverables */}
-            <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-sm p-6 sm:p-7">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-                <div>
-                  <h3 className="font-bold text-base text-slate-900">Work Deliverables</h3>
-                  <p className="text-xs text-slate-400">Files and notes you provided for this order</p>
-                </div>
-                {!isCompleted && !isCancelled && !isDelivered && (
-                  <Button
-                    type="button"
-                    variant="soft"
-                    size="md"
-                    radius="fiverr"
-                    onClick={() => setShowDeliverModal(true)}
-                    className="text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-bold"
-                  >
-                    + Deliver Work
-                  </Button>
-                )}
-                {isDelivered && (
-                  <span className="bg-teal-50 text-teal-700 border border-teal-200 text-xs font-semibold px-3 py-1 rounded-full">
-                    Delivered
-                  </span>
-                )}
-              </div>
-
-              {/* Delivery Note / Message */}
-              {deliveryText && (
-                <div className="mb-5 p-4 sm:p-5 rounded-[6px] bg-slate-50 border border-slate-200/80">
-                  <div className="flex items-center gap-2 mb-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
-                    <FiFileText className="text-emerald-600 text-sm" />
-                    <span>Delivery Note</span>
-                  </div>
-                  <p className="text-xs sm:text-[13.5px] text-slate-700 leading-relaxed whitespace-pre-wrap">
-                    {deliveryText}
-                  </p>
-                </div>
-              )}
-
-              <OrderDeliverablesList files={order.deliveryFiles} />
-            </div>
-
-            {/* CARD 3: Order Activity Timeline Stepper */}
-            <OrderTimelineStepper order={order} />
-
-            {/* CARD 4: Order Activity & Escrow Ledger Trigger Card */}
-            <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-sm p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-start sm:items-center gap-3.5">
-                <div className="w-11 h-11 rounded-[6px] bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100 shadow-2xs">
-                  <FiClock className="text-xl" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-base text-slate-900">Order Activity &amp; Escrow Ledger</h3>
-                    <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
-                      Escrow Protected
+            {/* CARD 2: Share Feedback & Reviews (When Order is Completed) */}
+            {isCompleted && (
+              <div className="bg-[#f5f5f5] rounded-[6px] border border-slate-200/90 shadow-sm p-6 sm:p-7">
+                <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+                  <h3 className="text-xl font-bold text-[#292929] font-inter">
+                    {buyerReview ? "Buyer Feedback & Review" : "Client Feedback"}
+                  </h3>
+                  <div className="flex items-center gap-1.5 px-3 py-1 bg-[#EDEDED] border border-[#C7C7C7] rounded-[6px] text-base font-semibold text-slate-700">
+                    <span className="text-[#292929]">Total</span>
+                    <span className="font-bold text-slate-900">
+                      {buyerReview?.star ? Number(buyerReview.star).toFixed(1) : "0.0"}
+                    </span>
+                    <span className={Number(buyerReview?.star || 0) > 0 ? "text-amber-500" : "text-slate-300"}>
+                      ★
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Chronological statement of escrow events, payment milestones, and order status updates
-                  </p>
                 </div>
+
+                {buyerReview ? (
+                  <div className="bg-white rounded-[6px] p-6 sm:p-8 space-y-6 shadow-2xs">
+                    {buyerReview.description && (
+                      <p className="text-sm sm:text-[15px] text-[#555] italic leading-relaxed font-normal">
+                        &ldquo;{buyerReview.description}&rdquo;
+                      </p>
+                    )}
+
+                    <div className="space-y-4 pt-1">
+                      {[
+                        {
+                          label: "Seller communication level",
+                          ques: "How responsive and clear was the communication throughout the order?",
+                          score: Number(buyerReview.communicationRating || buyerReview.communication || buyerReview.star || 0),
+                        },
+                        {
+                          label: "Quality of delivery",
+                          ques: "Did the completed work meet your requirements and expectations?",
+                          score: Number(buyerReview.qualityRating || buyerReview.quality || buyerReview.star || 0),
+                        },
+                        {
+                          label: "Service as described",
+                          ques: "Did the delivered work match the gig package description?",
+                          score: Number(buyerReview.valueRating || buyerReview.service || buyerReview.star || 0),
+                        },
+                      ].map((crit, idx) => (
+                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div className="flex flex-col">
+                            <span className="text-sm sm:text-[15px] font-bold text-[#1a1a1a]">
+                              {crit.label}
+                            </span>
+                            <span className="text-xs text-[#8c8c8c] mt-0.5">
+                              {crit.ques}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 self-start sm:self-center">
+                            <div className="flex items-center gap-1 text-base">
+                              {[1, 2, 3, 4, 5].map((s) => (
+                                <span
+                                  key={s}
+                                  className={
+                                    s <= Math.round(crit.score)
+                                      ? "text-[#F5B400]"
+                                      : "text-[#E0E0E0]"
+                                  }
+                                >
+                                  ★
+                                </span>
+                              ))}
+                            </div>
+                            <span className="text-sm font-bold text-[#1a1a1a] min-w-[28px] text-right">
+                              {crit.score.toFixed(1)}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-6 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] text-center">
+                    <p className="text-sm text-slate-500">
+                      The buyer has not left a review yet. Reviews will automatically show here once submitted.
+                    </p>
+                  </div>
+                )}
               </div>
-              <Button
-                type="button"
-                variant="dark"
-                size="md"
-                radius="fiverr"
-                onClick={() => setIsLedgerOpen(true)}
-                rightIcon={<FiArrowRight className="text-sm" />}
-                className="w-full sm:w-auto shrink-0 shadow-xs"
-              >
-                View Full Ledger
-              </Button>
-            </div>
+            )}
 
           </div>
 
           {/* RIGHT COLUMN (Sidebar): Buyer Profile + Order Details */}
-          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-20 self-start">
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-20 self-start max-w-[500px]">
 
-            {/* Buyer Profile Card */}
-            <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-sm p-6">
-              <h3 className="font-bold text-base text-slate-900 mb-4">Buyer Information</h3>
-
-              <div className="flex items-center gap-3.5 pb-4 border-b border-slate-100">
-                <img
-                  src={order.buyer.avatar || "/media/noavatar.png"}
-                  alt={order.buyer.name}
-                  className="w-12 h-12 rounded-full object-cover border border-slate-200 shrink-0"
-                />
-                <div>
-                  <p className="font-bold text-sm text-slate-900">{order.buyer.name}</p>
-                  <p className="text-xs text-slate-500">Client</p>
-                </div>
-              </div>
-
-              <div className="py-4 space-y-2.5 text-xs border-b border-slate-100">
-                {order.buyer.country && (
-                  <div className="flex justify-between text-slate-600">
-                    <span>From</span>
-                    <span className="font-semibold text-slate-900">{order.buyer.country}</span>
-                  </div>
-                )}
-                {order.buyer.joinedDate && (
-                  <div className="flex justify-between text-slate-600">
-                    <span>Member Since</span>
-                    <span className="font-semibold text-slate-900">{order.buyer.joinedDate}</span>
-                  </div>
-                )}
-              </div>
-
-              <Button
-                type="button"
-                variant="dark"
-                size="md"
-                fullWidth
-                radius="fiverr"
-                disabled={isContacting}
-                isLoading={isContacting}
-                leftIcon={<FiMessageSquare className="text-base" />}
-                onClick={handleContact}
-                className="mt-4 shadow-xs font-semibold"
-              >
-                Message Buyer
-              </Button>
-            </div>
-
-            {/* Order Details & Earnings Card */}
+            {/* Order Details Card */}
             <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-base text-slate-900">Order Summary</h3>
+                <h3 className="font-bold text-base text-slate-900">Order Details</h3>
                 <span className="text-[11px] font-semibold text-slate-600 border border-slate-200 rounded-[6px] px-2 py-0.5">
                   Package
                 </span>
@@ -925,56 +828,77 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                 </p>
               </div>
 
-              {/* Financial breakdown */}
-              <div className="py-4 space-y-2.5 text-xs border-b border-slate-100">
-                <div className="flex justify-between text-slate-600">
-                  <span>Order Total Price</span>
-                  <span className="font-semibold text-slate-900">${order.price.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-slate-600">
-                  <span>Platform Fee ({commissionRate}%)</span>
-                  <span className="text-rose-600 font-medium">-${platformFee.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between pt-2 border-t border-slate-100 text-sm font-bold text-slate-900">
-                  <span>Your Net Earnings</span>
-                  <span className="text-emerald-600 font-extrabold">${netEarnings}</span>
+              {/* Buyer Profile Row */}
+              <div className="flex items-center gap-3.5 pb-4 mt-4">
+                <img
+                  src={order.buyer.avatar || "/media/noavatar.png"}
+                  alt={order.buyer.name}
+                  className="w-12 h-12 rounded-full object-cover border border-[#f5f5f5]"
+                />
+                <div>
+                  <p className="font-bold text-sm text-slate-900">{order.buyer.name}</p>
+                  <span className="text-xs text-slate-500">Client</span>
+                  {order.buyer.country && (
+                    <p className="text-xs text-slate-400 mt-0.5">{order.buyer.country}</p>
+                  )}
                 </div>
               </div>
 
-              {/* Escrow Clearance Schedule */}
-              <div className="py-3 border-b border-slate-100 text-xs">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-slate-600 font-medium">Escrow Clearance</span>
-                  {isCleared ? (
-                    <span className="text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">
-                      Cleared
-                    </span>
-                  ) : isCompleted ? (
-                    <span className="text-[11px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full border border-amber-200">
-                      Holding Period
-                    </span>
-                  ) : (
-                    <span className="text-[11px] font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded-full border border-sky-200">
-                      In Escrow
-                    </span>
-                  )}
+              <div className="w-full max-w-sm rounded-[6px] border border-[rgba(0, 0, 0, 0.10)] bg-[#f5f5f5] divide-y divide-neutral-200 overflow-hidden text-sm">
+                {/* Order Number */}
+                <div className="flex items-center justify-between px-5 py-4">
+                  <span className="text-[#6E6E6E] font-inter text-[14px]">Order number</span>
+                  <span className="text-[#292929] text-[14px] font-inter font-semibold">#{order.orderCode}</span>
                 </div>
-                <div className="text-[11.5px] text-slate-500">
-                  {isCleared ? (
-                    <span className="text-emerald-700 font-semibold flex items-center gap-1">
-                      <FiCheckCircle className="text-emerald-600" />
-                      Funds cleared {clearedAt ? `(${moment(clearedAt).format("MMM DD, YYYY")})` : "to balance"}
-                    </span>
-                  ) : clearsAt ? (
-                    <span className="text-amber-700 font-semibold">
-                      Clears {moment(clearsAt).format("MMM DD, YYYY")}{" "}
-                      <span className="text-slate-400 font-normal">({moment(clearsAt).fromNow()})</span>
-                    </span>
-                  ) : isCompleted ? (
-                    <span className="text-slate-500">Pending standard clearance window</span>
-                  ) : (
-                    <span className="text-slate-400">Holding period starts upon order completion</span>
-                  )}
+
+                {/* Status */}
+                <div className="flex items-center justify-between px-5 py-4">
+                  <span className="text-[#6E6E6E] font-inter text-[14px]">Status</span>
+                  <Tag variant={order.status === 'paid' ? 'inprogress' : order.status} size="sm">
+                    {order.status === 'paid' ? 'Inprogress' : undefined}
+                  </Tag>
+                </div>
+
+                {/* Started on */}
+                <div className="flex items-center justify-between px-5 py-4">
+                  <span className="text-[#6E6E6E] font-inter text-[14px]">Started on</span>
+                  <span className="text-[#292929] text-[14px] font-inter font-semibold">{order.startedOn}</span>
+                </div>
+
+                {/* Delivery time */}
+                <div className="flex items-center justify-between px-5 py-4">
+                  <span className="text-[#6E6E6E] font-inter text-[14px]">Delivery time</span>
+                  <span className="text-[#292929] text-[14px] font-inter font-semibold">{order.deliveryTime}</span>
+                </div>
+
+                {/* Total Price */}
+                <div className="flex items-center justify-between px-5 py-4">
+                  <span className="text-[#6E6E6E] font-inter text-[14px]">Total</span>
+                  <span className="text-[#000] text-[16px] font-inter font-semibold">
+                    ${order.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+
+                {/* Platform Fee */}
+                <div className="flex items-center justify-between px-5 py-4">
+                  <span className="text-[#6E6E6E] font-inter text-[14px]">Platform Fee ({commissionRate}%)</span>
+                  <span className="text-rose-600 font-medium font-inter text-[14px]">-${platformFee.toFixed(2)}</span>
+                </div>
+
+                {/* Net Earnings */}
+                <div className="flex items-center justify-between px-5 py-4">
+                  <span className="text-[#6E6E6E] font-inter text-[14px]">Your Net Earnings</span>
+                  <span className="text-[#0D6D5F] text-[16px] font-inter font-bold">
+                    ${netEarnings}
+                  </span>
+                </div>
+
+                {/* Escrow Clearance Schedule */}
+                <div className="flex items-center justify-between px-5 py-4">
+                  <span className="text-[#6E6E6E] font-inter text-[14px]">Escrow Clearance</span>
+                  <Tag variant={isCleared ? "completed" : "pending"} size="sm">
+                    {isCleared ? "Cleared" : clearsAt ? `Clears ${moment(clearsAt).fromNow()}` : "In Escrow"}
+                  </Tag>
                 </div>
               </div>
 
@@ -990,40 +914,68 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
               >
                 View Escrow Ledger
               </Button> */}
-
-              {/* Delivery Duration & Dates */}
-              <div className="pt-4 space-y-2 text-xs text-slate-600">
-                <div className="flex justify-between">
-                  <span>Delivery Date</span>
-                  <span className="font-semibold text-slate-900">{order.deliveryTime}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Order Number</span>
-                  <span className="font-mono text-slate-900">#{order.orderCode}</span>
-                </div>
-              </div>
             </div>
 
-            {/* Resolution Center Card */}
-            {!isCompleted && !isCancelled && !isDisputed && (
-              <div className="bg-slate-50 border border-slate-200/80 rounded-[6px] p-5 text-center">
-                <h4 className="font-bold text-xs sm:text-sm text-slate-800">Resolution Center</h4>
-                <p className="text-xs text-slate-500 mt-1 mb-3">
-                  Need more time or need help resolving an issue with this order?
-                </p>
+            {/* Quick actions Card */}
+            <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-sm p-6">
+              <h3 className="font-bold text-base text-slate-900 mb-4">Quick actions</h3>
+
+              <div className="flex flex-col gap-3">
+                {!isCompleted && !isCancelled && !isDisputed && !isDelivered && (
+                  <Button
+                    type="button"
+                    variant="brand"
+                    size="md"
+                    radius="fiverr"
+                    fullWidth
+                    leftIcon={<FiUploadCloud className="text-lg" />}
+                    onClick={() => setShowDeliverModal(true)}
+                    className="font-bold"
+                  >
+                    Deliver Completed Work
+                  </Button>
+                )}
+
+                {!isCompleted && !isCancelled && !isDisputed && !isDelivered && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="md"
+                    radius="fiverr"
+                    fullWidth
+                    onClick={() => setIsExtensionModalOpen(true)}
+                  >
+                    Ask for Time Extension
+                  </Button>
+                )}
+
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="soft"
                   size="md"
-                  fullWidth
                   radius="fiverr"
-                  onClick={() => setIsExtensionModalOpen(true)}
-                  className="bg-white hover:bg-slate-100"
+                  fullWidth
+                  disabled={isContacting}
+                  isLoading={isContacting}
+                  leftIcon={<FiMessageSquare className="text-base" />}
+                  onClick={handleContact}
                 >
-                  Ask for Time Extension
+                  Message Buyer
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="dark"
+                  size="md"
+                  radius="fiverr"
+                  fullWidth
+                  onClick={() => setIsLedgerOpen(true)}
+                  rightIcon={<FiArrowRight className="text-sm" />}
+                >
+                  View Activity Ledger
                 </Button>
               </div>
-            )}
+            </div>
 
           </div>
         </div>
@@ -1111,13 +1063,34 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                         key={i}
                         className="flex items-center justify-between p-2.5 rounded-[6px] bg-slate-50 border border-slate-200 text-xs"
                       >
-                        <span className="font-semibold text-slate-800 truncate max-w-[280px]">{f.name}</span>
-                        <span className="text-slate-400">{f.size}</span>
+                        <span className="font-semibold text-slate-800 truncate max-w-[240px] sm:max-w-[280px]">{f.name}</span>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-slate-400">{f.size}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFile(i)}
+                            className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-colors cursor-pointer"
+                            title="Remove attachment"
+                            aria-label={`Remove ${f.name}`}
+                          >
+                            <FiX size={15} />
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
+
+              {/* Warning if no attachment added */}
+              {uploadedFiles.length === 0 && (
+                <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-[6px] bg-[rgba(239, 252, 250, 0.50)] border border-[rgba(0, 0, 0, 0.10)] text-amber-800 text-xs">
+                  <FiAlertCircle className="text-amber-600 text-base shrink-0" />
+                  <span>
+                    No attachments added. Please make sure to attach your deliverables before sending delivery.
+                  </span>
+                </div>
+              )}
 
               <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 pt-3">
                 <Button
@@ -1133,12 +1106,11 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                 </Button>
                 <Button
                   type="submit"
-                  variant="brand"
+                  variant="dark"
                   size="md"
                   radius="fiverr"
                   disabled={isSubmittingDelivery || isUploading}
                   isLoading={isSubmittingDelivery}
-                  rightIcon={<FiCheck />}
                   className="w-full sm:w-auto sm:flex-1 font-bold shadow-md"
                 >
                   Send Delivery

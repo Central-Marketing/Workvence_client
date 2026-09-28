@@ -525,8 +525,8 @@ function SearchPageContent() {
               type="button"
               onClick={() => handleCategorySelect("")}
               className={`flex items-center gap-[8px] pl-[12px] pr-[14px] py-[6px] rounded-[4px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer active:scale-95 ${!selectedCategory
-                  ? "bg-[#0D6D5F] text-white shadow-sm ring-1 ring-emerald-400/50"
-                  : "bg-white/10 hover:bg-white/20 backdrop-blur-[50px] text-white"
+                ? "bg-[#0D6D5F] text-white shadow-sm ring-1 ring-emerald-400/50"
+                : "bg-white/10 hover:bg-white/20 backdrop-blur-[50px] text-white"
                 }`}
             >
               <Layers className="w-3.5 h-3.5 shrink-0" />
@@ -542,8 +542,8 @@ function SearchPageContent() {
                   type="button"
                   onClick={() => handleCategorySelect(isActive ? "" : cat.slug)}
                   className={`flex items-center gap-[10px] pl-[10px] pr-[12px] py-[6px] rounded-[4px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer active:scale-95 ${isActive
-                      ? "bg-[#0D6D5F] text-white shadow-sm ring-1 ring-emerald-400/50"
-                      : "bg-white/10 hover:bg-white/20 backdrop-blur-[50px] text-white"
+                    ? "bg-[#0D6D5F] text-white shadow-sm ring-1 ring-emerald-400/50"
+                    : "bg-white/10 hover:bg-white/20 backdrop-blur-[50px] text-white"
                     }`}
                 >
                   {getCategoryIcon(cat.icon, cat.name)}
@@ -617,21 +617,18 @@ function SearchPageContent() {
           </div>
 
           {/* Table Container Card */}
-          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-4 sm:p-6 md:p-8 space-y-6">
+          <div className="bg-[#f5f5f5] rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-4 sm:p-6 md:p-8 space-y-6">
             <div className="flex items-center justify-between border-b border-gray-100 pb-4">
               <div className="flex items-center gap-2">
-                <Layers className="w-4 h-4 text-[#0D6D5F]" />
                 <h2 className="text-sm sm:text-base font-bold text-gray-900 font-sf-pro">
                   Services Table View
                 </h2>
               </div>
-              <span className="text-xs text-gray-400 font-medium">
-                Click any row to open service
-              </span>
+
             </div>
 
             {/* Responsive Table Wrapper */}
-            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
+            <div className="w-full bg-white shadow-sm overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
               <table className="w-full text-left text-sm border-collapse min-w-[760px]">
                 <thead>
                   <tr className="text-xs font-bold text-gray-800 border-b border-gray-100 uppercase tracking-wider">
@@ -896,7 +893,7 @@ function SearchPageContent() {
                               variant="dark"
                               size="sm"
                               radius="md"
-                              className="bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs px-3.5 py-1.5 font-medium shadow-2xs group-hover:shadow transition-all inline-flex items-center gap-1.5"
+                              className=""
                             >
                               <span>View Details</span>
                               <ArrowRight className="w-3.5 h-3.5" />

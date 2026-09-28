@@ -47,12 +47,12 @@ const staticFooterColumns: FooterColumn[] = [
     title: "About",
     links: [
       // { name: "Careers", href: "/careers" },
-      { name: "Press & News", href: "/press" },
+      // { name: "Press & News", href: "/press" },
       { name: "Partnerships", href: "/partnerships" },
       { name: "Privacy Policy", href: "/privacy" },
       { name: "Terms of Service", href: "/terms" },
       { name: "Intellectual Property Claims", href: "/intellectual-property" },
-      { name: "Investor Relations", href: "/investor-relations" },
+      // { name: "Investor Relations", href: "/investor-relations" },
     ]
   },
   {
@@ -61,23 +61,23 @@ const staticFooterColumns: FooterColumn[] = [
       { name: "Help & Support", href: "/help-center" },
       { name: "Trust & Safety", href: "/trust-safety" },
       { name: "How Escrow Works", href: "/how-escrow-works" },
-      { name: "Selling on Workvence", href: "/how-to-sell" },
-      { name: "Buying on Workvence", href: "/how-to-buy" },
+      // { name: "Selling on Workvence", href: "/how-to-sell" },
+      // { name: "Buying on Workvence", href: "/how-to-buy" },
     ]
   },
   {
     title: "Community",
     links: [
       // { name: "Customer Success Stories", href: "/success-stories" },
-      { name: "Community Hub", href: "/community" },
-      { name: "Forum", href: "/forum" },
+      // { name: "Community Hub", href: "/community" },
+      // { name: "Forum", href: "/forum" },
       { name: "Events", href: "/events" },
       { name: "Blog", href: "/blog" },
-      { name: "Influencers", href: "/influencers" },
-      { name: "Affiliates", href: "/affiliates" },
+      // { name: "Influencers", href: "/influencers" },
+      // { name: "Affiliates", href: "/affiliates" },
       // { name: "Podcast", href: "/podcast" },
       // { name: "Invite a Friend", href: "/invite" },
-      { name: "Become a Seller", href: "/become-a-seller" },
+      // { name: "Become a Seller", href: "/become-a-seller" },
       // { name: "Community Standards", href: "/community-standards" },
     ]
   },

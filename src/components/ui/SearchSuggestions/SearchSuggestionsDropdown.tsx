@@ -89,27 +89,19 @@ export const SearchSuggestionsDropdown: React.FC<SearchSuggestionsDropdownProps>
                 e.preventDefault();
                 onSelect(item);
               }}
-              className={`px-3.5 py-2.5 flex items-center justify-between cursor-pointer transition-colors group ${
-                isSelected ? 'bg-teal-50/70 text-teal-800 font-medium' : 'hover:bg-gray-50 text-gray-700'
-              }`}
+              className={`px-3.5 py-2.5 flex items-center justify-between cursor-pointer transition-colors group ${isSelected ? 'bg-teal-50/70 text-teal-800 font-medium' : 'hover:bg-gray-50 text-gray-700'
+                }`}
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
-                {isCategory ? (
-                  <FiFolder className={`text-base shrink-0 ${isSelected ? 'text-teal-700' : 'text-[#327C73]'}`} />
-                ) : (
-                  <RiSearchLine className={`text-base shrink-0 ${isSelected ? 'text-teal-700' : 'text-gray-400 group-hover:text-gray-600'}`} />
-                )}
+
+                <RiSearchLine className={`text-base shrink-0 ${isSelected ? 'text-teal-700' : 'text-gray-400 group-hover:text-gray-600'}`} />
 
                 <span className="text-[13px] sm:text-[14px] truncate">
                   {highlightMatch(item.text, query)}
                 </span>
               </div>
 
-              {isCategory && (
-                <span className="ml-2 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-[4px] bg-teal-50 text-teal-800 border border-teal-100/80 shrink-0">
-                  Category
-                </span>
-              )}
+
             </div>
           );
         })}
@@ -123,11 +115,10 @@ export const SearchSuggestionsDropdown: React.FC<SearchSuggestionsDropdownProps>
                 e.preventDefault();
                 handleSeeMore();
               }}
-              className={`w-full py-2.5 px-3 rounded-[6px] text-xs sm:text-[13px] font-semibold flex items-center justify-between gap-2.5 transition-all cursor-pointer ${
-                isSeeMoreSelected
-                  ? 'bg-[#0D6D5F] text-white shadow-sm'
-                  : 'text-[#0D6D5F] hover:bg-emerald-50/80 bg-white border border-gray-200/80 hover:border-emerald-300'
-              }`}
+              className={`w-full py-2.5 px-3 rounded-[6px] text-xs sm:text-[13px] font-semibold flex items-center justify-between gap-2.5 transition-all cursor-pointer ${isSeeMoreSelected
+                ? 'bg-[#0D6D5F] text-white shadow-sm'
+                : 'text-[#0D6D5F] hover:bg-[#EDEDED] bg-white border border-gray-200/80 hover:border-[rgba(0, 0, 0, 0.10)] hover:text-black'
+                }`}
             >
               <div className="flex items-center gap-2 min-w-0 flex-1">
                 <RiSearchLine className={`text-sm shrink-0 ${isSeeMoreSelected ? 'text-white' : 'text-[#0D6D5F]'}`} />

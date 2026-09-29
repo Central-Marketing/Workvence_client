@@ -174,7 +174,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           )}
 
           {/* 4-Metric Stats Bar */}
-          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 gap-y-5 sm:gap-y-0">
+          <div className="bg-[#f5f5f5] rounded-[6px] border border-[#DADADA] shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 gap-y-5 sm:gap-y-0">
             <div className="sm:pr-6">
               <span className="text-xs font-normal text-gray-500 block mb-1">Total Revenue</span>
               <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">

@@ -3,7 +3,7 @@
 import toast from 'react-hot-toast';
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, Flag, ArrowRight, Download, Eye } from "lucide-react";
+import { ArrowLeft, Flag, ArrowRight, Download, Eye, Home } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BsThreeDotsVertical } from "react-icons/bs";
 
@@ -1711,7 +1711,11 @@ const ChatView = () => {
             <aside className={`w-[300px] min-w-[280px] md:w-[320px] lg:w-[340px] xl:w-[350px] border-r border-[rgba(0,0,0,0.10)] flex flex-col bg-[var(--Foundation-White-white-200,#F8F8F8)] overflow-hidden box-border transform transition-transform duration-300 ease-in-out max-md:absolute max-md:z-40 max-md:w-[320px] max-md:h-full max-md:shadow-xl max-md:flex ${isLeftSideOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'}`}>
               {/* Header: Back Button + Messages Heading */}
               <div className="p-4 sm:p-5 pb-3 flex flex-col gap-3.5 border-b border-slate-100">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 justify-between">
+
+                  <h2 className="text-[24px] sm:text-[26px] md:text-[28px] lg:text-[30px] macbook:text-[32px] 2xl:text-[36px] font-normal leading-tight tracking-tight text-[#292929] font-sf-pro">
+                    Messages
+                  </h2>
                   <Button
                     type="button"
                     variant="outline"
@@ -1721,14 +1725,11 @@ const ChatView = () => {
                       const targetDashboard = user?.isSeller ? '/dashboard/seller' : '/dashboard/buyer';
                       navigate.push(targetDashboard);
                     }}
-                    className="w-9 h-9 min-h-[36px] !p-0 border-slate-200 text-[#126D6B] bg-white hover:bg-slate-50 shrink-0"
+                    className="w-9 h-9 min-h-[36px] !p-0 border !border-[rgba(0,0,0,0.10)] text-[#126D6B] bg-white hover:bg-slate-50 shrink-0"
                     aria-label="Back to Dashboard"
                     title="Back to Dashboard"
-                    icon={<ArrowLeft className="w-4 h-4 text-slate-700" />}
+                    icon={<Home className="w-4 h-4 text-brand-green" />}
                   />
-                  <h2 className="text-[24px] sm:text-[26px] md:text-[28px] lg:text-[30px] macbook:text-[32px] 2xl:text-[36px] font-normal leading-tight tracking-tight text-[#292929] font-sf-pro">
-                    Messages
-                  </h2>
                 </div>
 
                 {/* Search Bar */}
@@ -2947,7 +2948,7 @@ const ChatView = () => {
                     <div className="flex xl:hidden bg-white rounded-[6px] p-4 border border-slate-200/80 shadow-xs flex-col gap-2.5">
                       <div className="flex items-center justify-between">
                         <span className="text-base sm:text-[17px] font-bold text-slate-800 tracking-tight">Quick Actions</span>
-                        
+
                       </div>
 
                       {user?.isSeller && (

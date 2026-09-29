@@ -325,7 +325,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
       : null);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pt-6 sm:pt-8 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+    <div className="min-h-screen bg-[#F8F8F8] pt-6 sm:pt-8 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6">
 
         {/* Top Breadcrumb */}
@@ -338,8 +338,8 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                   className="text-gray-600 hover:text-gray-900 hover:underline transition-colors font-normal inline-flex items-center gap-1 p-0 h-auto bg-transparent border-0 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 rounded-xs"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M2.5 9.99101V12.083C2.5 14.8328 2.5 16.2078 3.35427 17.0621C4.20854 17.9163 5.58347 17.9163 8.33333 17.9163H11.6667C14.4165 17.9163 15.7914 17.9163 16.6457 17.0621C17.5 16.2078 17.5 14.8328 17.5 12.083V9.99101C17.5 8.58992 17.5 7.88945 17.2034 7.28305C16.9068 6.67665 16.3539 6.24657 15.248 5.38643L13.5813 4.09013C11.8609 2.75205 11.0007 2.08301 10 2.08301C8.99925 2.08301 8.13908 2.75205 6.41868 4.09013L4.75201 5.38643C3.64611 6.24657 3.09316 6.67665 2.79658 7.28305C2.5 7.88945 2.5 8.58992 2.5 9.99101Z" stroke="#1A9997" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M13.3334 14.167H6.66675" stroke="#1A9997" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M2.5 9.99101V12.083C2.5 14.8328 2.5 16.2078 3.35427 17.0621C4.20854 17.9163 5.58347 17.9163 8.33333 17.9163H11.6667C14.4165 17.9163 15.7914 17.9163 16.6457 17.0621C17.5 16.2078 17.5 14.8328 17.5 12.083V9.99101C17.5 8.58992 17.5 7.88945 17.2034 7.28305C16.9068 6.67665 16.3539 6.24657 15.248 5.38643L13.5813 4.09013C11.8609 2.75205 11.0007 2.08301 10 2.08301C8.99925 2.08301 8.13908 2.75205 6.41868 4.09013L4.75201 5.38643C3.64611 6.24657 3.09316 6.67665 2.79658 7.28305C2.5 7.88945 2.5 8.58992 2.5 9.99101Z" stroke="#1A9997" strokeWidth="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M13.3334 14.167H6.66675" stroke="#1A9997" strokeWidth="1.5" stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </Link>
               </li>
@@ -402,9 +402,9 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                 <div className="flex items-center gap-2">
                   {isLate ? (
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#E11D48" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                      <path d="M12 16V12" stroke="#E11D48" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                      <path d="M11.875 8.25H12M11.75 8.25C11.75 8.11193 11.8619 8 12 8C12.1381 8 12.25 8.11193 12.25 8.25C12.25 8.38807 12.1381 8.5 12 8.5C11.8619 8.5 11.75 8.38807 11.75 8.25Z" stroke="#E11D48" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#E11D48" strokeWidth="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M12 16V12" stroke="#E11D48" strokeWidth="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M11.875 8.25H12M11.75 8.25C11.75 8.11193 11.8619 8 12 8C12.1381 8 12.25 8.11193 12.25 8.25C12.25 8.38807 12.1381 8.5 12 8.5C11.8619 8.5 11.75 8.38807 11.75 8.25Z" stroke="#E11D48" strokeWidth="1.5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                   ) : (
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -501,8 +501,8 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     className="w-full"
                     icon={
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M18.5 12H5" stroke="#292929" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                        <path d="M13 18C13 18 19 13.5811 19 12C19 10.4188 13 6 13 6" stroke="#292929" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M18.5 12H5" stroke="#292929" strokeWidth="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M13 18C13 18 19 13.5811 19 12C19 10.4188 13 6 13 6" stroke="#292929" strokeWidth="1.5" stroke-linecap="round" stroke-linejoin="round" />
                       </svg>
 
                     }

@@ -281,8 +281,8 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
             <hr className="border-[rgba(0, 0, 0, 0.10)] my-10" />
 
             {/* Orders Table */}
-            <div className="w-full shadow-md overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] ">
-              <table className="w-full text-left text-sm border-collapse min-w-[700px] bg-white rounded-[6px]">
+            <div className="w-full shadow-md overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] ">
+              <table className="w-full text-left text-sm border-collapse min-w-[700px] ">
                 <thead className="">
                   <tr className="text-xs font-bold text-gray-700 border-b border-gray-100">
                     <th className="py-3.5 px-3 font-bold">Order Name</th>

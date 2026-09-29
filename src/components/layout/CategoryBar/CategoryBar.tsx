@@ -10,9 +10,10 @@ import { Button } from '@/components/ui';
 
 interface CategoryBarProps {
   visible: boolean;
+  className?: string;
 }
 
-const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
+const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible, className = "" }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentCategory = searchParams?.get('category') || '';
@@ -118,12 +119,11 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
 
   return (
     <div
-      className={`w-full bg-white/98 backdrop-blur-md transition-all duration-300 overflow-hidden ${
-        isBarVisible ? 'max-h-16 opacity-100 visible border-t border-gray-100' : 'max-h-0 opacity-0 invisible pointer-events-none border-none'
-      }`}
+      className={`w-full bg-transparent transition-all duration-300 overflow-hidden ${isBarVisible ? 'max-h-16 opacity-100 visible' : 'max-h-0 opacity-0 invisible pointer-events-none border-none'
+        } ${className}`}
     >
       <div className="w-full container mx-auto px-4 md:px-6 flex items-center justify-between gap-2.5 py-2.5 relative">
-        
+
         {/* Left Scroll Arrow Button */}
         <div className={`transition-opacity duration-200 shrink-0 ${canScrollLeft ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none w-0'}`}>
           <Button
@@ -152,11 +152,10 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible }) => {
               <Link
                 key={cat.slug}
                 href={`/packages?category=${encodeURIComponent(cat.slug)}`}
-                className={`px-4 py-1.5 rounded-full font-sf-pro font-medium text-[13px] sm:text-[14px] whitespace-nowrap transition-colors shrink-0 ${
-                  isActive
-                    ? 'border border-[#327C73] bg-[#E8F8F5] text-[#1E293B]'
-                    : 'bg-[#F4F4F6] text-[#4A4A4A] hover:bg-[#EAEAEF] hover:text-[#111111]'
-                }`}
+                className={`px-4 py-1.5 rounded-full font-sf-pro font-medium text-[13px] sm:text-[14px] whitespace-nowrap transition-colors shrink-0 ${isActive
+                  ? 'border border-[#327C73] bg-brand-green text-white'
+                  : 'bg-[#F4F4F6] text-[#4A4A4A] hover:bg-[#EAEAEF] hover:text-[#111111]'
+                  }`}
               >
                 {cat.name}
               </Link>

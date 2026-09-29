@@ -20,11 +20,11 @@ export const PackageSectionNav: React.FC<PackageSectionNavProps> = ({
   const storeUser = useUserStore((state) => state.user);
   const isUserSeller = isSeller !== undefined ? isSeller : Boolean(storeUser?.isSeller);
 
-  const sections = [
+  const sections: Array<{ id: string; label: string; badge?: number }> = [
     { id: "section-about", label: "About" },
     { id: "section-seller", label: "Seller Info" },
     { id: "section-packages", label: "Packages" },
-    { id: "section-reviews", label: "Review", badge: reviewCount },
+    { id: "section-reviews", label: "Review" },
     { id: "section-faq", label: "FAQ" },
   ];
 

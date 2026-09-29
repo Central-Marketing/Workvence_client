@@ -310,7 +310,7 @@ export default function BuyerManageOrdersPage() {
               <Loader size={45} />
             </div>
           ) : (
-            <div className="w-full bg-white rounded-[6px] shadow-sm overflow-x-auto">
+            <div className="w-full bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-sm overflow-x-auto">
               <table className="w-full  min-w-[820px] border-collapse text-left">
                 <thead>
                   <tr className="border-b border-slate-100 text-xs sm:text-sm font-bold text-slate-800">
@@ -367,7 +367,7 @@ export default function BuyerManageOrdersPage() {
                         <tr
                           key={order.id}
                           onClick={() => handleRowClick(order.id)}
-                          className="group relative cursor-pointer transition-colors hover:bg-[#F5F5F5]
+                          className="group relative cursor-pointer transition-colors odd:bg-[#F5F5F5]
     after:pointer-events-none after:absolute after:inset-0
      after:border-transparent
     hover:after:border-[rgba(0,0,0,0.10)]"

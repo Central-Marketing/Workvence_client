@@ -313,7 +313,7 @@ const ManageOrders = () => {
             </div>
 
             {/* Orders Table */}
-            <div className="w-full bg-white rounded-[6px] shadow-sm overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
+            <div className="w-full bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-sm overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
               <table className="w-full text-left text-sm border-collapse min-w-[800px]">
                 <thead>
                   <tr className="text-xs font-bold text-gray-800 border-b border-gray-100">
@@ -392,7 +392,7 @@ const ManageOrders = () => {
                           onClick={() => {
                             router.push(`/orders/${order._id}`);
                           }}
-                          className="group relative cursor-pointer transition-colors hover:bg-[#F5F5F5]
+                          className="group relative cursor-pointer transition-colors odd:bg-[#F5F5F5]
     after:pointer-events-none after:absolute after:inset-0
       after:border-transparent
     hover:after:border-[rgba(0,0,0,0.10)]"

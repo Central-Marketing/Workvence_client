@@ -324,7 +324,7 @@ const Navbar = () => {
         className={`w-full sticky top-0 z-50 transition-all duration-300 ${isMobileMenuOpen
           ? pathname === "/" && !showMenu
             ? "bg-[#EDEDED] border-b border-gray-200/40 text-gray-800"
-            : "bg-white border-b border-gray-100 shadow-sm text-gray-800"
+            : "bg-white  shadow-sm text-gray-800"
           : pathname === "/"
             ? showMenu
               ? "bg-white/75 backdrop-blur-md backdrop-saturate-150 border-b border-white/20 shadow-xs text-gray-800"

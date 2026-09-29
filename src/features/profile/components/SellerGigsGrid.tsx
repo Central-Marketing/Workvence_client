@@ -28,7 +28,7 @@ export const SellerGigsGrid: React.FC<SellerGigsGridProps> = ({ gigs }) => {
 
   return (
     <div className="w-full">
-      <div className="grid grid-cols-1 sm:grid-cols-2 min-[1200px]:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 min-[1200px]:grid-cols-2 gap-5">
         {gigs.map((gig, idx) => (
           <PackageCard
             key={gig._id || gig.id || idx}

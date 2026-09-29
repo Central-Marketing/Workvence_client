@@ -54,7 +54,7 @@ const TermsAndConditions = () => {
     <div className="min-h-screen bg-white text-gray-800 pb-[80px] min-[1400px]:pb-[100px] font-inter">
       {/* Category Bar */}
       <div className="sticky top-0 z-20 shadow-2xs">
-        <CategoryBar visible={true} />
+        <CategoryBar visible={true} className="bg-white/98 backdrop-blur-md" />
       </div>
 
       <div className="container mx-auto px-4 md:px-6 pt-10">

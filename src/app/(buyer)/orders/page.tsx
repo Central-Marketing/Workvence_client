@@ -388,7 +388,7 @@ export default function BuyerOrdersPage() {
             <OrdersTableSkeleton />
           ) : (
             <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] rounded-[6px]">
-              <table className="w-full bg-white rounded-[6px] min-w-[760px] border-collapse text-left">
+              <table className="w-full bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] min-w-[760px] border-collapse text-left">
                 <thead className="">
                   <tr className="border-b border-slate-100 text-xs sm:text-sm font-bold text-slate-700">
                     <th className="py-3.5 px-3 font-bold">Order Name</th>

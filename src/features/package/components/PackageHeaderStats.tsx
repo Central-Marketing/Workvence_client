@@ -69,11 +69,11 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
           },
           ...(subcategoryName
             ? [
-                {
-                  name: subcategoryName,
-                  isLast: true,
-                },
-              ]
+              {
+                name: subcategoryName,
+                isLast: true,
+              },
+            ]
             : []),
         ]}
       />
@@ -163,9 +163,8 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
 
             <span className="inline-flex items-center gap-1.5 font-sf-pro text-base not-italic leading-normal">
               <span
-                className={`w-2 h-2 rounded-full shrink-0 ${
-                  sellerStatus.isOnline ? "bg-[#10B981]" : "bg-gray-300"
-                }`}
+                className={`w-2 h-2 rounded-full shrink-0 ${sellerStatus.isOnline ? "bg-[#10B981]" : "bg-gray-300"
+                  }`}
               />
               <span
                 className={
@@ -177,8 +176,8 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
                 {sellerStatus.isOnline
                   ? "Online"
                   : sellerStatus.lastSeenText
-                  ? sellerStatus.lastSeenText
-                  : "Offline"}
+                    ? sellerStatus.lastSeenText
+                    : "Offline"}
               </span>
             </span>
           </div>
@@ -212,230 +211,53 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
       </div>
 
       {/* 4. Seller Stats */}
-      <div className="w-full mb-6 overflow-hidden rounded-[6px] border border-[#DADADA] bg-[#F5F5F5] grid grid-cols-2 xl:grid-cols-4">
+      <div className="w-full mb-6 overflow-hidden rounded-[6px] border border-[#DADADA] bg-[#F5F5F5] grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4">
 
         {/* Card 1: Profile Status */}
-        <div className="
-          min-h-[72px]
-          sm:min-h-[80px]
-          xl:h-[84px]
-          px-3
-          min-[480px]:px-3.5
-          sm:px-4
-          lg:px-4
-          xl:px-3.5
-          macbook:px-4
-          2xl:px-5
-          py-3
-          sm:py-3.5
-          xl:py-0
-          flex items-center
-          gap-2
-          sm:gap-2.5
-          lg:gap-2.5
-          xl:gap-2.5
-          macbook:gap-3
-          2xl:gap-4
-          border-b
-          border-r
-          xl:border-b-0
-          border-black/10
-        ">
-          <div className="
-            w-8 h-8
-            sm:w-9 sm:h-9
-            lg:w-8 lg:h-8
-            xl:w-9 xl:h-9
-            2xl:w-10 2xl:h-10
-            rounded-[6px]
-            border border-[#0000001A]
-            bg-[#FAFAFA]
-            text-[#5568AB]
-            flex items-center justify-center
-            shrink-0
-          ">
+        <div className="min-h-[72px] sm:min-h-[80px] xl:h-[84px] px-3 min-[480px]:px-3.5 sm:px-4 lg:px-4 xl:px-3.5 macbook:px-4 2xl:px-5 py-3 sm:py-3.5 xl:py-0 flex items-center gap-2 sm:gap-2.5 lg:gap-2.5 xl:gap-2.5 macbook:gap-3 2xl:gap-4 border-b border-r 2xl:border-b-0 border-black/10">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-8 lg:h-8 xl:w-9 xl:h-9 2xl:w-10 2xl:h-10 rounded-[6px] border border-[#0000001A] bg-[#FAFAFA] text-[#5568AB] flex items-center justify-center shrink-0">
             <BadgeCheck className="w-4 h-4 sm:w-[17px] sm:h-[17px] lg:w-4 lg:h-4 xl:w-[17px] xl:h-[17px] 2xl:w-[18px] 2xl:h-[18px]" />
           </div>
 
           <div className="min-w-0 flex-1">
-            <span className="
-              text-xs
-  macbook:text-[13px]
-  2xl:text-[13px]
-  font-inter
-  font-normal
-  leading-tight
-  text-[#6E6E6E]
-  block
-  truncate
-            ">
+            <span className="text-xs macbook:text-[13px] 2xl:text-[13px] font-inter font-normal leading-tight text-[#6E6E6E] block truncate">
               Profile Status
             </span>
 
-            <span className="
-              text-base
-  
-  font-inter
-  font-bold
-  leading-tight
-  text-black
-  block
-  truncate
-            ">
+            <span className="text-[14px] font-inter font-bold text-black block truncate">
               {seller.verified ? "Verified" : "Active"}
             </span>
           </div>
         </div>
 
         {/* Card 2: Response Time */}
-        <div className="
-          min-h-[72px]
-          sm:min-h-[80px]
-          xl:h-[84px]
-          px-3
-          min-[480px]:px-3.5
-          sm:px-4
-          lg:px-4
-          xl:px-3.5
-          macbook:px-4
-          2xl:px-5
-          py-3
-          sm:py-3.5
-          xl:py-0
-          flex items-center
-          gap-2
-          sm:gap-2.5
-          lg:gap-2.5
-          xl:gap-2.5
-          macbook:gap-3
-          2xl:gap-4
-          border-b
-          xl:border-b-0
-          xl:border-r
-          border-black/10
-        ">
-          <div className="
-            w-8 h-8
-            sm:w-9 sm:h-9
-            lg:w-8 lg:h-8
-            xl:w-9 xl:h-9
-            2xl:w-10 2xl:h-10
-            rounded-[6px]
-            border border-[#0000001A]
-            bg-[#FAFAFA]
-            text-[#F57727]
-            flex items-center justify-center
-            shrink-0
-          ">
+        <div className="min-h-[72px] sm:min-h-[80px] xl:h-[84px] px-3 min-[480px]:px-3.5 sm:px-4 lg:px-4 xl:px-3.5 macbook:px-4 2xl:px-5 py-3 sm:py-3.5 xl:py-0 flex items-center gap-2 sm:gap-2.5 lg:gap-2.5 xl:gap-2.5 macbook:gap-3 2xl:gap-4 border-b 2xl:border-b-0 xl:border-r border-black/10">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-8 lg:h-8 xl:w-9 xl:h-9 2xl:w-10 2xl:h-10 rounded-[6px] border border-[#0000001A] bg-[#FAFAFA] text-[#F57727] flex items-center justify-center shrink-0">
             <FiClock className="w-4 h-4 sm:w-[17px] sm:h-[17px] lg:w-4 lg:h-4 xl:w-[17px] xl:h-[17px] 2xl:w-[18px] 2xl:h-[18px]" />
           </div>
 
           <div className="min-w-0 flex-1">
-            <span className="
-              text-[11px]
-              min-[480px]:text-xs
-              sm:text-xs
-              md:text-xs
-              lg:text-[11px]
-              xl:text-xs
-              macbook:text-[13px]
-              2xl:text-sm
-              font-inter
-              text-[#6E6E6E]
-              block
-              font-normal
-              leading-tight
-              truncate
-            ">
+            <span className="text-[11px] min-[480px]:text-xs sm:text-xs md:text-xs lg:text-[11px] xl:text-xs macbook:text-[13px] 2xl:text-sm font-inter text-[#6E6E6E] block font-normal leading-tight truncate">
               Response Time
             </span>
 
-            <span className="
-              text-base
-  font-inter
-  font-bold
-  leading-tight
-  text-black
-  block
-  truncate
-            ">
+            <span className="text-base font-inter font-bold leading-tight text-black block truncate">
               {seller.responseTime}
             </span>
           </div>
         </div>
 
         {/* Card 3: Category */}
-        <div className="
-          min-h-[72px]
-          sm:min-h-[80px]
-          xl:h-[84px]
-          px-3
-          min-[480px]:px-3.5
-          sm:px-4
-          lg:px-4
-          xl:px-3.5
-          macbook:px-4
-          2xl:px-5
-          py-3
-          sm:py-3.5
-          xl:py-0
-          flex items-center
-          gap-2
-          sm:gap-2.5
-          lg:gap-2.5
-          xl:gap-2.5
-          macbook:gap-3
-          2xl:gap-4
-          border-r
-          border-black/10
-        ">
-          <div className="
-            w-8 h-8
-            sm:w-9 sm:h-9
-            lg:w-8 lg:h-8
-            xl:w-9 xl:h-9
-            2xl:w-10 2xl:h-10
-            rounded-[6px]
-            border border-[#0000001A]
-            bg-[#FAFAFA]
-            text-[#54AA54]
-            flex items-center justify-center
-            shrink-0
-          ">
+        <div className="min-h-[72px] sm:min-h-[80px] xl:h-[84px] px-3 min-[480px]:px-3.5 sm:px-4 lg:px-4 xl:px-3.5 macbook:px-4 2xl:px-5 py-3 sm:py-3.5 xl:py-0 flex items-center gap-2 sm:gap-2.5 lg:gap-2.5 xl:gap-2.5 macbook:gap-3 2xl:gap-4 border-b md:border-b-0 border-r border-black/10">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-8 lg:h-8 xl:w-9 xl:h-9 2xl:w-10 2xl:h-10 rounded-[6px] border border-[#0000001A] bg-[#FAFAFA] text-[#54AA54] flex items-center justify-center shrink-0">
             <FaAward className="w-4 h-4 sm:w-[17px] sm:h-[17px] lg:w-4 lg:h-4 xl:w-[17px] xl:h-[17px] 2xl:w-[18px] 2xl:h-[18px]" />
           </div>
 
           <div className="min-w-0 flex-1">
-            <span className="
-              text-[11px]
-              min-[480px]:text-xs
-              sm:text-xs
-              md:text-xs
-              lg:text-[11px]
-              xl:text-xs
-              macbook:text-[13px]
-              2xl:text-sm
-              font-inter
-              text-[#6E6E6E]
-              block
-              font-normal
-              leading-tight
-              truncate
-            ">
+            <span className="text-[11px] min-[480px]:text-xs sm:text-xs md:text-xs lg:text-[11px] xl:text-xs macbook:text-[13px] 2xl:text-sm font-inter text-[#6E6E6E] block font-normal leading-tight truncate">
               Category
             </span>
-
-            <span
-              className="
-                text-base
-  
-  font-inter
-  font-bold
-  leading-tight
-  text-black
-  block
-  truncate
-              "
+            <span className="text-base font-inter font-bold leading-tight text-black block truncate"
               title={seller.topRatedIn}
             >
               {seller.topRatedIn}
@@ -444,74 +266,17 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
         </div>
 
         {/* Card 4: Completion */}
-        <div className="
-          min-h-[72px]
-          sm:min-h-[80px]
-          xl:h-[84px]
-          px-3
-          min-[480px]:px-3.5
-          sm:px-4
-          lg:px-4
-          xl:px-3.5
-          macbook:px-4
-          2xl:px-5
-          py-3
-          sm:py-3.5
-          xl:py-0
-          flex items-center
-          gap-2
-          sm:gap-2.5
-          lg:gap-2.5
-          xl:gap-2.5
-          macbook:gap-3
-          2xl:gap-4
-        ">
-          <div className="
-            w-8 h-8
-            sm:w-9 sm:h-9
-            lg:w-8 lg:h-8
-            xl:w-9 xl:h-9
-            2xl:w-10 2xl:h-10
-            rounded-[6px]
-            border border-[#0000001A]
-            bg-[#FAFAFA]
-            text-[#9654F4]
-            flex items-center justify-center
-            shrink-0
-          ">
+        <div className="min-h-[72px] sm:min-h-[80px] xl:h-[84px] px-3 min-[480px]:px-3.5 sm:px-4 lg:px-4 xl:px-3.5 macbook:px-4 2xl:px-5 py-3 sm:py-3.5 xl:py-0 flex items-center gap-2 sm:gap-2.5 lg:gap-2.5 xl:gap-2.5 macbook:gap-3 2xl:gap-4">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-8 lg:h-8 xl:w-9 xl:h-9 2xl:w-10 2xl:h-10 rounded-[6px] border border-[#0000001A] bg-[#FAFAFA] text-[#9654F4] flex items-center justify-center shrink-0">
             <FiRepeat className="w-4 h-4 sm:w-[17px] sm:h-[17px] lg:w-4 lg:h-4 xl:w-[17px] xl:h-[17px] 2xl:w-[18px] 2xl:h-[18px]" />
           </div>
 
           <div className="min-w-0 flex-1">
-            <span className="
-              text-[11px]
-              min-[480px]:text-xs
-              sm:text-xs
-              md:text-xs
-              lg:text-[11px]
-              xl:text-xs
-              macbook:text-[13px]
-              2xl:text-sm
-              font-inter
-              text-[#6E6E6E]
-              block
-              font-normal
-              leading-tight
-              truncate
-            ">
+            <span className="text-[11px] min-[480px]:text-xs sm:text-xs md:text-xs lg:text-[11px] xl:text-xs macbook:text-[13px] 2xl:text-sm font-inter text-[#6E6E6E] block font-normal leading-tight truncate">
               Completion
             </span>
 
-            <span className="
-              text-base
-  
-  font-inter
-  font-bold
-  leading-tight
-  text-black
-  block
-  truncate
-            ">
+            <span className="text-base font-inter font-bold leading-tight text-black block truncate">
               {seller.returnRate || seller.onTimeDelivery || "100%"}
             </span>
           </div>

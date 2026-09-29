@@ -186,9 +186,8 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
             style={{
               top: `calc(var(--navbar-height, ${isSeller ? "82px" : "136px"}) + 12px)`,
             }}
-            className={`lg:col-span-4 sticky self-start z-20 transition-[top] duration-200 ${
-              isSeller ? "top-[74px] md:top-[94px]" : "top-[122px] md:top-[148px]"
-            }`}
+            className={`lg:col-span-5 sticky self-start z-20 transition-[top] duration-200 ${isSeller ? "top-[74px] md:top-[94px]" : "top-[122px] md:top-[148px]"
+              }`}
           >
             <SellerAboutSidebar
               name={profileData.name}
@@ -208,7 +207,7 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
           </div>
 
           {/* Right Column (lg:col-span-8) */}
-          <div className="lg:col-span-8">
+          <div className="lg:col-span-7">
             <SellerGigsGrid gigs={profileData.gigs} />
           </div>
         </div>

@@ -159,7 +159,7 @@ const MyPackages = () => {
               <span
                 className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 ${activeTab === "draft"
                   ? "bg-white/20 text-white"
-                  : "bg-amber-100 text-amber-800"
+                  : "bg-white border border-[rgba(0,0,0,0.10)] text-yellow-600"
                   }`}
               >
                 {draftPackages.length}

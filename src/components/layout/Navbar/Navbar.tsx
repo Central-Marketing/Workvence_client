@@ -15,6 +15,7 @@ import { useUserStore } from "@/store/userStore";
 import { useAuthModalStore } from "@/store/authModalStore";
 import { Loader, NotificationBell, HeaderInboxIcon, AiGradientButton, Button, SearchSuggestionsDropdown } from '@/components';
 import CategoryBar from "../CategoryBar/CategoryBar";
+import ExploreCategoryMegaMenu from "./ExploreCategoryMegaMenu";
 
 const Navbar = () => {
   const navRef = useRef<HTMLElement>(null);
@@ -26,6 +27,41 @@ const Navbar = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isMobileCategoryOpen, setIsMobileCategoryOpen] = useState(false);
+  const categoryTriggerRef = useRef<HTMLButtonElement>(null);
+  const categoryCloseTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleCategoryPointerEnter = () => {
+    if (categoryCloseTimerRef.current) {
+      clearTimeout(categoryCloseTimerRef.current);
+      categoryCloseTimerRef.current = null;
+    }
+    setIsCategoryDropdownOpen(true);
+  };
+
+  const handleCategoryPointerLeave = () => {
+    if (categoryCloseTimerRef.current) {
+      clearTimeout(categoryCloseTimerRef.current);
+    }
+    categoryCloseTimerRef.current = setTimeout(() => {
+      const activeEl = document.activeElement;
+      if (
+        activeEl &&
+        (categoryTriggerRef.current?.contains(activeEl) ||
+          document.querySelector('.category-dropdown-container')?.contains(activeEl))
+      ) {
+        return;
+      }
+      setIsCategoryDropdownOpen(false);
+    }, 200);
+  };
+
+  const handleCategoryClose = () => {
+    if (categoryCloseTimerRef.current) {
+      clearTimeout(categoryCloseTimerRef.current);
+      categoryCloseTimerRef.current = null;
+    }
+    setIsCategoryDropdownOpen(false);
+  };
   const pathname = usePathname();
   const router = useRouter();
   const { user, setUser } = useUserStore();
@@ -50,7 +86,7 @@ const Navbar = () => {
   const hidePostProjectAiButton = isMyBriefsRoute || isCreateBriefRoute;
 
   // Fetch real categories from backend
-  const { categoryList: rawCats, parentCategories } = useAdminCategories();
+  const { categoryList: rawCats, parentCategories, isLoading: isCategoriesLoading } = useAdminCategories();
 
   // Strictly filter to ensure only root categories are displayed in Navbar dropdowns
   const categoryList = (parentCategories && parentCategories.length > 0 ? parentCategories : rawCats)
@@ -410,52 +446,40 @@ const Navbar = () => {
                 {/* Navlinks Group */}
                 <div className="flex items-center font-sf-pro font-[510] text-[14px] xl:text-[15px] 2xl:text-[16px] leading-normal shrink-0">
                   {/* Explore Category Dropdown without extra icons */}
-                  <div className="relative category-dropdown-container">
+                  <div
+                    className="relative lg:static category-dropdown-container"
+                    onPointerEnter={handleCategoryPointerEnter}
+                    onPointerLeave={handleCategoryPointerLeave}
+                  >
                     <Button
+                      ref={categoryTriggerRef}
                       type="button"
                       variant="ghost"
                       size="md"
                       radius="lg"
-                      onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                      className={`flex items-center gap-1 xl:gap-1.5 px-2 xl:px-4 py-[8px] xl:py-[10px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal whitespace-nowrap ${isCategoryDropdownOpen ? "!text-[#327C73]" : "text-black hover:!text-[#327C73]"
-                        }`}
+                      onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
+                      className={`flex items-center gap-1 xl:gap-1.5 px-2 xl:px-4 py-[8px] xl:py-[10px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal whitespace-nowrap cursor-pointer ${
+                        isCategoryDropdownOpen ? "!text-[#327C73]" : "text-black hover:!text-[#327C73]"
+                      }`}
                       rightIcon={
                         <FiChevronDown
-                          className={`text-sm xl:text-base text-[#327C73] transition-transform duration-200 ${isCategoryDropdownOpen ? "rotate-180" : ""
-                            }`}
+                          className={`text-sm xl:text-base text-[#327C73] transition-transform duration-200 ${
+                            isCategoryDropdownOpen ? "rotate-180" : ""
+                          }`}
                         />
                       }
                     >
                       <span>Explore Category</span>
                     </Button>
 
-                    {isCategoryDropdownOpen && (
-                      <div className="absolute left-0 mt-2 w-64 bg-white border border-gray-100 rounded-[6px] shadow-xl py-2 flex flex-col z-[60] text-[14px] text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-                        <div className="px-3.5 py-2 border-b border-gray-100 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-400">
-                          <span>Categories</span>
-                        </div>
-
-                        <div className="max-h-[320px] overflow-y-auto py-1 scrollbar-hide">
-                          {categoryList.length > 0 ? (
-                            categoryList.map((cat: any, index: number) => (
-                              <Link
-                                key={cat.slug || index}
-                                href={`/packages?category=${encodeURIComponent(cat.slug)}`}
-                                onClick={() => setIsCategoryDropdownOpen(false)}
-                                className="px-3.5 py-2.5 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center justify-between group text-sm"
-                              >
-                                <span className="truncate">{cat.name}</span>
-                                <span className="text-gray-300 group-hover:text-teal-700 transition-colors text-xs">→</span>
-                              </Link>
-                            ))
-                          ) : (
-                            <div className="px-3.5 py-3 text-sm text-gray-400 text-center">
-                              No categories found
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
+                    <ExploreCategoryMegaMenu
+                      categories={parentCategories || []}
+                      isOpen={isCategoryDropdownOpen}
+                      isLoading={isCategoriesLoading}
+                      onOpen={handleCategoryPointerEnter}
+                      onClose={handleCategoryClose}
+                      triggerRef={categoryTriggerRef}
+                    />
                   </div>
 
                   <button

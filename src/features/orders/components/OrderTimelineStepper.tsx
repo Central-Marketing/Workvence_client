@@ -15,7 +15,8 @@ export const OrderTimelineStepper: React.FC<OrderTimelineStepperProps> = ({ orde
 
   const isDeliveredOrCompleted = order.status === "delivered" || order.status === "completed";
   const isCompleted = order.status === "completed";
-  const isLate = order.status === "late";
+  const isLate = Boolean(order.isLate || order.status === "late") && !isDeliveredOrCompleted;
+  const wasLateDelivered = Boolean(order.wasLateDelivered);
 
   const rawActivities = order.raw?.history || order.raw?.ledger || order.raw?.events || [];
 
@@ -30,7 +31,7 @@ export const OrderTimelineStepper: React.FC<OrderTimelineStepperProps> = ({ orde
             variant="ghost"
             size="xs"
             onClick={() => setIsLedgerOpen(true)}
-            className="!p-0 !h-auto !min-h-0 text-xs font-semibold !text-[#0D9488] hover:underline flex items-center gap-1 cursor-pointer"
+            className="!p-0 !h-auto !min-h-0  font-semibold !text-[#126D6B] flex items-center gap-1 cursor-pointer"
             rightIcon={<span>→</span>}
           >
             <span>See Advanced Timeline</span>
@@ -85,7 +86,14 @@ export const OrderTimelineStepper: React.FC<OrderTimelineStepperProps> = ({ orde
             {/* Urgency late badge only if status is actually late */}
             {isLate && (
               <div className="bg-[#FFF1F2] border border-[#FECDD3] text-rose-600 text-xs font-semibold px-3 py-1 rounded-[6px] w-fit">
-                The Order is late for <span className="font-bold">{order.lateDays || 1} day</span>
+                The Order is late for <span className="font-bold">{order.lateDays || 1} {order.lateDays === 1 ? "day" : "days"}</span>
+              </div>
+            )}
+
+            {/* Delivered late badge if work was delivered past deadline */}
+            {!isLate && wasLateDelivered && (
+              <div className="bg-[#FEF3C7] border border-[#FDE68A] text-amber-700 text-xs font-semibold px-3 py-1 rounded-[6px] w-fit">
+                Delivered late
               </div>
             )}
           </div>

@@ -26,6 +26,13 @@ export type TagVariant =
   | "Pending"
   | "draft"
   | "Draft"
+  | "late"
+  | "Late"
+  | "danger"
+  | "Danger"
+  | "delivered_late"
+  | "Delivered_late"
+  | "delivered-late"
   | "neutral"
   | "Neutral"
   | string;
@@ -82,7 +89,7 @@ const VARIANT_CONFIGS: Record<string, VariantDefinition> = {
   },
   pending: {
     color: "var(--alert-900, #674C00)",
-    background: "var(--alert-50, #FEF8E6)",
+    background: "#FFFFFF",
     defaultLabel: "Pending",
     dotColor: "#674C00",
   },
@@ -103,6 +110,24 @@ const VARIANT_CONFIGS: Record<string, VariantDefinition> = {
     background: "#FEF2F2",
     defaultLabel: "Failed",
     dotColor: "#991B1B",
+  },
+  late: {
+    color: "#DC2626",
+    background: "#FEE2E2",
+    defaultLabel: "Late",
+    dotColor: "#DC2626",
+  },
+  danger: {
+    color: "#DC2626",
+    background: "#FEE2E2",
+    defaultLabel: "Late",
+    dotColor: "#DC2626",
+  },
+  delivered_late: {
+    color: "#D97706",
+    background: "#FEF3C7",
+    defaultLabel: "Delivered late",
+    dotColor: "#D97706",
   },
   draft: {
     color: "#475569",

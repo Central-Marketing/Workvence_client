@@ -39,6 +39,10 @@ export interface NormalizedOrder {
   deadline?: string;
   lateDays: number;
   isLate: boolean;
+  wasLateDelivered?: boolean;
+  deliveredAt?: string;
+  overdueMs?: number;
+  displayStatus?: string;
   seller: OrderUser;
   buyer: OrderUser;
   requirements?: {

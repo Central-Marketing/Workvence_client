@@ -303,9 +303,10 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
   const statusLower = order.status?.toLowerCase() || "";
   const isCompleted = statusLower === "completed" || statusLower === "complete";
   const isDelivered = statusLower === "delivered";
-  const isLate = statusLower === "late";
-  const isDisputed = statusLower === "disputed" || statusLower === "escalated_to_dispute";
   const isCancelled = statusLower === "cancelled" || statusLower === "canceled";
+  const isLate = Boolean(order.isLate || statusLower === "late" || order.displayStatus === "late") && !isCompleted && !isDelivered && !isCancelled;
+  const wasLateDelivered = Boolean(order.wasLateDelivered || order.displayStatus === "delivered_late");
+  const isDisputed = statusLower === "disputed" || statusLower === "escalated_to_dispute";
 
   // Extension state
   const extensionData = order.raw?.extensionRequest || order.raw?.extension || order.extensionRequest;
@@ -428,15 +429,28 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
 
             {/* Delivery Countdown Banner when in progress */}
             {!['delivered', 'completed', 'cancelled', 'failed'].includes(order.status) && !isDisputed && (
-              <div className="flex items-center gap-3.5 sm:gap-4 px-4 sm:px-5 py-3.5 bg-[rgba(239, 252, 250, 0.50)] border border-[#B8DFDF] rounded-[8px] text-neutral-800">
+              <div
+                className={`flex items-center justify-between gap-3.5 sm:gap-4 px-4 sm:px-5 py-3.5 rounded-[8px] transition-colors ${isLate
+                  ? "bg-[#f5f5f5] border border-[#FECDD3] text-rose-800"
+                  : "bg-[rgba(239, 252, 250, 0.50)] border border-[#B8DFDF] text-neutral-800"
+                  }`}
+              >
                 <div className="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path d="M8.37563 3C8.16172 3.07993 7.95135 3.16712 7.74481 3.26126M20.7176 16.3011C20.8198 16.0799 20.914 15.8542 20.9999 15.6245M18.4987 19.3647C18.6704 19.2044 18.8364 19.0381 18.9962 18.866M15.2688 21.3723C15.4629 21.2991 15.654 21.22 15.842 21.1351M12.1559 21.9939C11.925 22.0019 11.6925 22.0019 11.4615 21.9939M7.7872 21.1404C7.968 21.2217 8.15172 21.2978 8.33814 21.3683M4.67244 18.9208C4.80913 19.0657 4.95018 19.2064 5.09539 19.3428M2.63259 15.6645C2.70747 15.8622 2.78856 16.0569 2.87561 16.2483M2.00486 12.5053C1.99837 12.2972 1.99839 12.0878 2.00486 11.8794M2.62534 8.73714C2.6989 8.54165 2.77853 8.34913 2.86399 8.1598M4.65591 5.47923C4.80057 5.32514 4.95014 5.17573 5.10439 5.03124" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M13.5 12C13.5 12.8284 12.8284 13.5 12 13.5C11.1716 13.5 10.5 12.8284 10.5 12C10.5 11.1716 11.1716 10.5 12 10.5M13.5 12C13.5 11.1716 12.8284 10.5 12 10.5M13.5 12H16M12 10.5V6" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" />
-                    <path d="M22 12C22 6.47715 17.5228 2 12 2" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
-                  <span className="text-sm sm:text-base font-bold text-slate-900 tracking-tight">
-                    Time Left Deliver
+                  {isLate ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#E11D48" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M12 16V12" stroke="#E11D48" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M11.875 8.25H12M11.75 8.25C11.75 8.11193 11.8619 8 12 8C12.1381 8 12.25 8.11193 12.25 8.25C12.25 8.38807 12.1381 8.5 12 8.5C11.8619 8.5 11.75 8.38807 11.75 8.25Z" stroke="#E11D48" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M8.37563 3C8.16172 3.07993 7.95135 3.16712 7.74481 3.26126M20.7176 16.3011C20.8198 16.0799 20.914 15.8542 20.9999 15.6245M18.4987 19.3647C18.6704 19.2044 18.8364 19.0381 18.9962 18.866M15.2688 21.3723C15.4629 21.2991 15.654 21.22 15.842 21.1351M12.1559 21.9939C11.925 22.0019 11.6925 22.0019 11.4615 21.9939M7.7872 21.1404C7.968 21.2217 8.15172 21.2978 8.33814 21.3683M4.67244 18.9208C4.80913 19.0657 4.95018 19.2064 5.09539 19.3428M2.63259 15.6645C2.70747 15.8622 2.78856 16.0569 2.87561 16.2483M2.00486 12.5053C1.99837 12.2972 1.99839 12.0878 2.00486 11.8794M2.62534 8.73714C2.6989 8.54165 2.77853 8.34913 2.86399 8.1598M4.65591 5.47923C4.80057 5.32514 4.95014 5.17573 5.10439 5.03124" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M13.5 12C13.5 12.8284 12.8284 13.5 12 13.5C11.1716 13.5 10.5 12.8284 10.5 12C10.5 11.1716 11.1716 10.5 12 10.5M13.5 12C13.5 11.1716 12.8284 10.5 12 10.5M13.5 12H16M12 10.5V6" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" />
+                      <path d="M22 12C22 6.47715 17.5228 2 12 2" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  )}
+                  <span className={`text-sm sm:text-base font-bold tracking-tight ${isLate ? "text-[#292929]" : "text-slate-900"}`}>
+                    {isLate ? "Order Overdue" : "Time Left Deliver"}
                   </span>
                 </div>
 
@@ -449,6 +463,9 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                 <h2 className="text-xl font-bold text-[#292929] font-inter">Order Summary</h2>
               </div>
+
+              <hr className="text-[rgba(0,0,0,0.10)] my-4" />
+
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100">
                 <div>
@@ -463,17 +480,11 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
               <hr className="text-[rgba(0,0,0,0.10)] my-4" />
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-xs text-slate-500 font-inter block">Your Net Earnings</span>
-                  <span className="text-base sm:text-lg font-bold text-[#0D6D5F]">
+                  <span className="text-base sm:text-lg font-bold text-slate-900">
                     ${netEarnings}
                   </span>
                 </div>
-                <div className="text-right">
-                  <span className="text-xs text-slate-500 font-inter block">Total Order Price</span>
-                  <span className="text-base sm:text-lg font-bold text-slate-900">
-                    ${Number(order.price || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </span>
-                </div>
+
               </div>
             </div>
 
@@ -511,21 +522,21 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
 
             {/* Cancelled Alert Banner */}
             {isCancelled && (
-              <div className="bg-rose-50 border border-rose-200 rounded-[6px] p-6 mb-6">
+              <div className="bg-[#f5f5f5] border border-rose-200 rounded-[6px] p-6 mb-6">
                 <div className="flex items-start gap-3.5">
-                  <div className="w-10 h-10 rounded-[6px] bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-[6px] bg-[#ffffff] border border-red-200 text-rose-700 flex items-center justify-center shrink-0">
                     <FiAlertCircle className="text-xl" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-bold text-base text-rose-950">This Order Has Been Cancelled</h4>
-                    <p className="text-xs sm:text-sm text-rose-800 mt-1 leading-relaxed">
+                    <h4 className="font-bold text-base text-[#292929]">This Order Has Been Cancelled</h4>
+                    <p className="text-xs sm:text-sm text-red-600 mt-1 leading-relaxed">
                       This order was marked as cancelled. If you believe this cancellation was processed in error or need assistance
                       with payment details, please submit an inquiry to Workvence Support.
                     </p>
                     <div className="flex flex-wrap gap-3 mt-4">
                       <Link
                         href="/support"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[#ffffff] border border-[rgba(0,0,0,0.10)] text-[#000000] text-xs sm:text-sm font-semibold transition-colors shadow-xs"
                       >
                         Contact Support
                       </Link>
@@ -854,8 +865,25 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                 {/* Status */}
                 <div className="flex items-center justify-between px-5 py-4">
                   <span className="text-[#6E6E6E] font-inter text-[14px]">Status</span>
-                  <Tag variant={order.status === 'paid' ? 'inprogress' : order.status} size="sm">
-                    {order.status === 'paid' ? 'Inprogress' : undefined}
+                  <Tag
+                    variant={
+                      isLate
+                        ? "late"
+                        : wasLateDelivered
+                          ? "delivered_late"
+                          : order.status === "paid"
+                            ? "inprogress"
+                            : order.status
+                    }
+                    size="sm"
+                  >
+                    {isLate
+                      ? "Late"
+                      : wasLateDelivered
+                        ? "Delivered late"
+                        : order.status === "paid"
+                          ? "Inprogress"
+                          : undefined}
                   </Tag>
                 </div>
 

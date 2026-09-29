@@ -128,23 +128,49 @@ export default function OrderDetailPage() {
     let isLate = false;
     let deadline = o.deadline;
 
+    if (!deadline && o.createdAt && o.deliveryTime) {
+      const days = Number(o.deliveryTime);
+      if (!isNaN(days)) {
+        const est = new Date(o.createdAt).getTime() + days * 86400000;
+        deadline = new Date(est).toISOString();
+      }
+    }
+
+    let overdueMs = 0;
     if (deadline) {
       const targetTime = new Date(deadline).getTime();
       if (!isNaN(targetTime)) {
         deliveryTime = moment(targetTime).format("MMM D, YYYY");
         const diff = targetTime - Date.now();
         if (diff < 0) {
-          isLate = true;
+          overdueMs = Math.abs(diff);
           lateDays = Math.max(1, Math.abs(Math.floor(diff / (1000 * 60 * 60 * 24))));
         }
       }
-    } else if (o.createdAt && o.deliveryTime) {
-      const days = Number(o.deliveryTime);
-      if (!isNaN(days)) {
-        const est = new Date(o.createdAt).getTime() + days * 86400000;
-        deliveryTime = moment(est).format("MMM D, YYYY");
-        deadline = new Date(est).toISOString();
-      }
+    }
+
+    const isTerminal = ["completed", "complete", "cancelled", "canceled", "failed"].includes(status);
+    const isDelivered = status === "delivered";
+
+    // Active order after deadline provided it's not completed, delivered, or cancelled
+    if (!isTerminal && !isDelivered && overdueMs > 0) {
+      isLate = true;
+    }
+
+    // Delivered late detection
+    const deliveredAt = o.deliveredAt || o.deliveredOn;
+    const deadlineTime = deadline ? new Date(deadline).getTime() : 0;
+    const deliveredTime = deliveredAt ? new Date(deliveredAt).getTime() : 0;
+    const wasLateDelivered = Boolean(
+      o.wasLateDelivered ||
+      (isDelivered && deliveredTime && deadlineTime && deliveredTime > deadlineTime)
+    );
+
+    let displayStatus = status;
+    if (isLate) {
+      displayStatus = "late";
+    } else if (isDelivered && wasLateDelivered) {
+      displayStatus = "delivered_late";
     }
 
     // Seller normalization
@@ -245,6 +271,10 @@ export default function OrderDetailPage() {
       deadline,
       lateDays,
       isLate,
+      wasLateDelivered,
+      deliveredAt,
+      overdueMs,
+      displayStatus,
       seller,
       buyer,
       requirements,

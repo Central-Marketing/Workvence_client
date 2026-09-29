@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import adminAxios from "@/utils/adminAxios";
+import axiosFetch from "@/utils/axiosFetch";
 
 export const ADMIN_CATEGORIES_QUERY_KEY = ["admin-categories"] as const;
 
@@ -26,8 +27,20 @@ export interface AdminCategory {
 }
 
 export const fetchAdminCategories = async () => {
-  const { data } = await adminAxios.get("/categories");
-  return data;
+  try {
+    const { data } = await adminAxios.get("/categories");
+    if (data && (Array.isArray(data) ? data.length > 0 : (data.data?.length > 0 || data.categories?.length > 0))) {
+      return data;
+    }
+    return data;
+  } catch {
+    try {
+      const { data } = await axiosFetch.get("/categories");
+      return data;
+    } catch {
+      return [];
+    }
+  }
 };
 
 export const extractCategoriesList = (fetchedData: any): AdminCategory[] => {
@@ -105,6 +118,27 @@ export const isCategoryRoot = (cat: any, allCategories?: any[]): boolean => {
   return true;
 };
 
+export const deduplicateCategories = <T extends { id?: any; _id?: any; slug?: string; name?: string; title?: string }>(items: T[]): T[] => {
+  const seen = new Set<string>();
+  const result: T[] = [];
+  for (const item of items) {
+    if (!item) continue;
+    const idKey = String(item.id || item._id || '').trim();
+    const slugKey = String(item.slug || '').trim().toLowerCase();
+    const nameKey = String(item.name || item.title || '').trim().toLowerCase();
+    const primaryKey = idKey || slugKey || nameKey;
+    if (primaryKey && !seen.has(primaryKey)) {
+      seen.add(primaryKey);
+      if (idKey) seen.add(idKey);
+      if (slugKey) seen.add(slugKey);
+      result.push(item);
+    } else if (!primaryKey) {
+      result.push(item);
+    }
+  }
+  return result;
+};
+
 export const useAdminCategories = () => {
   const query = useQuery({
     queryKey: ADMIN_CATEGORIES_QUERY_KEY,
@@ -122,7 +156,7 @@ export const useAdminCategories = () => {
   const rawList = extractCategoriesList(query.data);
 
   // Separate parent categories from child subcategories strictly
-  const rawParents = rawList.filter((c: any) => isCategoryRoot(c, rawList));
+  const rawParents = deduplicateCategories(rawList.filter((c: any) => isCategoryRoot(c, rawList)));
   const rawChildren = rawList.filter((c: any) => !isCategoryRoot(c, rawList));
 
   // Build parent categories with children as their sub categories
@@ -142,18 +176,17 @@ export const useAdminCategories = () => {
     const catId = cat.id || cat._id;
     const catName = cat.name || cat.title || String(cat);
 
-    // Children will be sub categories (directly from backend cat.children or matched by parentId)
-    let subCats: AdminCategory[] = [];
-    if (Array.isArray(cat.children) && cat.children.length > 0) {
-      subCats = cat.children;
-    } else if (Array.isArray(cat.subcategories) && cat.subcategories.length > 0) {
-      subCats = cat.subcategories;
-    } else {
-      subCats = rawChildren.filter((child: any) =>
-        (catId && child.parentId === catId) ||
-        (catName && child.parentName?.toLowerCase() === catName.toLowerCase())
-      );
-    }
+    // Collect direct subcategories from nested children and flat records matching parentId
+    const nestedSubCats = [
+      ...(Array.isArray(cat.children) ? cat.children : []),
+      ...(Array.isArray(cat.subcategories) ? cat.subcategories : []),
+    ];
+    const flatSubCats = rawChildren.filter((child: any) =>
+      (catId && (child.parentId === catId || (cat._id && child.parentId === cat._id))) ||
+      (catName && child.parentName?.toLowerCase() === catName.toLowerCase())
+    );
+
+    const subCats: AdminCategory[] = deduplicateCategories([...nestedSubCats, ...flatSubCats]);
 
     // Format sub categories and attach their 2nd-level child niches
     const formattedSubCats = subCats.map((sub: any) => {
@@ -161,19 +194,20 @@ export const useAdminCategories = () => {
       const subTitle = sub.name || sub.title || String(sub);
       const subSlug = sub.slug || subTitle.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
-      // Resolve 2nd-level children (niches)
-      let rawNiches: any[] = [];
-      if (Array.isArray(sub.children) && sub.children.length > 0) {
-        rawNiches = sub.children;
-      } else if (Array.isArray(sub.subcategories) && sub.subcategories.length > 0) {
-        rawNiches = sub.subcategories;
-      } else if (Array.isArray(rawList)) {
-        rawNiches = rawList.filter((c: any) =>
-          c && typeof c !== 'string' && c.parentId &&
-          ((subId && (c.parentId === subId || c.parentId === sub._id)) ||
-           (subTitle && c.parentName?.toLowerCase() === subTitle.toLowerCase()))
-        );
-      }
+      // Resolve 2nd-level children (niches) from nested and flat records
+      const nestedNiches = [
+        ...(Array.isArray(sub.children) ? sub.children : []),
+        ...(Array.isArray(sub.subcategories) ? sub.subcategories : []),
+      ];
+      const flatNiches = Array.isArray(rawList)
+        ? rawList.filter((c: any) =>
+            c && typeof c !== 'string' && c.parentId &&
+            ((subId && (c.parentId === subId || (sub._id && c.parentId === sub._id))) ||
+             (subTitle && c.parentName?.toLowerCase() === subTitle.toLowerCase()))
+          )
+        : [];
+
+      const rawNiches = deduplicateCategories([...nestedNiches, ...flatNiches]);
 
       const formattedNiches: AdminCategory[] = rawNiches.map((n: any) => {
         const nId = n.id || n._id;
@@ -217,7 +251,7 @@ export const useAdminCategories = () => {
   });
 
   // All sub categories (all children across all parents)
-  const subCategories: AdminCategory[] = parentCategories.flatMap((p) => p.children || []);
+  const subCategories: AdminCategory[] = deduplicateCategories(parentCategories.flatMap((p) => p.children || []));
 
   // Helper function to easily retrieve sub categories for a given parent by slug or id
   const getSubcategories = (parentSlugOrId?: string): AdminCategory[] => {

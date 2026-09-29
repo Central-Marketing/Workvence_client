@@ -4,7 +4,6 @@ export const dynamic = 'force-dynamic';
 import { useState, useRef, useEffect, useMemo, Suspense } from 'react';
 import {
   PackageCard,
-  Loader,
   TopRatedSellers,
   GigsGridSkeleton,
   CategoryHeroBanner,
@@ -21,6 +20,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import useAdminCategories from "@/hooks/useAdminCategories";
+import useDebounce from "@/hooks/useDebounce";
 import { FiAlertCircle, FiRefreshCw, FiGrid, FiArrowRight, FiArrowLeft, FiHome } from "react-icons/fi";
 
 const DEFAULT_CATEGORIES = [
@@ -86,7 +86,7 @@ const EmptyGigsState: React.FC<EmptyGigsStateProps> = ({
             : "The package you're looking for may have been removed, changed, or is temporarily unavailable."}
         </p>
 
-        {hasActiveFilters && onReset && (
+        {/* {hasActiveFilters && onReset && (
           <Button
             type="button"
             onClick={onReset}
@@ -96,7 +96,7 @@ const EmptyGigsState: React.FC<EmptyGigsStateProps> = ({
           >
             Clear all filters
           </Button>
-        )}
+        )} */}
       </div>
 
       {/* Real Recommended Section (only shown if real items exist) */}
@@ -140,16 +140,26 @@ const Packages = () => {
 
   const [sortBy, setSortBy] = useState(initialSort);
   const [searchVal, setSearchVal] = useState(initialSearch);
+  const [searchDraft, setSearchDraft] = useState({ value: initialSearch, source: search });
+  const debouncedSearchDraft = useDebounce(searchDraft, 350);
+  const [pendingSearch, setPendingSearch] = useState(false);
+  const [searchTransition, setSearchTransition] = useState<{ source: string; target: string; value: string; mobile: boolean } | null>(null);
+  const searchInputValue = searchDraft.source === search ? searchDraft.value : initialSearch;
+
+  useEffect(() => {
+    setPendingSearch(false);
+    setSearchDraft({ value: new URLSearchParams(search).get('search') || '', source: search });
+  }, [search]);
   const [activeCategory, setActiveCategory] = useState(initialCat);
-  const [showFilter, setShowFilter] = useState(false);
-  const [showFilterDrawer, setShowFilterDrawer] = useState(false);
-  const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [filterVisibility, setFilterVisibility] = useState<{ key: string; open: boolean } | null>(null);
+  const [filterDrawerVisibility, setFilterDrawerVisibility] = useState<{ key: string; open: boolean } | null>(null);
+  const [isMobileViewport, setIsMobileViewport] = useState(true);
   const [page, setPage] = useState(initialPage);
   const [viewTab, setViewTab] = useState<'hub' | 'gigs'>(
     (initialSearch || initialMin || initialMax || initialDeliveryDays || initialLegacySubcat || initialLegacyTag || initialParams.get('view') === 'gigs') ? 'gigs' : 'hub'
   );
 
-  // Responsively initialize filter state: false on small devices (<1024px), true on desktop (>=1024px)
+  // Filter defaults depend on resolved results as well as the viewport.
   useEffect(() => {
     const handleResize = () => {
       const isMobile = window.innerWidth < 1024;
@@ -159,7 +169,6 @@ const Packages = () => {
     if (typeof window !== 'undefined') {
       const isMobile = window.innerWidth < 1024;
       setIsMobileViewport(isMobile);
-      setShowFilter(!isMobile);
     }
 
     window.addEventListener('resize', handleResize);
@@ -351,7 +360,7 @@ const Packages = () => {
   }, [search, categories, categoryList]);
 
   // Reactive React Query key ensuring automatic re-fetching whenever any filter state changes
-  const { isLoading, isError, error, data, refetch } = useQuery({
+  const { isLoading, isSuccess, isError, error, data, refetch } = useQuery({
     queryKey: [
       'packages',
       searchVal,
@@ -459,6 +468,33 @@ const Packages = () => {
     return packagesList;
   }, [packagesList, sellerLevels]);
 
+  // Scope manual choices to this search; refetching the same query keeps them intact.
+  const filterVisibilityKey = JSON.stringify([
+    search, searchVal, activeCategory, filterCategory, minPrice, maxPrice,
+    deliveryDays, sortBy, page, sellerLevels,
+  ]);
+  useEffect(() => {
+    setFilterVisibility((previous) => previous?.key === filterVisibilityKey ? previous : null);
+    setFilterDrawerVisibility((previous) => previous?.key === filterVisibilityKey ? previous : null);
+  }, [filterVisibilityKey]);
+  const keepSearchOpen = searchTransition !== null &&
+    (search === searchTransition.source || search === searchTransition.target) &&
+    (search !== searchTransition.target || searchVal !== searchTransition.value || isLoading);
+  useEffect(() => {
+    if (searchTransition && !keepSearchOpen) setSearchTransition(null);
+  }, [searchTransition, keepSearchOpen]);
+  const showFilter = !isMobileViewport && ((keepSearchOpen && !searchTransition?.mobile) || (
+    filterVisibility?.key === filterVisibilityKey
+      ? filterVisibility.open
+      : isSuccess && displayPackages.length > 0
+  ));
+  const showFilterDrawer = isMobileViewport &&
+    ((keepSearchOpen && searchTransition?.mobile) ||
+      (filterDrawerVisibility?.key === filterVisibilityKey && filterDrawerVisibility.open));
+  const setShowFilterDrawer = (open: boolean) => {
+    setFilterDrawerVisibility({ key: filterVisibilityKey, open });
+  };
+
   const totalResultsCount = useMemo(() => {
     const hasClientFilter = Object.values(sellerLevels).some(Boolean);
     if (hasClientFilter) {
@@ -546,8 +582,31 @@ const Packages = () => {
     if (targetView === 'gigs') params.set('view', 'gigs');
     if (currentPage > 1) params.set('page', currentPage.toString());
 
-    navigate.push(`/packages?${params.toString()}`, { scroll: false });
+    const nextSearch = params.toString();
+    setPendingSearch(false);
+    if (overrides.debouncedSearch) {
+      setSearchTransition({ source: search, target: nextSearch, value: currentSearch.trim(), mobile: isMobileViewport });
+    } else {
+      setSearchTransition(null);
+      setSearchDraft({ value: currentSearch, source: search });
+    }
+    navigate.push(`/packages?${nextSearch}`, { scroll: false });
   };
+
+  const handleSearchChange = (value: string) => {
+    setPendingSearch(true);
+    setSearchDraft({ value, source: search });
+  };
+  const handleSearchSubmit = () => {
+    setPendingSearch(false);
+    syncUrlWithFilters({ searchVal: searchInputValue, resetPage: true, debouncedSearch: true });
+  };
+  useEffect(() => {
+    if (!pendingSearch || debouncedSearchDraft !== searchDraft || searchDraft.source !== search) return;
+    setPendingSearch(false);
+    if (searchDraft.value.trim() === searchVal) return;
+    syncUrlWithFilters({ searchVal: searchDraft.value, resetPage: true, debouncedSearch: true });
+  }, [debouncedSearchDraft, searchDraft, search, searchVal, pendingSearch]);
 
   const handleApplyFilter = () => {
     syncUrlWithFilters();
@@ -601,6 +660,9 @@ const Packages = () => {
   };
 
   const handleReset = () => {
+    setPendingSearch(false);
+    setSearchTransition(null);
+    setSearchDraft({ value: '', source: search });
     setMinPrice('');
     setMaxPrice('');
     setSearchVal('');
@@ -677,15 +739,9 @@ const Packages = () => {
               <LeftFilterSidebar
                 hideHeader
                 className="p-0 bg-transparent rounded-none"
-                searchVal={searchVal}
-                onSearchChange={(val) => {
-                  setSearchVal(val);
-                  syncUrlWithFilters({ searchVal: val });
-                }}
-                onSearchSubmit={() => {
-                  syncUrlWithFilters();
-                  refetch();
-                }}
+                searchVal={searchInputValue}
+                  onSearchChange={handleSearchChange}
+                  onSearchSubmit={handleSearchSubmit}
                 categories={categories.filter((c: any) => c.slug !== 'All services')}
                 selectedCategory={categoryAncestry.length > 0 ? categoryAncestry[0].slug : (filterCategory || (activeCategory !== 'All services' ? activeCategory : ''))}
                 onCategoryChange={(cat) => {
@@ -834,10 +890,10 @@ const Packages = () => {
           />
 
           {/* 2. Subcategory Filter Bar: Filter Toggle, Divider, Pills, View All */}
-          {resolvedSubcategoryHeaderItem.items && resolvedSubcategoryHeaderItem.items.length > 0 && (
+          {resolvedSubcategoryHeaderItem && (
             <div className="my-4 sm:my-[30px]">
               <SubcategoryFilterBar
-                items={resolvedSubcategoryHeaderItem.items}
+                items={resolvedSubcategoryHeaderItem.items || []}
                 activeTag={currentActiveTag}
                 isFilterOpen={isMobileViewport ? showFilterDrawer : showFilter}
                 onSelectTag={(tag) => {
@@ -860,7 +916,7 @@ const Packages = () => {
                   if (typeof window !== 'undefined' && window.innerWidth < 1024) {
                     setShowFilterDrawer(true);
                   } else {
-                    setShowFilter((prev) => !prev);
+                    setFilterVisibility({ key: filterVisibilityKey, open: !showFilter });
                   }
                 }}
               />
@@ -883,15 +939,9 @@ const Packages = () => {
             {showFilter && (
               <div className="hidden lg:block lg:w-[270px] xl:w-[280px] shrink-0 lg:sticky lg:top-24">
                 <LeftFilterSidebar
-                  searchVal={searchVal}
-                  onSearchChange={(val) => {
-                    setSearchVal(val);
-                    syncUrlWithFilters({ searchVal: val });
-                  }}
-                  onSearchSubmit={() => {
-                    syncUrlWithFilters();
-                    refetch();
-                  }}
+                  searchVal={searchInputValue}
+                  onSearchChange={handleSearchChange}
+                  onSearchSubmit={handleSearchSubmit}
                   categories={categories.filter((c: any) => c.slug !== 'All services')}
                   selectedCategory={categoryAncestry.length > 0 ? categoryAncestry[0].slug : (filterCategory || (activeCategory !== 'All services' ? activeCategory : ''))}
                   onCategoryChange={(cat) => {
@@ -1262,7 +1312,14 @@ const Packages = () => {
 
 export default function PackagesPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center items-center h-64"><Loader size={45} /></div>}>
+    <Suspense fallback={
+      <div role="status" className="min-h-screen bg-[#F8F8F8]">
+        <span className="sr-only">Loading packages</span>
+        <div aria-hidden="true" className="container mx-auto pt-8 pb-[80px] min-[1400px]:pb-[100px]">
+          <GigsGridSkeleton count={8} />
+        </div>
+      </div>
+    }>
       <Packages />
     </Suspense>
   );

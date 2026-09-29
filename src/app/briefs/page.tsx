@@ -26,7 +26,7 @@ import { RiSearchLine } from "react-icons/ri";
 import { axiosFetch } from "@/utils";
 import useAdminCategories from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
-import { Loader, Button, Breadcrumb, LeftFilterSidebar } from "@/components";
+import { BriefsListSkeleton, Button, Breadcrumb, LeftFilterSidebar } from "@/components";
 import { ClientBrief } from "@/types";
 import useDebounce from "@/hooks/useDebounce";
 import useDragScroll from "@/hooks/useDragScroll";
@@ -1032,7 +1032,7 @@ function BriefsContent() {
                   </div>
                 ) : filteredBriefs.length === 0 ? (
                   <div className="py-20 text-center flex flex-col items-center justify-center bg-white rounded-[6px] border border-gray-200/90 p-8 shadow-2xs">
-                    <div className="w-14 h-14 rounded-full bg-emerald-50 text-[#327C73] flex items-center justify-center mb-4 border border-emerald-100 shadow-2xs">
+                    <div className="w-14 h-14 rounded-[6px] border border-[rgba(0,0,0,0.1)] bg-white text-[#327C73] flex items-center justify-center mb-4 border border-emerald-100 shadow-2xs">
                       <FiBriefcase className="w-6 h-6" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-1">
@@ -1043,38 +1043,7 @@ function BriefsContent() {
                         ? `No open briefs match "${search}". Try another keyword or clear your filters.`
                         : "There are currently no open projects in this category. Check back soon or post your own project!"}
                     </p>
-                    <div className="flex items-center gap-3">
-                      {hasActiveFilters && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="md"
-                          radius="xl"
-                          onClick={clearAllFilters}
-                          className="px-5 py-2.5 text-xs font-semibold shadow-2xs"
-                        >
-                          Clear Filters
-                        </Button>
-                      )}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="md"
-                        radius="xl"
-                        onClick={handleBackToCategories}
-                        className="px-5 py-2.5 text-xs font-semibold shadow-2xs"
-                      >
-                        Browse Categories
-                      </Button>
-                      {user && !user.isSeller && (
-                        <Link
-                          href="/briefs/create"
-                          className="px-5 py-2.5 bg-[#327C73] text-white text-xs font-semibold rounded-[6px] hover:bg-[#256059] transition shadow-xs"
-                        >
-                          + Post a Project
-                        </Link>
-                      )}
-                    </div>
+                    
                   </div>
                 ) : (
                   <>
@@ -1408,8 +1377,11 @@ export default function BriefsPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          <Loader size={45} />
+        <div role="status" className="min-h-screen bg-[#F5F5F5] text-gray-800 pt-5 sm:pt-7 pb-[80px] min-[1400px]:pb-[100px]">
+          <span className="sr-only">Loading briefs</span>
+          <div aria-hidden="true" className="container mx-auto">
+            <BriefsListSkeleton />
+          </div>
         </div>
       }
     >

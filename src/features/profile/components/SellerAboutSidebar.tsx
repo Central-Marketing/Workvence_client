@@ -4,9 +4,12 @@ import React from "react";
 import { FiMapPin, FiClock, FiPackage, FiArrowRight } from "react-icons/fi";
 import { AiGradientButton, Button } from "@/components/ui";
 import { getOnlineStatus } from "@/utils/userStatus";
+import { SELLER_FALLBACK_IMAGES } from "../utils/sellerProfileNormalizer";
 
 interface SellerAboutSidebarProps {
   name: string;
+  avatar?: string;
+  showIdentity?: boolean;
   memberSince?: string;
   bio: string;
   country: string;
@@ -23,6 +26,8 @@ interface SellerAboutSidebarProps {
 
 export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
   name,
+  avatar,
+  showIdentity = false,
   memberSince,
   bio,
   country,
@@ -50,6 +55,7 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
     <div className="w-full space-y-6">
       {/* 1. Main "About this seler" Card */}
       <div className="bg-[#F5F5F5] border border-gray-200/80 rounded-[6px] p-6 shadow-2xs">
+        
         {/* Header */}
         <div className="flex items-center justify-between gap-4 mb-4">
           <h2 className="text-xl sm:text-2xl font-bold font-sf-pro text-gray-900 tracking-tight">

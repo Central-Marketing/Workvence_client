@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { axiosFetch } from "@/utils";
@@ -30,6 +30,44 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
   const [rawUserData, setRawUserData] = useState<any>(null);
   const [rawGigsData, setRawGigsData] = useState<any[]>([]);
   const [rawReviewsData, setRawReviewsData] = useState<any[]>([]);
+  const [showStickyIdentity, setShowStickyIdentity] = useState(false);
+  const sidebarMarkerRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const marker = sidebarMarkerRef.current;
+    if (isLoading || !marker) return;
+
+    let frame = 0;
+    const updateIdentity = () => {
+      frame = 0;
+      const navbarHeight = Number.parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue("--navbar-height"),
+      );
+      const stickyTop = (Number.isFinite(navbarHeight) ? navbarHeight : isSeller ? 82 : 136) + 12;
+      setShowStickyIdentity(marker.getBoundingClientRect().top <= stickyTop);
+    };
+    const scheduleUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateIdentity);
+    };
+
+    // The marker stays in normal document coordinates even as the sticky card grows.
+    const resizeObserver = new ResizeObserver(scheduleUpdate);
+    resizeObserver.observe(document.body);
+    if (marker.parentElement) resizeObserver.observe(marker.parentElement);
+    const navbarObserver = new MutationObserver(scheduleUpdate);
+    navbarObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["style"] });
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    scheduleUpdate();
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      navbarObserver.disconnect();
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+    };
+  }, [isLoading, isSeller, username]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -180,7 +218,8 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
         />
 
         {/* 2. Main Two-Column Grid: Left (About & Contact) + Right (Gigs Grid) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start mb-12">
+        <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start mb-12">
+          <span ref={sidebarMarkerRef} aria-hidden="true" className="absolute top-0 left-0 h-0 w-0 pointer-events-none" />
           {/* Left Column (lg:col-span-4) */}
           <div
             style={{
@@ -191,6 +230,8 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
           >
             <SellerAboutSidebar
               name={profileData.name}
+              avatar={profileData.avatar}
+              showIdentity={showStickyIdentity}
               memberSince={profileData.memberSince}
               bio={profileData.bio}
               country={profileData.country}

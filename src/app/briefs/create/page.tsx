@@ -62,6 +62,11 @@ const CreateBrief = () => {
 
   // Modal & Input States
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [isAiDrawerMounted, setIsAiDrawerMounted] = useState(false);
+  const [isAiDrawerVisible, setIsAiDrawerVisible] = useState(false);
+  const aiDrawerRef = useRef<HTMLDivElement>(null);
+  const generationInFlight = useRef(false);
+  const scrollToDraft = useRef(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [newSkillInput, setNewSkillInput] = useState("");
   const [aiGeneratedSuccess, setAiGeneratedSuccess] = useState(false);
@@ -130,27 +135,6 @@ const CreateBrief = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Autofocus modal prompt input when modal opens
-  useEffect(() => {
-    if (isAiModalOpen) {
-      const timer = setTimeout(() => {
-        modalPromptRef.current?.focus();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [isAiModalOpen]);
-
-  // Close modal on Escape key press
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isAiModalOpen && !aiGenerate.isPending) {
-        setIsAiModalOpen(false);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isAiModalOpen]);
-
   // Step 1: Ask AI to Draft the Project (POST /api/briefs/ai-generate)
   const aiGenerate = useMutation({
     mutationFn: async (promptText: string) => {
@@ -214,18 +198,16 @@ const CreateBrief = () => {
       });
 
       setAiGeneratedSuccess(true);
+      scrollToDraft.current = true;
       setIsAiModalOpen(false);
       toast.success(data?.message || "AI brief draft generated successfully!");
 
-      // Scroll smoothly down to the form
-      setTimeout(() => {
-        formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 150);
     },
     onError: (err: any) => {
       console.error("AI generation failed:", err);
       toast.error(err?.response?.data?.message || "Failed to generate project with AI. Try again.");
     },
+    onSettled: () => { generationInFlight.current = false; },
   });
 
   const handleOpenAiModal = () => {
@@ -261,23 +243,90 @@ const CreateBrief = () => {
     }
   }, [searchParams, user, openAuthModal]);
 
-  // Auto-focus prompt input when modal opens
+  // Keep the drawer mounted until its exit transition has completed.
   useEffect(() => {
+    let firstFrame = 0;
+    let secondFrame = 0;
+    let timer: ReturnType<typeof setTimeout>;
     if (isAiModalOpen) {
-      const timer = setTimeout(() => {
-        modalPromptRef.current?.focus();
-      }, 200);
-      return () => clearTimeout(timer);
+      setIsAiDrawerMounted(true);
+      firstFrame = requestAnimationFrame(() => {
+        secondFrame = requestAnimationFrame(() => setIsAiDrawerVisible(true));
+      });
+    } else {
+      setIsAiDrawerVisible(false);
+      timer = setTimeout(() => setIsAiDrawerMounted(false),
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 300);
     }
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      cancelAnimationFrame(secondFrame);
+      clearTimeout(timer);
+    };
   }, [isAiModalOpen]);
 
+  const isAiDrawerPresent = isAiModalOpen || isAiDrawerMounted;
+  useEffect(() => {
+    if (!isAiDrawerPresent) {
+      if (!scrollToDraft.current) return;
+      scrollToDraft.current = false;
+      const frame = requestAnimationFrame(() => formRef.current?.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+      }));
+      return () => cancelAnimationFrame(frame);
+    }
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    modalPromptRef.current?.focus({ preventScroll: true });
+    const trapFocus = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+      const controls = aiDrawerRef.current?.querySelectorAll<HTMLElement>(
+        'button:not(:disabled), textarea:not(:disabled), [tabindex="0"]',
+      );
+      if (!controls?.length) {
+        event.preventDefault();
+        aiDrawerRef.current?.focus();
+        return;
+      }
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (!aiDrawerRef.current?.contains(document.activeElement) ||
+        (event.shiftKey && document.activeElement === first) ||
+        (!event.shiftKey && document.activeElement === last)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      }
+    };
+    document.addEventListener('keydown', trapFocus);
+    return () => {
+      document.removeEventListener('keydown', trapFocus);
+      document.body.style.overflow = previousOverflow;
+      if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+    };
+  }, [isAiDrawerPresent]);
+
+  useEffect(() => {
+    if (!isAiModalOpen) return;
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !aiGenerate.isPending && !generationInFlight.current) {
+        setIsAiModalOpen(false);
+      }
+    };
+    document.addEventListener('keydown', onEscape);
+    return () => document.removeEventListener('keydown', onEscape);
+  }, [isAiModalOpen, aiGenerate.isPending]);
+
   const handleGenerateFromModal = (overridePrompt?: string) => {
+    if (generationInFlight.current || aiGenerate.isPending || !isAiModalOpen) return;
     const promptText = (typeof overridePrompt === "string" ? overridePrompt : aiPrompt).trim();
     if (!promptText) {
       toast.error("Please describe your project or select a suggestion");
       modalPromptRef.current?.focus();
       return;
     }
+    generationInFlight.current = true;
     aiGenerate.mutate(promptText);
   };
 
@@ -442,7 +491,7 @@ const CreateBrief = () => {
             }
             px="px-4"
             py="py-2"
-            
+
             className="self-start sm:self-auto shrink-0 text-sm font-semibold rounded-[6px]"
           />
         </div>
@@ -658,14 +707,22 @@ const CreateBrief = () => {
         </form>
       </div>
 
-      {/* AI Draft Modal */}
-      {isAiModalOpen && (
+      {/* AI Draft Drawer */}
+      {isAiDrawerPresent && (
         <div
-          className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs select-none transition-all duration-300 ease-out animate-fadeIn"
+          className="fixed inset-0 z-[1000] flex justify-end select-none"
           onClick={() => !aiGenerate.isPending && setIsAiModalOpen(false)}
         >
+          <div aria-hidden="true" className={`absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 ease-out motion-reduce:transition-none ${isAiDrawerVisible ? 'opacity-100' : 'opacity-0'}`} />
           <div
-            className="bg-white border border-slate-200 rounded-[6px] sm:rounded-[6px] max-w-xl w-full max-h-[calc(100dvh-2rem)] flex flex-col p-6 sm:p-8 shadow-2xl relative overflow-y-auto select-text transition-all duration-300 ease-out transform scale-100"
+            ref={aiDrawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="ai-drawer-title"
+            aria-describedby="ai-drawer-description"
+            aria-busy={aiGenerate.isPending}
+            tabIndex={-1}
+            className={`bg-white border-l border-slate-200 max-w-[560px] w-full h-[100dvh] flex flex-col shadow-2xl relative overflow-hidden select-text transition-transform duration-300 ease-out motion-reduce:transition-none ${isAiDrawerVisible ? 'translate-x-0' : 'translate-x-full'}`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top Close Button */}
@@ -676,19 +733,20 @@ const CreateBrief = () => {
               radius="xl"
               onClick={() => !aiGenerate.isPending && setIsAiModalOpen(false)}
               disabled={aiGenerate.isPending}
-              className="absolute top-5 right-5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors border-none shadow-none"
-              title="Close modal"
+              className="absolute top-5 right-5 text-slate-400 hover:text-slate-700 hover:bg-white border border-[rgba(0,0,0,0.10)] transition-colors border-none shadow-none"
+              title="Close drawer"
+              aria-label="Close drawer"
             >
               <FiX className="text-lg" />
             </Button>
 
             {/* Modal Header */}
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-[6px] bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center justify-center text-xl shadow-xs">
+            <div className="flex items-center gap-3 p-6 pr-16 sm:p-8 sm:pr-16 border-b border-slate-100 shrink-0">
+              <div className="w-10 h-10 shrink-0 rounded-[6px] bg-white text-emerald-700 border border-[rgba(0,0,0,0.10)] flex items-center justify-center text-xl shadow-xs">
                 <HiSparkles />
               </div>
               <div>
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 font-sf-pro">
+                <h3 id="ai-drawer-title" className="text-lg sm:text-xl font-bold text-slate-900 font-sf-pro">
                   Draft Project with Workvence AI
                 </h3>
                 <p className="text-slate-500 text-xs sm:text-sm">
@@ -697,16 +755,20 @@ const CreateBrief = () => {
               </div>
             </div>
 
-            <p className="text-slate-600 text-xs sm:text-[13px] leading-relaxed mb-4 mt-3">
+            <div className="flex-1 min-h-0 overflow-y-auto flex flex-col p-6 sm:p-8">
+            <div className="my-auto shrink-0">
+            <p id="ai-drawer-description" className="text-slate-600 text-sm leading-relaxed mb-4">
               Our AI will automatically generate your project title, detailed requirements, budget, timeline, and required tech skills.
             </p>
 
             {/* Prompt Input */}
             <div className="space-y-3">
               <div>
+                <label htmlFor="ai-drawer-prompt" className="block text-sm font-semibold text-slate-900 mb-2">Describe your project</label>
                 <textarea
+                  id="ai-drawer-prompt"
                   ref={modalPromptRef}
-                  rows={4}
+                  rows={6}
                   placeholder="e.g. I need a landing page for my mobile app with responsive design and email waitlist form."
                   value={aiPrompt}
                   onChange={(e) => setAiPrompt(e.target.value)}
@@ -716,7 +778,7 @@ const CreateBrief = () => {
                       handleGenerateFromModal();
                     }
                   }}
-                  className="w-full p-3.5 sm:p-4 rounded-[6px] border border-slate-200 bg-slate-50 text-slate-900 text-xs sm:text-sm leading-relaxed outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:bg-white focus:ring-4 focus:ring-[#327C73]/10 resize-none"
+                  className="w-full p-3.5 sm:p-4 rounded-[6px] border border-slate-200 bg-slate-50 text-slate-900 text-base leading-relaxed outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:bg-white focus:ring-4 focus:ring-[#327C73]/10 resize-none"
                 />
               </div>
 
@@ -729,15 +791,16 @@ const CreateBrief = () => {
                   {PROMPT_SUGGESTIONS.map((suggestion) => (
                     <Button
                       key={suggestion}
+                      disabled={aiGenerate.isPending}
                       type="button"
                       variant="soft"
                       size="xs"
-                      radius="lg"
+                      radius="fiverr"
                       onClick={() => {
                         setAiPrompt(suggestion);
                         handleGenerateFromModal(suggestion);
                       }}
-                      className="px-2.5 py-1 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-900 text-slate-700 text-[11px] font-medium transition-all border border-slate-200/60 shadow-2xs"
+                      className="px-2.5 py-1 max-w-full whitespace-normal text-[12px] font-normal font-inter text-[#292929]"
                     >
                       {suggestion}
                     </Button>
@@ -745,8 +808,11 @@ const CreateBrief = () => {
                 </div>
               </div>
 
-              {/* Modal Actions */}
-              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-4 border-t border-slate-100 mt-5">
+            </div>
+            </div>
+            </div>
+              {/* Drawer Actions */}
+              <div className="flex shrink-0 flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 p-6 sm:p-8 border-t border-slate-100">
                 <Button
                   type="button"
                   variant="soft"
@@ -773,7 +839,6 @@ const CreateBrief = () => {
                   Generate Project Draft
                 </Button>
               </div>
-            </div>
           </div>
         </div>
       )}

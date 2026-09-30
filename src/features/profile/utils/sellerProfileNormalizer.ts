@@ -28,6 +28,9 @@ export interface SellerReviewItem {
   projectPrice: string;
   projectDuration: string;
   sellerResponse?: string;
+  sellerReply?: string | null;
+  sellerReplyAt?: string | null;
+  orderId?: string;
 }
 
 export interface SellerFaqItem {
@@ -222,6 +225,7 @@ export function normalizeSellerProfile(
 
       reviewsList.push({
         id: r._id || r.id || `rev-${idx}`,
+        orderId: r.orderID?._id || r.orderID || r.orderId || undefined,
         buyerName: buyerObj.name || buyerObj.username || 'Verified Client',
         buyerAvatar: buyerObj.image || buyerObj.avatar || buyerObj.img || '',
         country: buyerCountry,
@@ -233,7 +237,9 @@ export function normalizeSellerProfile(
         projectImage: r.gigID?.cover || (Array.isArray(r.gigID?.images) && r.gigID?.images[0]) || '',
         projectPrice: formattedPrice,
         projectDuration: r.duration ? `${r.duration} Days` : '',
-        sellerResponse: r.sellerResponse || undefined,
+        sellerResponse: r.sellerReply || r.sellerResponse || undefined,
+        sellerReply: r.sellerReply || r.sellerResponse || null,
+        sellerReplyAt: r.sellerReplyAt || null,
       });
     });
   }

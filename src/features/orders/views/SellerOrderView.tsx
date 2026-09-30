@@ -27,6 +27,8 @@ import { axiosFetch } from "@/utils";
 import generateImageURL from "@/utils/generateImageURL";
 import { ExtensionModal } from "@/components";
 import { Breadcrumb, Button, Tag } from "@/components/ui";
+import { useUserStore } from "@/store/userStore";
+import { SellerReviewReply } from "@/features/reviews";
 import { NormalizedOrder } from "../types";
 import { OrderTimelineStepper } from "../components/OrderTimelineStepper";
 import { OrderDeliverablesList } from "../components/OrderDeliverablesList";
@@ -40,6 +42,7 @@ interface SellerOrderViewProps {
 
 export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch }) => {
   const router = useRouter();
+  const currentUser = useUserStore((state) => state.user);
 
   // Modals & form state
   const [isExtensionModalOpen, setIsExtensionModalOpen] = useState(false);
@@ -774,6 +777,22 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                           </div>
                         </div>
                       ))}
+                    </div>
+
+                    {/* Seller Public Response Component */}
+                    <div className="pt-3 border-t border-slate-100">
+                      <SellerReviewReply
+                        reviewId={buyerReview?._id || buyerReview?.id || order.raw?.reviewID}
+                        orderId={order.id || order.raw?._id}
+                        sellerReply={buyerReview?.sellerReply}
+                        sellerReplyAt={buyerReview?.sellerReplyAt}
+                        sellerName={order.seller?.name || currentUser?.name || currentUser?.username || "Seller"}
+                        sellerAvatar={order.seller?.avatar || (order.seller as any)?.image || currentUser?.image || currentUser?.img}
+                        canReply={true}
+                        onReplySuccess={() => {
+                          refetch();
+                        }}
+                      />
                     </div>
                   </div>
                 ) : (

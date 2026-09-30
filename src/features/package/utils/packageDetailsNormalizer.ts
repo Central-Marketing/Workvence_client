@@ -72,6 +72,9 @@ export interface ClientReviewItem {
   projectPrice?: string;
   projectDuration?: string;
   sellerResponse?: string;
+  sellerReply?: string | null;
+  sellerReplyAt?: string | null;
+  orderId?: string;
 }
 
 export interface FaqItem {
@@ -432,7 +435,10 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
       rating: Number(r.star ?? r.rating ?? 5),
       dateText: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : "",
       reviewText: r.description || r.comment || r.desc || "",
-      sellerResponse: r.sellerResponse || undefined
+      sellerResponse: r.sellerReply || r.sellerResponse || undefined,
+      sellerReply: r.sellerReply || r.sellerResponse || null,
+      sellerReplyAt: r.sellerReplyAt || null,
+      orderId: r.orderID?._id || r.orderID || r.orderId || undefined,
     };
   });
 

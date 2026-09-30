@@ -386,6 +386,10 @@ const PackageContent = () => {
               starDistribution={normalizedData.reviewsData.starDistribution}
               categoryScores={normalizedData.reviewsData.categoryScores}
               reviews={normalizedData.reviewsData.list}
+              sellerName={normalizedData.seller.name || normalizedData.seller.username}
+              sellerAvatar={normalizedData.seller.avatar}
+              sellerId={normalizedData.seller.id}
+              sellerUsername={normalizedData.seller.username}
             />
 
             {/* Section 6: Frequently asked questions */}

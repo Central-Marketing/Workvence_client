@@ -29,6 +29,7 @@ import { OrderTimelineStepper } from "../components/OrderTimelineStepper";
 import { OrderDeliverablesList } from "../components/OrderDeliverablesList";
 import { ArrowRight } from "lucide-react";
 import { DeliveryCountdown } from "../components/DeliveryCountdown";
+import { SellerReviewReply } from "@/features/reviews";
 
 interface BuyerOrderViewProps {
   order: NormalizedOrder;
@@ -625,6 +626,17 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                         </div>
                       ))}
                     </div>
+
+                    {/* Seller Public Response Component (Buyer View) */}
+                    <SellerReviewReply
+                      reviewId={existingReview?._id || existingReview?.id || order.raw?.reviewID}
+                      orderId={order.id || order.raw?._id}
+                      sellerReply={existingReview?.sellerReply}
+                      sellerReplyAt={existingReview?.sellerReplyAt}
+                      sellerName={order.seller?.name || "Seller"}
+                      sellerAvatar={order.seller?.avatar || (order.seller as any)?.image}
+                      canReply={false}
+                    />
                   </div>
                 ) : (
                   <form onSubmit={handleReviewSubmit} className="space-y-5 bg-white p-6 rounded-[6px]">

@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { FiChevronDown } from "react-icons/fi";
 import { Button } from "@/components/ui";
+import { useUserStore } from "@/store/userStore";
+import { SellerReviewReply } from "@/features/reviews";
 import { ClientReviewItem } from "../utils/packageDetailsNormalizer";
 
 interface PackageReviewsSectionProps {
@@ -16,6 +18,10 @@ interface PackageReviewsSectionProps {
     value: number;
   };
   reviews?: ClientReviewItem[];
+  sellerName?: string;
+  sellerAvatar?: string;
+  sellerId?: string;
+  sellerUsername?: string;
 }
 
 export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
@@ -24,13 +30,21 @@ export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
   starDistribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
   categoryScores = { communication: 0, quality: 0, value: 0 },
   reviews = [],
+  sellerName,
+  sellerAvatar,
+  sellerId,
+  sellerUsername,
 }) => {
-  const [expandedResponses, setExpandedResponses] = useState<{ [id: string]: boolean }>({});
+  const currentUser = useUserStore((state) => state.user);
   const [visibleCount, setVisibleCount] = useState(3);
 
-  const toggleResponse = (id: string) => {
-    setExpandedResponses((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
+  const isSellerOwner = Boolean(
+    currentUser && (
+      (currentUser.username && sellerUsername && currentUser.username.toLowerCase() === sellerUsername.toLowerCase()) ||
+      (currentUser._id && sellerId && currentUser._id === sellerId) ||
+      (currentUser.id && sellerId && currentUser.id === sellerId)
+    )
+  );
 
   const handleShowMore = () => {
     setVisibleCount((prev) => prev + 3);
@@ -127,7 +141,6 @@ export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
       {/* Reviews Cards List */}
       <div className="space-y-4 mb-6">
         {reviews.slice(0, visibleCount).map((review) => {
-          const isResponseOpen = Boolean(expandedResponses[review.id]);
           const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
             review.buyerName || "Buyer"
           )}&background=0D9488&color=fff&bold=true`;
@@ -170,30 +183,16 @@ export const PackageReviewsSection: React.FC<PackageReviewsSectionProps> = ({
                 {review.reviewText}
               </p>
 
-              {/* Optional Seller Response */}
-              {review.sellerResponse && (
-                <div className="mt-3 pt-3 border-t border-gray-200/60">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="xs"
-                    onClick={() => toggleResponse(review.id)}
-                    className="flex items-center gap-1 text-xs font-semibold !text-brand-green hover:underline cursor-pointer !p-0 !min-h-0 !h-auto"
-                    rightIcon={
-                      <FiChevronDown
-                        className={`w-3.5 h-3.5 transition-transform ${isResponseOpen ? "rotate-180" : ""}`}
-                      />
-                    }
-                  >
-                    <span>Seller response</span>
-                  </Button>
-                  {isResponseOpen && (
-                    <p className="mt-2 text-xs text-gray-600 bg-white p-3 rounded-[6px] border border-gray-100 leading-relaxed">
-                      {review.sellerResponse}
-                    </p>
-                  )}
-                </div>
-              )}
+              {/* Nested Seller Response & Reply Box */}
+              <SellerReviewReply
+                reviewId={review.id}
+                orderId={review.orderId}
+                sellerReply={review.sellerReply || review.sellerResponse}
+                sellerReplyAt={review.sellerReplyAt}
+                sellerName={sellerName || "Seller"}
+                sellerAvatar={sellerAvatar}
+                canReply={isSellerOwner}
+              />
             </div>
           );
         })}

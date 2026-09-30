@@ -7,3 +7,4 @@ export * from './earnings';
 export * from './kyc';
 export * from './support';
 export * from './common';
+export * from './review';

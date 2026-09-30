@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import moment from 'moment';
 import { getCountryFlag } from '@/utils';
 import { Button } from "@/components/ui";
+import { SellerReviewReply } from "@/features/reviews";
 
 export interface ReviewUser {
   _id?: string;
@@ -32,13 +33,24 @@ export interface ReviewItem {
   price?: number | string;
   duration?: string;
   gigID?: ReviewGig;
+  sellerReply?: string | null;
+  sellerReplyAt?: string | null;
+  orderId?: string;
 }
 
 export interface ReviewProps {
   review?: ReviewItem;
+  canReply?: boolean;
+  sellerName?: string;
+  sellerAvatar?: string;
 }
 
-const Review: React.FC<ReviewProps> = ({ review }) => {
+const Review: React.FC<ReviewProps> = ({
+  review,
+  canReply = false,
+  sellerName,
+  sellerAvatar,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const userObj = review?.userID || review?.user;
@@ -170,6 +182,17 @@ const Review: React.FC<ReviewProps> = ({ review }) => {
             Service: {gigTitle}
           </p>
         )}
+
+        {/* Nested Seller Response */}
+        <SellerReviewReply
+          reviewId={review?._id || review?.id}
+          orderId={review?.orderId}
+          sellerReply={review?.sellerReply}
+          sellerReplyAt={review?.sellerReplyAt}
+          sellerName={sellerName || "Seller"}
+          sellerAvatar={sellerAvatar}
+          canReply={canReply}
+        />
       </div>
 
       {/* Footer Specs: Price & Duration */}

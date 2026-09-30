@@ -77,13 +77,19 @@ export default function OrderDetailPage() {
           /order|delivery extension|revision/i.test(String(data.message))
         );
 
+      const isReviewReplied =
+        data?.event === "review_replied" ||
+        /review|reply/i.test(String(data?.title || data?.message || ""));
+
       if (
         (incomingId && incomingId === String(id)) ||
         isLinkMatch ||
+        isReviewReplied ||
         (!incomingId && hasOrderKeywords) ||
         (!data || Object.keys(data).length === 0)
       ) {
         queryClient.invalidateQueries({ queryKey: ["order", id] });
+        queryClient.invalidateQueries({ queryKey: ["reviews"] });
         refetch();
       }
     };

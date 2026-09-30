@@ -2,8 +2,10 @@
 
 import React, { useState } from "react";
 import { FaStar } from "react-icons/fa";
-import { FiChevronDown, FiChevronUp, FiTag, FiCalendar, FiArrowRight } from "react-icons/fi";
+import { FiTag, FiCalendar, FiArrowRight } from "react-icons/fi";
 import { Button } from "@/components/ui";
+import { useUserStore } from "@/store/userStore";
+import { SellerReviewReply } from "@/features/reviews";
 import { SellerReviewItem, SELLER_FALLBACK_IMAGES } from "../utils/sellerProfileNormalizer";
 
 interface SellerReviewsSectionProps {
@@ -16,6 +18,10 @@ interface SellerReviewsSectionProps {
     value: string;
   };
   reviews: SellerReviewItem[];
+  sellerName?: string;
+  sellerAvatar?: string;
+  sellerUsername?: string;
+  sellerId?: string;
 }
 
 export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
@@ -24,17 +30,25 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
   starDistribution,
   categoryScores,
   reviews,
+  sellerName,
+  sellerAvatar,
+  sellerUsername,
+  sellerId,
 }) => {
-  const [expandedResponses, setExpandedResponses] = useState<{ [id: string]: boolean }>({});
+  const currentUser = useUserStore((state) => state.user);
   const [visibleCount, setVisibleCount] = useState(2);
+
+  const isSellerOwner = Boolean(
+    currentUser && (
+      (currentUser.username && sellerUsername && currentUser.username.toLowerCase() === sellerUsername.toLowerCase()) ||
+      (currentUser._id && sellerId && currentUser._id === sellerId) ||
+      (currentUser.id && sellerId && currentUser.id === sellerId)
+    )
+  );
 
   if (!reviews || reviews.length === 0) {
     return null;
   }
-
-  const toggleResponse = (id: string) => {
-    setExpandedResponses((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
 
   const displayedReviews = reviews.slice(0, visibleCount);
   const hasCategoryScores = Boolean(categoryScores?.communication || categoryScores?.quality || categoryScores?.value);
@@ -116,8 +130,6 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
       {/* 3. Client Reviews List */}
       <div className="space-y-4">
         {displayedReviews.map((rev) => {
-          const isRespOpen = expandedResponses[rev.id] ?? false;
-
           return (
             <div
               key={rev.id}
@@ -217,35 +229,16 @@ export const SellerReviewsSection: React.FC<SellerReviewsSectionProps> = ({
                 </div>
               )}
 
-              {/* Collapsible Seller Response */}
-              {rev.sellerResponse && (
-                <div className="border-t border-gray-200/60 pt-3">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="xs"
-                    onClick={() => toggleResponse(rev.id)}
-                    className="text-xs font-semibold text-gray-600 hover:text-gray-900 flex items-center gap-1.5 transition-colors !p-0 !min-h-0 !h-auto hover:!bg-transparent"
-                    rightIcon={
-                      isRespOpen ? (
-                        <FiChevronUp className="w-3.5 h-3.5" />
-                      ) : (
-                        <FiChevronDown className="w-3.5 h-3.5" />
-                      )
-                    }
-                  >
-                    <span>Seller Response</span>
-                  </Button>
-
-                  {isRespOpen && (
-                    <div className="mt-3 pl-4 border-l-2 border-teal-600 bg-white/70 p-3 rounded-r-lg">
-                      <p className="text-xs text-gray-600 leading-relaxed font-normal">
-                        {rev.sellerResponse}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Nested Seller Response & Reply Box */}
+              <SellerReviewReply
+                reviewId={rev.id}
+                orderId={rev.orderId}
+                sellerReply={rev.sellerReply || rev.sellerResponse}
+                sellerReplyAt={rev.sellerReplyAt}
+                sellerName={sellerName || "Seller"}
+                sellerAvatar={sellerAvatar}
+                canReply={isSellerOwner}
+              />
             </div>
           );
         })}

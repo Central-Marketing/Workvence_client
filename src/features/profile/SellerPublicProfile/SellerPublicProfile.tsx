@@ -261,6 +261,10 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
             starDistribution={profileData.reviewsData.starDistribution}
             categoryScores={profileData.reviewsData.categoryScores}
             reviews={profileData.reviewsData.list}
+            sellerName={profileData.name || profileData.username}
+            sellerAvatar={profileData.avatar}
+            sellerUsername={profileData.username}
+            sellerId={profileData.id}
           />
         )}
 

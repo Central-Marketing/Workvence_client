@@ -20,16 +20,20 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   const isAuthPage = AUTH_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
+  const isOnboardingPage =
+    pathname.startsWith("/seller/onboarding") ||
+    pathname === "/onboarding" ||
+    pathname.startsWith("/onboarding/");
   const isAdminPage = pathname.startsWith("/admin");
 
   return (
     <div className={`flex flex-col overflow-x-clip w-full max-w-full ${isChatDetailPage ? 'h-screen h-[100dvh] max-h-[100dvh] overflow-hidden' : 'min-h-screen'}`}>
-      {!isAuthPage && !isAdminPage && !isChatDetailPage && <Navbar />}
-      {!isAdminPage && !isAuthPage && <KycPromptModal />}
+      {!isAuthPage && !isOnboardingPage && !isAdminPage && !isChatDetailPage && <Navbar />}
+      {!isAdminPage && !isAuthPage && !isOnboardingPage && <KycPromptModal />}
       <main id="main-content" className={`flex-1 min-h-0 ${isChatDetailPage ? 'overflow-hidden flex flex-col h-full max-h-full' : ''}`}>
         {children}
       </main>
-      {!isMessagePage && !isAuthPage && !isAdminPage && <Footer />}
+      {!isMessagePage && !isAuthPage && !isOnboardingPage && !isAdminPage && <Footer />}
     </div>
   );
 }

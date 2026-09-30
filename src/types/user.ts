@@ -49,6 +49,9 @@ export interface User {
   createdAt?: string;
   updatedAt?: string;
   skills?: string[];
+  categories?: string[];
+  primaryCategory?: string;
+  onboardingCompleted?: boolean;
   languages?: string[];
   education?: EducationItem[];
   experience?: ExperienceItem[];

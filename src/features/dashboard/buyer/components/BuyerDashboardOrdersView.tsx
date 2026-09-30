@@ -174,7 +174,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
               <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">
                 <path d="M26.25 4.12508C25.0384 3.87911 23.7842 3.75 22.5 3.75C12.1447 3.75 3.75 12.1447 3.75 22.5C3.75 32.8552 12.1447 41.25 22.5 41.25C32.8552 41.25 41.25 32.8552 41.25 22.5C41.25 21.2158 41.1208 19.9616 40.875 18.75" stroke="#F57727" strokeWidth="2.5" strokeLinecap="round" />
                 <path d="M22.5 16.875C20.4289 16.875 18.75 18.1342 18.75 19.6875C18.75 21.2408 20.4289 22.5 22.5 22.5C24.5711 22.5 26.25 23.7592 26.25 25.3125C26.25 26.8658 24.5711 28.125 22.5 28.125M22.5 16.875C24.1328 16.875 25.5217 17.6576 26.0366 18.75M22.5 16.875V15M22.5 28.125C20.8672 28.125 19.4783 27.3424 18.9634 26.25M22.5 28.125V30" stroke="#F57727" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M31.8712 13.1289L39.7011 5.29478M41.2462 12.1506L41.0246 6.35406C41.0246 4.98786 40.209 4.13663 38.7231 4.02927L32.8654 3.75391" stroke="#F57727" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                <path d="M31.8712 13.1289L39.7011 5.29478M41.2462 12.1506L41.0246 6.35406C41.0246 4.98786 40.209 4.13663 38.7231 4.02927L32.8654 3.75391" stroke="#F57727" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
           </div>
@@ -190,10 +190,10 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
             </div>
             <div className="w-10 h-10 p-2 rounded-[6px] border border-[rgba(0,0,0,0.10)] bg-[#fff] flex items-center justify-center text-[#9747FF] shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">
-                <path d="M4.6875 14.0625V25.3125C4.6875 32.3835 4.6875 35.9192 6.88419 38.1157C9.08091 40.3125 12.6164 40.3125 19.6875 40.3125H25.3125C32.3835 40.3125 35.9192 40.3125 38.1157 38.1157C40.3125 35.9192 40.3125 32.3835 40.3125 25.3125V14.0625" stroke="#8133F1" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M7.25454 9.96489L4.6875 14.0625H40.3125L37.9646 10.1494C36.3639 7.48164 35.5637 6.14775 34.2741 5.41763C32.9846 4.6875 31.4289 4.6875 28.3179 4.6875H16.7882C13.7437 4.6875 12.2215 4.6875 10.9502 5.39119C9.67903 6.09487 8.87087 7.38489 7.25454 9.96489Z" stroke="#8133F1" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M22.5 14.0625V4.6875" stroke="#8133F1" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M11.25 33.75H20.625M11.25 28.125H16.875" stroke="#8133F1" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                <path d="M4.6875 14.0625V25.3125C4.6875 32.3835 4.6875 35.9192 6.88419 38.1157C9.08091 40.3125 12.6164 40.3125 19.6875 40.3125H25.3125C32.3835 40.3125 35.9192 40.3125 38.1157 38.1157C40.3125 35.9192 40.3125 32.3835 40.3125 25.3125V14.0625" stroke="#8133F1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M7.25454 9.96489L4.6875 14.0625H40.3125L37.9646 10.1494C36.3639 7.48164 35.5637 6.14775 34.2741 5.41763C32.9846 4.6875 31.4289 4.6875 28.3179 4.6875H16.7882C13.7437 4.6875 12.2215 4.6875 10.9502 5.39119C9.67903 6.09487 8.87087 7.38489 7.25454 9.96489Z" stroke="#8133F1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M22.5 14.0625V4.6875" stroke="#8133F1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M11.25 33.75H20.625M11.25 28.125H16.875" stroke="#8133F1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
           </div>
@@ -209,13 +209,13 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
             </div>
             <div className="w-10 h-10 p-2 rounded-[6px] border border-[rgba(0,0,0,0.10)] bg-[#fff] flex items-center justify-center text-[#0D9488] shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">
-                <path d="M22.5 22.5V30" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M15 22.5V30" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M42.1875 15H2.8125" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M33.75 15L28.125 5.625" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M11.25 15L16.875 5.625" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M28.125 35.625C28.125 35.625 30 35.625 31.875 39.375C31.875 39.375 35.9559 30 41.25 28.125" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M22.5 37.5H17.9677C13.4161 37.5 11.1403 37.5 9.56674 36.1671C7.99316 34.8339 7.61903 32.5892 6.87075 28.0995L4.6875 15H40.3125L39.0624 22.5" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                <path d="M22.5 22.5V30" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M15 22.5V30" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M42.1875 15H2.8125" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M33.75 15L28.125 5.625" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M11.25 15L16.875 5.625" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M28.125 35.625C28.125 35.625 30 35.625 31.875 39.375C31.875 39.375 35.9559 30 41.25 28.125" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M22.5 37.5H17.9677C13.4161 37.5 11.1403 37.5 9.56674 36.1671C7.99316 34.8339 7.61903 32.5892 6.87075 28.0995L4.6875 15H40.3125L39.0624 22.5" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
           </div>
@@ -243,7 +243,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
             </div>
             <div className="w-10 h-10 p-2 rounded-[6px] border border-[rgba(0,0,0,0.10)] bg-[#fff] group-hover:bg-[#FFEBEB] flex items-center justify-center text-[#EF4444] shrink-0 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">
-                <path d="M19.5201 37.4394C14.2302 33.4837 3.75 24.4403 3.75 16.3021C3.75 10.9231 7.69736 6.5625 13.125 6.5625C15.9375 6.5625 18.75 7.5 22.5 11.25C26.25 7.5 29.0625 6.5625 31.875 6.5625C37.3026 6.5625 41.25 10.9231 41.25 16.3021C41.25 24.4403 30.7699 33.4837 25.4799 37.4394C23.6998 38.7705 21.3002 38.7705 19.5201 37.4394Z" stroke="#F00000" strokeWidth="2.8125" strokeLinecap="round" stroke-linejoin="round" />
+                <path d="M19.5201 37.4394C14.2302 33.4837 3.75 24.4403 3.75 16.3021C3.75 10.9231 7.69736 6.5625 13.125 6.5625C15.9375 6.5625 18.75 7.5 22.5 11.25C26.25 7.5 29.0625 6.5625 31.875 6.5625C37.3026 6.5625 41.25 10.9231 41.25 16.3021C41.25 24.4403 30.7699 33.4837 25.4799 37.4394C23.6998 38.7705 21.3002 38.7705 19.5201 37.4394Z" stroke="#F00000" strokeWidth="2.8125" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
           </Link>

@@ -105,8 +105,8 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
           <div className="min-h-[64px] sm:min-h-[72px] px-3.5 py-3 sm:px-4 sm:py-3.5 2xl:px-2.5 2xl:py-3 flex items-center gap-2.5 2xl:gap-2 border-b 2xl:border-b-0 2xl:border-r border-black/10 min-w-0">
             <div className="w-7 h-7 sm:w-7.5 sm:h-7.5 2xl:w-8 2xl:h-8 rounded-[6px] p-1 bg-white border border-[rgba(0,0,0,0.10)] text-amber-500 flex items-center justify-center shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#F57727" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M12 6V12H16" stroke="#F57727" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round" />
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#F57727" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M12 6V12H16" stroke="#F57727" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
 
@@ -128,11 +128,11 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
           <div className="min-h-[64px] sm:min-h-[72px] px-3.5 py-3 sm:px-4 sm:py-3.5 2xl:px-2.5 2xl:py-3 flex items-center gap-2.5 2xl:gap-2 min-w-0">
             <div className="w-7 h-7 sm:w-7.5 sm:h-7.5 2xl:w-8 2xl:h-8 rounded-[6px] p-1 bg-white border border-[rgba(0,0,0,0.10)] text-emerald-500 flex items-center justify-center shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M13 22C12.1818 22 11.4002 21.6588 9.83691 20.9764C8.01233 20.18 6.61554 19.5703 5.64648 19H2M13 22C13.8182 22 14.5998 21.6588 16.1631 20.9764C20.0544 19.2779 22 18.4286 22 17V6.5M13 22V11M4 6.5V9.5" stroke="#54AA54" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M9.32592 9.69138L6.40472 8.27785C4.80157 7.5021 4 7.11423 4 6.5C4 5.88577 4.80157 5.4979 6.40472 4.72215L9.32592 3.30862C11.1288 2.43621 12.0303 2 13 2C13.9697 2 14.8712 2.4362 16.6741 3.30862L19.5953 4.72215C21.1984 5.4979 22 5.88577 22 6.5C22 7.11423 21.1984 7.5021 19.5953 8.27785L16.6741 9.69138C14.8712 10.5638 13.9697 11 13 11C12.0303 11 11.1288 10.5638 9.32592 9.69138Z" stroke="#54AA54" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M18.1366 4.01562L7.86719 8.98485" stroke="#54AA54" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M2 13H5" stroke="#54AA54" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round" />
-                <path d="M2 16H5" stroke="#54AA54" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round" />
+                <path d="M13 22C12.1818 22 11.4002 21.6588 9.83691 20.9764C8.01233 20.18 6.61554 19.5703 5.64648 19H2M13 22C13.8182 22 14.5998 21.6588 16.1631 20.9764C20.0544 19.2779 22 18.4286 22 17V6.5M13 22V11M4 6.5V9.5" stroke="#54AA54" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M9.32592 9.69138L6.40472 8.27785C4.80157 7.5021 4 7.11423 4 6.5C4 5.88577 4.80157 5.4979 6.40472 4.72215L9.32592 3.30862C11.1288 2.43621 12.0303 2 13 2C13.9697 2 14.8712 2.4362 16.6741 3.30862L19.5953 4.72215C21.1984 5.4979 22 5.88577 22 6.5C22 7.11423 21.1984 7.5021 19.5953 8.27785L16.6741 9.69138C14.8712 10.5638 13.9697 11 13 11C12.0303 11 11.1288 10.5638 9.32592 9.69138Z" stroke="#54AA54" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M18.1366 4.01562L7.86719 8.98485" stroke="#54AA54" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M2 13H5" stroke="#54AA54" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M2 16H5" stroke="#54AA54" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
 

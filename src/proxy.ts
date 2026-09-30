@@ -27,6 +27,8 @@ const SELLER_ROUTES = [
   "/settings/verification",
   "/seller/suspended",
   "/suspended-seller",
+  "/seller/onboarding",
+  "/onboarding",
 ];
 
 // 4. Buyer-only routes (sellers should be redirected to seller manage-orders)

@@ -12,9 +12,16 @@ export default function SellerDashboardPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    if (user) {
+      const hasCategories = Array.isArray(user.categories) && user.categories.length > 0;
+      if (!user.onboardingCompleted && !hasCategories) {
+        router.replace("/seller/onboarding");
+      }
+    }
+  }, [user, router]);
 
-  if (!user) {
+  const hasCategories = Array.isArray(user?.categories) && user.categories.length > 0;
+  if (!user || (!user.onboardingCompleted && !hasCategories)) {
     return <DashboardSkeleton />;
   }
 

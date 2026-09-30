@@ -3,7 +3,7 @@
 import toast from 'react-hot-toast';
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, Flag, ArrowRight, Download, Eye, Home } from "lucide-react";
+import { ArrowLeft, Flag, ArrowRight, Download, Eye, Home, Check } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BsThreeDotsVertical } from "react-icons/bs";
 
@@ -2272,8 +2272,8 @@ const ChatView = () => {
                             )}
 
                             {isAccepted && (
-                              <div className="w-full flex items-center justify-between gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200/80 rounded-[6px] px-3.5 py-2 text-xs font-bold">
-                                <span>✓ Custom Proposal Accepted</span>
+                              <div className="w-full flex items-center justify-between gap-2 bg-white text-emerald-800 border border-[rgba(0,0,0,0.10)] rounded-[6px] px-3.5 py-2 text-xs font-bold">
+                                <span className='flex items-center gap-1'><Check size={20} /> Custom Proposal Accepted</span>
                                 {targetOrderId && (
                                   <span className="text-[11px] font-mono text-emerald-700">
                                     Order #{String(targetOrderId).slice(-6)}

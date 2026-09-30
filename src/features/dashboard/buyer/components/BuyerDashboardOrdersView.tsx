@@ -146,7 +146,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
         </div>
 
         {/* 4-Stat Metric Bar */}
-        <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.03)] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 overflow-hidden">
+        <div className="bg-[#f5f5f5] rounded-[6px] border border-[#DADADA] shadow-[0_1px_3px_rgba(0,0,0,0.03)] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[rgba(0,0,0,0.10)] overflow-hidden">
           {/* Total Spend */}
           <div className="p-5 sm:p-6 flex items-center justify-between">
             <div>
@@ -271,21 +271,21 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
               className="text-xs sm:text-sm font-semibold text-[#113E37] hover:underline flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
             >
               <span>Manage all orders</span>
-              <span>→</span>
+              <FiArrowRight className="text-xs" />
             </Link>
           </div>
         </div>
 
         {/* Orders Table */}
-        <div className="w-full shadow-md overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)]">
+        <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)]">
           <table className="w-full  min-w-[760px] border-collapse text-left">
             <thead>
-              <tr className="border-b border-slate-100 text-xs sm:text-sm font-bold text-slate-700">
-                <th className="py-3.5 px-3 font-bold">Order Name</th>
-                <th className="py-3.5 px-3 font-bold whitespace-nowrap">Order Date</th>
-                <th className="py-3.5 px-3 font-bold whitespace-nowrap">Due on</th>
-                <th className="py-3.5 px-3 font-bold whitespace-nowrap">Total</th>
-                <th className="py-3.5 px-3 font-bold whitespace-nowrap">Status</th>
+              <tr className="border-b border-slate-100 text-base  font-sf-pro font-bold text-[#434343]">
+                <th className="py-3 px-4 font-bold">Order Name</th>
+                <th className="py-3 px-4 font-bold whitespace-nowrap">Order Date</th>
+                <th className="py-3 px-4 font-bold whitespace-nowrap">Due on</th>
+                <th className="py-3 px-4 font-bold whitespace-nowrap">Total</th>
+                <th className="py-3 px-4 font-bold whitespace-nowrap">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -353,7 +353,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
                           </div>
                           <div className="flex flex-col min-w-0">
                             <span
-                              className="text-[13px] font-semibold text-slate-900 leading-snug line-clamp-2 group-hover:text-[#327C73] transition-colors"
+                              className="text-[14px] font-[700] font-sf-pro text-[#434343] line-clamp-1 group-hover:text-[#0D3B34] transition-colors"
                               title={order.title}
                             >
                               {order.title}

@@ -137,31 +137,23 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
             )} */}
           </div>
 
-          {/* Complete Your Profile Bar */}
-          <div className="flex flex-col items-start md:items-end shrink-0">
-            {completionPercentage >= 100 ? (
-              <div className="flex items-center justify-between w-56 sm:w-64 text-xs sm:text-sm font-semibold text-emerald-700 mb-1.5">
-                <span className="flex items-center gap-1.5">
-                  <FiCheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                  Profile 100% Completed
-                </span>
-              </div>
-            ) : (
+          {/* Complete Your Profile Bar (only shown when profile < 100%) */}
+          {completionPercentage < 100 && (
+            <div className="flex flex-col items-start md:items-end shrink-0">
               <div className="flex items-center justify-between w-56 sm:w-64 text-xs sm:text-sm font-semibold text-gray-800 mb-1.5">
                 <Link href="/profile" className="underline hover:text-[#327C73] transition-colors">
                   Complete your profile
                 </Link>
                 <span className="font-bold text-gray-900">{completionPercentage}%</span>
               </div>
-            )}
-            <div className="w-56 sm:w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-700 ${completionPercentage >= 100 ? "bg-emerald-500 w-full" : "bg-[#00E599]"
-                  }`}
-                style={{ width: `${completionPercentage}%` }}
-              />
+              <div className="w-56 sm:w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700 bg-[#00E599]"
+                  style={{ width: `${completionPercentage}%` }}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {isOrdersLoading ? (

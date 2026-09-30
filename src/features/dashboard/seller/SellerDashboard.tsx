@@ -132,6 +132,34 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
       <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
         <div className="container mx-auto px-4 md:px-6 space-y-7">
 
+          {/* 1. Header: Welcome & Profile Completion */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-1">
+            {/* Greeting */}
+            <div>
+              <h1 className="text-3xl sm:text-4xl md:text-[38px] font-normal text-gray-800 tracking-tight leading-tight">
+                Welcome to Workvence, <span className="font-extrabold text-gray-950">{displayName}</span>
+              </h1>
+            </div>
+
+            {/* Complete Your Profile Bar (only shown when profile < 100%) */}
+            {completionPercentage < 100 && (
+              <div className="flex flex-col items-start md:items-end shrink-0">
+                <div className="flex items-center justify-between w-56 sm:w-64 text-xs sm:text-sm font-semibold text-gray-800 mb-1.5">
+                  <Link href="/profile" className="underline hover:text-[#327C73] transition-colors">
+                    Complete your profile
+                  </Link>
+                  <span className="font-bold text-gray-900">{completionPercentage}%</span>
+                </div>
+                <div className="w-56 sm:w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-700 bg-[#00E599]"
+                    style={{ width: `${completionPercentage}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Top Hero Banner: Draft Package Notification */}
           {latestDraftPackage && (
             <div className="relative overflow-hidden rounded-[6px] bg-[#0F0F12] bg-[radial-gradient(ellipse_65%_130%_at_82%_50%,_#7C3AED_0%,_#531A85_38%,_#1D0933_68%,_#0F0F12_100%)] p-7 sm:p-[22px] text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
@@ -173,52 +201,115 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
             </div>
           )}
 
+          <div>
+            <h2 className="text-[20px] font-bold text-slate-900">Order Summary</h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Get a quick overview of your orders, spending, and current order activity in one place.
+            </p>
+          </div>
+
           {/* 4-Metric Stats Bar */}
-          <div className="bg-[#f5f5f5] rounded-[6px] border border-[#DADADA] shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-7 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 gap-y-5 sm:gap-y-0">
-            <div className="sm:pr-6">
-              <span className="text-xs font-normal text-gray-500 block mb-1">Total Revenue</span>
-              <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
-                {displayRevenue.toLocaleString("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                })}
+          <div className="bg-[#f5f5f5] rounded-[6px] border border-[#DADADA] shadow-[0_1px_3px_rgba(0,0,0,0.03)] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[rgba(0,0,0,0.10)] overflow-hidden">
+            <div className="p-5 sm:p-6 flex items-center justify-between">
+              <div>
+                <p className="text-xs text-slate-500 font-medium">Total Revenue</p>
+                <p className="text-[24px] font-semibold text-slate-900 mt-1 tracking-tight">
+                  {displayRevenue.toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  })}
+                </p>
+                <p className="text-xs text-slate-400 mt-1">Cleared earning from {completedOrders.length} packages</p>
               </div>
-              <p className="text-[11px] text-gray-400 mt-1">
-                Cleared earning from{" "}
-                <strong className="font-semibold text-gray-700">
-                  {completedOrders.length}
-                </strong>{" "}
-                packages
-              </p>
+              <div className="w-10 h-10 p-2 rounded-[6px] border border-[rgba(0,0,0,0.10)] bg-[#fff] flex items-center justify-center text-[#E07A24] shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">
+                  <path d="M26.25 4.12508C25.0384 3.87911 23.7842 3.75 22.5 3.75C12.1447 3.75 3.75 12.1447 3.75 22.5C3.75 32.8552 12.1447 41.25 22.5 41.25C32.8552 41.25 41.25 32.8552 41.25 22.5C41.25 21.2158 41.1208 19.9616 40.875 18.75" stroke="#F57727" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M22.5 16.875C20.4289 16.875 18.75 18.1342 18.75 19.6875C18.75 21.2408 20.4289 22.5 22.5 22.5C24.5711 22.5 26.25 23.7592 26.25 25.3125C26.25 26.8658 24.5711 28.125 22.5 28.125M22.5 16.875C24.1328 16.875 25.5217 17.6576 26.0366 18.75M22.5 16.875V15M22.5 28.125C20.8672 28.125 19.4783 27.3424 18.9634 26.25M22.5 28.125V30" stroke="#F57727" strokeWidth="2.5" strokeLinecap="round" />
+                  <path d="M31.8712 13.1289L39.7011 5.29478M41.2462 12.1506L41.0246 6.35406C41.0246 4.98786 40.209 4.13663 38.7231 4.02927L32.8654 3.75391" stroke="#F57727" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+
+
+
             </div>
 
-            <div className="sm:px-6 pt-4 sm:pt-0">
-              <span className="text-xs font-normal text-gray-500 block mb-1">Active Orders</span>
-              <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
-                {displayActiveOrders}
+            <div className="p-5 sm:p-6 flex items-center justify-between">
+              <div className="">
+                <p className="text-xs text-slate-500 font-medium">Active Orders</p>
+                <p className="text-[24px] font-semibold text-slate-900 mt-1 tracking-tight">
+                  {displayActiveOrders}
+                </p>
+                <p className="text-[11px] text-gray-400 mt-1">Currently in progress</p>
               </div>
-              <p className="text-[11px] text-gray-400 mt-1">Currently in progress</p>
+              <div className="w-10 h-10 p-2 rounded-[6px] border border-[rgba(0,0,0,0.10)] bg-[#fff] flex items-center justify-center text-[#9747FF] shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">
+                  <path d="M4.6875 14.0625V25.3125C4.6875 32.3835 4.6875 35.9192 6.88419 38.1157C9.08091 40.3125 12.6164 40.3125 19.6875 40.3125H25.3125C32.3835 40.3125 35.9192 40.3125 38.1157 38.1157C40.3125 35.9192 40.3125 32.3835 40.3125 25.3125V14.0625" stroke="#8133F1" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                  <path d="M7.25454 9.96489L4.6875 14.0625H40.3125L37.9646 10.1494C36.3639 7.48164 35.5637 6.14775 34.2741 5.41763C32.9846 4.6875 31.4289 4.6875 28.3179 4.6875H16.7882C13.7437 4.6875 12.2215 4.6875 10.9502 5.39119C9.67903 6.09487 8.87087 7.38489 7.25454 9.96489Z" stroke="#8133F1" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                  <path d="M22.5 14.0625V4.6875" stroke="#8133F1" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                  <path d="M11.25 33.75H20.625M11.25 28.125H16.875" stroke="#8133F1" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
             </div>
 
-            <div className="sm:px-6 pt-4 sm:pt-0">
-              <span className="text-xs font-normal text-gray-500 block mb-1">Completed Orders</span>
-              <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
-                {displayCompletedOrders}
+            <div className="p-5 sm:p-6 flex items-center justify-between">
+              <div className="">
+                <p className="text-xs font-normal text-slate-500 block mb-1">Completed Orders</p>
+                <p className="text-2xl sm:text-[26px] font-bold text-slate-900 mt-1 tracking-tight">
+                  {displayCompletedOrders}
+                </p>
+                <p className="text-[11px] text-slate-400 mt-1">Packages successfully completed</p>
               </div>
-              <p className="text-[11px] text-gray-400 mt-1">Packages successfully closed</p>
+              <div className="w-10 h-10 p-2 rounded-[6px] border border-[rgba(0,0,0,0.10)] bg-[#fff] flex items-center justify-center text-[#0D9488] shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">
+                  <path d="M22.5 22.5V30" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                  <path d="M15 22.5V30" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                  <path d="M42.1875 15H2.8125" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                  <path d="M33.75 15L28.125 5.625" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                  <path d="M11.25 15L16.875 5.625" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                  <path d="M28.125 35.625C28.125 35.625 30 35.625 31.875 39.375C31.875 39.375 35.9559 30 41.25 28.125" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                  <path d="M22.5 37.5H17.9677C13.4161 37.5 11.1403 37.5 9.56674 36.1671C7.99316 34.8339 7.61903 32.5892 6.87075 28.0995L4.6875 15H40.3125L39.0624 22.5" stroke="#1A9997" strokeWidth="2.5" strokeLinecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
             </div>
 
-            <div className="sm:pl-6 pt-4 sm:pt-0">
-              <span className="text-xs font-normal text-gray-500 block mb-1">Unread Messages</span>
-              <div className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
-                {displayUnreadMessages}
+
+            <div className="p-5 sm:p-6 flex items-center justify-between">
+              <div className="">
+                <p className="text-xs font-normal text-gray-500 block mb-1">Unread Messages</p>
+                <p className="text-2xl sm:text-[26px] font-bold text-gray-950 tracking-tight">
+                  {displayUnreadMessages}
+                </p>
+                <p className="text-[11px] text-gray-400 mt-1">Awaiting your response</p>
               </div>
-              <p className="text-[11px] text-gray-400 mt-1">Awaiting your response</p>
+              <div className="w-10 h-10 p-2 rounded-[6px] border border-[rgba(0,0,0,0.10)] bg-[#fff] group-hover:bg-[#FFEBEB] flex items-center justify-center text-[#EF4444] shrink-0 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">
+                  <rect
+                    x="4.6875"
+                    y="9.375"
+                    width="35.625"
+                    height="26.25"
+                    rx="5.625"
+                    stroke="#F00000"
+                    stroke-width="2.8125"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M6.5625 12.1875L20.2444 23.133C21.5794 24.201 23.4206 24.201 24.7556 23.133L38.4375 12.1875"
+                    stroke="#F00000"
+                    stroke-width="2.8125"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+
+              </div>
             </div>
+
           </div>
 
           {/* Recent Orders Card */}
-          <div className="bg-[#F5F5F5] rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-10 space-y-6">
+          <div className="bg-[#F5F5F5] rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-7 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <h2 className="text-xl sm:text-[22px] font-bold text-gray-900 tracking-tight">
                 Recent Orders
@@ -271,7 +362,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
 
                 <Link
                   href="/manage-orders"
-                  className="text-[#0D6D5F] hover:text-[#0A5348] font-semibold text-xs sm:text-[13px] flex items-center gap-1.5 hover:underline ml-1 transition-colors"
+                  className="text-xs sm:text-sm font-semibold text-[#113E37] hover:underline flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
                 >
                   Manage all orders <FiArrowRight className="text-xs" />
                 </Link>
@@ -281,15 +372,15 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
             <hr className="border-[rgba(0, 0, 0, 0.10)] my-10" />
 
             {/* Orders Table */}
-            <div className="w-full shadow-md overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] ">
+            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] ">
               <table className="w-full text-left text-sm border-collapse min-w-[700px] ">
                 <thead className="">
-                  <tr className="text-xs font-bold text-gray-700 border-b border-gray-100">
-                    <th className="py-3.5 px-3 font-bold">Order Name</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Order Date</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Due on</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Total</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Status</th>
+                  <tr className="border-b border-slate-100 text-base  font-sf-pro font-bold text-[#434343]">
+                    <th className="py-3 px-4 ">Order Name</th>
+                    <th className="py-3 px-4  whitespace-nowrap">Order Date</th>
+                    <th className="py-3 px-4  whitespace-nowrap">Due on</th>
+                    <th className="py-3 px-4  whitespace-nowrap">Total</th>
+                    <th className="py-3 px-4  whitespace-nowrap">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -300,7 +391,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                       </td>
                     </tr>
                   ) : (
-                    ordersToDisplay.slice(0, 8).map((order: any, idx: number) => {
+                    ordersToDisplay.slice(0, 5).map((order: any, idx: number) => {
                       const isBrief = Boolean(order.briefID || order.type === "brief");
                       const orderDate = order.createdAt
                         ? new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
@@ -372,7 +463,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                                 />
                               </div>
                               <div className="flex flex-col gap-1 min-w-0">
-                                <span className="text-xs sm:text-[13px] font-normal text-gray-800 line-clamp-2 leading-snug">
+                                <span className="text-[14px] font-[700] font-sf-pro text-[#434343] line-clamp-1 group-hover:text-[#0D3B34] transition-colors">
                                   {order.title || "Custom Deliverable"}
                                 </span>
                                 <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-[6px] bg-[#FAFAFA] text-[#292929] border border-[#C7C7C7] w-fit">
@@ -409,6 +500,20 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                 </tbody>
               </table>
             </div>
+
+            {/* See more orders button */}
+            <div className="flex justify-center mt-6 pt-2 ">
+              <Button
+                href="/manage-orders"
+                variant="outline"
+                size="sm"
+                radius="fiverr"
+                className="font-medium text-xs sm:text-sm px-6 py-2.5 border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center gap-2 cursor-pointer shadow-2xs"
+              >
+                <span>See more orders</span>
+                <FiArrowRight className="w-4 h-4 text-slate-500" />
+              </Button>
+            </div>
           </div>
 
         </div>
@@ -424,43 +529,31 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
       <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
 
         {/* 1. Header: Welcome & Profile Completion */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-1">
+          {/* Greeting */}
           <div>
-            <h1 className="text-2xl sm:text-[26px] text-[#555E68] font-normal tracking-tight">
-              Welcome to Workvence, <span className="font-bold text-black">{displayName}</span>
+            <h1 className="text-3xl sm:text-4xl md:text-[38px] font-normal text-gray-800 tracking-tight leading-tight">
+              Welcome to Workvence, <span className="font-extrabold text-gray-950">{displayName}</span>
             </h1>
           </div>
 
-          {/* Profile Completion Bar */}
-          <Link
-            href="/profile"
-            className="flex flex-col items-start sm:items-end gap-1.5 group cursor-pointer self-start sm:self-auto"
-          >
-            <div className="flex items-center gap-3 text-[11px] sm:text-xs">
-              {isProfileCompleted ? (
-                <span className="flex items-center gap-1.5 text-emerald-700 font-semibold">
-                  <FiCheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  Profile 100% Completed
-                </span>
-              ) : (
-                <>
-                  <span className="text-[#374151] group-hover:text-teal-600 transition-colors underline underline-offset-2">
-                    Complete your profile
-                  </span>
-                  <span className="font-bold text-[#111827]">{completionPercentage}%</span>
-                </>
-              )}
+          {/* Complete Your Profile Bar (only shown when profile < 100%) */}
+          {completionPercentage < 100 && (
+            <div className="flex flex-col items-start md:items-end shrink-0">
+              <div className="flex items-center justify-between w-56 sm:w-64 text-xs sm:text-sm font-semibold text-gray-800 mb-1.5">
+                <Link href="/profile" className="underline hover:text-[#327C73] transition-colors">
+                  Complete your profile
+                </Link>
+                <span className="font-bold text-gray-900">{completionPercentage}%</span>
+              </div>
+              <div className="w-56 sm:w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700 bg-[#00E599]"
+                  style={{ width: `${completionPercentage}%` }}
+                />
+              </div>
             </div>
-            <div className="w-[170px] sm:w-[200px] h-[5px] bg-[#E9EBEF] rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-500 ${isProfileCompleted
-                  ? "bg-emerald-500 w-full"
-                  : "bg-gradient-to-r from-[#00E575] to-[#00E3A2]"
-                  }`}
-                style={{ width: `${completionPercentage}%` }}
-              />
-            </div>
-          </Link>
+          )}
         </div>
 
         {/* Draft Package Notification (if draft exists during onboarding) */}

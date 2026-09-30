@@ -249,10 +249,10 @@ const ManageOrders = () => {
             homeHref="/dashboard/seller"
             homeTitle="Dashboard"
             items={[
-              {
-                name: "Dashboard",
-                href: "/dashboard/seller",
-              },
+              // {
+              //   name: "Dashboard",
+              //   href: "/dashboard/seller",
+              // },
               {
                 name: "Manage Orders",
                 isLast: true,
@@ -262,10 +262,10 @@ const ManageOrders = () => {
 
           {/* Page Heading */}
           <div>
-            <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
+            <h1 className="text-xl md:text-2xl font-bold font-sf-pro text-[#292929]">
               Manage Orders
             </h1>
-            <p className="text-xs sm:text-[13px] text-gray-500 mt-1.5 leading-relaxed">
+            <p className="text-xs sm:text-[14px] text-[#6E6E6E] mt-1.5 leading-relaxed">
               View, track, and manage all your orders, from recent purchases to upcoming deliveries, in one place.
             </p>
           </div>

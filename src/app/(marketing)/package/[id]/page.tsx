@@ -182,29 +182,34 @@ const PackageContent = () => {
     }
 
     try {
-      const { data: convData } = await axiosFetch.post('/conversations', {
-        sellerID,
-        buyerID,
+      const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
+      const targetId = res.data?.uuid || res.data?.conversationID || res.data?.id || res.data?._id;
+      if (targetId) {
+        router.push(`/message/${targetId}`);
+        return;
+      }
+    } catch {
+      // not found, proceed to create
+    }
+
+    try {
+      const { data } = await axiosFetch.post('/conversations', {
         to: sellerID,
         from: buyerID,
+        sellerID,
+        buyerID,
         seller_username: sellerUser,
         buyer_username: buyerUsername,
       });
 
-      const targetId = convData?.uuid || convData?.conversationID || convData?._id;
+      const targetId = data?.uuid || data?.conversationID || data?.id || data?._id;
       if (targetId) {
         router.push(`/message/${targetId}`);
+        return;
       }
+      toast.error('Could not start conversation');
     } catch (err: any) {
-      try {
-        const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
-        const targetId = res.data?.uuid || res.data?.conversationID || res.data?._id;
-        if (targetId) {
-          router.push(`/message/${targetId}`);
-        }
-      } catch {
-        toast.error(err?.response?.data?.message || 'Could not start conversation');
-      }
+      toast.error(err?.response?.data?.message || 'Could not start conversation');
     }
   };
 
@@ -431,10 +436,7 @@ const PackageContent = () => {
         categoryName={normalizedData.categoryName || normalizedData.subcategoryName || "Design"}
         onCtaClick={() => {
           closeCustomModal();
-          const catQuery = normalizedData.categorySlug || normalizedData.categoryName
-            ? `?category=${encodeURIComponent(normalizedData.categorySlug || normalizedData.categoryName)}`
-            : "";
-          router.push(`/briefs/create${catQuery}`);
+          handleContact();
         }}
       />
     </div>

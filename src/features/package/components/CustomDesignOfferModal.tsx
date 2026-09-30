@@ -1,13 +1,20 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { X, ArrowRight } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { X, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui";
+import { useUserStore } from "@/store/userStore";
+import { useAuthModalStore } from "@/store/authModalStore";
+import axiosFetch from "@/utils/axiosFetch";
+import toast from "react-hot-toast";
 
 export interface CustomDesignOfferModalProps {
   isOpen: boolean;
   onClose: () => void;
   seller?: {
+    id?: string;
+    _id?: string;
     name?: string;
     username?: string;
     image?: string;
@@ -25,8 +32,85 @@ export const CustomDesignOfferModal: React.FC<CustomDesignOfferModalProps> = ({
   categoryName = "Design",
   onCtaClick,
 }) => {
+  const router = useRouter();
   const modalRef = useRef<HTMLDivElement>(null);
   const triggerElementRef = useRef<HTMLElement | null>(null);
+
+  const user = useUserStore((state: any) => state.user);
+  const openAuthModal = useAuthModalStore((state: any) => state.openAuthModal);
+  const [isStartingChat, setIsStartingChat] = useState(false);
+
+  const handleGoToChat = async (currentUser?: any) => {
+    if (onCtaClick) {
+      onCtaClick();
+      return;
+    }
+
+    const activeUser =
+      currentUser && !currentUser.nativeEvent && ('_id' in currentUser || 'id' in currentUser || 'email' in currentUser)
+        ? currentUser
+        : user;
+
+    if (!activeUser) {
+      openAuthModal({
+        mode: 'login',
+        onSuccess: (loggedInUser: any) => {
+          handleGoToChat(loggedInUser);
+        },
+      });
+      return;
+    }
+
+    const sellerID = seller?.id || seller?._id;
+    const buyerID = activeUser?._id || activeUser?.id;
+
+    if (!sellerID || !buyerID) {
+      toast.error('User information missing to start conversation.');
+      return;
+    }
+
+    if (String(sellerID) === String(buyerID)) {
+      toast.error('You cannot contact yourself.');
+      return;
+    }
+
+    setIsStartingChat(true);
+
+    try {
+      const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
+      const targetId = res.data?.uuid || res.data?.conversationID || res.data?.id || res.data?._id;
+      if (targetId) {
+        onClose();
+        router.push(`/message/${targetId}`);
+        return;
+      }
+    } catch {
+      // not found, try post
+    }
+
+    try {
+      const { data } = await axiosFetch.post('/conversations', {
+        to: sellerID,
+        from: buyerID,
+        sellerID,
+        buyerID,
+        seller_username: seller?.username || null,
+        buyer_username: activeUser?.username || null,
+      });
+
+      const targetId = data?.uuid || data?.conversationID || data?.id || data?._id;
+      if (targetId) {
+        onClose();
+        router.push(`/message/${targetId}`);
+        return;
+      }
+      toast.error('Could not start conversation');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Could not start conversation');
+    } finally {
+      setIsStartingChat(false);
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -166,14 +250,20 @@ export const CustomDesignOfferModal: React.FC<CustomDesignOfferModalProps> = ({
               variant="dark"
               size="lg"
               radius="fiverr"
-              className="w-full text-white font-bold flex items-center justify-center gap-2 text-xs sm:text-sm shadow-md transition duration-200 cursor-pointer"
-              onClick={() => {
-                if (onCtaClick) {
-                  onCtaClick();
-                }
-              }}
+              disabled={isStartingChat}
+              className="w-full text-white font-bold flex items-center justify-center gap-2 text-xs sm:text-sm shadow-md transition duration-200 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
+              onClick={() => handleGoToChat()}
             >
-              Get tailored proposals <ArrowRight size={16} />
+              {isStartingChat ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Connecting...
+                </>
+              ) : (
+                <>
+                  Contact <ArrowRight size={16} />
+                </>
+              )}
             </Button>
 
             <button

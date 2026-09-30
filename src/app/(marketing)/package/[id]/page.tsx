@@ -142,7 +142,13 @@ const PackageContent = () => {
   };
 
   const handleContact = async (currentUser?: any) => {
-    const activeUser = currentUser || user;
+    // If called from onClick={onContact}, React passes the click MouseEvent as the first parameter.
+    // Ensure we only treat currentUser as a user object if it contains user identifiers, otherwise use user from store.
+    const activeUser =
+      currentUser && !currentUser.nativeEvent && ('_id' in currentUser || 'id' in currentUser || 'email' in currentUser)
+        ? currentUser
+        : user;
+
     if (!activeUser) {
       openAuthModal({
         mode: 'login',
@@ -156,9 +162,14 @@ const PackageContent = () => {
     const sellerObj = typeof rawApiData?.userID === 'object' ? rawApiData.userID : null;
     const sellerID = sellerObj?._id || sellerObj?.id || (typeof rawApiData?.userID === 'string' ? rawApiData.userID : null) || normalizedData.seller.id;
     const sellerUser = sellerObj?.username || normalizedData.seller.username;
+    console.log("sellerID", sellerID);
+    console.log("sellerUser", sellerUser);
 
     const buyerID = activeUser?._id || activeUser?.id;
     const buyerUsername = activeUser?.username;
+
+    console.log("buyerID", buyerID);
+    console.log("buyerUsername", buyerUsername);
 
     if (!sellerID || !buyerID) {
       toast.error('User information missing to start conversation.');
@@ -198,8 +209,12 @@ const PackageContent = () => {
   };
 
   const handleCheckout = (tier?: 'basic' | 'standard' | 'premium', currentUser?: any) => {
-    const activeTier = tier || selectedTier;
-    const activeUser = currentUser || user;
+    const activeTier = typeof tier === 'string' ? tier : selectedTier;
+    const activeUser =
+      currentUser && !currentUser.nativeEvent && ('_id' in currentUser || 'id' in currentUser || 'email' in currentUser)
+        ? currentUser
+        : user;
+
     if (!activeUser) {
       openAuthModal({
         mode: 'login',
@@ -213,6 +228,8 @@ const PackageContent = () => {
     const sellerObj = typeof rawApiData?.userID === 'object' ? rawApiData.userID : null;
     const sellerID = sellerObj?._id || sellerObj?.id || normalizedData.seller.id;
     const buyerID = activeUser?._id || activeUser?.id;
+    console.log("sellerID", sellerID);
+    console.log("buyerID", buyerID);
 
     if (sellerID && buyerID && String(sellerID) === String(buyerID)) {
       toast.error("You cannot purchase your own package.");
@@ -223,7 +240,10 @@ const PackageContent = () => {
   };
 
   const handleToggleFavorite = async (currentUser?: any) => {
-    const activeUser = currentUser || user;
+    const activeUser =
+      currentUser && !currentUser.nativeEvent && ('_id' in currentUser || 'id' in currentUser || 'email' in currentUser)
+        ? currentUser
+        : user;
     if (!activeUser) {
       openAuthModal({
         mode: 'login',

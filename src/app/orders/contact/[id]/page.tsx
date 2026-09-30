@@ -228,6 +228,8 @@ export default function ContactOrdersPage() {
         {/* Breadcrumb Navigation */}
         <div className="flex items-center justify-between flex-wrap gap-2">
           <Breadcrumb
+            homeHref={isSeller ? "/dashboard/seller" : "/dashboard/buyer"}
+            homeTitle="Dashboard"
             items={[
               {
                 name: isSeller ? "Manage Orders" : "Orders",

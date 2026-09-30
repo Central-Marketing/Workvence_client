@@ -603,21 +603,19 @@ const BriefDetail = () => {
     <div className="min-h-screen bg-[#FAFAFA] text-slate-800 pt-6 sm:pt-8 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4">
         {/* Top Breadcrumb */}
-        {categoryFormatted ? (
-          <Breadcrumb
-            className="mb-5 select-none"
-            items={[
-              {
-                name: "Briefs",
-                href: "/briefs",
-              },
-              {
-                name: categoryFormatted,
-                isLast: true,
-              },
-            ]}
-          />
-        ) : null}
+        <Breadcrumb
+          className="mb-5 select-none"
+          items={[
+            {
+              name: "Find Projects",
+              href: "/briefs",
+            },
+            {
+              name: brief.title || "Project Details",
+              isLast: true,
+            },
+          ]}
+        />
 
         {/* Main Title & Header */}
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">

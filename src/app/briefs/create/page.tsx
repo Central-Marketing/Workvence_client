@@ -456,10 +456,12 @@ const CreateBrief = () => {
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Top Breadcrumb */}
         <Breadcrumb
+          homeHref={user?.isSeller ? "/dashboard/seller" : "/dashboard/buyer"}
+          homeTitle="Dashboard"
           className="mb-6 select-none"
           items={[
             {
-              name: "Briefs",
+              name: "Find Projects",
               href: "/briefs",
             },
             {

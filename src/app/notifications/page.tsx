@@ -270,6 +270,8 @@ const NotificationsPage = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb Navigation */}
         <Breadcrumb
+          homeHref={dashboardRoute}
+          homeTitle="Dashboard"
           className="mb-4 select-none"
           items={[
             {

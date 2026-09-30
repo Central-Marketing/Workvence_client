@@ -41,12 +41,13 @@ export const SellerHeroBanner: React.FC<SellerHeroBannerProps> = ({
         items={[
           {
             name: categoryName,
-            href: `/packages?category=${encodeURIComponent(categoryName.toLowerCase().replace(/&/g, "and").replace(/\s+/g, "-"))}`,
+            href: categoryName === "Services" ? "/packages" : `/packages?category=${encodeURIComponent(categoryName)}`,
           },
           ...(subcategoryName
             ? [
                 {
                   name: subcategoryName,
+                  href: `/packages?category=${encodeURIComponent(subcategoryName)}`,
                 },
               ]
             : []),

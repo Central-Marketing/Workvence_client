@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { FiHome, FiCheck } from "react-icons/fi";
+import { FiCheck } from "react-icons/fi";
 import { SubcategoryItem } from "@/data/categoryTaxonomy";
-import { Button } from "@/components/ui";
+import { Breadcrumb, Button } from "@/components/ui";
 
 export interface BreadcrumbCrumb {
   name: string;
@@ -58,7 +58,7 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
         ...(categoryName
           ? [
             {
-              name: categoryName.replace(" & Design", "") || categoryName,
+              name: categoryName,
               onClick: onSelectCategory,
               isLast: !activeSubcategory,
             },
@@ -77,49 +77,11 @@ const SubcategoryHeader: React.FC<SubcategoryHeaderProps> = ({
   return (
     <div className="w-full mb-6">
       {/* Semantic Breadcrumb Navigation */}
-      <nav aria-label="Breadcrumb" className="mb-3">
-        <ol className="flex items-center gap-2 text-[13px] text-gray-500 flex-wrap list-none p-0 m-0">
-          {/* Home Icon */}
-          <li className="inline-flex items-center">
-            <button
-              type="button"
-              onClick={onSelectCategory}
-              className="inline-flex items-center text-teal-600 hover:text-teal-700 transition-colors p-0 h-auto bg-transparent border-0 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-teal-600 rounded-xs"
-              title="All services"
-              aria-label="All services"
-            >
-              <FiHome className="w-4 h-4 shrink-0" aria-hidden="true" />
-            </button>
-          </li>
-
-          {/* Dynamic Breadcrumbs */}
-          {breadcrumbItems.map((item, idx) => (
-            <li key={idx} className="inline-flex items-center gap-2">
-              <span className="text-gray-300 select-none" aria-hidden="true">
-                /
-              </span>
-
-              {item.isLast ? (
-                <span
-                  aria-current="page"
-                  className="text-gray-900 font-medium truncate max-w-[200px] sm:max-w-xs"
-                  title={item.name}
-                >
-                  {item.name}
-                </span>
-              ) : (
-                <button
-                  type="button"
-                  onClick={item.onClick}
-                  className="text-gray-600 hover:text-gray-900 hover:underline transition-colors font-normal p-0 h-auto bg-transparent border-0 cursor-pointer text-left focus:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 rounded-xs"
-                >
-                  {item.name}
-                </button>
-              )}
-            </li>
-          ))}
-        </ol>
-      </nav>
+      <Breadcrumb
+        onHomeClick={onSelectCategory}
+        homeTitle="All services"
+        items={breadcrumbItems}
+      />
 
       {/* Main Subcategory Title + Chevron Dropdown */}
       <div className="relative inline-block" ref={dropdownRef}>

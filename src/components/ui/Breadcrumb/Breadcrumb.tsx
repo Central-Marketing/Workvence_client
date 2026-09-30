@@ -93,10 +93,12 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
           const itemTitle = item.title || (typeof itemText === "string" ? itemText : undefined);
 
           return (
-            <li key={idx} className="inline-flex items-center gap-2">
-              <span className={separatorClasses} aria-hidden="true">
-                /
-              </span>
+            <li key={idx} className="inline-flex min-w-0 max-w-full items-center gap-2">
+              {(showHome || idx > 0) && (
+                <span className={`${separatorClasses} shrink-0`} aria-hidden="true">
+                  /
+                </span>
+              )}
 
               {isItemLast ? (
                 <span

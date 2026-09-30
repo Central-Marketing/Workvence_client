@@ -141,9 +141,10 @@ const FavoritesPage = () => {
       <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
         <div className="container mx-auto px-4 md:px-6 space-y-6">
           <Breadcrumb
+            homeHref={user?.isSeller ? "/dashboard/seller" : "/dashboard/buyer"}
+            homeTitle="Dashboard"
             items={[
-              { name: "Home", href: "/" },
-              { name: "Saved", isLast: true },
+              { name: "Favorites", isLast: true },
             ]}
           />
           <div className="space-y-1.5">
@@ -190,12 +191,10 @@ const FavoritesPage = () => {
       <div className="container mx-auto px-4 md:px-6">
         {/* Breadcrumb */}
         <Breadcrumb
+          homeHref={user?.isSeller ? "/dashboard/seller" : "/dashboard/buyer"}
+          homeTitle="Dashboard"
           className="mb-6"
           items={[
-            {
-              name: "Orders",
-              href: "/orders",
-            },
             {
               name: "Favorites",
               isLast: true,

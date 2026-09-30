@@ -64,17 +64,17 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
         items={[
           {
             name: categoryName,
-            href: `/packages?category=${encodeURIComponent(categoryName.toLowerCase().replace(/&/g, 'and').replace(/\s+/g, '-'))}`,
-            isLast: !subcategoryName,
+            href: categoryName === "Services" ? "/packages" : `/packages?category=${encodeURIComponent(categoryName)}`,
           },
           ...(subcategoryName
             ? [
               {
                 name: subcategoryName,
-                isLast: true,
+                href: `/packages?category=${encodeURIComponent(subcategoryName)}`,
               },
             ]
             : []),
+          { name: title, isLast: true },
         ]}
       />
 

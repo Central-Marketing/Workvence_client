@@ -214,10 +214,12 @@ const ManageOrders = () => {
       {isLoading ? (
         <div className="container mx-auto px-4 md:px-6 space-y-6">
           <Breadcrumb
+            homeHref="/dashboard/seller"
+            homeTitle="Dashboard"
             items={[
               {
-                name: "Orders",
-                href: "/orders",
+                name: "Dashboard",
+                href: "/dashboard/seller",
               },
               {
                 name: "Manage Orders",
@@ -244,10 +246,12 @@ const ManageOrders = () => {
 
           {/* Breadcrumb Navigation */}
           <Breadcrumb
+            homeHref="/dashboard/seller"
+            homeTitle="Dashboard"
             items={[
               {
-                name: "Orders",
-                href: "/orders",
+                name: "Dashboard",
+                href: "/dashboard/seller",
               },
               {
                 name: "Manage Orders",

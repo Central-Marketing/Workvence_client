@@ -436,6 +436,8 @@ const Earnings = () => {
 
         {/* 1. Breadcrumb */}
         <Breadcrumb
+          homeHref="/dashboard/seller"
+          homeTitle="Dashboard"
           items={[
             {
               name: "Earnings",

@@ -238,6 +238,8 @@ export default function BuyerManageOrdersPage() {
       <div className="container mx-auto px-4 md:px-6">
         {/* Breadcrumb */}
         <Breadcrumb
+          homeHref="/dashboard/buyer"
+          homeTitle="Dashboard"
           items={[
             {
               name: "Orders",

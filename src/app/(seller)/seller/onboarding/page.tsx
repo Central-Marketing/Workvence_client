@@ -87,13 +87,11 @@ export default function SellerOnboardingPage() {
         toast.success("Profile updated! Welcome to your seller dashboard.");
         router.replace("/dashboard/seller");
       } else {
-        // Even if backend threw error, the service saved locally in userStore
-        toast.success("Categories saved! Entering dashboard...");
-        router.replace("/dashboard/seller");
+        toast.error(result.error || "Failed to save categories. Please try again.");
       }
     } catch (err: any) {
       console.error("Error saving seller categories:", err);
-      toast.error("Failed to save categories. Please try again.");
+      toast.error(err?.response?.data?.message || err?.message || "Failed to save categories. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

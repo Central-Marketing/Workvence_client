@@ -15,8 +15,7 @@ export default function DashboardPage() {
     window.scrollTo(0, 0);
     if (user) {
       if (user.isSeller) {
-        const hasCategories = Array.isArray(user.categories) && user.categories.length > 0;
-        if (!user.onboardingCompleted && !hasCategories) {
+        if (user.onboardingCompleted === false) {
           router.replace("/seller/onboarding");
           return;
         }

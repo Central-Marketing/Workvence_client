@@ -24,8 +24,10 @@ axiosFetch.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     config.url = config.url.replace(/^\/api\//, "/");
   }
 
-  // Attach access token header if available in cookie
-  const accessToken = getCookie("accessToken");
+  // Attach access token header if available in cookie or localStorage
+  const accessToken =
+    getCookie("accessToken") ||
+    (typeof window !== "undefined" ? localStorage.getItem("accessToken") || localStorage.getItem("token") : null);
   if (accessToken && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
@@ -63,9 +65,20 @@ axiosFetch.interceptors.response.use(
     if (originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      // Only attempt refresh if a refresh token actually exists
-      const hasRefreshToken = Boolean(getCookie("refreshToken"));
-      if (!hasRefreshToken) {
+      // Only attempt refresh if user has an active session
+      // (accessToken, user cookie, HttpOnly session indicator, or stored session)
+      const hasSession = Boolean(
+        originalRequest.headers?.Authorization ||
+        getCookie("accessToken") ||
+        getCookie("user") ||
+        getCookie("isSeller") ||
+        getCookie("refreshToken") ||
+        (typeof window !== "undefined" &&
+          (localStorage.getItem("user") ||
+            localStorage.getItem("accessToken") ||
+            localStorage.getItem("refreshToken")))
+      );
+      if (!hasSession) {
         return Promise.reject(error);
       }
 

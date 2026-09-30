@@ -69,15 +69,23 @@ export function decodeJwtPayload(token?: string): JwtPayload | null {
  * Returns false if no session tokens exist (guest state).
  */
 export function isAccessTokenExpiringSoon(bufferSeconds: number = 300): boolean {
-  const token = getCookie("accessToken");
-  const refreshToken = getCookie("refreshToken");
+  const token =
+    getCookie("accessToken") ||
+    (typeof window !== "undefined" ? localStorage.getItem("accessToken") || localStorage.getItem("token") : null);
 
-  // If user has neither access token nor refresh token, there is no active session to refresh
-  if (!token && !refreshToken) return false;
-  // If access token is missing but refresh token exists, renew immediately
-  if (!token && refreshToken) return true;
+  const hasSession = Boolean(
+    token ||
+    getCookie("user") ||
+    getCookie("refreshToken") ||
+    (typeof window !== "undefined" && (localStorage.getItem("user") || localStorage.getItem("refreshToken")))
+  );
 
-  const payload = decodeJwtPayload(token!);
+  // If user has neither session nor token, there is no active session to refresh
+  if (!hasSession) return false;
+  // If access token is missing but a session exists, renew immediately
+  if (!token) return true;
+
+  const payload = decodeJwtPayload(token);
   if (!payload || !payload.exp) return true;
   // payload.exp is in seconds
   const remainingMs = payload.exp * 1000 - Date.now();
@@ -175,7 +183,7 @@ const getAuthBaseURL = (): string => {
 
 /**
  * Refresh access token using POST /api/auth/refresh-token
- * Sends credentials (Cookie: refreshToken) + header fallback (x-refresh-token: <token>)
+ * Sends credentials (Cookie: refreshToken HttpOnly) + header fallback + body fallback
  * Concurrency-safe: Queues simultaneous callers to a single in-flight request.
  */
 export async function refreshAccessToken(): Promise<string> {
@@ -199,26 +207,41 @@ export async function refreshAccessToken(): Promise<string> {
       "Content-Type": "application/json",
     };
 
-    // Header method: x-refresh-token: <refresh_token>
-    const refreshToken = getCookie("refreshToken");
+    // Header method: x-refresh-token fallback (if readable from cookie or localStorage)
+    const refreshToken =
+      getCookie("refreshToken") ||
+      (typeof window !== "undefined" ? localStorage.getItem("refreshToken") : null);
+
     if (refreshToken) {
       headers["x-refresh-token"] = refreshToken;
     }
 
-    // Call /api/auth/refresh-token using dedicated axios instance to avoid interceptor recursion
+    // Call /api/auth/refresh-token with withCredentials: true (so browser sends HttpOnly cookie automatically)
+    // and also provide body payload in case backend DTO validates @Body() { refreshToken }
+    const body = refreshToken ? { refreshToken } : {};
+
     const response = await axios.post(
       `${getAuthBaseURL()}/auth/refresh-token`,
-      {},
+      body,
       {
         withCredentials: true,
         headers,
       }
     );
 
-    const newAccessToken = response.data?.accessToken;
+    const newAccessToken =
+      response.data?.accessToken ||
+      response.data?.token ||
+      response.data?.data?.accessToken ||
+      response.data?.data?.token;
+
     if (newAccessToken) {
       // Access token lifetime: 1 hour (3600 seconds)
       setCookie("accessToken", newAccessToken, 3600);
+      if (typeof window !== "undefined") {
+        try { localStorage.setItem("accessToken", newAccessToken); } catch {}
+        try { localStorage.setItem("token", newAccessToken); } catch {}
+      }
       isRefreshing = false;
       onRefreshed(newAccessToken);
       return newAccessToken;

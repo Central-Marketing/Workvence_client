@@ -396,33 +396,57 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                       const orderDate = order.createdAt
                         ? new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
                         : "-";
-                      const dueDate = order.deadline
-                        ? new Date(order.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                        : "-";
+                      let dueDate = "-";
+                      let deadlineTime: number | null = null;
+                      if (order.deadline) {
+                        const d = new Date(order.deadline);
+                        if (!isNaN(d.getTime())) {
+                          dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                          deadlineTime = d.getTime();
+                        }
+                      } else if (order.createdAt && order.deliveryTime) {
+                        const d = new Date(order.createdAt);
+                        if (!isNaN(d.getTime())) {
+                          d.setDate(d.getDate() + Number(order.deliveryTime));
+                          dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                          deadlineTime = d.getTime();
+                        }
+                      }
 
                       // Determine status pill badge style
+                      const isCompleted = order.status === "completed" || order.isCompleted === true;
                       const st = (order.status || "inprogress").toLowerCase();
+                      const isCancelled = st === "failed" || st === "cancelled";
+                      const isDelivered = st === "delivered";
+                      const isRevision = st === "revision" || st === "in_revision";
+                      const isLate = !isCompleted && !isCancelled && !isDelivered && !isRevision && Boolean(deadlineTime && deadlineTime < Date.now());
+
                       let statusBadge = {
                         label: "Inprogress",
                         style: "bg-[#E6E9F2] text-[#0284C7]",
                       };
 
-                      if (st === "completed" || order.isCompleted === true) {
+                      if (isCompleted) {
                         statusBadge = {
                           label: "Completed",
                           style: "bg-[#D1FAE5] text-[#059669]",
                         };
-                      } else if (st === "delivered") {
+                      } else if (isDelivered) {
                         statusBadge = {
                           label: "Delivered",
                           style: "bg-[#D1FAE5] text-[#059669]",
                         };
-                      } else if (st === "revision" || st === "in_revision") {
+                      } else if (isRevision) {
                         statusBadge = {
-                          label: "Revision",
+                          label: "In Revision",
                           style: "bg-[#F3E8FF] text-[#9333EA]",
                         };
-                      } else if (st === "failed" || st === "cancelled") {
+                      } else if (isLate || st === "late") {
+                        statusBadge = {
+                          label: "Late",
+                          style: "bg-[#FEE2E2] text-[#DC2626]",
+                        };
+                      } else if (isCancelled) {
                         statusBadge = {
                           label: "Cancelled",
                           style: "bg-[#FEE2E2] text-[#EF4444]",
@@ -489,7 +513,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                           </td>
 
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            <Tag variant={statusBadge.label} size="sm">
+                            <Tag variant={isRevision ? "in_revision" : (isLate || st === "late" ? "late" : (st || statusBadge.label))} size="sm">
                               {statusBadge.label}
                             </Tag>
                           </td>

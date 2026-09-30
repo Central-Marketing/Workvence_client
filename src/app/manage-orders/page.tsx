@@ -83,14 +83,15 @@ const ManageOrders = () => {
   };
 
   // Helper for status badge style matching the mockup
-  const getStatusBadge = (status?: string, isCompleted?: boolean) => {
-    if (isCompleted || status === "completed") {
+  const getStatusBadge = (item: any) => {
+    const isCompleted = item?.isCompleted || item?.status === "completed";
+    if (isCompleted) {
       return {
         label: "Completed",
         style: "bg-[#D1FAE5] text-[#059669]",
       };
     }
-    const st = (status || "inprogress").toLowerCase();
+    const st = (item?.status || "inprogress").toLowerCase();
     if (st === "delivered") {
       return {
         label: "Delivered",
@@ -103,16 +104,20 @@ const ManageOrders = () => {
         style: "bg-[#F3E8FF] text-[#9333EA]",
       };
     }
-    if (st === "late") {
-      return {
-        label: "Late",
-        style: "bg-[#FEE2E2] text-[#DC2626]",
-      };
-    }
-    if (st === "cancelled") {
+    if (st === "cancelled" || st === "failed") {
       return {
         label: "Cancelled",
         style: "bg-[#FEE2E2] text-[#EF4444]",
+      };
+    }
+
+    const deadlineTime = getOrderDeadlineTime(item);
+    const isLate = Boolean(deadlineTime && deadlineTime < Date.now());
+
+    if (isLate || st === "late") {
+      return {
+        label: "Late",
+        style: "bg-[#FEE2E2] text-[#DC2626]",
       };
     }
     if (st === "pending") {
@@ -134,31 +139,25 @@ const ManageOrders = () => {
   const tabFilteredOrders = ordersList.filter((item: any) => {
     const isCompleted = item.status === "completed" || item.isCompleted === true;
     const st = (item.status || "inprogress").toLowerCase();
+    const isCancelled = st === "cancelled" || st === "failed";
+    const isDelivered = st === "delivered";
+    const isRevision = st === "revision" || st === "in_revision";
+
+    const deadlineTime = getOrderDeadlineTime(item);
+    const isLate = !isCompleted && !isCancelled && !isDelivered && !isRevision && Boolean(deadlineTime && deadlineTime < Date.now());
+
     if (activeTab === "priority") {
-      if (isCompleted) return false;
-      if (st === "cancelled" || st === "failed") return false;
+      if (isCompleted || isCancelled) return false;
       return true;
     }
     if (activeTab === "active") {
-      if (isCompleted) return false;
-      if (st === "cancelled" || st === "failed") return false;
-      return (
-        item.isCompleted === false ||
-        st === "paid" ||
-        st === "in_progress" ||
-        st === "inprogress" ||
-        st === "delivered" ||
-        st === "in_revision" ||
-        st === "revision" ||
-        st === "pending" ||
-        st === "late" ||
-        !item.status
-      );
+      if (isCompleted || isCancelled) return false;
+      return true;
     }
-    if (activeTab === "late") return st === "late";
-    if (activeTab === "delivered") return st === "delivered";
+    if (activeTab === "late") return isLate || st === "late";
+    if (activeTab === "delivered") return isDelivered;
     if (activeTab === "completed") return isCompleted;
-    if (activeTab === "cancelled") return st === "cancelled" || st === "failed";
+    if (activeTab === "cancelled") return isCancelled;
     return true;
   });
 
@@ -405,7 +404,7 @@ const ManageOrders = () => {
                       }
 
                       // Status pill styling
-                      const statusBadge = getStatusBadge(order.status, order.isCompleted);
+                      const statusBadge = getStatusBadge(order);
 
                       return (
                         <tr
@@ -477,7 +476,7 @@ const ManageOrders = () => {
 
                           {/* Status Column */}
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            <Tag variant={order.status || statusBadge.label} size="sm">
+                            <Tag variant={statusBadge.label} size="sm">
                               {statusBadge.label}
                             </Tag>
                           </td>

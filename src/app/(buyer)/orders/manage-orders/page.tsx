@@ -69,23 +69,36 @@ export default function BuyerManageOrdersPage() {
       const sellerBadge = sellerObj.badge;
 
       let dueDate = "-";
+      let deadlineTime: number | null = null;
       if (order.deadline) {
         const d = new Date(order.deadline);
         if (!isNaN(d.getTime())) {
           dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          deadlineTime = d.getTime();
+        }
+      } else if (order.createdAt && order.deliveryTime) {
+        const d = new Date(order.createdAt);
+        if (!isNaN(d.getTime())) {
+          d.setDate(d.getDate() + Number(order.deliveryTime));
+          dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          deadlineTime = d.getTime();
         }
       }
 
       const isCompleted = order.status === "completed" || order.isCompleted === true;
       const st = (order.status || "inprogress").toLowerCase();
+      const isCancelled = st === "cancelled" || st === "failed";
+      const isDelivered = st === "delivered";
+      const isRevision = st === "revision" || st === "in_revision";
+      const isLate = !isCompleted && !isCancelled && !isDelivered && !isRevision && Boolean(deadlineTime && deadlineTime < Date.now());
+
       let status: ManageOrderItem["status"] = "inprogress";
       if (isCompleted) status = "completed";
-      else if (st === "delivered") status = "delivered";
-      else if (st === "revision" || st === "in_revision") status = "revision";
-      else if (st === "failed") status = "failed";
+      else if (isDelivered) status = "delivered";
+      else if (isRevision) status = "revision";
+      else if (isCancelled) status = "cancelled";
+      else if (isLate || st === "late") status = "late";
       else if (st === "pending") status = "pending";
-      else if (st === "cancelled") status = "cancelled";
-      else if (st === "late") status = "late";
       else status = "inprogress";
 
       return {
@@ -351,8 +364,13 @@ export default function BuyerManageOrdersPage() {
                         };
                       } else if (st === "revision" || st === "in_revision") {
                         statusBadge = {
-                          label: "Revision",
+                          label: "In Revision",
                           style: "bg-[#F3E8FF] text-[#9333EA]",
+                        };
+                      } else if (st === "late") {
+                        statusBadge = {
+                          label: "Late",
+                          style: "bg-[#FEE2E2] text-[#DC2626]",
                         };
                       } else if (st === "failed" || st === "cancelled") {
                         statusBadge = {
@@ -447,7 +465,7 @@ export default function BuyerManageOrdersPage() {
 
                           {/* Status pill */}
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            <Tag variant={order.status || statusBadge.label} size="sm">
+                            <Tag variant={order.status === "revision" ? "in_revision" : (order.status || statusBadge.label)} size="sm">
                               {statusBadge.label}
                             </Tag>
                           </td>

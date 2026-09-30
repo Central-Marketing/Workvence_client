@@ -302,7 +302,8 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
   const isCompleted = statusLower === "completed" || statusLower === "complete";
   const isDelivered = statusLower === "delivered";
   const isCancelled = statusLower === "cancelled" || statusLower === "canceled";
-  const isLate = Boolean(order.isLate || statusLower === "late" || order.displayStatus === "late") && !isCompleted && !isDelivered && !isCancelled;
+  const isRevision = statusLower === "in_revision" || statusLower === "revision";
+  const isLate = Boolean(order.isLate || statusLower === "late" || order.displayStatus === "late") && !isCompleted && !isDelivered && !isCancelled && !isRevision;
   const wasLateDelivered = Boolean(order.wasLateDelivered || order.displayStatus === "delivered_late");
   const deliveryText =
     order.deliveryText ||
@@ -386,7 +387,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     </svg>
                   )}
                   <span className={`text-sm sm:text-base font-bold tracking-tight ${isLate ? "text-[#292929]" : "text-slate-900"}`}>
-                    {isLate ? "Order Overdue" : "Time Left Deliver"}
+                    {isLate ? "Order Overdue" : isRevision ? "Revision in Progress" : "Time Left Deliver"}
                   </span>
                 </div>
 
@@ -854,9 +855,11 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                         ? "late"
                         : wasLateDelivered
                           ? "delivered_late"
-                          : order.status === "paid"
-                            ? "inprogress"
-                            : order.status
+                          : isRevision
+                            ? "revision"
+                            : order.status === "paid"
+                              ? "inprogress"
+                              : order.status
                     }
                     size="sm"
                   >
@@ -864,9 +867,11 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                       ? "Late"
                       : wasLateDelivered
                         ? "Delivered late"
-                        : order.status === "paid"
-                          ? "Inprogress"
-                          : undefined}
+                        : isRevision
+                          ? "In Revision"
+                          : order.status === "paid"
+                            ? "Inprogress"
+                            : undefined}
                   </Tag>
                 </div>
 

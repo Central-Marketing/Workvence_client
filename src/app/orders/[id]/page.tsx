@@ -151,9 +151,10 @@ export default function OrderDetailPage() {
 
     const isTerminal = ["completed", "complete", "cancelled", "canceled", "failed"].includes(status);
     const isDelivered = status === "delivered";
+    const isRevision = status === "revision" || status === "in_revision";
 
-    // Active order after deadline provided it's not completed, delivered, or cancelled
-    if (!isTerminal && !isDelivered && overdueMs > 0) {
+    // Active order after deadline provided it's not completed, delivered, cancelled, or in revision
+    if (!isTerminal && !isDelivered && !isRevision && overdueMs > 0) {
       isLate = true;
     }
 
@@ -167,7 +168,9 @@ export default function OrderDetailPage() {
     );
 
     let displayStatus = status;
-    if (isLate) {
+    if (isRevision) {
+      displayStatus = "in_revision";
+    } else if (isLate) {
       displayStatus = "late";
     } else if (isDelivered && wasLateDelivered) {
       displayStatus = "delivered_late";

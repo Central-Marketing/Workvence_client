@@ -10,18 +10,14 @@ export const SELLER_ONBOARDING_PATCH_ENDPOINT = "/users/profile";
 
 export interface SaveSellerCategoriesPayload {
   categories: string[];
-  primaryCategory?: string;
   onboardingCompleted?: boolean;
 }
 
 export async function saveSellerOnboardingCategories(
-  categories: string[],
-  primaryCategory?: string
+  categories: string[]
 ): Promise<{ success: boolean; data?: any; error?: string }> {
-  const chosenPrimary = primaryCategory || (categories.length > 0 ? categories[0] : undefined);
   const payload: SaveSellerCategoriesPayload = {
     categories,
-    primaryCategory: chosenPrimary,
     onboardingCompleted: true,
   };
 
@@ -58,7 +54,6 @@ export async function saveSellerOnboardingCategories(
     const updatedUser: User = {
       ...currentUser,
       categories,
-      primaryCategory: chosenPrimary,
       onboardingCompleted: true,
     };
     useUserStore.getState().setUser(updatedUser);

@@ -81,10 +81,7 @@ export default function SellerOnboardingPage() {
 
     setIsSubmitting(true);
     try {
-      const result = await saveSellerOnboardingCategories(
-        selectedCategories,
-        selectedCategories[0]
-      );
+      const result = await saveSellerOnboardingCategories(selectedCategories);
 
       if (result.success) {
         toast.success("Profile updated! Welcome to your seller dashboard.");
@@ -143,7 +140,7 @@ export default function SellerOnboardingPage() {
       </div>
 
       {/* Right Panel / Background Glow Container */}
-      <div className="flex-1 min-h-[500px] lg:min-h-screen p-4 sm:p-8 lg:p-12 xl:p-16 flex items-center relative overflow-hidden bg-white">
+      <div className="flex-1 min-h-screen p-6 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden bg-white">
         {/* Glow circle background */}
         <div
           className="absolute pointer-events-none select-none rounded-full"
@@ -160,107 +157,105 @@ export default function SellerOnboardingPage() {
           aria-hidden="true"
         />
 
-        <div className="w-full max-w-2xl flex flex-col justify-between min-h-[480px] relative z-10">
-          {/* Top content */}
-          <div>
-            {/* Step Counter */}
-            <div className="text-xs sm:text-sm font-semibold text-gray-400 tracking-wide uppercase mb-2">
-              Step 1 of 1
+        {/* Center content */}
+        <div className="w-full max-w-2xl my-auto relative z-10 py-6">
+          {/* Step Counter */}
+          <div className="text-xs sm:text-sm font-semibold text-gray-400 tracking-wide uppercase mb-2">
+            Step 1 of 1
+          </div>
+
+          {/* Prompt Heading */}
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+            Select your service categories
+          </h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1 mb-8">
+            Choose at least one category to set up your seller workspace. You
+            can pick multiple.
+          </p>
+
+          {/* Category Pills */}
+          {isCategoriesLoading ? (
+            <div className="flex flex-wrap gap-2.5 sm:gap-3">
+              {Array.from({ length: 9 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-10 w-32 rounded-xl bg-gray-100 animate-pulse border border-gray-200/50"
+                />
+              ))}
             </div>
-
-            {/* Prompt Heading */}
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
-              Select your service categories
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1 mb-8">
-              Choose at least one category to set up your seller workspace. You
-              can pick multiple.
-            </p>
-
-            {/* Category Pills */}
-            {isCategoriesLoading ? (
-              <div className="flex flex-wrap gap-2.5 sm:gap-3">
-                {Array.from({ length: 9 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-10 w-32 rounded-xl bg-gray-100 animate-pulse border border-gray-200/50"
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-2.5 sm:gap-3">
-                {categoryNames.map((catName) => {
-                  const isSelected = selectedCategories.includes(catName);
-                  return (
-                    <button
-                      key={catName}
-                      type="button"
-                      onClick={() => toggleCategory(catName)}
-                      className={`group inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-medium transition-all duration-150 cursor-pointer ${isSelected
-                        ? "bg-[#F0FDF4] border-[#0D6D5F] text-[#0D6D5F] shadow-xs"
-                        : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50/70"
+          ) : (
+            <div className="flex flex-wrap gap-2.5 sm:gap-3">
+              {categoryNames.map((catName) => {
+                const isSelected = selectedCategories.includes(catName);
+                return (
+                  <button
+                    key={catName}
+                    type="button"
+                    onClick={() => toggleCategory(catName)}
+                    className={`group inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-medium transition-all duration-150 cursor-pointer ${isSelected
+                      ? "bg-[#F0FDF4] border-[#0D6D5F] text-[#0D6D5F] shadow-xs"
+                      : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50/70"
+                      }`}
+                  >
+                    {/* Check / Radio Circle */}
+                    <span
+                      className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 transition-colors ${isSelected
+                        ? "bg-[#0D6D5F] text-white"
+                        : "border border-gray-300 group-hover:border-gray-400 bg-white"
                         }`}
                     >
-                      {/* Check / Radio Circle */}
-                      <span
-                        className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 transition-colors ${isSelected
-                          ? "bg-[#0D6D5F] text-white"
-                          : "border border-gray-300 group-hover:border-gray-400 bg-white"
-                          }`}
-                      >
-                        {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                      </span>
+                      {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                    </span>
 
-                      {/* Category Label */}
-                      <span className="truncate">{catName}</span>
-                    </button>
-                  );
-                })}
-              </div>
+                    {/* Category Label */}
+                    <span className="truncate">{catName}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Bar: Selection Feedback & Submit Button */}
+        <div className="w-full max-w-2xl relative z-10 pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          {/* Status Feedback */}
+          <div className="text-xs sm:text-sm font-medium">
+            {selectedCategories.length === 0 ? (
+              <span className="text-amber-600 flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                Select at least 1 category to continue
+              </span>
+            ) : (
+              <span className="text-[#0D6D5F] flex items-center gap-1.5">
+                <Check className="w-4 h-4 shrink-0" />
+                {selectedCategories.length}{" "}
+                {selectedCategories.length === 1
+                  ? "category selected"
+                  : "categories selected"}
+              </span>
             )}
           </div>
 
-          {/* Bottom Bar: Selection Feedback & Submit Button */}
-          <div className="mt-12 pt-6 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            {/* Status Feedback */}
-            <div className="text-xs sm:text-sm font-medium">
-              {selectedCategories.length === 0 ? (
-                <span className="text-amber-600 flex items-center gap-1.5">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  Select at least 1 category to continue
-                </span>
-              ) : (
-                <span className="text-[#0D6D5F] flex items-center gap-1.5">
-                  <Check className="w-4 h-4 shrink-0" />
-                  {selectedCategories.length}{" "}
-                  {selectedCategories.length === 1
-                    ? "category selected"
-                    : "categories selected"}
-                </span>
-              )}
-            </div>
-
-            {/* Next Button */}
-            <button
-              type="button"
-              id="onboarding-next-btn"
-              onClick={handleSubmit}
-              disabled={selectedCategories.length === 0 || isSubmitting}
-              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-black hover:bg-gray-900 active:scale-[0.98] text-white text-xs sm:text-sm font-medium transition-all shadow-xs disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Saving...</span>
-                </>
-              ) : (
-                <>
-                  <span>Next</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </div>
+          {/* Next Button */}
+          <button
+            type="button"
+            id="onboarding-next-btn"
+            onClick={handleSubmit}
+            disabled={selectedCategories.length === 0 || isSubmitting}
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-black hover:bg-gray-900 active:scale-[0.98] text-white text-xs sm:text-sm font-medium transition-all shadow-xs disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Saving...</span>
+              </>
+            ) : (
+              <>
+                <span>Next</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>

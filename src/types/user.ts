@@ -50,7 +50,6 @@ export interface User {
   updatedAt?: string;
   skills?: string[];
   categories?: string[];
-  primaryCategory?: string;
   onboardingCompleted?: boolean;
   languages?: string[];
   education?: EducationItem[];

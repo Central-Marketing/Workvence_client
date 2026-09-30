@@ -1,123 +1,11 @@
 @import 'react-quill-new/dist/quill.snow.css';
 
-/* SF Pro Display */
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Thin.otf') format('opentype');
-  font-weight: 100;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Light.otf') format('opentype');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Regular.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Medium.otf') format('opentype');
-  font-weight: 510;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Semibold.otf') format('opentype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Black.otf') format('opentype');
-  font-weight: 800 900;
-  font-style: normal;
-  font-display: swap;
-}
 
 /* SF Pro */
 @font-face {
   font-family: 'SF Pro';
   src: url('/fonts/sf-pro/SF-Pro.ttf') format('truetype');
   font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Regular.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Medium.otf') format('opentype');
-  font-weight: 510;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Semibold.otf') format('opentype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SF Pro';
-  src: url('/fonts/sf-pro/SF-Pro-Display-Black.otf') format('opentype');
-  font-weight: 800 900;
   font-style: normal;
   font-display: swap;
 }
@@ -184,55 +72,56 @@
 @tailwind utilities;
 
 :root {
-    --font-sf-pro: 'SF Pro Display', 'SF Pro', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --green-color: #10b981;
-    --white-color: #ffffff;
-    --dark-green: #0f172a;
-    --gray-color: #64748b;
-    --accent-color: #10b981;
-    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-    --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
-    --purple-100: #CEB0FA;
-    --purple-200: #B78AF7;
-    --purple-700: #4600A9;
-    --purple-50: #EFE6FD;
-    --blue-600: #021B75;
-    --blue-50: #E6E9F2;
-    --teal-900: #265F58;
-    --teal-100: #CCF6F1;
-    --alert-900: #674C00;
-    --alert-50: #FEF8E6;
+  --font-sf-pro: 'SF Pro', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --green-color: #10b981;
+  --white-color: #ffffff;
+  --dark-green: #0f172a;
+  --gray-color: #64748b;
+  --accent-color: #10b981;
+  --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+  --purple-100: #CEB0FA;
+  --purple-200: #B78AF7;
+  --purple-700: #4600A9;
+  --purple-50: #EFE6FD;
+  --blue-600: #021B75;
+  --blue-50: #E6E9F2;
+  --teal-900: #265F58;
+  --teal-100: #CCF6F1;
+  --alert-900: #674C00;
+  --alert-50: #FEF8E6;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html,
 body {
-    overflow-x: clip;
-    max-width: 100vw;
+  overflow-x: clip;
+  max-width: 100vw;
 }
 
 body {
-    font-family: var(--font-sf-pro);
-    background-color: #f8fafc;
-    color: #1e293b;
-    -webkit-font-smoothing: antialiased;
+  font-family: var(--font-sf-pro);
+  background-color: #f8fafc;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
 }
 
 .scrollbar-hide::-webkit-scrollbar,
 .scrollbar-none::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    height: 0;
+  display: none;
+  width: 0;
+  height: 0;
 }
+
 .scrollbar-hide,
 .scrollbar-none {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Quill Rich Text Editor Custom Overrides */
@@ -426,6 +315,7 @@ body.hide-navbar nav {
     animation-timing-function: ease-out;
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -436,6 +326,7 @@ body.hide-navbar nav {
     animation-timing-function: ease-out;
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -447,6 +338,7 @@ body.hide-navbar nav {
     --rotate-transform: -3.142rad;
     transform: rotate(-3.142rad);
   }
+
   100% {
     --rotate-transform: -6.283rad;
     transform: rotate(-6.283rad);
@@ -458,6 +350,7 @@ body.hide-navbar nav {
     animation-timing-function: ease-out;
     translate: 0px 0px;
   }
+
   100% {
     translate: 12px 0px;
   }
@@ -527,8 +420,10 @@ body.hide-navbar nav {
 }
 
 .no-scrollbar {
-  -ms-overflow-style: none !important; /* IE and Edge */
-  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important;
+  /* IE and Edge */
+  scrollbar-width: none !important;
+  /* Firefox */
 }
 
 /* Maintain 6px border-radius across all textareas and search input boxes across the site */

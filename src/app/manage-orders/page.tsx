@@ -109,9 +109,9 @@ const ManageOrders = () => {
         style: "bg-[#FEE2E2] text-[#DC2626]",
       };
     }
-    if (st === "failed" || st === "cancelled") {
+    if (st === "cancelled") {
       return {
-        label: "Failed",
+        label: "Cancelled",
         style: "bg-[#FEE2E2] text-[#EF4444]",
       };
     }
@@ -316,12 +316,12 @@ const ManageOrders = () => {
             <div className="w-full bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-sm overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
               <table className="w-full text-left text-sm border-collapse min-w-[800px]">
                 <thead>
-                  <tr className="text-xs font-bold text-gray-800 border-b border-gray-100">
-                    <th className="py-3.5 px-4 font-bold">Buyer</th>
-                    <th className="py-3.5 px-4 font-bold">Project</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Order Id</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Price</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Status</th>
+                  <tr className="border-b border-slate-100 text-base  font-sf-pro font-bold text-[#434343]">
+                    <th className="py-3 px-4 ">Buyer</th>
+                    <th className="py-3 px-4 ">Project</th>
+                    <th className="py-3 px-4  whitespace-nowrap">Due on</th>
+                    <th className="py-3 px-4  whitespace-nowrap">Price</th>
+                    <th className="py-3 px-4  whitespace-nowrap">Status</th>
                   </tr>
                 </thead>
 
@@ -368,18 +368,35 @@ const ManageOrders = () => {
                         order.instructions ||
                         "";
 
-                      // Extract Order ID or Due Date text
-                      let orderIdDisplay = order.orderNumber || order.code || order.orderIdText;
-                      if (!orderIdDisplay) {
-                        if (order.deadline) {
-                          orderIdDisplay = new Date(order.deadline).toLocaleDateString("en-US", {
+                      // Extract Due Date text
+                      const rawDeadline =
+                        order.deadline ||
+                        order.dueDate ||
+                        order.raw?.deadline;
+                      let dueDate = "-";
+                      if (rawDeadline) {
+                        const d = new Date(rawDeadline);
+                        if (!isNaN(d.getTime())) {
+                          dueDate = d.toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
                           });
-                        } else if (order._id) {
-                          orderIdDisplay = `ORD_${order._id.slice(-8).toUpperCase()}`;
-                        } else {
-                          orderIdDisplay = "-";
+                        }
+                      } else if (order.deliveryTime && order.createdAt) {
+                        const days =
+                          typeof order.deliveryTime === "number"
+                            ? order.deliveryTime
+                            : parseInt(order.deliveryTime, 10);
+                        if (!isNaN(days)) {
+                          const d = new Date(
+                            new Date(order.createdAt).getTime() + days * 24 * 60 * 60 * 1000
+                          );
+                          if (!isNaN(d.getTime())) {
+                            dueDate = d.toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            });
+                          }
                         }
                       }
 
@@ -392,10 +409,7 @@ const ManageOrders = () => {
                           onClick={() => {
                             router.push(`/orders/${order._id}`);
                           }}
-                          className="group relative cursor-pointer transition-colors odd:bg-[#F5F5F5]
-    after:pointer-events-none after:absolute after:inset-0
-      after:border-transparent
-    hover:after:border-[rgba(0,0,0,0.10)]"
+                          className="group relative cursor-pointer transition-colors odd:bg-[#F5F5F5] after:pointer-events-none after:absolute after:inset-0 after:border-transparent hover:after:border-[rgba(0,0,0,0.10)]"
                         >
                           {/* Buyer Column */}
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
@@ -407,7 +421,7 @@ const ManageOrders = () => {
                               />
                               <div className="flex flex-col">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="text-xs sm:text-[13px] font-semibold text-gray-950">
+                                  <span className="text-sm font-[510] font-sf-pro text-black group-hover:text-[#0D3B34] transition-colors">
                                     {buyerName}
                                   </span>
                                   {/* {isVerified && (
@@ -427,7 +441,7 @@ const ManageOrders = () => {
                           <td className="py-4 px-4 align-middle max-w-[340px]">
                             <div className="flex flex-col">
                               <span
-                                className="text-[13px] font-semibold text-gray-900 line-clamp-1 leading-snug"
+                                className="text-[14px] font-[700] font-sf-pro text-[#434343] line-clamp-1 group-hover:text-[#0D3B34] transition-colors"
                                 title={projectTitle}
                               >
                                 {projectTitle}
@@ -444,9 +458,9 @@ const ManageOrders = () => {
                             </div>
                           </td>
 
-                          {/* Order Id Column */}
-                          <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
-                            {orderIdDisplay}
+                          {/* Due Date Column */}
+                          <td className="py-5 px-4 align-middle text-xs sm:text-sm font-[400] font-sf-pro text-[#434343] whitespace-nowrap">
+                            {dueDate}
                           </td>
 
                           {/* Price Column */}

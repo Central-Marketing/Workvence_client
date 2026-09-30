@@ -313,12 +313,12 @@ export default function BuyerManageOrdersPage() {
             <div className="w-full bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-sm overflow-x-auto">
               <table className="w-full  min-w-[820px] border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-slate-100 text-xs sm:text-sm font-bold text-slate-800">
-                    <th className="py-4 px-4 font-bold">Seller</th>
-                    <th className="py-4 px-4 font-bold">Project</th>
-                    <th className="py-4 px-4 font-bold whitespace-nowrap">Due on</th>
-                    <th className="py-4 px-4 font-bold whitespace-nowrap">Price</th>
-                    <th className="py-4 px-4 font-bold whitespace-nowrap">Status</th>
+                  <tr className="border-b border-slate-100 text-base  font-sf-pro font-bold text-[#434343]">
+                    <th className="px-4 py-3">Seller</th>
+                    <th className="px-4 py-3">Project</th>
+                    <th className="px-4 py-3 whitespace-nowrap">Due on</th>
+                    <th className="px-4 py-3 whitespace-nowrap">Price</th>
+                    <th className="px-4 py-3 whitespace-nowrap">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -382,7 +382,7 @@ export default function BuyerManageOrdersPage() {
                               />
                               <div className="flex flex-col">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="text-sm font-bold text-slate-900 group-hover:text-[#0D3B34] transition-colors">
+                                  <span className="text-sm font-[510] font-sf-pro text-black group-hover:text-[#0D3B34] transition-colors">
                                     {order.seller.name}
                                   </span>
                                   {/* {renderBadge(order.seller.badge)} */}
@@ -399,7 +399,7 @@ export default function BuyerManageOrdersPage() {
                             <div className="flex items-center justify-between gap-3">
                               <div className="flex flex-col min-w-0">
                                 <span
-                                  className="text-sm font-bold text-slate-900 line-clamp-1 group-hover:text-[#0D3B34] transition-colors"
+                                  className="text-[14px] font-[700] font-sf-pro text-[#434343] line-clamp-1 group-hover:text-[#0D3B34] transition-colors"
                                   title={order.projectTitle}
                                 >
                                   {order.projectTitle}
@@ -434,7 +434,7 @@ export default function BuyerManageOrdersPage() {
                           </td>
 
                           {/* Due date */}
-                          <td className="py-5 px-4 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
+                          <td className="py-5 px-4 align-middle text-xs sm:text-sm font-[400] font-sf-pro text-[#434343] whitespace-nowrap">
                             {order.dueDate}
                           </td>
 

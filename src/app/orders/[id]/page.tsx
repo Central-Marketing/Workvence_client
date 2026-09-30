@@ -45,6 +45,8 @@ export default function OrderDetailPage() {
     const joinRoom = () => {
       socket.emit("join_order", id);
       socket.emit("join_room", `order_${id}`);
+      socket.emit("join_room", `order:${id}`);
+      socket.emit("join_room", String(id));
     };
 
     joinRoom();
@@ -87,12 +89,18 @@ export default function OrderDetailPage() {
     };
 
     socket.on("order_updated", handleOrderUpdate);
+    socket.on("order_status_changed", handleOrderUpdate);
     socket.on("new_notification", handleOrderUpdate);
     socket.on("notification", handleOrderUpdate);
 
     return () => {
+      socket.emit("leave_order", id);
+      socket.emit("leave_room", `order_${id}`);
+      socket.emit("leave_room", `order:${id}`);
+      socket.emit("leave_room", String(id));
       socket.off("connect", joinRoom);
       socket.off("order_updated", handleOrderUpdate);
+      socket.off("order_status_changed", handleOrderUpdate);
       socket.off("new_notification", handleOrderUpdate);
       socket.off("notification", handleOrderUpdate);
     };
@@ -163,8 +171,10 @@ export default function OrderDetailPage() {
     const deadlineTime = deadline ? new Date(deadline).getTime() : 0;
     const deliveredTime = deliveredAt ? new Date(deliveredAt).getTime() : 0;
     const wasLateDelivered = Boolean(
-      o.wasLateDelivered ||
-      (isDelivered && deliveredTime && deadlineTime && deliveredTime > deadlineTime)
+      isDelivered && (
+        o.wasLateDelivered ||
+        (deliveredTime && deadlineTime && deliveredTime > deadlineTime)
+      )
     );
 
     let displayStatus = status;

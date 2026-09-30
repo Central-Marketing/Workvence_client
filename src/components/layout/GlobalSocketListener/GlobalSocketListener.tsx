@@ -81,16 +81,30 @@ export default function GlobalSocketListener() {
       socket.emit("user_connected", currentUserId);
     };
 
-    const handleOrderUpdate = () => {
+    const handleOrderUpdate = (payload?: any) => {
       queryClient.invalidateQueries({ queryKey: ["dashboard-orders"] });
       queryClient.invalidateQueries({ queryKey: ["seller-dashboard-orders"] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["orders-all"] });
       queryClient.invalidateQueries({ queryKey: ["order"] });
+      const targetOrderId =
+        payload?.orderID ||
+        payload?.orderId ||
+        payload?.order?._id ||
+        payload?.order?.id;
+      if (targetOrderId) {
+        queryClient.invalidateQueries({ queryKey: ["order", String(targetOrderId)] });
+      }
       queryClient.invalidateQueries({ queryKey: ["seller-earnings-statement"] });
       queryClient.invalidateQueries({ queryKey: ["my-payouts"] });
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       queryClient.invalidateQueries({ queryKey: ["unread-notifications-count"] });
+    };
+
+    const handleSupportUpdate = () => {
+      queryClient.invalidateQueries({ queryKey: ["support-tickets"] });
+      queryClient.invalidateQueries({ queryKey: ["support-ticket"] });
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
     };
 
     // Handler for real-time incoming chat messages
@@ -234,7 +248,7 @@ export default function GlobalSocketListener() {
 
     // Handler for real-time system notifications
     const handleNewNotification = (newNotif: any) => {
-      handleOrderUpdate();
+      handleOrderUpdate(newNotif);
 
       if (!newNotif) return;
 
@@ -260,6 +274,37 @@ export default function GlobalSocketListener() {
         return;
       }
 
+      // Domain-specific query invalidations based on backend notification payload
+      if (newNotif.briefID || newNotif.briefId || newNotif.proposalID || newNotif.proposalId || newNotif.link?.includes("/brief")) {
+        queryClient.invalidateQueries({ queryKey: ["briefs"] });
+        queryClient.invalidateQueries({ queryKey: ["my-briefs"] });
+        queryClient.invalidateQueries({ queryKey: ["proposals"] });
+        queryClient.invalidateQueries({ queryKey: ["my-proposals"] });
+      }
+
+      if (newNotif.ticketID || newNotif.ticketId || newNotif.link?.includes("/support")) {
+        queryClient.invalidateQueries({ queryKey: ["support-tickets"] });
+        queryClient.invalidateQueries({ queryKey: ["support-ticket"] });
+        queryClient.invalidateQueries({ queryKey: ["tickets"] });
+      }
+
+      if (newNotif.type === "payout" || newNotif.link?.includes("/earnings")) {
+        queryClient.invalidateQueries({ queryKey: ["my-payouts"] });
+        queryClient.invalidateQueries({ queryKey: ["seller-earnings"] });
+        queryClient.invalidateQueries({ queryKey: ["seller-earnings-statement"] });
+        queryClient.invalidateQueries({ queryKey: ["earnings"] });
+      }
+
+      if (
+        newNotif.link?.includes("/kyc") ||
+        newNotif.type === "kyc" ||
+        (newNotif.type === "system" && /kyc|verification|identity/i.test(`${newNotif.title || ""} ${newNotif.message || ""}`))
+      ) {
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+        queryClient.invalidateQueries({ queryKey: ["kyc"] });
+        queryClient.invalidateQueries({ queryKey: ["verification"] });
+      }
+
       // Skip chat messages (handled exclusively by handleReceiveMessage)
       if (isChatMessageNotif(newNotif)) {
         return;
@@ -282,6 +327,11 @@ export default function GlobalSocketListener() {
 
       playNotificationSound("notification");
 
+      const targetOrderId = newNotif.orderID || newNotif.orderId;
+      const targetTicketId = newNotif.ticketID || newNotif.ticketId;
+      const targetBriefId = newNotif.briefID || newNotif.briefId;
+      const targetProposalId = newNotif.proposalID || newNotif.proposalId;
+
       toast.custom(
         (t) => (
           <div
@@ -292,11 +342,13 @@ export default function GlobalSocketListener() {
               toast.dismiss(t.id);
               if (newNotif.link) {
                 router.push(newNotif.link);
-              } else if (newNotif.orderID) {
-                router.push(`/orders/${newNotif.orderID}`);
-              } else if (newNotif.briefID) {
-                router.push(`/briefs/${newNotif.briefID}`);
-              } else if (newNotif.proposalID) {
+              } else if (targetOrderId) {
+                router.push(`/orders/${targetOrderId}`);
+              } else if (targetTicketId) {
+                router.push(`/support/${targetTicketId}`);
+              } else if (targetBriefId) {
+                router.push(`/briefs/${targetBriefId}`);
+              } else if (targetProposalId) {
                 router.push("/briefs/my-proposals");
               }
             }}
@@ -324,6 +376,8 @@ export default function GlobalSocketListener() {
     socket.on("connect", joinUser);
     socket.on("receive_message", handleReceiveMessage);
     socket.on("order_updated", handleOrderUpdate);
+    socket.on("order_status_changed", handleOrderUpdate);
+    socket.on("receive_support_message", handleSupportUpdate);
     socket.on("new_notification", handleNewNotification);
     socket.on("notification", handleNewNotification);
 
@@ -331,6 +385,8 @@ export default function GlobalSocketListener() {
       socket.off("connect", joinUser);
       socket.off("receive_message", handleReceiveMessage);
       socket.off("order_updated", handleOrderUpdate);
+      socket.off("order_status_changed", handleOrderUpdate);
+      socket.off("receive_support_message", handleSupportUpdate);
       socket.off("new_notification", handleNewNotification);
       socket.off("notification", handleNewNotification);
     };

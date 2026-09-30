@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { socket as mainSocket } from '@/utils/socket';
 
 export interface SocketSupportMessage {
   id: string;
@@ -70,28 +71,52 @@ export function useSupportSocket({
   useEffect(() => {
     if (!ticketId) return;
 
-    const socket = getAdminSocket();
-    if (!socket) return;
+    const adminSocket = getAdminSocket();
 
-    if (!socket.connected) {
-      socket.connect();
+    if (adminSocket && !adminSocket.connected) {
+      adminSocket.connect();
     }
-    setIsConnected(socket.connected);
+    if (!mainSocket.connected) {
+      mainSocket.connect();
+    }
+    setIsConnected(Boolean(adminSocket?.connected || mainSocket.connected));
 
-    socket.emit('join_ticket_room', { ticketId, thread });
+    const joinTicketRooms = () => {
+      setIsConnected(true);
+      const payload = { ticketId };
+      const roomPayload = { ticketId, thread };
 
-    const handleConnect = () => setIsConnected(true);
-    const handleDisconnect = () => setIsConnected(false);
+      // Emit all room joining conventions supported by the backend
+      if (adminSocket) {
+        adminSocket.emit('join_ticket', payload);
+        adminSocket.emit('join_ticket_room', roomPayload);
+        adminSocket.emit('join_room', `ticket_${ticketId}`);
+        adminSocket.emit('join_room', `ticket:${ticketId}`);
+      }
+
+      mainSocket.emit('join_ticket', payload);
+      mainSocket.emit('join_ticket_room', roomPayload);
+      mainSocket.emit('join_room', `ticket_${ticketId}`);
+      mainSocket.emit('join_room', `ticket:${ticketId}`);
+    };
+
+    joinTicketRooms();
+
+    const handleConnect = () => joinTicketRooms();
+    const handleDisconnect = () => {
+      setIsConnected(Boolean(adminSocket?.connected || mainSocket.connected));
+    };
 
     const handleReceiveMessage = (payload: any) => {
-      if (payload && payload.ticketId === ticketId) {
+      const incomingTicketId = String(payload?.ticketId || payload?.ticketID || payload?.id || '');
+      if (incomingTicketId && incomingTicketId === String(ticketId)) {
         const formatted: SocketSupportMessage = {
-          id: payload.id || `msg-${Date.now()}`,
-          ticketId: payload.ticketId,
+          id: payload.id || payload._id || `msg-${Date.now()}`,
+          ticketId: String(ticketId),
           thread: payload.thread || thread,
-          sender: payload.sender || 'Admin Support',
+          sender: payload.sender || payload.senderName || 'Support Agent',
           role: payload.role || 'admin',
-          message: payload.message || '',
+          message: payload.message || payload.text || payload.content || '',
           attachments: payload.attachments || [],
           createdAt: payload.createdAt || new Date().toISOString(),
         };
@@ -103,62 +128,97 @@ export function useSupportSocket({
     };
 
     const handleUserTyping = (data: { ticketId: string; username: string }) => {
-      if (data && data.ticketId === ticketId) {
+      if (data && String(data.ticketId) === String(ticketId)) {
         setTypingUser(data.username);
       }
     };
 
     const handleUserStoppedTyping = (data: { ticketId: string }) => {
-      if (data && data.ticketId === ticketId) {
+      if (data && String(data.ticketId) === String(ticketId)) {
         setTypingUser(null);
       }
     };
 
-    socket.on('connect', handleConnect);
-    socket.on('disconnect', handleDisconnect);
-    socket.on('receive_support_message', handleReceiveMessage);
-    socket.on('user_typing', handleUserTyping);
-    socket.on('user_stopped_typing', handleUserStoppedTyping);
+    if (adminSocket) {
+      adminSocket.on('connect', handleConnect);
+      adminSocket.on('disconnect', handleDisconnect);
+      adminSocket.on('receive_support_message', handleReceiveMessage);
+      adminSocket.on('user_typing', handleUserTyping);
+      adminSocket.on('user_stopped_typing', handleUserStoppedTyping);
+    }
+
+    mainSocket.on('connect', handleConnect);
+    mainSocket.on('disconnect', handleDisconnect);
+    mainSocket.on('receive_support_message', handleReceiveMessage);
+    mainSocket.on('user_typing', handleUserTyping);
+    mainSocket.on('user_stopped_typing', handleUserStoppedTyping);
 
     return () => {
-      socket.emit('leave_ticket_room', { ticketId, thread });
-      socket.off('connect', handleConnect);
-      socket.off('disconnect', handleDisconnect);
-      socket.off('receive_support_message', handleReceiveMessage);
-      socket.off('user_typing', handleUserTyping);
-      socket.off('user_stopped_typing', handleUserStoppedTyping);
+      const payload = { ticketId };
+      const roomPayload = { ticketId, thread };
+
+      if (adminSocket) {
+        adminSocket.emit('leave_ticket', payload);
+        adminSocket.emit('leave_ticket_room', roomPayload);
+        adminSocket.emit('leave_room', `ticket_${ticketId}`);
+        adminSocket.emit('leave_room', `ticket:${ticketId}`);
+        adminSocket.off('connect', handleConnect);
+        adminSocket.off('disconnect', handleDisconnect);
+        adminSocket.off('receive_support_message', handleReceiveMessage);
+        adminSocket.off('user_typing', handleUserTyping);
+        adminSocket.off('user_stopped_typing', handleUserStoppedTyping);
+      }
+
+      mainSocket.emit('leave_ticket', payload);
+      mainSocket.emit('leave_ticket_room', roomPayload);
+      mainSocket.emit('leave_room', `ticket_${ticketId}`);
+      mainSocket.emit('leave_room', `ticket:${ticketId}`);
+      mainSocket.off('connect', handleConnect);
+      mainSocket.off('disconnect', handleDisconnect);
+      mainSocket.off('receive_support_message', handleReceiveMessage);
+      mainSocket.off('user_typing', handleUserTyping);
+      mainSocket.off('user_stopped_typing', handleUserStoppedTyping);
     };
   }, [ticketId, thread]);
 
   const sendSupportMessage = useCallback(
     (message: string, attachments: any[] = []) => {
-      const socket = getAdminSocket();
-      if (!ticketId || !message.trim() || !socket) return;
+      if (!ticketId || !message.trim()) return;
 
-      socket.emit('send_support_message', {
+      const payload = {
         ticketId,
         thread,
         message: message.trim(),
         attachments,
         senderName: userDisplayName,
         role: 'creator',
-      });
+      };
+
+      const adminSocket = getAdminSocket();
+      if (adminSocket && adminSocket.connected) {
+        adminSocket.emit('send_support_message', payload);
+      }
+      if (mainSocket.connected) {
+        mainSocket.emit('send_support_message', payload);
+      }
     },
     [ticketId, thread, userDisplayName]
   );
 
   const startTyping = useCallback(() => {
-    const socket = getAdminSocket();
-    if (ticketId && socket) {
-      socket.emit('typing_start', { ticketId, thread, username: userDisplayName });
-    }
+    if (!ticketId) return;
+    const payload = { ticketId, thread, username: userDisplayName };
+    const adminSocket = getAdminSocket();
+    if (adminSocket && adminSocket.connected) adminSocket.emit('typing_start', payload);
+    if (mainSocket.connected) mainSocket.emit('typing_start', payload);
   }, [ticketId, thread, userDisplayName]);
 
   const stopTyping = useCallback(() => {
-    const socket = getAdminSocket();
-    if (ticketId && socket) {
-      socket.emit('typing_stop', { ticketId, thread, username: userDisplayName });
-    }
+    if (!ticketId) return;
+    const payload = { ticketId, thread, username: userDisplayName };
+    const adminSocket = getAdminSocket();
+    if (adminSocket && adminSocket.connected) adminSocket.emit('typing_stop', payload);
+    if (mainSocket.connected) mainSocket.emit('typing_stop', payload);
   }, [ticketId, thread, userDisplayName]);
 
   return {

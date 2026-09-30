@@ -91,7 +91,7 @@ export const OrderTimelineStepper: React.FC<OrderTimelineStepperProps> = ({ orde
             )}
 
             {/* Delivered late badge if work was delivered past deadline */}
-            {!isLate && wasLateDelivered && (
+            {!isLate && isDeliveredOrCompleted && wasLateDelivered && (
               <div className="bg-[#FEF3C7] border border-[#FDE68A] text-amber-700 text-xs font-semibold px-3 py-1 rounded-[6px] w-fit">
                 Delivered late
               </div>

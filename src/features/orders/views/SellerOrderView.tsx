@@ -305,7 +305,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
   const isCancelled = statusLower === "cancelled" || statusLower === "canceled";
   const isRevision = statusLower === "in_revision" || statusLower === "revision";
   const isLate = Boolean(order.isLate || statusLower === "late" || order.displayStatus === "late") && !isCompleted && !isDelivered && !isCancelled && !isRevision;
-  const wasLateDelivered = Boolean(order.wasLateDelivered || order.displayStatus === "delivered_late");
+  const wasLateDelivered = isDelivered && Boolean(order.wasLateDelivered || order.displayStatus === "delivered_late");
   const isDisputed = statusLower === "disputed" || statusLower === "escalated_to_dispute";
 
   // Extension state
@@ -840,27 +840,39 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                   <span className="text-[#6E6E6E] font-inter text-[14px]">Status</span>
                   <Tag
                     variant={
-                      isLate
-                        ? "late"
-                        : wasLateDelivered
-                          ? "delivered_late"
+                      isCompleted
+                        ? "completed"
+                        : isCancelled
+                          ? "cancelled"
                           : isRevision
                             ? "revision"
-                            : order.status === "paid"
-                              ? "inprogress"
-                              : order.status
+                            : isLate
+                              ? "late"
+                              : wasLateDelivered
+                                ? "delivered_late"
+                                : isDelivered
+                                  ? "delivered"
+                                  : order.status === "paid"
+                                    ? "inprogress"
+                                    : order.status
                     }
                     size="sm"
                   >
-                    {isLate
-                      ? "Late"
-                      : wasLateDelivered
-                        ? "Delivered late"
+                    {isCompleted
+                      ? "Completed"
+                      : isCancelled
+                        ? "Cancelled"
                         : isRevision
                           ? "In Revision"
-                          : order.status === "paid"
-                            ? "Inprogress"
-                            : undefined}
+                          : isLate
+                            ? "Late"
+                            : wasLateDelivered
+                              ? "Delivered late"
+                              : isDelivered
+                                ? "Delivered"
+                                : order.status === "paid"
+                                  ? "Inprogress"
+                                  : undefined}
                   </Tag>
                 </div>
 

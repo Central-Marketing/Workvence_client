@@ -20,7 +20,12 @@ export interface DeliverableFile {
 export interface ExtensionRequestData {
   days: number;
   reason: string;
-  status?: string;
+  status?: 'pending' | 'accepted' | 'approved' | 'rejected' | string;
+  rejectionReason?: string;
+  rejectedAt?: string;
+  extraDays?: number;
+  requestedBy?: string;
+  createdAt?: string;
 }
 
 export interface NormalizedOrder {

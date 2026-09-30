@@ -30,6 +30,7 @@ import { OrderDeliverablesList } from "../components/OrderDeliverablesList";
 import { ArrowRight } from "lucide-react";
 import { DeliveryCountdown } from "../components/DeliveryCountdown";
 import { SellerReviewReply } from "@/features/reviews";
+import { DeclineExtensionModal } from "../components/DeclineExtensionModal";
 
 interface BuyerOrderViewProps {
   order: NormalizedOrder;
@@ -59,6 +60,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
   // Extension Action State
   const [extensionProcessed, setExtensionProcessed] = useState<"approved" | "rejected" | null>(null);
   const [isRespondingExtension, setIsRespondingExtension] = useState(false);
+  const [isDeclineModalOpen, setIsDeclineModalOpen] = useState(false);
 
   // Check if extension is strictly pending (never show if accepted/approved/rejected)
   const extensionData = order.raw?.extensionRequest || order.raw?.extension || order.extensionRequest;
@@ -71,6 +73,16 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
     extStatus !== "rejected" &&
     !extensionProcessed
   );
+
+  const isExtRejected =
+    extStatus === "rejected" ||
+    extensionProcessed === "rejected" ||
+    order.extensionRequest?.status === "rejected";
+  const buyerRejectionReason =
+    order.extensionRequest?.rejectionReason ||
+    extensionData?.rejectionReason ||
+    order.raw?.rejectionReason ||
+    "";
 
   // Reset local processed state if incoming order has a fresh pending extension
   useEffect(() => {
@@ -228,23 +240,44 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
     }
   };
 
-  const handleRejectExtension = async () => {
+  const handleConfirmDeclineExtension = async (reason: string) => {
     setIsRespondingExtension(true);
     const orderId = order.id || order.raw?._id;
+    const trimmedReason = reason.trim();
+    const payload: any = {
+      action: "reject",
+      status: "rejected",
+      accepted: false,
+    };
+    if (trimmedReason) {
+      payload.reason = trimmedReason;
+      payload.rejectionReason = trimmedReason;
+    }
+
     try {
-      await axiosFetch.patch(`/orders/${orderId}/respond-extension`, { action: "reject" });
-      toast.success("Time extension request rejected.");
+      await axiosFetch.post(`/orders/${orderId}/respond-extension`, payload);
+      toast.success("Extension request declined");
       setExtensionProcessed("rejected");
+      setIsDeclineModalOpen(false);
       refetch();
     } catch (err: any) {
-      const errMsg = err?.response?.data?.message || "";
-      if (errMsg.toLowerCase().includes("no pending extension")) {
+      try {
+        await axiosFetch.patch(`/orders/${orderId}/respond-extension`, payload);
+        toast.success("Extension request declined");
         setExtensionProcessed("rejected");
+        setIsDeclineModalOpen(false);
         refetch();
-        toast.error("No pending extension request found.");
-        return;
+      } catch (fallbackErr: any) {
+        const errMsg = err?.response?.data?.message || fallbackErr?.response?.data?.message || "";
+        if (errMsg.toLowerCase().includes("no pending extension")) {
+          setExtensionProcessed("rejected");
+          setIsDeclineModalOpen(false);
+          refetch();
+          toast.error("No pending extension request found.");
+          return;
+        }
+        toast.error(errMsg || "Failed to decline extension request.");
       }
-      toast.error(err?.response?.data?.message || "Failed to reject extension request.");
     } finally {
       setIsRespondingExtension(false);
     }
@@ -508,12 +541,12 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                   <Button
                     type="button"
                     disabled={isRespondingExtension}
-                    onClick={handleRejectExtension}
+                    onClick={() => setIsDeclineModalOpen(true)}
                     variant="soft"
                     size="md"
                     radius="fiverr"
                     fullWidth
-                    className="flex-1 w-full"
+                    className="flex-1 w-full cursor-pointer"
                   >
                     Reject
                   </Button>
@@ -531,6 +564,43 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     {isRespondingExtension ? "Processing..." : "Approve Extension"}
                   </Button>
                 </div>
+              </div>
+            )}
+
+            {/* Declined Extension Request Notice (Buyer View) */}
+            {isExtRejected && !isExtPending && (
+              <div className="bg-[#fef2f2] border border-rose-200/80 rounded-[6px] p-6 mb-6">
+                <div className="flex flex-row justify-between items-start gap-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 border border-rose-200">
+                        Declined
+                      </span>
+                      <span className="text-xs text-slate-500 font-inter">
+                        Delivery Extension ({order.extensionRequest?.days || extensionData?.days || extensionData?.extraDays || 1} day{(order.extensionRequest?.days || extensionData?.days || extensionData?.extraDays || 1) > 1 ? "s" : ""})
+                      </span>
+                    </div>
+                    <h4 className="text-lg font-bold text-[#292929] font-inter">
+                      Extension Request Declined
+                    </h4>
+                  </div>
+                </div>
+
+                {buyerRejectionReason ? (
+                  <div className="mt-3.5 bg-white border border-rose-100 rounded-[6px] p-3.5 sm:p-4 text-xs sm:text-[13px] text-slate-700 font-inter">
+                    <p className="font-semibold text-slate-900 mb-1 flex items-center gap-1.5">
+                      <FiAlertCircle className="text-rose-500" size={14} />
+                      Your Explanation:
+                    </p>
+                    <p className="italic text-slate-600 pl-5 border-l-2 border-rose-300">
+                      &ldquo;{buyerRejectionReason}&rdquo;
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-slate-500 text-xs sm:text-[13px] font-inter mt-2">
+                    You declined the seller&apos;s request for extra delivery time.
+                  </p>
+                )}
               </div>
             )}
 
@@ -1013,6 +1083,15 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
         isLoading={isRevisionLoading}
         onClose={() => setIsRevisionModalOpen(false)}
         onSubmit={handleRequestRevision}
+      />
+
+      {/* DECLINE EXTENSION MODAL */}
+      <DeclineExtensionModal
+        isOpen={isDeclineModalOpen}
+        isLoading={isRespondingExtension}
+        extensionDays={order.extensionRequest?.days || extensionData?.days || extensionData?.extraDays}
+        onClose={() => setIsDeclineModalOpen(false)}
+        onConfirm={handleConfirmDeclineExtension}
       />
     </div>
   );

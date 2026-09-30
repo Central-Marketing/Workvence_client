@@ -9,7 +9,7 @@ import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";
 import { useUserStore } from "@/store/userStore";
 import { OrderSkeleton } from "@/components/ui";
-import { BuyerOrderView, SellerOrderView, NormalizedOrder } from "@/features/orders";
+import { BuyerOrderView, SellerOrderView, NormalizedOrder, ExtensionRequestData } from "@/features/orders";
 
 export default function OrderDetailPage() {
   const { id } = useParams();
@@ -260,18 +260,16 @@ export default function OrderDetailPage() {
     // Extension request
     const extReq = o.extensionRequest || o.extension;
     const extStatus = String(extReq?.status || "").toLowerCase().trim();
-    const isExtPending = Boolean(
-      extReq &&
-      (extStatus === "pending" || (!extStatus && (extReq.extraDays || extReq.days))) &&
-      extStatus !== "accepted" &&
-      extStatus !== "approved" &&
-      extStatus !== "rejected"
-    );
-    const extensionRequest = (extReq && isExtPending)
+    const extensionRequest: ExtensionRequestData | null = extReq
       ? {
         days: extReq.days || extReq.extraDays || 1,
         reason: extReq.reason || "Time extension requested.",
-        status: extReq.status || "pending",
+        status: extStatus || "pending",
+        rejectionReason: extReq.rejectionReason || o.rejectionReason || "",
+        rejectedAt: extReq.rejectedAt || o.rejectedAt || "",
+        extraDays: extReq.extraDays || extReq.days,
+        requestedBy: extReq.requestedBy,
+        createdAt: extReq.createdAt,
       }
       : null;
 

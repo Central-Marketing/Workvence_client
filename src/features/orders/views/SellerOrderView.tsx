@@ -313,9 +313,16 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
 
   // Extension state
   const extensionData = order.raw?.extensionRequest || order.raw?.extension || order.extensionRequest;
-  const hasPendingExtension = extensionData?.status === "pending";
+  const extStatus = String(extensionData?.status || order.extensionRequest?.status || "").toLowerCase().trim();
+  const hasPendingExtension = extStatus === "pending";
+  const isExtensionRejected = extStatus === "rejected";
   const extensionDays = extensionData?.extraDays || extensionData?.requestedDays || extensionData?.days || 1;
   const extensionReason = extensionData?.reason || "Additional time requested to deliver quality work.";
+  const rejectionReason =
+    extensionData?.rejectionReason ||
+    order.extensionRequest?.rejectionReason ||
+    order.raw?.rejectionReason ||
+    "";
   const isExtensionRequestedByBuyer =
     extensionData?.requestedBy === "buyer" || extensionData?.requestedBy === order.buyer?.id;
 
@@ -569,6 +576,43 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                       {isRespondingExtension ? "Processing..." : "Approve Extension"}
                     </Button>
                   </div>
+                )}
+              </div>
+            )}
+
+            {/* Declined Extension Request Notice (Seller View) */}
+            {isExtensionRejected && !hasPendingExtension && (
+              <div className="bg-[#fef2f2] border border-rose-200/80 rounded-[6px] p-6 mb-6">
+                <div className="flex flex-row justify-between items-start gap-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 border border-rose-200">
+                        Declined
+                      </span>
+                      <span className="text-xs text-slate-500 font-inter">
+                        Delivery Extension Request ({extensionDays} day{extensionDays > 1 ? "s" : ""})
+                      </span>
+                    </div>
+                    <h4 className="text-lg font-bold text-[#292929] font-inter">
+                      Extension Request Declined
+                    </h4>
+                  </div>
+                </div>
+
+                {rejectionReason ? (
+                  <div className="mt-3.5 bg-white border border-rose-100 rounded-[6px] p-3.5 sm:p-4 text-xs sm:text-[13px] text-slate-700 font-inter">
+                    <p className="font-semibold text-slate-900 mb-1 flex items-center gap-1.5">
+                      <FiAlertCircle className="text-rose-500" size={14} />
+                      Buyer&apos;s Explanation:
+                    </p>
+                    <p className="italic text-slate-600 pl-5 border-l-2 border-rose-300">
+                      &ldquo;{rejectionReason}&rdquo;
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-slate-500 text-xs sm:text-[13px] font-inter mt-2">
+                    The buyer declined your request for extra delivery time.
+                  </p>
                 )}
               </div>
             )}

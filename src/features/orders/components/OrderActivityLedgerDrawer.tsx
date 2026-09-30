@@ -135,7 +135,7 @@ function parseHistoryItem(item: any, idx: number, fallbackTime: string | Date): 
   if (action === "EXTENSION_REJECTED") {
     const matchDays = rawText.match(/Rejected\s+(\d+)\s+day/i);
     const days = item.days || item.extraDays || (matchDays ? matchDays[1] : null);
-    const raw = item.details || item.reason || item.note || rawText || "";
+    const raw = item.rejectionReason || item.details || item.reason || item.note || rawText || "";
     const cleanDesc = raw
       .replace(/^(?:Rejected\s+\d+\s+day\(s\)\s+extension\.?|Rejected\s+delivery\s+extension\.?)\s*/i, "")
       .trim();

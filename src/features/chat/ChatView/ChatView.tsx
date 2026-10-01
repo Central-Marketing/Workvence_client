@@ -36,7 +36,7 @@ import supportService from "@/utils/supportService";
 import { getOtherUser, isConversationUnread, isTargetConversation, renderMessageTextWithLinks } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
 import { Loader, ChatSkeleton, Skeleton, AiGradientButton, Button } from "@/components";
-import { CustomSelect, CustomSelectOption } from "@/components/ui";
+import { CustomSelect, CustomSelectOption, Tag } from "@/components/ui";
 import { MessageModerationBadge } from "@/features/chat";
 import { formatFileSize } from "@/lib";
 import moment from 'moment';
@@ -2858,39 +2858,21 @@ const ChatView = () => {
           };
 
           const renderOrderStatusBadge = (status: string) => {
-            const normalized = (status || '').toLowerCase().replace(/[\s_-]/g, '');
-            if (normalized === 'inprogress' || normalized === 'active' || normalized === 'pending') {
-              return (
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#ede9fe] text-[#4f46e5] shrink-0">
-                  Inprogress
-                </span>
-              );
-            }
-            if (normalized === 'delivered') {
-              return (
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#ccfbf1] text-[#0f766e] shrink-0">
-                  Delivered
-                </span>
-              );
-            }
-            if (normalized === 'completed') {
-              return (
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#dcfce7] text-[#15803d] shrink-0">
-                  Completed
-                </span>
-              );
-            }
-            if (normalized === 'cancelled') {
-              return (
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#ffe4e6] text-[#be123c] shrink-0">
-                  Cancelled
-                </span>
-              );
-            }
+            const rawStatus = (status || '').toLowerCase().trim();
+            const normalized = rawStatus.replace(/[\s_-]/g, '');
+            const variant =
+              normalized === 'inprogress' || normalized === 'active'
+                ? 'in_progress'
+                : normalized === 'revision' || normalized === 'inrevision'
+                ? 'in_revision'
+                : rawStatus || 'in_progress';
+
             return (
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 shrink-0 capitalize">
-                {status || 'Inprogress'}
-              </span>
+              <Tag
+                variant={variant}
+                size="sm"
+                className="shrink-0 text-[11px] px-2.5 py-0.5 font-medium leading-none"
+              />
             );
           };
 

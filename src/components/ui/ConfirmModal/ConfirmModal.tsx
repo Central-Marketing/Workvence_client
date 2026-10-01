@@ -33,8 +33,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     switch (variant) {
       case 'danger':
         return {
-          iconBg: 'bg-red-50 text-red-500 border-red-100',
-          confirmBtn: 'bg-red-600 hover:bg-red-700 text-white shadow-red-500/20',
+          iconBg: 'bg-white text-red-500 border-[rgba(0,0,0,0.10)]',
+          confirmBtn: 'bg-[#fff] hover:bg-[#fff] text-red-800 border border-[rgba(0,0,0,0.10)]',
           Icon: AlertTriangle,
         };
       case 'info':

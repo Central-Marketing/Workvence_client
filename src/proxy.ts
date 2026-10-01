@@ -216,8 +216,7 @@ export async function proxy(req: NextRequest) {
   const isGeneralProtectedRoute =
     GENERAL_PROTECTED_ROUTES.some(
       (route) => pathname === route || pathname.startsWith(`${route}/`)
-    ) ||
-    (pathname.startsWith("/briefs/") && pathname.endsWith("/proposals"));
+    );
 
   const isAnyProtectedRoute = isAdminRoute || isSellerRoute || isBuyerRoute || isGeneralProtectedRoute;
 

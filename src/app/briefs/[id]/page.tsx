@@ -23,13 +23,18 @@ import {
   FiHeart,
   FiAlertTriangle,
   FiCheckCircle,
+  FiEdit3,
+  FiRotateCcw,
+  FiTrash2,
+  FiXCircle,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { SubmitProposalModal, AuthModal } from "@/components";
-import { Button, Breadcrumb, BriefDetailSkeleton } from "@/components/ui";
+import { Button, Breadcrumb, BriefDetailSkeleton, ConfirmModal } from "@/components/ui";
+import { EditBriefModal } from "@/features/buyer";
 import { ArrowRight } from "lucide-react";
 
 function formatCategoryName(cat?: string): string {
@@ -148,6 +153,8 @@ const BriefDetail = () => {
   const [showModal, setShowModal] = useState(false);
   const [showMyProposalModal, setShowMyProposalModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<"login" | "register">("register");
   const [submittedProposalData, setSubmittedProposalData] = useState<any>(null);
 
@@ -434,10 +441,39 @@ const BriefDetail = () => {
       axiosFetch.patch(`/briefs/${briefId}/close`).then(({ data }) => data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["brief", briefId] });
+      queryClient.invalidateQueries({ queryKey: ["my-briefs"] });
       toast.success("Project closed successfully");
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message || "Failed to close project");
+    },
+  });
+
+  // Reopen brief mutation (buyer)
+  const reopenMutation = useMutation({
+    mutationFn: () =>
+      axiosFetch.patch(`/briefs/${briefId}/reopen`).then(({ data }) => data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["brief", briefId] });
+      queryClient.invalidateQueries({ queryKey: ["my-briefs"] });
+      toast.success("Project reopened successfully");
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to reopen project");
+    },
+  });
+
+  // Delete brief mutation (buyer)
+  const deleteMutation = useMutation({
+    mutationFn: () =>
+      axiosFetch.delete(`/briefs/${briefId}`).then(({ data }) => data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-briefs"] });
+      toast.success("Project deleted successfully");
+      router.push("/briefs/my-briefs");
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to delete project");
     },
   });
 
@@ -960,9 +996,82 @@ const BriefDetail = () => {
                 </div>
               </div>
 
-              {/* Action Button: Guest ("Join Now") vs Logged-in Seller ("Send Proposal" / "Proposal Submitted") */}
+              {/* Action Button: Guest ("Join Now") vs Logged-in Seller ("Send Proposal" / "Proposal Submitted") vs Owner Controls */}
               <div className="mt-4">
-                {!user ? (
+                {isOwner ? (
+                  <div className="space-y-2.5 pt-2 border-t border-slate-100">
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className="font-bold text-slate-500 uppercase tracking-wider text-[11px]">
+                        Project Status
+                      </span>
+                      <span
+                        className={`font-bold px-2 py-0.5 rounded-full text-[11px] ${
+                          isClosed
+                            ? "bg-rose-50 text-rose-600 border border-rose-200/80"
+                            : "bg-emerald-50 text-emerald-700 border border-emerald-200/80"
+                        }`}
+                      >
+                        {isClosed ? "Closed" : "Active / Open"}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {!isClosed && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          radius="md"
+                          onClick={() => setShowEditModal(true)}
+                          leftIcon={<FiEdit3 className="text-slate-600" />}
+                          className="w-full text-xs font-semibold border-slate-200 hover:bg-slate-50"
+                        >
+                          Edit Project
+                        </Button>
+                      )}
+
+                      {!isClosed ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          radius="md"
+                          onClick={() => closeMutation.mutate()}
+                          isLoading={closeMutation.isPending}
+                          leftIcon={<FiXCircle className="text-amber-500" />}
+                          className="w-full text-xs font-semibold text-amber-700 border-amber-200 hover:bg-amber-50"
+                        >
+                          Close Project
+                        </Button>
+                      ) : (
+                        <Button
+                          type="button"
+                          variant="brand"
+                          size="sm"
+                          radius="md"
+                          onClick={() => reopenMutation.mutate()}
+                          isLoading={reopenMutation.isPending}
+                          leftIcon={<FiRotateCcw className="text-white" />}
+                          className="w-full text-xs font-semibold bg-[#0D6D5F] hover:bg-[#0b5c50] text-white"
+                        >
+                          Reopen Project
+                        </Button>
+                      )}
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      radius="md"
+                      onClick={() => setShowDeleteModal(true)}
+                      leftIcon={<FiTrash2 className="text-rose-500" />}
+                      className="w-full text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-100/80"
+                    >
+                      Delete Project
+                    </Button>
+                  </div>
+                ) : !user ? (
                   <Button
                     type="button"
                     variant="dark"
@@ -1859,6 +1968,25 @@ const BriefDetail = () => {
             setShowModal(true);
           }
         }}
+      />
+
+      {/* Owner Edit Brief Modal */}
+      <EditBriefModal
+        isOpen={showEditModal}
+        brief={brief}
+        onClose={() => setShowEditModal(false)}
+      />
+
+      {/* Owner Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        title="Delete Project"
+        message="Are you sure you want to delete this project? If proposals exist, the project will be safely archived; otherwise, it will be permanently removed."
+        confirmText="Delete"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+        onConfirm={() => deleteMutation.mutate()}
+        onClose={() => setShowDeleteModal(false)}
       />
     </div>
   );

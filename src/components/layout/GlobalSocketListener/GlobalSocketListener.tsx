@@ -214,34 +214,21 @@ export default function GlobalSocketListener() {
       const targetConvId = conversationId || newMsg.conversationID;
       const toastKey = contentFingerprint || msgId || `${senderIdStr}-${Date.now()}`;
 
-      toast.custom(
-        (id) => (
-          <div
-            className="relative bg-white border-l-4 border-[#0D6D5F] shadow-xl p-4 rounded-[6px] max-w-[350px] flex flex-col gap-1 transition-all duration-300 cursor-pointer pr-6"
-            onClick={() => {
-              toast.dismiss(id);
-              if (targetConvId) {
-                router.push(`/message/${targetConvId}`);
-              }
-            }}
-          >
-            <button
-              type="button"
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 p-0 w-5 h-5 flex items-center justify-center rounded-full text-base leading-none border-none bg-transparent hover:bg-gray-100 transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                toast.dismiss(id);
-              }}
-              aria-label="Close"
-            >
-              ×
-            </button>
-            <strong className="text-[#333] text-sm font-bold">💬 {displayName}</strong>
-            <p className="text-[#666] text-[13px] m-0 leading-snug line-clamp-2">{msgPreview}</p>
-          </div>
-        ),
-        { id: `chat-toast-${toastKey}`, duration: 5000 }
-      );
+      toast(displayName, {
+        id: `chat-toast-${toastKey}`,
+        description: msgPreview,
+        duration: 5000,
+        ...(targetConvId
+          ? {
+              action: {
+                label: "View",
+                onClick: () => {
+                  router.push(`/message/${targetConvId}`);
+                },
+              },
+            }
+          : {}),
+      });
     };
 
     // Handler for real-time system notifications
@@ -330,42 +317,37 @@ export default function GlobalSocketListener() {
       const targetBriefId = newNotif.briefID || newNotif.briefId;
       const targetProposalId = newNotif.proposalID || newNotif.proposalId;
 
-      toast.custom(
-        (id) => (
-          <div
-            className="relative bg-white border-l-4 border-[#0D6D5F] shadow-xl p-4 rounded-[6px] max-w-[350px] flex flex-col gap-1 transition-all duration-300 cursor-pointer pr-6"
-            onClick={() => {
-              toast.dismiss(id);
-              if (newNotif.link) {
-                router.push(newNotif.link);
-              } else if (targetOrderId) {
-                router.push(`/orders/${targetOrderId}`);
-              } else if (targetTicketId) {
-                router.push(`/support/${targetTicketId}`);
-              } else if (targetBriefId) {
-                router.push(`/briefs/${targetBriefId}`);
-              } else if (targetProposalId) {
-                router.push("/briefs/my-proposals");
-              }
-            }}
-          >
-            <button
-              type="button"
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 p-0 w-5 h-5 flex items-center justify-center rounded-full text-base leading-none border-none bg-transparent hover:bg-gray-100 transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                toast.dismiss(id);
-              }}
-              aria-label="Close"
-            >
-              ×
-            </button>
-            <strong className="text-[#333] text-sm font-bold">🔔 {newNotif.title}</strong>
-            <p className="text-[#666] text-[13px] m-0 leading-snug line-clamp-2">{newNotif.message}</p>
-          </div>
-        ),
-        { id: `sys-notif-${notifId}`, duration: 5000 }
+      const handleOpenNotification = () => {
+        if (newNotif.link) {
+          router.push(newNotif.link);
+        } else if (targetOrderId) {
+          router.push(`/orders/${targetOrderId}`);
+        } else if (targetTicketId) {
+          router.push(`/support/${targetTicketId}`);
+        } else if (targetBriefId) {
+          router.push(`/briefs/${targetBriefId}`);
+        } else if (targetProposalId) {
+          router.push("/briefs/my-proposals");
+        }
+      };
+
+      const hasAction = Boolean(
+        newNotif.link || targetOrderId || targetTicketId || targetBriefId || targetProposalId
       );
+
+      toast(newNotif.title || "Notification", {
+        id: `sys-notif-${notifId}`,
+        description: newNotif.message,
+        duration: 5000,
+        ...(hasAction
+          ? {
+              action: {
+                label: "View",
+                onClick: handleOpenNotification,
+              },
+            }
+          : {}),
+      });
     };
 
     joinUser();

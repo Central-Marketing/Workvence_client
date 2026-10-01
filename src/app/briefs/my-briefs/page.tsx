@@ -16,12 +16,16 @@ import {
   FiSearch,
   FiX,
   FiChevronDown,
+  FiEdit3,
+  FiRotateCcw,
+  FiTrash2,
 } from "react-icons/fi";
 
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Button, AiGradientButton } from "@/components";
-import { CustomSelect, CustomSelectOption, BriefsListSkeleton } from "@/components/ui";
+import { CustomSelect, CustomSelectOption, BriefsListSkeleton, ConfirmModal } from "@/components/ui";
+import { EditBriefModal } from "@/features/buyer";
 
 const DEFAULT_AVATARS = [
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
@@ -100,6 +104,8 @@ const MyBriefs = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"newest" | "proposals" | "budget">("newest");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [editingBrief, setEditingBrief] = useState<any | null>(null);
+  const [deletingBriefId, setDeletingBriefId] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -132,6 +138,31 @@ const MyBriefs = () => {
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message || "Failed to close project");
+    },
+  });
+
+  const reopenMutation = useMutation({
+    mutationFn: (briefId: string) =>
+      axiosFetch.patch(`/briefs/${briefId}/reopen`).then(({ data }) => data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-briefs"] });
+      toast.success("Project reopened successfully");
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to reopen project");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (briefId: string) =>
+      axiosFetch.delete(`/briefs/${briefId}`).then(({ data }) => data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["my-briefs"] });
+      setDeletingBriefId(null);
+      toast.success("Project deleted successfully");
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Failed to delete project");
     },
   });
 
@@ -480,7 +511,8 @@ const MyBriefs = () => {
                 <div
                   key={brief._id}
                   onClick={() => router.push(`/briefs/${brief._id}`)}
-                  className="relative overflow-hidden bg-white rounded-[6px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-5 sm:p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer"
+                  className={`relative bg-white rounded-[6px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-5 sm:p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer ${isMenuOpen ? "z-30 overflow-visible" : "overflow-hidden"
+                    }`}
                 >
                   {/* Ambient Purple Glow (appears on card hover) */}
                   <div
@@ -500,7 +532,7 @@ const MyBriefs = () => {
                   />
 
                   {/* Top Header Row */}
-                  <div className="relative z-10">
+                  <div className={`relative ${isMenuOpen ? "z-40" : "z-10"}`}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <h2 className="text-base sm:text-[19px] font-bold text-slate-900 tracking-tight group-hover:text-slate-950 truncate">
@@ -536,7 +568,7 @@ const MyBriefs = () => {
 
                         {/* More Action Menu Button */}
                         <div
-                          className="relative"
+                          className={`relative ${isMenuOpen ? "z-50" : ""}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             setOpenMenuId(isMenuOpen ? null : brief._id);
@@ -557,7 +589,7 @@ const MyBriefs = () => {
                           {isMenuOpen && (
                             <div
                               onClick={(e) => e.stopPropagation()}
-                              className="absolute right-0 top-9 w-44 bg-white border border-gray-100 rounded-[6px] shadow-xl py-1.5 z-20 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
+                              className="absolute right-0 top-9 w-44 bg-white border border-gray-100 rounded-[6px] shadow-2xl py-1.5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
                             >
                               <Button
                                 type="button"
@@ -572,10 +604,10 @@ const MyBriefs = () => {
                                 leftIcon={<FiEye className="text-slate-400 group-hover:text-teal-700" />}
                                 className="group justify-start px-3.5 py-2 text-xs font-medium text-gray-700 hover:bg-teal-50/70 hover:text-teal-800 border-none shadow-none h-auto min-h-0 transition-colors"
                               >
-                                View Details
+                                View
                               </Button>
 
-                              {!isClosed && proposalCount > 0 && (
+                              {!isClosed && (
                                 <Button
                                   type="button"
                                   variant="ghost"
@@ -584,12 +616,12 @@ const MyBriefs = () => {
                                   fullWidth
                                   onClick={() => {
                                     setOpenMenuId(null);
-                                    router.push(`/briefs/${brief._id}/proposals`);
+                                    setEditingBrief(brief);
                                   }}
-                                  leftIcon={<FiUsers className="text-slate-400 group-hover:text-teal-700" />}
+                                  leftIcon={<FiEdit3 className="text-slate-400 group-hover:text-teal-700" />}
                                   className="group justify-start px-3.5 py-2 text-xs font-medium text-gray-700 hover:bg-teal-50/70 hover:text-teal-800 border-none shadow-none h-auto min-h-0 transition-colors"
                                 >
-                                  View Proposals
+                                  Edit
                                 </Button>
                               )}
 
@@ -602,14 +634,48 @@ const MyBriefs = () => {
                                   fullWidth
                                   onClick={() => {
                                     setOpenMenuId(null);
-                                    closeMutation.mutate(brief._id);
+                                    closeMutation.mutate(brief._id || brief.id);
                                   }}
-                                  leftIcon={<FiXCircle className="text-rose-500" />}
-                                  className="justify-start px-3.5 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 border-none shadow-none h-auto min-h-0 transition-colors"
+                                  leftIcon={<FiXCircle className="text-amber-500" />}
+                                  className="justify-start px-3.5 py-2 text-xs font-medium text-amber-700 hover:bg-amber-50 border-none shadow-none h-auto min-h-0 transition-colors"
                                 >
-                                  Close Project
+                                  Close
                                 </Button>
                               )}
+
+                              {isClosed && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  radius="none"
+                                  fullWidth
+                                  onClick={() => {
+                                    setOpenMenuId(null);
+                                    reopenMutation.mutate(brief._id || brief.id);
+                                  }}
+                                  leftIcon={<FiRotateCcw className="text-teal-600" />}
+                                  className="justify-start px-3.5 py-2 text-xs font-medium text-teal-700 hover:bg-teal-50 border-none shadow-none h-auto min-h-0 transition-colors"
+                                >
+                                  Reopen
+                                </Button>
+                              )}
+
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                radius="none"
+                                fullWidth
+                                onClick={() => {
+                                  setOpenMenuId(null);
+                                  setDeletingBriefId(brief._id || brief.id);
+                                }}
+                                leftIcon={<FiTrash2 className="text-rose-500" />}
+                                className="justify-start px-3.5 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 border-none shadow-none h-auto min-h-0 transition-colors"
+                              >
+                                Delete
+                              </Button>
                             </div>
                           )}
                         </div>
@@ -635,7 +701,7 @@ const MyBriefs = () => {
                   </div>
 
                   {/* Divider & Footer */}
-                  <div className="relative z-10 border-t border-slate-100 pt-4 flex items-center justify-between mt-auto">
+                  <div className="relative z-0 border-t border-slate-100 pt-4 flex items-center justify-between mt-auto">
                     {/* Left: Avatar Stack and Proposal Count */}
                     <div className="flex items-center">
                       {proposalCount > 0 ? (
@@ -676,6 +742,25 @@ const MyBriefs = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Brief Modal */}
+      <EditBriefModal
+        isOpen={Boolean(editingBrief)}
+        brief={editingBrief}
+        onClose={() => setEditingBrief(null)}
+      />
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={Boolean(deletingBriefId)}
+        title="Delete Project"
+        message="Are you sure you want to delete this project? If proposals exist, the project will be safely archived; otherwise, it will be permanently removed."
+        confirmText="Delete"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+        onConfirm={() => deletingBriefId && deleteMutation.mutate(deletingBriefId)}
+        onClose={() => setDeletingBriefId(null)}
+      />
     </div>
   );
 };

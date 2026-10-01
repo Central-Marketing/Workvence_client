@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,25 +9,29 @@ import {
   X,
   Eye,
   EyeOff,
-  Check,
   Briefcase,
   User,
-  ShieldCheck,
-  Sparkles,
   ArrowRight,
+  ArrowLeft,
+  ShieldCheck,
+  RefreshCw,
+  Mail,
+  Lock,
 } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
-import { MdOutlineEmail } from "react-icons/md";
 import { Button } from "@/components/ui";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { useSocialAuth } from "@/hooks/useSocialAuth";
 
+export type AuthModalMode = "login" | "register" | "forgot" | "reset" | "verify";
+
 export interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialMode?: "login" | "register";
+  initialMode?: AuthModalMode;
+  initialEmail?: string;
   defaultIsSeller?: boolean;
   onSuccess?: (user: any) => void;
   redirectUrl?: string;
@@ -37,90 +41,79 @@ const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
   initialMode = "login",
-  defaultIsSeller = true,
+  initialEmail = "",
+  defaultIsSeller = false,
   onSuccess,
   redirectUrl,
 }) => {
   const router = useRouter();
   const setUser = useUserStore((state) => state.setUser);
 
-  const [mode, setMode] = useState<"login" | "register">(initialMode);
+  const [mode, setMode] = useState<AuthModalMode>(initialMode);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Social Auth
   const {
     loadingProvider,
     handleGoogleLogin,
     handleAppleLogin,
     renderGoogleButton,
   } = useSocialAuth();
-  const modalGoogleBtnRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (isOpen && mode === "login" && modalGoogleBtnRef.current) {
-      renderGoogleButton(modalGoogleBtnRef.current, {
-        onSuccess: (u) => {
-          onSuccess?.(u);
-          onClose();
-          if (redirectUrl) {
-            router.push(redirectUrl);
-          }
-        },
-        redirectUrl,
-        isSeller: defaultIsSeller,
-      });
-    }
-  }, [isOpen, mode, renderGoogleButton, onSuccess, onClose, redirectUrl, defaultIsSeller, router]);
+  const loginGoogleBtnRef = useRef<HTMLDivElement>(null);
+  const registerGoogleBtnRef = useRef<HTMLDivElement>(null);
 
-  const onSocialAuthClick = (provider: "google" | "apple") => {
-    const options = {
-      onSuccess: (u: any) => {
-        onSuccess?.(u);
-        onClose();
-        if (redirectUrl) {
-          router.push(redirectUrl);
-        }
-      },
-      redirectUrl,
-      isSeller: defaultIsSeller,
-    };
-    if (provider === "google") {
-      handleGoogleLogin(options);
-    } else {
-      handleAppleLogin(options);
-    }
-  };
-
-  // Login Form State
+  // Form States
   const [loginInput, setLoginInput] = useState({
-    identifier: "",
+    identifier: initialEmail,
     password: "",
   });
   const [showLoginPassword, setShowLoginPassword] = useState(false);
 
-  // Register Form State
   const [registerInput, setRegisterInput] = useState({
-    username: "",
-    email: "",
+    email: initialEmail,
     password: "",
     confirmPassword: "",
     isSeller: defaultIsSeller,
   });
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showRegisterConfirmPassword, setShowRegisterConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
 
-  // Sync mode whenever modal opens or initialMode changes
+  // Forgot Password State
+  const [forgotEmail, setForgotEmail] = useState(initialEmail);
+
+  // Reset Password State
+  const [resetEmail, setResetEmail] = useState(initialEmail);
+  const [resetOtp, setResetOtp] = useState(["", "", "", "", "", ""]);
+  const [resetPasswords, setResetPasswords] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [showResetConfirmPassword, setShowResetConfirmPassword] = useState(false);
+
+  // Email Verification State
+  const [verifyEmail, setVerifyEmail] = useState(initialEmail);
+  const [verifyOtp, setVerifyOtp] = useState(["", "", "", "", "", ""]);
+  const [resendTimer, setResendTimer] = useState(60);
+
+  // Sync state on modal open or prop change
   useEffect(() => {
     if (isOpen) {
       setMode(initialMode);
       setError(null);
-      setRegisterInput((prev) => ({
-        ...prev,
-        isSeller: defaultIsSeller,
-      }));
+      if (initialEmail) {
+        setLoginInput((prev) => ({ ...prev, identifier: initialEmail }));
+        setRegisterInput((prev) => ({ ...prev, email: initialEmail }));
+        setForgotEmail(initialEmail);
+        setResetEmail(initialEmail);
+        setVerifyEmail(initialEmail);
+      }
+      setRegisterInput((prev) => ({ ...prev, isSeller: defaultIsSeller }));
     }
-  }, [isOpen, initialMode, defaultIsSeller]);
+  }, [isOpen, initialMode, initialEmail, defaultIsSeller]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -134,13 +127,93 @@ const AuthModal: React.FC<AuthModalProps> = ({
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  // Resend Countdown Timer for Verification
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isOpen && mode === "verify" && resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isOpen, mode, resendTimer]);
 
-  // Handle Login Submit
+  // Social Auth Callback Helper
+  const handleSocialSuccess = useCallback(
+    (u: any) => {
+      onSuccess?.(u);
+      onClose();
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      }
+    },
+    [onSuccess, onClose, redirectUrl, router]
+  );
+
+  // Mount Google GIS Button for Login Mode
+  useEffect(() => {
+    if (isOpen && mode === "login" && loginGoogleBtnRef.current) {
+      renderGoogleButton(loginGoogleBtnRef.current, {
+        onSuccess: handleSocialSuccess,
+        redirectUrl,
+        isSeller: defaultIsSeller,
+      });
+    }
+  }, [isOpen, mode, renderGoogleButton, handleSocialSuccess, redirectUrl, defaultIsSeller]);
+
+  // Mount Google GIS Button for Register Mode
+  useEffect(() => {
+    if (isOpen && mode === "register" && registerGoogleBtnRef.current) {
+      renderGoogleButton(registerGoogleBtnRef.current, {
+        onSuccess: handleSocialSuccess,
+        redirectUrl,
+        isSeller: registerInput.isSeller,
+      });
+    }
+  }, [isOpen, mode, renderGoogleButton, handleSocialSuccess, redirectUrl, registerInput.isSeller]);
+
+  const onSocialAuthClick = (provider: "google" | "apple", isSellerChoice?: boolean) => {
+    const options = {
+      onSuccess: handleSocialSuccess,
+      redirectUrl,
+      isSeller: isSellerChoice ?? defaultIsSeller,
+    };
+    if (provider === "google") {
+      handleGoogleLogin(options);
+    } else {
+      handleAppleLogin(options);
+    }
+  };
+
+  // Helper to safely store authenticated session
+  const saveAuthSession = (data: any) => {
+    const user = data?.user || data;
+    const userKey = user.id || user._id || user.username || "default";
+    sessionStorage.removeItem(`kyc_prompt_dismissed_${userKey}`);
+    sessionStorage.removeItem("kyc_prompt_dismissed_session");
+
+    const token = data?.accessToken || data?.token || user?.token || user?.accessToken;
+    const refreshToken = data?.refreshToken || user?.refreshToken;
+    if (token) {
+      document.cookie = `accessToken=${encodeURIComponent(token)}; path=/; max-age=2592000; SameSite=Lax`;
+      try { localStorage.setItem("accessToken", token); } catch { }
+      try { localStorage.setItem("token", token); } catch { }
+    }
+    if (refreshToken) {
+      document.cookie = `refreshToken=${encodeURIComponent(refreshToken)}; path=/; max-age=2592000; SameSite=Lax`;
+      try { localStorage.setItem("refreshToken", refreshToken); } catch { }
+    }
+
+    localStorage.setItem("user", JSON.stringify(user));
+    setUser(user);
+    return user;
+  };
+
+  // 1. Handle Login Submit
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginInput.identifier.trim() || !loginInput.password) {
-      setError("Please fill in both email/username and password.");
+      setError("Please fill in both email and password.");
       return;
     }
 
@@ -154,27 +227,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
     try {
       const { data } = await axiosFetch.post("/auth/login", payload);
-      const user = data?.user || data;
-      const userKey = user.id || user._id || user.username || "default";
-      sessionStorage.removeItem(`kyc_prompt_dismissed_${userKey}`);
-      sessionStorage.removeItem("kyc_prompt_dismissed_session");
-
-      // Save tokens in cookies & localStorage
-      const token = data?.accessToken || data?.token || user?.token || user?.accessToken;
-      const refreshToken = data?.refreshToken || user?.refreshToken;
-      if (token) {
-        document.cookie = `accessToken=${encodeURIComponent(token)}; path=/; max-age=2592000; SameSite=Lax`;
-        try { localStorage.setItem("accessToken", token); } catch { }
-        try { localStorage.setItem("token", token); } catch { }
-      }
-      if (refreshToken) {
-        document.cookie = `refreshToken=${encodeURIComponent(refreshToken)}; path=/; max-age=2592000; SameSite=Lax`;
-        try { localStorage.setItem("refreshToken", refreshToken); } catch { }
-      }
-
-      localStorage.setItem("user", JSON.stringify(user));
-      setUser(user);
-      toast.success(`Welcome back, ${user.username || "User"}!`);
+      const user = saveAuthSession(data);
+      toast.success(`Welcome back, ${user.username || user.name || "User"}!`);
 
       if (onSuccess) {
         onSuccess(user);
@@ -186,15 +240,17 @@ const AuthModal: React.FC<AuthModalProps> = ({
       }
     } catch (err: any) {
       const isVerified = err.response?.data?.isVerified;
-      const email = err.response?.data?.email;
+      const unverifiedEmail = err.response?.data?.email || loginInput.identifier.trim();
       const msg = err.response?.data?.message || "Invalid email or password.";
 
-      if (isVerified === false && email) {
-        toast.error("Email verification required. Redirecting...");
+      if (isVerified === false) {
+        toast.error("Email verification required. Please verify your OTP.");
         sessionStorage.setItem("tempLoginPassword", loginInput.password);
-        sessionStorage.setItem("tempLoginUsername", loginInput.identifier);
-        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
-        onClose();
+        sessionStorage.setItem("tempLoginUsername", unverifiedEmail);
+        setVerifyEmail(unverifiedEmail);
+        setVerifyOtp(["", "", "", "", "", ""]);
+        setResendTimer(60);
+        setMode("verify");
         return;
       }
 
@@ -205,28 +261,19 @@ const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  // Handle Register Submit
+  // 2. Handle Register Submit (No Username Required in UI)
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { username, email, password, confirmPassword, isSeller } = registerInput;
+    const { email, password, confirmPassword, isSeller } = registerInput;
+    const trimmedEmail = email.trim();
 
-    if (!username.trim() || !email.trim() || !password || !confirmPassword) {
+    if (!trimmedEmail || !password || !confirmPassword) {
       setError("Please fill in all required fields.");
       return;
     }
 
-    if (username.trim().length < 3) {
-      setError("Username must be at least 3 characters.");
-      return;
-    }
-
-    if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) {
-      setError("Username can only contain letters, numbers, and underscores.");
-      return;
-    }
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
+    if (!emailRegex.test(trimmedEmail)) {
       setError("Please enter a valid email address.");
       return;
     }
@@ -249,22 +296,33 @@ const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     setError(null);
 
+    // Auto-derive clean, unique fallback username from email to satisfy NestJS DTO
+    const emailPrefix = (trimmedEmail.split("@")[0] || "user")
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, "")
+      .slice(0, 15);
+    const cleanPrefix = emailPrefix.length >= 3 ? emailPrefix : `user_${emailPrefix}`;
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    const derivedUsername = `${cleanPrefix}_${randomSuffix}`;
+
     try {
       const payload = {
-        username: username.trim(),
-        email: email.trim(),
+        username: derivedUsername,
+        email: trimmedEmail,
         password,
         isSeller,
       };
 
       await axiosFetch.post("/auth/register", payload);
-      toast.success("Registration successful! Please confirm your email.");
+      toast.success("Account created! Please enter the 6-digit code sent to your email.");
 
-      sessionStorage.setItem("tempLoginUsername", email.trim());
+      sessionStorage.setItem("tempLoginUsername", trimmedEmail);
       sessionStorage.setItem("tempLoginPassword", password);
 
-      onClose();
-      router.push(`/verify-email?email=${encodeURIComponent(email.trim())}`);
+      setVerifyEmail(trimmedEmail);
+      setVerifyOtp(["", "", "", "", "", ""]);
+      setResendTimer(60);
+      setMode("verify");
     } catch (err: any) {
       const msg = err.response?.data?.message || "Registration failed. Please try again.";
       setError(msg);
@@ -273,6 +331,263 @@ const AuthModal: React.FC<AuthModalProps> = ({
       setLoading(false);
     }
   };
+
+  // 3. Handle Forgot Password Submit
+  const handleForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail.trim()) {
+      setError("Please enter your email address.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      await axiosFetch.post("/auth/forgot-password", { email: forgotEmail.trim() });
+      toast.success("Password reset OTP sent to your email!");
+      setResetEmail(forgotEmail.trim());
+      setResetOtp(["", "", "", "", "", ""]);
+      setMode("reset");
+    } catch (err: any) {
+      const msg = err.response?.data?.message || "Failed to send reset link.";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 4. Handle Reset Password Submit
+  const handleResetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const otpValue = resetOtp.join("");
+
+    if (otpValue.length < 6) {
+      setError("Please enter the complete 6-digit OTP.");
+      return;
+    }
+
+    if (!resetPasswords.newPassword || !resetPasswords.confirmPassword) {
+      setError("Please enter and confirm your new password.");
+      return;
+    }
+
+    if (resetPasswords.newPassword !== resetPasswords.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    if (resetPasswords.newPassword.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      await axiosFetch.post("/auth/reset-password", {
+        email: resetEmail.trim(),
+        otp: otpValue,
+        newPassword: resetPasswords.newPassword,
+      });
+
+      toast.success("Password reset successfully! Please sign in with your new password.");
+      setLoginInput({
+        identifier: resetEmail.trim(),
+        password: "",
+      });
+      setMode("login");
+    } catch (err: any) {
+      const msg = err.response?.data?.message || "Failed to reset password.";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 5. Handle OTP Verification Submit
+  const handleVerifySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const otpValue = verifyOtp.join("");
+
+    if (otpValue.length < 6) {
+      setError("Please enter the complete 6-digit OTP.");
+      return;
+    }
+
+    if (!verifyEmail) {
+      setError("Email address is missing. Please sign up or log in again.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      await axiosFetch.post("/auth/verify-otp", {
+        email: verifyEmail.trim(),
+        otp: otpValue,
+      });
+
+      const loginUsername = verifyEmail.trim() || sessionStorage.getItem("tempLoginUsername");
+      const loginPassword = sessionStorage.getItem("tempLoginPassword");
+
+      // Auto-Login if temporary credentials exist
+      if (loginPassword && loginUsername) {
+        try {
+          const { data } = await axiosFetch.post("/auth/login", {
+            email: loginUsername,
+            username: loginUsername,
+            password: loginPassword,
+          });
+
+          const user = saveAuthSession(data);
+          sessionStorage.removeItem("tempLoginUsername");
+          sessionStorage.removeItem("tempLoginPassword");
+
+          toast.success("Email verified! Welcome to Workvence.");
+          if (onSuccess) {
+            onSuccess(user);
+          }
+          onClose();
+
+          if (redirectUrl) {
+            router.push(redirectUrl);
+          }
+          return;
+        } catch {
+          // If auto-login fails, switch cleanly to login mode
+        }
+      }
+
+      toast.success("Email verified successfully! You can now sign in.");
+      setLoginInput({
+        identifier: verifyEmail.trim(),
+        password: "",
+      });
+      setMode("login");
+    } catch (err: any) {
+      const msg = err.response?.data?.message || "Invalid or expired verification code.";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Resend Verification OTP
+  const handleResendOtp = async () => {
+    if (resendTimer > 0 || !verifyEmail) return;
+    try {
+      await axiosFetch.post("/auth/resend-otp", { email: verifyEmail.trim() });
+      setVerifyOtp(["", "", "", "", "", ""]);
+      setResendTimer(60);
+      toast.success("A new verification code has been sent to your email.");
+      const firstInput = document.getElementById("auth-modal-verify-otp-0");
+      if (firstInput) firstInput.focus();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to resend OTP.");
+    }
+  };
+
+  // OTP Input Change Handlers
+  const handleOtpInput = (
+    index: number,
+    value: string,
+    state: string[],
+    setState: (val: string[]) => void,
+    prefix: string
+  ) => {
+    if (isNaN(Number(value))) return;
+    const nextState = [...state];
+    nextState[index] = value.substring(value.length - 1);
+    setState(nextState);
+
+    if (value && index < 5) {
+      const nextInput = document.getElementById(`${prefix}-${index + 1}`);
+      if (nextInput) nextInput.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>,
+    state: string[],
+    prefix: string
+  ) => {
+    if (e.key === "Backspace" && !state[index] && index > 0) {
+      const prevInput = document.getElementById(`${prefix}-${index - 1}`);
+      if (prevInput) prevInput.focus();
+    }
+  };
+
+  const handleOtpPaste = (
+    e: React.ClipboardEvent<HTMLInputElement>,
+    setState: (val: string[]) => void,
+    prefix: string
+  ) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").trim();
+    const numbersOnly = pasted.replace(/\D/g, "").slice(0, 6);
+    if (!numbersOnly) return;
+
+    const nextState = ["", "", "", "", "", ""];
+    for (let i = 0; i < numbersOnly.length; i++) {
+      nextState[i] = numbersOnly[i];
+    }
+    setState(nextState);
+
+    const targetIndex = Math.min(numbersOnly.length, 5);
+    const targetInput = document.getElementById(`${prefix}-${targetIndex}`);
+    if (targetInput) targetInput.focus();
+  };
+
+  if (!isOpen) return null;
+
+  // Visual Pane Image & Taglines matched to auth pages
+  const getVisualPaneConfig = () => {
+    switch (mode) {
+      case "register":
+        return {
+          image: "/images/auth/registerImage.png",
+          tag: "Join Workvence",
+          title: "Your creative journey starts here.",
+          subtitle:
+            "Join thousands of top freelancers and businesses collaborating with secure milestone payments.",
+        };
+      case "verify":
+        return {
+          image: "/images/auth/verifyImage.png",
+          tag: "Account Security",
+          title: "Protecting your workspace.",
+          subtitle:
+            "Email verification ensures trusted collaboration, dispute protection, and instant access to client briefs.",
+        };
+      case "forgot":
+      case "reset":
+        return {
+          image: "/images/auth/loginImage.png",
+          tag: "Account Recovery",
+          title: "Seamless security recovery.",
+          subtitle:
+            "Safely regain access to your account, ongoing client orders, and project delivery workspaces.",
+        };
+      case "login":
+      default:
+        return {
+          image: "/images/auth/loginImage.png",
+          tag: "Welcome Back",
+          title: "Build, scale & collaborate.",
+          subtitle:
+            "Access high-budget client projects, submit proposals, and scale your freelance career with secure milestones.",
+        };
+    }
+  };
+
+  const visualConfig = getVisualPaneConfig();
 
   return (
     <div
@@ -283,7 +598,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       aria-labelledby="auth-modal-title"
     >
       <div
-        className="relative w-full max-w-[860px] max-h-[92vh] bg-white rounded-[6px] sm:rounded-[6px] shadow-2xl border border-gray-100 flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-[900px] h-[620px] max-h-[92vh] bg-white rounded-[6px] sm:rounded-[6px] shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -292,7 +607,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
           variant="ghost"
           size="icon"
           radius="full"
-          className="absolute top-3.5 right-3.5 z-20 w-8 h-8 text-gray-400 hover:text-gray-700 hover:bg-gray-100 border-none shadow-none"
+          className="absolute top-3.5 right-3.5 z-30 w-8 h-8 text-gray-400 hover:text-gray-700 hover:bg-gray-100 border-none shadow-none cursor-pointer"
           onClick={onClose}
           disabled={loading}
           aria-label="Close modal"
@@ -300,71 +615,60 @@ const AuthModal: React.FC<AuthModalProps> = ({
           <X className="w-4 h-4" />
         </Button>
 
-        {/* Left Pane (Desktop Branded Artwork / Benefits) */}
-        <div className="hidden md:flex w-[40%] shrink-0 bg-gradient-to-br from-[#0B403F] via-[#0D6D5F] to-[#072522] p-8 text-white flex-col justify-between relative overflow-hidden">
-          {/* Ambient Lighting Accents */}
-          <div className="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-emerald-400/15 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-16 -left-16 w-44 h-44 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none" />
+        {/* ── LEFT PANE: Auth Page Imagery & Branded Backdrop ── */}
+        <div className="hidden md:flex w-[42%] h-full shrink-0 relative overflow-hidden bg-[#0a0f1d] text-white flex-col justify-between p-7 lg:p-8">
+          {/* Dynamic Image from /images/auth/ */}
+          <Image
+            key={visualConfig.image}
+            src={visualConfig.image}
+            alt="Workvence"
+            fill
+            priority
+            className="object-cover transition-opacity duration-300"
+            sizes="45vw"
+          />
 
-          {/* Top Section */}
+          {/* Dark Gradient Vignette for Readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/35 pointer-events-none" />
+
+          {/* Top Brand Logo */}
           <div className="relative z-10">
-            <Link href="/" className="inline-block mb-6">
+            <Link href="/" className="inline-block mb-4">
               <Image
                 src="/Workvence-logo-Horizontal3.png"
                 alt="Workvence"
-                width={135}
-                height={32}
-                className="h-7 w-auto object-contain brightness-0 invert"
+                width={130}
+                height={30}
+                className="h-6.5 w-auto object-contain brightness-0 invert"
                 priority
               />
             </Link>
+          </div>
 
+          {/* Bottom Statement / Testimonial Overlay */}
+          <div className="relative z-10 space-y-2.5">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[11px] font-medium text-emerald-300">
+              <ShieldCheck className="w-3 h-3" />
+              <span>{visualConfig.tag}</span>
+            </div>
 
-
-            <h3 className="text-2xl font-bold font-sf-pro leading-snug tracking-tight text-white">
-              Success starts here.
+            <h3 className="text-xl lg:text-[22px] font-bold font-sf-pro leading-snug tracking-tight text-white drop-shadow-sm">
+              {visualConfig.title}
             </h3>
-            <p className="text-xs text-emerald-100/80 leading-relaxed mt-1.5">
-              Access high-budget client projects, submit proposals, and scale your freelance career with secure milestones.
+
+            <p className="text-xs text-gray-200/90 leading-relaxed drop-shadow-xs">
+              {visualConfig.subtitle}
             </p>
-          </div>
 
-          {/* Value Points */}
-          <div className="relative z-10 my-6 space-y-3">
-            <div className="flex items-center gap-2.5 text-xs text-emerald-50">
-              <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0">
-                <Check className="w-3 h-3 text-emerald-300" />
-              </div>
-              <span>Over 700 project categories</span>
+            <div className="pt-3 border-t border-white/15 text-[11px] text-gray-300/80 flex items-center justify-between">
+              <span>Trusted worldwide</span>
+              <span className="font-semibold text-emerald-400">Workvence Secure</span>
             </div>
-            <div className="flex items-center gap-2.5 text-xs text-emerald-50">
-              <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0">
-                <Check className="w-3 h-3 text-emerald-300" />
-              </div>
-              <span>Zero upfront fees — milestone escrow</span>
-            </div>
-            <div className="flex items-center gap-2.5 text-xs text-emerald-50">
-              <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0">
-                <Check className="w-3 h-3 text-emerald-300" />
-              </div>
-              <span>Direct client chat & proposal tools</span>
-            </div>
-            <div className="flex items-center gap-2.5 text-xs text-emerald-50">
-              <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-3 h-3 text-emerald-300" />
-              </div>
-              <span>Verified buyers & secure payouts</span>
-            </div>
-          </div>
-
-          {/* Bottom Trust Badge */}
-          <div className="relative z-10 pt-4 border-t border-white/10 text-[11px] text-emerald-100/70">
-            Trusted by creators and top businesses worldwide.
           </div>
         </div>
 
-        {/* Right Pane (Auth Form) */}
-        <div className="flex-1 min-w-0 p-6 sm:p-8 flex flex-col overflow-y-auto">
+        {/* ── RIGHT PANE: Auth Forms & State Machine ── */}
+        <div className="flex-1 min-w-0 h-full p-6 sm:p-7 lg:p-8 flex flex-col justify-between overflow-y-auto">
           {/* Mobile Brand Header */}
           <div className="flex md:hidden items-center justify-between mb-4">
             <Image
@@ -374,62 +678,89 @@ const AuthModal: React.FC<AuthModalProps> = ({
               height={28}
               className="h-6 w-auto object-contain"
             />
-          </div>          {/* Mode Switcher Tabs (Fiverr Style) */}
-          <div className="flex items-center border-b border-gray-100 mb-5 gap-6">
-            <button
-              type="button"
-              onClick={() => {
-                setMode("login");
-                setError(null);
-              }}
-              className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative ${mode === "login"
-                ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
-                : "text-gray-400 hover:text-gray-600"
-                }`}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMode("register");
-                setError(null);
-              }}
-              className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative ${mode === "register"
-                ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
-                : "text-gray-400 hover:text-gray-600"
-                }`}
-            >
-              Join Workvence
-            </button>
           </div>
 
-          {/* Title and Description */}
+          {/* Mode Switcher Tabs for Login & Register */}
+          {mode === "login" || mode === "register" ? (
+            <div className="flex items-center border-b border-gray-100 mb-5 gap-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("login");
+                  setError(null);
+                }}
+                className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative cursor-pointer ${mode === "login"
+                    ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
+                    : "text-gray-400 hover:text-gray-600"
+                  }`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("register");
+                  setError(null);
+                }}
+                className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative cursor-pointer ${mode === "register"
+                    ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
+                    : "text-gray-400 hover:text-gray-600"
+                  }`}
+              >
+                Join Workvence
+              </button>
+            </div>
+          ) : (
+            /* Sub-mode Breadcrumb Back Navigation */
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode("login");
+                  setError(null);
+                }}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#0D6D5F] transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to Sign In</span>
+              </button>
+            </div>
+          )}
+
+          {/* Title & Subtitle */}
           <div className="mb-4">
             <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-bold text-gray-900 font-sf-pro">
-              {mode === "login" ? "Sign in to your account" : "Create an account"}
+              {mode === "login" && "Sign in to your account"}
+              {mode === "register" && "Create an account"}
+              {mode === "forgot" && "Forgot your password?"}
+              {mode === "reset" && "Reset your password"}
+              {mode === "verify" && "Verify your email"}
             </h2>
             <p className="text-xs sm:text-[13px] text-gray-500 mt-1">
-              {mode === "login"
-                ? "Welcome back! Enter your details to continue."
-                : "Join Workvence to discover project opportunities and submit proposals."}
+              {mode === "login" && "Welcome back! Enter your credentials to continue."}
+              {mode === "register" && "Join Workvence to discover client projects and submit proposals."}
+              {mode === "forgot" && "Enter your email address and we'll send you a 6-digit reset code."}
+              {mode === "reset" && `Enter the 6-digit code sent to ${resetEmail || "your email"} and a new password.`}
+              {mode === "verify" && `Enter the 6-digit verification code sent to ${verifyEmail || "your email"}.`}
             </p>
           </div>
 
-          {/* Error Banner */}
+          {/* Inline Error Banner */}
           {error && (
             <div className="mb-4 p-3 rounded-[6px] bg-red-50 border border-red-200/80 text-red-600 text-xs sm:text-[13px] font-medium flex items-center gap-2">
               <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
                 !
               </span>
-              <span>{error}</span>
+              <span className="truncate">{error}</span>
             </div>
           )}
 
-          {/* SIGN IN FORM */}
-          {mode === "login" ? (
+          {/* ─────────────────────────────────────────────────────────────
+              MODE 1: SIGN IN (LOGIN)
+          ───────────────────────────────────────────────────────────── */}
+          {mode === "login" && (
             <div className="flex flex-col flex-1">
-              {/* Social Buttons (2-column grid) */}
+              {/* Social Buttons */}
               <div className="grid grid-cols-2 gap-2.5 w-full mb-3">
                 <div className="relative">
                   <button
@@ -444,10 +775,10 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     ) : (
                       <FcGoogle className="text-base shrink-0" />
                     )}
-                    <span className="truncate">Continue with Google</span>
+                    <span className="truncate">Google</span>
                   </button>
                   <div
-                    ref={modalGoogleBtnRef}
+                    ref={loginGoogleBtnRef}
                     className="absolute inset-0 overflow-hidden opacity-[0.0001] cursor-pointer pointer-events-auto [&>div]:!w-full [&>div]:!h-full [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!scale-150"
                   />
                 </div>
@@ -456,34 +787,31 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   data-testid="modal-login-apple-btn"
                   type="button"
                   onClick={() => onSocialAuthClick("apple")}
-                  // disabled={loading || !!loadingProvider}
                   disabled={true}
-                  className="h-10 px-2 cursor-not-allowed border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-not-allowed opacity-60"
+                  title="Apple Sign-In coming soon"
                 >
-                  {loadingProvider === "apple" ? (
-                    <span className="inline-block w-3.5 h-3.5 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
-                  ) : (
-                    <FaApple className="text-base text-black shrink-0" />
-                  )}
-                  <span className="truncate">Continue with Apple</span>
+                  <FaApple className="text-base text-black shrink-0" />
+                  <span className="truncate">Apple</span>
                 </button>
               </div>
 
               {/* Divider */}
-              <div className="relative flex items-center justify-center w-full mb-3">
+              <div className="relative flex items-center justify-center w-full mb-4">
                 <div className="w-full border-t border-gray-200/80" />
-                <span className="absolute px-2.5 bg-white text-[11px] text-gray-400 font-normal">
-                  or
+                <span className="absolute px-3 bg-white text-[11px] text-gray-400 uppercase tracking-wider font-medium">
+                  or with email
                 </span>
               </div>
 
-              <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3 flex-1">
-                {/* Email / Username */}
+              {/* Sign In Form */}
+              <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3.5 flex-1">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email</label>
+                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email Address</label>
                   <input
+                    data-testid="modal-login-email-input"
                     type="text"
-                    placeholder="e.g name@email.com"
+                    placeholder="name@email.com"
                     value={loginInput.identifier}
                     onChange={(e) =>
                       setLoginInput((prev) => ({ ...prev, identifier: e.target.value }))
@@ -493,58 +821,60 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   />
                 </div>
 
-                {/* Password */}
                 <div className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between">
                     <label className="text-xs sm:text-[13px] font-medium text-gray-700">Password</label>
-                    <Link
-                      href="/forgot-password"
-                      onClick={onClose}
-                      className="text-xs text-gray-500 hover:text-[#0D6D5F] hover:underline transition-colors"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForgotEmail(loginInput.identifier);
+                        setMode("forgot");
+                        setError(null);
+                      }}
+                      className="text-xs text-gray-500 hover:text-[#0D6D5F] hover:underline cursor-pointer"
                     >
                       Forgot password?
-                    </Link>
+                    </button>
                   </div>
                   <div className="relative flex items-center">
                     <input
+                      data-testid="modal-login-password-input"
                       type={showLoginPassword ? "text" : "password"}
-                      placeholder="Set Password"
+                      placeholder="Enter password"
                       value={loginInput.password}
                       onChange={(e) =>
                         setLoginInput((prev) => ({ ...prev, password: e.target.value }))
                       }
                       required
-                      className="w-full h-10 px-3.5 pr-11 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                      className="w-full h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                     />
                     <button
                       type="button"
-                      className="absolute right-3 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
+                      className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
                       onClick={() => setShowLoginPassword(!showLoginPassword)}
                       aria-label={showLoginPassword ? "Hide password" : "Show password"}
                     >
-                      {showLoginPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      {showLoginPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
                 </div>
 
-                {/* Submit Button */}
-                <button
+                <Button
+                  data-testid="modal-login-submit-btn"
                   type="submit"
+                  variant="dark"
+                  size="md"
+                  fullWidth
+                  radius="fiverr"
                   disabled={loading}
-                  className="mt-1 w-full h-10 bg-black hover:bg-gray-900 text-white font-medium rounded-[6px] flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer text-xs sm:text-sm"
+                  isLoading={loading}
+                  className="mt-2 bg-black hover:bg-gray-900 text-white font-medium shadow-sm transition-all"
+                  rightIcon={<ArrowRight className="w-4 h-4" />}
                 >
-                  {loading ? (
-                    <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <>
-                      <span>Get Started</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </button>
+                  Sign in
+                </Button>
 
-                {/* Bottom Switch */}
-                <div className="mt-3 text-center text-xs text-gray-500">
+                <div className="mt-2 text-center text-xs text-gray-500">
                   Don&apos;t have an account?{" "}
                   <button
                     type="button"
@@ -559,19 +889,23 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
               </form>
             </div>
-          ) : (
-            /* REGISTER FORM */
-            <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-3 flex-1">
-              {/* Role Selection (Fiverr Freelancer vs Client Toggle) */}
-              <div className="space-y-1">
+          )}
+
+          {/* ─────────────────────────────────────────────────────────────
+              MODE 2: CREATE ACCOUNT (REGISTER - NO USERNAME INPUT!)
+          ───────────────────────────────────────────────────────────── */}
+          {mode === "register" && (
+            <div className="flex flex-col flex-1">
+              {/* Role Toggle */}
+              <div className="space-y-1.5 mb-3">
                 <label className="text-xs font-semibold text-gray-700">I want to</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: true }))}
                     className={`flex items-center justify-center gap-1.5 h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${registerInput.isSeller
-                      ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
-                      : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
+                        ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
+                        : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
                       }`}
                   >
                     <Briefcase className="w-3.5 h-3.5" />
@@ -582,8 +916,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     type="button"
                     onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: false }))}
                     className={`flex items-center justify-center gap-1.5 h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${!registerInput.isSeller
-                      ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
-                      : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
+                        ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
+                        : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
                       }`}
                   >
                     <User className="w-3.5 h-3.5" />
@@ -592,112 +926,198 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
               </div>
 
-              {/* Username */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs sm:text-[13px] font-medium text-gray-700">Username</label>
-                <input
-                  type="text"
-                  placeholder="e.g. creative_dev"
-                  value={registerInput.username}
-                  onChange={(e) =>
-                    setRegisterInput((prev) => ({ ...prev, username: e.target.value }))
-                  }
-                  required
-                  className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
-                />
-              </div>
-
-              {/* Email */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email Address</label>
-                <input
-                  type="email"
-                  placeholder="name@example.com"
-                  value={registerInput.email}
-                  onChange={(e) =>
-                    setRegisterInput((prev) => ({ ...prev, email: e.target.value }))
-                  }
-                  required
-                  className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
-                />
-              </div>
-
-              {/* Password & Confirm Password Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Password</label>
-                  <div className="relative flex items-center">
-                    <input
-                      type={showRegisterPassword ? "text" : "password"}
-                      placeholder="At least 8 chars"
-                      value={registerInput.password}
-                      onChange={(e) =>
-                        setRegisterInput((prev) => ({ ...prev, password: e.target.value }))
-                      }
-                      required
-                      className="w-full h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
-                      onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                      aria-label={showRegisterPassword ? "Hide password" : "Show password"}
-                    >
-                      {showRegisterPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
+              {/* Social Sign Up Buttons */}
+              <div className="grid grid-cols-2 gap-2.5 w-full mb-3">
+                <div className="relative">
+                  <button
+                    data-testid="modal-register-google-btn"
+                    type="button"
+                    onClick={() => onSocialAuthClick("google", registerInput.isSeller)}
+                    disabled={loading || !!loadingProvider}
+                    className="w-full h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {loadingProvider === "google" ? (
+                      <span className="inline-block w-3.5 h-3.5 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
+                    ) : (
+                      <FcGoogle className="text-base shrink-0" />
+                    )}
+                    <span className="truncate">Sign up with Google</span>
+                  </button>
+                  <div
+                    ref={registerGoogleBtnRef}
+                    className="absolute inset-0 overflow-hidden opacity-[0.0001] cursor-pointer pointer-events-auto [&>div]:!w-full [&>div]:!h-full [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!scale-150"
+                  />
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Confirm Password</label>
-                  <div className="relative flex items-center">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Repeat password"
-                      value={registerInput.confirmPassword}
-                      onChange={(e) =>
-                        setRegisterInput((prev) => ({ ...prev, confirmPassword: e.target.value }))
-                      }
-                      required
-                      className="w-full h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                    >
-                      {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-                </div>
+                <button
+                  data-testid="modal-register-apple-btn"
+                  type="button"
+                  onClick={() => onSocialAuthClick("apple", registerInput.isSeller)}
+                  disabled={true}
+                  className="w-full h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-not-allowed opacity-60"
+                  title="Apple Sign-Up coming soon"
+                >
+                  <FaApple className="text-base text-black shrink-0" />
+                  <span className="truncate">Sign up with Apple</span>
+                </button>
               </div>
 
-              {/* Agree to Terms Checkbox */}
-              <label className="flex items-start gap-2 mt-1 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={agreeToTerms}
-                  onChange={(e) => setAgreeToTerms(e.target.checked)}
-                  className="mt-0.5 rounded text-[#0D6D5F] focus:ring-[#0D6D5F]"
-                />
-                <span className="text-[11px] text-gray-500 leading-tight">
-                  I agree to the{" "}
-                  <Link href="/terms" target="_blank" className="text-[#0D6D5F] underline">
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link href="/privacy" target="_blank" className="text-[#0D6D5F] underline">
-                    Privacy Policy
-                  </Link>
-                  .
+              {/* Divider */}
+              <div className="relative flex items-center justify-center w-full mb-3.5">
+                <div className="w-full border-t border-gray-200/80" />
+                <span className="absolute px-3 bg-white text-[11px] text-gray-400 uppercase tracking-wider font-medium">
+                  or continue with email
                 </span>
-              </label>
+              </div>
 
-              {/* Submit Button */}
+              {/* Register Form (No Username Field!) */}
+              <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-3 flex-1">
+                {/* Email Address */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email Address</label>
+                  <input
+                    data-testid="modal-register-email-input"
+                    type="email"
+                    placeholder="name@example.com"
+                    value={registerInput.email}
+                    onChange={(e) =>
+                      setRegisterInput((prev) => ({ ...prev, email: e.target.value }))
+                    }
+                    required
+                    className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                  />
+                </div>
+
+                {/* Password & Confirm Password Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs sm:text-[13px] font-medium text-gray-700">Password</label>
+                    <div className="relative flex items-center">
+                      <input
+                        data-testid="modal-register-password-input"
+                        type={showRegisterPassword ? "text" : "password"}
+                        placeholder="At least 8 chars"
+                        value={registerInput.password}
+                        onChange={(e) =>
+                          setRegisterInput((prev) => ({ ...prev, password: e.target.value }))
+                        }
+                        required
+                        className="w-full h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
+                        onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                        aria-label={showRegisterPassword ? "Hide password" : "Show password"}
+                      >
+                        {showRegisterPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs sm:text-[13px] font-medium text-gray-700">Confirm Password</label>
+                    <div className="relative flex items-center">
+                      <input
+                        data-testid="modal-register-confirm-password-input"
+                        type={showRegisterConfirmPassword ? "text" : "password"}
+                        placeholder="Repeat password"
+                        value={registerInput.confirmPassword}
+                        onChange={(e) =>
+                          setRegisterInput((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                        }
+                        required
+                        className="w-full h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
+                        onClick={() => setShowRegisterConfirmPassword(!showRegisterConfirmPassword)}
+                        aria-label={showRegisterConfirmPassword ? "Hide password" : "Show password"}
+                      >
+                        {showRegisterConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Agree to Terms */}
+                <label className="flex items-start gap-2 mt-1 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={agreeToTerms}
+                    onChange={(e) => setAgreeToTerms(e.target.checked)}
+                    className="mt-0.5 rounded text-[#0D6D5F] focus:ring-[#0D6D5F]"
+                  />
+                  <span className="text-[11px] text-gray-500 leading-tight">
+                    I agree to the{" "}
+                    <Link href="/trust-safety" target="_blank" className="text-[#0D6D5F] underline font-medium">
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="/trust-safety" target="_blank" className="text-[#0D6D5F] underline font-medium">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </span>
+                </label>
+
+                {/* Submit Button */}
+                <Button
+                  data-testid="modal-register-submit-btn"
+                  type="submit"
+                  variant="brand"
+                  size="md"
+                  fullWidth
+                  radius="fiverr"
+                  disabled={loading}
+                  isLoading={loading}
+                  className="mt-1 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
+                  rightIcon={<ArrowRight className="w-4 h-4" />}
+                >
+                  Join Workvence
+                </Button>
+
+                <div className="mt-1 text-center text-xs text-gray-500">
+                  Already have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode("login");
+                      setError(null);
+                    }}
+                    className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
+                  >
+                    Sign in
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* ─────────────────────────────────────────────────────────────
+              MODE 3: FORGOT PASSWORD
+          ───────────────────────────────────────────────────────────── */}
+          {mode === "forgot" && (
+            <form onSubmit={handleForgotSubmit} className="flex flex-col gap-4 flex-1">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700">Account Email</label>
+                <div className="relative flex items-center">
+                  <Mail className="absolute left-3.5 text-gray-400 w-4 h-4 pointer-events-none" />
+                  <input
+                    type="email"
+                    placeholder="name@email.com"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    required
+                    className="w-full h-10 pl-10 pr-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                  />
+                </div>
+              </div>
+
               <Button
                 type="submit"
-                variant="dark"
+                variant="brand"
                 size="md"
                 fullWidth
                 radius="fiverr"
@@ -706,12 +1126,11 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 className="mt-2 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
                 rightIcon={<ArrowRight className="w-4 h-4" />}
               >
-                Join Workvence
+                Send Reset Code
               </Button>
 
-              {/* Bottom Switch */}
-              <div className="mt-2 text-center text-xs text-gray-500">
-                Already have an account?{" "}
+              <div className="text-center text-xs text-gray-500 mt-2">
+                Remembered your password?{" "}
                 <button
                   type="button"
                   onClick={() => {
@@ -725,6 +1144,204 @@ const AuthModal: React.FC<AuthModalProps> = ({
               </div>
             </form>
           )}
+
+          {/* ─────────────────────────────────────────────────────────────
+              MODE 4: RESET PASSWORD
+          ───────────────────────────────────────────────────────────── */}
+          {mode === "reset" && (
+            <form onSubmit={handleResetSubmit} className="flex flex-col gap-3.5 flex-1">
+              {/* 6-box OTP Input */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700">6-Digit Reset Code</label>
+                <div className="flex gap-2 sm:gap-2.5 justify-center w-full my-1">
+                  {resetOtp.map((digit, idx) => (
+                    <input
+                      key={idx}
+                      id={`auth-modal-reset-otp-${idx}`}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) =>
+                        handleOtpInput(
+                          idx,
+                          e.target.value,
+                          resetOtp,
+                          setResetOtp,
+                          "auth-modal-reset-otp"
+                        )
+                      }
+                      onKeyDown={(e) =>
+                        handleOtpKeyDown(idx, e, resetOtp, "auth-modal-reset-otp")
+                      }
+                      onPaste={(e) =>
+                        handleOtpPaste(e, setResetOtp, "auth-modal-reset-otp")
+                      }
+                      className="w-10 sm:w-11 h-12 text-center text-lg sm:text-xl font-bold border border-gray-200 rounded-[6px] bg-[#F9FAFB] focus:bg-white focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F] outline-none transition-all"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* New Password */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700">New Password</label>
+                <div className="relative flex items-center">
+                  <Lock className="absolute left-3.5 text-gray-400 w-4 h-4 pointer-events-none" />
+                  <input
+                    type={showResetPassword ? "text" : "password"}
+                    placeholder="At least 8 characters"
+                    value={resetPasswords.newPassword}
+                    onChange={(e) =>
+                      setResetPasswords((prev) => ({ ...prev, newPassword: e.target.value }))
+                    }
+                    required
+                    className="w-full h-10 pl-10 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
+                    onClick={() => setShowResetPassword(!showResetPassword)}
+                  >
+                    {showResetPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm New Password */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700">Confirm New Password</label>
+                <div className="relative flex items-center">
+                  <Lock className="absolute left-3.5 text-gray-400 w-4 h-4 pointer-events-none" />
+                  <input
+                    type={showResetConfirmPassword ? "text" : "password"}
+                    placeholder="Repeat new password"
+                    value={resetPasswords.confirmPassword}
+                    onChange={(e) =>
+                      setResetPasswords((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                    }
+                    required
+                    className="w-full h-10 pl-10 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
+                    onClick={() => setShowResetConfirmPassword(!showResetConfirmPassword)}
+                  >
+                    {showResetConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                variant="brand"
+                size="md"
+                fullWidth
+                radius="fiverr"
+                disabled={loading}
+                isLoading={loading}
+                className="mt-2 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+              >
+                Reset Password
+              </Button>
+            </form>
+          )}
+
+          {/* ─────────────────────────────────────────────────────────────
+              MODE 5: EMAIL OTP VERIFICATION
+          ───────────────────────────────────────────────────────────── */}
+          {mode === "verify" && (
+            <form onSubmit={handleVerifySubmit} className="flex flex-col gap-4 flex-1">
+              <div className="flex flex-col gap-2">
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700 text-center">
+                  Enter 6-Digit Verification Code
+                </label>
+                <div className="flex gap-2 sm:gap-2.5 justify-center w-full my-2">
+                  {verifyOtp.map((digit, idx) => (
+                    <input
+                      key={idx}
+                      id={`auth-modal-verify-otp-${idx}`}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) =>
+                        handleOtpInput(
+                          idx,
+                          e.target.value,
+                          verifyOtp,
+                          setVerifyOtp,
+                          "auth-modal-verify-otp"
+                        )
+                      }
+                      onKeyDown={(e) =>
+                        handleOtpKeyDown(idx, e, verifyOtp, "auth-modal-verify-otp")
+                      }
+                      onPaste={(e) =>
+                        handleOtpPaste(e, setVerifyOtp, "auth-modal-verify-otp")
+                      }
+                      className="w-10 sm:w-11 h-12 text-center text-lg sm:text-xl font-bold border border-gray-200 rounded-[6px] bg-[#F9FAFB] focus:bg-white focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F] outline-none transition-all"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Resend OTP Bar */}
+              <div className="flex items-center justify-between px-1 text-xs text-gray-500">
+                <span>Didn&apos;t receive the code?</span>
+                {resendTimer > 0 ? (
+                  <span className="font-medium text-gray-400">Resend in {resendTimer}s</span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    className="text-[#0D6D5F] font-semibold hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                    <span>Resend Code</span>
+                  </button>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                variant="brand"
+                size="md"
+                fullWidth
+                radius="fiverr"
+                disabled={loading}
+                isLoading={loading}
+                className="mt-2 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+              >
+                Verify & Continue
+              </Button>
+
+              <div className="text-center text-xs text-gray-500 mt-1">
+                Wrong email address?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("register");
+                    setError(null);
+                  }}
+                  className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
+                >
+                  Change email
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Bottom Copyright & Terms Disclaimer */}
+          <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400 shrink-0">
+            <span>© 2026 Workvence. All rights reserved.</span>
+            <Link href="/trust-safety" className="hover:text-gray-600 transition-colors">
+              Privacy & Safety
+            </Link>
+          </div>
         </div>
       </div>
     </div>

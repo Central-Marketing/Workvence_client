@@ -8,6 +8,7 @@ const GlobalAuthModal: React.FC = () => {
   const {
     isOpen,
     mode,
+    email,
     defaultIsSeller,
     redirectUrl,
     onSuccessCallback,
@@ -29,6 +30,7 @@ const GlobalAuthModal: React.FC = () => {
         isOpen={isOpen}
         onClose={closeAuthModal}
         initialMode={mode}
+        initialEmail={email}
         defaultIsSeller={defaultIsSeller}
         redirectUrl={redirectUrl}
         onSuccess={handleSuccess}
@@ -38,3 +40,4 @@ const GlobalAuthModal: React.FC = () => {
 };
 
 export default GlobalAuthModal;
+

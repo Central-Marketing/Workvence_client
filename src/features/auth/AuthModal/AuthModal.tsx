@@ -562,7 +562,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
         return {
           image: "/images/auth/verifyImage.png",
           tag: "Account Security",
-          title: "Protecting your workspace.",
+          title: "Confirm your email.",
           subtitle:
             "Email verification ensures trusted collaboration, dispute protection, and instant access to client briefs.",
         };
@@ -633,7 +633,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* Top Brand Logo */}
           <div className="relative z-10">
-            <Link href="/" className="inline-block mb-4">
+            {/* <Link href="/" className="inline-block mb-4">
               <Image
                 src="/Workvence-logo-Horizontal3.png"
                 alt="Workvence"
@@ -642,7 +642,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 className="h-6.5 w-auto object-contain brightness-0 invert"
                 priority
               />
-            </Link>
+            </Link> */}
           </div>
 
           {/* Bottom Statement / Testimonial Overlay */}
@@ -690,8 +690,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   setError(null);
                 }}
                 className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative cursor-pointer ${mode === "login"
-                    ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
-                    : "text-gray-400 hover:text-gray-600"
+                  ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
+                  : "text-gray-400 hover:text-gray-600"
                   }`}
               >
                 Sign In
@@ -703,8 +703,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   setError(null);
                 }}
                 className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative cursor-pointer ${mode === "register"
-                    ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
-                    : "text-gray-400 hover:text-gray-600"
+                  ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
+                  : "text-gray-400 hover:text-gray-600"
                   }`}
               >
                 Join Workvence
@@ -716,34 +716,38 @@ const AuthModal: React.FC<AuthModalProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  setMode("login");
+                  if (mode === "verify") {
+                    setMode("register");
+                  } else {
+                    setMode("login");
+                  }
                   setError(null);
                 }}
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#0D6D5F] transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Back to Sign In</span>
+                <span>Back</span>
               </button>
             </div>
           )}
 
-          {/* Title & Subtitle */}
-          <div className="mb-4">
-            <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-bold text-gray-900 font-sf-pro">
-              {mode === "login" && "Sign in to your account"}
-              {mode === "register" && "Create an account"}
-              {mode === "forgot" && "Forgot your password?"}
-              {mode === "reset" && "Reset your password"}
-              {mode === "verify" && "Verify your email"}
-            </h2>
-            <p className="text-xs sm:text-[13px] text-gray-500 mt-1">
-              {mode === "login" && "Welcome back! Enter your credentials to continue."}
-              {mode === "register" && "Join Workvence to discover client projects and submit proposals."}
-              {mode === "forgot" && "Enter your email address and we'll send you a 6-digit reset code."}
-              {mode === "reset" && `Enter the 6-digit code sent to ${resetEmail || "your email"} and a new password.`}
-              {mode === "verify" && `Enter the 6-digit verification code sent to ${verifyEmail || "your email"}.`}
-            </p>
-          </div>
+          {/* Title & Subtitle for non-verify modes */}
+          {mode !== "verify" && (
+            <div className="mb-4">
+              <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-bold text-gray-900 font-sf-pro">
+                {mode === "login" && "Sign in to your account"}
+                {mode === "register" && "Create an account"}
+                {mode === "forgot" && "Forgot your password?"}
+                {mode === "reset" && "Reset your password"}
+              </h2>
+              <p className="text-xs sm:text-[13px] text-gray-500 mt-1">
+                {mode === "login" && "Welcome back! Enter your credentials to continue."}
+                {mode === "register" && "Join Workvence to discover client projects and submit proposals."}
+                {mode === "forgot" && "Enter your email address and we'll send you a 6-digit reset code."}
+                {mode === "reset" && `Enter the 6-digit code sent to ${resetEmail || "your email"} and a new password.`}
+              </p>
+            </div>
+          )}
 
           {/* Inline Error Banner */}
           {error && (
@@ -904,8 +908,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     type="button"
                     onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: true }))}
                     className={`flex items-center justify-center gap-1.5 h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${registerInput.isSeller
-                        ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
-                        : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
+                      ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
+                      : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
                       }`}
                   >
                     <Briefcase className="w-3.5 h-3.5" />
@@ -916,8 +920,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     type="button"
                     onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: false }))}
                     className={`flex items-center justify-center gap-1.5 h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${!registerInput.isSeller
-                        ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
-                        : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
+                      ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
+                      : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
                       }`}
                   >
                     <User className="w-3.5 h-3.5" />
@@ -1250,15 +1254,16 @@ const AuthModal: React.FC<AuthModalProps> = ({
           )}
 
           {/* ─────────────────────────────────────────────────────────────
-              MODE 5: EMAIL OTP VERIFICATION
+              MODE 5: EMAIL OTP VERIFICATION (Confirm your email)
           ───────────────────────────────────────────────────────────── */}
           {mode === "verify" && (
-            <form onSubmit={handleVerifySubmit} className="flex flex-col gap-4 flex-1">
-              <div className="flex flex-col gap-2">
-                <label className="text-xs sm:text-[13px] font-medium text-gray-700 text-center">
-                  Enter 6-Digit Verification Code
-                </label>
-                <div className="flex gap-2 sm:gap-2.5 justify-center w-full my-2">
+            <div className="my-auto flex flex-col w-full py-2">
+              <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-bold text-gray-900 font-sf-pro mb-5">
+                Confirm your email
+              </h2>
+
+              <form onSubmit={handleVerifySubmit} className="flex flex-col w-full">
+                <div className="flex gap-2 sm:gap-2.5 justify-start w-full mb-4">
                   {verifyOtp.map((digit, idx) => (
                     <input
                       key={idx}
@@ -1266,6 +1271,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                       type="text"
                       inputMode="numeric"
                       maxLength={1}
+                      placeholder="0"
                       value={digit}
                       onChange={(e) =>
                         handleOtpInput(
@@ -1282,57 +1288,58 @@ const AuthModal: React.FC<AuthModalProps> = ({
                       onPaste={(e) =>
                         handleOtpPaste(e, setVerifyOtp, "auth-modal-verify-otp")
                       }
-                      className="w-10 sm:w-11 h-12 text-center text-lg sm:text-xl font-bold border border-gray-200 rounded-[6px] bg-[#F9FAFB] focus:bg-white focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F] outline-none transition-all"
+                      className="flex-1 min-w-0 max-w-[56px] aspect-square text-center text-xl sm:text-2xl font-bold border border-gray-200 rounded-[6px] bg-[#f9fafb] text-gray-900 placeholder:text-[#868686] placeholder:font-normal placeholder:text-[24px] placeholder:leading-none placeholder:tracking-[0px] font-['SF_Pro',-apple-system,BlinkMacSystemFont,sans-serif] focus:bg-white focus:outline-none focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F] transition-all"
                     />
                   ))}
                 </div>
-              </div>
 
-              {/* Resend OTP Bar */}
-              <div className="flex items-center justify-between px-1 text-xs text-gray-500">
-                <span>Didn&apos;t receive the code?</span>
-                {resendTimer > 0 ? (
-                  <span className="font-medium text-gray-400">Resend in {resendTimer}s</span>
-                ) : (
+                {/* Resend OTP Bar */}
+                <div className="text-left w-full text-xs sm:text-[13px] text-[#6b7280] mb-5">
+                  <span>Didn’t receive the email?</span>{" "}
+                  {resendTimer > 0 ? (
+                    <span className="text-gray-900 font-semibold">
+                      Retry in <strong className="font-bold">{resendTimer}</strong> seconds
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleResendOtp}
+                      className="font-bold text-gray-900 hover:text-[#0D6D5F] transition-colors cursor-pointer"
+                    >
+                      Retry
+                    </button>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  variant="brand"
+                  size="md"
+                  fullWidth
+                  radius="fiverr"
+                  disabled={loading || verifyOtp.join("").length < 6}
+                  isLoading={loading}
+                  className="mt-1 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
+                  rightIcon={<ArrowRight className="w-4 h-4" />}
+                >
+                  Submit
+                </Button>
+
+                <div className="text-center text-xs text-gray-500 mt-3">
+                  Wrong email address?{" "}
                   <button
                     type="button"
-                    onClick={handleResendOtp}
-                    className="text-[#0D6D5F] font-semibold hover:underline flex items-center gap-1 cursor-pointer"
+                    onClick={() => {
+                      setMode("register");
+                      setError(null);
+                    }}
+                    className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
                   >
-                    <RefreshCw className="w-3 h-3" />
-                    <span>Resend Code</span>
+                    Change email
                   </button>
-                )}
-              </div>
-
-              <Button
-                type="submit"
-                variant="brand"
-                size="md"
-                fullWidth
-                radius="fiverr"
-                disabled={loading}
-                isLoading={loading}
-                className="mt-2 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
-                rightIcon={<ArrowRight className="w-4 h-4" />}
-              >
-                Verify & Continue
-              </Button>
-
-              <div className="text-center text-xs text-gray-500 mt-1">
-                Wrong email address?{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode("register");
-                    setError(null);
-                  }}
-                  className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
-                >
-                  Change email
-                </button>
-              </div>
-            </form>
+                </div>
+              </form>
+            </div>
           )}
 
           {/* Bottom Copyright & Terms Disclaimer */}

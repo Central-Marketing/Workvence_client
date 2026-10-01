@@ -458,14 +458,12 @@ const Navbar = () => {
                       size="md"
                       radius="lg"
                       onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
-                      className={`flex items-center gap-1 xl:gap-1.5 px-2 xl:px-4 py-[8px] xl:py-[10px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal whitespace-nowrap cursor-pointer ${
-                        isCategoryDropdownOpen ? "!text-[#327C73]" : "text-black hover:!text-[#327C73]"
-                      }`}
+                      className={`flex items-center gap-1 xl:gap-1.5 px-2 xl:px-4 py-[8px] xl:py-[10px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal whitespace-nowrap cursor-pointer ${isCategoryDropdownOpen ? "!text-[#327C73]" : "text-black hover:!text-[#327C73]"
+                        }`}
                       rightIcon={
                         <FiChevronDown
-                          className={`text-sm xl:text-base text-[#327C73] transition-transform duration-200 ${
-                            isCategoryDropdownOpen ? "rotate-180" : ""
-                          }`}
+                          className={`text-sm xl:text-base text-[#327C73] transition-transform duration-200 ${isCategoryDropdownOpen ? "rotate-180" : ""
+                            }`}
                         />
                       }
                     >
@@ -658,7 +656,7 @@ const Navbar = () => {
                   </div>
 
                   {isProfileDropdownOpen && (
-                    <div className="absolute right-0 mt-4 w-56 bg-white border border-gray-100 rounded-[6px] shadow-xl py-2 flex flex-col z-[60] text-sm text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="absolute right-0 mt-4 w-56 bg-white border border-gray-100 rounded-[6px] shadow-xl pt-2 flex flex-col z-[60] text-sm text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                       <div className="px-3.5 py-2.5 border-b border-gray-100 mb-1">
                         <p className="font-bold text-gray-900 truncate">@{effectiveUser?.username}</p>
                         <p className="text-xs text-gray-500 truncate">{effectiveUser?.email}</p>
@@ -679,11 +677,11 @@ const Navbar = () => {
                       <Link href="/my-packages" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                         My Packages
                       </Link>
-                      <Link href="/organize" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
+                      {/* <Link href="/organize" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                         Add New Package
-                      </Link>
+                      </Link> */}
                       <Link href="/earnings" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center justify-between">
-                        <span>Earnings</span>
+                        <span>My Earnings</span>
                       </Link>
                       <Link href="/kyc" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center justify-between">
                         <span>ID Verification</span>
@@ -694,7 +692,7 @@ const Navbar = () => {
                         )}
                       </Link>
                       <hr className="my-1 border-gray-100" />
-                      <span onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }} className="px-3.5 py-2 hover:bg-red-50 text-red-500 cursor-pointer transition-colors flex items-center gap-3">
+                      <span onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }} className="px-3.5 py-2 bg-red-100 hover:bg-red-50 text-red-900 font-bold cursor-pointer transition-colors flex items-center gap-3">
                         Logout
                       </span>
                     </div>

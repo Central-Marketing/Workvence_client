@@ -63,7 +63,7 @@ const PrivacyPolicy = () => {
     } catch {
       return 'July 2026';
     }
-  }, [data?.updatedAt]);
+  }, [data]);
 
   const displayContent = (data?.content && data.content.trim().length > 0)
     ? data.content

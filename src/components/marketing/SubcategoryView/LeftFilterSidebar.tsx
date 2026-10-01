@@ -59,10 +59,12 @@ export const LeftFilterSidebar: React.FC<LeftFilterSidebarProps> = ({
 
   // Stable callback refs so changing parent function references don't trigger effects
   const onMinPriceChangeRef = useRef(onMinPriceChange);
-  onMinPriceChangeRef.current = onMinPriceChange;
-
   const onMaxPriceChangeRef = useRef(onMaxPriceChange);
-  onMaxPriceChangeRef.current = onMaxPriceChange;
+
+  useEffect(() => {
+    onMinPriceChangeRef.current = onMinPriceChange;
+    onMaxPriceChangeRef.current = onMaxPriceChange;
+  });
 
   // Track last known values (from props or emitted) to prevent circular cascades
   const lastMinPropRef = useRef(minPrice || "");

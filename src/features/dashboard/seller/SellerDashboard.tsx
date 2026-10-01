@@ -290,14 +290,14 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                     height="26.25"
                     rx="5.625"
                     stroke="#F00000"
-                    stroke-width="2.8125"
+                    strokeWidth="2.8125"
                     stroke-linecap="round"
                     strokeLinejoin="round"
                   />
                   <path
                     d="M6.5625 12.1875L20.2444 23.133C21.5794 24.201 23.4206 24.201 24.7556 23.133L38.4375 12.1875"
                     stroke="#F00000"
-                    stroke-width="2.8125"
+                    strokeWidth="2.8125"
                     stroke-linecap="round"
                     strokeLinejoin="round"
                   />

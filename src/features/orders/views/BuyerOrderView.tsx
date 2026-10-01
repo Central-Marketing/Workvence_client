@@ -569,11 +569,11 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
 
             {/* Declined Extension Request Notice (Buyer View) */}
             {isExtRejected && !isExtPending && (
-              <div className="bg-[#fef2f2] border border-rose-200/80 rounded-[6px] p-6 mb-6">
+              <div className="bg-[#f5f5f5] border border-rose-200/80 rounded-[6px] p-6 mb-6">
                 <div className="flex flex-row justify-between items-start gap-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 border border-rose-200">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white text-rose-800 border border-[rgba(0,0,0,0.10)]">
                         Declined
                       </span>
                       <span className="text-xs text-slate-500 font-inter">
@@ -592,7 +592,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                       <FiAlertCircle className="text-rose-500" size={14} />
                       Your Explanation:
                     </p>
-                    <p className="italic text-slate-600 pl-5 border-l-2 border-rose-300">
+                    <p className="italic text-slate-600 pl-5">
                       &ldquo;{buyerRejectionReason}&rdquo;
                     </p>
                   </div>

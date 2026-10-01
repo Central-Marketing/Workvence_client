@@ -58,7 +58,7 @@ export const DeclineExtensionModal: React.FC<DeclineExtensionModalProps> = ({
         </button>
 
         <div className="flex items-center gap-3.5 mb-4">
-          <div className="w-12 h-12 rounded-[6px] bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-100 shrink-0">
+          <div className="w-12 h-12 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] text-rose-600 flex items-center justify-center  shrink-0">
             <Clock size={22} strokeWidth={2.2} />
           </div>
           <div>
@@ -120,7 +120,7 @@ export const DeclineExtensionModal: React.FC<DeclineExtensionModalProps> = ({
               size="md"
               radius="fiverr"
               disabled={isLoading}
-              className="px-5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs sm:text-sm shadow-sm transition cursor-pointer flex items-center gap-2"
+              className=""
             >
               {isLoading ? (
                 <>

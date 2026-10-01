@@ -87,13 +87,15 @@ export default function BuyerManageOrdersPage() {
 
       const isCompleted = order.status === "completed" || order.isCompleted === true;
       const st = (order.status || "inprogress").toLowerCase();
+      const isDisputed = st === "disputed" || st === "escalated_to_dispute";
       const isCancelled = st === "cancelled" || st === "failed";
       const isDelivered = st === "delivered";
       const isRevision = st === "revision" || st === "in_revision";
-      const isLate = !isCompleted && !isCancelled && !isDelivered && !isRevision && Boolean(deadlineTime && deadlineTime < Date.now());
+      const isLate = !isCompleted && !isCancelled && !isDelivered && !isRevision && !isDisputed && Boolean(deadlineTime && deadlineTime < Date.now());
 
       let status: ManageOrderItem["status"] = "inprogress";
       if (isCompleted) status = "completed";
+      else if (isDisputed) status = "disputed";
       else if (isDelivered) status = "delivered";
       else if (isRevision) status = "revision";
       else if (isCancelled) status = "cancelled";
@@ -237,6 +239,12 @@ export default function BuyerManageOrdersPage() {
             Late
           </span>
         );
+      case "disputed":
+        return (
+          <span className="bg-[#FEF3C7] text-[#B45309] text-xs font-semibold px-4 py-1.5 rounded-full inline-block">
+            Disputed
+          </span>
+        );
       default:
         return (
           <span className="bg-[#EEF2FF] text-[#6366F1] text-xs font-semibold px-4 py-1.5 rounded-full inline-block">
@@ -356,6 +364,11 @@ export default function BuyerManageOrdersPage() {
                         statusBadge = {
                           label: "Completed",
                           style: "bg-[#D1FAE5] text-[#059669]",
+                        };
+                      } else if (st === "disputed" || st === "escalated_to_dispute") {
+                        statusBadge = {
+                          label: "Disputed",
+                          style: "bg-[#FEF3C7] text-[#B45309]",
                         };
                       } else if (st === "delivered") {
                         statusBadge = {

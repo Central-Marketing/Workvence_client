@@ -92,6 +92,12 @@ const ManageOrders = () => {
       };
     }
     const st = (item?.status || "inprogress").toLowerCase();
+    if (st === "disputed" || st === "escalated_to_dispute") {
+      return {
+        label: "Disputed",
+        style: "bg-[#FEF3C7] text-[#B45309]",
+      };
+    }
     if (st === "delivered") {
       return {
         label: "Delivered",
@@ -139,12 +145,13 @@ const ManageOrders = () => {
   const tabFilteredOrders = ordersList.filter((item: any) => {
     const isCompleted = item.status === "completed" || item.isCompleted === true;
     const st = (item.status || "inprogress").toLowerCase();
+    const isDisputed = st === "disputed" || st === "escalated_to_dispute";
     const isCancelled = st === "cancelled" || st === "failed";
     const isDelivered = st === "delivered";
     const isRevision = st === "revision" || st === "in_revision";
 
     const deadlineTime = getOrderDeadlineTime(item);
-    const isLate = !isCompleted && !isCancelled && !isDelivered && !isRevision && Boolean(deadlineTime && deadlineTime < Date.now());
+    const isLate = !isCompleted && !isCancelled && !isDelivered && !isRevision && !isDisputed && Boolean(deadlineTime && deadlineTime < Date.now());
 
     if (activeTab === "priority") {
       if (isCompleted || isCancelled) return false;

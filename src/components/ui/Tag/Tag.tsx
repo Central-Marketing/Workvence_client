@@ -33,6 +33,8 @@ export type TagVariant =
   | "delivered_late"
   | "Delivered_late"
   | "delivered-late"
+  | "disputed"
+  | "Disputed"
   | "neutral"
   | "Neutral"
   | string;
@@ -140,6 +142,12 @@ const VARIANT_CONFIGS: Record<string, VariantDefinition> = {
     background: "#F1F5F9",
     defaultLabel: "Neutral",
     dotColor: "#475569",
+  },
+  disputed: {
+    color: "#B45309",
+    background: "#FEF3C7",
+    defaultLabel: "Disputed",
+    dotColor: "#B45309",
   },
 };
 

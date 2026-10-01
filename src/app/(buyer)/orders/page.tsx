@@ -108,6 +108,7 @@ export default function BuyerOrdersPage() {
       const st = (order.status || "inprogress").toLowerCase();
       let status = "inprogress";
       if (isCompleted) status = "completed";
+      else if (st === "disputed" || st === "escalated_to_dispute") status = "disputed";
       else if (st === "delivered") status = "delivered";
       else if (st === "revision" || st === "in_revision") status = "revision";
       else if (st === "failed" || st === "cancelled") status = "cancelled";
@@ -475,6 +476,10 @@ export default function BuyerOrdersPage() {
                             ) : order.status === "late" ? (
                               <span className="bg-[#FEE2E2] text-[#DC2626] border border-[#FECACA] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">
                                 Late
+                              </span>
+                            ) : order.status === "disputed" ? (
+                              <span className="bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">
+                                Disputed
                               </span>
                             ) : (
                               <span className="bg-[#EEF2FF] text-[#6366F1] border border-[#C7D2FE] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">

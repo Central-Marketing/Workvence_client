@@ -307,9 +307,9 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
   const isDelivered = statusLower === "delivered";
   const isCancelled = statusLower === "cancelled" || statusLower === "canceled";
   const isRevision = statusLower === "in_revision" || statusLower === "revision";
-  const isLate = Boolean(order.isLate || statusLower === "late" || order.displayStatus === "late") && !isCompleted && !isDelivered && !isCancelled && !isRevision;
-  const wasLateDelivered = isDelivered && Boolean(order.wasLateDelivered || order.displayStatus === "delivered_late");
   const isDisputed = statusLower === "disputed" || statusLower === "escalated_to_dispute";
+  const isLate = Boolean(order.isLate || statusLower === "late" || order.displayStatus === "late") && !isCompleted && !isDelivered && !isCancelled && !isRevision && !isDisputed;
+  const wasLateDelivered = isDelivered && Boolean(order.wasLateDelivered || order.displayStatus === "delivered_late");
 
   // Extension state
   const extensionData = order.raw?.extensionRequest || order.raw?.extension || order.extensionRequest;
@@ -473,13 +473,13 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
 
             {/* Dispute Alert Banner */}
             {isDisputed && (
-              <div className="bg-amber-50 border border-amber-200 rounded-[6px] p-6 mb-6">
+              <div className="bg-[#f5f5f5] border border-[#F5B400] rounded-[6px] p-6 mb-6">
                 <div className="flex items-start gap-3.5">
-                  <div className="w-10 h-10 rounded-[6px] bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] text-amber-700 flex items-center justify-center shrink-0">
                     <FiShield className="text-xl" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-bold text-base text-amber-950">Workvence Support is handling your dispute</h4>
+                    <h4 className="font-bold text-base text-[rgb(41,41,41)]">Workvence Support is handling your dispute</h4>
                     <p className="text-xs sm:text-sm text-amber-800 mt-1 leading-relaxed">
                       Our Support & Administration team is actively investigating the details of this order. All payment releases
                       and work deliveries are temporarily paused while administrators review the communication history and deliverables.
@@ -487,13 +487,13 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                     <div className="flex flex-wrap gap-3 mt-4">
                       <Link
                         href="/support"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-black border border-[rgba(0,0,0,0.10)] text-white text-[16px] font-semibold font-sf-pro transition-colors shadow-xs"
                       >
                         Go to Support Desk
                       </Link>
                       <a
                         href="mailto:support@workvence.com"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-white border border-amber-300 text-amber-900 text-xs sm:text-sm font-semibold hover:bg-amber-100/50 transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] text-black text-[16px] font-semibold font-sf-pro transition-colors shadow-xs"
                       >
                         Email: support@workvence.com
                       </a>
@@ -909,15 +909,17 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                           ? "cancelled"
                           : isRevision
                             ? "revision"
-                            : isLate
-                              ? "late"
-                              : wasLateDelivered
-                                ? "delivered_late"
-                                : isDelivered
-                                  ? "delivered"
-                                  : order.status === "paid"
-                                    ? "inprogress"
-                                    : order.status
+                            : isDisputed
+                              ? "disputed"
+                              : isLate
+                                ? "late"
+                                : wasLateDelivered
+                                  ? "delivered_late"
+                                  : isDelivered
+                                    ? "delivered"
+                                    : order.status === "paid"
+                                      ? "inprogress"
+                                      : order.status
                     }
                     size="sm"
                   >
@@ -927,15 +929,17 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                         ? "Cancelled"
                         : isRevision
                           ? "In Revision"
-                          : isLate
-                            ? "Late"
-                            : wasLateDelivered
-                              ? "Delivered late"
-                              : isDelivered
-                                ? "Delivered"
-                                : order.status === "paid"
-                                  ? "Inprogress"
-                                  : undefined}
+                          : isDisputed
+                            ? "Disputed"
+                            : isLate
+                              ? "Late"
+                              : wasLateDelivered
+                                ? "Delivered late"
+                                : isDelivered
+                                  ? "Delivered"
+                                  : order.status === "paid"
+                                    ? "Inprogress"
+                                    : undefined}
                   </Tag>
                 </div>
 

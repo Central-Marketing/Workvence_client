@@ -45,7 +45,7 @@ export interface ManageOrderItem {
   dueDate: string;
   notes: string;
   price: number;
-  status: "revision" | "inprogress" | "delivered" | "failed" | "pending" | "completed" | "cancelled" | "late";
+  status: "revision" | "inprogress" | "delivered" | "failed" | "pending" | "completed" | "cancelled" | "late" | "disputed";
   isCompleted?: boolean;
   starred?: boolean;
 }

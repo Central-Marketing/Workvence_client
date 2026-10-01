@@ -598,7 +598,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       aria-labelledby="auth-modal-title"
     >
       <div
-        className="relative w-full max-w-[900px] h-[620px] max-h-[92vh] bg-white rounded-[6px] sm:rounded-[6px] shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-[900px] h-[640px] max-h-[92vh] bg-white rounded-[6px] sm:rounded-[6px] shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -615,8 +615,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
           <X className="w-4 h-4" />
         </Button>
 
-        {/* ── LEFT PANE: Auth Page Imagery & Branded Backdrop ── */}
-        <div className="hidden md:flex w-[42%] h-full shrink-0 relative overflow-hidden bg-[#0a0f1d] text-white flex-col justify-between p-7 lg:p-8">
+        {/* ── LEFT PANE: Auth Page Imagery & Branded Backdrop (50% Split) ── */}
+        <div className="hidden md:flex w-1/2 h-full shrink-0 relative overflow-hidden bg-[#0a0f1d] text-white flex-col justify-between px-6 sm:px-8 py-6">
           {/* Dynamic Image from /images/auth/ */}
           <Image
             key={visualConfig.image}
@@ -625,50 +625,39 @@ const AuthModal: React.FC<AuthModalProps> = ({
             fill
             priority
             className="object-cover transition-opacity duration-300"
-            sizes="45vw"
+            sizes="50vw"
           />
 
-          {/* Dark Gradient Vignette for Readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/35 pointer-events-none" />
+          {/* Dark Gradient Vignette for Text Contrast */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none" />
 
-          {/* Top Brand Logo */}
-          <div className="relative z-10">
-            {/* <Link href="/" className="inline-block mb-4">
-              <Image
-                src="/Workvence-logo-Horizontal3.png"
-                alt="Workvence"
-                width={130}
-                height={30}
-                className="h-6.5 w-auto object-contain brightness-0 invert"
-                priority
-              />
-            </Link> */}
-          </div>
+          {/* Top Spacing Container */}
+          <div className="relative z-10" />
 
-          {/* Bottom Statement / Testimonial Overlay */}
+          {/* Bottom Statement / Testimonial Overlay with Crisp White Text */}
           <div className="relative z-10 space-y-2.5">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[11px] font-medium text-emerald-300">
-              <ShieldCheck className="w-3 h-3" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-[11px] font-medium text-white shadow-sm">
+              <ShieldCheck className="w-3 h-3 text-white" />
               <span>{visualConfig.tag}</span>
             </div>
 
-            <h3 className="text-xl lg:text-[22px] font-bold font-sf-pro leading-snug tracking-tight text-white drop-shadow-sm">
+            <h3 className="text-xl lg:text-[22px] font-bold font-sf-pro leading-snug tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
               {visualConfig.title}
             </h3>
 
-            <p className="text-xs text-gray-200/90 leading-relaxed drop-shadow-xs">
+            <p className="text-xs text-white leading-relaxed drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
               {visualConfig.subtitle}
             </p>
 
-            <div className="pt-3 border-t border-white/15 text-[11px] text-gray-300/80 flex items-center justify-between">
-              <span>Trusted worldwide</span>
-              <span className="font-semibold text-emerald-400">Workvence Secure</span>
+            <div className="pt-3 border-t border-white/20 text-[11px] text-white flex items-center justify-between drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+              <span className="font-normal text-white">Trusted worldwide</span>
+              <span className="font-semibold text-white">Workvence Secure</span>
             </div>
           </div>
         </div>
 
-        {/* ── RIGHT PANE: Auth Forms & State Machine ── */}
-        <div className="flex-1 min-w-0 h-full p-6 sm:p-7 lg:p-8 flex flex-col justify-between overflow-y-auto">
+        {/* ── RIGHT PANE: Auth Forms & State Machine (50% Split) ── */}
+        <div className="w-full md:w-1/2 min-w-0 h-full px-6 sm:px-8 py-5 sm:py-6 flex flex-col justify-between overflow-y-auto scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {/* Mobile Brand Header */}
           <div className="flex md:hidden items-center justify-between mb-4">
             <Image
@@ -682,7 +671,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* Mode Switcher Tabs for Login & Register */}
           {mode === "login" || mode === "register" ? (
-            <div className="flex items-center border-b border-gray-100 mb-5 gap-6">
+            <div className="flex items-center border-b border-gray-100 mb-3.5 gap-6">
               <button
                 type="button"
                 onClick={() => {
@@ -712,7 +701,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
             </div>
           ) : (
             /* Sub-mode Breadcrumb Back Navigation */
-            <div className="mb-4">
+            <div className="mb-3.5">
               <button
                 type="button"
                 onClick={() => {
@@ -733,14 +722,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* Title & Subtitle for non-verify modes */}
           {mode !== "verify" && (
-            <div className="mb-4">
+            <div className="mb-3">
               <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-bold text-gray-900 font-sf-pro">
                 {mode === "login" && "Sign in to your account"}
                 {mode === "register" && "Create an account"}
                 {mode === "forgot" && "Forgot your password?"}
                 {mode === "reset" && "Reset your password"}
               </h2>
-              <p className="text-xs sm:text-[13px] text-gray-500 mt-1">
+              <p className="text-xs sm:text-[13px] text-gray-500 mt-0.5">
                 {mode === "login" && "Welcome back! Enter your credentials to continue."}
                 {mode === "register" && "Join Workvence to discover client projects and submit proposals."}
                 {mode === "forgot" && "Enter your email address and we'll send you a 6-digit reset code."}
@@ -751,7 +740,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* Inline Error Banner */}
           {error && (
-            <div className="mb-4 p-3 rounded-[6px] bg-red-50 border border-red-200/80 text-red-600 text-xs sm:text-[13px] font-medium flex items-center gap-2">
+            <div className="mb-3 p-2.5 rounded-[6px] bg-red-50 border border-red-200/80 text-red-600 text-xs sm:text-[13px] font-medium flex items-center gap-2">
               <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
                 !
               </span>
@@ -901,13 +890,13 @@ const AuthModal: React.FC<AuthModalProps> = ({
           {mode === "register" && (
             <div className="flex flex-col flex-1">
               {/* Role Toggle */}
-              <div className="space-y-1.5 mb-3">
+              <div className="space-y-1 mb-2.5">
                 <label className="text-xs font-semibold text-gray-700">I want to</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: true }))}
-                    className={`flex items-center justify-center gap-1.5 h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${registerInput.isSeller
+                    className={`flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${registerInput.isSeller
                       ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
                       : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
                       }`}
@@ -919,7 +908,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: false }))}
-                    className={`flex items-center justify-center gap-1.5 h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${!registerInput.isSeller
+                    className={`flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${!registerInput.isSeller
                       ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
                       : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
                       }`}
@@ -931,14 +920,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
               </div>
 
               {/* Social Sign Up Buttons */}
-              <div className="grid grid-cols-2 gap-2.5 w-full mb-3">
+              <div className="grid grid-cols-2 gap-2.5 w-full mb-2.5">
                 <div className="relative">
                   <button
                     data-testid="modal-register-google-btn"
                     type="button"
                     onClick={() => onSocialAuthClick("google", registerInput.isSeller)}
                     disabled={loading || !!loadingProvider}
-                    className="w-full h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="w-full h-9 sm:h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {loadingProvider === "google" ? (
                       <span className="inline-block w-3.5 h-3.5 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
@@ -958,7 +947,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   type="button"
                   onClick={() => onSocialAuthClick("apple", registerInput.isSeller)}
                   disabled={true}
-                  className="w-full h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-not-allowed opacity-60"
+                  className="w-full h-9 sm:h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-not-allowed opacity-60"
                   title="Apple Sign-Up coming soon"
                 >
                   <FaApple className="text-base text-black shrink-0" />
@@ -967,7 +956,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
               </div>
 
               {/* Divider */}
-              <div className="relative flex items-center justify-center w-full mb-3.5">
+              <div className="relative flex items-center justify-center w-full mb-2.5">
                 <div className="w-full border-t border-gray-200/80" />
                 <span className="absolute px-3 bg-white text-[11px] text-gray-400 uppercase tracking-wider font-medium">
                   or continue with email
@@ -975,9 +964,9 @@ const AuthModal: React.FC<AuthModalProps> = ({
               </div>
 
               {/* Register Form (No Username Field!) */}
-              <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-3 flex-1">
+              <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-2.5 flex-1">
                 {/* Email Address */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email Address</label>
                   <input
                     data-testid="modal-register-email-input"
@@ -988,13 +977,13 @@ const AuthModal: React.FC<AuthModalProps> = ({
                       setRegisterInput((prev) => ({ ...prev, email: e.target.value }))
                     }
                     required
-                    className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                    className="w-full h-9 sm:h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                   />
                 </div>
 
                 {/* Password & Confirm Password Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-1">
                     <label className="text-xs sm:text-[13px] font-medium text-gray-700">Password</label>
                     <div className="relative flex items-center">
                       <input
@@ -1006,7 +995,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                           setRegisterInput((prev) => ({ ...prev, password: e.target.value }))
                         }
                         required
-                        className="w-full h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                        className="w-full h-9 sm:h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                       />
                       <button
                         type="button"
@@ -1019,7 +1008,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-1">
                     <label className="text-xs sm:text-[13px] font-medium text-gray-700">Confirm Password</label>
                     <div className="relative flex items-center">
                       <input
@@ -1031,7 +1020,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                           setRegisterInput((prev) => ({ ...prev, confirmPassword: e.target.value }))
                         }
                         required
-                        className="w-full h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                        className="w-full h-9 sm:h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                       />
                       <button
                         type="button"
@@ -1046,7 +1035,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
 
                 {/* Agree to Terms */}
-                <label className="flex items-start gap-2 mt-1 cursor-pointer select-none">
+                <label className="flex items-start gap-2 mt-0.5 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={agreeToTerms}
@@ -1076,13 +1065,13 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   radius="fiverr"
                   disabled={loading}
                   isLoading={loading}
-                  className="mt-1 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
+                  className="mt-0.5 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
                   rightIcon={<ArrowRight className="w-4 h-4" />}
                 >
                   Join Workvence
                 </Button>
 
-                <div className="mt-1 text-center text-xs text-gray-500">
+                <div className="mt-0.5 text-center text-xs text-gray-500">
                   Already have an account?{" "}
                   <button
                     type="button"

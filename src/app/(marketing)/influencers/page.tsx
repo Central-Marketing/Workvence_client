@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { Button, Breadcrumb } from "@/components";
 import { CustomSelect, CustomSelectOption } from "@/components/ui";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const PLATFORM_OPTIONS: CustomSelectOption[] = [
   { value: "YouTube", label: "YouTube" },

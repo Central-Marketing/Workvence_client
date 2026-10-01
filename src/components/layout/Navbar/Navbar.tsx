@@ -9,7 +9,7 @@ import { FiMenu, FiX, FiMessageSquare, FiBell, FiChevronDown, FiGrid, FiArrowRig
 import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
 import useSearchSuggestions, { SuggestionItem } from "@/hooks/useSearchSuggestions";
 
-import toast from 'react-hot-toast';
+import { toast } from "sonner";
 import { axiosFetch, socket, handleAuthExpired, isAccessTokenExpiringSoon, refreshAccessToken, getCookie } from '@/utils';
 import { useUserStore } from "@/store/userStore";
 import { useAuthModalStore } from "@/store/authModalStore";

@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components";
 import { CustomSelect, CustomSelectOption } from "@/components/ui";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const VOLUME_OPTIONS: CustomSelectOption[] = [
   { value: "2-4 articles/month", label: "2 - 4 articles / month" },

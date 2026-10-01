@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { axiosFetch } from "@/utils";
 import useAdminCategories from "@/hooks/useAdminCategories";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { ArrowRight, Globe } from "lucide-react";
 import { Button } from "@/components/ui";
 

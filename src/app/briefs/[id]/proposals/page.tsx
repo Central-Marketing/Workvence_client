@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import moment from "moment";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";

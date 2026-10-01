@@ -16,7 +16,7 @@ import {
   X
 } from "lucide-react";
 import { Button } from "@/components";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 interface Course {
   id: string;

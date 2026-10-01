@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch, socket } from "@/utils";
 import { Breadcrumb } from "@/components/ui";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import moment from "moment";
 import {
   Bell,

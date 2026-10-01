@@ -30,7 +30,7 @@ import {
 } from "react-icons/fa6";
 import { Button } from "@/components";
 import { CustomSelect, CustomSelectOption } from "@/components/ui";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const PARTNER_TRACK_OPTIONS: CustomSelectOption[] = [
   { value: "Agency & Solutions Partners", label: "Agency & Solutions Partners" },

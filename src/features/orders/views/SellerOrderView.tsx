@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import moment from "moment";
 import { useQuery } from "@tanstack/react-query";
 import {

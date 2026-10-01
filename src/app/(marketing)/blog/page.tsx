@@ -15,7 +15,7 @@ import {
   X,
   Mail
 } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { Button, Breadcrumb } from "@/components";
 
 interface BlogPost {

@@ -11,7 +11,7 @@ import { KycRequiredModal, PayoneerLogo, PayoneerIcon, Button } from "@/componen
 import { Breadcrumb, EarningsSkeleton } from "@/components/ui";
 import { FaStripe } from "react-icons/fa";
 import moment from "moment";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import {
   Home,
   RefreshCw,

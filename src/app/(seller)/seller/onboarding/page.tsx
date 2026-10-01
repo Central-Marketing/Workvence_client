@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, ShieldCheck, ArrowRight, Loader2, AlertCircle } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 import { useUserStore } from "@/store/userStore";
 import { useAdminCategories } from "@/hooks/useAdminCategories";

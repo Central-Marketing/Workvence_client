@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { Button } from "@/components/ui";
 
 interface FavoriteSellerButtonProps {

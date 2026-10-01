@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { Button, Breadcrumb } from "@/components";
 import { CustomSelect } from "@/components/ui";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 interface Thread {
   id: string;

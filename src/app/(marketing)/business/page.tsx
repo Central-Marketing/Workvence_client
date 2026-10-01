@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components";
 import { CustomSelect, CustomSelectOption } from "@/components/ui";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const COMPANY_SIZE_OPTIONS: CustomSelectOption[] = [
   { value: "1-20 employees", label: "1-20 employees" },

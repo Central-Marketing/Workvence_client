@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { socket } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { playNotificationSound } from "@/utils/soundUtil";
@@ -215,13 +215,11 @@ export default function GlobalSocketListener() {
       const toastKey = contentFingerprint || msgId || `${senderIdStr}-${Date.now()}`;
 
       toast.custom(
-        (t) => (
+        (id) => (
           <div
-            className={`relative bg-white border-l-4 border-[#0D6D5F] shadow-xl p-4 rounded-[6px] max-w-[350px] flex flex-col gap-1 transition-all duration-300 cursor-pointer pr-6 ${
-              t.visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
-            }`}
+            className="relative bg-white border-l-4 border-[#0D6D5F] shadow-xl p-4 rounded-[6px] max-w-[350px] flex flex-col gap-1 transition-all duration-300 cursor-pointer pr-6"
             onClick={() => {
-              toast.dismiss(t.id);
+              toast.dismiss(id);
               if (targetConvId) {
                 router.push(`/message/${targetConvId}`);
               }
@@ -232,7 +230,7 @@ export default function GlobalSocketListener() {
               className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 p-0 w-5 h-5 flex items-center justify-center rounded-full text-base leading-none border-none bg-transparent hover:bg-gray-100 transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
-                toast.dismiss(t.id);
+                toast.dismiss(id);
               }}
               aria-label="Close"
             >
@@ -333,13 +331,11 @@ export default function GlobalSocketListener() {
       const targetProposalId = newNotif.proposalID || newNotif.proposalId;
 
       toast.custom(
-        (t) => (
+        (id) => (
           <div
-            className={`relative bg-white border-l-4 border-[#0D6D5F] shadow-xl p-4 rounded-[6px] max-w-[350px] flex flex-col gap-1 transition-all duration-300 cursor-pointer pr-6 ${
-              t.visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
-            }`}
+            className="relative bg-white border-l-4 border-[#0D6D5F] shadow-xl p-4 rounded-[6px] max-w-[350px] flex flex-col gap-1 transition-all duration-300 cursor-pointer pr-6"
             onClick={() => {
-              toast.dismiss(t.id);
+              toast.dismiss(id);
               if (newNotif.link) {
                 router.push(newNotif.link);
               } else if (targetOrderId) {
@@ -358,7 +354,7 @@ export default function GlobalSocketListener() {
               className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 p-0 w-5 h-5 flex items-center justify-center rounded-full text-base leading-none border-none bg-transparent hover:bg-gray-100 transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
-                toast.dismiss(t.id);
+                toast.dismiss(id);
               }}
               aria-label="Close"
             >

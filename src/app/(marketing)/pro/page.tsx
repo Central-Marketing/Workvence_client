@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components";
 import { CustomSelect, CustomSelectOption } from "@/components/ui";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const DISCIPLINE_OPTIONS: CustomSelectOption[] = [
   { value: "Software Engineering", label: "Software Engineering" },

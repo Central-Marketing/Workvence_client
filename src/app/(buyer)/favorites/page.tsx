@@ -8,7 +8,7 @@ import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FiHome } from "react-icons/fi";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const FavoritesPage = () => {
   const [activeTab, setActiveTab] = useState<"gigs" | "sellers">("gigs");

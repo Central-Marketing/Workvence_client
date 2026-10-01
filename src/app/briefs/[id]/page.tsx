@@ -6,7 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import moment from "moment";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import {
   FiHome,
   FiMapPin,

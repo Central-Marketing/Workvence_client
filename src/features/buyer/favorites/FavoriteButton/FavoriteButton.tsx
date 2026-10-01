@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { axiosFetch } from "@/utils";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { Button } from "@/components/ui";
 import { useAuthModalStore } from "@/store/authModalStore";
 

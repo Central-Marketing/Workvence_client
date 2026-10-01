@@ -1,6 +1,6 @@
 "use client";
 
-import toast from 'react-hot-toast';
+import { toast } from "sonner";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Flag, ArrowRight, Download, Eye, Home, Check } from "lucide-react";

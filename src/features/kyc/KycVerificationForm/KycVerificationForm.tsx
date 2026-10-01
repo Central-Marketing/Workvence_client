@@ -24,7 +24,7 @@ import {
   Eye,
   X
 } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import moment from "moment";
 import kycService, { KycRecord, KycSubmitPayload } from "@/utils/kycService";
 import countriesFlags from "@/utils/countriesFlags";

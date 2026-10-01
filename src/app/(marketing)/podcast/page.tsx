@@ -16,7 +16,7 @@ import {
   Radio,
   ExternalLink
 } from "lucide-react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { Button } from "@/components";
 
 interface Episode {

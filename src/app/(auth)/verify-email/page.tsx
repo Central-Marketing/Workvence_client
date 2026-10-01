@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import toast from 'react-hot-toast';
+import { toast } from "sonner";
 import { axiosFetch } from '@/utils';
 import { useUserStore } from '@/store/userStore';
 import { Button } from '@/components/ui';

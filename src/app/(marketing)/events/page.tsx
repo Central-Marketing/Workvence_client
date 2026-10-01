@@ -16,7 +16,7 @@ import {
   Play
 } from "lucide-react";
 import { Button, Breadcrumb } from "@/components";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 interface EventItem {
   id: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useReducer, useState, useRef, useMemo } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter, useParams } from "next/navigation";
 import dynamic from "next/dynamic";

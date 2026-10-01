@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { Button, Breadcrumb } from "@/components";
 import { CustomSelect, CustomSelectOption } from "@/components/ui";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 const TRAFFIC_SOURCE_OPTIONS: CustomSelectOption[] = [
   { value: "Blog / Content Site", label: "Blog / Content Site" },

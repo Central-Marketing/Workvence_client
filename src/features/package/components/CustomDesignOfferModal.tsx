@@ -7,7 +7,7 @@ import { Button } from "@/components/ui";
 import { useUserStore } from "@/store/userStore";
 import { useAuthModalStore } from "@/store/authModalStore";
 import axiosFetch from "@/utils/axiosFetch";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 export interface CustomDesignOfferModalProps {
   isOpen: boolean;

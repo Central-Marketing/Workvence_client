@@ -159,7 +159,7 @@ const ManageOrders = () => {
       return true;
     }
     if (activeTab === "active") {
-      if (isCompleted || isCancelled) return false;
+      if (isCompleted || isCancelled || isDelivered || isDisputed) return false;
       return true;
     }
     if (activeTab === "late") return isLate || st === "late";

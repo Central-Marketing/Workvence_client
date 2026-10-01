@@ -9,6 +9,7 @@ import { axiosFetch } from "@/utils";
 import { FiCalendar, FiArrowRight, FiCheckCircle } from "react-icons/fi";
 import { Button, Tag } from "@/components/ui";
 import { calculateProfileCompletion } from "../utils/dashboardNormalizer";
+import { sortOrdersByPriority } from "@/features/orders";
 
 interface SellerDashboardProps {
   user: any;
@@ -121,7 +122,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
   // 1. ACTIVE SELLER DASHBOARD (Profile complete 100% & packages > 0)
   // -------------------------------------------------------------
   if (showActiveDashboard) {
-    const ordersToDisplay = filteredOrders;
+    const ordersToDisplay = sortOrdersByPriority(filteredOrders);
 
     const displayRevenue = totalFinancialAmount;
     const displayActiveOrders = pendingOrders.length;
@@ -416,10 +417,11 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                       // Determine status pill badge style
                       const isCompleted = order.status === "completed" || order.isCompleted === true;
                       const st = (order.status || "inprogress").toLowerCase();
+                      const isDisputed = st === "disputed" || st === "escalated_to_dispute";
                       const isCancelled = st === "failed" || st === "cancelled";
                       const isDelivered = st === "delivered";
                       const isRevision = st === "revision" || st === "in_revision";
-                      const isLate = !isCompleted && !isCancelled && !isDelivered && !isRevision && Boolean(deadlineTime && deadlineTime < Date.now());
+                      const isLate = !isCompleted && !isCancelled && !isDelivered && !isRevision && !isDisputed && Boolean(deadlineTime && deadlineTime < Date.now());
 
                       let statusBadge = {
                         label: "Inprogress",
@@ -430,6 +432,11 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                         statusBadge = {
                           label: "Completed",
                           style: "bg-[#D1FAE5] text-[#059669]",
+                        };
+                      } else if (isDisputed) {
+                        statusBadge = {
+                          label: "Disputed",
+                          style: "bg-[#FEF3C7] text-[#B45309]",
                         };
                       } else if (isDelivered) {
                         statusBadge = {
@@ -513,7 +520,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                           </td>
 
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            <Tag variant={isRevision ? "in_revision" : (isLate || st === "late" ? "late" : (st || statusBadge.label))} size="sm">
+                            <Tag variant={isDisputed ? "disputed" : (isRevision ? "in_revision" : (isLate || st === "late" ? "late" : (st || statusBadge.label)))} size="sm">
                               {statusBadge.label}
                             </Tag>
                           </td>

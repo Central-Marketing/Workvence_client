@@ -8,6 +8,7 @@ import { FiPackage, FiHeart, FiArrowRight } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { Button, Tag } from "@/components/ui";
+import { sortOrdersByPriority } from "@/features/orders";
 
 interface BuyerDashboardOrdersViewProps {
   user: any;
@@ -70,13 +71,15 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
 
       const isCompleted = order.status === "completed" || order.isCompleted === true;
       const st = (order.status || "inprogress").toLowerCase();
+      const isDisputed = st === "disputed" || st === "escalated_to_dispute";
       const isCancelled = st === "failed" || st === "cancelled";
       const isDelivered = st === "delivered";
       const isRevision = st === "revision" || st === "in_revision";
-      const isLate = !isCompleted && !isCancelled && !isDelivered && !isRevision && Boolean(deadlineTime && deadlineTime < Date.now());
+      const isLate = !isCompleted && !isCancelled && !isDelivered && !isRevision && !isDisputed && Boolean(deadlineTime && deadlineTime < Date.now());
 
       let status = "inprogress";
       if (isCompleted) status = "completed";
+      else if (isDisputed) status = "disputed";
       else if (isDelivered) status = "delivered";
       else if (isRevision) status = "revision";
       else if (isCancelled) status = "cancelled";
@@ -105,6 +108,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
         price: Number(order.price) || 0,
         status,
         isCompleted,
+        raw: order,
       };
     });
   }, [orders]);
@@ -131,7 +135,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
   const favSellersCount = apiFavorites?.sellers?.length || 0;
   const totalFavoritesCount = favGigsCount + favSellersCount;
 
-  // Filtered orders: capped to 5 rows for dashboard overview
+  // Filtered orders: sorted by priority and capped to 5 rows for dashboard overview
   const displayedOrders = useMemo(() => {
     let list = normalizedOrders;
     if (activeTab === "Packages") {
@@ -139,7 +143,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
     } else if (activeTab === "Briefs") {
       list = list.filter((o) => o.itemType === "brief");
     }
-    return list.slice(0, 5);
+    return sortOrdersByPriority(list).slice(0, 5);
   }, [normalizedOrders, activeTab]);
 
   const handleRowClick = (orderId: string) => {
@@ -327,6 +331,11 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
                     statusBadge = {
                       label: "Delivered",
                       style: "bg-[#D1FAE5] text-[#059669]",
+                    };
+                  } else if (st === "disputed" || st === "escalated_to_dispute") {
+                    statusBadge = {
+                      label: "Disputed",
+                      style: "bg-[#FEF3C7] text-[#B45309]",
                     };
                   } else if (st === "revision" || st === "in_revision") {
                     statusBadge = {

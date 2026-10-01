@@ -18,6 +18,7 @@ import { useUserStore } from "@/store/userStore";
 import { ManageOrderItem } from "@/features/dashboard/data/mockBuyerDashboard";
 import { Loader, Button } from "@/components";
 import { Breadcrumb, Tag } from "@/components/ui";
+import { sortOrdersByPriority } from "@/features/orders";
 
 export default function BuyerManageOrdersPage() {
   const router = useRouter();
@@ -120,13 +121,15 @@ export default function BuyerManageOrdersPage() {
         price: Number(order.price) || 0,
         status,
         isCompleted,
+        deadline: order.deadline,
+        raw: order,
       };
     });
   }, [buyerOrders]);
 
   // Filter orders based on active tab and search query
   const filteredOrders = useMemo(() => {
-    return normalizedOrders.filter((order) => {
+    const list = normalizedOrders.filter((order) => {
       // Search query match
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -155,6 +158,8 @@ export default function BuyerManageOrdersPage() {
       // Priority (default view: show all)
       return true;
     });
+
+    return sortOrdersByPriority(list);
   }, [normalizedOrders, activeTab, searchQuery]);
 
   const handleRowClick = (orderId: string) => {

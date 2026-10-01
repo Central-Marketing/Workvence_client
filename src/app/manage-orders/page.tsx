@@ -9,6 +9,7 @@ import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components";
 import { Breadcrumb, OrdersTableSkeleton, Tag } from "@/components/ui";
 import { FiHome, FiCalendar, FiSearch } from "react-icons/fi";
+import { sortOrdersByPriority } from "@/features/orders";
 
 const getOrderDeadlineTime = (item: any): number | null => {
   const deadlineStr = item.deadline || item.raw?.deadline;
@@ -184,27 +185,10 @@ const ManageOrders = () => {
     );
   });
 
-  // Sort orders based on active tab:
-  // "priority" tab sorts by deadline ascending (closest/earliest deadline first)
+  // Sort orders based on business priority rules
   const displayedOrders = useMemo(() => {
-    if (activeTab === "priority") {
-      return [...filteredOrders].sort((a: any, b: any) => {
-        const timeA = getOrderDeadlineTime(a);
-        const timeB = getOrderDeadlineTime(b);
-
-        const validA = timeA !== null && !isNaN(timeA);
-        const validB = timeB !== null && !isNaN(timeB);
-
-        if (validA && validB) {
-          return (timeA as number) - (timeB as number);
-        }
-        if (validA && !validB) return -1;
-        if (!validA && validB) return 1;
-        return 0;
-      });
-    }
-    return filteredOrders;
-  }, [filteredOrders, activeTab]);
+    return sortOrdersByPriority(filteredOrders);
+  }, [filteredOrders]);
 
   const tabs: { id: FilterTab; label: string }[] = [
     { id: "priority", label: "Priority" },

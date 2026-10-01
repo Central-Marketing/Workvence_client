@@ -48,6 +48,8 @@ export interface ManageOrderItem {
   status: "revision" | "inprogress" | "delivered" | "failed" | "pending" | "completed" | "cancelled" | "late" | "disputed";
   isCompleted?: boolean;
   starred?: boolean;
+  deadline?: string;
+  raw?: any;
 }
 
 export const MOCK_MANAGE_ORDERS: ManageOrderItem[] = [];

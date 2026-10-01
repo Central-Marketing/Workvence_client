@@ -6,3 +6,4 @@ export { OrderDeliverablesList } from './components/OrderDeliverablesList';
 export { OrderActivityLedgerDrawer } from './components/OrderActivityLedgerDrawer';
 export { DeclineExtensionModal } from './components/DeclineExtensionModal';
 export * from './types';
+export * from './utils/orderPrioritySort';

@@ -39,7 +39,6 @@ export const MessageModerationBadge: React.FC<MessageModerationBadgeProps> = ({
             setIsOpen((prev) => !prev);
           }}
           className="cursor-pointer focus:outline-none flex items-center justify-center p-0.5 rounded transition-transform hover:scale-105 active:scale-95"
-          title={tooltipText}
           aria-label={tooltipText}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -76,9 +75,8 @@ export const MessageModerationBadge: React.FC<MessageModerationBadgeProps> = ({
         <div
           onMouseEnter={() => setIsOpen(true)}
           onMouseLeave={() => setIsOpen(false)}
-          className={`absolute bottom-full mb-2 z-50 w-72 max-w-[calc(100vw-32px)] p-3.5 rounded-[6px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-800 dark:text-slate-100 text-xs transition-all pointer-events-auto ${
-            isOwner ? 'right-0' : 'left-0 sm:left-auto sm:right-0 md:left-0'
-          }`}
+          className={`absolute bottom-full mb-2 z-50 w-72 max-w-[calc(100vw-32px)] p-3.5 rounded-[6px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-800 dark:text-slate-100 text-xs transition-all pointer-events-auto ${isOwner ? 'right-0' : 'left-0 sm:left-auto sm:right-0 md:left-0'
+            }`}
           style={{
             boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08)',
           }}
@@ -109,9 +107,8 @@ export const MessageModerationBadge: React.FC<MessageModerationBadgeProps> = ({
 
           {/* Tooltip triangle arrow */}
           <div
-            className={`absolute top-full w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-white dark:border-t-slate-900 ${
-              isOwner ? 'right-3' : 'left-3'
-            }`}
+            className={`absolute top-full w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-white dark:border-t-slate-900 ${isOwner ? 'right-3' : 'left-3'
+              }`}
           />
         </div>
       )}

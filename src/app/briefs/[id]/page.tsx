@@ -33,9 +33,9 @@ import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { SubmitProposalModal, AuthModal } from "@/components";
-import { Button, Breadcrumb, BriefDetailSkeleton, ConfirmModal } from "@/components/ui";
+import { Button, Breadcrumb, BriefDetailSkeleton, ConfirmModal, AiGradientButton } from "@/components/ui";
 import { EditBriefModal } from "@/features/buyer";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Timer } from "lucide-react";
 
 function formatCategoryName(cat?: string): string {
   if (!cat) return "";
@@ -739,7 +739,7 @@ const BriefDetail = () => {
         <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-2xs p-4 sm:p-5 my-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
           {/* Spec 1: Location */}
           <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-3 first:pl-0">
-            <div className="w-10 h-10 rounded-[6px] bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center shrink-0">
               <FiMapPin className="text-rose-500 text-base" />
             </div>
             <div className="min-w-0">
@@ -754,7 +754,7 @@ const BriefDetail = () => {
 
           {/* Spec 2: Hourly/Budget */}
           <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-3">
-            <div className="w-10 h-10 rounded-[6px] bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center shrink-0">
               <FiClock className="text-amber-500 text-base" />
             </div>
             <div className="min-w-0">
@@ -769,6 +769,9 @@ const BriefDetail = () => {
 
           {/* Spec 3: Duration */}
           <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-3">
+            <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center shrink-0">
+              <Timer className="text-rose-400 text-base" />
+            </div>
 
             <div className="min-w-0">
               <span className="text-[11px] text-slate-400 font-medium block">
@@ -782,7 +785,7 @@ const BriefDetail = () => {
 
           {/* Spec 4: Experience Level */}
           <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-3">
-            <div className="w-10 h-10 rounded-[6px] bg-purple-50 border border-purple-100 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center shrink-0">
               <FiBarChart2 className="text-purple-500 text-base" />
             </div>
             <div className="min-w-0">
@@ -798,10 +801,7 @@ const BriefDetail = () => {
           {/* Spec 5: Project Type / Status */}
           <div className="flex items-center gap-3 pt-2 sm:pt-0 sm:px-3">
             <div
-              className={`w-10 h-10 rounded-[6px] ${isClosed
-                ? "bg-rose-50 border border-rose-100"
-                : "bg-amber-50 border border-amber-100"
-                } flex items-center justify-center shrink-0`}
+              className={`w-10 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center shrink-0`}
             >
               <FiFileText
                 className={`${isClosed ? "text-rose-500" : "text-amber-500"} text-base`}
@@ -1005,11 +1005,10 @@ const BriefDetail = () => {
                         Project Status
                       </span>
                       <span
-                        className={`font-bold px-2 py-0.5 rounded-full text-[11px] ${
-                          isClosed
-                            ? "bg-rose-50 text-rose-600 border border-rose-200/80"
-                            : "bg-emerald-50 text-emerald-700 border border-emerald-200/80"
-                        }`}
+                        className={`font-bold px-2 py-0.5 rounded-full text-[11px] ${isClosed
+                          ? "bg-rose-50 text-rose-600 border border-rose-200/80"
+                          : "bg-emerald-50 text-emerald-700 border border-emerald-200/80"
+                          }`}
                       >
                         {isClosed ? "Closed" : "Active / Open"}
                       </span>
@@ -1242,19 +1241,46 @@ const BriefDetail = () => {
 
               <div className="flex items-center gap-2.5 shrink-0">
                 {modalView === "list" && normalizedProposals.length > 0 && (
-                  <Button
+                  <AiGradientButton
                     type="button"
-                    variant="soft"
-                    size="xs"
-                    radius="fiverr"
+                    height="h-[32px] sm:h-[34px]"
+                    px="px-3 sm:px-3.5"
+                    className="!text-xs font-semibold shadow-2xs"
+                    iconPosition="left"
                     onClick={handleGetAiRecommendation}
                     disabled={aiLoading}
-                    isLoading={aiLoading}
-                    leftIcon={<HiSparkles className="text-[#0D6B5D] text-sm" />}
-                    className="bg-[#D8F5ED] hover:bg-[#C3F0E4] text-[#0D6B5D] border border-[#BCE8DE] font-semibold shadow-2xs text-xs"
+                    icon={
+                      aiLoading ? (
+                        <div className="w-3.5 h-3.5 border-2 border-[#112131] border-t-transparent rounded-full animate-spin shrink-0" />
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          className="shrink-0"
+                        >
+                          <path
+                            d="M19.5 3.9375V5.5M19.5 5.5V7.0625M19.5 5.5H18.25M19.5 5.5H20.75M22 5.5L20.9156 5.13852C20.4179 4.97263 20.0274 4.58211 19.8615 4.08443L19.5 3L19.1385 4.08443C18.9726 4.58211 18.5821 4.97263 18.0844 5.13852L17 5.5L18.0844 5.86148C18.5821 6.02737 18.9726 6.41789 19.1385 6.91557L19.5 8L19.8615 6.91557C20.0274 6.41789 20.4179 6.02737 20.9156 5.86148L22 5.5Z"
+                            stroke="#112131"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M2 12.8598C4.81875 10.0939 11.44 4.44198 13.275 6.40609C15.5938 8.888 3.40937 15.1646 5.28854 17.93C7.2734 20.851 14.2146 10.5543 16.5635 12.3982C18.9125 14.2422 10.926 18.391 12.8052 20.696C13.5569 21.6179 15.6239 20.235 16.5635 19.313"
+                            stroke="#112131"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      )
+                    }
                   >
-                    Get AI Recommendation
-                  </Button>
+                    {aiLoading ? "Analyzing..." : "Get AI Recommendation"}
+                  </AiGradientButton>
                 )}
 
                 {/* Close Button */}
@@ -1274,7 +1300,7 @@ const BriefDetail = () => {
 
             {/* MODAL CONTENT: VIEW 1 (List Proposals) */}
             {modalView === "list" && (
-              <div className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
+              <div className="p-5 sm:p-6 overflow-y-auto scrollbar-hidden space-y-4 flex-1">
                 {displayedProposals.length === 0 ? (
                   <div className="text-center py-16 px-4">
                     <div className="w-12 h-12 rounded-full bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center text-xl mx-auto mb-3">
@@ -1481,7 +1507,10 @@ const BriefDetail = () => {
                               <div className="flex items-center gap-2 flex-wrap">
                                 {rank === 1 ? (
                                   <span className="inline-flex items-center gap-1.5 bg-[#0D6D5F] text-white text-[11px] font-bold px-2.5 py-1 rounded-[6px] shadow-2xs tracking-wide">
-                                    <HiSparkles className="text-xs text-amber-300" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                      <path d="M19.5 3.9375V5.5M19.5 5.5V7.0625M19.5 5.5H18.25M19.5 5.5H20.75M22 5.5L20.9156 5.13852C20.4179 4.97263 20.0274 4.58211 19.8615 4.08443L19.5 3L19.1385 4.08443C18.9726 4.58211 18.5821 4.97263 18.0844 5.13852L17 5.5L18.0844 5.86148C18.5821 6.02737 18.9726 6.41789 19.1385 6.91557L19.5 8L19.8615 6.91557C20.0274 6.41789 20.4179 6.02737 20.9156 5.86148L22 5.5Z" stroke="#ede053" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                      <path d="M2 12.8598C4.81875 10.0939 11.44 4.44198 13.275 6.40609C15.5938 8.888 3.40937 15.1646 5.28854 17.93C7.2734 20.851 14.2146 10.5543 16.5635 12.3982C18.9125 14.2422 10.926 18.391 12.8052 20.696C13.5569 21.6179 15.6239 20.235 16.5635 19.313" stroke="#ede053" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
                                     #1 Top Match
                                   </span>
                                 ) : rank === 2 ? (

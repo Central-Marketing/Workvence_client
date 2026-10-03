@@ -260,7 +260,7 @@ export default function BuyerManageOrdersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-8 font-sans">
+    <div className="min-h-screen bg-[#F8F8F8] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px]">
       <div className="container mx-auto px-4 md:px-6">
         {/* Breadcrumb */}
         <Breadcrumb
@@ -279,7 +279,7 @@ export default function BuyerManageOrdersPage() {
         />
 
         {/* Page Title & Subtitle */}
-        <div className="mb-6">
+        <div className="mb-7 sm:mb-8">
           <h1 className="text-xl md:text-2xl font-bold font-sf-pro text-[#292929]">
             Manage Orders
           </h1>

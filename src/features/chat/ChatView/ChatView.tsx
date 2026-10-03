@@ -2894,34 +2894,36 @@ const ChatView = () => {
                   />
                 </div>
 
-                {/* Top Segmented Controls: Profile | Media */}
-                <div className="sticky top-0 z-10 bg-[#f0f2f5] p-1 rounded-[6px] flex items-center border border-slate-200/70 shadow-xs">
-                  <Button
-                    type="button"
-                    variant={contactSidebarTab === 'profile' ? 'dark' : 'ghost'}
-                    size="sm"
-                    radius="xl"
-                    onClick={() => setContactSidebarTab('profile')}
-                    className={`flex-1 py-2 text-sm font-semibold text-center ${contactSidebarTab === 'profile'
-                      ? '!bg-[#0e3834] !text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                  >
-                    Profile
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={contactSidebarTab === 'media' ? 'dark' : 'ghost'}
-                    size="sm"
-                    radius="xl"
-                    onClick={() => setContactSidebarTab('media')}
-                    className={`flex-1 py-2 text-sm font-semibold text-center ${contactSidebarTab === 'media'
-                      ? '!bg-[#0e3834] !text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                      }`}
-                  >
-                    Media
-                  </Button>
+                {/* Top Segmented Controls: Profile | Media (Sticky header shield) */}
+                <div className="sticky -top-4 xl:-top-5 -mt-4 xl:-mt-5 pt-4 xl:pt-5 pb-2 bg-[#F8F8F8] z-10">
+                  <div className="bg-[#f0f2f5] p-1 rounded-[6px] flex items-center border border-slate-200/70 shadow-xs">
+                    <Button
+                      type="button"
+                      variant={contactSidebarTab === 'profile' ? 'dark' : 'ghost'}
+                      size="sm"
+                      radius="xl"
+                      onClick={() => setContactSidebarTab('profile')}
+                      className={`flex-1 py-2 text-sm font-semibold text-center ${contactSidebarTab === 'profile'
+                        ? '!bg-[#0e3834] !text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                    >
+                      Profile
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={contactSidebarTab === 'media' ? 'dark' : 'ghost'}
+                      size="sm"
+                      radius="xl"
+                      onClick={() => setContactSidebarTab('media')}
+                      className={`flex-1 py-2 text-sm font-semibold text-center ${contactSidebarTab === 'media'
+                        ? '!bg-[#0e3834] !text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                    >
+                      Media
+                    </Button>
+                  </div>
                 </div>
 
                 {contactSidebarTab === 'profile' ? (

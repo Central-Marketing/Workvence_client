@@ -14,7 +14,7 @@ import {
   SellerFaqSection,
   normalizeSellerProfile,
 } from "@/features/profile";
-import { SellerProfileSkeleton } from "@/components/ui";
+import { SellerProfileSkeleton, Button } from "@/components/ui";
 
 interface SellerPublicProfileProps {
   username?: string;
@@ -220,13 +220,12 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
         {/* 2. Main Two-Column Grid: Left (About & Contact) + Right (Gigs Grid) */}
         <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start mb-12">
           <span ref={sidebarMarkerRef} aria-hidden="true" className="absolute top-0 left-0 h-0 w-0 pointer-events-none" />
-          {/* Left Column (lg:col-span-4) */}
+          {/* Left Column (lg:col-span-5) */}
           <div
             style={{
-              top: `calc(var(--navbar-height, ${isSeller ? "82px" : "136px"}) + 12px)`,
-            }}
-            className={`lg:col-span-5 sticky self-start z-20 transition-[top] duration-200 ${isSeller ? "top-[74px] md:top-[94px]" : "top-[122px] md:top-[148px]"
-              }`}
+              "--sticky-top": `calc(var(--navbar-height, ${isSeller ? "82px" : "136px"}) + 12px)`,
+            } as React.CSSProperties}
+            className="lg:col-span-5 relative lg:sticky lg:self-start lg:z-20 lg:top-[var(--sticky-top)] transition-[top] duration-200"
           >
             <SellerAboutSidebar
               name={profileData.name}
@@ -272,6 +271,47 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
         {profileData.faqs && profileData.faqs.length > 0 && (
           <SellerFaqSection faqs={profileData.faqs} />
         )}
+      </div>
+
+      {/* 5. Mobile Sticky Bottom Contact Bar (Only visible on small devices: < lg) */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] px-4 py-3 z-40 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 border border-slate-200 bg-slate-100">
+            {profileData.avatar ? (
+              <img
+                src={profileData.avatar}
+                alt={profileData.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center font-bold text-slate-700 text-sm">
+                {(profileData.name || "U").charAt(0).toUpperCase()}
+              </div>
+            )}
+            {profileData.isOnline && (
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-white" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <span className="text-[13px] font-bold text-slate-900 truncate block">
+              {profileData.name}
+            </span>
+            <span className="text-[11px] text-slate-500 block">
+              {profileData.isOnline ? "Online" : "Offline"}
+            </span>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          variant="dark"
+          size="sm"
+          radius="fiverr"
+          onClick={() => handleContact()}
+          className="shrink-0 h-[40px] px-5 font-semibold text-xs shadow-xs"
+        >
+          Contact
+        </Button>
       </div>
     </div>
   );

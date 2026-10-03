@@ -138,7 +138,7 @@ const FavoritesPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="min-h-screen bg-[#F8F9FA] pt-10 sm:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
         <div className="container mx-auto px-4 md:px-6 space-y-6">
           <Breadcrumb
             homeHref={user?.isSeller ? "/dashboard/seller" : "/dashboard/buyer"}
@@ -221,8 +221,8 @@ const FavoritesPage = () => {
             size="sm"
             radius="fiverr"
             className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 flex items-center gap-2.5 whitespace-nowrap ${activeTab === "gigs"
-                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+              ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+              : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
               }`}
           >
             <span className="whitespace-nowrap shrink-0">Saved Services</span>
@@ -241,8 +241,8 @@ const FavoritesPage = () => {
             size="sm"
             radius="fiverr"
             className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-4 flex items-center gap-2.5 whitespace-nowrap ${activeTab === "sellers"
-                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+              ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+              : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
               }`}
           >
             <span className="whitespace-nowrap shrink-0">Favorite Sellers</span>

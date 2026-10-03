@@ -431,7 +431,7 @@ const Earnings = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+    <div className="min-h-screen bg-[#F8F9FA] pt-10 sm:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-7">
 
         {/* 1. Breadcrumb */}

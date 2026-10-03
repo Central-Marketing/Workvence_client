@@ -115,8 +115,8 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px]">
-      <div className="container mx-auto px-4 md:px-6 space-y-10 md:space-y-12">
+    <div className="min-h-screen bg-[#F8F8F8] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px]">
+      <div className="container mx-auto px-4 md:px-6 space-y-7 sm:space-y-8">
 
         {/* Top Header Row */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -230,7 +230,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
 
         {/* Section 1: Recommended for You */}
         <section>
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-7 sm:mb-8">
             <h2 className="text-2xl sm:text-[26px] font-bold text-gray-900 tracking-tight">
               Recommended for You
             </h2>
@@ -252,7 +252,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
 
         {/* Section 2: Most Popular Packages */}
         <section>
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-7 sm:mb-8">
             <h2 className="text-2xl sm:text-[26px] font-bold text-gray-900 tracking-tight">
               Most Popular Packages
             </h2>

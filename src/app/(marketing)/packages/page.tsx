@@ -740,8 +740,8 @@ const Packages = () => {
                 hideHeader
                 className="p-0 bg-transparent rounded-none"
                 searchVal={searchInputValue}
-                  onSearchChange={handleSearchChange}
-                  onSearchSubmit={handleSearchSubmit}
+                onSearchChange={handleSearchChange}
+                onSearchSubmit={handleSearchSubmit}
                 categories={categories.filter((c: any) => c.slug !== 'All services')}
                 selectedCategory={categoryAncestry.length > 0 ? categoryAncestry[0].slug : (filterCategory || (activeCategory !== 'All services' ? activeCategory : ''))}
                 onCategoryChange={(cat) => {
@@ -1033,7 +1033,7 @@ const Packages = () => {
         /* Main Content - Gigs Listing View */
         <div className="container mx-auto pt-8 pb-[80px] min-[1400px]:pb-[100px]">
           {/* Breadcrumb + Filter Button Row */}
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-7 sm:mb-8">
             <div>
               {categoryAncestry && categoryAncestry.length > 0 ? (
                 <Breadcrumb

@@ -514,30 +514,42 @@ const MyBriefs = () => {
                   className={`relative bg-white rounded-[6px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-5 sm:p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer ${isMenuOpen ? "z-30 overflow-visible" : "overflow-hidden"
                     }`}
                 >
-                  {/* Ambient Purple Glow (appears on card hover) */}
-                  <div
-                    className="absolute pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out z-0"
-                    style={{
-                      position: "absolute",
-                      right: "-210px",
-                      top: "-407px",
-                      width: "555px",
-                      height: "513px",
-                      borderRadius: "555px",
-                      transform: "rotate(-180deg)",
-                      background: "var(--purple-100, #CEB0FA)",
-                      filter: "blur(150px)",
-                    }}
-                    aria-hidden="true"
-                  />
+                  {/* Ambient Purple Glow (contained in clipped layer so it never overflows) */}
+                  <div className="absolute inset-0 overflow-hidden rounded-[6px] pointer-events-none z-0">
+                    <div
+                      className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"
+                      style={{
+                        position: "absolute",
+                        right: "-210px",
+                        top: "-407px",
+                        width: "555px",
+                        height: "513px",
+                        borderRadius: "555px",
+                        transform: "rotate(-180deg)",
+                        background: "var(--purple-100, #CEB0FA)",
+                        filter: "blur(150px)",
+                      }}
+                      aria-hidden="true"
+                    />
+                  </div>
 
                   {/* Top Header Row */}
                   <div className={`relative ${isMenuOpen ? "z-40" : "z-10"}`}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
-                        <h2 className="text-base sm:text-[19px] font-bold text-slate-900 tracking-tight group-hover:text-slate-950 truncate">
-                          {brief.title}
-                        </h2>
+                        <div className="relative group/title max-w-full inline-block">
+                          <h2 className="text-base sm:text-[19px] font-bold text-slate-900 tracking-tight group-hover:text-slate-950 truncate">
+                            {brief.title}
+                          </h2>
+
+                          {/* Custom Floating Tooltip */}
+                          <div className="pointer-events-none absolute left-0 top-full mt-1.5 hidden group-hover/title:flex items-center z-50 animate-in fade-in zoom-in-95 duration-150">
+                            <div className="relative bg-slate-900 text-white text-xs font-medium px-3 py-1.5 rounded-[6px] shadow-xl max-w-xs sm:max-w-sm whitespace-normal leading-snug border border-slate-800">
+                              {brief.title}
+                              <div className="absolute -top-1 left-4 w-2 h-2 bg-slate-900 rotate-45 border-l border-t border-slate-800" />
+                            </div>
+                          </div>
+                        </div>
                         <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-400 mt-1">
                           <span>Posted {moment(brief.createdAt).fromNow()}</span>
                           <span>{workType}</span>
@@ -547,7 +559,7 @@ const MyBriefs = () => {
                             <>
                               <span>•</span>
                               <span className="text-rose-600 font-semibold bg-rose-50 border border-rose-200/80 text-[11px] px-2 py-0.5 rounded-full">
-                                Closed
+                                Inactive
                               </span>
                             </>
                           )}
@@ -591,21 +603,7 @@ const MyBriefs = () => {
                               onClick={(e) => e.stopPropagation()}
                               className="absolute right-0 top-9 w-44 bg-white border border-gray-100 rounded-[6px] shadow-2xl py-1.5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
                             >
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                radius="none"
-                                fullWidth
-                                onClick={() => {
-                                  setOpenMenuId(null);
-                                  router.push(`/briefs/${brief._id}`);
-                                }}
-                                leftIcon={<FiEye className="text-slate-400 group-hover:text-teal-700" />}
-                                className="group justify-start px-3.5 py-2 text-xs font-medium text-gray-700 hover:bg-teal-50/70 hover:text-teal-800 border-none shadow-none h-auto min-h-0 transition-colors"
-                              >
-                                View
-                              </Button>
+
 
                               {!isClosed && (
                                 <Button
@@ -619,7 +617,7 @@ const MyBriefs = () => {
                                     setEditingBrief(brief);
                                   }}
                                   leftIcon={<FiEdit3 className="text-slate-400 group-hover:text-teal-700" />}
-                                  className="group justify-start px-3.5 py-2 text-xs font-medium text-gray-700 hover:bg-teal-50/70 hover:text-teal-800 border-none shadow-none h-auto min-h-0 transition-colors"
+                                  className="group !justify-start text-left px-3.5 py-2 text-xs font-medium text-gray-700 hover:bg-teal-50/70 hover:text-teal-800 border-none shadow-none h-auto min-h-0 transition-colors"
                                 >
                                   Edit
                                 </Button>
@@ -637,9 +635,9 @@ const MyBriefs = () => {
                                     closeMutation.mutate(brief._id || brief.id);
                                   }}
                                   leftIcon={<FiXCircle className="text-amber-500" />}
-                                  className="justify-start px-3.5 py-2 text-xs font-medium text-amber-700 hover:bg-amber-50 border-none shadow-none h-auto min-h-0 transition-colors"
+                                  className="!justify-start text-left px-3.5 py-2 text-xs font-medium text-amber-700 hover:bg-amber-50 border-none shadow-none h-auto min-h-0 transition-colors"
                                 >
-                                  Close
+                                  Inactive
                                 </Button>
                               )}
 
@@ -655,9 +653,9 @@ const MyBriefs = () => {
                                     reopenMutation.mutate(brief._id || brief.id);
                                   }}
                                   leftIcon={<FiRotateCcw className="text-teal-600" />}
-                                  className="justify-start px-3.5 py-2 text-xs font-medium text-teal-700 hover:bg-teal-50 border-none shadow-none h-auto min-h-0 transition-colors"
+                                  className="!justify-start text-left px-3.5 py-2 text-xs font-medium text-teal-700 hover:bg-teal-50 border-none shadow-none h-auto min-h-0 transition-colors"
                                 >
-                                  Reopen
+                                  Active
                                 </Button>
                               )}
 
@@ -672,7 +670,7 @@ const MyBriefs = () => {
                                   setDeletingBriefId(brief._id || brief.id);
                                 }}
                                 leftIcon={<FiTrash2 className="text-rose-500" />}
-                                className="justify-start px-3.5 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 border-none shadow-none h-auto min-h-0 transition-colors"
+                                className="!justify-start text-left px-3.5 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 border-none shadow-none h-auto min-h-0 transition-colors"
                               >
                                 Delete
                               </Button>

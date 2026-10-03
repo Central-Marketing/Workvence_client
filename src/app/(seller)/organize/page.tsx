@@ -653,7 +653,7 @@ const OrganizePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+    <div className="min-h-screen bg-[#F8F9FA] pt-10 sm:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-7">
 
         {/* 1. Header Section */}
@@ -748,11 +748,10 @@ const OrganizePage = () => {
                   Package title
                 </label>
                 <span
-                  className={`text-[11px] font-medium transition-colors ${
-                    (state.title?.length || 0) > 80
+                  className={`text-[11px] font-medium transition-colors ${(state.title?.length || 0) > 80
                       ? "text-red-500 font-semibold"
                       : "text-gray-400"
-                  }`}
+                    }`}
                 >
                   {state.title?.length || 0}/80
                 </span>
@@ -763,11 +762,10 @@ const OrganizePage = () => {
                 value={state.title || ""}
                 onChange={handleInputChange}
                 placeholder="e.g I will do something i am really good at"
-                className={`w-full h-10 px-3.5 bg-[#F0F0F0] border rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors ${
-                  (state.title?.length || 0) > 80
+                className={`w-full h-10 px-3.5 bg-[#F0F0F0] border rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors ${(state.title?.length || 0) > 80
                     ? "border-red-400 focus:border-red-500 bg-red-50/10"
                     : "border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white"
-                }`}
+                  }`}
               />
               {(state.title?.length || 0) > 80 && (
                 <p className="text-[11px] text-red-500 font-medium">
@@ -842,8 +840,8 @@ const OrganizePage = () => {
                     !state.category
                       ? "Select category first"
                       : currentSubcategories.length === 0
-                      ? "No subcategories available"
-                      : "Select Subcategory (Optional)"
+                        ? "No subcategories available"
+                        : "Select Subcategory (Optional)"
                   }
                   ariaLabel="Select Subcategory"
                 />
@@ -871,8 +869,8 @@ const OrganizePage = () => {
                     !state.subcategory
                       ? "Select subcategory first"
                       : currentNiches.length === 0
-                      ? "No niches available"
-                      : "Select Niche (Optional)"
+                        ? "No niches available"
+                        : "Select Niche (Optional)"
                   }
                   ariaLabel="Select Niche"
                 />
@@ -1075,11 +1073,10 @@ const OrganizePage = () => {
                   Package title
                 </label>
                 <span
-                  className={`text-[11px] font-medium transition-colors ${
-                    (currentTierData.title?.length || 0) > 80
+                  className={`text-[11px] font-medium transition-colors ${(currentTierData.title?.length || 0) > 80
                       ? "text-red-500 font-semibold"
                       : "text-gray-400"
-                  }`}
+                    }`}
                 >
                   {currentTierData.title?.length || 0}/80
                 </span>
@@ -1089,11 +1086,10 @@ const OrganizePage = () => {
                 value={currentTierData.title || ""}
                 onChange={(e) => handleTierInputChange("title", e.target.value)}
                 placeholder="e.g I will do something i am really good at"
-                className={`w-full h-10 px-3.5 bg-[#F0F0F0] border rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors ${
-                  (currentTierData.title?.length || 0) > 80
+                className={`w-full h-10 px-3.5 bg-[#F0F0F0] border rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors ${(currentTierData.title?.length || 0) > 80
                     ? "border-red-400 focus:border-red-500 bg-red-50/10"
                     : "border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white"
-                }`}
+                  }`}
               />
               {(currentTierData.title?.length || 0) > 80 && (
                 <p className="text-[11px] text-red-500 font-medium">

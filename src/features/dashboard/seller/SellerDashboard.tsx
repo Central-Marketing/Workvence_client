@@ -130,7 +130,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
     const displayUnreadMessages = unreadMessagesCount;
 
     return (
-      <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="min-h-screen bg-[#F8F9FA] pt-10 sm:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
         <div className="container mx-auto px-4 md:px-6 space-y-7">
 
           {/* 1. Header: Welcome & Profile Completion */}
@@ -292,14 +292,14 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                     rx="5.625"
                     stroke="#F00000"
                     strokeWidth="2.8125"
-                    stroke-linecap="round"
+                    strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                   <path
                     d="M6.5625 12.1875L20.2444 23.133C21.5794 24.201 23.4206 24.201 24.7556 23.133L38.4375 12.1875"
                     stroke="#F00000"
                     strokeWidth="2.8125"
-                    stroke-linecap="round"
+                    strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 </svg>

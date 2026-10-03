@@ -3,7 +3,7 @@ import { Skeleton } from './Skeleton';
 
 export const OrderSkeleton: React.FC = () => {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-6 sm:py-8 font-sans">
+    <div className="min-h-screen bg-[#F8F8F8] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px]">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content Area (2 cols) */}

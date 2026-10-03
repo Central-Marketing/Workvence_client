@@ -10,7 +10,7 @@ import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components";
-import { GigsGridSkeleton } from "@/components/ui";
+import { GigsGridSkeleton, AccountStandingBanner } from "@/components/ui";
 
 const MyPackages = () => {
   const user = useUserStore((state: any) => state.user);
@@ -96,7 +96,8 @@ const MyPackages = () => {
         </div>
       ) : (
         <div className="container mx-auto px-4 md:px-6 space-y-6">
-
+          {/* Account Standing Warning / Suspension Banner */}
+          <AccountStandingBanner />
 
           {/* Page Heading & Create New Package Button */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -109,15 +110,28 @@ const MyPackages = () => {
               </p>
             </div>
 
-            <Button
-              href="/organize"
-              variant="outline"
-              size="sm"
-              radius="fiverr"
-              className="bg-gradient-to-r from-[#98FDE8] to-[#80B6FD] hover:opacity-95 text-[#0A3B32] border-transparent shadow-2xs self-start sm:self-auto shrink-0"
-            >
-              Create New Package
-            </Button>
+            {user?.isSuspended ? (
+              <Button
+                variant="outline"
+                size="sm"
+                radius="fiverr"
+                disabled
+                onClick={() => toast.error("Account is suspended. Package creation is temporarily disabled.")}
+                className="bg-gray-200 text-gray-500 border-transparent shadow-none cursor-not-allowed opacity-75 self-start sm:self-auto shrink-0"
+              >
+                Create New Package (Suspended)
+              </Button>
+            ) : (
+              <Button
+                href="/organize"
+                variant="outline"
+                size="sm"
+                radius="fiverr"
+                className="bg-gradient-to-r from-[#98FDE8] to-[#80B6FD] hover:opacity-95 text-[#0A3B32] border-transparent shadow-2xs self-start sm:self-auto shrink-0"
+              >
+                Create New Package
+              </Button>
+            )}
           </div>
 
           {/* Tab Filter: Published and Draft */}

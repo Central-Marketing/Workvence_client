@@ -4,7 +4,7 @@ import React, { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FiArrowLeft, FiArrowRight, FiCheckCircle } from "react-icons/fi";
-import { Button, Skeleton } from "@/components/ui";
+import { Button, Skeleton, AccountStandingBanner } from "@/components/ui";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { PackageCard } from "@/features/gigs";
@@ -117,6 +117,8 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
   return (
     <div className="min-h-screen bg-[#F8F8F8] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px]">
       <div className="container mx-auto px-4 md:px-6 space-y-7 sm:space-y-8">
+        {/* Account Standing Warning / Suspension Banner */}
+        <AccountStandingBanner />
 
         {/* Top Header Row */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">

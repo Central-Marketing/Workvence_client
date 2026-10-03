@@ -32,7 +32,7 @@ import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
 import supportService from "@/utils/supportService";
 import { Loader, KycVerificationForm, Button } from "@/components";
-import { CustomSelect, CustomSelectOption } from "@/components/ui";
+import { CustomSelect, CustomSelectOption, AccountStandingCard } from "@/components/ui";
 import { calculateProfileCompletion } from "@/features/dashboard";
 
 const LANGUAGE_LEVEL_OPTIONS: CustomSelectOption[] = [
@@ -641,6 +641,9 @@ export default function ProfilePage() {
             )}
           </div>
         </div>
+
+        {/* Account Standing Status Card (only renders if warning or suspended) */}
+        <AccountStandingCard className="mb-6" />
 
         {/* HERO BANNER CARD */}
         <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-4 sm:p-5 mb-7">

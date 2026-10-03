@@ -63,6 +63,15 @@ export interface User {
   starCounts?: StarCounts;
   earnings?: number;
   activeOrders?: number;
+  // Warning & Suspension policy fields
+  isSuspended?: boolean;
+  suspensionCount?: number;
+  suspensionReason?: string;
+  suspendedAt?: string;
+  warningCount?: number;
+  warningExpiresAt?: string;
+  isWarningActive?: boolean;
+  warningReason?: string;
   [key: string]: any;
 }
 
@@ -75,6 +84,10 @@ export interface JwtPayload {
   isSeller?: boolean;
   isAdmin?: boolean;
   role?: string;
+  isSuspended?: boolean;
+  suspensionCount?: number;
+  isWarningActive?: boolean;
+  warningExpiresAt?: string;
   exp?: number;
   iat?: number;
   [key: string]: any;

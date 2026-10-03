@@ -13,7 +13,7 @@ import useAdminCategories from "@/hooks/useAdminCategories";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components";
-import { CustomSelect, CustomSelectOption, OrganizeSkeleton } from "@/components/ui";
+import { CustomSelect, CustomSelectOption, OrganizeSkeleton, AccountStandingBanner } from "@/components/ui";
 
 // Dynamically import ReactQuill to ensure SSG/SSR compatibility
 const ReactQuill = dynamic(() => import("react-quill-new"), {
@@ -735,6 +735,11 @@ const EditPackagePage = () => {
 
   // Submit Handler
   const handleSubmit = (isDraft = false) => {
+    if (user?.isSuspended) {
+      toast.error("Account is suspended. You cannot edit or publish packages during restricted fulfillment mode.");
+      return;
+    }
+
     // Resolve hierarchical category, subcategory, and niche information
     const selectedParent = parentCategories.find(
       (p: any) =>
@@ -1008,6 +1013,8 @@ const EditPackagePage = () => {
   return (
     <div className="min-h-screen bg-[#F8F9FA] pt-10 sm:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-7">
+        {/* Account Standing Warning / Suspension Banner */}
+        <AccountStandingBanner />
 
         {/* 1. Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1041,8 +1048,8 @@ const EditPackagePage = () => {
               size="sm"
               radius="fiverr"
               onClick={() => handleSubmit(true)}
-              disabled={mutation.isPending}
-              className="bg-[#F1F3F5] hover:bg-gray-200 text-[#353535] hover:text-gray-900 font-semibold px-5 py-2.5"
+              disabled={mutation.isPending || user?.isSuspended}
+              className="bg-[#F1F3F5] hover:bg-gray-200 text-[#353535] hover:text-gray-900 font-semibold px-5 py-2.5 disabled:opacity-50"
             >
               Draft and Save
             </Button>
@@ -1053,9 +1060,10 @@ const EditPackagePage = () => {
               size="sm"
               radius="fiverr"
               onClick={() => handleSubmit(false)}
+              disabled={user?.isSuspended}
               isLoading={mutation.isPending}
               loadingText="Updating..."
-              className="font-semibold px-5 py-2.5 shadow-2xs"
+              className="font-semibold px-5 py-2.5 shadow-2xs disabled:opacity-50"
             >
               Update Package
             </Button>

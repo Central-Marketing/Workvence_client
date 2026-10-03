@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { FiCalendar, FiArrowRight, FiCheckCircle } from "react-icons/fi";
-import { Button, Tag } from "@/components/ui";
+import { Button, Tag, AccountStandingBanner } from "@/components/ui";
 import { calculateProfileCompletion } from "../utils/dashboardNormalizer";
 import { sortOrdersByPriority } from "@/features/orders";
 
@@ -132,6 +132,8 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
     return (
       <div className="min-h-screen bg-[#F8F9FA] pt-10 sm:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
         <div className="container mx-auto px-4 md:px-6 space-y-7">
+          {/* Account Standing Warning / Suspension Banner */}
+          <AccountStandingBanner />
 
           {/* 1. Header: Welcome & Profile Completion */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-1">
@@ -558,6 +560,8 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
   return (
     <div className="min-h-screen bg-[#F8F8F8] pt-8 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        {/* Account Standing Warning / Suspension Banner */}
+        <AccountStandingBanner />
 
         {/* 1. Header: Welcome & Profile Completion */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pt-1">
@@ -678,12 +682,21 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                 >
                   Manage All
                 </Link>
-                <Link
-                  href="/organize"
-                  className="px-4 py-2 rounded-[6px] bg-brand-green hover:bg-brand-green/90 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
-                >
-                  + Add New Package
-                </Link>
+                {user?.isSuspended ? (
+                  <span
+                    title="Account is suspended. Package creation is temporarily disabled."
+                    className="px-4 py-2 rounded-[6px] bg-gray-200 text-gray-500 text-xs sm:text-sm font-semibold cursor-not-allowed select-none"
+                  >
+                    + Add New Package
+                  </span>
+                ) : (
+                  <Link
+                    href="/organize"
+                    className="px-4 py-2 rounded-[6px] bg-brand-green hover:bg-brand-green/90 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
+                  >
+                    + Add New Package
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -749,12 +762,21 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
               <p className="text-[#6B7280] text-xs sm:text-[13px] max-w-[480px] mx-auto leading-relaxed mb-6">
                 Create packages that showcase your expertise, set clear deliverables, and make it easy for clients to hire you.
               </p>
-              <Link
-                href="/organize"
-                className="px-6 py-2.5 sm:py-3 rounded-[6px] bg-gradient-to-r from-[#74F2C7] to-[#70B2F8] hover:opacity-95 text-[#111827] text-xs sm:text-[13.5px] font-semibold transition-all shadow-xs"
-              >
-                Create Your First Package
-              </Link>
+              {user?.isSuspended ? (
+                <span
+                  title="Account is suspended. Package creation is temporarily disabled."
+                  className="px-6 py-2.5 sm:py-3 rounded-[6px] bg-gray-200 text-gray-500 text-xs sm:text-[13.5px] font-semibold cursor-not-allowed select-none"
+                >
+                  Create Your First Package (Suspended)
+                </span>
+              ) : (
+                <Link
+                  href="/organize"
+                  className="px-6 py-2.5 sm:py-3 rounded-[6px] bg-gradient-to-r from-[#74F2C7] to-[#70B2F8] hover:opacity-95 text-[#111827] text-xs sm:text-[13.5px] font-semibold transition-all shadow-xs"
+                >
+                  Create Your First Package
+                </Link>
+              )}
             </div>
           </div>
         )}

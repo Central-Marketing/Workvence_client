@@ -1180,6 +1180,10 @@ const ChatView = () => {
 
   const handleOfferSubmit = (e: any) => {
     e.preventDefault();
+    if (user?.isSuspended) {
+      toast.error("Account is suspended. You cannot send custom offers during restricted fulfillment mode.");
+      return;
+    }
     if (!selectedPackageId && !selectedBriefId) { toast.error("Select at least a Package or a Project."); return; }
     if (!offerDesc || !offerPrice || !offerDelivery) { toast.error("Fill all fields."); return; }
 
@@ -2138,10 +2142,17 @@ const ChatView = () => {
                           variant="dark"
                           size="md"
                           radius="fiverr"
-                          onClick={() => setShowOfferModal(true)}
-                          className="hidden xl:inline-flex h-10 text-[16px] font-semibold px-4 whitespace-nowrap shrink-0"
+                          onClick={() => {
+                            if (user?.isSuspended) {
+                              toast.error("Account is suspended. You cannot send custom offers during restricted fulfillment mode.");
+                              return;
+                            }
+                            setShowOfferModal(true);
+                          }}
+                          disabled={Boolean(user?.isSuspended)}
+                          className={`hidden xl:inline-flex h-10 text-[16px] font-semibold px-4 whitespace-nowrap shrink-0 ${user?.isSuspended ? "opacity-60 cursor-not-allowed" : ""}`}
                         >
-                          Create Offer
+                          {user?.isSuspended ? "Offer Restricted" : "Create Offer"}
                         </Button>
                       )}
 

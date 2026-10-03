@@ -8,7 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
 import { KycRequiredModal, PayoneerLogo, PayoneerIcon, Button } from "@/components";
-import { Breadcrumb, EarningsSkeleton } from "@/components/ui";
+import { Breadcrumb, EarningsSkeleton, AccountStandingBanner } from "@/components/ui";
 import { FaStripe } from "react-icons/fa";
 import moment from "moment";
 import { toast } from "sonner";
@@ -450,6 +450,9 @@ const Earnings = () => {
           ]}
         />
 
+        {/* Account Standing Warning / Suspension Banner */}
+        <AccountStandingBanner />
+
         {/* 2. Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex flex-col gap-[10px]">
@@ -541,6 +544,10 @@ const Earnings = () => {
             <Button
               type="button"
               onClick={() => {
+                if (user?.isSuspended) {
+                  toast.error("Account is suspended. Payout withdrawals are frozen during restricted fulfillment mode.");
+                  return;
+                }
                 if (!hasAnyConnected) {
                   setShowWalletModal(true);
                   toast("Please connect Stripe or Payoneer before withdrawing funds.", { icon: "💳" });
@@ -550,12 +557,13 @@ const Earnings = () => {
                   setShowPayoutModal(true);
                 }
               }}
-              disabled={availableBalance <= 0}
+              disabled={availableBalance <= 0 || Boolean(user?.isSuspended)}
               variant="dark"
               size="md"
               radius="fiverr"
+              className={user?.isSuspended ? "opacity-60 cursor-not-allowed" : ""}
             >
-              Request Payout
+              {user?.isSuspended ? "Payouts Frozen" : "Request Payout"}
             </Button>
           </div>
         </div>

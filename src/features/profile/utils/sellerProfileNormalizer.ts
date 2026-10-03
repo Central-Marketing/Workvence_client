@@ -103,9 +103,18 @@ export function normalizeSellerProfile(
     rawReviews = [];
   }
 
-  const sellerObj = rawUser?.user || rawUser || {};
+  const sellerObj =
+    rawUser?.data?.user ||
+    rawUser?.user ||
+    rawUser?.data ||
+    rawUser ||
+    {};
 
-  const id = sellerObj._id || sellerObj.id || '';
+  const id =
+    sellerObj._id ||
+    sellerObj.id ||
+    (Array.isArray(rawGigs) && (rawGigs[0]?.userID?._id || rawGigs[0]?.userID || rawGigs[0]?.sellerID?._id || rawGigs[0]?.sellerID)) ||
+    '';
   const username = sellerObj.username || usernameParam || '';
   const name = sellerObj.name || (sellerObj.username ? `${sellerObj.username.replace(/[_-]/g, ' ')}` : '');
   const avatar = sellerObj.image || sellerObj.avatar || SELLER_FALLBACK_IMAGES.avatar;

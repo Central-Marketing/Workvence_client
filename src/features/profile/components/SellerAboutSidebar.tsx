@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { FiMapPin, FiClock, FiPackage, FiArrowRight } from "react-icons/fi";
 import { AiGradientButton, Button } from "@/components/ui";
 import { getOnlineStatus } from "@/utils/userStatus";
@@ -19,6 +20,9 @@ interface SellerAboutSidebarProps {
   localTimeText?: string;
   lastActiveAt?: string | Date | null;
   isOnline?: boolean;
+  sellerId?: string;
+  sellerUsername?: string;
+  isContactLoading?: boolean;
   onContact?: () => void;
   onMessage?: () => void;
   onAnalyzeProfile?: () => void;
@@ -37,10 +41,14 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
   localTimeText,
   lastActiveAt,
   isOnline,
+  sellerId,
+  sellerUsername,
+  isContactLoading = false,
   onContact,
   onMessage,
   onAnalyzeProfile,
 }) => {
+  const router = useRouter();
   const userStatus = getOnlineStatus(lastActiveAt, isOnline, 10);
   const statusLabel = userStatus.isOnline
     ? "Online"
@@ -51,6 +59,21 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
   const cleanLocalTime = (localTimeText || "")
     .replace(/^(Online|Offline|Active[^•]*)\s*•\s*/i, "")
     .trim();
+
+  const handleContactClick = () => {
+    if (onContact) {
+      onContact();
+      return;
+    }
+    if (onMessage) {
+      onMessage();
+      return;
+    }
+    const target = sellerId || sellerUsername;
+    if (target) {
+      router.push(`/message/${target}`);
+    }
+  };
   return (
     <div className="w-full space-y-6">
       {/* 1. Main "About this seler" Card */}
@@ -205,7 +228,9 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
             size="md"
             radius="fiverr"
             fullWidth
-            onClick={onContact}
+            onClick={handleContactClick}
+            isLoading={isContactLoading}
+            disabled={isContactLoading}
             rightIcon={<FiArrowRight className="w-4 h-4" />}
             className="font-semibold shadow-xs mb-3"
           >

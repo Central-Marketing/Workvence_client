@@ -27,6 +27,7 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
   const isSeller = Boolean(user?.isSeller);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isContactLoading, setIsContactLoading] = useState(false);
   const [rawUserData, setRawUserData] = useState<any>(null);
   const [rawGigsData, setRawGigsData] = useState<any[]>([]);
   const [rawReviewsData, setRawReviewsData] = useState<any[]>([]);
@@ -152,7 +153,12 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
       });
       return;
     }
-    const sellerID = profileData.id;
+    const sellerID =
+      profileData.id ||
+      rawUserData?._id ||
+      rawUserData?.id ||
+      rawUserData?.data?._id ||
+      (Array.isArray(rawGigsData) && (rawGigsData[0]?.userID?._id || rawGigsData[0]?.userID || rawGigsData[0]?.sellerID?._id || rawGigsData[0]?.sellerID));
     const buyerID = activeUser._id || activeUser.id;
 
     if (!sellerID || !buyerID) {
@@ -160,34 +166,70 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
       return;
     }
 
-    if (String(sellerID) === String(buyerID)) {
+    const sellerUsername = profileData.username || username;
+    const buyerUsername = activeUser.username;
+
+    if (
+      String(sellerID) === String(buyerID) ||
+      (sellerUsername && buyerUsername && sellerUsername.toLowerCase() === buyerUsername.toLowerCase())
+    ) {
       toast.error("You cannot contact yourself.");
       return;
     }
 
+    setIsContactLoading(true);
     try {
-      const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
-      const targetId = res.data?.uuid || res.data?.conversationID || res.data?._id;
-      if (targetId) {
-        router.push(`/message/${targetId}`);
-        return;
+      try {
+        const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
+        const targetId =
+          res.data?.uuid ||
+          res.data?.conversationID ||
+          res.data?.id ||
+          res.data?._id ||
+          res.data?.data?.uuid ||
+          res.data?.data?._id ||
+          res.data?.conversation?.uuid ||
+          res.data?.conversation?._id;
+        if (targetId) {
+          router.push(`/message/${targetId}`);
+          return;
+        }
+      } catch {
+        // Conversation does not exist yet; proceed to create
       }
-    } catch {
+
       try {
         const res = await axiosFetch.post("/conversations", {
           to: sellerID,
           from: buyerID,
           sellerID,
           buyerID,
+          seller_username: sellerUsername || null,
+          buyer_username: buyerUsername || null,
         });
-        const targetId = res.data?.uuid || res.data?.conversationID || res.data?._id;
+        const targetId =
+          res.data?.uuid ||
+          res.data?.conversationID ||
+          res.data?.id ||
+          res.data?._id ||
+          res.data?.data?.uuid ||
+          res.data?.data?._id ||
+          res.data?.conversation?.uuid ||
+          res.data?.conversation?._id;
         if (targetId) {
           router.push(`/message/${targetId}`);
           return;
         }
       } catch (postErr: any) {
-        toast.error(postErr?.response?.data?.message || "Failed to start conversation.");
+        console.warn("Could not create conversation via API:", postErr);
       }
+
+      // Graceful fallback to chatview directly with sellerID
+      router.push(`/message/${sellerID}`);
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to start conversation.");
+    } finally {
+      setIsContactLoading(false);
     }
   };
 
@@ -240,6 +282,9 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
               localTimeText={profileData.localTimeText}
               lastActiveAt={profileData.lastActiveAt}
               isOnline={profileData.isOnline}
+              sellerId={profileData.id}
+              sellerUsername={profileData.username}
+              isContactLoading={isContactLoading}
               onContact={handleContact}
               onMessage={handleContact}
               onAnalyzeProfile={handleAnalyzeProfile}
@@ -308,6 +353,8 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
           size="sm"
           radius="fiverr"
           onClick={() => handleContact()}
+          isLoading={isContactLoading}
+          disabled={isContactLoading}
           className="shrink-0 h-[40px] px-5 font-semibold text-xs shadow-xs"
         >
           Contact

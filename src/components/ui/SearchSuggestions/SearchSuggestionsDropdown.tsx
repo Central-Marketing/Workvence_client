@@ -120,13 +120,8 @@ export const SearchSuggestionsDropdown: React.FC<SearchSuggestionsDropdownProps>
                 : 'text-[#0D6D5F] hover:bg-[#EDEDED] bg-white border border-gray-200/80 hover:border-[rgba(0, 0, 0, 0.10)] hover:text-black'
                 }`}
             >
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                <RiSearchLine className={`text-sm shrink-0 ${isSeeMoreSelected ? 'text-white' : 'text-[#0D6D5F]'}`} />
-                <span className="truncate">
-                  See more results for &ldquo;{query.trim()}&rdquo;
-                </span>
-              </div>
-              <div className={`flex items-center gap-1 text-[11px] font-semibold shrink-0 ml-1.5 ${isSeeMoreSelected ? 'text-emerald-100' : 'text-[#0D6D5F]'}`}>
+
+              <div className={`flex items-center gap-1 text-[13px] font-semibold shrink-0 ml-1.5 ${isSeeMoreSelected ? 'text-emerald-100' : 'text-[#0D6D5F]'}`}>
                 <span>See more</span>
                 <FiArrowRight className="text-xs" />
               </div>

@@ -32,8 +32,12 @@ import {
   ShoppingCart,
   RefreshCw,
   RotateCcw,
+  LayoutGrid,
+  List,
 } from "lucide-react";
 import { Button, CustomSelect } from "@/components/ui";
+import { PackageCard } from "@/features/gigs";
+import { CardSkeleton } from "@/components/ui/Skeletons/Skeleton";
 
 const isValidUrl = (url?: unknown): boolean => {
   if (!url || typeof url !== "string") return false;
@@ -190,6 +194,7 @@ function SearchPageContent() {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const [isFocused, setIsFocused] = useState(false);
+  const [viewMode, setViewMode] = useState<"table" | "card">("table");
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -618,17 +623,52 @@ function SearchPageContent() {
 
           {/* Table Container Card */}
           <div className="bg-[#f5f5f5] rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-4 sm:p-6 md:p-8 space-y-6">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+            <div className="flex items-center justify-between border-b border-gray-200/80 pb-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-sm sm:text-base font-bold text-gray-900 font-sf-pro">
-                  Services Table View
+                  {viewMode === "table" ? "Services Table View" : "Services Grid View"}
                 </h2>
+                {!isLoading && (
+                  <span className="text-xs text-gray-500 font-medium">
+                    ({totalResults} {totalResults === 1 ? "result" : "results"})
+                  </span>
+                )}
               </div>
 
+              {/* View Mode Toggle Tabs */}
+              <div className="flex items-center bg-white border border-gray-200/80 rounded-[6px] p-0.5 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("table")}
+                  title="Table View"
+                  className={`p-1.5 rounded-[4px] transition-colors cursor-pointer flex items-center justify-center ${
+                    viewMode === "table"
+                      ? "bg-slate-900 text-white shadow-xs"
+                      : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                  }`}
+                  aria-label="Table View"
+                >
+                  <List className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("card")}
+                  title="Card Grid View"
+                  className={`p-1.5 rounded-[4px] transition-colors cursor-pointer flex items-center justify-center ${
+                    viewMode === "card"
+                      ? "bg-slate-900 text-white shadow-xs"
+                      : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                  }`}
+                  aria-label="Card View"
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             {/* Responsive Table Wrapper */}
-            <div className="w-full bg-white shadow-sm overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
+            {viewMode === "table" && (
+              <div className="w-full bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-sm overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
               <table className="w-full text-left text-sm border-collapse min-w-[760px]">
                 <thead>
                   <tr className="text-xs font-bold text-gray-800 border-b border-gray-100 uppercase tracking-wider">
@@ -646,7 +686,7 @@ function SearchPageContent() {
                   {isInitialLoading && (
                     <>
                       {[...Array(6)].map((_, idx) => (
-                        <tr key={`skeleton-${idx}`} className="animate-pulse">
+                        <tr key={`skeleton-${idx}`} className="animate-pulse odd:bg-[#f5f5f5] even:bg-white">
                           <td className="py-4 px-4 align-middle">
                             <div className="flex items-center gap-3">
                               <div className="w-24 sm:w-28 h-14 sm:h-16 rounded-[6px] bg-gray-200 shrink-0" />
@@ -777,7 +817,7 @@ function SearchPageContent() {
                         <tr
                           key={pkg._id || pkg.id}
                           onClick={() => router.push(packageUrl)}
-                          className="hover:bg-slate-50/75 cursor-pointer transition-colors group"
+                          className="odd:bg-[#f5f5f5] even:bg-white cursor-pointer transition-colors group"
                         >
                           {/* Package Name & Real Thumbnail */}
                           <td className="py-4 px-4 align-middle max-w-[420px]">
@@ -905,6 +945,89 @@ function SearchPageContent() {
                 </tbody>
               </table>
             </div>
+          )}
+
+          {/* Card Grid View */}
+          {viewMode === "card" && (
+            <div className="w-full">
+              {/* 1. Loading Skeleton */}
+              {isInitialLoading && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+                  {Array.from({ length: 8 }).map((_, idx) => (
+                    <CardSkeleton key={`card-skel-${idx}`} />
+                  ))}
+                </div>
+              )}
+
+              {/* 2. Error State */}
+              {!isLoading && isError && (
+                <div className="bg-white rounded-[6px] border border-gray-200/80 p-12 text-center shadow-sm">
+                  <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
+                    <div className="w-12 h-12 rounded-[6px] bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 text-xl mb-3 shadow-2xs">
+                      <X className="w-6 h-6" />
+                    </div>
+                    <p className="text-slate-800 font-semibold text-sm sm:text-base mb-1">
+                      Failed to load search results
+                    </p>
+                    <p className="text-slate-400 text-xs sm:text-[13px] mb-4">
+                      Unable to retrieve packages at this time. Please try again.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => refetch()}
+                      className="inline-flex items-center gap-2 bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs px-4 py-2 rounded-[6px] font-medium transition-colors cursor-pointer"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      <span>Retry</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 3. Empty State */}
+              {!isLoading && !isError && packagesList.length === 0 && (
+                <div className="bg-white rounded-[6px] border border-gray-200/80 p-12 text-center shadow-sm">
+                  <div className="flex flex-col items-center justify-center max-w-md mx-auto">
+                    <div className="w-12 h-12 rounded-[6px] bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
+                      <Search className="w-6 h-6" />
+                    </div>
+                    <p className="text-slate-900 font-semibold text-sm sm:text-base mb-1">
+                      No services found
+                    </p>
+                    <p className="text-slate-500 text-xs sm:text-[13px] mb-4 text-center leading-relaxed">
+                      {activeQuery
+                        ? `No packages match your search for "${activeQuery}". Try different keywords or select a different category.`
+                        : "No packages available in this selection."}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleResetAll}
+                      className="bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs px-4 py-2 rounded-[6px] font-medium transition-colors cursor-pointer"
+                    >
+                      Reset Filters & View All
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 4. Real Results Card Grid */}
+              {!isLoading && !isError && packagesList.length > 0 && (
+                <div
+                  className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 transition-opacity duration-150 ${
+                    isFetching && !isInitialLoading ? "opacity-60" : "opacity-100"
+                  }`}
+                >
+                  {packagesList.map((pkg: any, idx: number) => (
+                    <PackageCard
+                      key={pkg._id || pkg.id || idx}
+                      data={pkg}
+                      priority={idx < 4}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
             {/* Pagination Controls */}
             {!isLoading && !isError && packagesList.length > 0 && (

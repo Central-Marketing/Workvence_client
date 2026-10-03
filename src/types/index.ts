@@ -8,3 +8,4 @@ export * from './kyc';
 export * from './support';
 export * from './common';
 export * from './review';
+export * from './event';

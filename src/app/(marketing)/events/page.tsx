@@ -2,291 +2,186 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { Breadcrumb } from "@/components";
 import {
-  Calendar,
-  Clock,
-  MapPin,
-  Users,
-  Video,
-  Sparkles,
-  ArrowRight,
-  CheckCircle2,
-  X,
-  Send,
-  Play
-} from "lucide-react";
-import { Button, Breadcrumb } from "@/components";
-import { toast } from "sonner";
-
-interface EventItem {
-  id: string;
-  title: string;
-  date: string;
-  time: string;
-  type: "Webinar" | "Workshop" | "Meetup" | "Recording";
-  speaker: string;
-  speakerRole: string;
-  attendeesCount: number;
-  description: string;
-  isVirtual: boolean;
-}
-
-const events: EventItem[] = [
-  {
-    id: "ev-1",
-    title: "Mastering UI/UX Design Systems in Figma for Marketplace Clients",
-    date: "September 12, 2026",
-    time: "11:00 AM EST (Virtual)",
-    type: "Workshop",
-    speaker: "Elena Rostova",
-    speakerRole: "Top Rated Design Specialist",
-    attendeesCount: 420,
-    description: "Learn how to structure multi-brand design tokens, build reusable Figma component libraries, and pitch high-ticket design packages.",
-    isVirtual: true
-  },
-  {
-    id: "ev-2",
-    title: "AI-Powered Full Stack Development: Accelerating Delivery with Next.js 16",
-    date: "September 18, 2026",
-    time: "2:00 PM EST (Virtual)",
-    type: "Webinar",
-    speaker: "Kenji Sato",
-    speakerRole: "Senior AI & Cloud Engineer",
-    attendeesCount: 680,
-    description: "Deep dive into real-time server actions, vector embeddings, and building reliable freelance client deliverables with modern TypeScript.",
-    isVirtual: true
-  },
-  {
-    id: "ev-3",
-    title: "Workvence Creators Meetup — London Tech Week",
-    date: "October 05, 2026",
-    time: "6:30 PM BST (Shoreditch, London)",
-    type: "Meetup",
-    speaker: "Workvence Community Team",
-    speakerRole: "Global Community Leads",
-    attendeesCount: 150,
-    description: "An evening of drinks, networking, lightning talks, and freelance agency masterclasses in central London.",
-    isVirtual: false
-  },
-  {
-    id: "ev-4",
-    title: "Pricing Strategy Masterclass: How to 3x Your Freelance Rates",
-    date: "August 20, 2026 (Recorded)",
-    time: "60 mins on-demand",
-    type: "Recording",
-    speaker: "Marcus Vance",
-    speakerRole: "Agency Growth Mentor",
-    attendeesCount: 1850,
-    description: "Watch the recorded recording on value-based pricing, handling client objections, and structuring recurring retainers.",
-    isVirtual: true
-  }
-];
+  EventHeroSpotlight,
+  EventFiltersBar,
+  EventCard,
+  EventGridSkeleton,
+} from "@/features/events/components";
+import { eventService } from "@/features/events/services/eventService";
+import { EventTimeline } from "@/types";
+import { Calendar, ChevronLeft, ChevronRight, Sparkles, Inbox } from "lucide-react";
 
 export default function EventsPage() {
-  const [filterType, setFilterType] = useState<string>("All");
-  const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
-  const [rsvpForm, setRsvpForm] = useState({ name: "", email: "" });
+  const [timeline, setTimeline] = useState<EventTimeline>("upcoming");
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const limit = 9;
 
-  const eventTypes = ["All", "Webinar", "Workshop", "Meetup", "Recording"];
+  // 1. Fetch Featured Event for Hero Spotlight
+  const { data: featuredData } = useQuery({
+    queryKey: ["featured-event"],
+    queryFn: () => eventService.getEvents({ featured: true, limit: 1 }),
+    staleTime: 1000 * 60 * 5,
+  });
 
-  const filteredEvents = events.filter(
-    (e) => filterType === "All" || e.type === filterType
-  );
+  const featuredEvent = featuredData?.events?.[0] || null;
 
-  const handleRsvpSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!rsvpForm.name || !rsvpForm.email) {
-      toast.error("Please fill in your name and email.");
-      return;
-    }
-    toast.success(`RSVP confirmed for ${selectedEvent?.title}! Calendar invite sent.`);
-    setSelectedEvent(null);
-    setRsvpForm({ name: "", email: "" });
+  // 2. Fetch Events for Listing Grid
+  const {
+    data: eventsData,
+    isLoading,
+    isFetching,
+    isError,
+  } = useQuery({
+    queryKey: ["events", { timeline, selectedCategory, searchQuery, page, limit }],
+    queryFn: () =>
+      eventService.getEvents({
+        timeline,
+        category: selectedCategory,
+        search: searchQuery,
+        page,
+        limit,
+      }),
+    staleTime: 1000 * 60 * 2,
+  });
+
+  const events = eventsData?.events || [];
+  const total = eventsData?.total || 0;
+  const totalPages = eventsData?.totalPages || 0;
+
+  // Handler for timeline change (resets page)
+  const handleTimelineChange = (newTimeline: EventTimeline) => {
+    setTimeline(newTimeline);
+    setPage(1);
+  };
+
+  // Handler for category change (resets page)
+  const handleCategoryChange = (newCategory: string) => {
+    setSelectedCategory(newCategory);
+    setPage(1);
+  };
+
+  // Handler for search change (resets page)
+  const handleSearchChange = (newSearch: string) => {
+    setSearchQuery(newSearch);
+    setPage(1);
   };
 
   return (
-    <div className="min-h-screen bg-white text-[#112131] font-sans">
-      {/* 1. Hero Banner Card */}
-      <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10">
-        <section
-          aria-label="Workvence Events Banner"
-          className="relative w-full rounded-[6px] py-12 sm:py-14 md:py-16 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/media/Events.png')" }}
-        >
-          {/* Subtle dark overlay for optimal text contrast */}
-          <div className="absolute inset-0 bg-[#011e40]/30 backdrop-blur-[0.5px]" />
-
-          <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center">
-            {/* Breadcrumb Navigation */}
-            <Breadcrumb
-              variant="inverted"
-              className="mb-3 sm:mb-4 select-none [&>ol]:justify-center"
-              items={[
-                {
-                  name: "Events & Workshops",
-                  isLast: true,
-                },
-              ]}
-            />
-
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-[64px] font-normal italic tracking-tight text-[#fff] leading-[1.12] sm:leading-[1.08] select-none">
-              Learn, Connect &amp; Grow <br className="hidden sm:inline" />
-              <span className="text-[#6AD724]">with Industry Masters</span>
-            </h1>
-
-            <p className="mt-3 sm:mt-4 text-xs sm:text-[13px] md:text-sm text-[#fff]/60 max-w-xl leading-relaxed">
-              Join interactive live workshops, seller masterclasses, and local creator meetups designed to level up your craft and business.
-            </p>
-
-            {/* Filter Pills */}
-            <div className="flex flex-wrap items-center justify-center gap-3 pt-4 sm:pt-6">
-              {eventTypes.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setFilterType(t)}
-                  className={`px-5 h-10 inline-flex items-center justify-center rounded-[6px] text-xs sm:text-sm font-semibold transition cursor-pointer ${
-                    filterType === t
-                      ? "bg-[#0D6D5F] text-white shadow-xs"
-                      : "bg-white hover:bg-gray-100 text-[#0f172a] shadow-xs"
-                  }`}
-                >
-                  {t === "All" ? "All Events" : `${t}s`}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-      </div>
-
-      {/* Events Grid */}
-      <section className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-white">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {filteredEvents.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white border border-gray-200/90 rounded-[6px] p-8 hover:border-[#327C73] hover:shadow-md transition-all duration-300 flex flex-col justify-between space-y-6 group"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#10b981]/10 text-[#327C73]">
-                      {item.type}
-                    </span>
-                    <span className="text-xs text-gray-500 flex items-center gap-1">
-                      <Users className="w-3.5 h-3.5" />
-                      {item.attendeesCount} Registered
-                    </span>
-                  </div>
-
-                  <h3 className="text-xl font-bold text-[#0f172a] group-hover:text-[#327C73] transition-colors leading-snug">
-                    {item.title}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
-                    {item.description}
-                  </p>
-
-                  <div className="space-y-1.5 pt-2 border-t border-gray-100 text-xs text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 text-[#327C73]" />
-                      <span className="font-semibold text-gray-800">{item.date}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-3.5 h-3.5 text-gray-400" />
-                      <span>{item.time}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-400">Speaker:</span>
-                      <span className="font-medium text-gray-800">{item.speaker} ({item.speakerRole})</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-gray-100">
-                  <Button
-                    onClick={() => setSelectedEvent(item)}
-                    variant="brand"
-                    size="md"
-                    radius="xl"
-                    fullWidth
-                    leftIcon={item.type === "Recording" ? <Play className="w-3.5 h-3.5" /> : <Calendar className="w-3.5 h-3.5" />}
-                    className="font-semibold shadow-xs"
-                  >
-                    {item.type === "Recording" ? "Watch Recording" : "RSVP for Free"}
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+    <div className="min-h-screen bg-white text-[#171717] font-sans antialiased">
+      <div className="w-full container mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-12 pb-24">
+        {/* Breadcrumb */}
+        <div className="mb-4">
+          <Breadcrumb
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Community", href: "/community" },
+              { label: "Events", isLast: true },
+            ]}
+          />
         </div>
-      </section>
 
-      {/* RSVP Modal */}
-      {selectedEvent && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
-            <Button
-              onClick={() => setSelectedEvent(null)}
-              variant="soft"
-              size="icon"
-              radius="full"
-              className="absolute top-5 right-5 w-8 h-8 text-gray-600 hover:text-black"
-              aria-label="Close modal"
-            >
-              <X className="w-4 h-4" />
-            </Button>
+        {/* Hero Spotlight Section */}
+        <EventHeroSpotlight featuredEvent={featuredEvent} />
 
-            <div className="space-y-2 mb-6">
-              <span className="text-xs font-bold text-[#327C73] uppercase tracking-wider">
-                Event Registration
-              </span>
-              <h3 className="text-xl font-bold text-[#0f172a]">{selectedEvent.title}</h3>
-              <p className="text-xs text-gray-500">
-                {selectedEvent.date} • {selectedEvent.time}
+        {/* Events Directory & Filter Section */}
+        <section className="mt-12 sm:mt-16 md:mt-20 space-y-8">
+          {/* Filter Bar with Tabs, Categories and Search */}
+          <EventFiltersBar
+            timeline={timeline}
+            onTimelineChange={handleTimelineChange}
+            selectedCategory={selectedCategory}
+            onCategoryChange={handleCategoryChange}
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+            totalCount={total}
+          />
+
+          {/* Events Grid or States */}
+          {isLoading ? (
+            <EventGridSkeleton count={6} />
+          ) : isError ? (
+            <div className="rounded-[8px] border border-red-200 bg-red-50/50 p-8 text-center text-red-600 space-y-2">
+              <p className="font-semibold text-sm">Failed to load events.</p>
+              <p className="text-xs text-red-500">
+                Please check your network connection or try refreshing the page.
               </p>
             </div>
-
-            <form onSubmit={handleRsvpSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Your Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={rsvpForm.name}
-                  onChange={(e) => setRsvpForm({ ...rsvpForm, name: e.target.value })}
-                  placeholder="e.g. Jordan Miller"
-                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                />
+          ) : events.length === 0 ? (
+            <div className="rounded-[10px] border border-dashed border-gray-300 bg-[#FBFBFB] p-12 sm:p-16 text-center flex flex-col items-center justify-center space-y-3">
+              <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                <Inbox className="w-6 h-6" />
+              </div>
+              <h3 className="font-sf-pro font-semibold text-lg text-[#112131]">
+                {timeline === "upcoming"
+                  ? "No upcoming events scheduled right now"
+                  : "No past event recordings found"}
+              </h3>
+              <p className="font-inter text-xs sm:text-sm text-[#64748b] max-w-md">
+                {timeline === "upcoming"
+                  ? "We are preparing exciting webinars, workshops, and meetups. In the meantime, explore past sessions and recordings."
+                  : "We couldn't find any recorded events matching your current filters. Try changing categories or search terms."}
+              </p>
+              {timeline === "upcoming" && (
+                <button
+                  type="button"
+                  onClick={() => handleTimelineChange("past")}
+                  className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs font-medium transition-colors shadow-2xs"
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Browse Past Recordings</span>
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {events.map((event) => (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    isPast={timeline === "past"}
+                  />
+                ))}
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Email Address *</label>
-                <input
-                  type="email"
-                  required
-                  value={rsvpForm.email}
-                  onChange={(e) => setRsvpForm({ ...rsvpForm, email: e.target.value })}
-                  placeholder="jordan@example.com"
-                  className="w-full px-3.5 py-2.5 rounded-[6px] border border-gray-300 text-xs focus:border-[#327C73] outline-none"
-                />
-              </div>
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
+                  <button
+                    type="button"
+                    disabled={page <= 1 || isFetching}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] border border-gray-200 text-xs font-medium text-[#112131] hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>Previous</span>
+                  </button>
 
-              <Button
-                type="submit"
-                variant="brand"
-                size="md"
-                radius="xl"
-                fullWidth
-                leftIcon={<Send className="w-4 h-4" />}
-                className="font-semibold shadow-md mt-2"
-              >
-                Confirm RSVP & Add to Calendar
-              </Button>
-            </form>
-          </div>
-        </div>
-      )}
+                  <span className="text-xs text-[#64748b] font-inter">
+                    Page <span className="font-semibold text-[#112131]">{page}</span> of{" "}
+                    <span className="font-semibold text-[#112131]">{totalPages}</span>
+                  </span>
+
+                  <button
+                    type="button"
+                    disabled={page >= totalPages || isFetching}
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] border border-gray-200 text-xs font-medium text-[#112131] hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none transition-colors"
+                  >
+                    <span>Next</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

@@ -1,34 +1,118 @@
 "use client";
 
-import React, { useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import adminAxios from '@/utils/adminAxios';
-import { Loader } from '@/components';
 
-const defaultPrivacyPolicy = `
-<h1>Platform Privacy Policy</h1>
-<p>Welcome to Workvence. We are committed to protecting your personal information and your right to privacy.</p>
-<h2>1. Information We Collect</h2>
-<p>We collect personal information that you voluntarily provide to us when you register on the marketplace, express an interest in obtaining information about us or our products and services, when you participate in activities on the platform, or otherwise when you contact us.</p>
-<ul>
-  <li><strong>Account Credentials:</strong> Passwords, email addresses, and security authentication data.</li>
-  <li><strong>Payment & Escrow Information:</strong> Payout method details, transaction histories, and withdrawal requests.</li>
-  <li><strong>Communication Records:</strong> Dispute resolution messages, support ticket threads, and seller-buyer gig deliverables.</li>
-</ul>
-<h2>2. How We Use Your Information</h2>
-<p>We process your information for purposes based on legitimate business interests, the fulfillment of our contract with you, compliance with our legal obligations, and/or your consent.</p>
-<ol>
-  <li>To facilitate account creation and logon process.</li>
-  <li>To process financial escrow releases and seller payout distributions.</li>
-  <li>To enforce our terms, conditions, and policies for security and moderation purposes.</li>
-</ol>
-<blockquote>Workvence does not sell, rent, or lease customer data to third parties for marketing purposes.</blockquote>
-<h2>3. Data Security & Storage</h2>
-<p>We have implemented appropriate technical and organizational security measures designed to protect the security of any personal information we process.</p>
-`;
+interface ParsedSection {
+  id: string;
+  title: string;
+  contentHtml: string;
+}
+
+const FALLBACK_POLICY_SECTIONS: ParsedSection[] = [
+  {
+    id: "section-1",
+    title: "1. Information We Collect",
+    contentHtml: "<p>We collect information that you provide directly to us, information generated when you use the Platform, and information received from third-party services.</p>",
+  },
+  {
+    id: "section-2",
+    title: "2. Communications and Messages",
+    contentHtml: "<p>When you communicate with other users or Workvence through messages, orders, or support channels, we process the contents of those communications.</p>",
+  },
+  {
+    id: "section-3",
+    title: "3. Payment Information",
+    contentHtml: "<p>We process transaction data, payment method references, escrow records, earnings, and withdrawal information through licensed payment processors.</p>",
+  },
+  {
+    id: "section-4",
+    title: "4. Identity Verification and KYC",
+    contentHtml: "<p>To comply with legal obligations and safeguard marketplace integrity, we verify user identity using official government identification documents.</p>",
+  },
+  {
+    id: "section-5",
+    title: "5. Automatically Collected Information",
+    contentHtml: "<p>When you access or use the Platform, we automatically collect technical details such as IP address, browser type, device information, and activity logs.</p>",
+  },
+  {
+    id: "section-6",
+    title: "6. Cookies and Similar Technologies",
+    contentHtml: "<p>We use essential and functional cookies to ensure platform authentication, session stability, and customized preferences.</p>",
+  },
+  {
+    id: "section-7",
+    title: "7. How We Use Your Information",
+    contentHtml: "<p>We use collected data to deliver marketplace services, execute orders, prevent fraud, fulfill legal requirements, and resolve customer support inquiries.</p>",
+  },
+  {
+    id: "section-8",
+    title: "8. How We Share Information",
+    contentHtml: "<p>We share information with project counterparties, verified payment and infrastructure partners, and regulatory authorities when legally required.</p>",
+  },
+  {
+    id: "section-9",
+    title: "9. Data Security",
+    contentHtml: "<p>We implement industry-standard TLS encryption in transit, AES encryption at rest, and strict role-based access controls to safeguard your data.</p>",
+  },
+  {
+    id: "section-10",
+    title: "10. Contact Us",
+    contentHtml: "<p>If you have questions or requests regarding this Privacy Policy or your personal information, contact us at privacy@workvence.com.</p>",
+  },
+];
+
+function decodeHtmlEntities(str: string): string {
+  return str
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+}
+
+function parsePrivacyPolicyHtml(rawHtml: string): { preamble: string; sections: ParsedSection[] } {
+  if (!rawHtml || !rawHtml.trim()) {
+    return { preamble: '', sections: [] };
+  }
+
+  const parts = rawHtml.split(/(?=<h2[\s>])/i);
+  const sections: ParsedSection[] = [];
+  let preamble = '';
+  let startIndex = 0;
+
+  if (parts.length > 0 && !parts[0].trim().toLowerCase().startsWith('<h2')) {
+    preamble = parts[0]
+      .replace(/<h1[\s\S]*?<\/h1>/gi, '')
+      .replace(/<p>\s*<strong>\s*Last\s*Updated[\s\S]*?<\/p>/gi, '')
+      .trim();
+    startIndex = 1;
+  }
+
+  for (let i = startIndex; i < parts.length; i++) {
+    const part = parts[i];
+    const h2Match = part.match(/<h2[^>]*>([\s\S]*?)<\/h2>/i);
+    if (!h2Match) continue;
+
+    const rawTitle = h2Match[1];
+    const cleanTitle = decodeHtmlEntities(rawTitle.replace(/<[^>]+>/g, '')).trim();
+    const contentHtml = part.substring(h2Match[0].length).trim();
+    const id = `section-${sections.length + 1}`;
+
+    sections.push({
+      id,
+      title: cleanTitle,
+      contentHtml,
+    });
+  }
+
+  return { preamble, sections };
+}
 
 const PrivacyPolicy = () => {
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ['privacy-policy'],
     queryFn: async () => {
       try {
@@ -53,21 +137,71 @@ const PrivacyPolicy = () => {
     }
   });
 
+  const { preamble, sections } = useMemo(() => {
+    if (data?.content) {
+      const parsed = parsePrivacyPolicyHtml(data.content);
+      if (parsed.sections.length > 0) {
+        return parsed;
+      }
+    }
+    return { preamble: '', sections: FALLBACK_POLICY_SECTIONS };
+  }, [data?.content]);
+
+  const [activeSectionId, setActiveSectionId] = useState<string>(
+    sections[0]?.id || 'section-1'
+  );
+
   const formattedDate = useMemo(() => {
-    if (!data?.updatedAt) return 'July 2026';
+    if (!data?.updatedAt) return 'September 2026';
     try {
       return new Date(data.updatedAt).toLocaleDateString('en-US', {
         month: 'long',
         year: 'numeric',
       });
     } catch {
-      return 'July 2026';
+      return 'September 2026';
     }
   }, [data]);
 
-  const displayContent = (data?.content && data.content.trim().length > 0)
-    ? data.content
-    : defaultPrivacyPolicy;
+  // Scroll spy to highlight active section in TOC
+  useEffect(() => {
+    if (sections.length === 0) return;
+
+    if (!sections.some((s) => s.id === activeSectionId)) {
+      setActiveSectionId(sections[0].id);
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (visible.length > 0) {
+          const sorted = visible.sort(
+            (a, b) => a.boundingClientRect.top - b.boundingClientRect.top
+          );
+          setActiveSectionId(sorted[0].target.id);
+        }
+      },
+      {
+        rootMargin: "-90px 0px -60% 0px",
+        threshold: [0, 0.1, 0.3],
+      }
+    );
+
+    sections.forEach((section) => {
+      const el = document.getElementById(section.id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [sections, activeSectionId]);
+
+  const handleScrollTo = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setActiveSectionId(id);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white text-[#171717] font-sans antialiased">
@@ -101,19 +235,68 @@ const PrivacyPolicy = () => {
           />
         </div>
 
-        {/* 3. Real Dynamic Rich Text Policy Content */}
-        <div className="mt-8 sm:mt-10 md:mt-12 pb-[80px] min-[1400px]:pb-[100px]">
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-16 space-y-3">
-              <Loader size={40} />
-              <span className="font-inter text-xs sm:text-sm font-semibold text-gray-400">Loading Privacy Policy...</span>
-            </div>
-          ) : (
+        {/* 3. Main Policy Section with Sticky TOC + Content Grid */}
+        <div className="mt-10 sm:mt-12 md:mt-16 pb-[80px] min-[1400px]:pb-[100px]">
+          {/* Optional Intro / Preamble from Backend */}
+          {preamble && (
             <div
-              className="quill-content-display font-inter text-sm sm:text-base text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: displayContent }}
+              className="mb-8 sm:mb-12 font-inter text-[14px] text-[#475569] leading-relaxed max-w-4xl space-y-2.5 [&_p]:mb-3 [&_strong]:font-semibold [&_strong]:text-[#112131]"
+              dangerouslySetInnerHTML={{ __html: preamble }}
             />
           )}
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 xl:gap-20 items-start">
+            {/* Left Column: Sticky Section Navigation */}
+            <aside className="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-[90px] lg:self-start">
+              <nav className="flex flex-col space-y-3.5 sm:space-y-4 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-none py-0 pt-0.5">
+                {sections.map((section) => {
+                  const isActive = activeSectionId === section.id;
+                  return (
+                    <button
+                      key={section.id}
+                      type="button"
+                      onClick={() => handleScrollTo(section.id)}
+                      className={`text-left text-[13px] sm:text-[13.5px] leading-snug transition-colors ${isActive
+                        ? "text-[#112131] font-medium"
+                        : "text-[#64748b] hover:text-[#112131] font-normal"
+                        }`}
+                    >
+                      {section.title}
+                    </button>
+                  );
+                })}
+              </nav>
+            </aside>
+
+            {/* Right Column: Sections Content */}
+            <main className="lg:col-span-8 xl:col-span-9 flex flex-col">
+              {sections.map((section, idx) => (
+                <article
+                  key={section.id}
+                  id={section.id}
+                  className={`scroll-mt-24 ${idx === 0
+                    ? "pt-0 border-t-0"
+                    : "pt-8 sm:pt-10 border-t border-gray-200 mt-8 sm:mt-10"
+                    }`}
+                >
+                  <h2 className="text-xl sm:text-2xl font-semibold text-[#112131] tracking-tight mb-4 font-sf-pro mt-0">
+                    {section.title}
+                  </h2>
+
+                  <div
+                    className="font-inter text-[14px] text-[#475569] leading-relaxed
+                      [&_p]:mb-3.5 [&_p]:leading-relaxed
+                      [&_h3]:text-[16px] [&_h3]:font-semibold [&_h3]:text-[#112131] [&_h3]:mt-6 [&_h3]:mb-2.5 [&_h3]:font-sf-pro
+                      [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-2 [&_ul]:mb-4 [&_ul]:marker:text-slate-400
+                      [&_li]:pl-1
+                      [&_strong]:font-semibold [&_strong]:text-[#112131]
+                      [&_a]:text-[#0D6D5F] [&_a]:underline hover:[&_a]:text-[#0b5c50]"
+                    dangerouslySetInnerHTML={{ __html: section.contentHtml }}
+                  />
+                </article>
+              ))}
+            </main>
+          </div>
         </div>
       </div>
     </div>
@@ -121,3 +304,4 @@ const PrivacyPolicy = () => {
 };
 
 export default PrivacyPolicy;
+

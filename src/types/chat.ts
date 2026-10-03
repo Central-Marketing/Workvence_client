@@ -77,6 +77,7 @@ export interface Conversation {
   lastMessage?: string;
   readBySeller: boolean;
   readByBuyer: boolean;
+  tags?: string[];
   updatedAt: string;
   createdAt: string;
 }

@@ -111,3 +111,59 @@ export const renderMessageTextWithLinks = (text: string) => {
 
 export { formatFileSize } from '@/lib/formatters';
 
+export const PRESET_TAGS = ['Urgent', 'Lead', 'VIP', 'Follow Up', 'In Review'];
+
+export const sanitizeTags = (rawTags: string[]): string[] => {
+  if (!Array.isArray(rawTags)) return [];
+  const seen = new Set<string>();
+  const sanitized: string[] = [];
+
+  for (const raw of rawTags) {
+    if (typeof raw !== 'string') continue;
+    const trimmed = raw.trim();
+    if (!trimmed) continue;
+    const truncated = trimmed.slice(0, 50);
+    const lowerKey = truncated.toLowerCase();
+    if (!seen.has(lowerKey)) {
+      seen.add(lowerKey);
+      sanitized.push(truncated);
+      if (sanitized.length >= 20) break;
+    }
+  }
+
+  return sanitized;
+};
+
+export const getTagColor = (tagName: string) => {
+  const lower = (tagName || '').toLowerCase();
+  if (lower.includes('urgent') || lower.includes('priority')) {
+    return 'bg-white text-rose-700 border-[rgba(0,0,0,0.10)]';
+  }
+  if (lower.includes('vip') || lower.includes('star')) {
+    return 'bg-white text-purple-700 border-[rgba(0,0,0,0.10)]';
+  }
+  if (lower.includes('lead') || lower.includes('client') || lower.includes('deal')) {
+    return 'bg-white text-emerald-800 border-[rgba(0,0,0,0.10)]';
+  }
+  if (lower.includes('follow') || lower.includes('pending')) {
+    return 'bg-white text-sky-800 border-[rgba(0,0,0,0.10)]';
+  }
+  if (lower.includes('review') || lower.includes('wait') || lower.includes('hold')) {
+    return 'bg-white text-amber-800 border-[rgba(0,0,0,0.10)]';
+  }
+  return 'bg-white text-slate-700 border-[rgba(0,0,0,0.10)]';
+};
+
+export const updateConversationTagsApi = async (conversationId: string, tags: string[]) => {
+  if (!conversationId) throw new Error('Missing conversation ID');
+  const sanitized = sanitizeTags(tags);
+
+  try {
+    const res = await axiosFetch.patch(`/chat/conversations/${conversationId}/tags`, { tags: sanitized });
+    return res.data;
+  } catch (err: any) {
+    // Fallback to /conversations/:id/tags if /chat/ prefix rewrite differs
+    const res = await axiosFetch.patch(`/conversations/${conversationId}/tags`, { tags: sanitized });
+    return res.data;
+  }
+};

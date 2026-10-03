@@ -1,7 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft, Flag, ArrowRight, Download, Eye, Home, Check } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -38,6 +38,8 @@ import { useUserStore } from "@/store/userStore";
 import { Loader, ChatSkeleton, Skeleton, AiGradientButton, Button } from "@/components";
 import { CustomSelect, CustomSelectOption, Tag } from "@/components/ui";
 import { MessageModerationBadge } from "@/features/chat";
+import { ConversationTagBadge, ConversationTagsManager } from "../ConversationTags";
+import { FiTag, FiX, FiCheck } from "react-icons/fi";
 import { formatFileSize } from "@/lib";
 import moment from 'moment';
 // Helper to reliably extract file extension from URL, item metadata, or MIME type
@@ -382,6 +384,10 @@ const ChatView = () => {
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
   const [convSearchQuery, setConvSearchQuery] = useState("");
   const [convFilterTab, setConvFilterTab] = useState<'all' | 'read' | 'unread'>('all');
+  const [isTagPopoverOpen, setIsTagPopoverOpen] = useState(false);
+  const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
+  const [isTagFilterMenuOpen, setIsTagFilterMenuOpen] = useState(false);
+  const tagFilterDropdownRef = useRef<HTMLDivElement>(null);
   const [msgSearchQuery, setMsgSearchQuery] = useState("");
   const [isMsgSearchActive, setIsMsgSearchActive] = useState(false);
   const [isLeftSideOpen, setIsLeftSideOpen] = useState(false);
@@ -405,7 +411,23 @@ const ChatView = () => {
   const recipientTypingTimerRef = useRef<any>(null);
 
   useEffect(() => { userRef.current = user; }, [user]);
-  useEffect(() => { convIdRef.current = conversationID; }, [conversationID]);
+  useEffect(() => {
+    convIdRef.current = conversationID;
+    setIsTagPopoverOpen(false);
+    setIsTagFilterMenuOpen(false);
+  }, [conversationID]);
+
+  // Click outside to close tag filter menu
+  useEffect(() => {
+    if (!isTagFilterMenuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (tagFilterDropdownRef.current && !tagFilterDropdownRef.current.contains(e.target as Node)) {
+        setIsTagFilterMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isTagFilterMenuOpen]);
 
   // Ensure user session is hydrated immediately even when Navbar is not rendered
   useEffect(() => {
@@ -498,7 +520,12 @@ const ChatView = () => {
   // Fetch all conversations
   const { isLoading: convsLoading, data: conversations = [] } = useQuery({
     queryKey: ['conversations'],
-    queryFn: () => axiosFetch.get('/conversations').then(({ data }) => Array.isArray(data) ? data : (data?.conversations || data?.data || [])).catch(() => [])
+    queryFn: () =>
+      axiosFetch
+        .get('/conversations')
+        .then(({ data }) => (Array.isArray(data) ? data : data?.conversations || data?.data || []))
+        .catch(() => []),
+    staleTime: 15000,
   });
 
   // Auto-navigate to first conversation if none selected or invalid ID
@@ -1486,10 +1513,28 @@ const ChatView = () => {
     return isReadByRecipient;
   };
 
+  const allAvailableTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    conversations.forEach((conv: any) => {
+      if (Array.isArray(conv.tags)) {
+        conv.tags.forEach((t: string) => {
+          if (t && typeof t === 'string' && t.trim()) tagSet.add(t.trim());
+        });
+      }
+    });
+    return Array.from(tagSet);
+  }, [conversations]);
+
   const filteredConversations = conversations.filter((conv: any) => {
     const isUnread = isConversationUnread(conv, user);
     if (convFilterTab === 'read' && isUnread) return false;
     if (convFilterTab === 'unread' && !isUnread) return false;
+
+    if (selectedTagFilter) {
+      const convTags = Array.isArray(conv.tags) ? conv.tags : [];
+      const matches = convTags.some((t: string) => t.toLowerCase() === selectedTagFilter.toLowerCase());
+      if (!matches) return false;
+    }
 
     if (!convSearchQuery) return true;
     const contact = getOtherUser(conv, user);
@@ -1745,14 +1790,17 @@ const ChatView = () => {
                 </div>
 
                 {/* Filter Pills */}
-                <div className="flex items-center gap-2 pt-0.5">
+                <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
                   <Button
                     type="button"
-                    variant={convFilterTab === 'all' ? 'pill-tab' : 'ghost'}
+                    variant={convFilterTab === 'all' && !selectedTagFilter ? 'pill-tab' : 'ghost'}
                     size="xs"
                     radius="full"
-                    onClick={() => setConvFilterTab('all')}
-                    className={`px-4 py-1.5 text-xs font-medium border transition-colors ${convFilterTab === 'all'
+                    onClick={() => {
+                      setConvFilterTab('all');
+                      setSelectedTagFilter(null);
+                    }}
+                    className={`px-3 py-1 text-xs font-medium border transition-colors ${convFilterTab === 'all' && !selectedTagFilter
                       ? '!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold'
                       : '!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50'
                       }`}
@@ -1766,13 +1814,74 @@ const ChatView = () => {
                     size="xs"
                     radius="full"
                     onClick={() => setConvFilterTab('unread')}
-                    className={`px-3.5 py-1.5 text-xs font-medium border transition-colors ${convFilterTab === 'unread'
+                    className={`px-3 py-1 text-xs font-medium border transition-colors ${convFilterTab === 'unread'
                       ? '!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold'
                       : '!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50'
                       }`}
                   >
                     Unread
                   </Button>
+
+                  {/* Tag Filter Dropdown */}
+                  {allAvailableTags.length > 0 && (
+                    <div ref={tagFilterDropdownRef} className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setIsTagFilterMenuOpen(!isTagFilterMenuOpen)}
+                        className={`px-2.5 py-1 text-xs font-medium border rounded-full transition-colors flex items-center gap-1 ${selectedTagFilter
+                          ? '!border-[rgba(0,0,0,0.10)] !text-teal-800 !bg-white font-semibold shadow-2xs'
+                          : '!border-slate-200 text-slate-600 '
+                          }`}
+                      >
+                        <FiTag className="w-3 h-3 text-teal-700" />
+                        <span className="truncate max-w-[80px]">{selectedTagFilter || "Tags"}</span>
+                        <RiArrowDownSLine className="w-3 h-3 text-slate-400" />
+                      </button>
+
+                      {isTagFilterMenuOpen && (
+                        <div
+                          className="absolute left-0 top-full mt-1.5 w-44 bg-white border border-slate-200 rounded-[8px] shadow-lg py-1.5 z-50 animate-in fade-in"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div className="px-3 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                            Filter by private tag
+                          </div>
+                          {selectedTagFilter && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedTagFilter(null);
+                                setIsTagFilterMenuOpen(false);
+                              }}
+                              className="w-full text-left px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50 flex items-center justify-between"
+                            >
+                              <span>Clear tag filter</span>
+                              <FiX className="w-3 h-3" />
+                            </button>
+                          )}
+                          {allAvailableTags.map((tagName: string) => (
+                            <button
+                              key={tagName}
+                              type="button"
+                              onClick={() => {
+                                setSelectedTagFilter(tagName);
+                                setIsTagFilterMenuOpen(false);
+                              }}
+                              className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 ${selectedTagFilter?.toLowerCase() === tagName.toLowerCase()
+                                ? "font-semibold text-teal-800 bg-teal-50/50"
+                                : "text-slate-700"
+                                }`}
+                            >
+                              <span className="truncate">{tagName}</span>
+                              {selectedTagFilter?.toLowerCase() === tagName.toLowerCase() && (
+                                <FiCheck className="w-3 h-3 text-teal-700 shrink-0 ml-1" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1840,6 +1949,19 @@ const ChatView = () => {
                           <p className="text-xs text-slate-500 truncate leading-snug">
                             {lastMsg}
                           </p>
+                          {/* Private Tags Badges on Conversation Card */}
+                          {Array.isArray(conv.tags) && conv.tags.length > 0 && (
+                            <div className="flex items-center gap-1 mt-1 overflow-hidden flex-wrap">
+                              {conv.tags.slice(0, 2).map((t: string) => (
+                                <ConversationTagBadge key={t} tag={t} size="xs" />
+                              ))}
+                              {conv.tags.length > 2 && (
+                                <span className="text-[10px] text-slate-400 font-medium leading-none">
+                                  +{conv.tags.length - 2}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -1989,6 +2111,20 @@ const ChatView = () => {
                             'Offline'
                           )}
                         </span>
+
+                        {/* Active Conversation Private Tags Display */}
+                        {Array.isArray(activeConversation?.tags) && activeConversation.tags.length > 0 && (
+                          <div className="flex items-center gap-1 mt-1 flex-wrap">
+                            {activeConversation.tags.slice(0, 3).map((t: string) => (
+                              <ConversationTagBadge key={t} tag={t} size="xs" />
+                            ))}
+                            {activeConversation.tags.length > 3 && (
+                              <span className="text-[10px] text-slate-400 font-medium">
+                                +{activeConversation.tags.length - 3}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -2052,6 +2188,31 @@ const ChatView = () => {
                           </svg>
                         }
                       />
+
+                      {/* Private Conversation Tags Button & Popover */}
+                      <div className="relative hidden sm:block">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          radius="lg"
+                          className={`w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] sm:rounded-[6px] transition-colors shrink-0 ${isTagPopoverOpen || (activeConversation?.tags && activeConversation.tags.length > 0)
+                            ? "!bg-white border !border-[rgba(0,0,0,0.10)] text-teal-800"
+                            : "hover:bg-slate-100 text-slate-600"
+                            }`}
+                          onClick={() => setIsTagPopoverOpen(!isTagPopoverOpen)}
+                          title="Private Tags"
+                          aria-label="Private Tags"
+                          icon={<FiTag className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />}
+                        />
+                        <ConversationTagsManager
+                          conversationId={String(activeConversation?.uuid || activeConversation?.conversationID || activeConversation?._id || conversationID)}
+                          tags={activeConversation?.tags || []}
+                          mode="popover"
+                          isOpen={isTagPopoverOpen}
+                          onClose={() => setIsTagPopoverOpen(false)}
+                        />
+                      </div>
 
                       {/* Search */}
                       {isMsgSearchActive ? (
@@ -2864,8 +3025,8 @@ const ChatView = () => {
               normalized === 'inprogress' || normalized === 'active'
                 ? 'in_progress'
                 : normalized === 'revision' || normalized === 'inrevision'
-                ? 'in_revision'
-                : rawStatus || 'in_progress';
+                  ? 'in_revision'
+                  : rawStatus || 'in_progress';
 
             return (
               <Tag
@@ -2992,6 +3153,13 @@ const ChatView = () => {
                         Start Video Meeting
                       </Button>
                     </div>
+
+                    {/* ── Private Tags Card ── */}
+                    <ConversationTagsManager
+                      conversationId={String(activeConversation?.uuid || activeConversation?.conversationID || activeConversation?._id || conversationID)}
+                      tags={activeConversation?.tags || []}
+                      mode="card"
+                    />
 
                     {/* ── Card 1: About Contact ── */}
                     <div className="bg-white rounded-[6px] p-5 border border-slate-200/80 shadow-xs flex flex-col gap-3 relative">

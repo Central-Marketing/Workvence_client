@@ -16,6 +16,278 @@ interface SellerDashboardProps {
   onSwitchToBuyer?: () => void;
 }
 
+interface RecentOrdersCardProps {
+  orders: any[];
+  orderTypeFilter: "all" | "package" | "brief";
+  setOrderTypeFilter: (filter: "all" | "package" | "brief") => void;
+  router: any;
+}
+
+const RecentOrdersCard: React.FC<RecentOrdersCardProps> = ({
+  orders,
+  orderTypeFilter,
+  setOrderTypeFilter,
+  router,
+}) => {
+  return (
+    <div className="bg-[#F5F5F5] rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-7 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 className="text-xl sm:text-[22px] font-bold text-gray-900 tracking-tight">
+          Recent Orders
+        </h2>
+
+        <div className="flex items-center gap-3 self-start sm:self-auto flex-wrap">
+          <div className="inline-flex items-center h-[46px] bg-[#fff] p-[4px] rounded-[6px] border border-gray-200/50">
+            <Button
+              type="button"
+              onClick={() => setOrderTypeFilter("all")}
+              variant={orderTypeFilter === "all" ? "brand" : "ghost"}
+              size="sm"
+              radius="fiverr"
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${
+                orderTypeFilter === "all"
+                  ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                  : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+              }`}
+            >
+              All
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setOrderTypeFilter("package")}
+              variant={orderTypeFilter === "package" ? "brand" : "ghost"}
+              size="sm"
+              radius="fiverr"
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${
+                orderTypeFilter === "package"
+                  ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                  : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+              }`}
+            >
+              Packages
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setOrderTypeFilter("brief")}
+              variant={orderTypeFilter === "brief" ? "brand" : "ghost"}
+              size="sm"
+              radius="fiverr"
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${
+                orderTypeFilter === "brief"
+                  ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                  : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+              }`}
+            >
+              Briefs
+            </Button>
+          </div>
+
+          <Link
+            href="/manage-orders"
+            className="text-xs sm:text-sm font-semibold text-[#113E37] hover:underline flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
+          >
+            Manage all orders <FiArrowRight className="text-xs" />
+          </Link>
+        </div>
+      </div>
+
+      <hr className="border-[rgba(0, 0, 0, 0.10)] my-10" />
+
+      {/* Orders Table */}
+      <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)]">
+        <table className="w-full text-left text-sm border-collapse min-w-[700px]">
+          <thead>
+            <tr className="border-b border-slate-100 text-base font-sf-pro font-bold text-[#434343]">
+              <th className="py-3 px-4">Order Name</th>
+              <th className="py-3 px-4 whitespace-nowrap">Order Date</th>
+              <th className="py-3 px-4 whitespace-nowrap">Due on</th>
+              <th className="py-3 px-4 whitespace-nowrap">Total</th>
+              <th className="py-3 px-4 whitespace-nowrap">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {orders.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="py-12 text-center text-gray-400 text-xs sm:text-sm">
+                  No orders found in this view.
+                </td>
+              </tr>
+            ) : (
+              orders.slice(0, 5).map((order: any, idx: number) => {
+                const isBrief = Boolean(order.briefID || order.type === "brief");
+                const orderDate = order.createdAt
+                  ? new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                  : "-";
+                let dueDate = "-";
+                let deadlineTime: number | null = null;
+                if (order.deadline) {
+                  const d = new Date(order.deadline);
+                  if (!isNaN(d.getTime())) {
+                    dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                    deadlineTime = d.getTime();
+                  }
+                } else if (order.createdAt && order.deliveryTime) {
+                  const d = new Date(order.createdAt);
+                  if (!isNaN(d.getTime())) {
+                    d.setDate(d.getDate() + Number(order.deliveryTime));
+                    dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                    deadlineTime = d.getTime();
+                  }
+                }
+
+                // Determine status pill badge style
+                const isCompleted = order.status === "completed" || order.isCompleted === true;
+                const st = (order.status || "inprogress").toLowerCase();
+                const isDisputed = st === "disputed" || st === "escalated_to_dispute";
+                const isCancelled = st === "failed" || st === "cancelled";
+                const isDelivered = st === "delivered";
+                const isRevision = st === "revision" || st === "in_revision";
+                const isLate =
+                  !isCompleted &&
+                  !isCancelled &&
+                  !isDelivered &&
+                  !isRevision &&
+                  !isDisputed &&
+                  Boolean(deadlineTime && deadlineTime < Date.now());
+
+                let statusBadge = {
+                  label: "Inprogress",
+                  style: "bg-[#E6E9F2] text-[#0284C7]",
+                };
+
+                if (isCompleted) {
+                  statusBadge = {
+                    label: "Completed",
+                    style: "bg-[#D1FAE5] text-[#059669]",
+                  };
+                } else if (isDisputed) {
+                  statusBadge = {
+                    label: "Disputed",
+                    style: "bg-[#FEF3C7] text-[#B45309]",
+                  };
+                } else if (isDelivered) {
+                  statusBadge = {
+                    label: "Delivered",
+                    style: "bg-[#D1FAE5] text-[#059669]",
+                  };
+                } else if (isRevision) {
+                  statusBadge = {
+                    label: "In Revision",
+                    style: "bg-[#F3E8FF] text-[#9333EA]",
+                  };
+                } else if (isLate || st === "late") {
+                  statusBadge = {
+                    label: "Late",
+                    style: "bg-[#FEE2E2] text-[#DC2626]",
+                  };
+                } else if (isCancelled) {
+                  statusBadge = {
+                    label: "Cancelled",
+                    style: "bg-[#FEE2E2] text-[#EF4444]",
+                  };
+                } else if (st === "pending") {
+                  statusBadge = {
+                    label: "Pending",
+                    style: "bg-[#FEF3C7] text-[#D97706]",
+                  };
+                }
+
+                return (
+                  <tr
+                    key={order._id}
+                    onClick={() => {
+                      router.push(`/orders/${order._id}`);
+                    }}
+                    className={`group relative cursor-pointer transition-colors ${
+                      idx % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
+                    } after:pointer-events-none after:absolute after:inset-0`}
+                  >
+                    <td className="py-4 px-3 align-middle">
+                      <div className="flex items-center gap-3.5">
+                        <div className="relative w-24 sm:w-36 md:w-[180px] lg:w-[220px] aspect-[11/6] rounded-[6px] overflow-hidden bg-gray-100 border border-gray-200/80 shrink-0">
+                          <Image
+                            src={
+                              order.image ||
+                              order.cover ||
+                              order.packageID?.cover ||
+                              order.packageID?.image ||
+                              order.packageID?.images?.[0] ||
+                              "/images/dashboard/orders/order_1.jpg"
+                            }
+                            alt={order.title || "Order deliverable"}
+                            fill
+                            sizes="(max-width: 640px) 96px, (max-width: 1024px) 180px, 220px"
+                            className="object-cover"
+                            unoptimized
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1 min-w-0">
+                          <span className="text-[14px] font-[700] font-sf-pro text-[#434343] line-clamp-1 group-hover:text-[#0D3B34] transition-colors">
+                            {order.title || "Custom Deliverable"}
+                          </span>
+                          <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-[6px] bg-[#FAFAFA] text-[#292929] border border-[#C7C7C7] w-fit">
+                            {isBrief ? "Brief" : "Package"}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
+                      {orderDate}
+                    </td>
+
+                    <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
+                      {dueDate}
+                    </td>
+
+                    <td className="py-4 px-4 align-middle text-xs sm:text-[13.5px] font-bold text-gray-950 whitespace-nowrap">
+                      {(order.price || 0).toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      })}
+                    </td>
+
+                    <td className="py-4 px-4 align-middle whitespace-nowrap">
+                      <Tag
+                        variant={
+                          isDisputed
+                            ? "disputed"
+                            : isRevision
+                            ? "in_revision"
+                            : isLate || st === "late"
+                            ? "late"
+                            : st || statusBadge.label
+                        }
+                        size="sm"
+                      >
+                        {statusBadge.label}
+                      </Tag>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* See more orders button */}
+      <div className="flex justify-center mt-6 pt-2">
+        <Button
+          href="/manage-orders"
+          variant="outline"
+          size="sm"
+          radius="fiverr"
+          className="font-medium text-xs sm:text-sm px-6 py-2.5 border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center gap-2 cursor-pointer shadow-2xs"
+        >
+          <span>See more orders</span>
+          <FiArrowRight className="w-4 h-4 text-slate-500" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
   const router = useRouter();
   const [orderTypeFilter, setOrderTypeFilter] = useState<"all" | "package" | "brief">("all");
@@ -118,11 +390,13 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
     return true;
   });
 
+  const hasOrders = sellerOrders.length > 0;
+  const ordersToDisplay = sortOrdersByPriority(filteredOrders);
+
   // -------------------------------------------------------------
   // 1. ACTIVE SELLER DASHBOARD (Profile complete 100% & packages > 0)
   // -------------------------------------------------------------
   if (showActiveDashboard) {
-    const ordersToDisplay = sortOrdersByPriority(filteredOrders);
 
     const displayRevenue = totalFinancialAmount;
     const displayActiveOrders = pendingOrders.length;
@@ -312,242 +586,12 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           </div>
 
           {/* Recent Orders Card */}
-          <div className="bg-[#F5F5F5] rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-7 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <h2 className="text-xl sm:text-[22px] font-bold text-gray-900 tracking-tight">
-                Recent Orders
-              </h2>
-
-              <div className="flex items-center gap-3 self-start sm:self-auto flex-wrap">
-
-
-                <div className="inline-flex items-center h-[46px] bg-[#fff] p-[4px] rounded-[6px] border border-gray-200/50">
-                  <Button
-                    type="button"
-                    onClick={() => setOrderTypeFilter("all")}
-                    variant={orderTypeFilter === "all" ? "brand" : "ghost"}
-                    size="sm"
-                    radius="fiverr"
-                    className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${orderTypeFilter === "all"
-                      ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                      : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
-                      }`}
-                  >
-                    All
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => setOrderTypeFilter("package")}
-                    variant={orderTypeFilter === "package" ? "brand" : "ghost"}
-                    size="sm"
-                    radius="fiverr"
-                    className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${orderTypeFilter === "package"
-                      ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                      : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
-                      }`}
-                  >
-                    Packages
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => setOrderTypeFilter("brief")}
-                    variant={orderTypeFilter === "brief" ? "brand" : "ghost"}
-                    size="sm"
-                    radius="fiverr"
-                    className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${orderTypeFilter === "brief"
-                      ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                      : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
-                      }`}
-                  >
-                    Briefs
-                  </Button>
-                </div>
-
-                <Link
-                  href="/manage-orders"
-                  className="text-xs sm:text-sm font-semibold text-[#113E37] hover:underline flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
-                >
-                  Manage all orders <FiArrowRight className="text-xs" />
-                </Link>
-              </div>
-            </div>
-
-            <hr className="border-[rgba(0, 0, 0, 0.10)] my-10" />
-
-            {/* Orders Table */}
-            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] ">
-              <table className="w-full text-left text-sm border-collapse min-w-[700px] ">
-                <thead className="">
-                  <tr className="border-b border-slate-100 text-base  font-sf-pro font-bold text-[#434343]">
-                    <th className="py-3 px-4 ">Order Name</th>
-                    <th className="py-3 px-4  whitespace-nowrap">Order Date</th>
-                    <th className="py-3 px-4  whitespace-nowrap">Due on</th>
-                    <th className="py-3 px-4  whitespace-nowrap">Total</th>
-                    <th className="py-3 px-4  whitespace-nowrap">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {ordersToDisplay.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="py-12 text-center text-gray-400 text-xs sm:text-sm">
-                        No orders found in this view.
-                      </td>
-                    </tr>
-                  ) : (
-                    ordersToDisplay.slice(0, 5).map((order: any, idx: number) => {
-                      const isBrief = Boolean(order.briefID || order.type === "brief");
-                      const orderDate = order.createdAt
-                        ? new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                        : "-";
-                      let dueDate = "-";
-                      let deadlineTime: number | null = null;
-                      if (order.deadline) {
-                        const d = new Date(order.deadline);
-                        if (!isNaN(d.getTime())) {
-                          dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-                          deadlineTime = d.getTime();
-                        }
-                      } else if (order.createdAt && order.deliveryTime) {
-                        const d = new Date(order.createdAt);
-                        if (!isNaN(d.getTime())) {
-                          d.setDate(d.getDate() + Number(order.deliveryTime));
-                          dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-                          deadlineTime = d.getTime();
-                        }
-                      }
-
-                      // Determine status pill badge style
-                      const isCompleted = order.status === "completed" || order.isCompleted === true;
-                      const st = (order.status || "inprogress").toLowerCase();
-                      const isDisputed = st === "disputed" || st === "escalated_to_dispute";
-                      const isCancelled = st === "failed" || st === "cancelled";
-                      const isDelivered = st === "delivered";
-                      const isRevision = st === "revision" || st === "in_revision";
-                      const isLate = !isCompleted && !isCancelled && !isDelivered && !isRevision && !isDisputed && Boolean(deadlineTime && deadlineTime < Date.now());
-
-                      let statusBadge = {
-                        label: "Inprogress",
-                        style: "bg-[#E6E9F2] text-[#0284C7]",
-                      };
-
-                      if (isCompleted) {
-                        statusBadge = {
-                          label: "Completed",
-                          style: "bg-[#D1FAE5] text-[#059669]",
-                        };
-                      } else if (isDisputed) {
-                        statusBadge = {
-                          label: "Disputed",
-                          style: "bg-[#FEF3C7] text-[#B45309]",
-                        };
-                      } else if (isDelivered) {
-                        statusBadge = {
-                          label: "Delivered",
-                          style: "bg-[#D1FAE5] text-[#059669]",
-                        };
-                      } else if (isRevision) {
-                        statusBadge = {
-                          label: "In Revision",
-                          style: "bg-[#F3E8FF] text-[#9333EA]",
-                        };
-                      } else if (isLate || st === "late") {
-                        statusBadge = {
-                          label: "Late",
-                          style: "bg-[#FEE2E2] text-[#DC2626]",
-                        };
-                      } else if (isCancelled) {
-                        statusBadge = {
-                          label: "Cancelled",
-                          style: "bg-[#FEE2E2] text-[#EF4444]",
-                        };
-                      } else if (st === "pending") {
-                        statusBadge = {
-                          label: "Pending",
-                          style: "bg-[#FEF3C7] text-[#D97706]",
-                        };
-                      }
-
-                      return (
-                        <tr
-                          key={order._id}
-                          onClick={() => {
-                            router.push(`/orders/${order._id}`);
-                          }}
-                          className={`group relative cursor-pointer transition-colors ${idx % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
-                            } after:pointer-events-none after:absolute after:inset-0`}
-                        >
-                          <td className="py-4 px-3 align-middle">
-                            <div className="flex items-center gap-3.5">
-                              <div className="relative w-24 sm:w-36 md:w-[180px] lg:w-[220px] aspect-[11/6] rounded-[6px] overflow-hidden bg-gray-100 border border-gray-200/80 shrink-0">
-                                <Image
-                                  src={
-                                    order.image ||
-                                    order.cover ||
-                                    order.packageID?.cover ||
-                                    order.packageID?.image ||
-                                    order.packageID?.images?.[0] ||
-                                    "/images/dashboard/orders/order_1.jpg"
-                                  }
-                                  alt={order.title || "Order deliverable"}
-                                  fill
-                                  sizes="(max-width: 640px) 96px, (max-width: 1024px) 180px, 220px"
-                                  className="object-cover"
-                                  unoptimized
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1 min-w-0">
-                                <span className="text-[14px] font-[700] font-sf-pro text-[#434343] line-clamp-1 group-hover:text-[#0D3B34] transition-colors">
-                                  {order.title || "Custom Deliverable"}
-                                </span>
-                                <span className="text-[10.5px] font-medium px-2 py-0.5 rounded-[6px] bg-[#FAFAFA] text-[#292929] border border-[#C7C7C7] w-fit">
-                                  {isBrief ? "Brief" : "Package"}
-                                </span>
-                              </div>
-                            </div>
-                          </td>
-
-                          <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
-                            {orderDate}
-                          </td>
-
-                          <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
-                            {dueDate}
-                          </td>
-
-                          <td className="py-4 px-4 align-middle text-xs sm:text-[13.5px] font-bold text-gray-950 whitespace-nowrap">
-                            {(order.price || 0).toLocaleString("en-US", {
-                              style: "currency",
-                              currency: "USD",
-                            })}
-                          </td>
-
-                          <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            <Tag variant={isDisputed ? "disputed" : (isRevision ? "in_revision" : (isLate || st === "late" ? "late" : (st || statusBadge.label)))} size="sm">
-                              {statusBadge.label}
-                            </Tag>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {/* See more orders button */}
-            <div className="flex justify-center mt-6 pt-2 ">
-              <Button
-                href="/manage-orders"
-                variant="outline"
-                size="sm"
-                radius="fiverr"
-                className="font-medium text-xs sm:text-sm px-6 py-2.5 border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center gap-2 cursor-pointer shadow-2xs"
-              >
-                <span>See more orders</span>
-                <FiArrowRight className="w-4 h-4 text-slate-500" />
-              </Button>
-            </div>
-          </div>
+          <RecentOrdersCard
+            orders={ordersToDisplay}
+            orderTypeFilter={orderTypeFilter}
+            setOrderTypeFilter={setOrderTypeFilter}
+            router={router}
+          />
 
         </div>
       </div>
@@ -629,6 +673,16 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
               }}
             />
           </div>
+        )}
+
+        {/* Recent Orders Card (shown if seller has any orders) */}
+        {hasOrders && (
+          <RecentOrdersCard
+            orders={ordersToDisplay}
+            orderTypeFilter={orderTypeFilter}
+            setOrderTypeFilter={setOrderTypeFilter}
+            router={router}
+          />
         )}
 
         {/* 2. Card 1: Ready to Grow Your Business? */}

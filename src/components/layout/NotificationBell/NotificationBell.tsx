@@ -132,10 +132,12 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
     };
 
     socket.on("new_notification", handleNewNotification);
+    socket.on("notification_received", handleNewNotification);
     socket.on("receive_message", handleReceiveMessage);
 
     return () => {
       socket.off("new_notification", handleNewNotification);
+      socket.off("notification_received", handleNewNotification);
       socket.off("receive_message", handleReceiveMessage);
     };
   }, [currentUser, storeUser]);

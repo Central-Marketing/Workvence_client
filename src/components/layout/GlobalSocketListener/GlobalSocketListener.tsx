@@ -237,6 +237,83 @@ export default function GlobalSocketListener() {
 
       if (!newNotif) return;
 
+      // Account standing sync (suspend / unsuspend / warning) — runs before any early return
+      const standingAction = String(newNotif.action || newNotif.event || "").toLowerCase();
+      const standingText = `${newNotif.title || ""} ${newNotif.message || ""}`;
+      const isWarningRemoval =
+        /(remove|clear|lift|revoke|expire|withdraw)/.test(standingAction) && /warn/.test(standingAction) ||
+        /warning\s+(has\s+been\s+)?(removed|lifted|cleared|revoked|withdrawn|expired)/i.test(standingText);
+      const isWarningIssue =
+        !isWarningRemoval &&
+        (["warning", "warn", "issue_warning", "warning_issued", "add_warning"].includes(standingAction) ||
+          /(policy|account|official)\s+warning/i.test(String(newNotif.title || "")));
+      const isUnsuspend =
+        ["unsuspend", "reinstate", "reinstated", "unsuspended", "lift_suspension"].includes(standingAction) ||
+        /reinstated|suspension\s+(has\s+been\s+)?lifted/i.test(standingText);
+      const isSuspend =
+        !isUnsuspend &&
+        (["suspend", "suspended"].includes(standingAction) || /account\s+suspended/i.test(String(newNotif.title || "")));
+      const isStandingNotif =
+        isWarningRemoval ||
+        isWarningIssue ||
+        isUnsuspend ||
+        isSuspend ||
+        typeof newNotif.isSuspended === "boolean" ||
+        typeof newNotif.isWarningActive === "boolean" ||
+        /suspen|reinstat|account standing|warning/i.test(String(newNotif.title || ""));
+
+      if (isStandingNotif) {
+        const targetUserId = String(newNotif.userID || newNotif.userId || "").trim();
+        const isForCurrentUser = !targetUserId || targetUserId === currentUserId;
+
+        if (isForCurrentUser) {
+          const standingPatch: Record<string, any> = {};
+
+          // Suspension: explicit payload flag wins, otherwise infer from action/title
+          if (typeof newNotif.isSuspended === "boolean") standingPatch.isSuspended = newNotif.isSuspended;
+          else if (isUnsuspend) standingPatch.isSuspended = false;
+          else if (isSuspend) standingPatch.isSuspended = true;
+          if (standingPatch.isSuspended === true) {
+            if (newNotif.suspensionReason) standingPatch.suspensionReason = newNotif.suspensionReason;
+            standingPatch.suspendedAt = newNotif.suspendedAt || newNotif.createdAt || new Date().toISOString();
+          }
+
+          // Warning: explicit payload flag wins, otherwise infer from action/title
+          if (typeof newNotif.isWarningActive === "boolean") standingPatch.isWarningActive = newNotif.isWarningActive;
+          else if (isWarningRemoval) standingPatch.isWarningActive = false;
+          else if (isWarningIssue) standingPatch.isWarningActive = true;
+          if (standingPatch.isWarningActive === false) {
+            // useAccountStanding treats a future warningExpiresAt as active, so clear it too
+            standingPatch.warningExpiresAt = null;
+          } else if (newNotif.warningExpiresAt) {
+            standingPatch.warningExpiresAt = newNotif.warningExpiresAt;
+          }
+          if (standingPatch.isWarningActive === true && newNotif.warningReason) {
+            standingPatch.warningReason = newNotif.warningReason;
+          }
+
+          if (Object.keys(standingPatch).length > 0) {
+            // Instant UI update for components reading the user store
+            const storeUser = useUserStore.getState().user;
+            if (storeUser) {
+              useUserStore.getState().setUser({ ...storeUser, ...standingPatch });
+            }
+            // Instant UI update for useAccountStanding (cached remote user takes precedence over store)
+            queryClient.setQueryData(["auth-me-standing"], (old: any) =>
+              old ? { ...old, ...standingPatch } : old
+            );
+          }
+
+          // Confirm with server now, and again shortly after in case the first read raced the DB write
+          const confirmStanding = () => {
+            queryClient.invalidateQueries({ queryKey: ["auth-me-standing"] });
+            queryClient.invalidateQueries({ queryKey: ["user"] });
+          };
+          confirmStanding();
+          setTimeout(confirmStanding, 2000);
+        }
+      }
+
       const notifSenderId =
         newNotif.senderId ||
         newNotif.senderID ||
@@ -358,6 +435,7 @@ export default function GlobalSocketListener() {
     socket.on("receive_support_message", handleSupportUpdate);
     socket.on("new_notification", handleNewNotification);
     socket.on("notification", handleNewNotification);
+    socket.on("notification_received", handleNewNotification);
 
     return () => {
       socket.off("connect", joinUser);
@@ -367,6 +445,7 @@ export default function GlobalSocketListener() {
       socket.off("receive_support_message", handleSupportUpdate);
       socket.off("new_notification", handleNewNotification);
       socket.off("notification", handleNewNotification);
+      socket.off("notification_received", handleNewNotification);
     };
   }, [user, queryClient, router]);
 

@@ -132,6 +132,10 @@ const VerifyEmailContent = () => {
           sessionStorage.removeItem('tempLoginPassword');
 
           toast.success('Welcome to Workvence! Email verified.');
+          if (user?.isSeller && !user?.onboardingCompleted) {
+            router.push('/seller/onboarding');
+            return;
+          }
           router.push('/dashboard');
           return;
         } catch (loginErr) {

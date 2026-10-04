@@ -124,8 +124,8 @@ export function CustomSelect<T extends string | number = any>({
         ? "bg-[#F0F0F0] border-red-400 focus:bg-white focus:border-red-500 focus:ring-1 focus:ring-red-400/40"
         : "bg-[#F0F0F0] border-[rgba(0,0,0,0.10)] hover:border-gray-300 focus:bg-white focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F]/20"
       : error
-      ? "bg-white border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-400/40"
-      : "bg-white border-gray-200 hover:border-gray-300 focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F]/20";
+        ? "bg-white border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-400/40"
+        : "bg-white border-gray-200 hover:border-gray-300 focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F]/20";
 
   return (
     <div className={`relative w-full ${className}`} ref={dropdownRef}>
@@ -155,18 +155,16 @@ export function CustomSelect<T extends string | number = any>({
             <span className="shrink-0 flex items-center">{selectedOption.icon}</span>
           )}
           <span
-            className={`text-[13px] font-medium truncate ${
-              selectedOption ? "text-gray-900" : "text-[#868686] font-normal"
-            }`}
+            className={`text-[13px] font-medium truncate ${selectedOption ? "text-gray-900" : "text-[#868686] font-normal"
+              }`}
           >
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
 
         <FiChevronDown
-          className={`${cfg.icon} text-gray-400 transition-transform duration-200 shrink-0 ml-1.5 ${
-            isOpen ? "rotate-180 text-gray-700" : ""
-          }`}
+          className={`${cfg.icon} text-gray-400 transition-transform duration-200 shrink-0 ml-1.5 ${isOpen ? "rotate-180 text-gray-700" : ""
+            }`}
           aria-hidden="true"
         />
       </button>
@@ -175,9 +173,9 @@ export function CustomSelect<T extends string | number = any>({
         <div
           role="listbox"
           tabIndex={-1}
-          className={`absolute left-0 right-0 z-50 w-full mt-1.5 bg-white border border-gray-100 rounded-[6px] shadow-xl overflow-hidden py-1 animate-in fade-in slide-in-from-top-1 duration-150 ${menuClassName}`}
+          className={`absolute left-0 right-0 z-50 w-full mt-1.5 bg-white border border-gray-100 rounded-[6px] shadow-xl overflow-visible py-1 animate-in fade-in slide-in-from-top-1 duration-150 ${menuClassName}`}
         >
-          <ul className="max-h-60 overflow-y-auto divide-y divide-gray-50/50">
+          <ul className="max-h-60 overflow-y-auto divide-y divide-gray-50/50 z-50">
             {options.map((option) => {
               const isSelected = selectedOption
                 ? option.value === selectedOption.value || option.label === selectedOption.label
@@ -190,11 +188,10 @@ export function CustomSelect<T extends string | number = any>({
                     role="option"
                     aria-selected={isSelected}
                     disabled={option.disabled}
-                    className={`w-full flex items-center justify-between text-left transition-colors cursor-pointer select-none disabled:opacity-40 disabled:cursor-not-allowed ${cfg.option} ${
-                      isSelected
-                        ? "bg-teal-50/70 text-[#0D6D5F] font-semibold hover:bg-teal-50"
-                        : "text-gray-700 hover:bg-gray-50/90 font-medium"
-                    }`}
+                    className={`w-full flex items-center justify-between text-left transition-colors cursor-pointer select-none disabled:opacity-40 disabled:cursor-not-allowed ${cfg.option} ${isSelected
+                      ? "bg-teal-50/70 text-[#0D6D5F] font-semibold hover:bg-teal-50"
+                      : "text-gray-700 hover:bg-gray-50/90 font-medium"
+                      }`}
                     onClick={() => {
                       if (!option.disabled) {
                         onChange(option.value as T);

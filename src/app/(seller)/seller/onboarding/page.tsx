@@ -84,8 +84,8 @@ export default function SellerOnboardingPage() {
       const result = await saveSellerOnboardingCategories(selectedCategories);
 
       if (result.success) {
-        toast.success("Profile updated! Welcome to your seller dashboard.");
-        router.replace("/dashboard/seller");
+        toast.success("Categories saved! Next, let's verify your identity.");
+        router.replace("/kyc");
       } else {
         toast.error(result.error || "Failed to save categories. Please try again.");
       }

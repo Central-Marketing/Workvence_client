@@ -282,6 +282,27 @@ export async function proxy(req: NextRequest) {
   }
 
   // -------------------------------------------------------------
+  // RULE D.1: Enforce Seller Onboarding Before Dashboard or Seller Features
+  // -------------------------------------------------------------
+  if (isSeller && !isAdmin && parsedUser && !parsedUser.onboardingCompleted) {
+    const isAllowedOnboardingRoute =
+      pathname === "/seller/onboarding" ||
+      pathname.startsWith("/seller/onboarding/") ||
+      pathname === "/onboarding" ||
+      pathname.startsWith("/onboarding/");
+
+    const isRestrictedSellerAccess =
+      pathname.startsWith("/dashboard") ||
+      pathname === "/organize" ||
+      pathname.startsWith("/organize/") ||
+      (isSellerRoute && !isAllowedOnboardingRoute);
+
+    if (isRestrictedSellerAccess) {
+      return applyRefreshedCookie(NextResponse.redirect(new URL("/seller/onboarding", req.url)));
+    }
+  }
+
+  // -------------------------------------------------------------
   // RULE E: Protect Buyer Routes (Redirect Sellers to /manage-orders)
   // -------------------------------------------------------------
   if (isBuyerRoute && isSeller && !isAdmin) {

@@ -15,7 +15,7 @@ export default function DashboardPage() {
     window.scrollTo(0, 0);
     if (user) {
       if (user.isSeller) {
-        if (user.onboardingCompleted === false) {
+        if (!user.onboardingCompleted) {
           router.replace("/seller/onboarding");
           return;
         }

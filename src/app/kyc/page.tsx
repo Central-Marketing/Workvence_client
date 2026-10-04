@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { CheckCircle2, Clock, Sparkles } from "lucide-react";
+import { CheckCircle2, Clock, Sparkles, ArrowRight } from "lucide-react";
 import moment from "moment";
 import { KycVerificationForm, Loader } from "@/components";
 import { useUserStore } from "@/store/userStore";
@@ -149,6 +149,17 @@ export default function KycPage() {
                 Your account has full seller privileges instant payout access.
               </p>
             </div>
+
+            {/* Go to Dashboard CTA */}
+            <div className="pt-2 flex justify-start">
+              <Link
+                href="/dashboard/seller"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs sm:text-sm font-semibold transition shadow-xs cursor-pointer"
+              >
+                <span>Go to Seller Dashboard</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         ) : isPending ? (
           /* ── STATE B: PENDING REVIEW ── */
@@ -209,6 +220,17 @@ export default function KycPage() {
               <p className="text-xs text-gray-500 pl-6 leading-relaxed">
                 Your submission is currently being reviewed. Reviews typically take 24–48 hours. You will be notified as soon as your identity is verified.
               </p>
+            </div>
+
+            {/* Go to Dashboard CTA */}
+            <div className="pt-2 flex justify-start">
+              <Link
+                href="/dashboard/seller"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs sm:text-sm font-semibold transition shadow-xs cursor-pointer"
+              >
+                <span>Go to Seller Dashboard</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
         ) : user && !user.isSeller ? (

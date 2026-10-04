@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { ShieldAlert, ShieldCheck, ArrowRight, X, Lock, CheckCircle2 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components/ui";
+import kycService from "@/utils/kycService";
 
 export const KycPromptModal: React.FC = () => {
   const router = useRouter();
@@ -12,9 +14,17 @@ export const KycPromptModal: React.FC = () => {
   const user = useUserStore((state) => state.user);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Check if KYC prompt is enabled via env
+  // Mandatory KYC: skipping is forbidden for sellers
   const isKycPromptEnabled = process.env.NEXT_PUBLIC_ENABLE_KYC_PROMPT !== "false";
-  const allowSkipKyc = process.env.NEXT_PUBLIC_ALLOW_SKIP_KYC !== "false";
+  const allowSkipKyc = false;
+
+  // Query KYC status if user is a seller and not already verified
+  const { data: statusData } = useQuery({
+    queryKey: ["kyc-status"],
+    queryFn: () => kycService.getKycStatus(),
+    enabled: Boolean(user?.isSeller && !user?.isKycVerified),
+    staleTime: 60000,
+  });
 
   useEffect(() => {
     if (!isKycPromptEnabled) return;
@@ -35,24 +45,28 @@ export const KycPromptModal: React.FC = () => {
       return;
     }
 
-    // Check if user is a seller and is not verified
+    // Check if user is a seller and whether KYC is completed (submitted or approved)
     const isSeller = Boolean(currentUser.isSeller);
-    const isVerified = currentUser.isKycVerified === true;
+    const isKycSubmittedOrVerified = Boolean(
+      currentUser.isKycVerified ||
+      statusData?.isKycVerified ||
+      statusData?.kyc?.status === "pending" ||
+      statusData?.kyc?.status === "approved"
+    );
 
-    // Don't show modal if already on kyc, auth, or admin pages
+    // Don't show modal if already on kyc, onboarding, auth, or admin pages
     const isExcludedPage =
       pathname === "/kyc" ||
       pathname === "/settings/verification" ||
+      pathname.startsWith("/seller/onboarding") ||
+      pathname === "/onboarding" ||
       pathname.startsWith("/admin") ||
       pathname === "/login" ||
       pathname === "/register" ||
       pathname === "/forgot-password" ||
       pathname === "/reset-password";
 
-    const userKey = currentUser.id || currentUser._id || currentUser.username || "default";
-    const sessionDismissed = sessionStorage.getItem(`kyc_prompt_dismissed_${userKey}`);
-
-    if (isSeller && !isVerified && !isExcludedPage && !sessionDismissed) {
+    if (isSeller && !isKycSubmittedOrVerified && !isExcludedPage) {
       const timer = setTimeout(() => {
         setIsOpen(true);
       }, 400);
@@ -60,16 +74,14 @@ export const KycPromptModal: React.FC = () => {
     } else {
       setIsOpen(false);
     }
-  }, [user, pathname, isKycPromptEnabled]);
+  }, [user, pathname, isKycPromptEnabled, statusData]);
 
   const handleDismiss = () => {
-    const userKey = user?.id || user?._id || user?.username || "default";
-    sessionStorage.setItem(`kyc_prompt_dismissed_${userKey}`, "true");
     setIsOpen(false);
   };
 
   const handleGoToKyc = () => {
-    handleDismiss();
+    setIsOpen(false);
     router.push("/kyc");
   };
 

@@ -143,8 +143,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
     (u: any) => {
       onSuccess?.(u);
       onClose();
+      if (u?.isSeller && !u?.onboardingCompleted) {
+        router.push("/seller/onboarding");
+        return;
+      }
       if (redirectUrl) {
         router.push(redirectUrl);
+      } else if (u?.isSeller) {
+        router.push("/dashboard/seller");
       }
     },
     [onSuccess, onClose, redirectUrl, router]
@@ -235,8 +241,15 @@ const AuthModal: React.FC<AuthModalProps> = ({
       }
       onClose();
 
+      if (user?.isSeller && !user?.onboardingCompleted) {
+        router.push("/seller/onboarding");
+        return;
+      }
+
       if (redirectUrl) {
         router.push(redirectUrl);
+      } else if (user?.isSeller) {
+        router.push("/dashboard/seller");
       }
     } catch (err: any) {
       const isVerified = err.response?.data?.isVerified;
@@ -454,8 +467,15 @@ const AuthModal: React.FC<AuthModalProps> = ({
           }
           onClose();
 
+          if (user?.isSeller && !user?.onboardingCompleted) {
+            router.push("/seller/onboarding");
+            return;
+          }
+
           if (redirectUrl) {
             router.push(redirectUrl);
+          } else if (user?.isSeller) {
+            router.push("/dashboard/seller");
           }
           return;
         } catch {

@@ -101,7 +101,7 @@ export function useSocialAuth() {
         }
       }
 
-      const safeTarget =
+      let safeTarget =
         target &&
         target.startsWith("/") &&
         !target.startsWith("/login") &&
@@ -110,6 +110,10 @@ export function useSocialAuth() {
           : user.isSeller
           ? "/dashboard/seller"
           : "/dashboard/buyer";
+
+      if (user.isSeller && !user.onboardingCompleted) {
+        safeTarget = "/seller/onboarding";
+      }
 
       window.location.href = safeTarget;
     },

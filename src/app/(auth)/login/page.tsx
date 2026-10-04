@@ -50,8 +50,13 @@ const LoginForm = () => {
     })();
 
     if (currentUser) {
+      if (currentUser.isSeller && !currentUser.onboardingCompleted) {
+        window.location.href = '/seller/onboarding';
+        return;
+      }
+
       const rawRedirect = searchParams?.get('redirect');
-      let target = rawRedirect || '/dashboard';
+      let target = rawRedirect || (currentUser.isSeller ? '/dashboard/seller' : '/dashboard');
       if (target) {
         try { target = decodeURIComponent(target); } catch { }
         if (target.includes('%')) {
@@ -60,8 +65,9 @@ const LoginForm = () => {
       }
       const safe = (target && target.startsWith('/') && !target.startsWith('/login') && !target.startsWith('/register'))
         ? target
-        : '/dashboard';
+        : (currentUser.isSeller ? '/dashboard/seller' : '/dashboard');
       window.location.href = safe;
+      return;
     }
   }, [searchParams]);
 
@@ -119,9 +125,16 @@ const LoginForm = () => {
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);
 
+      // If seller hasn't completed onboarding, direct immediately to onboarding
+      if (user.isSeller && !user.onboardingCompleted) {
+        window.location.href = '/seller/onboarding';
+        setLoading(false);
+        return;
+      }
+
       // Properly decode redirect parameter (handles %2Fsupport%2Fnew)
       const rawRedirect = searchParams?.get('redirect');
-      let target = rawRedirect || '/dashboard';
+      let target = rawRedirect || (user.isSeller ? '/dashboard/seller' : '/dashboard');
       if (target) {
         try { target = decodeURIComponent(target); } catch { }
         if (target.includes('%')) {
@@ -130,7 +143,7 @@ const LoginForm = () => {
       }
       const safeTarget = (target && target.startsWith('/') && !target.startsWith('/login') && !target.startsWith('/register'))
         ? target
-        : '/dashboard';
+        : (user.isSeller ? '/dashboard/seller' : '/dashboard');
 
       window.location.href = safeTarget;
       setLoading(false);

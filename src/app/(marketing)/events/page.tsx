@@ -86,7 +86,7 @@ export default function EventsPage() {
         </div>
 
         {/* Hero Spotlight Section */}
-        <EventHeroSpotlight featuredEvent={featuredEvent} />
+        {/* <EventHeroSpotlight featuredEvent={featuredEvent} /> */}
 
         {/* Events Directory & Filter Section */}
         <section className="mt-12 sm:mt-16 md:mt-20 space-y-8">

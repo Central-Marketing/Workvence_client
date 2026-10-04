@@ -164,7 +164,7 @@ export default function MyProposalsPage() {
 
           <div className="flex items-center gap-3 shrink-0 self-start sm:self-center">
             <Button
-              href="/briefs"
+              href="/briefs?view=feed"
               variant="brand"
               size="sm"
               radius="fiverr"
@@ -269,7 +269,7 @@ export default function MyProposalsPage() {
               </Button>
             ) : (
               <Link
-                href="/briefs"
+                href="/briefs?view=feed"
                 className="px-5 py-2.5 rounded-[6px] font-semibold text-xs sm:text-[13px] bg-[#0D6D5F] hover:bg-[#0B5C50] text-white transition-colors cursor-pointer shadow-2xs"
               >
                 Browse Open Projects

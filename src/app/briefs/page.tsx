@@ -87,6 +87,7 @@ function BriefsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const user = useUserStore((state) => state.user);
+  const isSeller = Boolean(user?.isSeller || user?.role === "seller");
 
   const initialSearch = searchParams?.get("search") || "";
   const initialCategory = searchParams?.get("category") || "";
@@ -101,9 +102,10 @@ function BriefsContent() {
   const initialView = searchParams?.get("view") || "";
   const initialExplore = searchParams?.get("explore") || "";
 
-  // Dual view mode: 'categories' hub view by default, or 'feed' when exploring all / filtering
+  // Dual view mode: 'categories' hub view by default, or 'feed' when exploring all / filtering / seller logged in
   const [viewMode, setViewMode] = useState<"categories" | "feed">(() => {
     if (
+      isSeller ||
       initialView === "all" ||
       initialView === "feed" ||
       initialExplore === "true" ||
@@ -167,6 +169,21 @@ function BriefsContent() {
     return () => window.removeEventListener("resize", checkViewport);
   }, []);
 
+  // Redirect logged-in sellers from /briefs to /briefs?view=feed
+  useEffect(() => {
+    if (isSeller) {
+      const currentView = searchParams?.get("view");
+      if (currentView !== "feed") {
+        const params = new URLSearchParams(searchParams ? searchParams.toString() : "");
+        params.set("view", "feed");
+        router.replace(`/briefs?${params.toString()}`, { scroll: false });
+      }
+      if (viewMode !== "feed") {
+        setViewMode("feed");
+      }
+    }
+  }, [isSeller, searchParams, router, viewMode]);
+
   const syncToUrl = (overrides?: {
     search?: string;
     category?: string;
@@ -199,10 +216,11 @@ function BriefsContent() {
     // Sort is omitted when search keyword is present (backend auto-sorts by relevance)
     if (qSort && !qSearch.trim()) params.set("sort", qSort);
     if (qPage > 1) params.set("page", String(qPage));
-    if (qView === "feed") params.set("view", "feed");
+    if (isSeller || qView === "feed") params.set("view", "feed");
 
     const qs = params.toString();
-    router.push(qs ? `/briefs?${qs}` : "/briefs", { scroll: false });
+    const targetUrl = qs ? `/briefs?${qs}` : (isSeller ? "/briefs?view=feed" : "/briefs");
+    router.push(targetUrl, { scroll: false });
   };
 
   const isFirstRender = useRef(true);
@@ -241,6 +259,7 @@ function BriefsContent() {
     setCurrentPage(qPage);
 
     if (
+      isSeller ||
       qView === "all" ||
       qView === "feed" ||
       qExplore === "true" ||
@@ -255,6 +274,7 @@ function BriefsContent() {
     ) {
       setViewMode("feed");
     } else if (
+      !isSeller &&
       !qView &&
       !qCat &&
       !qSearch &&
@@ -268,7 +288,7 @@ function BriefsContent() {
     ) {
       setViewMode("categories");
     }
-  }, [searchParams]);
+  }, [searchParams, isSeller]);
 
   // Fetch real categories directly from backend API
   const { categoryList, parentCategories } = useAdminCategories();
@@ -427,6 +447,11 @@ function BriefsContent() {
   };
 
   const handleBackToCategories = () => {
+    if (isSeller) {
+      router.push("/briefs?view=feed", { scroll: false });
+      setViewMode("feed");
+      return;
+    }
     router.push("/briefs", { scroll: false });
     setViewMode("categories");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -617,7 +642,7 @@ function BriefsContent() {
   return (
     <div className="min-h-screen bg-[#F5F5F5] text-gray-800 pt-5 sm:pt-7 pb-[80px] min-[1400px]:pb-[100px]">
       <div className="container mx-auto">
-        {viewMode === "categories" ? (
+        {viewMode === "categories" && !isSeller ? (
           /* ============================================================ */
           /* CATEGORY HUB VIEW (Default View)                             */
           /* ============================================================ */
@@ -789,17 +814,19 @@ function BriefsContent() {
 
               {/* Action Buttons: Browse by Category & Post a Project */}
               <div className="flex items-center gap-2.5 shrink-0">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  radius="lg"
-                  onClick={handleBackToCategories}
-                  leftIcon={<FiChevronLeft className="w-3.5 h-3.5" />}
-                  className="text-xs sm:text-sm font-semibold bg-white border-gray-300 hover:bg-gray-50 text-gray-700 shadow-2xs"
-                >
-                  Browse by Category
-                </Button>
+                {!isSeller && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    radius="lg"
+                    onClick={handleBackToCategories}
+                    leftIcon={<FiChevronLeft className="w-3.5 h-3.5" />}
+                    className="text-xs sm:text-sm font-semibold bg-white border-gray-300 hover:bg-gray-50 text-gray-700 shadow-2xs"
+                  >
+                    Browse by Category
+                  </Button>
+                )}
 
                 {user && !user.isSeller && (
                   <Link

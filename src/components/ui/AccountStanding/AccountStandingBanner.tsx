@@ -29,11 +29,11 @@ export const AccountStandingBanner: React.FC<AccountStandingBannerProps> = ({ cl
     return (
       <div
         role="alert"
-        className={`w-full bg-[#FFF1F2] border border-[#FECDD3] rounded-[6px] p-4 sm:p-5 shadow-2xs ${className}`}
+        className={`w-full bg-[#F5f5f5] border border-[#FECDD3] rounded-[6px] p-4 sm:p-5 shadow-2xs ${className}`}
       >
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
           <div className="flex items-start gap-3.5">
-            <div className="w-8 h-8 rounded-[6px] bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 mt-0.5">
+            <div className="w-8 h-8 rounded-[6px] bg-[#ffffff] border border-[rgba(0,0,0,0.10)] text-rose-600 flex items-center justify-center shrink-0 mt-0.5">
               <ShieldAlert className="w-5 h-5" />
             </div>
 
@@ -100,11 +100,11 @@ export const AccountStandingBanner: React.FC<AccountStandingBannerProps> = ({ cl
   return (
     <div
       role="alert"
-      className={`w-full bg-[#FFFBEB] border border-[#FDE68A] rounded-[6px] p-4 sm:p-5 shadow-2xs ${className}`}
+      className={`w-full bg-[#f5f5f5] border border-[#FDE68A] rounded-[6px] p-4 sm:p-5 shadow-2xs ${className}`}
     >
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         <div className="flex items-start gap-3.5">
-          <div className="w-8 h-8 rounded-[6px] bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+          <div className="w-8 h-8 rounded-[6px] bg-[#ffffff] border border-[rgba(0,0,0,0.10)] text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
             <AlertTriangle className="w-5 h-5" />
           </div>
 

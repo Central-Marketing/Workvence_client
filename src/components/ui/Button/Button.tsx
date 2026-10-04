@@ -124,6 +124,19 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
           })
           .join(" ");
       }
+
+      const hasCustomHeight = userTokens.some((t) => t.startsWith("h-") || t.startsWith("!h-"));
+      const hasCustomTextSize = userTokens.some((t) => isNonColorTextToken(t));
+      if (hasCustomHeight || hasCustomTextSize) {
+        effectiveSizeClasses = effectiveSizeClasses
+          .split(/\s+/)
+          .filter((t) => {
+            if (hasCustomHeight && (t.startsWith("h-") || t.startsWith("!h-") || t.startsWith("min-h-") || t.startsWith("!min-h-"))) return false;
+            if (hasCustomTextSize && isNonColorTextToken(t)) return false;
+            return true;
+          })
+          .join(" ");
+      }
     }
 
     const baseClasses = [

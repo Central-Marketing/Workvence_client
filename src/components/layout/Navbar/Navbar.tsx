@@ -622,7 +622,7 @@ const Navbar = () => {
                 </Link>
 
                 <Link
-                  href="/briefs"
+                  href="/briefs?view=feed"
                   className="font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
                 >
                   Find Project
@@ -872,7 +872,7 @@ const Navbar = () => {
                   </Link>
                   <Link href="/message" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/message") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Messages</Link>
                   <Link href="/packages?category=ai-services" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Browse Packages</Link>
-                  <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
+                  <Link href="/briefs?view=feed" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
                 </div>
               ) : (
                 /* Buyer Navigation Links (UX-Optimized Ordering) */

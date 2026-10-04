@@ -648,7 +648,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           </p>
           <div className="flex items-center justify-center gap-3 flex-wrap">
             <Link
-              href="/briefs"
+              href="/briefs?view=feed"
               className="px-5 py-2.5 rounded-[6px] bg-[#EFEFEF] hover:bg-[#E5E5E5] text-[#1F2937] text-xs sm:text-[13px] font-semibold transition-colors"
             >
               Explore Projects

@@ -289,7 +289,18 @@ export async function proxy(req: NextRequest) {
   }
 
   // -------------------------------------------------------------
-  // RULE F: Allow Request to Proceed
+  // RULE F: Redirect Logged-In Sellers from /briefs to /briefs?view=feed
+  // -------------------------------------------------------------
+  if (pathname === "/briefs" && isSeller && !isAdmin) {
+    if (searchParams.get("view") !== "feed") {
+      const feedUrl = req.nextUrl.clone();
+      feedUrl.searchParams.set("view", "feed");
+      return applyRefreshedCookie(NextResponse.redirect(feedUrl));
+    }
+  }
+
+  // -------------------------------------------------------------
+  // RULE G: Allow Request to Proceed
   // -------------------------------------------------------------
   return applyRefreshedCookie(NextResponse.next());
 }

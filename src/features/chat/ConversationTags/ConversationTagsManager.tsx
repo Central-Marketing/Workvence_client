@@ -182,7 +182,7 @@ export const ConversationTagsManager: React.FC<ConversationTagsManagerProps> = (
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isSaving || currentTags.length >= 20}
-          className="flex-1 h-[32px] bg-white border border-slate-200 focus:border-teal-700 focus:ring-1 focus:ring-teal-700 rounded-[6px] px-2.5 text-xs text-slate-800 placeholder:text-slate-400 outline-none transition-colors"
+          className="flex-1 h-[32px] min-h-[32px] max-h-[32px] box-border bg-white border border-slate-200 focus:border-teal-700 focus:ring-1 focus:ring-teal-700 rounded-[6px] px-2.5 text-xs text-slate-800 placeholder:text-slate-400 outline-none transition-colors"
         />
         <Button
           type="button"
@@ -192,7 +192,7 @@ export const ConversationTagsManager: React.FC<ConversationTagsManagerProps> = (
           onClick={() => handleAddTag(inputValue)}
           disabled={!inputValue.trim() || isSaving || currentTags.length >= 20}
           isLoading={isSaving}
-          className="h-[32px] !min-h-[32px] px-3 text-xs font-semibold shrink-0"
+          className="!h-[32px] !min-h-[32px] !max-h-[32px] box-border px-3 !text-xs font-semibold shrink-0 !py-0 flex items-center justify-center leading-none"
         >
           Add
         </Button>

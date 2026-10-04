@@ -657,7 +657,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {/* ── RIGHT PANE: Auth Forms & State Machine (50% Split) ── */}
-        <div className="w-full md:w-1/2 min-w-0 h-full px-6 sm:px-8 py-5 sm:py-6 flex flex-col justify-between overflow-y-auto scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div className="w-full md:w-1/2 min-w-0 h-full px-6 sm:px-8 py-5 sm:py-6 flex flex-col overflow-y-auto scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div className="my-auto w-full flex flex-col justify-center py-2">
           {/* Mobile Brand Header */}
           <div className="flex md:hidden items-center justify-between mb-4">
             <Image
@@ -752,7 +753,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
               MODE 1: SIGN IN (LOGIN)
           ───────────────────────────────────────────────────────────── */}
           {mode === "login" && (
-            <div className="flex flex-col flex-1">
+            <div className="flex flex-col w-full">
               {/* Social Buttons */}
               <div className="grid grid-cols-2 gap-2.5 w-full mb-3">
                 <div className="relative">
@@ -798,7 +799,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
               </div>
 
               {/* Sign In Form */}
-              <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3.5 flex-1">
+              <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3.5 w-full">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email Address</label>
                   <input
@@ -888,7 +889,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
               MODE 2: CREATE ACCOUNT (REGISTER - NO USERNAME INPUT!)
           ───────────────────────────────────────────────────────────── */}
           {mode === "register" && (
-            <div className="flex flex-col flex-1">
+            <div className="flex flex-col w-full">
               {/* Role Toggle */}
               <div className="space-y-1 mb-2.5">
                 <label className="text-xs font-semibold text-gray-700">I want to</label>
@@ -964,7 +965,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
               </div>
 
               {/* Register Form (No Username Field!) */}
-              <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-2.5 flex-1">
+              <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-2.5 w-full">
                 {/* Email Address */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email Address</label>
@@ -1092,7 +1093,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
               MODE 3: FORGOT PASSWORD
           ───────────────────────────────────────────────────────────── */}
           {mode === "forgot" && (
-            <form onSubmit={handleForgotSubmit} className="flex flex-col gap-4 flex-1">
+            <form onSubmit={handleForgotSubmit} className="flex flex-col gap-4 w-full">
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs sm:text-[13px] font-medium text-gray-700">Account Email</label>
                 <div className="relative flex items-center">
@@ -1142,7 +1143,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
               MODE 4: RESET PASSWORD
           ───────────────────────────────────────────────────────────── */}
           {mode === "reset" && (
-            <form onSubmit={handleResetSubmit} className="flex flex-col gap-3.5 flex-1">
+            <form onSubmit={handleResetSubmit} className="flex flex-col gap-3.5 w-full">
               {/* 6-box OTP Input */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs sm:text-[13px] font-medium text-gray-700">6-Digit Reset Code</label>
@@ -1330,6 +1331,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
               </form>
             </div>
           )}
+          </div>
 
           {/* Bottom Copyright & Terms Disclaimer */}
           <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400 shrink-0">

@@ -84,7 +84,7 @@ export default function CreateSupportTicketPage() {
     setError(null);
 
     try {
-      const uploaded = await supportService.uploadFileToCloudinary(file, "support_chat_attachments");
+      const uploaded = await supportService.uploadFileToCloudinary(file, "chat_attachments");
       setAttachments((prev) => [
         ...prev,
         {

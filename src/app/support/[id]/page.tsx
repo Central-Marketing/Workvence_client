@@ -20,87 +20,135 @@ import {
   Upload,
   FileText,
   ImageIcon,
+  Eye,
+  Download,
+  X,
+  File,
 } from "lucide-react";
 import { supportService, SupportTicketItem, SupportMessage } from "@/utils/supportService";
 import { useSupportSocket, SocketSupportMessage } from "@/hooks/useSupportSocket";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components/ui";
 
-function AttachmentDisplayItem({ att, ticketId }: { att: any; ticketId: string }) {
-  const [resolvedUrl, setResolvedUrl] = useState<string>(att.url || att.secure_url || "");
-  const [loadingUrl, setLoadingUrl] = useState<boolean>(!att.url || att.url.startsWith("blob:") || Boolean(att.public_id));
+interface SupportAttachmentCardProps {
+  att: any;
+  isMe: boolean;
+  onPreview: (img: { url: string; name: string }) => void;
+  onDownload: (e: React.MouseEvent, url: string, name: string) => void;
+}
 
-  useEffect(() => {
-    let isMounted = true;
-    async function resolveSignedUrl() {
-      if (att.public_id) {
-        const signed = await supportService.getSignedAssetUrl(att.public_id, ticketId, "creator");
-        if (isMounted && signed) {
-          setResolvedUrl(signed);
-          setLoadingUrl(false);
-          return;
-        }
-      }
-      if (isMounted) {
-        setLoadingUrl(false);
-      }
-    }
-    resolveSignedUrl();
-    return () => {
-      isMounted = false;
-    };
-  }, [att.public_id, att.url, ticketId]);
+function SupportAttachmentCard({ att, isMe, onPreview, onDownload }: SupportAttachmentCardProps) {
+  const fileUrl =
+    att.url ||
+    att.secure_url ||
+    (att.public_id && att.public_id.startsWith("http")
+      ? att.public_id
+      : att.public_id
+        ? `https://res.cloudinary.com/cqtrqtyu/image/upload/${att.public_id}`
+        : "");
 
   const name = att.name || "Attachment";
-  const url = resolvedUrl || att.url || att.secure_url || "#";
-  const isImage = Boolean(
+  const sizeText =
+    att.size ||
+    (att.bytes ? `${(att.bytes / 1024).toFixed(0)} KB` : "Attachment");
+
+  const isImg = Boolean(
+    att.type === "image" ||
     att.type?.startsWith("image") ||
-    /\.(png|jpe?g|gif|webp|svg)($|\?)/i.test(name) ||
-    /\.(png|jpe?g|gif|webp|svg)($|\?)/i.test(url)
+    /\.(jpg|jpeg|png|gif|webp|svg|bmp|avif)($|[?#])/i.test(fileUrl) ||
+    /\.(jpg|jpeg|png|gif|webp|svg|bmp|avif)$/i.test(name) ||
+    (fileUrl.includes("cloudinary.com") && fileUrl.includes("/image/") && !fileUrl.includes("pdf"))
   );
 
-  if (isImage && url && !url.startsWith("blob:")) {
-    return (
-      <div className="mt-2 space-y-1">
-        <a
-          href={url}
-          target="_blank"
-          rel="noreferrer"
-          className="block group overflow-hidden rounded-[6px] border border-black/10 dark:border-white/10 max-w-sm bg-black/5 hover:opacity-95 transition"
+  return (
+    <div
+      className={`group relative flex items-center gap-3 rounded-[6px] border p-2.5 transition-all text-left ${
+        isMe
+          ? "bg-white/10 border-white/20 text-white"
+          : "bg-[#f8fafc] border-[#e2e8f0] text-[#0f172a]"
+      }`}
+    >
+      {/* File Thumbnail or Icon */}
+      {isImg && fileUrl ? (
+        <button
+          type="button"
+          onClick={() => onPreview({ url: fileUrl, name })}
+          className="relative h-11 w-11 rounded-[6px] overflow-hidden shrink-0 border border-current/20 group/thumb cursor-pointer bg-black/10"
         >
-          {loadingUrl ? (
-            <div className="p-6 text-center text-xs text-gray-500 flex items-center justify-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-[#327C73]" />
-              <span>Loading image...</span>
-            </div>
-          ) : (
-            <img
-              src={url}
-              alt={name}
-              className="max-h-60 w-auto object-cover rounded-[6px] group-hover:scale-105 transition-transform duration-200"
-              onError={(e) => {
-                (e.target as HTMLElement).style.display = "none";
-              }}
-            />
-          )}
-        </a>
-        <span className="text-[10px] opacity-80 font-medium block truncate max-w-sm">
-          📷 {name}
+          <img
+            src={fileUrl}
+            alt={name}
+            className="h-full w-full object-cover transition-transform group-hover/thumb:scale-105"
+            onError={(e) => {
+              (e.target as HTMLElement).style.display = "none";
+            }}
+          />
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center transition-opacity">
+            <Eye className="w-3.5 h-3.5 text-white" />
+          </div>
+        </button>
+      ) : (
+        <div
+          className={`grid h-11 w-11 place-items-center rounded-[6px] shrink-0 ${
+            isMe ? "bg-white/15 text-white" : "bg-[#0D6D5F]/10 text-[#0D6D5F]"
+          }`}
+        >
+          <File className="w-5 h-5" />
+        </div>
+      )}
+
+      {/* File Metadata */}
+      <div className="flex flex-col min-w-0 flex-1">
+        <span
+          title={name}
+          className="font-semibold text-xs truncate leading-tight hover:underline cursor-pointer"
+          onClick={() => {
+            if (isImg && fileUrl) {
+              onPreview({ url: fileUrl, name });
+            } else if (fileUrl) {
+              window.open(fileUrl, "_blank", "noopener,noreferrer");
+            }
+          }}
+        >
+          {name}
+        </span>
+        <span className={`text-[10px] mt-0.5 ${isMe ? "text-white/80" : "text-[#64748b]"}`}>
+          {sizeText}
         </span>
       </div>
-    );
-  }
 
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noreferrer"
-      className="inline-flex items-center gap-2 px-3 py-2 rounded-[6px] bg-black/5 hover:bg-black/10 text-xs font-semibold underline truncate max-w-xs transition font-inter"
-    >
-      <FileText className="w-4 h-4 flex-shrink-0 text-[#327C73]" />
-      <span className="truncate">{name}</span>
-    </a>
+      {/* Actions (Preview / Download) */}
+      {fileUrl && (
+        <div className="flex items-center gap-1 shrink-0">
+          {isImg && (
+            <button
+              type="button"
+              onClick={() => onPreview({ url: fileUrl, name })}
+              title="Preview image"
+              className={`p-1.5 rounded-[6px] transition cursor-pointer ${
+                isMe
+                  ? "hover:bg-white/20 text-white"
+                  : "hover:bg-[#e2e8f0] text-[#64748b] hover:text-[#0f172a]"
+              }`}
+            >
+              <Eye className="w-4 h-4" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={(e) => onDownload(e, fileUrl, name)}
+            title="Download attachment"
+            className={`p-1.5 rounded-[6px] transition cursor-pointer ${
+              isMe
+                ? "hover:bg-white/20 text-white"
+                : "hover:bg-[#e2e8f0] text-[#64748b] hover:text-[#0f172a]"
+            }`}
+          >
+            <Download className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -120,6 +168,31 @@ export default function TicketDetailsPage() {
   const [sending, setSending] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [attachments, setAttachments] = useState<{ name: string; url: string; public_id?: string; type?: string }[]>([]);
+  const [selectedPreviewImage, setSelectedPreviewImage] = useState<{ url: string; name: string } | null>(null);
+
+  const handleDownload = async (e: React.MouseEvent, url: string, fileName: string = "attachment") => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!url || url === "#") return;
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = fileName || "attachment";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+        return;
+      }
+    } catch {
+      // Fallback
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
 
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   const currentUserId = String(user?._id || user?.id || "").trim();
@@ -234,7 +307,7 @@ export default function TicketDetailsPage() {
     setError(null);
 
     try {
-      const uploaded = await supportService.uploadFileToCloudinary(file, "support_chat_attachments");
+      const uploaded = await supportService.uploadFileToCloudinary(file, "chat_attachments");
       setAttachments((prev) => [
         ...prev,
         {
@@ -257,8 +330,8 @@ export default function TicketDetailsPage() {
     const canSend = !sending && !uploadingFile && (replyText.trim().length > 0 || attachments.length > 0);
     if (!canSend) return;
 
-    const messageContent = replyText.trim();
     const currentAttachments = [...attachments];
+    const messageContent = replyText.trim() || (currentAttachments.length > 0 ? "attachment" : "");
 
     setReplyText("");
     setAttachments([]);
@@ -603,14 +676,25 @@ export default function TicketDetailsPage() {
                         <p className="whitespace-pre-wrap">{msg.message}</p>
 
                         {/* Attachments rendering with Signed URL resolution & Image Previews */}
+                        {/* Attachments Section */}
                         {msg.attachments && msg.attachments.length > 0 && (
-                          <div className="mt-3 pt-2 border-t border-black/10 text-[11px] space-y-2">
-                            <span className="font-semibold uppercase tracking-wider block opacity-80 text-[10px]">
-                              Attachments ({msg.attachments.length}):
-                            </span>
-                            {msg.attachments.map((att: any, aIdx: number) => (
-                              <AttachmentDisplayItem key={aIdx} att={att} ticketId={ticketId} />
-                            ))}
+                          <div className={`mt-3 pt-3 border-t ${isMe ? "border-white/20" : "border-[#e2e8f0]"} space-y-2`}>
+                            <p className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${isMe ? "text-white/80" : "text-[#64748b]"}`}>
+                              <FileText className="w-3 h-3" />
+                              <span>Attachments ({msg.attachments.length})</span>
+                            </p>
+
+                            <div className="grid grid-cols-1 gap-2">
+                              {msg.attachments.map((att: any, aIdx: number) => (
+                                <SupportAttachmentCard
+                                  key={att.id || att.public_id || `${att.name}-${aIdx}`}
+                                  att={att}
+                                  isMe={isMe}
+                                  onPreview={(img) => setSelectedPreviewImage(img)}
+                                  onDownload={handleDownload}
+                                />
+                              ))}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -740,6 +824,44 @@ export default function TicketDetailsPage() {
         </div>
 
       </div>
+      {/* High-Res Image Preview Lightbox Modal */}
+      {selectedPreviewImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setSelectedPreviewImage(null)}
+        >
+          <div
+            className="relative max-w-4xl max-h-[90vh] w-full flex flex-col items-center justify-center space-y-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setSelectedPreviewImage(null)}
+              className="absolute -top-10 right-0 p-2 text-white hover:text-rose-400 transition cursor-pointer"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <div className="rounded-[6px] overflow-hidden border border-white/20 shadow-2xl bg-[#0f172a] max-h-[80vh] flex items-center justify-center">
+              <img
+                src={selectedPreviewImage.url}
+                alt={selectedPreviewImage.name}
+                className="max-h-[80vh] w-auto object-contain"
+              />
+            </div>
+            <div className="flex items-center gap-3 text-white text-xs font-semibold">
+              <span className="truncate max-w-xs">{selectedPreviewImage.name}</span>
+              <button
+                type="button"
+                onClick={(e) => handleDownload(e, selectedPreviewImage.url, selectedPreviewImage.name)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-[#0D6D5F] text-white hover:bg-[#0D6D5F]/90 transition cursor-pointer shadow-xs"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Image</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

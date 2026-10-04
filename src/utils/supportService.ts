@@ -143,12 +143,10 @@ export const supportService = {
     ticketId: string,
     payload: { message?: string; attachments?: any[]; thread?: string }
   ) {
-    const cleanPayload: { message?: string; attachments?: any[] } = {};
-    if (payload.message && payload.message.trim().length > 0) {
-      cleanPayload.message = payload.message.trim();
-    } else if (payload.attachments && payload.attachments.length > 0) {
-      cleanPayload.message = "";
-    }
+    const text = payload.message?.trim();
+    const cleanPayload: { message: string; attachments?: any[] } = {
+      message: text && text.length > 0 ? text : 'attachment',
+    };
     if (payload.attachments && payload.attachments.length > 0) {
       cleanPayload.attachments = payload.attachments;
     }
@@ -175,13 +173,35 @@ export const supportService = {
   /**
    * Get Cloudinary upload signature from backend storage service
    */
-  async getCloudinarySignature(folder: string = 'support_chat_attachments', type: string = 'upload') {
+  async getCloudinarySignature(folder: string = 'chat_attachments', type: string = 'upload') {
+    const foldersToTry = [folder, 'chat_attachments', 'uploads'];
+    const uniqueFolders = Array.from(new Set(foldersToTry));
+
+    for (const f of uniqueFolders) {
+      try {
+        const res = await axiosFetch.post('/storage/cloudinary-signature', { folder: f, type });
+        if (res.data?.data?.signature || res.data?.signature) {
+          return res.data;
+        }
+      } catch (err: any) {
+        const msg = err?.response?.data?.message || err?.message || '';
+        if (msg.includes('not permitted')) {
+          continue;
+        }
+        try {
+          const fallbackRes = await adminAxiosFetch.post('/storage/cloudinary-signature', { folder: f, type });
+          if (fallbackRes.data?.data?.signature || fallbackRes.data?.signature) {
+            return fallbackRes.data;
+          }
+        } catch {}
+      }
+    }
+
     try {
-      const res = await axiosFetch.post('/storage/cloudinary-signature', { folder, type });
-      return res.data;
-    } catch {
-      const fallbackRes = await adminAxiosFetch.post('/storage/cloudinary-signature', { folder, type });
+      const fallbackRes = await adminAxiosFetch.post('/storage/cloudinary-signature', { folder: 'chat_attachments', type });
       return fallbackRes.data;
+    } catch {
+      return null;
     }
   },
 
@@ -224,7 +244,7 @@ export const supportService = {
   },
 
   async uploadFileToCloudinary(file: File, folder: string = 'chat_attachments', customType?: string) {
-    const isPrivate = folder === 'support_chat_attachments' || folder === 'kyc_documents';
+    const isPrivate = folder === 'kyc_documents';
     const uploadType = customType || (isPrivate ? 'authenticated' : 'upload');
 
     try {

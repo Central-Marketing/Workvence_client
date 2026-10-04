@@ -21,7 +21,7 @@ import {
   FileText,
   ImageIcon,
 } from "lucide-react";
-import { supportService, SupportTicketItem } from "@/utils/supportService";
+import { supportService, SupportTicketItem, SupportMessage } from "@/utils/supportService";
 import { useSupportSocket, SocketSupportMessage } from "@/hooks/useSupportSocket";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components/ui";
@@ -111,9 +111,10 @@ export default function TicketDetailsPage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [ticket, setTicket] = useState<SupportTicketItem | null>(null);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<SupportMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [is403, setIs403] = useState(false);
 
   const [replyText, setReplyText] = useState("");
   const [sending, setSending] = useState(false);
@@ -121,6 +122,7 @@ export default function TicketDetailsPage() {
   const [attachments, setAttachments] = useState<{ name: string; url: string; public_id?: string; type?: string }[]>([]);
 
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
+  const currentUserId = String(user?._id || user?.id || "").trim();
 
   const scrollToBottom = useCallback(() => {
     if (messageContainerRef.current) {
@@ -143,17 +145,33 @@ export default function TicketDetailsPage() {
 
   const handleMessageReceived = useCallback((newMsg: SocketSupportMessage) => {
     setMessages((prev) => {
-      if (prev.some((m) => m.id === newMsg.id || (m.message === newMsg.message && m.createdAt === newMsg.createdAt))) {
+      // Dedupe incoming socket message against existing message list using id or createdAt
+      if (
+        prev.some(
+          (m) =>
+            (newMsg.id && m.id === newMsg.id) ||
+            (m.createdAt === newMsg.createdAt && (m.message === newMsg.message || m.senderID === newMsg.senderID))
+        )
+      ) {
         return prev;
       }
-      return [...prev, newMsg];
+      const mappedMsg: SupportMessage = {
+        id: newMsg.id || newMsg.createdAt,
+        sender: newMsg.sender,
+        senderID: newMsg.senderID || (newMsg.role === "admin" ? "support" : ""),
+        role: (newMsg.role as any) || "admin",
+        message: newMsg.message,
+        attachments: newMsg.attachments || [],
+        createdAt: newMsg.createdAt,
+      };
+      return [...prev, mappedMsg];
     });
     setTimeout(scrollToBottom, 100);
-  }, []);
+  }, [scrollToBottom]);
 
-  const { isConnected, typingUser, sendSupportMessage, startTyping, stopTyping } = useSupportSocket({
+  const { isConnected, isUnauthorized, typingUser, sendSupportMessage, startTyping, stopTyping } = useSupportSocket({
     ticketId,
-    thread: "creator",
+    thread: "group",
     userDisplayName: user?.username || user?.name || user?.email || "User",
     onMessageReceived: handleMessageReceived,
   });
@@ -162,27 +180,24 @@ export default function TicketDetailsPage() {
     if (!ticketId) return;
     setLoading(true);
     setError(null);
+    setIs403(false);
     try {
       const data = await supportService.getTicketById(ticketId);
       const ticketObj = (data as any)?.ticket || (data as any)?.data?.ticket || data;
       setTicket(ticketObj);
 
-      const threadsObj = ticketObj?.threads || (data as any)?.threads;
-      let allSupportMessages: any[] = [];
-
-      if (threadsObj) {
-        const creatorMsgs = Array.isArray(threadsObj.creator) ? threadsObj.creator : [];
-        const buyerMsgs = Array.isArray(threadsObj.buyer) ? threadsObj.buyer : [];
-        const sellerMsgs = Array.isArray(threadsObj.seller) ? threadsObj.seller : [];
-        allSupportMessages = [...creatorMsgs, ...buyerMsgs, ...sellerMsgs];
-      } else if (Array.isArray(ticketObj?.messages)) {
+      // Single shared messages stream
+      let allSupportMessages: SupportMessage[] = [];
+      if (Array.isArray(ticketObj?.messages)) {
         allSupportMessages = ticketObj.messages;
+      } else if (Array.isArray(ticketObj?.threads?.group)) {
+        allSupportMessages = ticketObj.threads.group;
       }
 
-      // Deduplicate and sort chronologically by createdAt
-      const uniqueMap = new Map();
+      // Deduplicate and sort chronologically by createdAt (oldest to newest)
+      const uniqueMap = new Map<string, SupportMessage>();
       allSupportMessages.forEach((m: any) => {
-        const key = m.id || `${m.sender}-${m.createdAt}-${m.message || m.content}`;
+        const key = m.id || `${m.senderID || m.sender}-${m.createdAt}-${m.message || ""}`;
         if (!uniqueMap.has(key)) {
           uniqueMap.set(key, m);
         }
@@ -195,12 +210,16 @@ export default function TicketDetailsPage() {
       setMessages(sortedMessages);
     } catch (err: any) {
       console.error("Failed to load ticket details:", err);
+      const status = err?.response?.status;
+      if (status === 403) {
+        setIs403(true);
+      }
       setError(err?.response?.data?.message || err.message || "Failed to load support ticket details.");
     } finally {
       setLoading(false);
       setTimeout(scrollToBottom, 150);
     }
-  }, [ticketId]);
+  }, [ticketId, scrollToBottom]);
 
   useEffect(() => {
     fetchTicketDetails();
@@ -235,7 +254,8 @@ export default function TicketDetailsPage() {
 
   const handleSendReply = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!replyText.trim() || sending) return;
+    const canSend = !sending && !uploadingFile && (replyText.trim().length > 0 || attachments.length > 0);
+    if (!canSend) return;
 
     const messageContent = replyText.trim();
     const currentAttachments = [...attachments];
@@ -245,22 +265,30 @@ export default function TicketDetailsPage() {
     setSending(true);
 
     try {
-      // 1. Post reply to backend HTTP API
-      await supportService.replyTicket(ticketId, {
+      // Post reply to backend HTTP API (clean payload: message and attachments, no thread/role)
+      const res = await supportService.replyTicket(ticketId, {
         message: messageContent,
-        thread: "creator",
         attachments: currentAttachments,
       });
 
-      // 2. Emit real-time message via socket if connected
-      if (isConnected) {
-        sendSupportMessage(messageContent, currentAttachments);
+      // If backend returns updated ticket with messages, sync immediately
+      const updatedTicket = res?.data?.ticket || res?.ticket || res;
+      if (updatedTicket && Array.isArray(updatedTicket.messages)) {
+        setTicket(updatedTicket);
+        setMessages(updatedTicket.messages);
+      } else {
+        // Fallback: emit via socket if supported
+        if (isConnected) {
+          sendSupportMessage(messageContent, currentAttachments);
+        }
+        await fetchTicketDetails();
       }
-
-      // 3. Refresh ticket details and message history from backend
-      await fetchTicketDetails();
     } catch (err: any) {
       console.error("Failed to send reply:", err);
+      const status = err?.response?.status;
+      if (status === 403) {
+        setIs403(true);
+      }
       setError(err?.response?.data?.message || "Failed to send message reply.");
     } finally {
       setSending(false);
@@ -304,12 +332,66 @@ export default function TicketDetailsPage() {
     }
   };
 
+  const getRoleBadge = (role?: string) => {
+    switch (role?.toLowerCase()) {
+      case "admin":
+        return (
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#0D6D5F]/15 text-[#0D6D5F] border border-[#0D6D5F]/30 uppercase">
+            Support Agent
+          </span>
+        );
+      case "buyer":
+        return (
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200 uppercase">
+            Buyer
+          </span>
+        );
+      case "seller":
+        return (
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 border border-purple-200 uppercase">
+            Seller
+          </span>
+        );
+      case "creator":
+        return (
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 border border-amber-200 uppercase">
+            Creator
+          </span>
+        );
+      default:
+        return null;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f8fafc] py-16 px-4 flex items-center justify-center">
         <div className="text-center space-y-3">
-          <Loader2 className="w-9 h-9 mx-auto animate-spin text-[#327C73]" />
+          <Loader2 className="w-9 h-9 mx-auto animate-spin text-[#0D6D5F]" />
           <p className="text-xs font-semibold text-[#64748b]">Loading support conversation...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Unauthorized (403) or socket unauthorized state
+  if (is403 || isUnauthorized) {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] py-16 px-4">
+        <div className="max-w-xl mx-auto bg-white p-8 rounded-[6px] border border-[#e2e8f0] text-center space-y-4 shadow-xs">
+          <ShieldAlert className="w-12 h-12 mx-auto text-rose-600" />
+          <h2 className="text-lg font-bold text-[#0f172a] font-sf-pro">Access Restricted</h2>
+          <p className="text-xs text-[#64748b] font-inter">
+            You are not authorized to view or reply to this support ticket. Tickets are private to the participants of the associated order and support agents.
+          </p>
+          <div className="pt-2">
+            <Link
+              href="/support"
+              className="inline-flex px-5 py-2.5 rounded-[6px] bg-[#0f172a] text-white font-semibold text-xs hover:bg-[#1e293b] transition font-sf-pro"
+            >
+              Back to Support Dashboard
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -344,6 +426,16 @@ export default function TicketDetailsPage() {
     );
   }
 
+  // Participants list from backend, with fallback for backward compatibility
+  const participants = Array.isArray(ticket.participants) && ticket.participants.length > 0
+    ? ticket.participants
+    : [
+      ticket.user ? { id: ticket.user.id, name: ticket.user.name, avatar: ticket.user.avatar, role: "creator" as const } : null,
+      { id: "support", name: "Support Agent", role: "admin" as const },
+    ].filter(Boolean);
+
+  const canSendReply = !sending && !uploadingFile && (replyText.trim().length > 0 || attachments.length > 0);
+
   return (
     <div className="min-h-screen bg-[#f8fafc] pt-8 pb-[80px] min-[1400px]:pb-[100px] px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto px-4 md:px-6 space-y-6">
@@ -352,16 +444,16 @@ export default function TicketDetailsPage() {
         <div className="flex items-center justify-between">
           <Link
             href="/support"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-[#64748b] hover:text-[#327C73] transition font-sf-pro"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-[#64748b] hover:text-[#0D6D5F] transition font-sf-pro"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Support Dashboard</span>
           </Link>
 
           <div className="flex items-center gap-2 font-inter">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#327C73] animate-pulse" />
-            <span className="text-xs font-semibold text-[#327C73]">
-              {isConnected ? "Real-time Support Connected" : "Connected"}
+            <span className="w-2.5 h-2.5 rounded-full bg-[#0D6D5F] animate-pulse" />
+            <span className="text-xs font-semibold text-[#0D6D5F]">
+              {isConnected ? "Real-time Support Connected" : "Connecting..."}
             </span>
           </div>
         </div>
@@ -398,8 +490,8 @@ export default function TicketDetailsPage() {
 
           {/* Linked Order Banner */}
           {ticket.order && (
-            <div className="flex items-center gap-3 p-4 rounded-[6px] bg-[#327C73]/5 border border-[#327C73]/20 text-xs font-inter">
-              <ShoppingBag className="w-5 h-5 text-[#327C73] flex-shrink-0" />
+            <div className="flex items-center gap-3 p-4 rounded-[6px] bg-[#0D6D5F]/5 border border-[#0D6D5F]/20 text-xs font-inter">
+              <ShoppingBag className="w-5 h-5 text-[#0D6D5F] flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <span className="font-bold text-[#0f172a] block truncate">
                   Linked Order: {ticket.order.title || ticket.order.code}
@@ -410,6 +502,29 @@ export default function TicketDetailsPage() {
               </div>
             </div>
           )}
+
+          {/* Participants Strip */}
+          <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs border-t border-[#f1f5f9]">
+            <div className="flex items-center gap-2 text-[#64748b] font-medium">
+              <span>Participants:</span>
+              <div className="flex items-center gap-2 flex-wrap">
+                {participants.map((p: any, idx: number) => {
+                  const isUser = p.id === currentUserId;
+                  const displayName = p.role === "admin" ? "Support Agent" : p.name || "Member";
+                  return (
+                    <div
+                      key={p.id || idx}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f8fafc] border border-[#e2e8f0] text-[11px] font-semibold text-[#0f172a]"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-[#0D6D5F]" />
+                      <span>{displayName} {isUser && "(You)"}</span>
+                      {getRoleBadge(p.role)}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Conversation Stream */}
@@ -418,18 +533,18 @@ export default function TicketDetailsPage() {
           {/* Chat Header */}
           <div className="px-6 py-4 border-b border-[#e2e8f0] bg-[#f8fafc] flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#1dbf73]" />
+              <ShieldCheck className="w-4 h-4 text-[#0D6D5F]" />
               <span className="text-xs font-semibold text-[#0f172a]">
-                Official Support Communication Stream
+                Shared Support Conversation
               </span>
             </div>
             <span className="text-xs text-[#64748b]">
-              {messages.length} Message(s)
+              {messages.length} Message{messages.length === 1 ? "" : "s"}
             </span>
           </div>
 
           {/* Message List */}
-          <div ref={messageContainerRef} className="flex-1 p-6 space-y-6 overflow-y-auto max-h-[600px] bg-[#f8fafc]/50 scroll-smooth">
+          <div ref={messageContainerRef} className="flex-1 p-6 space-y-5 overflow-y-auto max-h-[600px] bg-[#f8fafc]/50 scroll-smooth">
             {messages.length === 0 ? (
               <div className="text-center py-12 space-y-2">
                 <User className="w-8 h-8 mx-auto text-[#cbd5e1]" />
@@ -437,32 +552,53 @@ export default function TicketDetailsPage() {
               </div>
             ) : (
               messages.map((msg, idx) => {
-                const isAdmin = msg.role === "admin" || msg.role === "system";
-                const senderName = msg.senderName || msg.sender || (isAdmin ? "Support Agent" : "You");
+                const isSystem = msg.role === "system";
+                const isAdmin = msg.role === "admin" || msg.senderID === "support";
+                const isMe = Boolean(currentUserId && msg.senderID && msg.senderID === currentUserId);
+                const displayName = isAdmin ? "Support Agent" : msg.sender || (isMe ? "You" : "Participant");
                 const timeStr = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "";
+
+                // System message rendering (e.g. escalated to dispute)
+                if (isSystem) {
+                  return (
+                    <div key={msg.id || idx} className="flex items-center justify-center my-3">
+                      <div className="px-4 py-2 rounded-[6px] bg-purple-50 border border-purple-200 text-purple-800 text-xs font-medium text-center max-w-md shadow-2xs">
+                        <span className="font-bold mr-1">System Notice:</span>
+                        <span>{msg.message}</span>
+                        {timeStr && <span className="block text-[10px] text-purple-600 mt-0.5">{timeStr}</span>}
+                      </div>
+                    </div>
+                  );
+                }
 
                 return (
                   <div
                     key={msg.id || idx}
-                    className={`flex items-start gap-3 ${isAdmin ? "justify-start" : "justify-end"}`}
+                    className={`flex items-start gap-3 ${isMe ? "justify-end" : "justify-start"}`}
                   >
-                    {isAdmin && (
-                      <div className="w-8 h-8 rounded-full bg-[#327C73] text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-2xs">
-                        S
+                    {!isMe && (
+                      <div
+                        className={`w-8 h-8 rounded-full text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-2xs ${
+                          isAdmin ? "bg-[#0D6D5F]" : "bg-[#0f172a]"
+                        }`}
+                      >
+                        {isAdmin ? "S" : displayName[0]?.toUpperCase() || "U"}
                       </div>
                     )}
 
-                    <div className={`space-y-1 max-w-lg ${isAdmin ? "items-start" : "items-end text-right"}`}>
+                    <div className={`space-y-1 max-w-lg ${isMe ? "items-end text-right" : "items-start"}`}>
                       <div className="flex items-center gap-2 text-[11px] font-semibold text-[#64748b] px-1">
-                        <span>{senderName}</span>
+                        <span>{isMe ? "You" : displayName}</span>
+                        {getRoleBadge(msg.role)}
                         {timeStr && <span>• {timeStr}</span>}
                       </div>
 
                       <div
-                        className={`p-4 rounded-[6px] text-xs leading-relaxed ${isAdmin
-                          ? "bg-white text-[#0f172a] rounded-tl-none border border-[#e2e8f0] shadow-2xs"
-                          : "bg-[#327C73] text-white rounded-tr-none shadow-2xs"
-                          }`}
+                        className={`p-4 rounded-[6px] text-xs leading-relaxed ${
+                          isMe
+                            ? "bg-[#0D6D5F] text-white rounded-tr-none shadow-2xs"
+                            : "bg-white text-[#0f172a] rounded-tl-none border border-[#e2e8f0] shadow-2xs"
+                        }`}
                       >
                         <p className="whitespace-pre-wrap">{msg.message}</p>
 
@@ -480,7 +616,7 @@ export default function TicketDetailsPage() {
                       </div>
                     </div>
 
-                    {!isAdmin && (
+                    {isMe && (
                       <div className="w-8 h-8 rounded-full bg-[#0f172a] text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-2xs">
                         {user?.username?.[0]?.toUpperCase() || user?.name?.[0]?.toUpperCase() || "U"}
                       </div>
@@ -492,7 +628,7 @@ export default function TicketDetailsPage() {
 
             {/* Typing Indicator */}
             {typingUser && (
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#327C73] animate-pulse font-inter">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#0D6D5F] animate-pulse font-inter">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 <span>{typingUser} is typing a response...</span>
               </div>
@@ -508,7 +644,7 @@ export default function TicketDetailsPage() {
                 {attachments.map((att, idx) => (
                   <span
                     key={idx}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[6px] bg-[#327C73]/10 border border-[#327C73]/20 text-[#327C73] text-xs font-semibold font-inter"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[6px] bg-[#0D6D5F]/10 border border-[#0D6D5F]/20 text-[#0D6D5F] text-xs font-semibold font-inter"
                   >
                     <FileText className="w-3.5 h-3.5" />
                     <span>{att.name}</span>
@@ -529,12 +665,12 @@ export default function TicketDetailsPage() {
 
             <form
               onSubmit={handleSendReply}
-              className="bg-[#f8fafc] border border-[#e2e8f0] focus-within:border-[#327C73] focus-within:ring-2 focus-within:ring-[#327C73]/10 rounded-[6px] p-3 sm:p-4 transition-all space-y-3"
+              className="bg-[#f8fafc] border border-[#e2e8f0] focus-within:border-[#0D6D5F] focus-within:ring-2 focus-within:ring-[#0D6D5F]/10 rounded-[6px] p-3 sm:p-4 transition-all space-y-3"
             >
               {/* Textarea */}
               <textarea
                 rows={3}
-                placeholder="Type your message reply to support..."
+                placeholder="Type your message reply..."
                 value={replyText}
                 onChange={(e) => {
                   setReplyText(e.target.value);
@@ -543,7 +679,7 @@ export default function TicketDetailsPage() {
                 onKeyDown={(e) => {
                   if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
                     e.preventDefault();
-                    if (!sending && !uploadingFile && replyText.trim()) {
+                    if (canSendReply) {
                       handleSendReply(e);
                     }
                   }
@@ -572,8 +708,8 @@ export default function TicketDetailsPage() {
                     isLoading={uploadingFile}
                     loadingText="Uploading..."
                     onClick={() => fileInputRef.current?.click()}
-                    leftIcon={<Upload className="w-3.5 h-3.5 text-[#327C73]" />}
-                    className="bg-white border-[#e2e8f0] hover:border-[#327C73]/40 text-[#475569] hover:text-[#327C73] text-xs font-semibold font-sf-pro shadow-2xs"
+                    leftIcon={<Upload className="w-3.5 h-3.5 text-[#0D6D5F]" />}
+                    className="bg-white border-[#e2e8f0] hover:border-[#0D6D5F]/40 text-[#475569] hover:text-[#0D6D5F] text-xs font-semibold font-sf-pro shadow-2xs"
                   >
                     Upload File
                   </Button>
@@ -589,7 +725,7 @@ export default function TicketDetailsPage() {
                   variant="brand"
                   size="sm"
                   radius="xl"
-                  disabled={sending || uploadingFile || !replyText.trim()}
+                  disabled={!canSendReply}
                   isLoading={sending}
                   loadingText="Sending..."
                   rightIcon={<Send className="w-3.5 h-3.5" />}

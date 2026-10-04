@@ -377,6 +377,20 @@ export default function GlobalSocketListener() {
         return;
       }
 
+      const targetOrderId = newNotif.orderID || newNotif.orderId;
+      const targetTicketId = newNotif.ticketID || newNotif.ticketId;
+      const targetBriefId = newNotif.briefID || newNotif.briefId;
+      const targetProposalId = newNotif.proposalID || newNotif.proposalId;
+
+      // If user is currently looking at this open support ticket, skip toast (message renders live in stream)
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
+      if (
+        (targetTicketId && currentPath.includes(`/support/${targetTicketId}`)) ||
+        (newNotif.type === "support" && newNotif.link && currentPath === newNotif.link)
+      ) {
+        return;
+      }
+
       const notifId = String(
         newNotif._id ||
           newNotif.id ||
@@ -388,11 +402,6 @@ export default function GlobalSocketListener() {
       setTimeout(() => processedNotifIds.delete(notifId), 8000);
 
       playNotificationSound("notification");
-
-      const targetOrderId = newNotif.orderID || newNotif.orderId;
-      const targetTicketId = newNotif.ticketID || newNotif.ticketId;
-      const targetBriefId = newNotif.briefID || newNotif.briefId;
-      const targetProposalId = newNotif.proposalID || newNotif.proposalId;
 
       const handleOpenNotification = () => {
         if (newNotif.link) {

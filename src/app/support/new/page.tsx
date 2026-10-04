@@ -20,6 +20,7 @@ import {
   FileText,
 } from "lucide-react";
 import { supportService } from "@/utils/supportService";
+import { useUserStore } from "@/store/userStore";
 import { Button, CustomSelect, CustomSelectOption } from "@/components/ui";
 
 const CATEGORIES = [
@@ -47,12 +48,24 @@ export default function CreateSupportTicketPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const user = useUserStore((state: any) => state.user);
+
   useEffect(() => {
     async function loadOrders() {
       setLoadingOrders(true);
       try {
         const list = await supportService.getUserOrders();
-        setOrders(list);
+        // Ensure only orders user is part of are included
+        const currentUid = String(user?._id || user?.id || "").trim();
+        const validList = Array.isArray(list)
+          ? list.filter((o: any) => {
+              if (!currentUid) return true;
+              const buyerId = String(o.buyerID?._id || o.buyerID?.id || o.buyerID || "").trim();
+              const sellerId = String(o.sellerID?._id || o.sellerID?.id || o.sellerID || "").trim();
+              return buyerId === currentUid || sellerId === currentUid;
+            })
+          : [];
+        setOrders(validList);
       } catch (err) {
         console.error("Failed to load user orders for linker:", err);
       } finally {
@@ -60,7 +73,7 @@ export default function CreateSupportTicketPage() {
       }
     }
     loadOrders();
-  }, []);
+  }, [user]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -123,7 +136,7 @@ export default function CreateSupportTicketPage() {
         attachments,
       });
 
-      const ticketId = res?.id || res?._id || res?.ticket?.id;
+      const ticketId = res?.id || res?._id || res?.ticket?.id || res?.data?.ticket?.id || res?.data?.id;
       if (ticketId) {
         router.push(`/support/${ticketId}`);
       } else {
@@ -131,7 +144,14 @@ export default function CreateSupportTicketPage() {
       }
     } catch (err: any) {
       console.error("Failed to create support ticket:", err);
-      setError(err?.response?.data?.message || err.message || "Failed to create support ticket.");
+      const status = err?.response?.status;
+      if (status === 403) {
+        setError("You can only open a support ticket for an order you are part of.");
+      } else if (status === 404) {
+        setError("The selected order could not be found.");
+      } else {
+        setError(err?.response?.data?.message || err.message || "Failed to create support ticket.");
+      }
       setSubmitting(false);
     }
   };

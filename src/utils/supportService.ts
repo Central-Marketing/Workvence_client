@@ -32,8 +32,27 @@ adminAxiosFetch.interceptors.request.use((config) => {
   return config;
 });
 
+export interface SupportParticipant {
+  id: string;
+  name: string;
+  avatar?: string;
+  role: 'buyer' | 'seller' | 'creator' | 'admin';
+}
+
+export interface SupportMessage {
+  id: string;
+  sender: string;
+  senderID: string;
+  role: 'admin' | 'buyer' | 'seller' | 'creator' | 'system';
+  message: string;
+  attachments?: any[];
+  createdAt: string;
+  thread?: string;
+}
+
 export interface SupportTicketItem {
   id: string;
+  _id?: string;
   ticketNumber: string;
   subject: string;
   message: string;
@@ -53,14 +72,19 @@ export interface SupportTicketItem {
     email: string;
     avatar?: string;
   };
-  messageCount: number;
+  messageCount?: number;
   createdAt: string;
-  messages?: any[];
+  messages: SupportMessage[];
+  participants: SupportParticipant[];
+  disputeID?: string | null;
   ticket?: any;
+  /** @deprecated use `messages` instead */
   threads?: {
     creator?: any[];
     buyer?: any[];
     seller?: any[];
+    group?: any[];
+    directBuyerSellerChat?: any[];
   };
 }
 
@@ -92,22 +116,43 @@ export const supportService = {
   },
 
   /**
-   * Get single support ticket details & thread messages
+   * Get single support ticket details & shared messages
    */
   async getTicketById(ticketId: string): Promise<SupportTicketItem> {
     const res = await adminAxiosFetch.get(`/admin/support/tickets/${ticketId}`);
     const payload = res.data;
-    return payload?.data?.ticket || payload?.ticket || payload?.data || payload;
+    const ticketObj = payload?.data?.ticket || payload?.ticket || payload?.data || payload;
+    if (ticketObj) {
+      if (!ticketObj.messages && Array.isArray(ticketObj.threads?.group)) {
+        ticketObj.messages = ticketObj.threads.group;
+      }
+      if (!Array.isArray(ticketObj.messages)) {
+        ticketObj.messages = [];
+      }
+      if (!Array.isArray(ticketObj.participants)) {
+        ticketObj.participants = [];
+      }
+    }
+    return ticketObj;
   },
 
   /**
-   * Reply to an existing support ticket
+   * Reply to an existing support ticket (shared conversation)
    */
   async replyTicket(
     ticketId: string,
-    payload: { message: string; thread?: string; attachments?: any[] }
+    payload: { message?: string; attachments?: any[]; thread?: string }
   ) {
-    const res = await adminAxiosFetch.post(`/admin/support/tickets/${ticketId}/reply`, payload);
+    const cleanPayload: { message?: string; attachments?: any[] } = {};
+    if (payload.message && payload.message.trim().length > 0) {
+      cleanPayload.message = payload.message.trim();
+    } else if (payload.attachments && payload.attachments.length > 0) {
+      cleanPayload.message = "";
+    }
+    if (payload.attachments && payload.attachments.length > 0) {
+      cleanPayload.attachments = payload.attachments;
+    }
+    const res = await adminAxiosFetch.post(`/admin/support/tickets/${ticketId}/reply`, cleanPayload);
     return res.data;
   },
 

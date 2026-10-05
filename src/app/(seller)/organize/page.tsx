@@ -108,6 +108,8 @@ const OrganizePage = () => {
   const subImagesInputRef = useRef<HTMLInputElement>(null);
   const galleryScrollRef = useRef<HTMLDivElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const MAX_IMAGE_SIZE_BYTES = 3 * 1024 * 1024; // 3MB
 
   const scrollGallery = (direction: "left" | "right") => {
     if (galleryScrollRef.current) {
@@ -444,6 +446,15 @@ const OrganizePage = () => {
   const handleCoverSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      setImageError(`"${file.name}" exceeds the 3MB size limit. Please upload an image under 3MB.`);
+      if (coverInputRef.current) coverInputRef.current.value = "";
+      e.target.value = "";
+      return;
+    }
+
+    setImageError(null);
     try {
       setUploading(true);
       toast.loading("Uploading banner image...", { id: "upload-cover" });
@@ -460,12 +471,27 @@ const OrganizePage = () => {
       toast.error("Failed to upload banner", { id: "upload-cover" });
     } finally {
       setUploading(false);
+      if (coverInputRef.current) coverInputRef.current.value = "";
     }
   };
 
   const handleSubImagesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     if (files.length === 0) return;
+
+    const oversizedFiles = files.filter((f) => f.size > MAX_IMAGE_SIZE_BYTES);
+    if (oversizedFiles.length > 0) {
+      if (oversizedFiles.length === 1) {
+        setImageError(`"${oversizedFiles[0].name}" exceeds the 3MB size limit. Please upload an image under 3MB.`);
+      } else {
+        setImageError(`${oversizedFiles.length} images exceed the 3MB size limit. Maximum allowed size is 3MB per file.`);
+      }
+      if (subImagesInputRef.current) subImagesInputRef.current.value = "";
+      e.target.value = "";
+      return;
+    }
+
+    setImageError(null);
     try {
       setUploading(true);
       toast.loading(`Uploading ${files.length} images...`, { id: "upload-subs" });
@@ -483,6 +509,7 @@ const OrganizePage = () => {
       toast.error("Failed uploading images", { id: "upload-subs" });
     } finally {
       setUploading(false);
+      if (subImagesInputRef.current) subImagesInputRef.current.value = "";
     }
   };
 
@@ -1308,6 +1335,13 @@ const OrganizePage = () => {
               <span>Add Sub Images</span>
               <Plus className="w-4 h-4" />
             </div>
+
+            {/* Inline Error Span */}
+            {imageError && (
+              <span className="text-[12px] text-red-500 font-medium block">
+                {imageError}
+              </span>
+            )}
           </div>
 
           {/* Real Uploaded Images Gallery Row */}

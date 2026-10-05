@@ -44,11 +44,10 @@ const RecentOrdersCard: React.FC<RecentOrdersCardProps> = ({
               variant={orderTypeFilter === "all" ? "brand" : "ghost"}
               size="sm"
               radius="fiverr"
-              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${
-                orderTypeFilter === "all"
-                  ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                  : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
-              }`}
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${orderTypeFilter === "all"
+                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                }`}
             >
               All
             </Button>
@@ -58,11 +57,10 @@ const RecentOrdersCard: React.FC<RecentOrdersCardProps> = ({
               variant={orderTypeFilter === "package" ? "brand" : "ghost"}
               size="sm"
               radius="fiverr"
-              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${
-                orderTypeFilter === "package"
-                  ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                  : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
-              }`}
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${orderTypeFilter === "package"
+                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                }`}
             >
               Packages
             </Button>
@@ -72,11 +70,10 @@ const RecentOrdersCard: React.FC<RecentOrdersCardProps> = ({
               variant={orderTypeFilter === "brief" ? "brand" : "ghost"}
               size="sm"
               radius="fiverr"
-              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${
-                orderTypeFilter === "brief"
-                  ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                  : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
-              }`}
+              className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 ${orderTypeFilter === "brief"
+                ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                }`}
             >
               Briefs
             </Button>
@@ -95,9 +92,9 @@ const RecentOrdersCard: React.FC<RecentOrdersCardProps> = ({
 
       {/* Orders Table */}
       <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)]">
-        <table className="w-full text-left text-sm border-collapse min-w-[700px]">
+        <table className="w-full  min-w-[760px] border-collapse text-left">
           <thead>
-            <tr className="border-b border-slate-100 text-base font-sf-pro font-bold text-[#434343]">
+            <tr className="border-b border-slate-100 text-base  font-sf-pro font-bold text-[#434343]">
               <th className="py-3 px-4">Order Name</th>
               <th className="py-3 px-4 whitespace-nowrap">Order Date</th>
               <th className="py-3 px-4 whitespace-nowrap">Due on</th>
@@ -113,7 +110,7 @@ const RecentOrdersCard: React.FC<RecentOrdersCardProps> = ({
                 </td>
               </tr>
             ) : (
-              orders.slice(0, 5).map((order: any, idx: number) => {
+              orders.slice(0, 10).map((order: any, idx: number) => {
                 const isBrief = Boolean(order.briefID || order.type === "brief");
                 const orderDate = order.createdAt
                   ? new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
@@ -198,11 +195,10 @@ const RecentOrdersCard: React.FC<RecentOrdersCardProps> = ({
                     onClick={() => {
                       router.push(`/orders/${order._id}`);
                     }}
-                    className={`group relative cursor-pointer transition-colors ${
-                      idx % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
-                    } after:pointer-events-none after:absolute after:inset-0`}
+                    className={`group relative cursor-pointer transition-colors ${idx % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
+                      } after:pointer-events-none after:absolute after:inset-0`}
                   >
-                    <td className="py-4 px-3 align-middle">
+                    <td className="py-3 px-4 align-middle max-w-[380px]">
                       <div className="flex items-center gap-3.5">
                         <div className="relative w-24 sm:w-36 md:w-[180px] lg:w-[220px] aspect-[11/6] rounded-[6px] overflow-hidden bg-gray-100 border border-gray-200/80 shrink-0">
                           <Image
@@ -232,31 +228,31 @@ const RecentOrdersCard: React.FC<RecentOrdersCardProps> = ({
                       </div>
                     </td>
 
-                    <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
+                    <td className="py-3 px-4 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
                       {orderDate}
                     </td>
 
-                    <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
+                    <td className="py-3 px-4 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
                       {dueDate}
                     </td>
 
-                    <td className="py-4 px-4 align-middle text-xs sm:text-[13.5px] font-bold text-gray-950 whitespace-nowrap">
+                    <td className="py-3 px-4 align-middle text-xs sm:text-sm font-bold text-slate-900 whitespace-nowrap">
                       {(order.price || 0).toLocaleString("en-US", {
                         style: "currency",
                         currency: "USD",
                       })}
                     </td>
 
-                    <td className="py-4 px-4 align-middle whitespace-nowrap">
+                    <td className="py-3 px-4 align-middle whitespace-nowrap">
                       <Tag
                         variant={
                           isDisputed
                             ? "disputed"
                             : isRevision
-                            ? "in_revision"
-                            : isLate || st === "late"
-                            ? "late"
-                            : st || statusBadge.label
+                              ? "in_revision"
+                              : isLate || st === "late"
+                                ? "late"
+                                : st || statusBadge.label
                         }
                         size="sm"
                       >

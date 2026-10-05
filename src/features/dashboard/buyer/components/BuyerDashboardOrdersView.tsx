@@ -143,7 +143,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
     } else if (activeTab === "Briefs") {
       list = list.filter((o) => o.itemType === "brief");
     }
-    return sortOrdersByPriority(list).slice(0, 5);
+    return sortOrdersByPriority(list).slice(0, 10);
   }, [normalizedOrders, activeTab]);
 
   const handleRowClick = (orderId: string) => {

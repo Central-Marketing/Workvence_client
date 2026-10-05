@@ -173,7 +173,7 @@ export const SellerReviewReply: React.FC<SellerReviewReplyProps> = ({
         </form>
       ) : currentReply ? (
         /* 2. Display Nested Seller Response */
-        <div className="ml-2 sm:ml-4 pl-3.5 sm:pl-4 py-3 pr-4 bg-[#F9FBFA] border border-gray-200/80 border-l-[3px] border-l-[#0D6D5F] rounded-r-[6px] rounded-l-[2px] space-y-2">
+        <div className="ml-2 sm:ml-4 pl-3.5 sm:pl-4 py-3 pr-4 bg-[#ffffff] border border-[rgba(0,0,0,0.10)] space-y-2">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <div className="flex items-center gap-2">
               <img

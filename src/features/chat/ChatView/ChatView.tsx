@@ -3,7 +3,7 @@
 import { toast } from "sonner";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ArrowLeft, Flag, ArrowRight, Download, Eye, Home, Check } from "lucide-react";
+import { ArrowLeft, Flag, ArrowRight, Download, Eye, Home, Check, CheckCircle2, Bell, Clock } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BsThreeDotsVertical } from "react-icons/bs";
 
@@ -1070,6 +1070,23 @@ const ChatView = () => {
       textareaRef.current.style.height = 'auto';
     }
 
+    // Check if this is the buyer's very first message in the conversation
+    const currentUid = String(user?._id || user?.id || '');
+    const currentUsername = String(user?.username || '').toLowerCase();
+    const hasPriorBuyerMessage = filteredMessages.some((m: any) => {
+      const sObj = m.sender || m.user || m.userID || m.senderID || m.from;
+      const sId = String(sObj?._id || sObj?.id || sObj || '');
+      const sUsername = String(sObj?.username || m.username || '').toLowerCase();
+      return (currentUid && sId === currentUid) || (currentUsername && sUsername === currentUsername);
+    });
+
+    if (!hasPriorBuyerMessage && !user?.isSeller) {
+      toast.success("Message sent successfully", {
+        description: "The seller has received your message. You’ll be notified when they reply.",
+        duration: 5000,
+      });
+    }
+
     // 1. Optimistically append temporary message to local UI (0ms latency)
     const tempId = `temp-${Date.now()}`;
     const tempMessage = {
@@ -1639,6 +1656,51 @@ const ChatView = () => {
       const text = (msg.description || msg.desc || msg.text || msg.message || '').toLowerCase();
       return text.includes(msgSearchQuery.toLowerCase());
     });
+
+  // Detect if buyer has sent messages and is awaiting the seller's very first reply
+  const isAwaitingFirstReply = useMemo(() => {
+    if (!user) return false;
+
+    const currentUid = String(user._id || user.id || '');
+    const currentUsername = String(user.username || '').toLowerCase();
+    const bId = String(activeConversation?.buyerID?._id || activeConversation?.buyerID || '');
+    const sId = String(activeConversation?.sellerID?._id || activeConversation?.sellerID || '');
+    const isBuyerInConv = bId ? bId === currentUid : sId ? sId !== currentUid : !user.isSeller;
+    if (!isBuyerInConv) return false;
+
+    if (!Array.isArray(filteredMessages) || filteredMessages.length === 0) return false;
+
+    let buyerMsgCount = 0;
+    let sellerMsgCount = 0;
+
+    for (const msg of filteredMessages) {
+      const senderObj =
+        (typeof msg.sender === 'object' && msg.sender) ||
+        (typeof msg.user === 'object' && msg.user) ||
+        (typeof msg.userID === 'object' && msg.userID) ||
+        (typeof msg.senderID === 'object' && msg.senderID) ||
+        msg.sender ||
+        msg.user ||
+        msg.senderID ||
+        msg.userID ||
+        msg.from;
+      const senderIdStr = String(senderObj?._id || senderObj?.id || senderObj || '');
+      const senderUsername = String(senderObj?.username || msg.username || '').toLowerCase();
+
+      const isMyMsg = Boolean(
+        (currentUid && senderIdStr && currentUid === senderIdStr) ||
+        (currentUsername && senderUsername && currentUsername === senderUsername)
+      );
+
+      if (isMyMsg) {
+        buyerMsgCount++;
+      } else {
+        sellerMsgCount++;
+      }
+    }
+
+    return buyerMsgCount > 0 && sellerMsgCount === 0;
+  }, [user, activeConversation, filteredMessages]);
 
   // Auto-scroll on initial load, conversation switch, or new messages
   useEffect(() => {
@@ -2737,6 +2799,35 @@ const ChatView = () => {
                     </div>
                   );
                 })}
+
+                {/* First Message Sent Milestone Card */}
+                {isAwaitingFirstReply && (
+                  <div className="mx-auto my-5 max-w-md w-full bg-white border border-[#0D6D5F]/20 rounded-[8px] p-5 shadow-xs text-center transition-all animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="w-10 h-10 rounded-full bg-[#ffffff] border  border-[#0D6D5F] text-[#0D6D5F] flex items-center justify-center mx-auto mb-3 shadow-2xs">
+                      <CheckCircle2 className="w-5 h-5 text-[#0D6D5F]" />
+                    </div>
+                    <h3 className="font-bold text-sm sm:text-base text-slate-900 font-sf-pro">
+                      Message sent successfully
+                    </h3>
+                    <p className="text-xs sm:text-[13px] text-slate-500 mt-1 leading-relaxed max-w-sm mx-auto">
+                      The seller has received your message. You’ll be notified when they reply.
+                    </p>
+                    <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-center gap-3 sm:gap-4 flex-wrap text-xs text-slate-500">
+                      <span className="inline-flex items-center gap-1.5">
+                        <Bell className="w-3.5 h-3.5 text-[#0D6D5F]" />
+                        In-app alerts
+                      </span>
+                      <span className="text-slate-300">•</span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        {finalRecipientUser?.responseTimeHours
+                          ? `Avg. reply: ${finalRecipientUser.responseTimeHours}h`
+                          : finalRecipientUser?.responseTime || "Quick response"}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 {isRecipientTyping && (
                   <div className="flex items-center gap-2 text-xs text-slate-400 pl-14 italic mb-4">
                     <span className="flex gap-[3px]">

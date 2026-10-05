@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -54,83 +54,34 @@ function formatCategoryName(cat?: string): string {
     .join(" ");
 }
 
-const normalizeProposal = (p: any, idx: number, fullSellerData?: any) => {
-  const rawSeller = p?.seller || (typeof p?.sellerID === "object" ? p?.sellerID : null) || {};
-  const resolvedFull = fullSellerData?.user || fullSellerData?.seller || fullSellerData?.data || fullSellerData || {};
-  const seller = { ...rawSeller, ...resolvedFull };
-  const id = p?._id || p?.id || `prop-${idx}`;
-  const sellerId =
-    seller?._id ||
-    seller?.id ||
-    (typeof p?.sellerID === "string" ? p.sellerID : p?.sellerID?._id || p?.sellerID?.id) ||
-    p?.sellerId ||
-    "";
-  const name = seller?.username || seller?.name || "Freelancer";
-  const avatar = seller?.image || seller?.avatar || "";
+const normalizeProposal = (p: any, idx: number) => {
+  const seller = p?.seller || {};
+  const id = p?.id || p?._id || `prop-${idx}`;
+  const sellerId = seller?.id || seller?._id || p?.sellerID || "";
+  const username = seller?.username || "freelancer";
+  const avatar = seller?.image || "";
   const country = seller?.country || "";
-  const badge = seller?.sellerLevel || (seller?.isTopRated ? "Top Rated" : "");
-  const tagline = seller?.headline || seller?.tagline || seller?.title || "";
-  const rating =
-    typeof seller?.starRating === "number"
-      ? seller.starRating
-      : typeof seller?.rating === "number"
-        ? seller.rating
-        : typeof seller?.metrics?.overall?.starRating === "number"
-          ? seller.metrics.overall.starRating
-          : null;
-  const reviewCount =
-    typeof seller?.totalReviews === "number"
-      ? seller.totalReviews
-      : typeof seller?.reviewCount === "number"
-        ? seller.reviewCount
-        : typeof seller?.metrics?.overall?.totalReviews === "number"
-          ? seller.metrics.overall.totalReviews
-          : null;
-  const completedProjects =
-    typeof seller?.metrics?.overall?.completedOrdersCount === "number"
-      ? seller.metrics.overall.completedOrdersCount
-      : typeof seller?.completedOrdersCount === "number"
-        ? seller.completedOrdersCount
-        : typeof seller?.completedProjects === "number"
-          ? seller.completedProjects
-          : typeof seller?.ordersCount === "number"
-            ? seller.ordersCount
-            : null;
-  const successRate =
-    typeof seller?.metrics?.overall?.jobSuccessRate === "number"
-      ? `${seller.metrics.overall.jobSuccessRate}%`
-      : typeof seller?.jobSuccessRate === "number"
-        ? `${seller.jobSuccessRate}%`
-        : seller?.successRate
-          ? String(seller.successRate).includes("%")
-            ? String(seller.successRate)
-            : `${seller.successRate}%`
-          : "";
+  const badge = seller?.sellerLevel || "";
+  const rating = typeof seller?.starRating === "number" ? seller.starRating : null;
+  const reviewCount = typeof seller?.totalReviews === "number" ? seller.totalReviews : null;
   const memberSince = seller?.createdAt ? moment(seller.createdAt).format("YYYY") : "";
   const price = typeof p?.price === "number" ? p.price : Number(p?.price) || 0;
   const deliveryTime = p?.deliveryTime || 0;
-  const coverLetter = p?.coverLetter || p?.description || p?.message || "";
+  const coverLetter = p?.coverLetter || "";
   const attachments = Array.isArray(p?.attachments) ? p.attachments.filter(Boolean) : [];
   const createdAt = p?.createdAt || "";
-  const skills = Array.isArray(seller?.skills) && seller.skills.length > 0
-    ? seller.skills
-    : Array.isArray(p?.skills) && p.skills.length > 0
-      ? p.skills
-      : [];
+  const skills = Array.isArray(p?.skills) ? p.skills : [];
 
   return {
     id,
     proposal: p,
     sellerId,
-    name,
+    username,
     avatar,
     country,
     badge,
-    tagline,
     rating,
     reviewCount,
-    completedProjects,
-    successRate,
     memberSince,
     price,
     deliveryTime,
@@ -170,28 +121,9 @@ const BriefDetail = () => {
   const [isFavorited, setIsFavorited] = useState(false);
 
   const aiRecommendationsList = useMemo(() => {
-    if (!aiResult) return [];
-    return (
-      (Array.isArray(aiResult.top3Recommendations) && aiResult.top3Recommendations) ||
-      (Array.isArray(aiResult.recommendation?.top3) && aiResult.recommendation.top3) ||
-      (Array.isArray(aiResult.topProposals) && aiResult.topProposals) ||
-      (Array.isArray(aiResult.rankedProposals) && aiResult.rankedProposals) ||
-      (Array.isArray(aiResult.recommendations) && aiResult.recommendations) ||
-      (Array.isArray(aiResult) && aiResult) ||
-      []
-    );
+    return Array.isArray(aiResult?.top3Recommendations) ? aiResult.top3Recommendations : [];
   }, [aiResult]);
 
-  // Fetch full seller profile on demand for genuine database details
-  const { data: selectedSellerProfile } = useQuery({
-    queryKey: ["seller-full-profile", selectedProposal?.sellerId],
-    queryFn: () =>
-      axiosFetch
-        .get(`/users/${selectedProposal?.sellerId}`)
-        .then(({ data }) => data?.user || data?.seller || data?.data || data)
-        .catch(() => null),
-    enabled: !!selectedProposal?.sellerId && modalView === "detail",
-  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -292,57 +224,14 @@ const BriefDetail = () => {
     return [];
   }, [isOwner, brief?.proposals, fetchedProposals]);
 
-  // Extract unique seller IDs from proposals to fetch their full live profiles
-  const uniqueSellerIds: string[] = useMemo(() => {
-    const ids = new Set<string>();
-    rawProposals.forEach((p: any) => {
-      const s = p?.seller || (typeof p?.sellerID === "object" ? p?.sellerID : null);
-      const sid = s?._id || s?.id || (typeof p?.sellerID === "string" ? p.sellerID : p?.sellerId);
-      if (sid) ids.add(sid);
-    });
-    return Array.from(ids);
-  }, [rawProposals]);
-
-  const sellerProfilesQueries = useQueries({
-    queries: uniqueSellerIds.map((sid) => ({
-      queryKey: ["seller-full-profile", sid],
-      queryFn: () =>
-        axiosFetch
-          .get(`/users/${sid}`)
-          .then(({ data }) => data?.user || data?.seller || data?.data || data)
-          .catch(() => null),
-      enabled: Boolean(isOwner && sid && (showProposalsModal || isOwner)),
-      staleTime: 5 * 60 * 1000,
-    })),
-  });
-
-  const sellerProfilesMap: Record<string, any> = useMemo(() => {
-    const map: Record<string, any> = {};
-    uniqueSellerIds.forEach((sid, idx) => {
-      const query = sellerProfilesQueries[idx];
-      if (query?.data) {
-        map[sid] = query.data;
-      }
-    });
-    return map;
-  }, [uniqueSellerIds, sellerProfilesQueries]);
-
   const normalizedProposals = useMemo(() => {
-    return rawProposals.map((p, idx) => {
-      const s = p?.seller || (typeof p?.sellerID === "object" ? p?.sellerID : null);
-      const sid = s?._id || s?.id || (typeof p?.sellerID === "string" ? p.sellerID : p?.sellerId);
-      const fullProfile = sid ? sellerProfilesMap[sid] : null;
-      return normalizeProposal(p, idx, fullProfile);
-    });
-  }, [rawProposals, sellerProfilesMap]);
+    return rawProposals.map((p, idx) => normalizeProposal(p, idx));
+  }, [rawProposals]);
 
   const detailedProposal = useMemo(() => {
     if (!selectedProposal) return null;
-    const fullProfile =
-      (selectedProposal.sellerId ? sellerProfilesMap[selectedProposal.sellerId] : null) ||
-      selectedSellerProfile;
-    return normalizeProposal(selectedProposal.proposal, 0, fullProfile);
-  }, [selectedProposal, sellerProfilesMap, selectedSellerProfile]);
+    return normalizeProposal(selectedProposal.proposal, 0);
+  }, [selectedProposal]);
 
   const displayedProposals = useMemo(() => {
     if (modalView !== "ai" || aiRecommendedIds.length === 0) {
@@ -568,19 +457,9 @@ const BriefDetail = () => {
       const res = await axiosFetch.get(`/briefs/${briefId}/ai-recommendation`);
       const data = res.data;
       setAiResult(data);
-      const recList =
-        (Array.isArray(data?.top3Recommendations) && data.top3Recommendations) ||
-        (Array.isArray(data?.recommendation?.top3) && data.recommendation.top3) ||
-        (Array.isArray(data?.rankedProposals) && data.rankedProposals) ||
-        (Array.isArray(data?.topProposals) && data.topProposals) ||
-        (Array.isArray(data?.recommendations) && data.recommendations) ||
-        (Array.isArray(data) && data) ||
-        [];
-      if (recList.length > 0) {
+      if (Array.isArray(data?.top3Recommendations)) {
         setAiRecommendedIds(
-          recList
-            .map((r: any) => r.proposalID || r.proposal?.id || r.proposal?._id || r._id || r.id)
-            .filter(Boolean)
+          data.top3Recommendations.map((r: any) => r.proposalID).filter(Boolean)
         );
       }
       setModalView("ai");
@@ -897,7 +776,7 @@ const BriefDetail = () => {
                       <img
                         key={aIdx}
                         src={item.avatar}
-                        alt={item.name}
+                        alt={item.username}
                         className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-2xs group-hover:scale-105 transition-transform"
                         onError={(e) => {
                           (e.currentTarget as HTMLElement).style.display = "none";
@@ -908,7 +787,7 @@ const BriefDetail = () => {
                         key={aIdx}
                         className="w-8 h-8 rounded-full bg-teal-50 border-2 border-white text-[11px] font-bold text-teal-800 flex items-center justify-center shadow-2xs uppercase group-hover:scale-105 transition-transform"
                       >
-                        {item.name.slice(0, 2)}
+                        {item.username.slice(0, 2)}
                       </div>
                     )
                   )}
@@ -954,7 +833,7 @@ const BriefDetail = () => {
                       <img
                         key={aIdx}
                         src={item.avatar}
-                        alt={item.name}
+                        alt={item.username}
                         className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-2xs"
                         onError={(e) => {
                           (e.currentTarget as HTMLElement).style.display = "none";
@@ -965,7 +844,7 @@ const BriefDetail = () => {
                         key={aIdx}
                         className="w-8 h-8 rounded-full bg-teal-50 border-2 border-white text-[11px] font-bold text-teal-800 flex items-center justify-center shadow-2xs uppercase"
                       >
-                        {item.name.slice(0, 2)}
+                        {item.username.slice(0, 2)}
                       </div>
                     )
                   )}
@@ -1321,25 +1200,39 @@ const BriefDetail = () => {
                         {/* Sender Profile Header */}
                         <div className="flex items-start justify-between gap-3 mb-2">
                           <div className="flex items-center gap-3 min-w-0">
-                            {item.avatar ? (
-                              <img
-                                src={item.avatar}
-                                alt={item.name}
-                                className="w-11 h-11 rounded-full object-cover border border-slate-200 shrink-0"
-                                onError={(e) => {
-                                  (e.currentTarget as HTMLElement).style.display = "none";
-                                }}
-                              />
-                            ) : (
-                              <div className="w-11 h-11 rounded-full bg-teal-50 text-teal-800 font-bold text-sm flex items-center justify-center border border-teal-200 shrink-0 uppercase">
-                                {item.name.slice(0, 2)}
-                              </div>
-                            )}
+                            <Link
+                              href={`/seller/${item.username}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="shrink-0 hover:opacity-90 transition-opacity"
+                            >
+                              {item.avatar ? (
+                                <img
+                                  src={item.avatar}
+                                  alt={item.username}
+                                  className="w-11 h-11 rounded-full object-cover border border-slate-200"
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLElement).style.display = "none";
+                                  }}
+                                />
+                              ) : (
+                                <div className="w-11 h-11 rounded-full bg-teal-50 text-teal-800 font-bold text-sm flex items-center justify-center border border-teal-200 uppercase">
+                                  {item.username.slice(0, 2)}
+                                </div>
+                              )}
+                            </Link>
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className="font-bold text-sm text-slate-900 truncate">
-                                  {item.name}
-                                </span>
+                                <Link
+                                  href={`/seller/${item.username}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="font-bold text-sm text-slate-900 hover:text-[#0D6D5F] hover:underline truncate transition-colors"
+                                >
+                                  {item.username}
+                                </Link>
                                 {item.badge && (
                                   <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] tracking-wider">
                                     {item.badge}
@@ -1347,11 +1240,6 @@ const BriefDetail = () => {
                                 )}
                               </div>
                               <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
-                                {item.tagline && (
-                                  <span className="font-medium text-slate-600 truncate max-w-[180px]">
-                                    {item.tagline}
-                                  </span>
-                                )}
                                 {typeof item.rating === "number" && item.rating > 0 && (
                                   <span className="font-bold text-slate-800 flex items-center gap-0.5">
                                     <FiStar className="fill-amber-400 text-amber-400 text-xs" />
@@ -1361,17 +1249,13 @@ const BriefDetail = () => {
                                 {typeof item.reviewCount === "number" && item.reviewCount > 0 && (
                                   <span>({item.reviewCount})</span>
                                 )}
+                                {item.country && <span>• {item.country}</span>}
                               </div>
-                              <p className="text-[11px] text-slate-400 mt-0.5">
-                                {item.completedProjects !== null && (
-                                  <span>{item.completedProjects} Projects Completed</span>
-                                )}
-                                {item.createdAt && (
-                                  <span>
-                                    {item.completedProjects !== null ? " | " : ""}Submitted {moment(item.createdAt).fromNow()}
-                                  </span>
-                                )}
-                              </p>
+                              {item.createdAt && (
+                                <p className="text-[11px] text-slate-400 mt-0.5">
+                                  Submitted {moment(item.createdAt).fromNow()}
+                                </p>
+                              )}
                             </div>
                           </div>
 
@@ -1426,7 +1310,7 @@ const BriefDetail = () => {
                             rightIcon={<FiArrowRight className="text-xs text-white" />}
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleMessageSeller(item.sellerId, item.name);
+                              handleMessageSeller(item.sellerId, item.username);
                             }}
                             className="flex-1 text-center shadow-xs !text-white text-white"
                           >
@@ -1445,7 +1329,7 @@ const BriefDetail = () => {
               <div className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
                 {aiLoading ? (
                   <div className="py-16 px-6 text-center flex flex-col items-center justify-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-[#0D6D5F]/10 text-[#0D6D5F] flex items-center justify-center text-2xl animate-pulse">
+                    <div className="w-12 h-12 rounded-full bg-[#ffffff] border border-[rgba(0,0,0,0.10)] text-[#0D6D5F] flex items-center justify-center text-2xl animate-pulse">
                       <HiSparkles />
                     </div>
                     <h3 className="text-base font-bold text-slate-900">Workvence AI is evaluating proposals...</h3>
@@ -1456,25 +1340,28 @@ const BriefDetail = () => {
                 ) : (
                   <>
                     {/* Analysis Summary Banner */}
-                    {(aiResult?.summary || aiResult?.recommendation?.summary) && (
-                      <div className="bg-gradient-to-br from-[#0D6D5F]/5 via-[#0D6D5F]/10 to-slate-50/50 border border-[#0D6D5F]/20 rounded-[6px] p-4 sm:p-5 shadow-2xs">
+                    {aiResult?.summary && (
+                      <div className="bg-white border border-[#0D6D5F]/40 rounded-[6px] p-4 sm:p-5 shadow-2xs">
                         <div className="flex items-center justify-between gap-2 mb-2">
                           <div className="flex items-center gap-2">
                             <div className="w-7 h-7 rounded-[6px] bg-[#0D6D5F]/15 flex items-center justify-center text-[#0D6D5F]">
-                              <HiSparkles className="text-base" />
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M19.5 3.9375V5.5M19.5 5.5V7.0625M19.5 5.5H18.25M19.5 5.5H20.75M22 5.5L20.9156 5.13852C20.4179 4.97263 20.0274 4.58211 19.8615 4.08443L19.5 3L19.1385 4.08443C18.9726 4.58211 18.5821 4.97263 18.0844 5.13852L17 5.5L18.0844 5.86148C18.5821 6.02737 18.9726 6.41789 19.1385 6.91557L19.5 8L19.8615 6.91557C20.0274 6.41789 20.4179 6.02737 20.9156 5.86148L22 5.5Z" stroke="#292929" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M2 12.8598C4.81875 10.0939 11.44 4.44198 13.275 6.40609C15.5938 8.888 3.40937 15.1646 5.28854 17.93C7.2734 20.851 14.2146 10.5543 16.5635 12.3982C18.9125 14.2422 10.926 18.391 12.8052 20.696C13.5569 21.6179 15.6239 20.235 16.5635 19.313" stroke="#292929" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                              </svg>
                             </div>
                             <h3 className="font-bold text-sm text-slate-900">
                               AI Evaluation Summary
                             </h3>
                           </div>
-                          {(aiResult?.totalProposalsEvaluated || aiRecommendationsList.length > 0) && (
+                          {aiResult?.totalProposalsEvaluated !== undefined && (
                             <span className="text-[11px] font-semibold bg-white text-[#0D6D5F] border border-[#0D6D5F]/20 px-2.5 py-0.5 rounded-full shadow-2xs">
-                              {aiResult?.totalProposalsEvaluated || aiRecommendationsList.length} Evaluated
+                              {aiResult.totalProposalsEvaluated} Evaluated
                             </span>
                           )}
                         </div>
                         <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed font-normal">
-                          {aiResult?.summary || aiResult?.recommendation?.summary}
+                          {aiResult.summary}
                         </p>
                       </div>
                     )}
@@ -1482,12 +1369,7 @@ const BriefDetail = () => {
                     {/* AI Recommendations List */}
                     {aiRecommendationsList.length > 0 ? (
                       aiRecommendationsList.map((rec: any, index: number) => {
-                        const recProposal = rec.proposal || rec;
-                        const recId = rec.proposalID || recProposal?._id || recProposal?.id || rec.id;
-                        const matched = normalizedProposals.find(
-                          (np: any) => np.id === recId || np.proposal?._id === recId || np.proposal?.id === recId
-                        );
-                        const displayItem = matched || normalizeProposal(recProposal, index, null);
+                        const displayItem = normalizeProposal(rec.proposal, index);
                         const rank = rec.rank || index + 1;
                         const score = rec.score !== undefined && rec.score !== null ? rec.score : null;
                         const pros: string[] = Array.isArray(rec.pros) ? rec.pros : [];
@@ -1540,25 +1422,39 @@ const BriefDetail = () => {
                             {/* Sender Profile Header */}
                             <div className="flex items-start justify-between gap-3 mb-3">
                               <div className="flex items-center gap-3 min-w-0">
-                                {displayItem.avatar ? (
-                                  <img
-                                    src={displayItem.avatar}
-                                    alt={displayItem.name}
-                                    className="w-11 h-11 rounded-full object-cover border border-slate-200 shrink-0"
-                                    onError={(e) => {
-                                      (e.currentTarget as HTMLElement).style.display = "none";
-                                    }}
-                                  />
-                                ) : (
-                                  <div className="w-11 h-11 rounded-full bg-[#0D6D5F]/10 text-[#0D6D5F] font-bold text-sm flex items-center justify-center border border-[#0D6D5F]/20 shrink-0 uppercase">
-                                    {displayItem.name.slice(0, 2)}
-                                  </div>
-                                )}
+                                <Link
+                                  href={`/seller/${displayItem.username}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="shrink-0 hover:opacity-90 transition-opacity"
+                                >
+                                  {displayItem.avatar ? (
+                                    <img
+                                      src={displayItem.avatar}
+                                      alt={displayItem.username}
+                                      className="w-11 h-11 rounded-full object-cover border border-slate-200"
+                                      onError={(e) => {
+                                        (e.currentTarget as HTMLElement).style.display = "none";
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="w-11 h-11 rounded-full bg-[#0D6D5F]/10 text-[#0D6D5F] font-bold text-sm flex items-center justify-center border border-[#0D6D5F]/20 uppercase">
+                                      {displayItem.username.slice(0, 2)}
+                                    </div>
+                                  )}
+                                </Link>
                                 <div className="min-w-0">
                                   <div className="flex items-center gap-2">
-                                    <span className="font-bold text-sm text-slate-900 truncate">
-                                      {displayItem.name}
-                                    </span>
+                                    <Link
+                                      href={`/seller/${displayItem.username}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="font-bold text-sm text-slate-900 hover:text-[#0D6D5F] hover:underline truncate transition-colors"
+                                    >
+                                      {displayItem.username}
+                                    </Link>
                                     {displayItem.badge && (
                                       <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] tracking-wider">
                                         {displayItem.badge}
@@ -1566,11 +1462,6 @@ const BriefDetail = () => {
                                     )}
                                   </div>
                                   <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
-                                    {displayItem.tagline && (
-                                      <span className="font-medium text-slate-600 truncate max-w-[180px]">
-                                        {displayItem.tagline}
-                                      </span>
-                                    )}
                                     {typeof displayItem.rating === "number" && displayItem.rating > 0 && (
                                       <span className="font-bold text-slate-800 flex items-center gap-0.5">
                                         <FiStar className="fill-amber-400 text-amber-400 text-xs" />
@@ -1580,20 +1471,8 @@ const BriefDetail = () => {
                                     {typeof displayItem.reviewCount === "number" && displayItem.reviewCount > 0 && (
                                       <span>({displayItem.reviewCount})</span>
                                     )}
+                                    {displayItem.country && <span>• {displayItem.country}</span>}
                                   </div>
-                                  <p className="text-[11px] text-slate-400 mt-0.5">
-                                    {displayItem.deliveryTime > 0 && (
-                                      <span>{displayItem.deliveryTime} Days Delivery · </span>
-                                    )}
-                                    {displayItem.completedProjects !== null && (
-                                      <span>{displayItem.completedProjects} Projects Completed</span>
-                                    )}
-                                    {displayItem.createdAt && (
-                                      <span>
-                                        {displayItem.completedProjects !== null ? " · " : ""}Submitted {moment(displayItem.createdAt).fromNow()}
-                                      </span>
-                                    )}
-                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -1697,7 +1576,7 @@ const BriefDetail = () => {
                                 rightIcon={<FiArrowRight className="text-xs text-white" />}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleMessageSeller(displayItem.sellerId, displayItem.name);
+                                  handleMessageSeller(displayItem.sellerId, displayItem.username);
                                 }}
                                 className="flex-1 text-center shadow-xs !text-white text-white"
                               >
@@ -1729,25 +1608,39 @@ const BriefDetail = () => {
                 {/* Top Sender Profile Card with Member Since */}
                 <div className="flex items-start justify-between gap-3 pb-4 border-b border-slate-100">
                   <div className="flex items-center gap-3.5 min-w-0">
-                    {detailedProposal.avatar ? (
-                      <img
-                        src={detailedProposal.avatar}
-                        alt={detailedProposal.name}
-                        className="w-14 h-14 rounded-full object-cover border border-slate-200 shrink-0"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLElement).style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      <div className="w-14 h-14 rounded-full bg-teal-50 text-teal-800 font-bold text-base flex items-center justify-center border border-teal-200 shrink-0 uppercase">
-                        {detailedProposal.name.slice(0, 2)}
-                      </div>
-                    )}
+                    <Link
+                      href={`/seller/${detailedProposal.username}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="shrink-0 hover:opacity-90 transition-opacity"
+                    >
+                      {detailedProposal.avatar ? (
+                        <img
+                          src={detailedProposal.avatar}
+                          alt={detailedProposal.username}
+                          className="w-14 h-14 rounded-full object-cover border border-slate-200"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLElement).style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <div className="w-14 h-14 rounded-full bg-teal-50 text-teal-800 font-bold text-base flex items-center justify-center border border-teal-200 uppercase">
+                          {detailedProposal.username.slice(0, 2)}
+                        </div>
+                      )}
+                    </Link>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-base text-slate-900 truncate">
-                          {detailedProposal.name}
-                        </span>
+                        <Link
+                          href={`/seller/${detailedProposal.username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="font-bold text-base text-slate-900 hover:text-[#0D6D5F] hover:underline truncate transition-colors"
+                        >
+                          {detailedProposal.username}
+                        </Link>
                         {detailedProposal.badge && (
                           <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] tracking-wider">
                             {detailedProposal.badge}
@@ -1755,11 +1648,6 @@ const BriefDetail = () => {
                         )}
                       </div>
                       <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
-                        {detailedProposal.tagline && (
-                          <span className="font-medium text-slate-600 truncate max-w-[200px]">
-                            {detailedProposal.tagline}
-                          </span>
-                        )}
                         {typeof detailedProposal.rating === "number" && detailedProposal.rating > 0 && (
                           <span className="font-bold text-slate-800 flex items-center gap-0.5">
                             <FiStar className="fill-amber-400 text-amber-400 text-xs" />
@@ -1769,18 +1657,8 @@ const BriefDetail = () => {
                         {typeof detailedProposal.reviewCount === "number" && detailedProposal.reviewCount > 0 && (
                           <span>({detailedProposal.reviewCount})</span>
                         )}
+                        {detailedProposal.country && <span>• {detailedProposal.country}</span>}
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
-                        {detailedProposal.completedProjects !== null && (
-                          <span>{detailedProposal.completedProjects} Projects Completed</span>
-                        )}
-                        {detailedProposal.successRate && (
-                          <span>
-                            {detailedProposal.completedProjects !== null ? " | " : ""}
-                            {detailedProposal.successRate} Success Rate
-                          </span>
-                        )}
-                      </p>
                     </div>
                   </div>
 
@@ -1847,7 +1725,7 @@ const BriefDetail = () => {
                   <h3 className="font-bold text-sm text-slate-900 mb-2">Contact</h3>
                   <div className="bg-white border border-slate-200 rounded-[6px] p-4 space-y-3 shadow-2xs">
                     <div>
-                      <p className="font-bold text-sm text-slate-900">{detailedProposal.name}</p>
+                      <p className="font-bold text-sm text-slate-900">{detailedProposal.username}</p>
                       <p className="text-xs text-slate-400 mt-0.5 flex items-center">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1.5 shrink-0" />
                         <span>Active on Workvence</span>
@@ -1868,7 +1746,7 @@ const BriefDetail = () => {
                       rightIcon={<FiArrowRight className="text-sm" />}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleMessageSeller(detailedProposal.sellerId, detailedProposal.name);
+                        handleMessageSeller(detailedProposal.sellerId, detailedProposal.username);
                       }}
                       className="shadow-xs"
                     >

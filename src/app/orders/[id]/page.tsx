@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import moment from "moment";
 import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";
@@ -16,23 +17,48 @@ export default function OrderDetailPage() {
   const queryClient = useQueryClient();
   const user = useUserStore((state: any) => state.user);
 
+  // Persistent reference to preserve order data during background refetches or transient errors
+  const lastValidOrderRef = useRef<any>(null);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   // Fetch real order from backend API
-  const { data: rawOrder, isLoading, refetch } = useQuery({
+  const { data: rawOrder, isLoading, error, refetch } = useQuery({
     queryKey: ["order", id],
     queryFn: async () => {
       try {
         const { data } = await axiosFetch.get(`/orders/${id}`);
-        return data?.order || data?.data || data;
-      } catch {
-        return null;
+        const orderData = data?.order || data?.data || data;
+        if (orderData) {
+          lastValidOrderRef.current = orderData;
+        }
+        return orderData;
+      } catch (err: any) {
+        if (err?.response?.status === 429) {
+          toast.error("Too many requests. Please wait a moment and try again.", {
+            id: "order-429-toast",
+          });
+          // If we already have previous valid data, keep it intact
+          if (lastValidOrderRef.current) {
+            return lastValidOrderRef.current;
+          }
+        }
+        throw err;
       }
     },
     staleTime: 30000,
+    retry: (failureCount, err: any) => {
+      // Do not auto-retry on 429, 404, or 403
+      if (err?.response?.status === 429 || err?.response?.status === 404 || err?.response?.status === 403) {
+        return false;
+      }
+      return failureCount < 1;
+    },
   });
+
+  const activeRawOrder = rawOrder || lastValidOrderRef.current;
 
   // Real-time socket sync
   useEffect(() => {
@@ -45,12 +71,12 @@ export default function OrderDetailPage() {
     const joinRoom = () => {
       socket.emit("join_order", id);
       socket.emit("join_room", `order_${id}`);
-      socket.emit("join_room", `order:${id}`);
-      socket.emit("join_room", String(id));
     };
 
     joinRoom();
     socket.on("connect", joinRoom);
+
+    let debounceTimer: NodeJS.Timeout | null = null;
 
     const handleOrderUpdate = (data: any) => {
       const incomingId = String(
@@ -85,12 +111,13 @@ export default function OrderDetailPage() {
         (incomingId && incomingId === String(id)) ||
         isLinkMatch ||
         isReviewReplied ||
-        (!incomingId && hasOrderKeywords) ||
-        (!data || Object.keys(data).length === 0)
+        (!incomingId && hasOrderKeywords)
       ) {
-        queryClient.invalidateQueries({ queryKey: ["order", id] });
-        queryClient.invalidateQueries({ queryKey: ["reviews"] });
-        refetch();
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          queryClient.invalidateQueries({ queryKey: ["order", id] });
+          queryClient.invalidateQueries({ queryKey: ["reviews"] });
+        }, 600);
       }
     };
 
@@ -100,22 +127,21 @@ export default function OrderDetailPage() {
     socket.on("notification", handleOrderUpdate);
 
     return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
       socket.emit("leave_order", id);
       socket.emit("leave_room", `order_${id}`);
-      socket.emit("leave_room", `order:${id}`);
-      socket.emit("leave_room", String(id));
       socket.off("connect", joinRoom);
       socket.off("order_updated", handleOrderUpdate);
       socket.off("order_status_changed", handleOrderUpdate);
       socket.off("new_notification", handleOrderUpdate);
       socket.off("notification", handleOrderUpdate);
     };
-  }, [id, refetch]);
+  }, [id, queryClient]);
 
   // Normalized order data
   const normalizedOrder: NormalizedOrder | null = useMemo(() => {
-    if (!rawOrder) return null;
-    const o = rawOrder;
+    if (!activeRawOrder) return null;
+    const o = activeRawOrder;
 
     const orderId = String(o._id || id || "");
     const orderCode = o.orderCode || (orderId ? `FO_${orderId.slice(-8).toUpperCase()}` : "-");
@@ -305,12 +331,32 @@ export default function OrderDetailPage() {
       isUserBuyer,
       raw: o,
     };
-  }, [rawOrder, id, user]);
+  }, [activeRawOrder, id, user]);
 
-  if (isLoading) {
+  // 1. Initial loading state (only while first fetch is pending and no cached data exists)
+  if (isLoading && !activeRawOrder) {
     return <OrderSkeleton />;
   }
 
+  // 2. Scenario 2: First visit gets 429 (Rate Limit on initial load, no data yet)
+  if (!activeRawOrder && (error as any)?.response?.status === 429) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] py-24 flex flex-col items-center justify-center font-sans px-4">
+        <h2 className="text-xl font-bold text-slate-800 mb-2">Too Many Requests</h2>
+        <p className="text-sm text-slate-500 mb-6 text-center max-w-sm">
+          You have made too many requests in a short period. Please wait a moment and try again.
+        </p>
+        <button
+          onClick={() => refetch()}
+          className="px-5 py-2.5 rounded-[6px] bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
+  // 3. Scenario 3: Genuine 404 or missing order
   if (!normalizedOrder) {
     return (
       <div className="min-h-screen bg-[#F8FAFC] py-24 flex flex-col items-center justify-center font-sans px-4">

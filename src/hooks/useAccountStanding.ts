@@ -12,6 +12,13 @@ export interface AccountStandingInfo {
   suspensionCount: number;
   suspensionReason: string;
   suspendedAt?: string;
+  accessUntil?: string;
+  accessDays?: number;
+  metricsResetAt?: string;
+  isGraceActive: boolean;
+  isGraceExpired: boolean;
+  graceDaysLeft: number;
+  formattedAccessDeadline: string;
   isWarningActive: boolean;
   warningCount: number;
   warningExpiresAt?: string;
@@ -54,6 +61,10 @@ export function useAccountStanding(): AccountStandingInfo {
         isSuspended: false,
         suspensionCount: 0,
         suspensionReason: "",
+        isGraceActive: false,
+        isGraceExpired: false,
+        graceDaysLeft: 0,
+        formattedAccessDeadline: "",
         isWarningActive: false,
         warningCount: 0,
         warningDaysLeft: 0,
@@ -68,6 +79,41 @@ export function useAccountStanding(): AccountStandingInfo {
       currentUser.suspensionReason ||
       "Policy violation or terms of service infringement.";
     const suspendedAt = currentUser.suspendedAt;
+
+    const accessUntil = currentUser.accessUntil;
+    const accessDays = typeof currentUser.accessDays === "number" ? currentUser.accessDays : undefined;
+    const metricsResetAt = currentUser.metricsResetAt;
+
+    let isGraceActive = false;
+    let isGraceExpired = false;
+    let graceDaysLeft = 0;
+    let formattedAccessDeadline = "";
+
+    if (isSuspended && accessUntil) {
+      try {
+        const deadline = new Date(accessUntil);
+        const deadlineMs = deadline.getTime();
+        if (!isNaN(deadlineMs)) {
+          const diffMs = deadlineMs - Date.now();
+          formattedAccessDeadline = deadline.toLocaleString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+          if (diffMs > 0) {
+            isGraceActive = true;
+            graceDaysLeft = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+          } else {
+            isGraceExpired = true;
+          }
+        }
+      } catch {
+        // defensive fallback
+      }
+    }
 
     // Warning status calculation
     let isWarningActive = Boolean(currentUser.isWarningActive);
@@ -108,6 +154,13 @@ export function useAccountStanding(): AccountStandingInfo {
       suspensionCount,
       suspensionReason,
       suspendedAt,
+      accessUntil,
+      accessDays,
+      metricsResetAt,
+      isGraceActive,
+      isGraceExpired,
+      graceDaysLeft,
+      formattedAccessDeadline,
       isWarningActive,
       warningCount,
       warningExpiresAt,

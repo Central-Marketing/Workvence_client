@@ -237,9 +237,16 @@ export default function GlobalSocketListener() {
 
       if (!newNotif) return;
 
-      // Account standing sync (suspend / unsuspend / warning) — runs before any early return
+      // Account standing sync (suspend / unsuspend / warning / lockout) — runs before any early return
       const standingAction = String(newNotif.action || newNotif.event || "").toLowerCase();
       const standingText = `${newNotif.title || ""} ${newNotif.message || ""}`;
+      const isAccountLockout =
+        standingAction === "account_locked" ||
+        standingAction === "lockout" ||
+        standingAction === "grace_expired" ||
+        newNotif.code === "ACCOUNT_LOCKED" ||
+        /grace period (has )?expired/i.test(standingText) ||
+        /account (has been )?locked/i.test(standingText);
       const isWarningRemoval =
         /(remove|clear|lift|revoke|expire|withdraw)/.test(standingAction) && /warn/.test(standingAction) ||
         /warning\s+(has\s+been\s+)?(removed|lifted|cleared|revoked|withdrawn|expired)/i.test(standingText);
@@ -254,13 +261,14 @@ export default function GlobalSocketListener() {
         !isUnsuspend &&
         (["suspend", "suspended"].includes(standingAction) || /account\s+suspended/i.test(String(newNotif.title || "")));
       const isStandingNotif =
+        isAccountLockout ||
         isWarningRemoval ||
         isWarningIssue ||
         isUnsuspend ||
         isSuspend ||
         typeof newNotif.isSuspended === "boolean" ||
         typeof newNotif.isWarningActive === "boolean" ||
-        /suspen|reinstat|account standing|warning/i.test(String(newNotif.title || ""));
+        /suspen|reinstat|account standing|warning|lockout/i.test(String(newNotif.title || ""));
 
       if (isStandingNotif) {
         const targetUserId = String(newNotif.userID || newNotif.userId || "").trim();
@@ -276,6 +284,9 @@ export default function GlobalSocketListener() {
           if (standingPatch.isSuspended === true) {
             if (newNotif.suspensionReason) standingPatch.suspensionReason = newNotif.suspensionReason;
             standingPatch.suspendedAt = newNotif.suspendedAt || newNotif.createdAt || new Date().toISOString();
+            if (newNotif.accessUntil) standingPatch.accessUntil = newNotif.accessUntil;
+            if (typeof newNotif.accessDays === "number") standingPatch.accessDays = newNotif.accessDays;
+            if (newNotif.metricsResetAt) standingPatch.metricsResetAt = newNotif.metricsResetAt;
           }
 
           // Warning: explicit payload flag wins, otherwise infer from action/title

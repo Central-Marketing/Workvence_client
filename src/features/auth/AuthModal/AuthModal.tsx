@@ -268,7 +268,8 @@ const AuthModal: React.FC<AuthModalProps> = ({
       }
 
       setError(msg);
-      toast.error(msg);
+      const isLocked = msg?.toLowerCase().includes("account locked");
+      toast.error(isLocked ? "Account locked" : msg);
     } finally {
       setLoading(false);
     }
@@ -761,11 +762,16 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* Inline Error Banner */}
           {error && (
-            <div className="mb-3 p-2.5 rounded-[6px] bg-red-50 border border-red-200/80 text-red-600 text-xs sm:text-[13px] font-medium flex items-center gap-2">
+            <div
+              className="mb-3 p-2.5 rounded-[6px] bg-red-50 border border-red-200/80 text-red-600 text-xs sm:text-[13px] font-medium flex items-center gap-2 cursor-help"
+              title={error}
+            >
               <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
                 !
               </span>
-              <span className="truncate">{error}</span>
+              <span className="truncate" title={error}>
+                {error.toLowerCase().includes("account locked") ? "Account locked" : error}
+              </span>
             </div>
           )}
 

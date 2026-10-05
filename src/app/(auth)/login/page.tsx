@@ -163,7 +163,8 @@ const LoginForm = () => {
       }
 
       setError(message);
-      toast.error(message, {
+      const isLocked = message?.toLowerCase().includes('account locked');
+      toast.error(isLocked ? 'Account locked' : message, {
         duration: 3000,
       });
       setLoading(false);
@@ -302,11 +303,16 @@ const LoginForm = () => {
 
               {/* Inline Error */}
               {error && (
-                <div className="flex items-center gap-2 p-2.5 rounded-[6px] bg-red-50 border border-red-200/80 text-red-600 text-xs font-medium">
+                <div
+                  className="flex items-center gap-2 p-2.5 rounded-[6px] bg-red-50 border border-red-200/80 text-red-600 text-xs font-medium cursor-help"
+                  title={error}
+                >
                   <div className="flex items-center justify-center w-4 h-4 bg-red-500 text-white rounded-full text-[10px] font-bold shrink-0">
                     !
                   </div>
-                  <span>{error}</span>
+                  <span className="truncate" title={error}>
+                    {error.toLowerCase().includes('account locked') ? 'Account locked' : error}
+                  </span>
                 </div>
               )}
 

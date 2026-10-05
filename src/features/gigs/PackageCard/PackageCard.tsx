@@ -67,7 +67,10 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
   const rating = Number(rawRating || 0).toFixed(1);
   const sales = data.sales || 0;
   const reviewCount = data.starNumber || data.reviews || (data.sales ? data.sales : 0);
-  const level = userObj.sellerLevel || data.user?.sellerLevel || userObj.level || "Level 1";
+  const hasMetricsReset = Boolean(userObj.metricsResetAt || data.user?.metricsResetAt || data.metricsResetAt);
+  const level = hasMetricsReset
+    ? "Level 1"
+    : userObj.sellerLevel || data.user?.sellerLevel || userObj.level || "Level 1";
 
   // Price formatting
   const formattedPrice =

@@ -119,12 +119,15 @@ export function normalizeSellerProfile(
   const name = sellerObj.name || (sellerObj.username ? `${sellerObj.username.replace(/[_-]/g, ' ')}` : '');
   const avatar = sellerObj.image || sellerObj.avatar || SELLER_FALLBACK_IMAGES.avatar;
   const banner = sellerObj.cover || sellerObj.banner || SELLER_FALLBACK_IMAGES.banner;
-  const isPro = Boolean(sellerObj.isPro ?? false);
+  const hasMetricsReset = Boolean(sellerObj.metricsResetAt);
+  const isPro = !hasMetricsReset && Boolean(sellerObj.isPro ?? false);
   const isSeller = Boolean(
     sellerObj.isSeller ??
     (sellerObj.role === 'seller' || (Array.isArray(rawGigs) && rawGigs.length > 0) || true)
   );
-  const sellerLevel = sellerObj.sellerLevel || (isSeller ? 'Level 1 Seller' : '');
+  const sellerLevel = hasMetricsReset
+    ? 'Level 1 Seller'
+    : (sellerObj.sellerLevel || (isSeller ? 'Level 1 Seller' : ''));
   const role = sellerObj.role || sellerObj.headline || sellerObj.shortTitle || '';
 
   const memberSince = sellerObj.createdAt
@@ -174,7 +177,7 @@ export function normalizeSellerProfile(
           name,
           username,
           image: avatar,
-          sellerLevel: sellerObj.sellerLevel || 'Level 1',
+          sellerLevel: hasMetricsReset ? 'Level 1' : (sellerObj.sellerLevel || 'Level 1'),
         },
       };
     });

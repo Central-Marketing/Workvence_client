@@ -68,6 +68,10 @@ export interface User {
   suspensionCount?: number;
   suspensionReason?: string;
   suspendedAt?: string;
+  accessUntil?: string;
+  accessDays?: number;
+  metricsResetAt?: string;
+  sellerLevel?: string | number;
   warningCount?: number;
   warningExpiresAt?: string;
   isWarningActive?: boolean;
@@ -86,6 +90,10 @@ export interface JwtPayload {
   role?: string;
   isSuspended?: boolean;
   suspensionCount?: number;
+  accessUntil?: string;
+  accessDays?: number;
+  metricsResetAt?: string;
+  sellerLevel?: string | number;
   isWarningActive?: boolean;
   warningExpiresAt?: string;
   exp?: number;

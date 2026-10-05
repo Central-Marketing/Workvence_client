@@ -162,7 +162,8 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
   const isOnline = Boolean(rawUser.isOnline ?? raw.isOnline ?? false);
   const lastActiveAt = rawUser.lastActiveAt || raw.lastActiveAt || rawUser.lastSeen || rawUser.updatedAt || raw.updatedAt || raw.createdAt || "";
   const lastSeen = lastActiveAt;
-  const isPro = Boolean(
+  const hasMetricsReset = Boolean(rawUser.metricsResetAt || raw.metricsResetAt);
+  const isPro = !hasMetricsReset && Boolean(
     rawUser.isPro ||
     (typeof rawUser.sellerLevel === "string" &&
       (rawUser.sellerLevel.toLowerCase().includes("top") || rawUser.sellerLevel.toLowerCase().includes("pro")))
@@ -175,7 +176,7 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
   const sellerRole =
     rawUser.headline ||
     rawUser.role ||
-    rawUser.sellerLevel ||
+    (hasMetricsReset ? "Level 1 Seller" : rawUser.sellerLevel) ||
     "";
 
   const responseTime = rawUser.responseTimeHours

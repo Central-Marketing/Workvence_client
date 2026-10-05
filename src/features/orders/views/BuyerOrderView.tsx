@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import moment from "moment";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -135,6 +136,11 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
     order.raw?.isReviewed ||
     existingReview ||
     hasSubmittedReview
+  );
+
+  const reviewDeadline = order.reviewDeadline || order.raw?.reviewDeadline || order.raw?.review_deadline;
+  const isReviewDeadlinePassed = Boolean(
+    reviewDeadline && new Date().getTime() > new Date(reviewDeadline).getTime()
   );
 
   const totalScore = useMemo(() => {
@@ -287,6 +293,10 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
   // Submit Review
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isReviewDeadlinePassed) {
+      toast.error("The deadline to submit a review for this order has expired.");
+      return;
+    }
     if (isAlreadyReviewed) {
       toast.error("A review has already been submitted for this order.");
       return;
@@ -644,9 +654,19 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
             {isCompleted && (
               <div className="bg-[#f5f5f5] rounded-[6px] border border-slate-200/90 shadow-sm p-6 sm:p-7">
                 <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-                  <h3 className="text-xl font-bold text-[#292929] font-inter">
-                    {isAlreadyReviewed ? "Share Feedback and Reviews" : "Share Feedback & Review"}
-                  </h3>
+                  <div>
+                    <h3 className="text-xl font-bold text-[#292929] font-inter">
+                      {isAlreadyReviewed ? "Share Feedback and Reviews" : "Share Feedback & Review"}
+                    </h3>
+                    {!isAlreadyReviewed && reviewDeadline && !isReviewDeadlinePassed && (
+                      <div className="mt-1 flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200/80 px-2.5 py-0.5 rounded-[4px] font-medium w-fit">
+                        <FiClock className="w-3.5 h-3.5 text-amber-600" />
+                        <span>
+                          Review deadline: {moment(reviewDeadline).isValid() ? moment(reviewDeadline).format("MMM D, YYYY [at] h:mm A") : String(reviewDeadline)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex items-center gap-1.5 px-3 py-1 bg-[#EDEDED] border border-[#C7C7C7] rounded-[6px] text-base font-semibold text-slate-700">
                     <span className="text-[#292929]">Total</span>
                     <span className="font-bold text-slate-900">
@@ -740,7 +760,26 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                       sellerName={order.seller?.name || "Seller"}
                       sellerAvatar={order.seller?.avatar || (order.seller as any)?.image}
                       canReply={false}
+                      replyDeadline={existingReview?.replyDeadline || existingReview?.reply_deadline || order.replyDeadline || order.raw?.replyDeadline}
                     />
+                  </div>
+                ) : isReviewDeadlinePassed ? (
+                  <div className="bg-white rounded-[6px] p-6 sm:p-8 text-center border border-slate-200/80 shadow-2xs space-y-2.5">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-500 mb-1">
+                      <FiClock className="w-5 h-5 text-slate-400" />
+                    </div>
+                    <h4 className="text-base font-bold text-slate-900 font-sf-pro">
+                      Review Window Closed
+                    </h4>
+                    <p className="text-xs sm:text-[13px] text-slate-500 max-w-md mx-auto leading-relaxed">
+                      The review period for this order closed on{" "}
+                      <strong className="text-slate-700 font-semibold">
+                        {moment(reviewDeadline).isValid()
+                          ? moment(reviewDeadline).format("MMMM D, YYYY [at] h:mm A")
+                          : String(reviewDeadline)}
+                      </strong>
+                      . Reviews can no longer be submitted for this completed order.
+                    </p>
                   </div>
                 ) : (
                   <form onSubmit={handleReviewSubmit} className="space-y-5 bg-white p-6 rounded-[6px]">

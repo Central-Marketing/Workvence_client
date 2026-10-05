@@ -327,6 +327,8 @@ export default function OrderDetailPage() {
       extensionRequest,
       revisionReason: o.revisionReason || o.revision?.reason,
       hasReviewed: Boolean(o.hasReviewed || o.isReviewed || o.review || o.reviewID),
+      reviewDeadline: o.reviewDeadline || o.review_deadline || o.raw?.reviewDeadline,
+      replyDeadline: o.replyDeadline || o.reply_deadline || o.raw?.replyDeadline,
       isUserSeller,
       isUserBuyer,
       raw: o,

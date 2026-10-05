@@ -16,6 +16,7 @@ export interface SellerReviewReplyProps {
   sellerName?: string;
   sellerAvatar?: string;
   canReply?: boolean;
+  replyDeadline?: string | Date | null;
   onReplySuccess?: (updatedReply: { sellerReply: string; sellerReplyAt: string }) => void;
   className?: string;
 }
@@ -28,6 +29,7 @@ export const SellerReviewReply: React.FC<SellerReviewReplyProps> = ({
   sellerName = "Seller",
   sellerAvatar = "/media/noavatar.png",
   canReply = false,
+  replyDeadline,
   onReplySuccess,
   className = "",
 }) => {
@@ -45,8 +47,16 @@ export const SellerReviewReply: React.FC<SellerReviewReplyProps> = ({
     setCurrentReplyAt(initialSellerReplyAt || null);
   }, [initialSellerReply, initialSellerReplyAt]);
 
+  const isReplyDeadlinePassed = Boolean(
+    replyDeadline && new Date().getTime() > new Date(replyDeadline).getTime()
+  );
+
   // Open edit / reply form
   const handleOpenForm = () => {
+    if (isReplyDeadlinePassed) {
+      toast.error("The deadline to reply to this review has expired.");
+      return;
+    }
     setReplyInput(currentReply || "");
     setIsReplying(true);
   };
@@ -58,6 +68,10 @@ export const SellerReviewReply: React.FC<SellerReviewReplyProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isReplyDeadlinePassed) {
+      toast.error("The deadline to reply to this review has expired.");
+      return;
+    }
     const trimmed = replyInput.trim();
 
     if (!trimmed) {
@@ -217,16 +231,33 @@ export const SellerReviewReply: React.FC<SellerReviewReplyProps> = ({
         </div>
       ) : canReply ? (
         /* 3. "Reply to Review" trigger button for the seller */
-        <div className="pt-1">
-          <button
-            type="button"
-            onClick={handleOpenForm}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0D6D5F] hover:text-[#0b5c50] hover:underline py-1 cursor-pointer transition-colors"
-          >
-            <CornerDownRight className="w-3.5 h-3.5" />
-            <span>Reply to Review</span>
-          </button>
-        </div>
+        isReplyDeadlinePassed ? (
+          <div className="pt-2 text-xs text-slate-400 italic">
+            The response window for this review closed on{" "}
+            <span className="text-slate-600 font-medium">
+              {moment(replyDeadline).isValid()
+                ? moment(replyDeadline).format("MMM D, YYYY")
+                : String(replyDeadline)}
+            </span>
+            .
+          </div>
+        ) : (
+          <div className="pt-1 flex items-center gap-3 flex-wrap">
+            <button
+              type="button"
+              onClick={handleOpenForm}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0D6D5F] hover:text-[#0b5c50] hover:underline py-1 cursor-pointer transition-colors"
+            >
+              <CornerDownRight className="w-3.5 h-3.5" />
+              <span>Reply to Review</span>
+            </button>
+            {replyDeadline && (
+              <span className="text-[11px] text-slate-400">
+                (Reply before {moment(replyDeadline).isValid() ? moment(replyDeadline).format("MMM D, YYYY") : String(replyDeadline)})
+              </span>
+            )}
+          </div>
+        )
       ) : null}
     </div>
   );

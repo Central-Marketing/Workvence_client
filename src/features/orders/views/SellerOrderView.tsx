@@ -833,6 +833,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                         sellerName={order.seller?.name || currentUser?.name || currentUser?.username || "Seller"}
                         sellerAvatar={order.seller?.avatar || (order.seller as any)?.image || currentUser?.image || currentUser?.img}
                         canReply={true}
+                        replyDeadline={buyerReview?.replyDeadline || buyerReview?.reply_deadline || order.replyDeadline || order.raw?.replyDeadline}
                         onReplySuccess={() => {
                           refetch();
                         }}

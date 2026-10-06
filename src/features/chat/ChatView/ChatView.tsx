@@ -573,14 +573,27 @@ const ChatView = () => {
 
     // Global listener for new messages to update the sidebar/header even if in a different chat
     const handleGlobalReceiveMessage = (newMsg: any) => {
-      const incomingCid = String(newMsg?.conversationUUID || newMsg?.conversationID || newMsg?.uuid || newMsg?.id || '').trim();
+      const convFieldId = typeof newMsg?.conversation === 'object'
+        ? (newMsg.conversation?._id || newMsg.conversation?.id || newMsg.conversation?.uuid)
+        : newMsg?.conversation;
+
+      const incomingCid = String(
+        newMsg?.conversationUUID ||
+        newMsg?.conversationID ||
+        newMsg?.conversationId ||
+        newMsg?.uuid ||
+        convFieldId ||
+        ''
+      ).trim();
       if (!incomingCid) return;
 
       queryClient.setQueryData(['conversations'], (oldConvs: any) => {
         if (!Array.isArray(oldConvs)) return oldConvs;
         return oldConvs.map((c: any) => {
           if (isTargetConversation(c, incomingCid)) {
-            const isCurrentlyViewingThisChat = window.location.pathname.includes(`/message/${incomingCid}`);
+            const isCurrentlyViewingThisChat =
+              (typeof window !== 'undefined' && window.location.pathname.includes(`/message/${incomingCid}`)) ||
+              Boolean(conversationID && isTargetConversation(c, conversationID));
             return {
               ...c,
               lastMessage: newMsg.description || newMsg.desc || newMsg.text || newMsg.message || c.lastMessage,
@@ -694,23 +707,31 @@ const ChatView = () => {
         ? (data.conversation?._id || data.conversation?.id || data.conversation?.uuid)
         : data?.conversation;
 
+      // Extract conversation-level ID (exclude data.id, which represents message ID)
       const incomingId = String(
         data?.conversationUUID ||
         data?.conversationID ||
         data?.conversationId ||
         data?.uuid ||
-        data?.id ||
         convFieldId ||
         ''
       ).trim();
 
       if (!incomingId || incomingId === 'undefined') return false;
 
-      const currentParamId = String(convIdRef.current || '').trim();
+      const currentParamId = String(convIdRef.current || conversationID || '').trim();
       if (currentParamId && incomingId === currentParamId) return true;
+
+      // Browser pathname fallback
+      if (typeof window !== 'undefined' && window.location.pathname.includes(`/message/${incomingId}`)) {
+        return true;
+      }
 
       const convDoc = activeConvRef.current;
       if (convDoc) {
+        if (isTargetConversation(convDoc, incomingId)) return true;
+        if (currentParamId && isTargetConversation(convDoc, currentParamId)) return true;
+
         if (convDoc.uuid && incomingId === String(convDoc.uuid).trim()) return true;
         if (convDoc.conversationID && incomingId === String(convDoc.conversationID).trim()) return true;
         if (convDoc._id && incomingId === String(convDoc._id).trim()) return true;
@@ -730,26 +751,55 @@ const ChatView = () => {
 
       // 1. If message belongs to current open chat, append to messages list
       if (isForCurrent) {
-        queryClient.setQueryData(['messages', conversationID], (oldData: any = []) => {
+        const updateCache = (oldData: any = []) => {
           const arr = Array.isArray(oldData) ? oldData : [];
           const newMsgId = newMsg?._id || newMsg?.id;
           const incomingText = (newMsg.description || newMsg.desc || newMsg.text || newMsg.message || '').trim();
           const incomingFile = newMsg.file || (Array.isArray(newMsg.attachments) && newMsg.attachments[0]) || '';
+          const incomingSender = String(
+            (typeof newMsg.sender === 'object' && (newMsg.sender?._id || newMsg.sender?.id)) ||
+            (typeof newMsg.user === 'object' && (newMsg.user?._id || newMsg.user?.id)) ||
+            (typeof newMsg.userID === 'object' && (newMsg.userID?._id || newMsg.userID?.id)) ||
+            newMsg.sender ||
+            newMsg.user ||
+            newMsg.senderID ||
+            newMsg.userID ||
+            newMsg.from ||
+            ''
+          );
+          const incomingTime = newMsg.createdAt ? new Date(newMsg.createdAt).getTime() : Date.now();
 
           // 1. If already in cache by ID, update existing message in place (e.g., status/withdrawal update)
           if (newMsgId && arr.some((m: any) => String(m._id || m.id) === String(newMsgId))) {
             return arr.map((m: any) => String(m._id || m.id) === String(newMsgId) ? { ...m, ...newMsg } : m);
           }
 
-          // 2. If a non-temp message with identical text and file already exists, skip duplicate socket echo
-          const alreadyHasReal = arr.some((m: any) => {
+          // 2. Only skip duplicate socket echoes if same text/file AND same sender AND created within 15 seconds
+          const isDuplicateEcho = arr.some((m: any) => {
             const mId = String(m._id || m.id || '');
-            if (!mId || mId.startsWith('temp-')) return false;
+            if (mId.startsWith('temp-')) return false;
+
             const mText = (m.description || m.desc || m.text || m.message || '').trim();
             const mFile = m.file || (Array.isArray(m.attachments) && m.attachments[0]) || '';
-            return mText === incomingText && mFile === incomingFile;
+            if (mText !== incomingText || mFile !== incomingFile) return false;
+
+            const mSender = String(
+              (typeof m.sender === 'object' && (m.sender?._id || m.sender?.id)) ||
+              (typeof m.user === 'object' && (m.user?._id || m.user?.id)) ||
+              (typeof m.userID === 'object' && (m.userID?._id || m.userID?.id)) ||
+              m.sender ||
+              m.user ||
+              m.senderID ||
+              m.userID ||
+              m.from ||
+              ''
+            );
+            if (incomingSender && mSender && incomingSender !== mSender) return false;
+
+            const mTime = m.createdAt ? new Date(m.createdAt).getTime() : 0;
+            return mTime > 0 && Math.abs(incomingTime - mTime) < 15000;
           });
-          if (alreadyHasReal) return arr;
+          if (isDuplicateEcho) return arr;
 
           // 3. Replace matching temp message or remove matching temp- messages
           const withoutTemp = arr.filter((m: any) => {
@@ -761,13 +811,32 @@ const ChatView = () => {
             return true;
           });
           return [...withoutTemp, newMsg];
-        });
+        };
+
+        queryClient.setQueryData(['messages', conversationID], updateCache);
+        if (convIdRef.current && convIdRef.current !== conversationID) {
+          queryClient.setQueryData(['messages', convIdRef.current], updateCache);
+        }
+        const activeDocId = activeConvRef.current?.uuid || activeConvRef.current?._id;
+        if (activeDocId && activeDocId !== conversationID && activeDocId !== convIdRef.current) {
+          queryClient.setQueryData(['messages', activeDocId], updateCache);
+        }
       }
 
       // 2. Instantly update conversation sidebar and header unread badge
       queryClient.setQueryData(['conversations'], (oldConvs: any) => {
         if (!Array.isArray(oldConvs)) return oldConvs;
-        const incomingCid = String(newMsg?.conversationUUID || newMsg?.conversationID || newMsg?.uuid || newMsg?.id || '').trim();
+        const convFieldId = typeof newMsg?.conversation === 'object'
+          ? (newMsg.conversation?._id || newMsg.conversation?.id || newMsg.conversation?.uuid)
+          : newMsg?.conversation;
+        const incomingCid = String(
+          newMsg?.conversationUUID ||
+          newMsg?.conversationID ||
+          newMsg?.conversationId ||
+          newMsg?.uuid ||
+          convFieldId ||
+          ''
+        ).trim();
         if (!incomingCid) return oldConvs;
         const incomingText = newMsg.description || newMsg.desc || newMsg.text || newMsg.message || '';
         return oldConvs.map((c: any) => {

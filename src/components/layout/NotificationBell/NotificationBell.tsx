@@ -185,16 +185,14 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
   };
 
   return (
-    <div className="notification-wrapper relative flex items-center" ref={dropdownRef}>
+    <div className="notification-wrapper relative flex items-center shrink-0" ref={dropdownRef}>
       {/* Header Bell Icon with Red Badge */}
-      <Button
+      <button
         type="button"
-        variant="ghost"
-        size="icon"
-        radius="full"
-        className={triggerClassName || "bell-btn text-gray-500 hover:text-brand-green transition-colors relative p-0 w-8 h-8 h-auto min-h-0 border-none shadow-none hover:bg-transparent"}
+        className={triggerClassName || "bell-btn text-gray-500 hover:text-brand-green transition-colors relative p-0 w-8 h-8 rounded-full border-none shadow-none hover:bg-transparent flex items-center justify-center shrink-0"}
         onClick={() => setIsOpen(!isOpen)}
         title="Notifications"
+        aria-label="Notifications"
       >
         <FiBell className={iconClassName || `text-[22px] transition-transform ${isAnimating ? 'animate-bounce text-brand-green' : ''}`} />
         {unreadCount > 0 && (
@@ -202,7 +200,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
-      </Button>
+      </button>
 
       {/* Notification Dropdown Menu */}
       {isOpen && (

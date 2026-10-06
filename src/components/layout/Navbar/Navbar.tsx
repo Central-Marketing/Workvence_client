@@ -636,7 +636,7 @@ const Navbar = () => {
 
                 <NotificationBell
                   currentUser={effectiveUser}
-                  triggerClassName="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer"
+                  triggerClassName="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer shrink-0"
                   iconClassName="text-[19px]"
                 />
 

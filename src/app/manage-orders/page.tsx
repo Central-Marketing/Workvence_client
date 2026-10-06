@@ -8,7 +8,7 @@ import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components";
 import { Breadcrumb, OrdersTableSkeleton, Tag } from "@/components/ui";
-import { FiHome, FiCalendar, FiSearch } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 import { sortOrdersByPriority } from "@/features/orders";
 
 const getOrderDeadlineTime = (item: any): number | null => {

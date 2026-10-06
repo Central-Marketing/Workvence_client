@@ -9,7 +9,6 @@ import {
   FiHome,
   FiArrowRight,
   FiDollarSign,
-  FiCalendar,
   FiCheckCircle,
   FiPlus,
   FiX,

@@ -4,8 +4,6 @@ import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  FiHome,
-  FiCalendar,
   FiFileText,
   FiX,
   FiSearch,

@@ -5,10 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
-  FiCalendar,
   FiChevronDown,
-  FiPackage,
-  FiHeart
 } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";

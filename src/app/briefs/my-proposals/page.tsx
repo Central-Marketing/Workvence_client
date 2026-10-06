@@ -24,6 +24,7 @@ import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components";
 import { BriefsListSkeleton } from "@/components/ui";
+import { Home } from "lucide-react";
 
 type StatusFilter = "all" | "open" | "closed";
 
@@ -148,8 +149,8 @@ export default function MyProposalsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[#0D6D5F] bg-teal-50 px-2 py-0.5 rounded">
-                Seller Hub
+              <span className="text-xs">
+                <Home />
               </span>
               <span className="text-gray-300">/</span>
               <span className="text-xs font-medium text-gray-500">Proposals</span>
@@ -343,8 +344,8 @@ export default function MyProposalsPage() {
 
                       {/* Price & Delivery duration tags */}
                       <div className="flex flex-wrap items-center gap-2.5 mb-3.5 pt-1">
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[6px] bg-emerald-50/80 text-emerald-800 border border-emerald-200/60 text-xs font-bold">
-                          <FiDollarSign className="w-3.5 h-3.5 text-emerald-600" />
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[6px] bg-white text-black border border-gray-200/60 text-xs font-bold">
+                          <FiDollarSign className="w-3.5 h-3.5 text-black" />
                           <span>Your Bid: ${proposal.price}</span>
                         </div>
                         {proposal.deliveryTime && (

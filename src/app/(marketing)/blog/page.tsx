@@ -5,8 +5,6 @@ import Link from "next/link";
 import {
   BookOpen,
   Search,
-  Calendar,
-  Clock,
   ArrowRight,
   User,
   Sparkles,

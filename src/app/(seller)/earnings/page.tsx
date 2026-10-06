@@ -657,16 +657,7 @@ const Earnings = () => {
             </h2>
 
             <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
-              {/* Calendar Filter Icon */}
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                radius="lg"
-                className="w-9 h-9 border-gray-200 text-gray-500 hover:text-gray-800 hover:bg-gray-50 shrink-0"
-                title="Filter by date"
-                icon={<CalendarIcon className="w-4 h-4" />}
-              />
+
 
               {/* Search Bar */}
               <div className="relative flex-1 sm:w-64 flex items-center">

@@ -11,7 +11,6 @@ import {
   FiHome,
   FiMapPin,
   FiClock,
-  FiCalendar,
   FiBarChart2,
   FiFileText,
   FiArrowRight,

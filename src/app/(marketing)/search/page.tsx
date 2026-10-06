@@ -34,6 +34,7 @@ import {
   RotateCcw,
   LayoutGrid,
   List,
+  Eye,
 } from "lucide-react";
 import { Button, CustomSelect } from "@/components/ui";
 import { PackageCard } from "@/features/gigs";
@@ -641,11 +642,10 @@ function SearchPageContent() {
                   type="button"
                   onClick={() => setViewMode("table")}
                   title="Table View"
-                  className={`p-1.5 rounded-[4px] transition-colors cursor-pointer flex items-center justify-center ${
-                    viewMode === "table"
-                      ? "bg-slate-900 text-white shadow-xs"
-                      : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
-                  }`}
+                  className={`p-1.5 rounded-[4px] transition-colors cursor-pointer flex items-center justify-center ${viewMode === "table"
+                    ? "bg-slate-900 text-white shadow-xs"
+                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                    }`}
                   aria-label="Table View"
                 >
                   <List className="w-4 h-4" />
@@ -654,11 +654,10 @@ function SearchPageContent() {
                   type="button"
                   onClick={() => setViewMode("card")}
                   title="Card Grid View"
-                  className={`p-1.5 rounded-[4px] transition-colors cursor-pointer flex items-center justify-center ${
-                    viewMode === "card"
-                      ? "bg-slate-900 text-white shadow-xs"
-                      : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
-                  }`}
+                  className={`p-1.5 rounded-[4px] transition-colors cursor-pointer flex items-center justify-center ${viewMode === "card"
+                    ? "bg-slate-900 text-white shadow-xs"
+                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                    }`}
                   aria-label="Card View"
                 >
                   <LayoutGrid className="w-4 h-4" />
@@ -669,365 +668,363 @@ function SearchPageContent() {
             {/* Responsive Table Wrapper */}
             {viewMode === "table" && (
               <div className="w-full bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-sm overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
-              <table className="w-full text-left text-sm border-collapse min-w-[760px]">
-                <thead>
-                  <tr className="text-xs font-bold text-gray-800 border-b border-gray-100 uppercase tracking-wider">
-                    <th className="py-3.5 px-4 font-bold">Package Name</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Seller</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Delivery</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Rating</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">Price</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap text-right">Action</th>
-                  </tr>
-                </thead>
-
-                <tbody className={`divide-y divide-gray-100 font-sf-pro transition-opacity duration-150 ${isFetching && !isInitialLoading ? "opacity-60" : "opacity-100"}`}>
-                  {/* 1. Loading State (initial mount only) */}
-                  {isInitialLoading && (
-                    <>
-                      {[...Array(6)].map((_, idx) => (
-                        <tr key={`skeleton-${idx}`} className="animate-pulse odd:bg-[#f5f5f5] even:bg-white">
-                          <td className="py-4 px-4 align-middle">
-                            <div className="flex items-center gap-3">
-                              <div className="w-24 sm:w-28 h-14 sm:h-16 rounded-[6px] bg-gray-200 shrink-0" />
-                              <div className="flex-1 space-y-2">
-                                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                                <div className="h-3 bg-gray-100 rounded w-1/3" />
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-4 px-4 align-middle">
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-8 h-8 rounded-full bg-gray-200 shrink-0" />
-                              <div className="space-y-1">
-                                <div className="h-3.5 bg-gray-200 rounded w-16" />
-                                <div className="h-2.5 bg-gray-100 rounded w-10" />
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-4 px-4 align-middle">
-                            <div className="h-3.5 bg-gray-200 rounded w-14" />
-                          </td>
-                          <td className="py-4 px-4 align-middle">
-                            <div className="h-3.5 bg-gray-200 rounded w-12" />
-                          </td>
-                          <td className="py-4 px-4 align-middle">
-                            <div className="h-4 bg-gray-200 rounded w-12" />
-                          </td>
-                          <td className="py-4 px-4 align-middle text-right">
-                            <div className="h-8 bg-gray-200 rounded-[6px] w-20 ml-auto" />
-                          </td>
-                        </tr>
-                      ))}
-                    </>
-                  )}
-
-                  {/* 2. Error State */}
-                  {!isLoading && isError && (
-                    <tr>
-                      <td colSpan={6} className="py-16 text-center">
-                        <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
-                          <div className="w-12 h-12 rounded-[6px] bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 text-xl mb-3 shadow-2xs">
-                            <X className="w-6 h-6" />
-                          </div>
-                          <p className="text-slate-800 font-semibold text-sm sm:text-base mb-1">
-                            Failed to load search results
-                          </p>
-                          <p className="text-slate-400 text-xs sm:text-[13px] mb-4">
-                            Unable to retrieve packages at this time. Please try again.
-                          </p>
-                          <button
-                            type="button"
-                            onClick={() => refetch()}
-                            className="inline-flex items-center gap-2 bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs px-4 py-2 rounded-[6px] font-medium transition-colors"
-                          >
-                            <RefreshCw className="w-3.5 h-3.5" />
-                            <span>Retry</span>
-                          </button>
-                        </div>
-                      </td>
+                <table className="w-full text-left text-sm border-collapse min-w-[760px]">
+                  <thead>
+                    <tr className="text-xs font-bold text-gray-800 border-b border-gray-100 uppercase tracking-wider">
+                      <th className="py-3.5 px-4 font-bold">Package Name</th>
+                      <th className="py-3.5 px-4 font-bold whitespace-nowrap">Seller</th>
+                      <th className="py-3.5 px-4 font-bold whitespace-nowrap">Delivery</th>
+                      <th className="py-3.5 px-4 font-bold whitespace-nowrap">Rating</th>
+                      <th className="py-3.5 px-4 font-bold whitespace-nowrap">Price</th>
+                      <th className="py-3.5 px-4 font-bold whitespace-nowrap text-right">Action</th>
                     </tr>
-                  )}
+                  </thead>
 
-                  {/* 3. Empty State */}
-                  {!isLoading && !isError && packagesList.length === 0 && (
-                    <tr>
-                      <td colSpan={6} className="py-16 text-center">
-                        <div className="flex flex-col items-center justify-center max-w-md mx-auto">
-                          <div className="w-12 h-12 rounded-[6px] bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
-                            <Search className="w-6 h-6" />
-                          </div>
-                          <p className="text-slate-900 font-semibold text-sm sm:text-base mb-1">
-                            No services found
-                          </p>
-                          <p className="text-slate-500 text-xs sm:text-[13px] mb-4 text-center leading-relaxed">
-                            {activeQuery
-                              ? `No packages match your search for "${activeQuery}". Try different keywords or select a different category.`
-                              : "No packages available in this selection."}
-                          </p>
-                          <button
-                            type="button"
-                            onClick={handleResetAll}
-                            className="bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs px-4 py-2 rounded-[6px] font-medium transition-colors cursor-pointer"
-                          >
-                            Reset Filters & View All
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-
-                  {/* 4. Strictly Real Results List */}
-                  {!isLoading &&
-                    !isError &&
-                    packagesList.map((pkg: any) => {
-                      const coverImage = resolveRealCoverImage(pkg);
-                      const userObj = pkg.user || pkg.userId || pkg.userID || {};
-                      const sellerUsername = userObj.username || pkg.username || "";
-                      const sellerName = userObj.name || sellerUsername || "--";
-                      const sellerAvatar = userObj.image || pkg.pp || "/media/noavatar.png";
-                      const sellerLevel = userObj.sellerLevel || "";
-
-                      // Real rating calculation: never default to dummy 5.0
-                      const rawRating =
-                        typeof pkg.gigRating === "number"
-                          ? pkg.gigRating
-                          : typeof pkg.starRating === "number"
-                            ? pkg.starRating
-                            : pkg.starNumber > 0 && typeof pkg.totalStars === "number"
-                              ? pkg.totalStars / pkg.starNumber
-                              : typeof userObj.starRating === "number"
-                                ? userObj.starRating
-                                : null;
-
-                      const reviewCount =
-                        pkg.starNumber || pkg.reviews || userObj.totalReviews || pkg.sales || 0;
-                      const hasRating = rawRating !== null && rawRating > 0;
-                      const formattedRating = hasRating ? Number(rawRating).toFixed(1) : null;
-
-                      // Real delivery days
-                      const deliveryDays = pkg.deliveryTime || pkg.deliveryDays;
-
-                      // Real price
-                      const price = pkg.price;
-                      const categoryName = pkg.category || pkg.cat || pkg.categoryName || "";
-                      const packageUrl = `/package/${pkg.slug || pkg._id || pkg.id}`;
-
-                      return (
-                        <tr
-                          key={pkg._id || pkg.id}
-                          onClick={() => router.push(packageUrl)}
-                          className="odd:bg-[#f5f5f5] even:bg-white cursor-pointer transition-colors group"
-                        >
-                          {/* Package Name & Real Thumbnail */}
-                          <td className="py-4 px-4 align-middle max-w-[420px]">
-                            <div className="flex items-center gap-3.5">
-                              <div className="relative w-24 sm:w-28 h-14 sm:h-16 rounded-[6px] overflow-hidden bg-gray-100 border border-gray-200/80 shrink-0 flex items-center justify-center">
-                                {coverImage ? (
-                                  <img
-                                    src={coverImage}
-                                    alt={pkg.title || "Package Cover"}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                  />
-                                ) : (
-                                  <Briefcase className="w-6 h-6 text-gray-300" />
-                                )}
+                  <tbody className={`divide-y divide-gray-100 font-sf-pro transition-opacity duration-150 ${isFetching && !isInitialLoading ? "opacity-60" : "opacity-100"}`}>
+                    {/* 1. Loading State (initial mount only) */}
+                    {isInitialLoading && (
+                      <>
+                        {[...Array(6)].map((_, idx) => (
+                          <tr key={`skeleton-${idx}`} className="animate-pulse odd:bg-[#f5f5f5] even:bg-white">
+                            <td className="py-4 px-4 align-middle">
+                              <div className="flex items-center gap-3">
+                                <div className="w-24 sm:w-28 h-14 sm:h-16 rounded-[6px] bg-gray-200 shrink-0" />
+                                <div className="flex-1 space-y-2">
+                                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                                  <div className="h-3 bg-gray-100 rounded w-1/3" />
+                                </div>
                               </div>
-                              <div className="flex flex-col gap-1 min-w-0">
-                                <span
-                                  className="text-xs sm:text-[13.5px] font-medium text-gray-900 group-hover:text-[#0D6D5F] transition-colors line-clamp-2 leading-relaxed"
-                                  title={pkg.title}
-                                >
-                                  {pkg.title || "--"}
-                                </span>
-                                {categoryName && (
-                                  <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-bold bg-[#fff] text-teal-800 border border-[rgba(0, 0, 0, 0.10)] w-fit capitalize">
-                                    {categoryName}
-                                  </span>
-                                )}
+                            </td>
+                            <td className="py-4 px-4 align-middle">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-full bg-gray-200 shrink-0" />
+                                <div className="space-y-1">
+                                  <div className="h-3.5 bg-gray-200 rounded w-16" />
+                                  <div className="h-2.5 bg-gray-100 rounded w-10" />
+                                </div>
                               </div>
+                            </td>
+                            <td className="py-4 px-4 align-middle">
+                              <div className="h-3.5 bg-gray-200 rounded w-14" />
+                            </td>
+                            <td className="py-4 px-4 align-middle">
+                              <div className="h-3.5 bg-gray-200 rounded w-12" />
+                            </td>
+                            <td className="py-4 px-4 align-middle">
+                              <div className="h-4 bg-gray-200 rounded w-12" />
+                            </td>
+                            <td className="py-4 px-4 align-middle text-right">
+                              <div className="h-8 bg-gray-200 rounded-[6px] w-20 ml-auto" />
+                            </td>
+                          </tr>
+                        ))}
+                      </>
+                    )}
+
+                    {/* 2. Error State */}
+                    {!isLoading && isError && (
+                      <tr>
+                        <td colSpan={6} className="py-16 text-center">
+                          <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
+                            <div className="w-12 h-12 rounded-[6px] bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 text-xl mb-3 shadow-2xs">
+                              <X className="w-6 h-6" />
                             </div>
-                          </td>
-
-                          {/* Real Seller */}
-                          <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            <div className="flex items-center gap-2.5">
-                              <div className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-200 bg-gray-100 shrink-0">
-                                <img
-                                  src={sellerAvatar}
-                                  alt={sellerName}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <div className="flex flex-col min-w-0">
-                                <span
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (sellerUsername) {
-                                      router.push(`/seller/${sellerUsername}`);
-                                    }
-                                  }}
-                                  className="text-xs sm:text-[13px] font-semibold text-gray-900 hover:text-[#0D6D5F] transition-colors truncate max-w-[130px]"
-                                  title={sellerName}
-                                >
-                                  {sellerName}
-                                </span>
-                                {sellerLevel && (
-                                  <span className="text-[10px] text-gray-400 font-medium">
-                                    {sellerLevel}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* Real Delivery Time */}
-                          <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 whitespace-nowrap">
-                            {deliveryDays ? (
-                              <div className="inline-flex items-center gap-1.5 text-gray-600">
-                                <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                                <span>{deliveryDays} {deliveryDays === 1 ? "day" : "days"}</span>
-                              </div>
-                            ) : (
-                              <span className="text-gray-400 text-xs">--</span>
-                            )}
-                          </td>
-
-                          {/* Real Rating */}
-                          <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            {hasRating ? (
-                              <div className="flex items-center gap-1">
-                                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
-                                <span className="text-xs sm:text-[13px] font-bold text-gray-900">
-                                  {formattedRating}
-                                </span>
-                                {reviewCount > 0 && (
-                                  <span className="text-[11px] text-gray-400">
-                                    ({reviewCount})
-                                  </span>
-                                )}
-                              </div>
-                            ) : (
-                              <span className="text-xs text-gray-400 font-normal">
-                                No ratings
-                              </span>
-                            )}
-                          </td>
-
-                          {/* Real Price */}
-                          <td className="py-4 px-4 align-middle text-xs sm:text-[14px] font-bold text-gray-950 whitespace-nowrap">
-                            {price !== null && price !== undefined ? (
-                              (Number(price) || 0).toLocaleString("en-US", {
-                                style: "currency",
-                                currency: "USD",
-                              })
-                            ) : (
-                              <span className="text-gray-400 font-normal">--</span>
-                            )}
-                          </td>
-
-                          {/* Action */}
-                          <td className="py-4 px-4 align-middle whitespace-nowrap text-right">
-                            <Button
-                              href={packageUrl}
-                              variant="dark"
-                              size="sm"
-                              radius="md"
-                              className=""
+                            <p className="text-slate-800 font-semibold text-sm sm:text-base mb-1">
+                              Failed to load search results
+                            </p>
+                            <p className="text-slate-400 text-xs sm:text-[13px] mb-4">
+                              Unable to retrieve packages at this time. Please try again.
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => refetch()}
+                              className="inline-flex items-center gap-2 bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs px-4 py-2 rounded-[6px] font-medium transition-colors"
                             >
-                              <span>View Details</span>
-                              <ArrowRight className="w-3.5 h-3.5" />
-                            </Button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
-            </div>
-          )}
+                              <RefreshCw className="w-3.5 h-3.5" />
+                              <span>Retry</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
 
-          {/* Card Grid View */}
-          {viewMode === "card" && (
-            <div className="w-full">
-              {/* 1. Loading Skeleton */}
-              {isInitialLoading && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
-                  {Array.from({ length: 8 }).map((_, idx) => (
-                    <CardSkeleton key={`card-skel-${idx}`} />
-                  ))}
-                </div>
-              )}
+                    {/* 3. Empty State */}
+                    {!isLoading && !isError && packagesList.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="py-16 text-center">
+                          <div className="flex flex-col items-center justify-center max-w-md mx-auto">
+                            <div className="w-12 h-12 rounded-[6px] bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
+                              <Search className="w-6 h-6" />
+                            </div>
+                            <p className="text-slate-900 font-semibold text-sm sm:text-base mb-1">
+                              No services found
+                            </p>
+                            <p className="text-slate-500 text-xs sm:text-[13px] mb-4 text-center leading-relaxed">
+                              {activeQuery
+                                ? `No packages match your search for "${activeQuery}". Try different keywords or select a different category.`
+                                : "No packages available in this selection."}
+                            </p>
+                            <button
+                              type="button"
+                              onClick={handleResetAll}
+                              className="bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs px-4 py-2 rounded-[6px] font-medium transition-colors cursor-pointer"
+                            >
+                              Reset Filters & View All
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
 
-              {/* 2. Error State */}
-              {!isLoading && isError && (
-                <div className="bg-white rounded-[6px] border border-gray-200/80 p-12 text-center shadow-sm">
-                  <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
-                    <div className="w-12 h-12 rounded-[6px] bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 text-xl mb-3 shadow-2xs">
-                      <X className="w-6 h-6" />
-                    </div>
-                    <p className="text-slate-800 font-semibold text-sm sm:text-base mb-1">
-                      Failed to load search results
-                    </p>
-                    <p className="text-slate-400 text-xs sm:text-[13px] mb-4">
-                      Unable to retrieve packages at this time. Please try again.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => refetch()}
-                      className="inline-flex items-center gap-2 bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs px-4 py-2 rounded-[6px] font-medium transition-colors cursor-pointer"
-                    >
-                      <RefreshCw className="w-3.5 h-3.5" />
-                      <span>Retry</span>
-                    </button>
+                    {/* 4. Strictly Real Results List */}
+                    {!isLoading &&
+                      !isError &&
+                      packagesList.map((pkg: any) => {
+                        const coverImage = resolveRealCoverImage(pkg);
+                        const userObj = pkg.user || pkg.userId || pkg.userID || {};
+                        const sellerUsername = userObj.username || pkg.username || "";
+                        const sellerName = userObj.name || sellerUsername || "--";
+                        const sellerAvatar = userObj.image || pkg.pp || "/media/noavatar.png";
+                        const sellerLevel = userObj.sellerLevel || "";
+
+                        // Real rating calculation: never default to dummy 5.0
+                        const rawRating =
+                          typeof pkg.gigRating === "number"
+                            ? pkg.gigRating
+                            : typeof pkg.starRating === "number"
+                              ? pkg.starRating
+                              : pkg.starNumber > 0 && typeof pkg.totalStars === "number"
+                                ? pkg.totalStars / pkg.starNumber
+                                : typeof userObj.starRating === "number"
+                                  ? userObj.starRating
+                                  : null;
+
+                        const reviewCount =
+                          pkg.starNumber || pkg.reviews || userObj.totalReviews || pkg.sales || 0;
+                        const hasRating = rawRating !== null && rawRating > 0;
+                        const formattedRating = hasRating ? Number(rawRating).toFixed(1) : null;
+
+                        // Real delivery days
+                        const deliveryDays = pkg.deliveryTime || pkg.deliveryDays;
+
+                        // Real price
+                        const price = pkg.price;
+                        const categoryName = pkg.category || pkg.cat || pkg.categoryName || "";
+                        const packageUrl = `/package/${pkg.slug || pkg._id || pkg.id}`;
+
+                        return (
+                          <tr
+                            key={pkg._id || pkg.id}
+                            onClick={() => router.push(packageUrl)}
+                            className="odd:bg-[#f5f5f5] even:bg-white cursor-pointer transition-colors group"
+                          >
+                            {/* Package Name & Real Thumbnail */}
+                            <td className="py-4 px-4 align-middle max-w-[420px]">
+                              <div className="flex items-center gap-3.5">
+                                <div className="relative w-24 sm:w-28 h-14 sm:h-16 rounded-[6px] overflow-hidden bg-gray-100 border border-gray-200/80 shrink-0 flex items-center justify-center">
+                                  {coverImage ? (
+                                    <img
+                                      src={coverImage}
+                                      alt={pkg.title || "Package Cover"}
+                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                    />
+                                  ) : (
+                                    <Briefcase className="w-6 h-6 text-gray-300" />
+                                  )}
+                                </div>
+                                <div className="flex flex-col gap-1 min-w-0">
+                                  <span
+                                    className="text-xs sm:text-[13.5px] font-medium text-gray-900 group-hover:text-[#0D6D5F] transition-colors line-clamp-2 leading-relaxed"
+                                    title={pkg.title}
+                                  >
+                                    {pkg.title || "--"}
+                                  </span>
+                                  {categoryName && (
+                                    <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-bold bg-[#fff] text-teal-800 border border-[rgba(0, 0, 0, 0.10)] w-fit capitalize">
+                                      {categoryName}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Real Seller */}
+                            <td className="py-4 px-4 align-middle whitespace-nowrap">
+                              <div className="flex items-center gap-2.5">
+                                <div className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-200 bg-gray-100 shrink-0">
+                                  <img
+                                    src={sellerAvatar}
+                                    alt={sellerName}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                  <span
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (sellerUsername) {
+                                        router.push(`/seller/${sellerUsername}`);
+                                      }
+                                    }}
+                                    className="text-xs sm:text-[13px] font-semibold text-gray-900 hover:text-[#0D6D5F] transition-colors truncate max-w-[130px]"
+                                    title={sellerName}
+                                  >
+                                    {sellerName}
+                                  </span>
+                                  {sellerLevel && (
+                                    <span className="text-[10px] text-gray-400 font-medium">
+                                      {sellerLevel}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Real Delivery Time */}
+                            <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 whitespace-nowrap">
+                              {deliveryDays ? (
+                                <div className="inline-flex items-center gap-1.5 text-gray-600">
+                                  <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                                  <span>{deliveryDays} {deliveryDays === 1 ? "day" : "days"}</span>
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">--</span>
+                              )}
+                            </td>
+
+                            {/* Real Rating */}
+                            <td className="py-4 px-4 align-middle whitespace-nowrap">
+                              {hasRating ? (
+                                <div className="flex items-center gap-1">
+                                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+                                  <span className="text-xs sm:text-[13px] font-bold text-gray-900">
+                                    {formattedRating}
+                                  </span>
+                                  {reviewCount > 0 && (
+                                    <span className="text-[11px] text-gray-400">
+                                      ({reviewCount})
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-xs text-gray-400 font-normal">
+                                  No ratings
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Real Price */}
+                            <td className="py-4 px-4 align-middle text-xs sm:text-[14px] font-bold text-gray-950 whitespace-nowrap">
+                              {price !== null && price !== undefined ? (
+                                (Number(price) || 0).toLocaleString("en-US", {
+                                  style: "currency",
+                                  currency: "USD",
+                                })
+                              ) : (
+                                <span className="text-gray-400 font-normal">--</span>
+                              )}
+                            </td>
+
+                            {/* Action */}
+                            <td className="py-4 px-4 align-middle whitespace-nowrap text-right">
+                              <Button
+                                href={packageUrl}
+                                variant="primary"
+                                size="sm"
+                                radius="md"
+                                className="bg-none hover:bg-none"
+                              >
+                                <Eye className="w-3.5 h-3.5 text-black" />
+                              </Button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Card Grid View */}
+            {viewMode === "card" && (
+              <div className="w-full">
+                {/* 1. Loading Skeleton */}
+                {isInitialLoading && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+                    {Array.from({ length: 8 }).map((_, idx) => (
+                      <CardSkeleton key={`card-skel-${idx}`} />
+                    ))}
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* 3. Empty State */}
-              {!isLoading && !isError && packagesList.length === 0 && (
-                <div className="bg-white rounded-[6px] border border-gray-200/80 p-12 text-center shadow-sm">
-                  <div className="flex flex-col items-center justify-center max-w-md mx-auto">
-                    <div className="w-12 h-12 rounded-[6px] bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
-                      <Search className="w-6 h-6" />
+                {/* 2. Error State */}
+                {!isLoading && isError && (
+                  <div className="bg-white rounded-[6px] border border-gray-200/80 p-12 text-center shadow-sm">
+                    <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
+                      <div className="w-12 h-12 rounded-[6px] bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 text-xl mb-3 shadow-2xs">
+                        <X className="w-6 h-6" />
+                      </div>
+                      <p className="text-slate-800 font-semibold text-sm sm:text-base mb-1">
+                        Failed to load search results
+                      </p>
+                      <p className="text-slate-400 text-xs sm:text-[13px] mb-4">
+                        Unable to retrieve packages at this time. Please try again.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => refetch()}
+                        className="inline-flex items-center gap-2 bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs px-4 py-2 rounded-[6px] font-medium transition-colors cursor-pointer"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        <span>Retry</span>
+                      </button>
                     </div>
-                    <p className="text-slate-900 font-semibold text-sm sm:text-base mb-1">
-                      No services found
-                    </p>
-                    <p className="text-slate-500 text-xs sm:text-[13px] mb-4 text-center leading-relaxed">
-                      {activeQuery
-                        ? `No packages match your search for "${activeQuery}". Try different keywords or select a different category.`
-                        : "No packages available in this selection."}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={handleResetAll}
-                      className="bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs px-4 py-2 rounded-[6px] font-medium transition-colors cursor-pointer"
-                    >
-                      Reset Filters & View All
-                    </button>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* 4. Real Results Card Grid */}
-              {!isLoading && !isError && packagesList.length > 0 && (
-                <div
-                  className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 transition-opacity duration-150 ${
-                    isFetching && !isInitialLoading ? "opacity-60" : "opacity-100"
-                  }`}
-                >
-                  {packagesList.map((pkg: any, idx: number) => (
-                    <PackageCard
-                      key={pkg._id || pkg.id || idx}
-                      data={pkg}
-                      priority={idx < 4}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+                {/* 3. Empty State */}
+                {!isLoading && !isError && packagesList.length === 0 && (
+                  <div className="bg-white rounded-[6px] border border-gray-200/80 p-12 text-center shadow-sm">
+                    <div className="flex flex-col items-center justify-center max-w-md mx-auto">
+                      <div className="w-12 h-12 rounded-[6px] bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
+                        <Search className="w-6 h-6" />
+                      </div>
+                      <p className="text-slate-900 font-semibold text-sm sm:text-base mb-1">
+                        No services found
+                      </p>
+                      <p className="text-slate-500 text-xs sm:text-[13px] mb-4 text-center leading-relaxed">
+                        {activeQuery
+                          ? `No packages match your search for "${activeQuery}". Try different keywords or select a different category.`
+                          : "No packages available in this selection."}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleResetAll}
+                        className="bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs px-4 py-2 rounded-[6px] font-medium transition-colors cursor-pointer"
+                      >
+                        Reset Filters & View All
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. Real Results Card Grid */}
+                {!isLoading && !isError && packagesList.length > 0 && (
+                  <div
+                    className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 transition-opacity duration-150 ${isFetching && !isInitialLoading ? "opacity-60" : "opacity-100"
+                      }`}
+                  >
+                    {packagesList.map((pkg: any, idx: number) => (
+                      <PackageCard
+                        key={pkg._id || pkg.id || idx}
+                        data={pkg}
+                        priority={idx < 4}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Pagination Controls */}
             {!isLoading && !isError && packagesList.length > 0 && (

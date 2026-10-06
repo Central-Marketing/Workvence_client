@@ -182,17 +182,17 @@ const MyPackages = () => {
           </div>
 
           {/* Main Card Container */}
-          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          <div className="p-7 bg-[#f5f5f5] rounded-[6px]">
+            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)]">
 
-            {/* Packages Table */}
-            <div className="w-full overflow-x-auto">
-              <table className="w-full text-left text-sm border-collapse min-w-[700px]">
+              {/* Packages Table */}
+              <table className="w-full  min-w-[760px] border-collapse text-left">
                 <thead>
-                  <tr className="text-xs font-bold text-gray-800 border-b border-gray-100">
-                    <th className="py-3.5 px-4 font-bold">Package Name</th>
-                    <th className="py-3.5 px-6 font-bold whitespace-nowrap">Price</th>
-                    <th className="py-3.5 px-6 font-bold whitespace-nowrap">Sales</th>
-                    <th className="py-3.5 px-6 font-bold whitespace-nowrap text-right">Action</th>
+                  <tr className="border-b border-slate-100 text-base  font-sf-pro font-bold text-[#434343]">
+                    <th className="py-3 px-4 ">Package Name</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Price</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Sales</th>
+                    <th className="py-3 px-4 whitespace-nowrap ">Action</th>
                   </tr>
                 </thead>
 
@@ -224,7 +224,7 @@ const MyPackages = () => {
                       </td>
                     </tr>
                   ) : (
-                    currentPackages.map((pkg: any) => {
+                    currentPackages.map((pkg: any, idx: number) => {
                       const coverImage =
                         pkg.cover ||
                         pkg.image ||
@@ -243,10 +243,11 @@ const MyPackages = () => {
                               router.push(`/package/${pkg._id}`);
                             }
                           }}
-                          className="hover:bg-slate-50/70 cursor-pointer transition-colors"
+                          className={`group relative cursor-pointer transition-colors ${idx % 2 === 0 ? "bg-[#F5F5F5]" : "bg-white"
+                            } after:pointer-events-none after:absolute after:inset-0`}
                         >
                           {/* Package Name & Thumbnail */}
-                          <td className="py-4 px-4 align-middle max-w-[460px]">
+                          <td className="py-3 px-4 align-middle max-w-[380px]">
                             <div className="flex items-center gap-4">
                               <img
                                 src={coverImage}
@@ -276,7 +277,7 @@ const MyPackages = () => {
                           </td>
 
                           {/* Price */}
-                          <td className="py-4 px-6 align-middle text-xs sm:text-[13.5px] font-bold text-gray-950 whitespace-nowrap">
+                          <td className="py-3 px-4 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
                             {(pkg.price || 0).toLocaleString("en-US", {
                               style: "currency",
                               currency: "USD",
@@ -284,12 +285,12 @@ const MyPackages = () => {
                           </td>
 
                           {/* Sales */}
-                          <td className="py-4 px-6 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
+                          <td className="py-3 px-4 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
                             {salesCount} {salesCount === 1 ? "Sale" : "Sales"}
                           </td>
 
                           {/* Action Buttons: Edit (Pencil) & Delete (Red Trash) */}
-                          <td className="py-4 px-6 align-middle whitespace-nowrap text-right">
+                          <td className="py-3 px-4 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
                             <div className="inline-flex items-center justify-end gap-2.5">
                               {/* Edit Button */}
                               <Button
@@ -303,7 +304,11 @@ const MyPackages = () => {
                                 size="icon"
                                 radius="full"
                                 className="w-8 h-8 min-w-[32px] min-h-[32px] p-0 shadow-2xs"
-                                icon={<FiEdit2 className="text-xs" />}
+                                icon={<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                  <path d="M14.0737 3.88545C14.8189 3.07808 15.1915 2.6744 15.5874 2.43893C16.5427 1.87076 17.7191 1.85309 18.6904 2.39232C19.0929 2.6158 19.4769 3.00812 20.245 3.79276C21.0131 4.5774 21.3972 4.96972 21.6159 5.38093C22.1438 6.37312 22.1265 7.57479 21.5703 8.5507C21.3398 8.95516 20.9446 9.33578 20.1543 10.097L10.7506 19.1543C9.25288 20.5969 8.504 21.3182 7.56806 21.6837C6.63212 22.0493 5.6032 22.0224 3.54536 21.9686L3.26538 21.9613C2.63891 21.9449 2.32567 21.9367 2.14359 21.73C1.9615 21.5234 1.98636 21.2043 2.03608 20.5662L2.06308 20.2197C2.20301 18.4235 2.27297 17.5255 2.62371 16.7182C2.97444 15.9109 3.57944 15.2555 4.78943 13.9445L14.0737 3.88545Z" stroke="#292929" stroke-width="1.5" stroke-linejoin="round" />
+                                  <path d="M13 4L20 11" stroke="#292929" stroke-width="1.5" stroke-linejoin="round" />
+                                  <path d="M14 22H22" stroke="#292929" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>}
                               />
 
                               {/* Delete Button */}
@@ -328,9 +333,10 @@ const MyPackages = () => {
                   )}
                 </tbody>
               </table>
-            </div>
 
+            </div>
           </div>
+
 
         </div>
       )}

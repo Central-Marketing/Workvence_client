@@ -111,7 +111,14 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
         const formatted = moment(kyc.dateOfBirth).format("YYYY-MM-DD");
         setDateOfBirth(formatted);
       }
-      if (kyc.country) setCountry(kyc.country);
+      if (kyc.country) {
+        const flagsRecord = countriesFlags as Record<string, { alias?: string }>;
+        const matched = flagsRecord[kyc.country]
+          ? kyc.country
+          : Object.keys(flagsRecord).find((k) => flagsRecord[k]?.alias === kyc.country) ||
+            kyc.country;
+        setCountry(matched);
+      }
       if (kyc.documentType && ["passport", "nid", "driving_license"].includes(kyc.documentType)) {
         setDocumentType(kyc.documentType as any);
       }
@@ -429,13 +436,12 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
   // STATE C: REJECTED & STATE A: UNVERIFIED / FIRST-TIME / RE-SUBMIT
   // ══════════════════════════════════════════════════════════
   const isRejectedState = kyc?.status === "rejected";
-  const countriesList = Object.keys(countriesFlags || {}).sort();
 
   return (
-    <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm">
       {/* Header Banner for State C (Rejected) */}
       {isRejectedState && !isReSubmitting && (
-        <div className="p-6 bg-red-50/90 border-b border-red-200">
+        <div className="p-6 bg-red-50/90 border-b border-red-200 rounded-t-[6px]">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-[6px] bg-red-100 border border-red-200 flex items-center justify-center text-red-600 shrink-0 shadow-2xs">
               <ShieldAlert size={26} />
@@ -474,7 +480,7 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
       {(!isRejectedState || isReSubmitting) && (
         <div>
           {/* Header */}
-          <div className="px-6 py-6 sm:px-8 border-b border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="px-6 py-6 sm:px-8 border-b border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-t-[6px]">
             <div>
               <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                 <ShieldCheck className="text-brand-green" size={24} />
@@ -580,6 +586,7 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
                       onChange={(val) => setCountry(String(val))}
                       placeholder="Select country..."
                       ariaLabel="Select country of issuance"
+                      searchable
                     />
                   </div>
                 </div>

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useId } from 'react';
-import { FiChevronDown, FiCheck } from 'react-icons/fi';
+import React, { useState, useRef, useEffect, useId, useMemo } from 'react';
+import { FiChevronDown, FiCheck, FiSearch } from 'react-icons/fi';
 
 export interface CustomSelectOption {
   value: string | number;
@@ -25,6 +25,7 @@ export interface CustomSelectProps<T extends string | number = any> {
   error?: boolean | string;
   ariaLabel?: string;
   menuClassName?: string;
+  searchable?: boolean;
 }
 
 const sizeConfig = {
@@ -63,11 +64,24 @@ export function CustomSelect<T extends string | number = any>({
   error,
   ariaLabel,
   menuClassName = "",
+  searchable = false,
 }: CustomSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const id = useId();
+
+  // Reset search query and autofocus when open/closed
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchQuery("");
+    } else if (searchable) {
+      const timer = setTimeout(() => searchInputRef.current?.focus(), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, searchable]);
 
   const normalizeStr = (v: any) =>
     v !== undefined && v !== null
@@ -92,6 +106,19 @@ export function CustomSelect<T extends string | number = any>({
       Boolean(targetNorm) && (optValNorm === targetNorm || optLabelNorm === targetNorm)
     );
   });
+
+  const filteredOptions = useMemo(() => {
+    if (!searchable || !searchQuery.trim()) return options;
+    const q = searchQuery.toLowerCase().trim();
+    return options.filter((opt) => {
+      // Don't hide the placeholder empty option unless searching
+      if (!opt.value && !opt.label.toLowerCase().includes(q)) return false;
+      return (
+        opt.label.toLowerCase().includes(q) ||
+        String(opt.value).toLowerCase().includes(q)
+      );
+    });
+  }, [options, searchable, searchQuery]);
 
   // Handle outside click & escape key
   useEffect(() => {
@@ -175,8 +202,36 @@ export function CustomSelect<T extends string | number = any>({
           tabIndex={-1}
           className={`absolute left-0 right-0 z-50 w-full mt-1.5 bg-white border border-gray-100 rounded-[6px] shadow-xl overflow-visible py-1 animate-in fade-in slide-in-from-top-1 duration-150 ${menuClassName}`}
         >
+          {searchable && (
+            <div className="p-2 border-b border-gray-100 bg-white sticky top-0 z-10">
+              <div className="relative">
+                <FiSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search country..."
+                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-[4px] focus:outline-none focus:bg-white focus:border-[#0D6D5F] text-gray-900 transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      setIsOpen(false);
+                      buttonRef.current?.focus();
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
           <ul className="max-h-60 overflow-y-auto divide-y divide-gray-50/50 z-50">
-            {options.map((option) => {
+            {filteredOptions.length === 0 ? (
+              <li className="px-3.5 py-4 text-center text-xs text-gray-400">
+                No matching results found
+              </li>
+            ) : (
+              filteredOptions.map((option) => {
               const isSelected = selectedOption
                 ? option.value === selectedOption.value || option.label === selectedOption.label
                 : option.value === value;
@@ -213,7 +268,8 @@ export function CustomSelect<T extends string | number = any>({
                   </button>
                 </li>
               );
-            })}
+            })
+          )}
           </ul>
         </div>
       )}

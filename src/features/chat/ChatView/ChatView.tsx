@@ -2224,7 +2224,7 @@ const ChatView = () => {
                         variant="ghost"
                         size="icon"
                         radius="lg"
-                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] sm:rounded-[6px] hover:bg-emerald-50 text-emerald-600 shrink-0"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] sm:rounded-[6px] hover:bg-slate-100  text-emerald-600 shrink-0"
                         onClick={() => {
                           setMeetingTitle(
                             `Job Discussion with @${finalRecipientUser?.username || 'Client'}`
@@ -2270,7 +2270,7 @@ const ChatView = () => {
                           size="icon"
                           radius="lg"
                           className={`w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] sm:rounded-[6px] transition-colors shrink-0 ${isTagPopoverOpen || (activeConversation?.tags && activeConversation.tags.length > 0)
-                            ? "!bg-white border !border-[rgba(0,0,0,0.10)] text-teal-800"
+                            ? " text-[#292929]"
                             : "hover:bg-slate-100 text-slate-600"
                             }`}
                           onClick={() => setIsTagPopoverOpen(!isTagPopoverOpen)}

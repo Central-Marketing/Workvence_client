@@ -139,37 +139,85 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 {finalRecipientUser.username}
               </h3>
 
-              <span className="text-[11px] sm:text-xs text-slate-500 font-medium">
-                {isRecipientTyping ? (
-                  <span className="text-brand-green font-semibold animate-pulse flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-brand-green rounded-full shrink-0" />
-                    typing...
-                  </span>
-                ) : isRecipientOnline ? (
-                  <span className="text-emerald-600 font-medium flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full shrink-0" />
-                    Online
-                  </span>
-                ) : recipientLastSeenText ? (
-                  <span>Last seen {recipientLastSeenText}</span>
-                ) : (
-                  "Offline"
-                )}
-              </span>
-
-              {/* Active Conversation Private Tags Display */}
-              {Array.isArray(activeConversation?.tags) && activeConversation.tags.length > 0 && (
-                <div className="flex items-center gap-1 mt-1 flex-wrap">
-                  {activeConversation.tags.slice(0, 3).map((t: string) => (
-                    <ConversationTagBadge key={t} tag={t} size="xs" />
-                  ))}
-                  {activeConversation.tags.length > 3 && (
-                    <span className="text-[10px] text-slate-400 font-medium">
-                      +{activeConversation.tags.length - 3}
+              {/* Active Status Indicator + Horizontal Private Tags Row */}
+              <div className="flex items-center gap-2 mt-0.5 min-w-0 flex-nowrap overflow-hidden">
+                {/* Presence Status */}
+                <span className="text-[11px] sm:text-xs text-slate-500 font-medium shrink-0 flex items-center">
+                  {isRecipientTyping ? (
+                    <span className="text-brand-green font-semibold animate-pulse flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-brand-green rounded-full shrink-0" />
+                      typing...
                     </span>
+                  ) : isRecipientOnline ? (
+                    <span className="text-emerald-600 font-medium flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full shrink-0" />
+                      Online
+                    </span>
+                  ) : recipientLastSeenText ? (
+                    <span>Last seen {recipientLastSeenText}</span>
+                  ) : (
+                    "Offline"
                   )}
-                </div>
-              )}
+                </span>
+
+                {/* Active Conversation Private Tags Display */}
+                {Array.isArray(activeConversation?.tags) && activeConversation.tags.length > 0 && (
+                  <>
+                    <span className="text-slate-300 select-none text-[10px] shrink-0">•</span>
+
+                    {/* MOBILE (<640px): Compact Tappable Tag Pill */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsTagPopoverOpen(true);
+                      }}
+                      className="sm:hidden inline-flex items-center gap-1 text-[10px] font-medium text-slate-700 bg-white border border-[rgba(0,0,0,0.10)] shadow-2xs px-2 py-0.5 rounded-full shrink-0 active:scale-95 transition-transform"
+                      aria-label="Manage conversation tags"
+                    >
+                      <HugeiconsIcon className="w-3 h-3 text-[#292929]" icon={Tag01Icon} />
+                      <span>{activeConversation.tags.length}</span>
+                    </button>
+
+                    {/* DESKTOP (>=640px): Inline Badges + Hover Tooltip */}
+                    <div className="hidden sm:flex items-center gap-1 min-w-0 overflow-hidden shrink-0">
+                      {activeConversation.tags.slice(0, 2).map((t: string) => (
+                        <ConversationTagBadge key={t} tag={t} size="xs" />
+                      ))}
+                      {activeConversation.tags.length > 2 && (
+                        <div
+                          className="relative group/tag inline-flex items-center"
+                          title={activeConversation.tags.slice(2).join(", ")}
+                        >
+                          <span
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsTagPopoverOpen(true);
+                            }}
+                            className="text-[10px] text-slate-600 font-medium shrink-0 cursor-pointer bg-white hover:bg-slate-50 px-2 py-0.5 rounded-full transition-colors leading-none border border-[rgba(0,0,0,0.10)] shadow-2xs"
+                          >
+                            +{activeConversation.tags.length - 2}
+                          </span>
+
+                          {/* Floating Tooltip showing remaining tags with existing tag colors */}
+                          <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden group-hover/tag:flex flex-col gap-1.5 bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] shadow-xl p-2.5 z-50 whitespace-nowrap pointer-events-none animate-in fade-in zoom-in-95 duration-150">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">
+                              Remaining Tags
+                            </span>
+                            <div className="flex flex-col gap-1">
+                              {activeConversation.tags.slice(2).map((t: string) => (
+                                <ConversationTagBadge key={t} tag={t} size="xs" />
+                              ))}
+                            </div>
+                            {/* Upward Arrow */}
+                            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white border-t border-l border-[rgba(0,0,0,0.10)] rotate-45" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
@@ -240,13 +288,13 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
             />
 
             {/* Private Conversation Tags Button & Popover */}
-            <div className="relative hidden sm:block">
+            <div className="relative">
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
                 radius="lg"
-                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] sm:rounded-[6px] transition-colors shrink-0 ${
+                className={`hidden sm:inline-flex w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] sm:rounded-[6px] transition-colors shrink-0 ${
                   isTagPopoverOpen ||
                   (activeConversation?.tags && activeConversation.tags.length > 0)
                     ? " text-[#292929]"

@@ -150,17 +150,19 @@ export const ContactProfileTab: React.FC<ContactProfileTabProps> = ({
         </Button>
       </div>
 
-      {/* Private Tags Card */}
-      <ConversationTagsManager
-        conversationId={String(
-          activeConversation?.uuid ||
-            activeConversation?.conversationID ||
-            activeConversation?._id ||
-            conversationID
-        )}
-        tags={activeConversation?.tags || []}
-        mode="card"
-      />
+      {/* Private Tags Card (Small devices / Mobile drawer only) */}
+      <div className="xl:hidden">
+        <ConversationTagsManager
+          conversationId={String(
+            activeConversation?.uuid ||
+              activeConversation?.conversationID ||
+              activeConversation?._id ||
+              conversationID
+          )}
+          tags={activeConversation?.tags || []}
+          mode="card"
+        />
+      </div>
 
       {/* Card 1: About Contact */}
       <div className="bg-white rounded-[6px] p-5 border border-slate-200/80 shadow-xs flex flex-col gap-3 relative">

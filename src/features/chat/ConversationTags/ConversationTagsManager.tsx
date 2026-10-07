@@ -29,7 +29,8 @@ export const ConversationTagsManager: React.FC<ConversationTagsManagerProps> = (
   const [currentTags, setCurrentTags] = useState<string[]>(tags || []);
   const [inputValue, setInputValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const desktopContainerRef = useRef<HTMLDivElement>(null);
+  const mobileContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Sync internal state with external tags prop
@@ -42,7 +43,10 @@ export const ConversationTagsManager: React.FC<ConversationTagsManagerProps> = (
     if (mode !== "popover" || !isOpen) return;
 
     const handleOutsideClick = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const clickedInsideDesktop = desktopContainerRef.current?.contains(target);
+      const clickedInsideMobile = mobileContainerRef.current?.contains(target);
+      if (!clickedInsideDesktop && !clickedInsideMobile) {
         onClose?.();
       }
     };
@@ -51,10 +55,12 @@ export const ConversationTagsManager: React.FC<ConversationTagsManagerProps> = (
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [mode, isOpen, onClose]);
 
-  // Focus input when opened as popover
+  // Focus input when opened as popover (desktop only to prevent mobile viewport zoom)
   useEffect(() => {
     if (mode === "popover" && isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 50);
+      if (typeof window !== "undefined" && window.innerWidth >= 640) {
+        setTimeout(() => inputRef.current?.focus(), 50);
+      }
     }
   }, [mode, isOpen]);
 
@@ -140,7 +146,7 @@ export const ConversationTagsManager: React.FC<ConversationTagsManagerProps> = (
       {/* Header & Lock notice */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-800">
-          <FiTag className="w-3.5 h-3.5 text-teal-700" />
+          <FiTag className="w-3.5 h-3.5 text-slate-600" />
           <span>Private Tags</span>
           <span className="text-[10px] text-slate-400 font-normal">
             ({currentTags.length}/20)
@@ -182,7 +188,7 @@ export const ConversationTagsManager: React.FC<ConversationTagsManagerProps> = (
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isSaving || currentTags.length >= 20}
-          className="flex-1 h-[32px] min-h-[32px] max-h-[32px] box-border bg-white border border-slate-200 focus:border-teal-700 focus:ring-1 focus:ring-teal-700 rounded-[6px] px-2.5 text-xs text-slate-800 placeholder:text-slate-400 outline-none transition-colors"
+          className="flex-1 h-[32px] min-h-[32px] max-h-[32px] box-border bg-white border border-slate-200 focus:border-slate-400 focus:ring-1 focus:ring-slate-400 rounded-[6px] px-2.5 text-xs text-slate-800 placeholder:text-slate-400 outline-none transition-colors"
         />
         <Button
           type="button"
@@ -217,11 +223,11 @@ export const ConversationTagsManager: React.FC<ConversationTagsManagerProps> = (
                 }}
                 disabled={isSaving}
                 className={`text-[11px] px-2 py-0.5 rounded-full border border-[rgba(0,0,0,0.10)] bg-white transition-all flex items-center gap-1 ${isAssigned
-                    ? "!border-[rgba(0,0,0,0.25)] text-teal-800 font-semibold shadow-2xs"
+                    ? "!border-[rgba(0,0,0,0.25)] text-slate-900 font-semibold shadow-2xs"
                     : "text-slate-600 hover:text-slate-900 hover:border-slate-300"
                   }`}
               >
-                {isAssigned && <FiCheck className="w-2.5 h-2.5 text-teal-700" />}
+                {isAssigned && <FiCheck className="w-2.5 h-2.5 text-slate-800" />}
                 <span>{preset}</span>
               </button>
             );
@@ -232,37 +238,71 @@ export const ConversationTagsManager: React.FC<ConversationTagsManagerProps> = (
   );
 
   if (mode === "popover") {
-    if (!isOpen) return null;
     return (
-      <div
-        ref={containerRef}
-        className="absolute top-full right-0 mt-2 w-[280px] sm:w-[320px] bg-white border border-slate-200 rounded-[8px] p-4 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150"
-      >
-        <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
-          <span className="text-xs font-bold text-slate-800">Organize Conversation</span>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-0.5 rounded-full"
-            aria-label="Close"
-          >
-            <FiX className="w-3.5 h-3.5" />
-          </button>
+      <>
+        {/* Mobile Backdrop (<640px) */}
+        <div
+          className={`sm:hidden fixed inset-0 bg-black/40 z-50 transition-opacity duration-300 ease-in-out ${
+            isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={onClose}
+        />
+
+        {/* Mobile Right-Side Drawer (<640px) */}
+        <div
+          ref={mobileContainerRef}
+          onClick={(e) => e.stopPropagation()}
+          className={`sm:hidden fixed top-0 bottom-0 right-0 z-50 w-[85vw] max-w-[340px] h-full bg-white shadow-2xl p-5 overflow-y-auto flex flex-col gap-3 transform transition-transform duration-300 ease-in-out ${
+            isOpen ? "translate-x-0" : "translate-x-full pointer-events-none"
+          }`}
+        >
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <span className="text-sm font-bold text-slate-800">Organize Conversation</span>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-slate-400 hover:text-slate-600 p-1 rounded-full"
+              aria-label="Close"
+            >
+              <FiX className="w-5 h-5" />
+            </button>
+          </div>
+          {content}
         </div>
-        {content}
-      </div>
+
+        {/* Desktop Anchored Popover (>=640px) */}
+        {isOpen && (
+          <div
+            ref={desktopContainerRef}
+            className="hidden sm:block absolute top-full right-0 mt-2 w-[320px] bg-white border border-slate-200 rounded-[8px] p-4 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150"
+          >
+            <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+              <span className="text-xs font-bold text-slate-800">Organize Conversation</span>
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-slate-400 hover:text-slate-600 p-0.5 rounded-full"
+                aria-label="Close"
+              >
+                <FiX className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            {content}
+          </div>
+        )}
+      </>
     );
   }
 
   // Card mode (for right sidebar)
-  // return (
-  //   <div
-  //     ref={containerRef}
-  //     className="bg-white rounded-[6px] p-4 border border-slate-200/80 shadow-xs flex flex-col gap-2"
-  //   >
-  //     {content}
-  //   </div>
-  // );
+  return (
+    <div
+      ref={desktopContainerRef}
+      className="bg-white rounded-[6px] p-4 border border-slate-200/80 shadow-xs flex flex-col gap-2"
+    >
+      {content}
+    </div>
+  );
 };
 
 export default ConversationTagsManager;

@@ -40,6 +40,8 @@ import { CustomSelect, CustomSelectOption, Tag, AIPolishButton } from "@/compone
 import { MessageModerationBadge } from "@/features/chat";
 import { ConversationTagBadge, ConversationTagsManager } from "../ConversationTags";
 import { FiTag, FiX, FiCheck } from "react-icons/fi";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Tag01Icon } from "@hugeicons/core-free-icons";
 import { formatFileSize } from "@/lib";
 import moment from 'moment';
 // Helper to reliably extract file extension from URL, item metadata, or MIME type
@@ -2306,11 +2308,11 @@ const ChatView = () => {
                         icon={
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="21"
-                            height="21"
+                            width="20"
+                            height="20"
                             viewBox="0 0 24 24"
                             fill="none"
-                            className="sm:w-6 sm:h-6"
+                            className=""
                           >
                             <path
                               d="M2 11C2 7.70017 2 6.05025 3.02513 5.02513C4.05025 4 5.70017 4 9 4H10C13.2998 4 14.9497 4 15.9749 5.02513C17 6.05025 17 7.70017 17 11V13C17 16.2998 17 17.9497 15.9749 18.9749C14.9497 20 13.2998 20 10 20H9C5.70017 20 4.05025 18.9749 3.02513 18.9749C2 17.9497 2 16.2998 2 13V11Z"
@@ -2346,7 +2348,7 @@ const ChatView = () => {
                           onClick={() => setIsTagPopoverOpen(!isTagPopoverOpen)}
                           title="Private Tags"
                           aria-label="Private Tags"
-                          icon={<FiTag className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />}
+                          icon={<HugeiconsIcon className="w-5 h-5 text-[#292929]" icon={Tag01Icon} />}
                         />
                         <ConversationTagsManager
                           conversationId={String(activeConversation?.uuid || activeConversation?.conversationID || activeConversation?._id || conversationID)}
@@ -2360,32 +2362,14 @@ const ChatView = () => {
                       {/* Search */}
                       {isMsgSearchActive ? (
                         <div
-                          className="
-        hidden md:flex items-center
-        h-8 sm:h-9
-        w-[160px] lg:w-[200px]
-        bg-slate-100
-        rounded-[6px]
-        px-2
-        shrink-0
-      "
+                          className="hidden md:flex items-center h-8 sm:h-9 w-[160px] lg:w-[200px] bg-slate-100 rounded-[6px] px-2 shrink-0"
                         >
                           <input
                             type="text"
                             placeholder="Search in chat..."
                             value={msgSearchQuery}
                             onChange={(e) => setMsgSearchQuery(e.target.value)}
-                            className="
-                border-none
-                bg-transparent
-                outline-none
-                text-xs sm:text-sm
-                py-1
-                min-w-0
-                flex-1
-                text-slate-800
-                placeholder:text-slate-400
-              "
+                            className="border-none bg-transparent outline-none text-xs sm:text-sm py-1 min-w-0 flex-1 text-slate-800 placeholder:text-slate-400"
                             autoFocus
                           />
 
@@ -2415,11 +2399,11 @@ const ChatView = () => {
                           icon={
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              width="21"
-                              height="21"
+                              width="20"
+                              height="20"
                               viewBox="0 0 24 24"
                               fill="none"
-                              className="sm:w-6 sm:h-6"
+                              className=""
                             >
                               <path
                                 d="M17 17L21 21"
@@ -2873,7 +2857,7 @@ const ChatView = () => {
                 {/* First Message Sent Milestone Card */}
                 {isAwaitingFirstReply && (
                   <div className="mx-auto my-5 max-w-md w-full bg-white border border-[#0D6D5F]/20 rounded-[8px] p-5 shadow-xs text-center transition-all animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    <div className="w-10 h-10 rounded-full bg-[#ffffff] border  border-[#0D6D5F] text-[#0D6D5F] flex items-center justify-center mx-auto mb-3 shadow-2xs">
+                    <div className="w-10 h-10 rounded-[6px] bg-[#ffffff] border  border-[rgba(0,0,0,0.10)] text-[#0D6D5F] flex items-center justify-center mx-auto mb-3 shadow-2xs">
                       <CheckCircle2 className="w-5 h-5 text-[#0D6D5F]" />
                     </div>
                     <h3 className="font-bold text-sm sm:text-base text-slate-900 font-sf-pro">
@@ -2987,7 +2971,7 @@ const ChatView = () => {
                     />
 
                     {/* AI Polish Button */}
-                    <AIPolishButton 
+                    <AIPolishButton
                       text={messageText}
                       onSuccess={(polishedText) => setMessageText(polishedText)}
                       onStateChange={setIsPolishing}

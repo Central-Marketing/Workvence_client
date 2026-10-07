@@ -216,11 +216,10 @@ export const ConversationTagsManager: React.FC<ConversationTagsManagerProps> = (
                   }
                 }}
                 disabled={isSaving}
-                className={`text-[11px] px-2 py-0.5 rounded-full border border-[rgba(0,0,0,0.10)] bg-white transition-all flex items-center gap-1 ${
-                  isAssigned
+                className={`text-[11px] px-2 py-0.5 rounded-full border border-[rgba(0,0,0,0.10)] bg-white transition-all flex items-center gap-1 ${isAssigned
                     ? "!border-[rgba(0,0,0,0.25)] text-teal-800 font-semibold shadow-2xs"
                     : "text-slate-600 hover:text-slate-900 hover:border-slate-300"
-                }`}
+                  }`}
               >
                 {isAssigned && <FiCheck className="w-2.5 h-2.5 text-teal-700" />}
                 <span>{preset}</span>
@@ -256,14 +255,14 @@ export const ConversationTagsManager: React.FC<ConversationTagsManagerProps> = (
   }
 
   // Card mode (for right sidebar)
-  return (
-    <div
-      ref={containerRef}
-      className="bg-white rounded-[6px] p-4 border border-slate-200/80 shadow-xs flex flex-col gap-2"
-    >
-      {content}
-    </div>
-  );
+  // return (
+  //   <div
+  //     ref={containerRef}
+  //     className="bg-white rounded-[6px] p-4 border border-slate-200/80 shadow-xs flex flex-col gap-2"
+  //   >
+  //     {content}
+  //   </div>
+  // );
 };
 
 export default ConversationTagsManager;

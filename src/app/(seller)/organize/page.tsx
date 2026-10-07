@@ -320,20 +320,12 @@ const OrganizePage = () => {
       payload: { tier: activeTier, name, value },
     });
 
-    // If basic tier, also sync root fields
+    // If basic tier, sync root price, deliveryTime, and revisionNumber for listing cards
     if (activeTier === "basic") {
-      dispatch({
-        type: "CHANGE_INPUT",
-        payload: { name, value },
-      });
-      if (name === "title" || name === "shortTitle") {
+      if (name !== "title" && name !== "shortTitle" && name !== "shortDesc") {
         dispatch({
-          type: "CHANGE_PACKAGE_INPUT",
-          payload: { tier: "basic", name: "title", value },
-        });
-        dispatch({
-          type: "CHANGE_PACKAGE_INPUT",
-          payload: { tier: "basic", name: "shortTitle", value },
+          type: "CHANGE_INPUT",
+          payload: { name, value },
         });
       }
     }
@@ -592,9 +584,9 @@ const OrganizePage = () => {
     // Ensure basic tier sync and integer revision numbers
     if (form.packages?.basic) {
       form.packages.basic.title =
-        form.packages.basic.title || form.packages.basic.shortTitle || form.shortTitle || form.title || "";
+        form.packages.basic.title?.trim() || (!isDraft ? "Basic Package" : "");
       form.packages.basic.shortDesc =
-        form.packages.basic.shortDesc || form.shortDesc || form.description || "";
+        form.packages.basic.shortDesc?.trim() || "";
       form.packages.basic.price = Number(form.packages.basic.price || form.price || 0);
       form.packages.basic.deliveryTime =
         form.packages.basic.deliveryTime || form.deliveryTime || "7";
@@ -602,6 +594,8 @@ const OrganizePage = () => {
         form.packages.basic.revisionNumber ?? form.revisionNumber ?? 1,
         1
       );
+      form.price = form.packages.basic.price;
+      form.deliveryTime = form.packages.basic.deliveryTime;
     }
 
     if (form.packages?.standard) {

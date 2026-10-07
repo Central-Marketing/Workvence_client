@@ -152,16 +152,13 @@ const EditPackagePage = () => {
     const gigTitle = raw.title || raw.shortTitle || raw.name || "";
     const existingPackages = raw.packages || {};
     const basicPkg = existingPackages.basic || {
-      title: gigTitle,
-      shortDesc: raw.shortDesc || "",
+      title: "",
+      shortDesc: "",
       price: raw.price || 0,
       deliveryTime: raw.deliveryTime || "7",
       revisionNumber: raw.revisionNumber || "1",
       features: raw.features || [],
     };
-    if (!basicPkg.title) {
-      basicPkg.title = gigTitle || raw.shortTitle || "";
-    }
 
     const rawCover = raw.cover || raw.coverImage || raw.cover_image || "";
     let rawImages: string[] = [];
@@ -218,8 +215,8 @@ const EditPackagePage = () => {
         faqs: Array.isArray(raw.faqs) ? raw.faqs : [],
         packages: {
           basic: {
-            title: basicPkg.title || gigTitle,
-            shortDesc: basicPkg.shortDesc || raw.shortDesc || "",
+            title: basicPkg.title || (!raw.isDraft ? "Basic Package" : ""),
+            shortDesc: basicPkg.shortDesc || "",
             price: Number(basicPkg.price || raw.price || 0),
             deliveryTime: basicPkg.deliveryTime || raw.deliveryTime || "7",
             revisionNumber: basicPkg.revisionNumber || raw.revisionNumber || "1",
@@ -366,16 +363,6 @@ const EditPackagePage = () => {
       type: "CHANGE_INPUT",
       payload: { name, value },
     });
-    if (name === "title") {
-      dispatch({
-        type: "CHANGE_PACKAGE_INPUT",
-        payload: { tier: "basic", name: "title", value },
-      });
-      dispatch({
-        type: "CHANGE_PACKAGE_INPUT",
-        payload: { tier: "basic", name: "shortTitle", value },
-      });
-    }
   };
 
   const currentSubcategories = getSubcategories(state.category);
@@ -524,24 +511,12 @@ const EditPackagePage = () => {
       payload: { tier: activeTier, name, value },
     });
 
-    // If basic tier, also sync root fields
+    // If basic tier, sync root price, deliveryTime, and revisionNumber for listing cards
     if (activeTier === "basic") {
-      dispatch({
-        type: "CHANGE_INPUT",
-        payload: { name, value },
-      });
-      if (name === "title" || name === "shortTitle") {
+      if (name !== "title" && name !== "shortTitle" && name !== "shortDesc") {
         dispatch({
           type: "CHANGE_INPUT",
-          payload: { name: "title", value },
-        });
-        dispatch({
-          type: "CHANGE_PACKAGE_INPUT",
-          payload: { tier: "basic", name: "title", value },
-        });
-        dispatch({
-          type: "CHANGE_PACKAGE_INPUT",
-          payload: { tier: "basic", name: "shortTitle", value },
+          payload: { name, value },
         });
       }
     }
@@ -824,15 +799,15 @@ const EditPackagePage = () => {
     };
 
     const basicTier = cleanTier(state.packages?.basic) || {
-      title: state.title || "",
-      shortDesc: state.shortDesc || "",
-      price: Number(state.price || 0),
-      deliveryTime: state.deliveryTime || "7",
-      revisionNumber: parseRevisionNumber(state.revisionNumber ?? 1, 1),
-      features: state.features || [],
+      title: state.packages?.basic?.title || "",
+      shortDesc: state.packages?.basic?.shortDesc || "",
+      price: Number(state.packages?.basic?.price || state.price || 0),
+      deliveryTime: state.packages?.basic?.deliveryTime || state.deliveryTime || "7",
+      revisionNumber: parseRevisionNumber(state.packages?.basic?.revisionNumber ?? state.revisionNumber ?? 1, 1),
+      features: state.packages?.basic?.features || state.features || [],
     };
-    basicTier.title = basicTier.title || state.title || "";
-    basicTier.shortDesc = basicTier.shortDesc || state.shortDesc || state.description || "";
+    basicTier.title = basicTier.title?.trim() || (!isDraft ? "Basic Package" : "");
+    basicTier.shortDesc = basicTier.shortDesc?.trim() || "";
     basicTier.price = Number(basicTier.price || state.price || 0);
     basicTier.deliveryTime = basicTier.deliveryTime || state.deliveryTime || "7";
     basicTier.revisionNumber = parseRevisionNumber(basicTier.revisionNumber ?? state.revisionNumber ?? 1, 1);
@@ -1144,12 +1119,12 @@ const EditPackagePage = () => {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
-                  Package title
+                  Package title <span className="text-red-500">*</span>
                 </label>
                 <span
                   className={`text-[11px] font-medium transition-colors ${(state.title?.length || 0) > 80
-                      ? "text-red-500 font-semibold"
-                      : "text-gray-400"
+                    ? "text-red-500 font-semibold"
+                    : "text-gray-400"
                     }`}
                 >
                   {state.title?.length || 0}/80
@@ -1162,8 +1137,8 @@ const EditPackagePage = () => {
                 onChange={handleInputChange}
                 placeholder="e.g I will do something i am really good at"
                 className={`w-full h-10 px-3.5 bg-[#F0F0F0] border rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors ${(state.title?.length || 0) > 80
-                    ? "border-red-400 focus:border-red-500 bg-red-50/10"
-                    : "border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white"
+                  ? "border-red-400 focus:border-red-500 bg-red-50/10"
+                  : "border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white"
                   }`}
               />
               {(state.title?.length || 0) > 80 && (
@@ -1461,7 +1436,7 @@ const EditPackagePage = () => {
                       }`}
                   >
                     <span>{label}</span>
-                    
+
                   </Button>
                 );
               })}
@@ -1470,10 +1445,7 @@ const EditPackagePage = () => {
             {/* Tier Title */}
             <div className="space-y-1">
               {(() => {
-                const currentTierTitle =
-                  activeTier === "basic"
-                    ? currentTierData.title || state.title || currentTierData.shortTitle || ""
-                    : currentTierData.title || "";
+                const currentTierTitle = currentTierData.title || "";
                 const isExceeded = currentTierTitle.length > 80;
                 return (
                   <>
@@ -1483,8 +1455,8 @@ const EditPackagePage = () => {
                       </label>
                       <span
                         className={`text-[11px] font-medium transition-colors ${isExceeded
-                            ? "text-red-500 font-semibold"
-                            : "text-gray-400"
+                          ? "text-red-500 font-semibold"
+                          : "text-gray-400"
                           }`}
                       >
                         {currentTierTitle.length}/80
@@ -1496,8 +1468,8 @@ const EditPackagePage = () => {
                       onChange={(e) => handleTierInputChange("title", e.target.value)}
                       placeholder="e.g I will do something i am really good at"
                       className={`w-full h-10 px-3.5 bg-[#F0F0F0] border rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors ${isExceeded
-                          ? "border-red-400 focus:border-red-500 bg-red-50/10"
-                          : "border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white"
+                        ? "border-red-400 focus:border-red-500 bg-red-50/10"
+                        : "border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white"
                         }`}
                     />
                     {isExceeded && (

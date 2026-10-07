@@ -591,7 +591,7 @@ const Navbar = () => {
                   </div>
 
                   {isProfileDropdownOpen && (
-                    <div className="absolute right-0 mt-3 w-56 bg-white border border-gray-100 rounded-[6px] shadow-xl py-2 flex flex-col z-[60] text-sm text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="absolute right-0 mt-3 w-56 bg-white border border-gray-100 rounded-[6px] shadow-xl pt-2 flex flex-col z-[60] text-sm text-gray-700 font-medium overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                       <div className="px-3.5 py-2.5 border-b border-gray-100 mb-1">
                         <p className="font-bold text-gray-900 truncate">@{effectiveUser?.username}</p>
                         <p className="text-xs text-gray-500 truncate">{effectiveUser?.email}</p>
@@ -612,7 +612,7 @@ const Navbar = () => {
                         My Projects
                       </Link>
                       <hr className="my-1 border-gray-100" />
-                      <span onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }} className="px-3.5 py-2 hover:bg-red-50 text-red-500 cursor-pointer transition-colors flex items-center gap-3">
+                      <span onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }} className="px-3.5 py-2 bg-red-100 hover:bg-red-50 text-red-900 font-bold cursor-pointer transition-colors flex items-center gap-3">
                         Logout
                       </span>
                     </div>

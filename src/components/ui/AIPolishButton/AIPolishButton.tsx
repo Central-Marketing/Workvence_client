@@ -72,7 +72,7 @@ const AIPolishButton = ({
       size="icon"
       radius="xl"
       className={`p-2 flex-shrink-0 transition-colors ${isDisabled
-        ? "text-gray-300 cursor-not-allowed"
+        ? "text-[var(--Foundation-Grey-grey-900,#1F1F1F)] cursor-not-allowed"
         : "text-brand-green hover:text-brand-green hover:bg-[#FAFAFA]"
         } ${className}`}
       onClick={handlePolish}

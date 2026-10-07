@@ -435,7 +435,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
 
           {/* Top Hero Banner: Draft Package Notification */}
           {latestDraftPackage && (
-            <div className="relative overflow-hidden rounded-[6px] bg-[#0F0F12] bg-[radial-gradient(ellipse_65%_130%_at_82%_50%,_#7C3AED_0%,_#531A85_38%,_#1D0933_68%,_#0F0F12_100%)] p-7 sm:p-[22px] text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+            <div className="relative overflow-hidden rounded-[6px] bg-[#0F0F12] bg-[radial-gradient(ellipse_65%_130%_at_82%_50%,_#7C3AED_0%,_#531A85_38%,_#1D0933_68%,_#0F0F12_100%)] py-7 px-10 text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
               {/* Ellipse 15017 ambient glow */}
               <div
                 className="absolute -right-16 -top-24 w-[620px] h-[440px] rounded-full pointer-events-none blur-[80px] opacity-80"
@@ -633,7 +633,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
 
         {/* Draft Package Notification (if draft exists during onboarding) */}
         {latestDraftPackage && (
-          <div className="relative overflow-hidden rounded-[6px] bg-[#0F0F12] bg-[radial-gradient(ellipse_65%_130%_at_82%_50%,_#7C3AED_0%,_#531A85_38%,_#1D0933_68%,_#0F0F12_100%)] p-7 sm:p-[22px] text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+          <div className="relative overflow-hidden rounded-[6px] bg-[#0F0F12] bg-[radial-gradient(ellipse_65%_130%_at_82%_50%,_#7C3AED_0%,_#531A85_38%,_#1D0933_68%,_#0F0F12_100%)] py-7 px-10 text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
             <div
               className="absolute -right-16 -top-24 w-[620px] h-[440px] rounded-full pointer-events-none blur-[80px] opacity-80"
               style={{

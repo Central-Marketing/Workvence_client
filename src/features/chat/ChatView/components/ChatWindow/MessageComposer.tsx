@@ -45,8 +45,8 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
       {attachment && (
         <div className="flex items-center gap-3 mb-3 p-2.5 bg-slate-50 dark:bg-slate-900 rounded-[6px] border border-slate-200 shadow-sm max-w-sm">
           {attachment.type?.includes("image") ||
-          /\.(png|jpe?g|gif|webp|svg)/i.test(attachment.name) ||
-          attachment.url?.includes("/image/upload/") ? (
+            /\.(png|jpe?g|gif|webp|svg)/i.test(attachment.name) ||
+            attachment.url?.includes("/image/upload/") ? (
             <div className="relative group flex-shrink-0">
               <img
                 src={attachment.previewUrl || attachment.url}
@@ -121,13 +121,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
             icon={isUploadingAttachment ? <Loader size={18} /> : <RiAddLine className="w-5 h-5" />}
           />
 
-          {/* AI Polish Button */}
-          <AIPolishButton
-            text={messageText}
-            onSuccess={(polishedText) => setMessageText(polishedText)}
-            onStateChange={setIsPolishing}
-            className="mb-0.5"
-          />
+
 
           {/* Message Textarea */}
           <textarea
@@ -139,6 +133,14 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
             disabled={isPolishing}
             rows={1}
             className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 resize-none text-gray-800 placeholder-gray-400 text-sm py-1.5 px-1 min-h-[36px] max-h-32 overflow-y-auto scrollbar-hide scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          />
+
+          {/* AI Polish Button */}
+          <AIPolishButton
+            text={messageText}
+            onSuccess={(polishedText) => setMessageText(polishedText)}
+            onStateChange={setIsPolishing}
+            className="mb-0.5"
           />
 
           {/* Send Button */}

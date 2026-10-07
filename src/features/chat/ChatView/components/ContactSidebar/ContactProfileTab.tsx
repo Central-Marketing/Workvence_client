@@ -47,11 +47,11 @@ export const ContactProfileTab: React.FC<ContactProfileTabProps> = ({
   const formattedLanguages =
     Array.isArray(finalRecipientUser?.languages) && finalRecipientUser.languages.length > 0
       ? finalRecipientUser.languages
-          .map((item: any) =>
-            typeof item === "string" ? item : item?.language || item?.lang || item?.name
-          )
-          .filter(Boolean)
-          .join(", ")
+        .map((item: any) =>
+          typeof item === "string" ? item : item?.language || item?.lang || item?.name
+        )
+        .filter(Boolean)
+        .join(", ")
       : "";
 
   const renderOrderStatusBadge = (status: string) => {
@@ -61,8 +61,8 @@ export const ContactProfileTab: React.FC<ContactProfileTabProps> = ({
       normalized === "inprogress" || normalized === "active"
         ? "in_progress"
         : normalized === "revision" || normalized === "inrevision"
-        ? "in_revision"
-        : rawStatus || "in_progress";
+          ? "in_revision"
+          : rawStatus || "in_progress";
 
     return (
       <Tag
@@ -155,9 +155,9 @@ export const ContactProfileTab: React.FC<ContactProfileTabProps> = ({
         <ConversationTagsManager
           conversationId={String(
             activeConversation?.uuid ||
-              activeConversation?.conversationID ||
-              activeConversation?._id ||
-              conversationID
+            activeConversation?.conversationID ||
+            activeConversation?._id ||
+            conversationID
           )}
           tags={activeConversation?.tags || []}
           mode="card"
@@ -172,8 +172,8 @@ export const ContactProfileTab: React.FC<ContactProfileTabProps> = ({
             finalRecipientUser?.isSeller !== undefined
               ? finalRecipientUser.isSeller
               : finalRecipientUser?.role
-              ? finalRecipientUser.role === "seller"
-              : !user?.isSeller
+                ? finalRecipientUser.role === "seller"
+                : !user?.isSeller
           )
             ? "Seller"
             : "Buyer"}
@@ -185,9 +185,9 @@ export const ContactProfileTab: React.FC<ContactProfileTabProps> = ({
             <img
               src={getAvatarUrl(
                 finalRecipientUser?.image ||
-                  finalRecipientUser?.img ||
-                  finalRecipientUser?.avatar ||
-                  "/media/noavatar.png"
+                finalRecipientUser?.img ||
+                finalRecipientUser?.avatar ||
+                "/media/noavatar.png"
               )}
               alt={finalRecipientUser.username || "Contact"}
               className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover shrink-0 border border-slate-100 shadow-xs"
@@ -212,12 +212,12 @@ export const ContactProfileTab: React.FC<ContactProfileTabProps> = ({
               {(finalRecipientUser.shortTitle ||
                 finalRecipientUser.occupation ||
                 finalRecipientUser.title) && (
-                <span className="font-medium text-slate-600">
-                  {finalRecipientUser.shortTitle ||
-                    finalRecipientUser.occupation ||
-                    finalRecipientUser.title}
-                </span>
-              )}
+                  <span className="font-medium text-slate-600">
+                    {finalRecipientUser.shortTitle ||
+                      finalRecipientUser.occupation ||
+                      finalRecipientUser.title}
+                  </span>
+                )}
               {finalRecipientUser.rating || finalRecipientUser.sellerRating ? (
                 <>
                   <span className="font-bold text-slate-900 ml-1">
@@ -313,9 +313,8 @@ export const ContactProfileTab: React.FC<ContactProfileTabProps> = ({
         >
           <h3 className="text-base sm:text-[17px] font-bold text-slate-800">Order History</h3>
           <RiArrowDownSLine
-            className={`w-5 h-5 text-slate-600 transition-transform duration-200 ${
-              isOrdersExpanded ? "" : "-rotate-90"
-            }`}
+            className={`w-5 h-5 text-slate-600 transition-transform duration-200 ${isOrdersExpanded ? "" : "-rotate-90"
+              }`}
           />
         </div>
 
@@ -325,7 +324,7 @@ export const ContactProfileTab: React.FC<ContactProfileTabProps> = ({
               <div className="py-6 text-center text-xs text-slate-400">No order history yet</div>
             ) : (
               <div className="flex flex-col divide-y divide-slate-100 pt-1">
-                {displayedOrders.map((order: any, idx: number) => (
+                {displayedOrders.slice(0, 4).map((order: any, idx: number) => (
                   <div
                     key={order._id || idx}
                     className="flex items-center justify-between py-2.5 gap-2 cursor-pointer hover:bg-slate-50/80 rounded-[6px] px-1 transition-colors group"

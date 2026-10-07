@@ -1089,9 +1089,6 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             />
 
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-12 h-12 rounded-[6px] bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shrink-0">
-                <FiUploadCloud size={24} />
-              </div>
               <div>
                 <h3 className="text-xl font-bold text-slate-900">Deliver Your Work</h3>
                 <p className="text-xs text-slate-500">Attach deliverables and add completion notes for the buyer</p>

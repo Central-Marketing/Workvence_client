@@ -518,12 +518,19 @@ const BriefDetail = () => {
       <div className="container mx-auto px-4">
         {/* Top Breadcrumb */}
         <Breadcrumb
+          homeHref={user?.isSeller ? "/dashboard/seller" : user ? "/dashboard/buyer" : "/"}
+          homeTitle={user ? (user.isSeller ? "Seller Dashboard" : "Buyer Dashboard") : "Home"}
           className="mb-5 select-none"
           items={[
-            {
-              name: "Find Projects",
-              href: "/briefs",
-            },
+            isOwner || (!isSeller && user)
+              ? {
+                  name: "My Projects",
+                  href: "/briefs/my-briefs",
+                }
+              : {
+                  name: "Find Projects",
+                  href: "/briefs",
+                },
             {
               name: brief.title || "Project Details",
               isLast: true,

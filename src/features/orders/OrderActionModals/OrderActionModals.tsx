@@ -53,8 +53,8 @@ export const RevisionModal: React.FC<RevisionModalProps> = ({
         />
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-[6px] bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shrink-0">
-            <FileText size={24} strokeWidth={2} />
+          <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] text-[#292929] flex items-center justify-center shrink-0">
+            <FileText size={20} />
           </div>
           <div>
             <h3 className="text-xl font-bold text-slate-900">Request Revision</h3>

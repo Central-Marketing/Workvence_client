@@ -2,7 +2,9 @@
 
 import React from "react";
 import { Button } from "@/components";
-import { CustomSelect } from "@/components/ui";
+import { CustomSelect, AIPolishButton } from "@/components/ui";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert01Icon, InformationCircleIcon } from "@hugeicons/core-free-icons";
 
 interface CreateOfferModalProps {
   isOpen: boolean;
@@ -43,6 +45,23 @@ export const CreateOfferModal: React.FC<CreateOfferModalProps> = ({
   setOfferRevisions,
   onSubmit,
 }) => {
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      setHasAttemptedSubmit(false);
+    }
+  }, [isOpen]);
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    setHasAttemptedSubmit(true);
+    if (!selectedPackageId && !selectedBriefId) {
+      e.preventDefault();
+      return;
+    }
+    onSubmit(e);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -68,7 +87,7 @@ export const CreateOfferModal: React.FC<CreateOfferModalProps> = ({
             &times;
           </Button>
         </div>
-        <form onSubmit={onSubmit} className="p-5 flex flex-col gap-3.5 overflow-y-auto">
+        <form onSubmit={handleFormSubmit} className="p-5 flex flex-col gap-3.5 overflow-y-auto">
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-bold text-slate-600">
               Package Reference{" "}
@@ -115,20 +134,48 @@ export const CreateOfferModal: React.FC<CreateOfferModalProps> = ({
             />
           </div>
           {!selectedPackageId && !selectedBriefId && (
-            <p className="text-amber-600 text-xs mt-0.5">
-              ⚠ Please select at least a Package or a Project
-            </p>
+            <div className="mt-0.5">
+              {hasAttemptedSubmit ? (
+                <div className="flex items-center gap-1.5 text-amber-600 text-xs font-medium animate-in fade-in duration-150">
+                  <HugeiconsIcon
+                    icon={Alert01Icon}
+                    size={16}
+                    className="shrink-0 text-amber-600"
+                  />
+                  <span>Please select at least a Package or a Project</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 text-slate-500 text-xs">
+                  <HugeiconsIcon
+                    icon={InformationCircleIcon}
+                    size={16}
+                    className="shrink-0 text-slate-400"
+                  />
+                  <span>Please select at least a Package or a Project</span>
+                </div>
+              )}
+            </div>
           )}
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-bold text-slate-600">Offer Description</label>
-            <textarea
-              placeholder="Describe the service…"
-              value={offerDesc}
-              onChange={(e) => setOfferDesc(e.target.value)}
-              rows={3}
-              required
-              className="px-3 py-2 border border-slate-300 rounded-[6px] text-sm text-slate-800 outline-none focus:border-brand-green bg-white resize-none transition-colors"
-            />
+            <div className="relative">
+              <textarea
+                placeholder="Describe the service…"
+                value={offerDesc}
+                onChange={(e) => setOfferDesc(e.target.value)}
+                rows={3}
+                required
+                className="w-full px-3 py-2 pb-8 border border-slate-300 rounded-[6px] text-sm text-slate-800 outline-none focus:border-brand-green bg-white resize-none transition-colors"
+              />
+              <div className="absolute right-1.5 bottom-1.5 flex items-center">
+                <AIPolishButton
+                  text={offerDesc}
+                  onSuccess={(polishedText) => setOfferDesc(polishedText)}
+                  className="p-1 hover:bg-slate-100 rounded-full"
+                  tooltip="Polish offer description with AI"
+                />
+              </div>
+            </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-1">
             <div className="flex flex-col gap-1.5">

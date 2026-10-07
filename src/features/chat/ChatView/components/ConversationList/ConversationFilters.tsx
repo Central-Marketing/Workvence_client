@@ -70,11 +70,10 @@ export const ConversationFilters: React.FC<ConversationFiltersProps> = ({
             setConvFilterTab("all");
             setSelectedTagFilter(null);
           }}
-          className={`px-3 py-1 text-xs font-medium border transition-colors ${
-            convFilterTab === "all" && !selectedTagFilter
-              ? "!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold"
-              : "!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50"
-          }`}
+          className={`px-3 py-1 text-xs font-medium border transition-colors ${convFilterTab === "all" && !selectedTagFilter
+            ? "!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold"
+            : "!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50"
+            }`}
         >
           All
         </Button>
@@ -85,11 +84,10 @@ export const ConversationFilters: React.FC<ConversationFiltersProps> = ({
           size="xs"
           radius="full"
           onClick={() => setConvFilterTab("unread")}
-          className={`px-3 py-1 text-xs font-medium border transition-colors ${
-            convFilterTab === "unread"
-              ? "!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold"
-              : "!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50"
-          }`}
+          className={`px-3 py-1 text-xs font-medium border transition-colors ${convFilterTab === "unread"
+            ? "!border-teal-700 !text-teal-800 !bg-white shadow-2xs font-semibold"
+            : "!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50"
+            }`}
         >
           Unread
         </Button>
@@ -100,11 +98,10 @@ export const ConversationFilters: React.FC<ConversationFiltersProps> = ({
             <button
               type="button"
               onClick={() => setIsTagFilterMenuOpen(!isTagFilterMenuOpen)}
-              className={`px-2.5 py-1 text-xs font-medium border rounded-full transition-colors flex items-center gap-1 ${
-                selectedTagFilter
-                  ? "!border-[rgba(0,0,0,0.10)] !text-teal-800 !bg-white font-semibold shadow-2xs"
-                  : "!border-slate-200 text-slate-600 "
-              }`}
+              className={`px-2.5 py-1 text-xs font-medium border rounded-full transition-colors flex items-center gap-1 ${selectedTagFilter
+                ? "!border-[rgba(0,0,0,0.10)] !text-teal-800 !bg-white font-semibold shadow-2xs"
+                : "!border-slate-200 text-slate-700 !bg-white hover:!bg-slate-50"
+                }`}
             >
               <FiTag className="w-3 h-3 text-teal-700" />
               <span className="truncate max-w-[80px]">{selectedTagFilter || "Tags"}</span>
@@ -140,11 +137,10 @@ export const ConversationFilters: React.FC<ConversationFiltersProps> = ({
                       setSelectedTagFilter(tagName);
                       setIsTagFilterMenuOpen(false);
                     }}
-                    className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 ${
-                      selectedTagFilter?.toLowerCase() === tagName.toLowerCase()
-                        ? "font-semibold text-teal-800 bg-teal-50/50"
-                        : "text-slate-700"
-                    }`}
+                    className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 ${selectedTagFilter?.toLowerCase() === tagName.toLowerCase()
+                      ? "font-semibold text-teal-800 bg-teal-50/50"
+                      : "text-slate-700"
+                      }`}
                   >
                     <span className="truncate">{tagName}</span>
                     {selectedTagFilter?.toLowerCase() === tagName.toLowerCase() && (

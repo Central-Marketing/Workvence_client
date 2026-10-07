@@ -26,6 +26,8 @@ import { useUserStore } from "@/store/userStore";
 import { Button, AiGradientButton } from "@/components";
 import { CustomSelect, CustomSelectOption, BriefsListSkeleton, ConfirmModal } from "@/components/ui";
 import { EditBriefModal } from "@/features/buyer";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { FolderKanbanIcon } from "@hugeicons/core-free-icons";
 
 const DEFAULT_AVATARS = [
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
@@ -320,7 +322,7 @@ const MyBriefs = () => {
           </div>
           {!user?.isSeller && (
             <AiGradientButton
-              href="/briefs/create"
+              href="/briefs/create?ai=true"
               text="Post a Project with AI"
               icon={
                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
@@ -461,8 +463,8 @@ const MyBriefs = () => {
           <BriefsListSkeleton />
         ) : filtered.length === 0 ? (
           <div className="text-center py-16 px-6 bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] flex flex-col items-center">
-            <div className="w-14 h-14 rounded-[6px] bg-slate-50 border border-slate-200 flex items-center justify-center text-2xl mb-4 text-slate-400">
-              📁
+            <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center text-2xl mb-4 text-slate-400">
+              <HugeiconsIcon icon={FolderKanbanIcon} size={20} color="#292929" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-1.5">
               {emptyState.title}

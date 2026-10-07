@@ -21,7 +21,7 @@ import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
 import { useAuthModalStore } from "@/store/authModalStore";
 import { Button, Breadcrumb, AiGradientButton } from "@/components";
-import { CustomSelect, CustomSelectOption } from "@/components/ui";
+import { CustomSelect, CustomSelectOption, Tag } from "@/components/ui";
 
 const CATEGORIES = [
   "AI",
@@ -36,10 +36,10 @@ const CATEGORIES = [
 ];
 
 const PROMPT_SUGGESTIONS = [
-  "Landing page for mobile app with waitlist",
-  "Full-stack SaaS dashboard with billing",
-  "Brand identity with logo and style guide",
-  "E-commerce store setup with Stripe checkout",
+  "Landing page",
+  "SaaS dashboard",
+  "Brand identity",
+  "E-commerce store",
 ];
 
 const CreateBrief = () => {
@@ -518,48 +518,52 @@ const CreateBrief = () => {
 
           </div>
 
-          {/* Section 1: Project Title */}
-          <div>
-            <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
-              Project Title <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Build a responsive SaaS web application for client invoicing"
-              value={form.title}
-              onChange={(e) => updateField("title", e.target.value)}
-              required
-              className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
-            />
-          </div>
+          {/* Section 1 & 2: Project Title & Category Selection (Flex Row) */}
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
+            {/* Section 1: Project Title */}
+            <div className="flex-1 min-w-0">
+              <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
+                Project Title <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Build a responsive SaaS web application for client invoicing"
+                value={form.title}
+                onChange={(e) => updateField("title", e.target.value)}
+                required
+                className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
+              />
+            </div>
 
-          {/* Section 2: Category Selection */}
-          <div>
-            <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
-              Category <span className="text-slate-400 font-normal text-xs">(Optional)</span>
-            </label>
-            <CustomSelect
-              size="md"
-              options={[
-                { value: "", label: "Select a category" },
-                ...categories.map((c: any) => ({
-                  value: c.slug,
-                  label: c.name,
-                })),
-              ]}
-              value={form.category}
-              onChange={(val) => {
-                const selectedSlug = String(val);
-                const found = categories.find((c: any) => c.slug === selectedSlug);
-                setForm((prev) => ({
-                  ...prev,
-                  category: selectedSlug,
-                  categoryName: found?.name || selectedSlug,
-                }));
-              }}
-              placeholder="Select a category"
-              ariaLabel="Select a category"
-            />
+            {/* Section 2: Category Selection */}
+            <div className="flex-1 min-w-0">
+              <label className="block text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5">
+                Category <span className="text-slate-400 font-normal text-xs">(Optional)</span>
+              </label>
+              <CustomSelect
+                size="md"
+                variant="filled"
+                options={[
+                  { value: "", label: "Select a category" },
+                  ...categories.map((c: any) => ({
+                    value: c.slug,
+                    label: c.name,
+                  })),
+                ]}
+                value={form.category}
+                onChange={(val) => {
+                  const selectedSlug = String(val);
+                  const found = categories.find((c: any) => c.slug === selectedSlug);
+                  setForm((prev) => ({
+                    ...prev,
+                    category: selectedSlug,
+                    categoryName: found?.name || selectedSlug,
+                  }));
+                }}
+                placeholder="Select a category"
+                ariaLabel="Select a category"
+              />
+            </div>
           </div>
 
           {/* Section 3: Description */}
@@ -586,24 +590,31 @@ const CreateBrief = () => {
             {/* Skill tags list */}
             <div className="flex flex-wrap items-center gap-2 mb-3 min-h-[40px]">
               {form.requiredSkills.map((skill) => (
-                <span
+                <Tag
                   key={skill}
-                  className="inline-flex h-10 items-center gap-1.5 px-3 rounded-[6px] bg-gray-200 text-emerald-800 border text-xs font-medium transition-all"
+                  size="sm"
+                  style={{
+                    background: "#ffffff",
+                    color: "#292929",
+                    borderColor: "rgba(0, 0, 0, 0.10)",
+                    borderRadius: "6px",
+                    height: "40px",
+                  }}
+                  className="bg-white text-[#292929] border-[rgba(0,0,0,0.10)] !rounded-[6px] !h-10 shadow-2xs font-normal"
+                  rightIcon={
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSkill(skill)}
+                      className="text-slate-400 hover:text-slate-800 transition-colors p-0.5 -mr-0.5 rounded-full hover:bg-slate-100 flex items-center justify-center cursor-pointer"
+                      title={`Remove ${skill}`}
+                      aria-label={`Remove ${skill}`}
+                    >
+                      <FiX className="text-[11px]" />
+                    </button>
+                  }
                 >
-                  <FiTag className="text-[11px] text-emerald-600" />
-                  <span>{skill}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    radius="full"
-                    onClick={() => handleRemoveSkill(skill)}
-                    className="hover:text-emerald-950 p-0.5 w-4 h-auto min-h-0 transition-colors border-none shadow-none"
-                    title={`Remove ${skill}`}
-                  >
-                    <FiX className="text-xs" />
-                  </Button>
-                </span>
+                  {skill}
+                </Tag>
               ))}
               {form.requiredSkills.length === 0 && (
                 <span className="text-xs text-slate-400 italic py-1">
@@ -743,8 +754,11 @@ const CreateBrief = () => {
 
             {/* Modal Header */}
             <div className="flex items-center gap-3 p-6 pr-16 sm:p-8 sm:pr-16 border-b border-slate-100 shrink-0">
-              <div className="w-10 h-10 shrink-0 rounded-[6px] bg-white text-emerald-700 border border-[rgba(0,0,0,0.10)] flex items-center justify-center text-xl shadow-xs">
-                <HiSparkles />
+              <div className="w-10 h-10 shrink-0 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center text-xl shadow-xs">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M19.5 3.9375V5.5M19.5 5.5V7.0625M19.5 5.5H18.25M19.5 5.5H20.75M22 5.5L20.9156 5.13852C20.4179 4.97263 20.0274 4.58211 19.8615 4.08443L19.5 3L19.1385 4.08443C18.9726 4.58211 18.5821 4.97263 18.0844 5.13852L17 5.5L18.0844 5.86148C18.5821 6.02737 18.9726 6.41789 19.1385 6.91557L19.5 8L19.8615 6.91557C20.0274 6.41789 20.4179 6.02737 20.9156 5.86148L22 5.5Z" stroke="#0B403F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M2 12.8598C4.81875 10.0939 11.44 4.44198 13.275 6.40609C15.5938 8.888 3.40937 15.1646 5.28854 17.93C7.2734 20.851 14.2146 10.5543 16.5635 12.3982C18.9125 14.2422 10.926 18.391 12.8052 20.696C13.5569 21.6179 15.6239 20.235 16.5635 19.313" stroke="#0B403F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               </div>
               <div>
                 <h3 id="ai-drawer-title" className="text-lg sm:text-xl font-bold text-slate-900 font-sf-pro">
@@ -757,89 +771,92 @@ const CreateBrief = () => {
             </div>
 
             <div className="flex-1 min-h-0 overflow-y-auto flex flex-col p-6 sm:p-8">
-            <div className="my-auto shrink-0">
-            <p id="ai-drawer-description" className="text-slate-600 text-sm leading-relaxed mb-4">
-              Our AI will automatically generate your project title, detailed requirements, budget, timeline, and required tech skills.
-            </p>
+              <div className="my-auto shrink-0">
+                <p id="ai-drawer-description" className="text-slate-600 text-sm leading-relaxed mb-4">
+                  Our AI will automatically generate your project title, detailed requirements, budget, timeline, and required tech skills.
+                </p>
 
-            {/* Prompt Input */}
-            <div className="space-y-3">
-              <div>
-                <label htmlFor="ai-drawer-prompt" className="block text-sm font-semibold text-slate-900 mb-2">Describe your project</label>
-                <textarea
-                  id="ai-drawer-prompt"
-                  ref={modalPromptRef}
-                  rows={6}
-                  placeholder="e.g. I need a landing page for my mobile app with responsive design and email waitlist form."
-                  value={aiPrompt}
-                  onChange={(e) => setAiPrompt(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-                      e.preventDefault();
-                      handleGenerateFromModal();
-                    }
-                  }}
-                  className="w-full p-3.5 sm:p-4 rounded-[6px] border border-slate-200 bg-slate-50 text-slate-900 text-base leading-relaxed outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:bg-white focus:ring-4 focus:ring-[#327C73]/10 resize-none"
-                />
-              </div>
-
-              {/* Suggestions */}
-              <div>
-                <span className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
-                  Suggestions:
-                </span>
-                <div className="flex flex-wrap gap-1.5">
-                  {PROMPT_SUGGESTIONS.map((suggestion) => (
-                    <Button
-                      key={suggestion}
-                      disabled={aiGenerate.isPending}
-                      type="button"
-                      variant="soft"
-                      size="xs"
-                      radius="fiverr"
-                      onClick={() => {
-                        setAiPrompt(suggestion);
-                        handleGenerateFromModal(suggestion);
+                {/* Prompt Input */}
+                <div className="space-y-3">
+                  <div>
+                    <label htmlFor="ai-drawer-prompt" className="block text-sm font-semibold text-slate-900 mb-2">Describe your project</label>
+                    <textarea
+                      id="ai-drawer-prompt"
+                      ref={modalPromptRef}
+                      rows={6}
+                      placeholder="e.g. I need a landing page for my mobile app with responsive design and email waitlist form."
+                      value={aiPrompt}
+                      onChange={(e) => setAiPrompt(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                          e.preventDefault();
+                          handleGenerateFromModal();
+                        }
                       }}
-                      className="px-2.5 py-1 max-w-full whitespace-normal text-[12px] font-normal font-inter text-[#292929]"
-                    >
-                      {suggestion}
-                    </Button>
-                  ))}
+                      className="w-full p-3.5 sm:p-4 rounded-[6px] border border-slate-200 bg-slate-50 text-slate-900 text-base leading-relaxed outline-none transition-all placeholder:text-slate-400 focus:border-[#327C73] focus:bg-white focus:ring-4 focus:ring-[#327C73]/10 resize-none"
+                    />
+                  </div>
+
+                  {/* Suggestions */}
+                  <div>
+                    <span className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                      Suggestions:
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {PROMPT_SUGGESTIONS.map((suggestion) => (
+                        <Tag
+                          key={suggestion}
+                          size="sm"
+                          as="button"
+                          className="cursor-pointer hover:opacity-80 active:scale-95 transition-all text-left bg-white"
+                          onClick={() => {
+                            setAiPrompt(suggestion);
+                            modalPromptRef.current?.focus();
+                          }}
+                        >
+                          {suggestion}
+                        </Tag>
+                      ))}
+                    </div>
+                  </div>
+
                 </div>
               </div>
+            </div>
+            {/* Drawer Actions */}
+            <div className="flex shrink-0 flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 p-6 sm:p-8 border-t border-slate-100">
+              <Button
+                type="button"
+                variant="soft"
+                size="md"
+                radius="fiverr"
+                onClick={() => setIsAiModalOpen(false)}
+                disabled={aiGenerate.isPending}
+                className="w-full sm:w-auto text-center"
+              >
+                Cancel
+              </Button>
 
+              <AiGradientButton
+                type="button"
+                onClick={() => handleGenerateFromModal()}
+                disabled={aiGenerate.isPending || !aiPrompt.trim()}
+                iconPosition="left"
+                icon={
+                  aiGenerate.isPending ? (
+                    <div className="w-4 h-4 border-2 border-[#112131] border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path d="M19.5 3.9375V5.5M19.5 5.5V7.0625M19.5 5.5H18.25M19.5 5.5H20.75M22 5.5L20.9156 5.13852C20.4179 4.97263 20.0274 4.58211 19.8615 4.08443L19.5 3L19.1385 4.08443C18.9726 4.58211 18.5821 4.97263 18.0844 5.13852L17 5.5L18.0844 5.86148C18.5821 6.02737 18.9726 6.41789 19.1385 6.91557L19.5 8L19.8615 6.91557C20.0274 6.41789 20.4179 6.02737 20.9156 5.86148L22 5.5Z" stroke="#112131" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M2 12.8598C4.81875 10.0939 11.44 4.44198 13.275 6.40609C15.5938 8.888 3.40937 15.1646 5.28854 17.93C7.2734 20.851 14.2146 10.5543 16.5635 12.3982C18.9125 14.2422 10.926 18.391 12.8052 20.696C13.5569 21.6179 15.6239 20.235 16.5635 19.313" stroke="#112131" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )
+                }
+                className="w-full sm:w-auto px-6 font-semibold"
+              >
+                {aiGenerate.isPending ? "Generating Draft..." : "Generate Project Draft"}
+              </AiGradientButton>
             </div>
-            </div>
-            </div>
-              {/* Drawer Actions */}
-              <div className="flex shrink-0 flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 p-6 sm:p-8 border-t border-slate-100">
-                <Button
-                  type="button"
-                  variant="soft"
-                  size="md"
-                  radius="fiverr"
-                  onClick={() => setIsAiModalOpen(false)}
-                  disabled={aiGenerate.isPending}
-                  className="w-full sm:w-auto text-center"
-                >
-                  Cancel
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="brand"
-                  size="md"
-                  radius="fiverr"
-                  onClick={() => handleGenerateFromModal()}
-                  disabled={aiGenerate.isPending || !aiPrompt.trim()}
-                  isLoading={aiGenerate.isPending}
-                  leftIcon={<HiSparkles className="text-emerald-400 text-base" />}
-                  className="w-full sm:w-auto px-6 shadow-sm"
-                >
-                  Generate Project Draft
-                </Button>
-              </div>
           </div>
         </div>
       )}

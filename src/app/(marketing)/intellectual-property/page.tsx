@@ -1,7 +1,5 @@
 import React from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
-import Image from "next/image";
 import {
   ShieldAlert,
   FileCheck,
@@ -21,7 +19,7 @@ import {
 } from "lucide-react";
 import IpClaimForm from "./IpClaimForm";
 import IpFaq, { IpFaqItem } from "./IpFaq";
-import { Breadcrumb } from "@/components";
+import { Breadcrumb, CTA } from "@/components";
 
 export const metadata: Metadata = {
   title: "Intellectual Property & Copyright Policy | Workvence Legal Portal",
@@ -386,45 +384,13 @@ export default function IntellectualPropertyPage() {
       </section>
 
       {/* 7. BOTTOM CTA RESOLUTION BANNER */}
-      <section className="w-full pt-12 sm:pt-16 md:pt-20 lg:pt-24 pb-[80px] min-[1400px]:pb-[100px] bg-white">
-        <div className="w-full container mx-auto px-4 sm:px-6 md:px-8 xl:px-12 2xl:px-20">
-          <div className="relative isolate w-full max-w-[1760px] mx-auto rounded-[6px] overflow-hidden shadow-xs flex items-center min-h-[460px] sm:min-h-[500px] md:min-h-[540px] lg:aspect-[1760/800] 2xl:h-[800px] 2xl:min-h-[800px] px-6 sm:px-10 md:px-14 lg:px-16 xl:px-20 py-12 sm:py-16 md:py-20 lg:py-0">
-            <Image
-              src="/media/AFreelancerBG.png"
-              alt="Have Questions About Rights or an Active Order?"
-              fill
-              priority
-              quality={100}
-              unoptimized
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, (max-width: 1536px) 100vw, 1760px"
-              className="object-cover object-right md:object-center select-none pointer-events-none z-0"
-            />
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full relative z-10">
-              <div className="lg:col-span-7 flex flex-col items-start justify-center">
-                <h2 className="font-sf-pro font-[510] text-3xl leading-[normal] sm:text-4xl sm:leading-[normal] lg:text-[44px] lg:leading-[normal] xl:text-[48px] xl:leading-[normal] text-white mb-4 sm:mb-5 my-4">
-                  Have Questions About Rights or an Active Order?
-                </h2>
-
-                <p className="font-inter font-normal text-base sm:text-[15px] text-[#C7C7C7] mb-5 sm:mb-10 max-w-xl leading-relaxed">
-                  Our Trust &amp; Safety team is here to assist with escrow protection, licensing questions, and dispute mediation.
-                </p>
-
-                <div className="flex flex-wrap items-center justify-start gap-4">
-                  <Link
-                    href="/support"
-                    className="bg-white hover:bg-gray-100 text-[#112131] border-transparent font-semibold h-[40px] text-[16px] px-6 shadow-sm rounded-[6px] inline-flex items-center justify-center gap-2 transition"
-                  >
-                    <span>Contact Legal Support</span>
-                    <ArrowRight size={16} strokeWidth={2} />
-                  </Link>
-
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <CTA
+        className="bg-white"
+        title="Have Questions About Rights or an Active Order?"
+        description="Our Trust & Safety team is here to assist with escrow protection, licensing questions, and dispute mediation."
+        buttonText="Contact Legal Support"
+        buttonHref="/support"
+      />
     </div>
   );
 }

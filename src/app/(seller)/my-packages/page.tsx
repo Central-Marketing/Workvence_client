@@ -201,7 +201,7 @@ const MyPackages = () => {
                     <tr>
                       <td colSpan={4} className="py-16 text-center">
                         <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
-                          <div className="w-12 h-12 rounded-[6px] bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
+                          <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
                             <FiEdit2 />
                           </div>
                           <p className="text-slate-800 font-semibold text-sm sm:text-base mb-1">

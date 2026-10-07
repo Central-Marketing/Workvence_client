@@ -557,7 +557,7 @@ const Featured = ({
         height: heroHeight ? `${heroHeight}px` : '100vh',
         minHeight: heroHeight ? `${heroHeight}px` : '100vh',
       }}
-      className="relative w-full bg-black overflow-x-clip flex flex-col justify-center items-center py-6 sm:py-8 select-none"
+      className="relative w-full bg-black overflow-x-clip flex flex-col justify-center items-center pb-6 sm:pb-8 select-none"
     >
       {/* Background Video Layer with High Quality Assurance */}
       <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">

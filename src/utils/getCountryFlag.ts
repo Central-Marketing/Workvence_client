@@ -73,4 +73,13 @@ const getCountryFlag = (data?: string): CountryFlagInfo => {
   return {};
 };
 
+export const getCountryShortName = (countryName?: string): string => {
+  if (!countryName) return "";
+  const flagInfo = getCountryFlag(countryName);
+  if (flagInfo?.alias && flagInfo.alias.length < countryName.length) {
+    return flagInfo.alias;
+  }
+  return countryName;
+};
+
 export default getCountryFlag;

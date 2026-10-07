@@ -100,7 +100,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
   const userDisplayName =
     user?.name?.split(" ")[0] ||
     user?.username ||
-    "Jonas";
+    "User";
 
   const handleScrollLeft = () => {
     if (popularScrollRef.current) {

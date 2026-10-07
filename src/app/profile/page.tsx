@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 
 import { useUserStore } from "@/store/userStore";
-import { axiosFetch } from "@/utils";
+import { axiosFetch, countriesFlags, getCountryShortName } from "@/utils";
 import supportService from "@/utils/supportService";
 import { Loader, KycVerificationForm, Button } from "@/components";
 import { CustomSelect, CustomSelectOption, AccountStandingCard } from "@/components/ui";
@@ -41,6 +41,13 @@ const LANGUAGE_LEVEL_OPTIONS: CustomSelectOption[] = [
   { value: "Fluent", label: "Fluent" },
   { value: "Native", label: "Native" },
 ];
+
+const COUNTRY_OPTIONS: CustomSelectOption[] = Object.keys(countriesFlags)
+  .sort((a, b) => a.localeCompare(b))
+  .map((c) => ({
+    value: getCountryShortName(c),
+    label: c,
+  }));
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -54,9 +61,9 @@ export default function ProfilePage() {
 
   // Form states - Personal & Professional
   const [phone, setPhone] = useState(user?.phone || "");
-  const [country, setCountry] = useState(user?.country || "Bangladesh");
-  const [shortTitle, setShortTitle] = useState(user?.shortTitle || "");
-  const [description, setDescription] = useState(user?.description || "");
+  const [country, setCountry] = useState(user?.country || "");
+  const [shortTitle, setShortTitle] = useState(user?.shortTitle || user?.title || "");
+  const [description, setDescription] = useState(user?.description || user?.desc || user?.bio || "");
 
   // Dedicated Username update states & handler (PATCH /api/users/username)
   const [isEditingUsername, setIsEditingUsername] = useState(false);
@@ -127,7 +134,7 @@ export default function ProfilePage() {
     }
   };
 
-  // Skills as an array
+  // Skills as an array - only real user skills, no dummy fallbacks
   const [skillsList, setSkillsList] = useState<string[]>(() => {
     if (Array.isArray(user?.skills)) return user.skills;
     if (typeof user?.skills === "string") {
@@ -136,13 +143,7 @@ export default function ProfilePage() {
         .map((s) => s.trim())
         .filter(Boolean);
     }
-    return [
-      "Problem solver",
-      "UI Designer",
-      "User Experience Designer",
-      "Analytical Thinker",
-      "Product management",
-    ];
+    return [];
   });
   const [newSkillInput, setNewSkillInput] = useState("");
   const [isAddingSkill, setIsAddingSkill] = useState(false);
@@ -180,7 +181,8 @@ export default function ProfilePage() {
 
   // Image upload states
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState(user?.image || "/media/noavatar.png");
+  const initialAvatar = user?.image || user?.img || user?.avatar || user?.pp;
+  const [previewUrl, setPreviewUrl] = useState(initialAvatar || "/media/noavatar.png");
   const [coverImageUrl, setCoverImageUrl] = useState(
     user?.coverImage ||
     (typeof window !== "undefined" ? localStorage.getItem("user_cover_image") : null) ||
@@ -198,10 +200,15 @@ export default function ProfilePage() {
   useEffect(() => {
     if (user) {
       if (user.phone !== undefined) setPhone(user.phone || "");
-      if (user.country !== undefined) setCountry(user.country || "Bangladesh");
-      if (user.shortTitle !== undefined) setShortTitle(user.shortTitle || "");
-      if (user.description !== undefined) setDescription(user.description || "");
-      if (user.image) setPreviewUrl(user.image);
+      if (user.country !== undefined) setCountry(user.country || "");
+      const titleVal = user.shortTitle || user.title || "";
+      setShortTitle(titleVal);
+      const descVal = user.description || user.desc || user.bio || "";
+      setDescription(descVal);
+
+      const avatar = user.image || user.img || user.avatar || user.pp;
+      if (avatar) setPreviewUrl(avatar);
+
       if (user.coverImage) {
         setCoverImageUrl(user.coverImage);
       } else if (typeof window !== "undefined") {
@@ -212,7 +219,7 @@ export default function ProfilePage() {
       if (Array.isArray(user.experience)) setExperience(user.experience);
       if (Array.isArray(user.education)) setEducation(user.education);
       if (Array.isArray(user.portfolio)) setPortfolio(user.portfolio);
-      if (Array.isArray(user.skills) && user.skills.length > 0) setSkillsList(user.skills);
+      if (Array.isArray(user.skills)) setSkillsList(user.skills);
       if (user.username && !isEditingUsername) setNewUsername(user.username);
     }
   }, [user, isEditingUsername]);
@@ -383,9 +390,12 @@ export default function ProfilePage() {
 
   // Profile completion calculation based on role-specific necessary fields
   const profileCompletion = useMemo(() => {
+    const realAvatar = (previewUrl && !previewUrl.includes("noavatar"))
+      ? previewUrl
+      : (user?.image || user?.img || user?.avatar || user?.pp || "");
     return calculateProfileCompletion({
       ...user,
-      image: previewUrl,
+      image: realAvatar,
       phone,
       country,
       shortTitle,
@@ -449,7 +459,7 @@ export default function ProfilePage() {
       const payload: any = {
         image: imageUrl,
         phone,
-        country,
+        country: getCountryShortName(country),
         shortTitle,
         description,
         skills: skillsList,
@@ -462,7 +472,7 @@ export default function ProfilePage() {
       const { data } = await axiosFetch.patch("/users", payload);
 
       if (!data.error) {
-        const updatedUser = { ...data.user, coverImage: coverImageUrl };
+        const updatedUser = { ...user, ...data.user, coverImage: coverImageUrl };
         setUser(updatedUser);
         if (typeof window !== "undefined") {
           localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -726,7 +736,7 @@ export default function ProfilePage() {
               <div className="mb-1">
                 <div className="flex items-center gap-2">
                   <h2 className="font-bold text-base sm:text-lg text-slate-900 leading-tight">
-                    {user?.username || "Nilson Norman"}
+                    {user?.name || user?.username || "User"}
                   </h2>
                   <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] tracking-wider">
                     {user?.badge || (isSeller ? "Pro" : "Client")}
@@ -753,7 +763,7 @@ export default function ProfilePage() {
               ) : (
                 <>
                   <div className="flex items-center sm:justify-end gap-2 text-xs mb-1.5">
-                    <span className="font-semibold text-slate-800 underline">
+                    <span className="font-semibold text-slate-800 ">
                       Complete your profile
                     </span>
                     <span className="font-bold text-slate-900">{profileCompletion}%</span>
@@ -934,16 +944,15 @@ export default function ProfilePage() {
               <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5">
                 Country
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  placeholder="e.g. Bangladesh, United States"
-                  className="w-full h-10 px-3.5 pr-9 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
-                />
-                <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-sm" />
-              </div>
+              <CustomSelect
+                options={COUNTRY_OPTIONS}
+                value={country}
+                onChange={(val) => setCountry(String(val))}
+                placeholder="Select country"
+                variant="filled"
+                searchable
+                ariaLabel="Country"
+              />
             </div>
           </div>
         </div>
@@ -1021,12 +1030,10 @@ export default function ProfilePage() {
                   </Button>
                 </span>
               ))}
-              {skillsList.length >= 5 && (
-                <span className="bg-[#F1F3F5] text-slate-700 text-xs font-bold px-2.5 py-1.5 rounded-[6px] border border-slate-200/60">
-                  +{skillsList.length - 4}
-                </span>
-              )}
             </div>
+            {skillsList.length === 0 && !isAddingSkill && (
+              <p className="text-xs text-slate-400 mb-2">There is no skill added</p>
+            )}
 
             {/* Add Skill Inline Form */}
             {isAddingSkill ? (

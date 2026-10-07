@@ -98,9 +98,12 @@ export function calculateProfileCompletion(user: any): number {
   const isSeller = Boolean(user.isSeller || user.role === "seller");
 
   // Common identity & contact fields
+  const rawName = String(user.username || user.name || "").trim();
   const hasName = Boolean(
-    (user.username && String(user.username).trim().length > 0) ||
-      (user.name && String(user.name).trim().length > 0)
+    rawName.length > 0 &&
+      rawName !== "Not set" &&
+      rawName.toLowerCase() !== "nilson norman" &&
+      rawName.toLowerCase() !== "nilson-norman"
   );
   const hasEmail = Boolean(user.email && String(user.email).trim().length > 0);
   const avatarUrl = user.image || user.img || user.avatar || user.pp;

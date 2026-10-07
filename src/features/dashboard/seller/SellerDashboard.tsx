@@ -324,7 +324,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
   const isProfileCompleted = completionPercentage >= 100;
   const packagesList = Array.isArray(packages) ? packages : [];
   const hasPackages = packagesList.length > 0;
-  const displayName = user?.name ? user.name.split(" ")[0] : (user?.username || "Tomas");
+  const displayName = user?.name ? user.name.split(" ")[0] : (user?.username || "User");
 
   // Filter draft packages (isDraft === true or "true" or status === "draft")
   const draftPackages = packagesList.filter(

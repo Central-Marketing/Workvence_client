@@ -37,7 +37,7 @@ export { default as RecommendedSellers } from "./marketing/RecommendedSellers/Re
 export { default as TrustProtection } from "./marketing/TrustProtection/TrustProtection";
 export { default as TwoWays } from "./marketing/TwoWays/TwoWays";
 export { default as FAQ } from "./marketing/FAQ/FAQ";
-export { default as CTA } from "./marketing/CTA/CTA";
+export { default as CTA, type CTAProps, type CTAButtonProps, type CTABadgeProps } from "./marketing/CTA/CTA";
 export { default as PostProject } from "./marketing/PostProject/PostProject";
 export { default as PrivacyPolicy } from "./marketing/PrivacyPolicy/PrivacyPolicy";
 export { default as TermsAndConditions } from "./marketing/TermsAndConditions/TermsAndConditions";

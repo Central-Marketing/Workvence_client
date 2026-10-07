@@ -260,9 +260,7 @@ const FavoritesPage = () => {
           <div>
             {favoriteGigs.length === 0 ? (
               <div className="bg-white border border-gray-200 rounded-[6px] p-12 flex flex-col items-center justify-center text-center shadow-sm min-h-[380px]">
-                <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6 border border-gray-100">
-                  <span className="text-4xl filter grayscale opacity-40">📦</span>
-                </div>
+
                 <h3 className="text-xl font-bold text-gray-900 mb-2">No saved services yet</h3>
                 <p className="text-gray-500 mb-8 max-w-md text-sm">
                   You haven't saved any services to your favorites yet. Explore the marketplace to bookmark top offerings!

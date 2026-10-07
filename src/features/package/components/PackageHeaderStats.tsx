@@ -211,7 +211,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
       </div>
 
       {/* 4. Seller Stats */}
-      <div className="w-full mb-6 overflow-hidden rounded-[6px] border border-[#DADADA] bg-[#F5F5F5] grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4">
+      <div className="w-full mb-6 overflow-hidden rounded-[6px] border border-[#DADADA] bg-[#F5F5F5] grid grid-cols-1 md:grid-cols-2 macbook:grid-cols-4 ">
 
         {/* Card 1: Profile Status */}
         <div className="min-h-[72px] sm:min-h-[80px] xl:h-[84px] px-3 min-[480px]:px-3.5 sm:px-4 lg:px-4 xl:px-3.5 macbook:px-4 2xl:px-5 py-3 sm:py-3.5 xl:py-0 flex items-center gap-2 sm:gap-2.5 lg:gap-2.5 xl:gap-2.5 macbook:gap-3 2xl:gap-4 border-b border-r 2xl:border-b-0 border-black/10">
@@ -241,7 +241,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
               Response Time
             </span>
 
-            <span className="text-base font-inter font-bold leading-tight text-black block truncate">
+            <span className="text-[14px] font-inter font-bold text-black block truncate">
               {seller.responseTime}
             </span>
           </div>
@@ -257,7 +257,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
             <span className="text-[11px] min-[480px]:text-xs sm:text-xs md:text-xs lg:text-[11px] xl:text-xs macbook:text-[13px] 2xl:text-sm font-inter text-[#6E6E6E] block font-normal leading-tight truncate">
               Category
             </span>
-            <span className="text-base font-inter font-bold leading-tight text-black block truncate"
+            <span className="text-[14px] font-inter font-bold text-black block truncate"
               title={seller.topRatedIn}
             >
               {seller.topRatedIn}
@@ -276,7 +276,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
               Completion
             </span>
 
-            <span className="text-base font-inter font-bold leading-tight text-black block truncate">
+            <span className="text-[14px] font-inter font-bold text-black block truncate">
               {seller.returnRate || seller.onTimeDelivery || "100%"}
             </span>
           </div>

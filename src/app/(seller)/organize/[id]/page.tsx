@@ -1461,11 +1461,7 @@ const EditPackagePage = () => {
                       }`}
                   >
                     <span>{label}</span>
-                    {tierKey !== "basic" && !isEnabled && (
-                      <span className={`text-[10px] px-1 py-0.2 rounded font-normal ${isCurrent ? "bg-white/20 text-white" : "bg-gray-200 text-gray-500"}`}>
-                        Off
-                      </span>
-                    )}
+                    
                   </Button>
                 );
               })}

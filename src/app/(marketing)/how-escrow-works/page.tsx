@@ -1,7 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import {
   ShieldCheck,
   Lock,
@@ -19,7 +18,7 @@ import {
   Layers,
   HelpCircle,
 } from "lucide-react";
-import { Breadcrumb } from "@/components";
+import { Breadcrumb, CTA } from "@/components";
 import EscrowFaq, { FaqItem } from "./EscrowFaq";
 
 export const metadata: Metadata = {
@@ -539,49 +538,17 @@ export default function HowEscrowWorksPage() {
       </section>
 
       {/* 7. READY TO GET STARTED? (BOTTOM CTA BANNER) */}
-      <section className="w-full pt-12 sm:pt-16 md:pt-20 lg:pt-24 pb-[80px] min-[1400px]:pb-[100px] bg-white">
-        <div className="w-full container mx-auto px-4 sm:px-6 md:px-8 xl:px-12 2xl:px-20">
-          <div className="relative isolate w-full max-w-[1760px] mx-auto rounded-[6px] overflow-hidden shadow-xs flex items-center min-h-[460px] sm:min-h-[500px] md:min-h-[540px] lg:aspect-[1760/800] 2xl:h-[800px] 2xl:min-h-[800px] px-6 sm:px-10 md:px-14 lg:px-16 xl:px-20 py-12 sm:py-16 md:py-20 lg:py-0">
-            <Image
-              src="/media/AFreelancerBG.png"
-              alt="Ready to Get Started?"
-              fill
-              priority
-              quality={100}
-              unoptimized
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, (max-width: 1536px) 100vw, 1760px"
-              className="object-cover object-right md:object-center select-none pointer-events-none z-0"
-            />
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full relative z-10">
-              <div className="lg:col-span-7 flex flex-col items-start justify-center">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-white/10 text-white text-xs font-semibold backdrop-blur-xs">
-                  <span>Zero Risk Hiring</span>
-                </div>
-
-                <h2 className="font-sf-pro font-[510] text-3xl leading-[normal] sm:text-4xl sm:leading-[normal] lg:text-[44px] lg:leading-[normal] xl:text-[48px] xl:leading-[normal] text-white mb-4 sm:mb-5 my-4">
-                  Ready to Get Started?
-                </h2>
-
-                <p className="font-inter font-normal text-base sm:text-[15px] text-[#C7C7C7] mb-5 sm:mb-10 max-w-xl leading-relaxed">
-                  Work with confidence. Get started today with automated escrow protection and verified milestone deliverables.
-                </p>
-
-                <div className="flex flex-wrap items-center justify-start gap-4">
-                  <Link
-                    href="/packages"
-                    className="bg-white hover:bg-gray-100 text-[#112131] border-transparent font-semibold h-[40px] text-[16px] px-6 shadow-sm rounded-[6px] inline-flex items-center justify-center gap-2 transition"
-                  >
-                    <span>Find a Freelancer</span>
-                    <ArrowRight size={16} strokeWidth={2} />
-                  </Link>
-
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <CTA
+        className="bg-white"
+        badge={{
+          text: "Zero Risk Hiring",
+          className: "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-white/10 text-white text-xs font-semibold backdrop-blur-xs",
+        }}
+        title="Ready to Get Started?"
+        description="Work with confidence. Get started today with automated escrow protection and verified milestone deliverables."
+        buttonText="Find a Freelancer"
+        buttonHref="/packages"
+      />
     </div>
   );
 }

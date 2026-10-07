@@ -753,7 +753,7 @@ function SearchPageContent() {
                       <tr>
                         <td colSpan={6} className="py-16 text-center">
                           <div className="flex flex-col items-center justify-center max-w-md mx-auto">
-                            <div className="w-12 h-12 rounded-[6px] bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
+                            <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
                               <Search className="w-6 h-6" />
                             </div>
                             <p className="text-slate-900 font-semibold text-sm sm:text-base mb-1">
@@ -767,7 +767,7 @@ function SearchPageContent() {
                             <button
                               type="button"
                               onClick={handleResetAll}
-                              className="bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs px-4 py-2 rounded-[6px] font-medium transition-colors cursor-pointer"
+                              className="bg-[#0D6D5F] hover:bg-[#0b5c50] text-white text-xs px-4 h-10 rounded-[6px] font-semibold transition-colors cursor-pointer"
                             >
                               Reset Filters & View All
                             </button>
@@ -986,7 +986,7 @@ function SearchPageContent() {
                 {!isLoading && !isError && packagesList.length === 0 && (
                   <div className="bg-white rounded-[6px] border border-gray-200/80 p-12 text-center shadow-sm">
                     <div className="flex flex-col items-center justify-center max-w-md mx-auto">
-                      <div className="w-12 h-12 rounded-[6px] bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
+                      <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center text-[#0D6D5F] text-xl mb-3 shadow-2xs">
                         <Search className="w-6 h-6" />
                       </div>
                       <p className="text-slate-900 font-semibold text-sm sm:text-base mb-1">

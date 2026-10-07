@@ -384,55 +384,63 @@ const Navbar = () => {
             </Link>
 
             <div className={`flex items-center transition-all duration-300 ${showSearchBar ? 'opacity-100 flex-1 min-w-0 max-w-full' : 'opacity-0 max-w-0 pointer-events-none w-0 overflow-hidden'}`}>
-              <div className="relative search-container flex items-center rounded-[6px] px-3 sm:px-3.5 xl:px-4 py-2 sm:py-2.5 w-full max-w-full lg:max-w-[240px] xl:max-w-[420px] macbook:max-w-[540px] 2xl:max-w-[620px] bg-[#F4F4F6] border border-transparent focus-within:border-gray-200 focus-within:bg-white focus-within:shadow-sm transition-all group">
-                <RiSearchLine
-                  className="text-gray-400 text-base sm:text-lg mr-2 sm:mr-2.5 group-focus-within:text-brand-green transition-colors shrink-0 cursor-pointer"
-                  onClick={() => {
-                    if (searchQuery.trim()) {
-                      closeSuggestions();
-                      setSelectedIndex(-1);
-                      searchInputRef.current?.blur();
-                      router.push(`/packages?search=${encodeURIComponent(searchQuery.trim())}`);
-                    }
-                  }}
-                />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="What you are looking for"
-                  className="bg-transparent border-none outline-none w-full text-xs sm:text-[13px] xl:text-[14px] font-medium text-gray-800 placeholder-gray-400 min-w-0 truncate"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setSelectedIndex(-1);
-                  }}
-                  onFocus={() => {
-                    setIsSearchFocused(true);
-                    if (items.length > 0) setIsOpen(true);
-                  }}
-                  onBlur={() => {
-                    setTimeout(() => setIsSearchFocused(false), 200);
-                  }}
-                  onKeyDown={handleSearch}
-                />
+              <div className="relative group/search search-container w-full max-w-full lg:max-w-[240px] xl:max-w-[420px] macbook:max-w-[540px] 2xl:max-w-[620px] h-[40px] xl:h-[44px] rounded-[6px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition-all">
+                {/* Gradient Border Layer (Pink: #FF5E8E, Violet: #8B5CF6, Green: #10B981) */}
+                <div className="absolute -inset-[1.5px] rounded-[7.5px] bg-gradient-to-r from-[#FF5E8E] via-[#8B5CF6] to-[#10B981] opacity-0 group-hover/search:opacity-100 group-focus-within/search:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-                <SearchSuggestionsDropdown
-                  items={items}
-                  query={searchQuery}
-                  isOpen={isOpen && isSearchFocused}
-                  isLoading={isSuggestionsLoading}
-                  selectedIndex={selectedIndex}
-                  isNavbar={true}
-                  onSelect={(item) => {
-                    setIsSearchFocused(false);
-                    handleSelectSuggestion(item);
-                  }}
-                  onSeeMore={(q) => {
-                    setIsSearchFocused(false);
-                    closeSuggestions();
-                    router.push(`/search?q=${encodeURIComponent(q)}`);
-                  }}
-                />
+                {/* Inner White Box */}
+                <div className="relative z-10 w-full h-full bg-white rounded-[6px] border border-black/10 group-hover/search:border-transparent group-focus-within/search:border-transparent px-4 sm:px-[20px] py-[10px] flex items-center justify-between gap-3 transition-all">
+                  <div className="flex items-center gap-2.5 sm:gap-3 w-full min-w-0">
+                    <RiSearchLine
+                      className="text-gray-400 text-base sm:text-lg group-focus-within/search:text-brand-green transition-colors shrink-0 cursor-pointer"
+                      onClick={() => {
+                        if (searchQuery.trim()) {
+                          closeSuggestions();
+                          setSelectedIndex(-1);
+                          searchInputRef.current?.blur();
+                          router.push(`/packages?search=${encodeURIComponent(searchQuery.trim())}`);
+                        }
+                      }}
+                    />
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      placeholder="What you are looking for"
+                      className="w-full flex-1 min-w-0 bg-transparent border-none outline-none text-xs sm:text-[13px] xl:text-[14px] font-medium text-gray-800 placeholder-gray-400 truncate"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setSelectedIndex(-1);
+                      }}
+                      onFocus={() => {
+                        setIsSearchFocused(true);
+                        if (items.length > 0) setIsOpen(true);
+                      }}
+                      onBlur={() => {
+                        setTimeout(() => setIsSearchFocused(false), 200);
+                      }}
+                      onKeyDown={handleSearch}
+                    />
+                  </div>
+
+                  <SearchSuggestionsDropdown
+                    items={items}
+                    query={searchQuery}
+                    isOpen={isOpen && isSearchFocused}
+                    isLoading={isSuggestionsLoading}
+                    selectedIndex={selectedIndex}
+                    isNavbar={true}
+                    onSelect={(item) => {
+                      setIsSearchFocused(false);
+                      handleSelectSuggestion(item);
+                    }}
+                    onSeeMore={(q) => {
+                      setIsSearchFocused(false);
+                      closeSuggestions();
+                      router.push(`/search?q=${encodeURIComponent(q)}`);
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>

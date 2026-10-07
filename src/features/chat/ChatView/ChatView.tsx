@@ -36,7 +36,7 @@ import supportService from "@/utils/supportService";
 import { getOtherUser, isConversationUnread, isTargetConversation, renderMessageTextWithLinks } from '@/utils/chatHelpers';
 import { useUserStore } from "@/store/userStore";
 import { Loader, ChatSkeleton, Skeleton, AiGradientButton, Button } from "@/components";
-import { CustomSelect, CustomSelectOption, Tag } from "@/components/ui";
+import { CustomSelect, CustomSelectOption, Tag, AIPolishButton } from "@/components/ui";
 import { MessageModerationBadge } from "@/features/chat";
 import { ConversationTagBadge, ConversationTagsManager } from "../ConversationTags";
 import { FiTag, FiX, FiCheck } from "react-icons/fi";
@@ -379,6 +379,7 @@ const ChatView = () => {
   const [offerDelivery, setOfferDelivery] = useState("");
   const [offerRevisions, setOfferRevisions] = useState<number | string>(0);
   const [messageText, setMessageText] = useState("");
+  const [isPolishing, setIsPolishing] = useState(false);
   const [isRecipientTyping, setIsRecipientTyping] = useState(false);
   const [partnerUsername, setPartnerUsername] = useState("");
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
@@ -2985,6 +2986,13 @@ const ChatView = () => {
                       }
                     />
 
+                    {/* AI Polish Button */}
+                    <AIPolishButton 
+                      text={messageText}
+                      onSuccess={(polishedText) => setMessageText(polishedText)}
+                      onStateChange={setIsPolishing}
+                      className="mb-0.5"
+                    />
 
                     {/* Message Textarea */}
                     <textarea
@@ -2993,6 +3001,7 @@ const ChatView = () => {
                       value={messageText}
                       onChange={handleInputChange}
                       onKeyDown={handleKeyDown}
+                      disabled={isPolishing}
                       rows={1}
                       className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 resize-none text-gray-800 placeholder-gray-400 text-sm py-1.5 px-1 min-h-[36px] max-h-32 overflow-y-auto scrollbar-hide scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                     />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { axiosFetch } from "@/utils";
 import { toast } from "sonner";
 import { Button } from "@/components/ui";
@@ -14,6 +14,7 @@ interface FavoriteButtonProps {
   className?: string;
   iconClassName?: string;
   showCount?: boolean;
+  onToggle?: (isFavorited: boolean) => void;
 }
 
 const FavoriteButton = ({
@@ -23,12 +24,18 @@ const FavoriteButton = ({
   currentUser,
   className = "",
   iconClassName = "",
-  showCount = false
+  showCount = false,
+  onToggle
 }: FavoriteButtonProps) => {
   const [isFavorited, setIsFavorited] = useState(initialIsFavorited);
   const [favoriteCount, setFavoriteCount] = useState(initialFavoriteCount);
   const [loading, setLoading] = useState(false);
   const openAuthModal = useAuthModalStore((state) => state.openAuthModal);
+
+  // Sync state if prop changes from outside (e.g. fresh API data)
+  useEffect(() => {
+    setIsFavorited(initialIsFavorited);
+  }, [initialIsFavorited]);
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -46,6 +53,7 @@ const FavoriteButton = ({
     const previousCount = favoriteCount;
 
     setIsFavorited(!previousState);
+    if (onToggle) onToggle(!previousState);
     setFavoriteCount((prev) => (previousState ? Math.max(0, prev - 1) : prev + 1));
     setLoading(true);
 
@@ -53,6 +61,7 @@ const FavoriteButton = ({
       const res = await axiosFetch.post(`/gigs/${gigId}/favorite`);
       if (!res.data.error) {
         setIsFavorited(res.data.isFavorited);
+        if (onToggle) onToggle(res.data.isFavorited);
         setFavoriteCount(res.data.favoriteCount);
         if (res.data.message) {
           toast.success(res.data.message);
@@ -61,6 +70,7 @@ const FavoriteButton = ({
     } catch (err: any) {
       // Revert optimistic update on failure
       setIsFavorited(previousState);
+      if (onToggle) onToggle(previousState);
       setFavoriteCount(previousCount);
       toast.error(err.response?.data?.message || "Failed to update favorite status.");
     } finally {
@@ -76,7 +86,7 @@ const FavoriteButton = ({
       radius="full"
       onClick={handleToggleFavorite}
       disabled={loading}
-      className={`!p-0 !min-h-0 !h-auto flex items-center justify-center transition-colors outline-none text-red-500 cursor-pointer ${className} ${isFavorited ? "text-red-500" : " hover:text-red-500"
+      className={`!p-0 !min-h-0 !h-auto flex items-center justify-center transition-colors outline-none cursor-pointer ${className} ${isFavorited ? "text-red-500" : "text-gray-500 hover:text-red-500"
         }`}
       title={isFavorited ? "Remove from Favorites" : "Add to Favorites"}
     >

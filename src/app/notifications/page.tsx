@@ -267,7 +267,7 @@ const NotificationsPage = () => {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] pt-6 sm:pt-8 pb-[80px] min-[1400px]:pb-[100px] font-sans">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 space-y-7">
         {/* Breadcrumb Navigation */}
         <Breadcrumb
           homeHref={dashboardRoute}
@@ -502,7 +502,7 @@ const NotificationsPage = () => {
                         >
                           {/* Category Icon Badge */}
                           <div
-                            className={`w-11 h-11 rounded-[6px] flex items-center justify-center shrink-0 border ${category.iconBg} shadow-2xs mt-0.5`}
+                            className={`w-10 h-10 rounded-[6px] flex items-center justify-center shrink-0 border  shadow-2xs mt-0.5`}
                           >
                             {category.icon}
                           </div>

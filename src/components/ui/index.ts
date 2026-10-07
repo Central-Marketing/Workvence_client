@@ -18,3 +18,5 @@ export type { InputProps } from './Input';
 export { Tag, default as TagComponent } from './Tag';
 export type { TagProps, TagVariant, TagSize } from './Tag';
 export * from './AccountStanding';
+export { default as AIPolishButton } from './AIPolishButton/AIPolishButton';
+export type { AIPolishButtonProps } from './AIPolishButton/AIPolishButton';

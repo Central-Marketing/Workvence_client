@@ -37,10 +37,15 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
   const { user } = useUserStore((state: any) => state);
 
   const [imgSrc, setImgSrc] = React.useState<string>(() => resolveCoverImage(data));
+  const [isFavorited, setIsFavorited] = React.useState<boolean>(!!data?.isFavorited);
 
   React.useEffect(() => {
     setImgSrc(resolveCoverImage(data));
   }, [data?.cover, data?.img, data?.image, data?.images]);
+
+  React.useEffect(() => {
+    setIsFavorited(!!data?.isFavorited);
+  }, [data?.isFavorited]);
 
   if (!data) return null;
 
@@ -113,7 +118,7 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
 
           {/* Favorite Button */}
           <div
-            className={`absolute top-2.5 right-2.5 z-10 transition-opacity duration-200 ${data.isFavorited
+            className={`absolute top-2.5 right-2.5 z-10 transition-opacity duration-200 ${isFavorited
               ? "opacity-100"
               : "opacity-0 group-hover:opacity-100"
               }`}
@@ -122,14 +127,15 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
               e.stopPropagation();
             }}
           >
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center text-gray-500 hover:text-red-500 hover:bg-white transition-all cursor-pointer">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center hover:bg-white transition-all cursor-pointer">
               <FavoriteButton
                 gigId={data._id || data.id}
-                initialIsFavorited={data.isFavorited}
+                initialIsFavorited={isFavorited}
                 initialFavoriteCount={data.favoriteCount}
                 currentUser={user}
                 className="w-full h-full flex items-center justify-center"
                 iconClassName="w-3.5 h-3.5 sm:w-4 sm:h-4"
+                onToggle={(newVal) => setIsFavorited(newVal)}
               />
             </div>
           </div>

@@ -23,7 +23,7 @@ import {
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components";
-import { BriefsListSkeleton } from "@/components/ui";
+import { Breadcrumb, BriefsListSkeleton } from "@/components/ui";
 import { Home } from "lucide-react";
 
 type StatusFilter = "all" | "open" | "closed";
@@ -143,18 +143,23 @@ export default function MyProposalsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] pt-6 sm:pt-10 pb-20 font-sans">
-      <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+    <div className="min-h-screen bg-[#f5f5f5] pt-6 sm:pt-10 pb-20 font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-7">
+
+        {/* 1. Breadcrumb */}
+        <Breadcrumb
+          homeHref="/dashboard/seller"
+          homeTitle="Home"
+          items={[
+            {
+              name: "My Proposals",
+              isLast: true,
+            },
+          ]}
+        />
         {/* Header section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs">
-                <Home />
-              </span>
-              <span className="text-gray-300">/</span>
-              <span className="text-xs font-medium text-gray-500">Proposals</span>
-            </div>
             <h1 className="text-2xl sm:text-[28px] font-medium text-gray-950 tracking-tight font-sf-pro">
               My Submitted Proposals
             </h1>

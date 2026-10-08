@@ -15,6 +15,7 @@ import {
   Briefcase,
   Layers,
   Cpu,
+  ArrowRight,
   icons,
   LucideIcon,
 } from 'lucide-react';
@@ -44,6 +45,8 @@ const ICON_ALIASES: Record<string, string> = {
   video: 'Video',
   film: 'Film',
   box: 'Box',
+  'arrow-right': 'ArrowRight',
+  arrowright: 'ArrowRight',
 };
 
 // Converts 'file-text' or 'palette' into PascalCase ('FileText', 'Palette')
@@ -87,6 +90,7 @@ const getCategoryIconComponent = (icon?: string, name?: string): LucideIcon => {
   if (nameStr.includes('code') || nameStr.includes('program') || nameStr.includes('tech') || nameStr.includes('dev')) return Code;
   if (nameStr.includes('business') || nameStr.includes('consult')) return Briefcase;
   if (nameStr.includes('ai')) return Cpu;
+  if (nameStr.includes('see more') || nameStr.includes('view all') || nameStr.includes('more')) return ArrowRight;
 
   return Layers;
 };
@@ -118,7 +122,30 @@ const ExploreCategories = () => {
   );
 
   const dynamicCategories = [...regularCats, ...otherCats];
-  const displayCategories = dynamicCategories.length > 0 ? dynamicCategories.slice(0, 8) : FALLBACK_CATEGORIES;
+  const baseCategories =
+    dynamicCategories.length > 0
+      ? dynamicCategories.slice(0, 7)
+      : FALLBACK_CATEGORIES.slice(0, 7);
+
+  // Find dynamic AI services category slug if available, default to 'ai-services'
+  const aiCategory = rawList.find((c: any) => {
+    const s = (c.slug || '').toLowerCase();
+    const n = (c.name || c.title || '').toLowerCase();
+    return s === 'ai-services' || s === 'ai' || n.includes('ai service') || n === 'ai';
+  });
+  const aiSlug = aiCategory?.slug || 'ai-services';
+
+  const seeMoreCard = {
+    _id: 'see-more-card',
+    name: 'See More',
+    title: 'See More',
+    slug: aiSlug,
+    href: `/packages?category=${encodeURIComponent(aiSlug)}`,
+    icon: 'arrow-right',
+    isSeeMore: true,
+  };
+
+  const displayCategories = [...baseCategories, seeMoreCard];
 
   return (
     <section className="relative w-full pb-12 sm:pb-16 md:pb-24 pt-8 sm:pt-12 md:pt-14 lg:pt-16 bg-[#fafafa] overflow-hidden">
@@ -147,6 +174,7 @@ const ExploreCategories = () => {
         {/* Categories Single Row Layout */}
         <div className="w-full flex items-stretch gap-3 sm:gap-3.5 lg:gap-4 overflow-x-auto scrollbar-none pb-3 pt-1 xl:overflow-x-visible">
           {displayCategories.map((category: any, index: number) => {
+            const isSeeMore = Boolean(category.isSeeMore);
             const title =
               category.name ||
               category.title ||
@@ -154,21 +182,34 @@ const ExploreCategories = () => {
               "Category";
 
             const path =
-              category.slug ||
-              title.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-');
+              category.href ||
+              `/packages?category=${encodeURIComponent(
+                category.slug ||
+                  title
+                    .toLowerCase()
+                    .trim()
+                    .replace(/&/g, 'and')
+                    .replace(/\s+/g, '-')
+                    .replace(/[^a-z0-9-]/g, '')
+                    .replace(/-+/g, '-')
+              )}`;
 
             return (
               <Link
-                href={`/packages?category=${encodeURIComponent(path)}`}
+                href={path}
                 key={category._id || category.id || index}
                 className="group flex-1 min-w-[130px] sm:min-w-[145px] lg:min-w-[150px] xl:min-w-0 bg-white hover:bg-[#004316] border border-gray-100 hover:border-brand-green rounded-[6px] p-4 sm:p-5 flex flex-col items-center justify-center text-center shadow-[0_1px_4px_rgba(0,0,0,0.03)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer min-h-[140px] sm:min-h-[150px]"
               >
                 {/* Icon Container */}
                 <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-[6px] bg-[#F5F5F7] group-hover:bg-white flex items-center justify-center mb-3 sm:mb-4 transition-all duration-300 shrink-0">
-                  {renderCategoryIcon(
-                    category.icon,
-                    title,
-                    "w-5 h-5 text-[#222427] group-hover:text-brand-green transition-colors duration-300"
+                  {isSeeMore ? (
+                    <ArrowRight className="w-5 h-5 text-[#222427] group-hover:text-brand-green transition-colors duration-300" strokeWidth={1.75} />
+                  ) : (
+                    renderCategoryIcon(
+                      category.icon,
+                      title,
+                      "w-5 h-5 text-[#222427] group-hover:text-brand-green transition-colors duration-300"
+                    )
                   )}
                 </div>
 

@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Pdf01Icon, File02Icon } from "@hugeicons/core-free-icons";
 import {
   ArrowLeft,
   Send,
@@ -60,94 +62,63 @@ function SupportAttachmentCard({ att, isMe, onPreview, onDownload }: SupportAtta
     (fileUrl.includes("cloudinary.com") && fileUrl.includes("/image/") && !fileUrl.includes("pdf"))
   );
 
+  const isPdf = /\.(pdf)($|[?#])/i.test(fileUrl) || /\.(pdf)$/i.test(name) || att.type === "pdf";
+
+  const handleOpenInNewTab = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (fileUrl) {
+      window.open(fileUrl, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  if (isImg && fileUrl) {
+    return (
+      <div
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onPreview({ url: fileUrl, name });
+        }}
+        className="mt-1 overflow-hidden rounded-[6px] border border-slate-200/90 shadow-sm max-w-[280px] bg-slate-50 cursor-pointer group hover:border-[#327C73]/50 transition-all mb-1.5"
+        title="Click to preview image"
+      >
+        <img
+          src={fileUrl}
+          alt={name}
+          className="w-full max-h-[220px] object-cover group-hover:scale-[1.02] transition-transform duration-200"
+          onError={(e) => {
+            (e.target as HTMLElement).style.display = "none";
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div
-      className={`group relative flex items-center gap-3 rounded-[6px] border p-2.5 transition-all text-left ${
-        isMe
-          ? "bg-white/10 border-white/20 text-white"
-          : "bg-[#f8fafc] border-[#e2e8f0] text-[#0f172a]"
-      }`}
+      onClick={handleOpenInNewTab}
+      className="flex items-center gap-2.5 px-3.5 py-2.5 mt-1 bg-slate-100 hover:bg-slate-200/80 text-slate-800 rounded-[6px] transition-all border border-slate-200/90 text-xs font-semibold cursor-pointer select-none max-w-[280px] group shadow-2xs mb-1.5"
+      title="Click to open file in a new tab"
     >
-      {/* File Thumbnail or Icon */}
-      {isImg && fileUrl ? (
-        <button
-          type="button"
-          onClick={() => onPreview({ url: fileUrl, name })}
-          className="relative h-11 w-11 rounded-[6px] overflow-hidden shrink-0 border border-current/20 group/thumb cursor-pointer bg-black/10"
-        >
-          <img
-            src={fileUrl}
-            alt={name}
-            className="h-full w-full object-cover transition-transform group-hover/thumb:scale-105"
-            onError={(e) => {
-              (e.target as HTMLElement).style.display = "none";
-            }}
-          />
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center transition-opacity">
-            <Eye className="w-3.5 h-3.5 text-white" />
-          </div>
-        </button>
-      ) : (
-        <div
-          className={`grid h-11 w-11 place-items-center rounded-[6px] shrink-0 ${
-            isMe ? "bg-white/15 text-white" : "bg-[#0D6D5F]/10 text-[#0D6D5F]"
-          }`}
-        >
-          <File className="w-5 h-5" />
-        </div>
-      )}
-
-      {/* File Metadata */}
-      <div className="flex flex-col min-w-0 flex-1">
-        <span
-          title={name}
-          className="font-semibold text-xs truncate leading-tight hover:underline cursor-pointer"
-          onClick={() => {
-            if (isImg && fileUrl) {
-              onPreview({ url: fileUrl, name });
-            } else if (fileUrl) {
-              window.open(fileUrl, "_blank", "noopener,noreferrer");
-            }
-          }}
-        >
+      <div className="w-8 h-8 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-105 transition-transform">
+        {isPdf ? (
+          <HugeiconsIcon icon={Pdf01Icon} size={18} className="text-rose-500" />
+        ) : (
+          <HugeiconsIcon icon={File02Icon} size={18} className="text-[#0D6D5F]" />
+        )}
+      </div>
+      <div className="flex flex-col min-w-0 flex-1 text-left">
+        <span className="truncate text-slate-900 text-[12.5px] font-medium leading-tight group-hover:text-[#327C73] transition-colors">
           {name}
         </span>
-        <span className={`text-[10px] mt-0.5 ${isMe ? "text-white/80" : "text-[#64748b]"}`}>
-          {sizeText}
+        <span className="text-[10.5px] text-slate-400 font-normal mt-0.5 flex items-center gap-1">
+          <span>Click to open in new tab</span>
         </span>
       </div>
-
-      {/* Actions (Preview / Download) */}
-      {fileUrl && (
-        <div className="flex items-center gap-1 shrink-0">
-          {isImg && (
-            <button
-              type="button"
-              onClick={() => onPreview({ url: fileUrl, name })}
-              title="Preview image"
-              className={`p-1.5 rounded-[6px] transition cursor-pointer ${
-                isMe
-                  ? "hover:bg-white/20 text-white"
-                  : "hover:bg-[#e2e8f0] text-[#64748b] hover:text-[#0f172a]"
-              }`}
-            >
-              <Eye className="w-4 h-4" />
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={(e) => onDownload(e, fileUrl, name)}
-            title="Download attachment"
-            className={`p-1.5 rounded-[6px] transition cursor-pointer ${
-              isMe
-                ? "hover:bg-white/20 text-white"
-                : "hover:bg-[#e2e8f0] text-[#64748b] hover:text-[#0f172a]"
-            }`}
-          >
-            <Download className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+      <span className="text-slate-400 group-hover:text-slate-700 text-sm shrink-0">
+        ↗
+      </span>
     </div>
   );
 }

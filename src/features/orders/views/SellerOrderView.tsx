@@ -323,9 +323,9 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
     typeof disputeDetails === "string"
       ? disputeDetails
       : disputeDetails?.decisionReason ||
-        disputeDetails?.reason ||
-        disputeDetails?.notes ||
-        (disputeDetails && typeof disputeDetails === "object" ? JSON.stringify(disputeDetails, null, 2) : "");
+      disputeDetails?.reason ||
+      disputeDetails?.notes ||
+      (disputeDetails && typeof disputeDetails === "object" ? JSON.stringify(disputeDetails, null, 2) : "");
   const hasDisputeHistory = Boolean(
     disputeSummary ||
     disputeDetails ||
@@ -573,7 +573,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
 
             {/* Dispute Resolved & Completed Alert Banner */}
             {isCompleted && (disputeSummary || disputeDetailsText) && (
-              <div className="bg-[#f0fdf4] border border-emerald-300 rounded-[6px] p-6 mb-6">
+              <div className="bg-[#f5f5f5] border border-emerald-300 rounded-[6px] p-6 mb-6">
                 <div className="flex items-start gap-3.5">
                   <div className="w-10 h-10 rounded-[6px] bg-white border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0">
                     <FiCheckCircle className="text-xl" />

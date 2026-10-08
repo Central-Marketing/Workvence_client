@@ -502,8 +502,10 @@ export default function TicketDetailsPage() {
           </div>
         </div>
 
-        {/* Ticket Header Details */}
-        <div className="bg-white p-6 md:p-8 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-4">
+        {/* Layout Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          {/* Ticket Header Details */}
+          <div className="lg:col-span-1 bg-white p-6 md:p-6 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-4 self-start lg:sticky lg:top-24">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#e2e8f0] pb-4">
             <div className="space-y-1.5">
               <div className="flex items-center gap-3 flex-wrap">
@@ -572,7 +574,7 @@ export default function TicketDetailsPage() {
         </div>
 
         {/* Conversation Stream */}
-        <div className="bg-white rounded-[6px] border border-[#e2e8f0] shadow-xs overflow-hidden flex flex-col min-h-[500px]">
+          <div className="lg:col-span-2 bg-white rounded-[6px] border border-[#e2e8f0] shadow-xs overflow-hidden flex flex-col min-h-[500px] max-h-[80vh]">
 
           {/* Chat Header */}
           <div className="px-6 py-4 border-b border-[#e2e8f0] bg-[#f8fafc] flex items-center justify-between">
@@ -618,33 +620,28 @@ export default function TicketDetailsPage() {
                 return (
                   <div
                     key={msg.id || idx}
-                    className={`flex items-start gap-3 ${isMe ? "justify-end" : "justify-start"}`}
+                    className={`flex gap-3 items-end max-w-[85%] sm:max-w-[75%] [overflow-wrap:anywhere] [word-break:break-word] ${isMe ? "self-end justify-end ml-auto" : "self-start mr-auto"}`}
                   >
                     {!isMe && (
                       <div
-                        className={`w-8 h-8 rounded-full text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-2xs ${
-                          isAdmin ? "bg-[#0D6D5F]" : "bg-[#0f172a]"
-                        }`}
+                        className={`w-8 h-8 rounded-full text-white flex items-center justify-center font-bold text-xs flex-shrink-0 border border-slate-100 ${isAdmin ? "bg-[#0D6D5F]" : "bg-[#0f172a]"}`}
                       >
                         {isAdmin ? "S" : displayName[0]?.toUpperCase() || "U"}
                       </div>
                     )}
 
-                    <div className={`space-y-1 max-w-lg ${isMe ? "items-end text-right" : "items-start"}`}>
-                      <div className="flex items-center gap-2 text-[11px] font-semibold text-[#64748b] px-1">
+                    <div className="flex flex-col">
+                      <div className={`flex items-center gap-2 text-[11px] font-semibold text-[#64748b] px-1 mb-1 ${isMe ? "justify-end" : "justify-start"}`}>
                         <span>{isMe ? "You" : displayName}</span>
                         {getRoleBadge(msg.role)}
-                        {timeStr && <span>• {timeStr}</span>}
+                        
                       </div>
 
                       <div
-                        className={`p-4 rounded-[6px] text-xs leading-relaxed ${
-                          isMe
-                            ? "bg-[#0D6D5F] text-white rounded-tr-none shadow-2xs"
-                            : "bg-white text-[#0f172a] rounded-tl-none border border-[#e2e8f0] shadow-2xs"
-                        }`}
+                        className={`relative px-4 py-3 min-w-[100px] max-w-full shadow-2xs [overflow-wrap:anywhere] [word-break:break-word] ${isMe ? "rounded-[10px_10px_10px_0] border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-300,#F5F5F5)] text-slate-800" : "rounded-[10px_10px_10px_0] bg-[#FFF] border-0 text-[#0f172a]"}`}
                       >
-                        <p className="whitespace-pre-wrap">{msg.message}</p>
+                        {msg.message && <p className="text-[13.5px] m-0 whitespace-pre-wrap leading-relaxed">{msg.message}</p>}
+  <span className="text-[11px] text-slate-400 block mt-1">{timeStr}</span>
 
                         {/* Attachments rendering with Signed URL resolution & Image Previews */}
                         {/* Attachments Section */}
@@ -671,11 +668,7 @@ export default function TicketDetailsPage() {
                       </div>
                     </div>
 
-                    {isMe && (
-                      <div className="w-8 h-8 rounded-full bg-[#0f172a] text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-2xs">
-                        {user?.username?.[0]?.toUpperCase() || user?.name?.[0]?.toUpperCase() || "U"}
-                      </div>
-                    )}
+                    
                   </div>
                 );
               })
@@ -795,6 +788,8 @@ export default function TicketDetailsPage() {
         </div>
 
       </div>
+      </div>
+
       {/* High-Res Image Preview Lightbox Modal */}
       {selectedPreviewImage && (
         <div

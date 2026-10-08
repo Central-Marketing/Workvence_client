@@ -5,12 +5,10 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Trash2, X } from "lucide-react";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Button } from "@/components";
-import { GigsGridSkeleton, AccountStandingBanner } from "@/components/ui";
+import { Button, GigsGridSkeleton, AccountStandingBanner, Modal } from "@/components/ui";
 
 const MyPackages = () => {
   const user = useUserStore((state: any) => state.user);
@@ -342,69 +340,48 @@ const MyPackages = () => {
       )}
 
       {/* Confirmation Delete Modal */}
-      {packageToDelete && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-all duration-300"
-          onClick={() => !mutation.isPending && setPackageToDelete(null)}
-        >
-          <div
-            className="bg-white rounded-[6px] max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col items-center text-center relative overflow-hidden transform transition-all duration-300 scale-100"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button */}
+      <Modal
+        isOpen={Boolean(packageToDelete)}
+        onClose={() => !mutation.isPending && setPackageToDelete(null)}
+        title="Delete Package?"
+        isLoading={mutation.isPending}
+        footer={
+          <>
             <Button
               type="button"
-              variant="ghost"
-              size="icon"
-              radius="full"
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50 w-8 h-8 min-h-[32px] p-0"
+              variant="soft"
+              size="md"
+              radius="fiverr"
               onClick={() => setPackageToDelete(null)}
               disabled={mutation.isPending}
-              icon={<X size={20} />}
-            />
-
-            {/* Trash Icon */}
-            <div className="w-14 h-14 rounded-[6px] bg-red-50 text-red-500 flex items-center justify-center mb-4 border border-red-100">
-              <Trash2 size={26} strokeWidth={2} />
-            </div>
-
-            <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">
-              Delete Package?
-            </h3>
-
-            <p className="text-slate-500 text-sm sm:text-base leading-relaxed mb-6">
-              Are you sure you want to permanently delete <span className="font-semibold text-slate-800">&quot;{packageToDelete.title}&quot;</span>? This action cannot be undone.
-            </p>
-
-            <div className="flex items-center gap-3 w-full">
-              <Button
-                type="button"
-                variant="outline"
-                size="md"
-                radius="fiverr"
-                className="flex-1"
-                onClick={() => setPackageToDelete(null)}
-                disabled={mutation.isPending}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                type="button"
-                variant="danger"
-                size="md"
-                radius="fiverr"
-                className="flex-1"
-                onClick={() => confirmDelete()}
-                disabled={mutation.isPending}
-                isLoading={mutation.isPending}
-              >
-                {mutation.isPending ? "Deleting..." : "Yes, Delete"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+              className="cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="md"
+              radius="fiverr"
+              onClick={() => confirmDelete()}
+              disabled={mutation.isPending}
+              isLoading={mutation.isPending}
+              loadingText="Deleting..."
+              className="cursor-pointer"
+            >
+              Yes, Delete
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-sf-pro">
+          Are you sure you want to permanently delete{" "}
+          <span className="font-semibold text-slate-800">
+            &quot;{packageToDelete?.title}&quot;
+          </span>
+          ? This action cannot be undone.
+        </p>
+      </Modal>
     </div>
   );
 };

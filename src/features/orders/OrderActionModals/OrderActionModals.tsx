@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Calendar, FileText, X } from 'lucide-react';
-import { Button } from '@/components/ui';
+import { Button, Modal } from '@/components/ui';
 
 interface RevisionModalProps {
   isOpen: boolean;
@@ -20,8 +19,6 @@ export const RevisionModal: React.FC<RevisionModalProps> = ({
   const [reason, setReason] = useState('');
   const [error, setError] = useState('');
 
-  if (!isOpen) return null;
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!reason.trim()) {
@@ -33,38 +30,48 @@ export const RevisionModal: React.FC<RevisionModalProps> = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn select-none"
-      onClick={() => !isLoading && onClose()}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Request Revision"
+      isLoading={isLoading}
+      footer={
+        <>
+          <Button
+            type="button"
+            variant="soft"
+            size="md"
+            radius="fiverr"
+            onClick={onClose}
+            disabled={isLoading}
+            className="cursor-pointer"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="dark"
+            size="md"
+            radius="fiverr"
+            onClick={handleSubmit}
+            disabled={isLoading || !reason.trim()}
+            isLoading={isLoading}
+            loadingText="Submitting..."
+            className="cursor-pointer"
+          >
+            Submit Request
+          </Button>
+        </>
+      }
     >
-      <div
-        className="bg-white rounded-[6px] max-w-lg w-full max-h-[calc(100dvh-2rem)] flex flex-col overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-100 relative"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          radius="full"
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer w-8 h-8 min-h-[32px] p-0"
-          onClick={onClose}
-          disabled={isLoading}
-          icon={<X size={20} />}
-        />
-
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] text-[#292929] flex items-center justify-center shrink-0">
-            <FileText size={20} />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-slate-900">Request Revision</h3>
-            <p className="text-xs text-slate-500">Provide clear instructions for the seller</p>
-          </div>
-        </div>
+      <div className="flex flex-col gap-4">
+        <p className="text-xs sm:text-sm text-slate-500 font-sf-pro">
+          Provide clear instructions for the seller
+        </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5 block">
+            <label className="text-xs sm:text-[13px] font-semibold text-gray-700 mb-1.5 block font-sf-pro">
               Revision Details
             </label>
             <textarea
@@ -75,38 +82,13 @@ export const RevisionModal: React.FC<RevisionModalProps> = ({
                 setReason(e.target.value);
                 if (error) setError('');
               }}
-              className="w-full px-3.5 py-2.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white outline-none text-gray-900 text-sm placeholder:text-[#868686] placeholder:font-normal resize-y transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white outline-none text-gray-900 text-sm placeholder:text-[#868686] placeholder:font-normal resize-y transition-colors font-sf-pro"
             />
-            {error && <p className="text-xs text-red-500 font-medium mt-1">{error}</p>}
-          </div>
-
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="md"
-              radius="fiverr"
-              className="w-full sm:w-auto sm:flex-1 text-center"
-              onClick={onClose}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isLoading || !reason.trim()}
-              isLoading={isLoading}
-              variant="brand"
-              size="md"
-              radius="fiverr"
-              className="w-full sm:w-auto sm:flex-1"
-            >
-              {isLoading ? 'Submitting...' : 'Submit Request'}
-            </Button>
+            {error && <p className="text-xs text-red-500 font-medium mt-1 font-sf-pro">{error}</p>}
           </div>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 };
 
@@ -127,8 +109,6 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
   const [reason, setReason] = useState('');
   const [error, setError] = useState('');
 
-  if (!isOpen) return null;
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const parsedDays = parseInt(days, 10);
@@ -145,38 +125,48 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn select-none"
-      onClick={() => !isLoading && onClose()}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Request Delivery Extension"
+      isLoading={isLoading}
+      footer={
+        <>
+          <Button
+            type="button"
+            variant="soft"
+            size="md"
+            radius="fiverr"
+            onClick={onClose}
+            disabled={isLoading}
+            className="cursor-pointer"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="dark"
+            size="md"
+            radius="fiverr"
+            onClick={handleSubmit}
+            disabled={isLoading || !reason.trim()}
+            isLoading={isLoading}
+            loadingText="Submitting..."
+            className="cursor-pointer"
+          >
+            Submit Extension
+          </Button>
+        </>
+      }
     >
-      <div
-        className="bg-white rounded-[6px] max-w-lg w-full max-h-[calc(100dvh-2rem)] flex flex-col overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-100 relative"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          radius="full"
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer w-8 h-8 min-h-[32px] p-0"
-          onClick={onClose}
-          disabled={isLoading}
-          icon={<X size={20} />}
-        />
-
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-[6px] bg-white text-amber-600 flex items-center justify-center border border-[rgba(0, 0, 0, 0.10)] shrink-0">
-            <Calendar size={24} strokeWidth={2} />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-slate-900">Request Delivery Extension</h3>
-            <p className="text-xs text-slate-500">Request extra time from the buyer</p>
-          </div>
-        </div>
+      <div className="flex flex-col gap-4">
+        <p className="text-xs sm:text-sm text-slate-500 font-sf-pro">
+          Request extra time from the buyer
+        </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5 block">
+            <label className="text-xs sm:text-[13px] font-semibold text-gray-700 mb-1.5 block font-sf-pro">
               Additional Delivery Days
             </label>
             <input
@@ -185,12 +175,12 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
               placeholder="e.g. 2"
               value={days}
               onChange={(e) => setDays(e.target.value)}
-              className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white outline-none text-gray-900 text-sm placeholder:text-[#868686] placeholder:font-normal transition-colors"
+              className="w-full h-10 px-3.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white outline-none text-gray-900 text-sm placeholder:text-[#868686] placeholder:font-normal transition-colors font-sf-pro"
             />
           </div>
 
           <div>
-            <label className="text-xs sm:text-[13px] font-medium text-gray-700 mb-1.5 block">
+            <label className="text-xs sm:text-[13px] font-semibold text-gray-700 mb-1.5 block font-sf-pro">
               Reason for Extension
             </label>
             <textarea
@@ -198,38 +188,14 @@ export const ExtensionModal: React.FC<ExtensionModalProps> = ({
               placeholder="Explain why extra time is needed..."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white outline-none text-gray-900 text-sm placeholder:text-[#868686] placeholder:font-normal resize-y transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-[6px] bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white outline-none text-gray-900 text-sm placeholder:text-[#868686] placeholder:font-normal resize-y transition-colors font-sf-pro"
             />
           </div>
 
-          {error && <p className="text-xs text-red-500 font-medium">{error}</p>}
-
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="md"
-              radius="fiverr"
-              className="w-full sm:w-auto sm:flex-1 text-center"
-              onClick={onClose}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isLoading || !reason.trim()}
-              isLoading={isLoading}
-              variant="brand"
-              size="md"
-              radius="fiverr"
-              className="w-full sm:w-auto sm:flex-1"
-            >
-              {isLoading ? 'Submitting...' : 'Submit Extension'}
-            </Button>
-          </div>
+          {error && <p className="text-xs text-red-500 font-medium font-sf-pro">{error}</p>}
         </form>
       </div>
-    </div>
+    </Modal>
   );
 };
+

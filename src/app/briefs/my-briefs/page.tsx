@@ -554,7 +554,7 @@ const MyBriefs = () => {
                         </div>
                         <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-400 mt-1">
                           <span>Posted {moment(brief.createdAt).fromNow()}</span>
-                          <span>{workType}</span>
+                          {/* <span>{workType}</span> */}
 
 
                           {isClosed && (
@@ -593,10 +593,10 @@ const MyBriefs = () => {
                             variant="ghost"
                             size="icon"
                             radius="full"
-                            className="w-8 h-8 text-slate-400 hover:text-slate-700 hover:bg-slate-100 border-none shadow-none"
+                            className="w-8 h-8 !p-0 aspect-square text-[#292929] hover:text-slate-700 hover:bg-slate-100 border-none shadow-none shrink-0"
                             title="Options"
                           >
-                            <FiMoreVertical className="text-base" />
+                            <FiMoreVertical className="w-4 h-4 text-[#292929]" />
                           </Button>
 
                           {/* Dropdown Menu */}
@@ -618,8 +618,8 @@ const MyBriefs = () => {
                                     setOpenMenuId(null);
                                     setEditingBrief(brief);
                                   }}
-                                  leftIcon={<FiEdit3 className="text-slate-400 group-hover:text-teal-700" />}
-                                  className="group !justify-start text-left px-3.5 py-2 text-xs font-medium text-gray-700 hover:bg-teal-50/70 hover:text-teal-800 border-none shadow-none h-auto min-h-0 transition-colors"
+                                  leftIcon={<FiEdit3 className="text-[#292929] group-hover:text-teal-700" />}
+                                  className="group !justify-start text-left px-3.5 py-2 text-xs font-medium text-[#292929] hover:bg-teal-50/70 hover:text-teal-800 border-none shadow-none h-auto min-h-0 transition-colors"
                                 >
                                   Edit
                                 </Button>
@@ -636,8 +636,8 @@ const MyBriefs = () => {
                                     setOpenMenuId(null);
                                     closeMutation.mutate(brief._id || brief.id);
                                   }}
-                                  leftIcon={<FiXCircle className="text-amber-500" />}
-                                  className="!justify-start text-left px-3.5 py-2 text-xs font-medium text-amber-700 hover:bg-amber-50 border-none shadow-none h-auto min-h-0 transition-colors"
+                                  leftIcon={<FiXCircle className="text-[#292929]" />}
+                                  className="!justify-start text-left px-3.5 py-2 text-xs font-medium text-[#292929] hover:bg-amber-50 border-none shadow-none h-auto min-h-0 transition-colors"
                                 >
                                   Inactive
                                 </Button>
@@ -731,7 +731,7 @@ const MyBriefs = () => {
                     </div>
 
                     {/* Right: View Details Link */}
-                    <div className="flex items-center gap-1 text-xs sm:text-sm font-bold text-[#0D9488] group-hover:underline">
+                    <div className="flex items-center gap-1 text-xs sm:text-sm font-bold text-[#0D9488] ">
                       <span>View Details</span>
                       <FiArrowRight className="text-sm group-hover:translate-x-0.5 transition-transform" />
                     </div>

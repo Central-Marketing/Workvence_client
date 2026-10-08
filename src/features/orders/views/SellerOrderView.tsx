@@ -26,7 +26,7 @@ import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
 import generateImageURL from "@/utils/generateImageURL";
 import { ExtensionModal } from "@/components";
-import { Breadcrumb, Button, Tag } from "@/components/ui";
+import { Breadcrumb, Button, Tag, Modal } from "@/components/ui";
 import { useUserStore } from "@/store/userStore";
 import { SellerReviewReply } from "@/features/reviews";
 import { NormalizedOrder } from "../types";
@@ -1068,140 +1068,126 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
       </div>
 
       {/* DELIVER WORK MODAL */}
-      {showDeliverModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn"
-          onClick={() => !isSubmittingDelivery && setShowDeliverModal(false)}
-        >
-          <div
-            className="bg-white rounded-[6px] max-w-xl w-full max-h-[calc(100dvh-2rem)] flex flex-col overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-100 relative"
-            onClick={(e) => e.stopPropagation()}
-          >
+      <Modal
+        isOpen={showDeliverModal}
+        onClose={() => !isSubmittingDelivery && setShowDeliverModal(false)}
+        title="Deliver Your Work"
+        isLoading={isSubmittingDelivery}
+        footer={
+          <>
             <Button
               type="button"
-              variant="ghost"
-              size="icon"
-              radius="full"
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors disabled:opacity-50 cursor-pointer w-8 h-8 min-h-[32px]"
-              onClick={() => setShowDeliverModal(false)}
+              variant="soft"
+              size="md"
+              radius="fiverr"
               disabled={isSubmittingDelivery}
-              icon={<FiX size={20} />}
-            />
+              onClick={() => setShowDeliverModal(false)}
+              className="cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="deliver-work-form"
+              variant="dark"
+              size="md"
+              radius="fiverr"
+              disabled={isSubmittingDelivery || isUploading}
+              isLoading={isSubmittingDelivery}
+              loadingText="Sending Delivery..."
+              className="cursor-pointer font-bold"
+            >
+              Send Delivery
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-xs sm:text-sm text-slate-500 font-sf-pro">
+            Attach deliverables and add completion notes for the buyer
+          </p>
 
-            <div className="flex items-center gap-3 mb-5">
-              <div>
-                <h3 className="text-xl font-bold text-slate-900">Deliver Your Work</h3>
-                <p className="text-xs text-slate-500">Attach deliverables and add completion notes for the buyer</p>
-              </div>
+          <form id="deliver-work-form" onSubmit={handleSubmitDelivery} className="space-y-4">
+            <div>
+              <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5 font-sf-pro">
+                Delivery Notes / Message
+              </label>
+              <textarea
+                rows={4}
+                placeholder="Describe what you completed, instructions, or notes for the buyer..."
+                value={deliveryNotes}
+                onChange={(e) => setDeliveryNotes(e.target.value)}
+                className="w-full bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors resize-y font-sf-pro"
+              />
             </div>
 
-            <form onSubmit={handleSubmitDelivery} className="space-y-4">
-              <div>
-                <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5">
-                  Delivery Notes / Message
-                </label>
-                <textarea
-                  rows={4}
-                  placeholder="Describe what you completed, instructions, or notes for the buyer..."
-                  value={deliveryNotes}
-                  onChange={(e) => setDeliveryNotes(e.target.value)}
-                  className="w-full bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors resize-y"
-                />
-              </div>
+            {/* Upload Files Section */}
+            <div>
+              <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5 font-sf-pro">
+                Attach Deliverable Files
+              </label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="md"
+                radius="xl"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="w-full py-4 h-auto min-h-[100px] border-2 border-dashed border-slate-200 hover:border-emerald-400 bg-slate-50 hover:bg-emerald-50/50 transition-colors flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
+              >
+                <FiUploadCloud className="text-2xl text-slate-400" />
+                <span className="text-xs font-semibold text-slate-700 font-sf-pro">
+                  {isUploading ? "Uploading files..." : "Click to browse and upload files"}
+                </span>
+                <span className="text-[11px] text-slate-400 font-normal font-sf-pro">ZIP, PNG, PDF, JPG, or design files</span>
+              </Button>
 
-              {/* Upload Files Section */}
-              <div>
-                <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5">
-                  Attach Deliverable Files
-                </label>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="md"
-                  radius="xl"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="w-full py-4 h-auto min-h-[100px] border-2 border-dashed border-slate-200 hover:border-emerald-400 bg-slate-50 hover:bg-emerald-50/50 transition-colors flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
-                >
-                  <FiUploadCloud className="text-2xl text-slate-400" />
-                  <span className="text-xs font-semibold text-slate-700">
-                    {isUploading ? "Uploading files..." : "Click to browse and upload files"}
-                  </span>
-                  <span className="text-[11px] text-slate-400 font-normal">ZIP, PNG, PDF, JPG, or design files</span>
-                </Button>
-
-                {/* Uploaded files preview list */}
-                {uploadedFiles.length > 0 && (
-                  <div className="mt-3 space-y-2">
-                    {uploadedFiles.map((f, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between p-2.5 rounded-[6px] bg-slate-50 border border-slate-200 text-xs"
-                      >
-                        <span className="font-semibold text-slate-800 truncate max-w-[240px] sm:max-w-[280px]">{f.name}</span>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-slate-400">{f.size}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveFile(i)}
-                            className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-colors cursor-pointer"
-                            title="Remove attachment"
-                            aria-label={`Remove ${f.name}`}
-                          >
-                            <FiX size={15} />
-                          </button>
-                        </div>
+              {/* Uploaded files preview list */}
+              {uploadedFiles.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {uploadedFiles.map((f, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between p-2.5 rounded-[6px] bg-slate-50 border border-slate-200 text-xs font-sf-pro"
+                    >
+                      <span className="font-semibold text-slate-800 truncate max-w-[240px] sm:max-w-[280px]">{f.name}</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-slate-400">{f.size}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFile(i)}
+                          className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-colors cursor-pointer"
+                          title="Remove attachment"
+                          aria-label={`Remove ${f.name}`}
+                        >
+                          <FiX size={15} />
+                        </button>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Warning if no attachment added */}
-              {uploadedFiles.length === 0 && (
-                <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-[6px] bg-[rgba(239, 252, 250, 0.50)] border border-[rgba(0, 0, 0, 0.10)] text-amber-800 text-xs">
-                  <FiAlertCircle className="text-amber-600 text-base shrink-0" />
-                  <span>
-                    No attachments added. Please make sure to attach your deliverables before sending delivery.
-                  </span>
+                    </div>
+                  ))}
                 </div>
               )}
+            </div>
 
-              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 pt-3">
-                <Button
-                  type="button"
-                  variant="soft"
-                  size="md"
-                  radius="fiverr"
-                  disabled={isSubmittingDelivery}
-                  onClick={() => setShowDeliverModal(false)}
-                  className="w-full sm:w-auto sm:flex-1 font-semibold text-center"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="dark"
-                  size="md"
-                  radius="fiverr"
-                  disabled={isSubmittingDelivery || isUploading}
-                  isLoading={isSubmittingDelivery}
-                  className="w-full sm:w-auto sm:flex-1 font-bold shadow-md"
-                >
-                  Send Delivery
-                </Button>
+            {/* Warning if no attachment added */}
+            {uploadedFiles.length === 0 && (
+              <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-[6px] bg-[rgba(239, 252, 250, 0.50)] border border-[rgba(0, 0, 0, 0.10)] text-amber-800 text-xs font-sf-pro">
+                <FiAlertCircle className="text-amber-600 text-base shrink-0" />
+                <span>
+                  No attachments added. Please make sure to attach your deliverables before sending delivery.
+                </span>
               </div>
-            </form>
-          </div>
+            )}
+          </form>
         </div>
-      )}
+      </Modal>
 
       {/* EXTENSION MODAL */}
       <ExtensionModal

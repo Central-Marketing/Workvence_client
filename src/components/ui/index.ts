@@ -20,3 +20,5 @@ export type { TagProps, TagVariant, TagSize } from './Tag';
 export * from './AccountStanding';
 export { default as AIPolishButton } from './AIPolishButton/AIPolishButton';
 export type { AIPolishButtonProps } from './AIPolishButton/AIPolishButton';
+export { Modal, default as ModalComponent } from './Modal';
+export type { ModalProps } from './Modal';

@@ -705,7 +705,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
             </Link>
             <Link
               href="/briefs/my-proposals"
-              className="px-5 py-2.5 rounded-[6px] bg-teal-50 hover:bg-teal-100 text-[#0D6D5F] border border-teal-200 text-xs sm:text-[13px] font-semibold transition-colors"
+              className="px-5 py-2.5 rounded-[6px] bg-white hover:bg-[#E5E5E5] text-[#000000] border border-[rgba(0,0,0,0.10)] text-xs sm:text-[13px] font-semibold transition-colors"
             >
               My Proposals
             </Link>

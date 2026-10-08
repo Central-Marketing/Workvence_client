@@ -126,12 +126,42 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       }
 
       const hasCustomHeight = userTokens.some((t) => t.startsWith("h-") || t.startsWith("!h-"));
+      const hasCustomWidth = userTokens.some((t) => t.startsWith("w-") || t.startsWith("!w-"));
+      const hasCustomPadding = userTokens.some(
+        (t) =>
+          t.startsWith("p-") ||
+          t.startsWith("!p-") ||
+          t.startsWith("px-") ||
+          t.startsWith("!px-") ||
+          t.startsWith("py-") ||
+          t.startsWith("!py-")
+      );
       const hasCustomTextSize = userTokens.some((t) => isNonColorTextToken(t));
-      if (hasCustomHeight || hasCustomTextSize) {
+
+      if (hasCustomHeight || hasCustomWidth || hasCustomPadding || hasCustomTextSize) {
         effectiveSizeClasses = effectiveSizeClasses
           .split(/\s+/)
           .filter((t) => {
-            if (hasCustomHeight && (t.startsWith("h-") || t.startsWith("!h-") || t.startsWith("min-h-") || t.startsWith("!min-h-"))) return false;
+            if (
+              hasCustomHeight &&
+              (t.startsWith("h-") || t.startsWith("!h-") || t.startsWith("min-h-") || t.startsWith("!min-h-"))
+            )
+              return false;
+            if (
+              hasCustomWidth &&
+              (t.startsWith("w-") || t.startsWith("!w-") || t.startsWith("min-w-") || t.startsWith("!min-w-"))
+            )
+              return false;
+            if (
+              hasCustomPadding &&
+              (t.startsWith("p-") ||
+                t.startsWith("!p-") ||
+                t.startsWith("px-") ||
+                t.startsWith("!px-") ||
+                t.startsWith("py-") ||
+                t.startsWith("!py-"))
+            )
+              return false;
             if (hasCustomTextSize && isNonColorTextToken(t)) return false;
             return true;
           })

@@ -2,19 +2,13 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  FiCalendar,
-  FiFileText,
-  FiX,
-  FiSearch,
-  FiArrowLeft,
-} from "react-icons/fi";
+import { FiArrowLeft, FiFileText } from "react-icons/fi";
 import { RiSearchLine } from "react-icons/ri";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Loader, Button } from "@/components";
-import { Breadcrumb, Tag } from "@/components/ui";
+import { Breadcrumb, Tag, Modal } from "@/components/ui";
 
 type FilterTab = "priority" | "active" | "late" | "delivered" | "completed" | "cancelled" | "starred";
 
@@ -643,61 +637,45 @@ export default function ContactOrdersPage() {
       </div>
 
       {/* Notes Modal Popup */}
-      {activeNotesOrder && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-[6px] max-w-md w-full p-6 shadow-xl border border-slate-100 relative animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
-              <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
-                <FiFileText className="text-teal-600" />
-                Order Requirements & Notes
-              </h3>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                radius="full"
-                onClick={() => setActiveNotesOrder(null)}
-                className="w-8 h-8 text-slate-400 hover:text-slate-700 border-none shadow-none"
-              >
-                <FiX className="text-lg" />
-              </Button>
+      <Modal
+        isOpen={Boolean(activeNotesOrder)}
+        onClose={() => setActiveNotesOrder(null)}
+        title="Order Requirements & Notes"
+        footer={
+          <Button
+            type="button"
+            onClick={() => setActiveNotesOrder(null)}
+            variant="soft"
+            size="md"
+            radius="fiverr"
+          >
+            Close
+          </Button>
+        }
+      >
+        {activeNotesOrder && (
+          <div className="space-y-4 text-left">
+            <div>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Project</p>
+              <p className="text-sm font-medium text-slate-800">{activeNotesOrder.projectTitle}</p>
             </div>
 
-            <div className="space-y-3">
-              <div>
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Project</p>
-                <p className="text-sm font-medium text-slate-800">{activeNotesOrder.projectTitle}</p>
-              </div>
-
-              <div>
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-                  {isSeller ? "Buyer" : "Seller"}
-                </p>
-                <p className="text-sm text-slate-700">{activeNotesOrder.sellerOrBuyerName}</p>
-              </div>
-
-              <div>
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Note / Instructions</p>
-                <div className="p-3.5 bg-slate-50 rounded-[6px] border border-slate-100 text-xs sm:text-sm text-slate-700 leading-relaxed max-h-48 overflow-y-auto whitespace-pre-wrap">
-                  {activeNotesOrder.notes}
-                </div>
-              </div>
+            <div>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                {isSeller ? "Buyer" : "Seller"}
+              </p>
+              <p className="text-sm text-slate-700">{activeNotesOrder.sellerOrBuyerName}</p>
             </div>
 
-            <div className="mt-6 flex justify-end">
-              <Button
-                type="button"
-                onClick={() => setActiveNotesOrder(null)}
-                variant="dark"
-                size="md"
-                radius="fiverr"
-              >
-                Close
-              </Button>
+            <div>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Note / Instructions</p>
+              <div className="p-3.5 bg-slate-50 rounded-[6px] border border-slate-100 text-xs sm:text-sm text-slate-700 leading-relaxed max-h-56 overflow-y-auto whitespace-pre-wrap">
+                {activeNotesOrder.notes}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 }

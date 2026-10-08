@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Clock, AlertCircle, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui";
+import { Loader2 } from "lucide-react";
+import { Button, Modal } from "@/components/ui";
 
 interface DeclineExtensionModalProps {
   isOpen: boolean;
@@ -28,56 +28,63 @@ export const DeclineExtensionModal: React.FC<DeclineExtensionModalProps> = ({
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onConfirm(reason.trim());
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn select-none"
-      onClick={() => !isLoading && onClose()}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Decline Extension Request"
+      isLoading={isLoading}
+      footer={
+        <>
+          <Button
+            type="button"
+            variant="soft"
+            size="md"
+            radius="fiverr"
+            onClick={onClose}
+            disabled={isLoading}
+            className="cursor-pointer"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="dark"
+            size="md"
+            radius="fiverr"
+            disabled={isLoading}
+            onClick={handleSubmit}
+            className="cursor-pointer"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 size={15} className="animate-spin mr-1.5" />
+                Declining...
+              </>
+            ) : (
+              "Confirm Decline"
+            )}
+          </Button>
+        </>
+      }
     >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="decline-extension-title"
-        className="bg-white rounded-[8px] max-w-lg w-full max-h-[calc(100dvh-2rem)] flex flex-col overflow-y-auto p-6 sm:p-8 shadow-2xl border border-slate-100 relative"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          type="button"
-          onClick={onClose}
-          disabled={isLoading}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 p-1.5 transition-colors disabled:opacity-50 cursor-pointer"
-          aria-label="Close modal"
-        >
-          <X size={18} />
-        </button>
+      <div className="flex flex-col gap-4">
+        <p className="text-sm text-slate-600 font-sf-pro">
+          {extensionDays
+            ? `The seller requested an additional ${extensionDays} day${extensionDays > 1 ? "s" : ""}.`
+            : "The seller requested additional delivery time."}
+        </p>
 
-        <div className="flex items-center gap-3.5 mb-4">
-          <div className="w-12 h-12 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] text-rose-600 flex items-center justify-center  shrink-0">
-            <Clock size={22} strokeWidth={2.2} />
-          </div>
-          <div>
-            <h3 id="decline-extension-title" className="text-xl font-bold text-slate-900 font-inter">
-              Decline Extension Request
-            </h3>
-            <p className="text-xs sm:text-[13px] text-slate-500 font-inter mt-0.5">
-              {extensionDays
-                ? `The seller requested an additional ${extensionDays} day${extensionDays > 1 ? "s" : ""}.`
-                : "The seller requested additional delivery time."}
-            </p>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div>
             <label
               htmlFor="decline-reason"
-              className="block text-xs sm:text-[13px] font-semibold text-slate-700 mb-1.5 font-inter"
+              className="block text-xs sm:text-[13px] font-semibold text-slate-700 mb-1.5 font-sf-pro"
             >
               Reason for declining <span className="text-slate-400 font-normal">(Optional)</span>
             </label>
@@ -89,11 +96,10 @@ export const DeclineExtensionModal: React.FC<DeclineExtensionModalProps> = ({
               onChange={(e) => setReason(e.target.value)}
               placeholder="Please explain why you are declining extra time (e.g., our marketing campaign launches this Friday)..."
               disabled={isLoading}
-              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] p-3 text-xs sm:text-[13px] text-slate-800 placeholder-slate-400 outline-none transition resize-none font-inter"
+              className="w-full bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] p-3 text-xs sm:text-[13px] text-slate-800 placeholder-slate-400 outline-none transition resize-none font-sf-pro"
             />
             <div className="flex items-center justify-between mt-1.5 px-0.5">
-              <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                <AlertCircle size={12} />
+              <span className="text-[11px] text-slate-400">
                 Helps the seller understand your project schedule
               </span>
               <span className="text-[11px] text-slate-400 font-medium">
@@ -101,41 +107,11 @@ export const DeclineExtensionModal: React.FC<DeclineExtensionModalProps> = ({
               </span>
             </div>
           </div>
-
-          <div className="flex items-center justify-end gap-3 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="md"
-              radius="fiverr"
-              onClick={onClose}
-              disabled={isLoading}
-              className="px-5 text-slate-700 font-semibold text-xs sm:text-sm cursor-pointer"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="dark"
-              size="md"
-              radius="fiverr"
-              disabled={isLoading}
-              className=""
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 size={15} className="animate-spin" />
-                  Declining...
-                </>
-              ) : (
-                "Confirm Decline"
-              )}
-            </Button>
-          </div>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 };
 
 export default DeclineExtensionModal;
+

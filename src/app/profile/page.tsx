@@ -14,6 +14,7 @@ import {
   FiX,
   FiExternalLink,
   FiEye,
+  FiSearch,
 } from "react-icons/fi";
 import {
   Briefcase,
@@ -34,6 +35,22 @@ import supportService from "@/utils/supportService";
 import { Loader, KycVerificationForm, Button } from "@/components";
 import { CustomSelect, CustomSelectOption, AccountStandingCard } from "@/components/ui";
 import { calculateProfileCompletion } from "@/features/dashboard";
+import useAdminCategories from "@/hooks/useAdminCategories";
+
+const FALLBACK_CATEGORIES = [
+  "Graphics & Design",
+  "Programming & Tech",
+  "Digital Marketing",
+  "Video & Animation",
+  "Writing & Translation",
+  "Music & Audio",
+  "Business & Consulting",
+  "AI Services & Development",
+  "Data & Analytics",
+  "Photography & Media",
+  "UI/UX & Web Design",
+  "Mobile App Development",
+];
 
 const LANGUAGE_LEVEL_OPTIONS: CustomSelectOption[] = [
   { value: "Basic", label: "Basic" },
@@ -53,6 +70,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
+  const isSeller = Boolean(user?.isSeller || user?.role === "seller");
 
   // Active section tab for navigation
   const [activeSection, setActiveSection] = useState<
@@ -64,6 +82,82 @@ export default function ProfilePage() {
   const [country, setCountry] = useState(user?.country || "");
   const [shortTitle, setShortTitle] = useState(user?.shortTitle || user?.title || "");
   const [description, setDescription] = useState(user?.description || user?.desc || user?.bio || "");
+
+  // Multi-Category state (for seller profile)
+  const { parentCategories } = useAdminCategories();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
+    if (Array.isArray(user?.categories)) return user.categories;
+    if (typeof user?.category === "string" && user.category) return [user.category];
+    return [];
+  });
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [categorySearch, setCategorySearch] = useState("");
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Available categories list
+  const allCategoryNames = useMemo(() => {
+    const list: string[] = [];
+    if (Array.isArray(parentCategories) && parentCategories.length > 0) {
+      parentCategories.forEach((cat) => {
+        const name = typeof cat === "string" ? cat : cat.name || cat.title;
+        if (name && !list.includes(name)) list.push(name);
+      });
+    }
+    FALLBACK_CATEGORIES.forEach((name) => {
+      if (!list.includes(name)) list.push(name);
+    });
+    return list;
+  }, [parentCategories]);
+
+  // Filtered categories for search
+  const filteredCategories = useMemo(() => {
+    if (!categorySearch.trim()) return allCategoryNames;
+    const q = categorySearch.toLowerCase().trim();
+    return allCategoryNames.filter((cat) => cat.toLowerCase().includes(q));
+  }, [allCategoryNames, categorySearch]);
+
+  const toggleCategory = (catName: string) => {
+    setSelectedCategories((prev) => {
+      if (prev.includes(catName)) {
+        return prev.filter((c) => c !== catName);
+      } else {
+        if (prev.length >= 5) {
+          toast.error("You can select up to 5 categories");
+          return prev;
+        }
+        return [...prev, catName];
+      }
+    });
+  };
+
+  const removeCategory = (catName: string) => {
+    setSelectedCategories((prev) => prev.filter((c) => c !== catName));
+  };
+
+  // Close category dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        categoryDropdownRef.current &&
+        !categoryDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+    if (isCategoryDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isCategoryDropdownOpen]);
+
+  // Clear search query when dropdown closes
+  useEffect(() => {
+    if (!isCategoryDropdownOpen) {
+      setCategorySearch("");
+    }
+  }, [isCategoryDropdownOpen]);
 
   // Dedicated Username update states & handler (PATCH /api/users/username)
   const [isEditingUsername, setIsEditingUsername] = useState(false);
@@ -220,6 +314,11 @@ export default function ProfilePage() {
       if (Array.isArray(user.education)) setEducation(user.education);
       if (Array.isArray(user.portfolio)) setPortfolio(user.portfolio);
       if (Array.isArray(user.skills)) setSkillsList(user.skills);
+      if (Array.isArray(user.categories)) {
+        setSelectedCategories(user.categories);
+      } else if (typeof user.category === "string" && user.category) {
+        setSelectedCategories([user.category]);
+      }
       if (user.username && !isEditingUsername) setNewUsername(user.username);
     }
   }, [user, isEditingUsername]);
@@ -401,6 +500,7 @@ export default function ProfilePage() {
       shortTitle,
       description,
       skills: skillsList,
+      categories: selectedCategories,
       languages,
       experience,
       education,
@@ -414,6 +514,7 @@ export default function ProfilePage() {
     shortTitle,
     description,
     skillsList,
+    selectedCategories,
     languages,
     experience,
     education,
@@ -424,6 +525,7 @@ export default function ProfilePage() {
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setIsUpdating(true);
+    let payload: any = {};
 
     try {
       let imageUrl = user?.image;
@@ -456,7 +558,7 @@ export default function ProfilePage() {
         (p: any) => p && p.title && p.title.trim() !== "" && p.image && p.image.trim() !== ""
       );
 
-      const payload: any = {
+      payload = {
         image: imageUrl,
         phone,
         country: getCountryShortName(country),
@@ -469,10 +571,29 @@ export default function ProfilePage() {
         portfolio: validPortfolio,
       };
 
+      if (isSeller) {
+        if (selectedCategories.length > 5) {
+          toast.error("You can select a maximum of 5 categories");
+          setIsUpdating(false);
+          return;
+        }
+        payload.categories = selectedCategories;
+      }
+
       const { data } = await axiosFetch.patch("/users", payload);
 
+      if (isSeller) {
+        // Also sync seller categories via auth/me endpoint to guarantee persistence
+        axiosFetch.patch("/auth/me", { categories: selectedCategories }).catch(() => null);
+      }
+
       if (!data.error) {
-        const updatedUser = { ...user, ...data.user, coverImage: coverImageUrl };
+        const updatedUser = {
+          ...user,
+          ...data.user,
+          ...(isSeller ? { categories: selectedCategories } : {}),
+          coverImage: coverImageUrl,
+        };
         setUser(updatedUser);
         if (typeof window !== "undefined") {
           localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -485,6 +606,38 @@ export default function ProfilePage() {
         toast.error(data.message || "Failed to update profile");
       }
     } catch (err: any) {
+      const errMsg = String(err?.response?.data?.message || "");
+      if (
+        isSeller &&
+        (errMsg.includes("categories should not exist") ||
+          errMsg.includes("property categories should not exist"))
+      ) {
+        try {
+          delete payload.categories;
+          const { data } = await axiosFetch.patch("/users", payload);
+          await axiosFetch.patch("/auth/me", { categories: selectedCategories }).catch(() => null);
+          const updatedUser = {
+            ...user,
+            ...data.user,
+            categories: selectedCategories,
+            coverImage: coverImageUrl,
+          };
+          setUser(updatedUser);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+            if (coverImageUrl) {
+              localStorage.setItem("user_cover_image", coverImageUrl);
+            }
+          }
+          toast.success("Profile updated successfully!");
+          return;
+        } catch (innerErr: any) {
+          toast.error(
+            innerErr.response?.data?.message || innerErr.message || "Failed to update profile"
+          );
+          return;
+        }
+      }
       toast.error(err.response?.data?.message || err.message || "Failed to update profile");
     } finally {
       setIsUpdating(false);
@@ -507,8 +660,6 @@ export default function ProfilePage() {
       });
     }
   };
-
-  const isSeller = Boolean(user?.isSeller || user?.role === "seller");
 
   // Sync active section based on scroll position
   useEffect(() => {
@@ -978,18 +1129,113 @@ export default function ProfilePage() {
             </Button>
           </div>
 
-          {/* Professional Title */}
-          <div className="mb-5">
-            <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5">
-              Professional Title
-            </label>
-            <input
-              type="text"
-              value={shortTitle}
-              onChange={(e) => setShortTitle(e.target.value)}
-              placeholder="e.g Expert Digital Marketer & Specialist"
-              className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
-            />
+          {/* Professional Title & Categories (Categories for Sellers only) */}
+          <div className={`grid grid-cols-1 ${isSeller ? "sm:grid-cols-2" : ""} gap-5 mb-5`}>
+            <div>
+              <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5">
+                Professional Title
+              </label>
+              <input
+                type="text"
+                value={shortTitle}
+                onChange={(e) => setShortTitle(e.target.value)}
+                placeholder="e.g Expert Digital Marketer & Specialist"
+                className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors"
+              />
+            </div>
+
+            {isSeller && (
+              <div className="relative" ref={categoryDropdownRef}>
+                <label className="text-xs sm:text-[13px] font-medium text-gray-700 block mb-1.5">
+                  Categories <span className="text-slate-400 font-normal text-[11px]">(Max 5)</span>
+                </label>
+
+                {/* Multi-Select Dropdown Trigger */}
+                <button
+                  type="button"
+                  onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
+                  className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] hover:border-gray-300 focus:border-[#0D6D5F] focus:bg-white rounded-[6px] text-sm text-gray-900 flex items-center justify-between outline-none transition-colors cursor-pointer"
+                >
+                  <span className={selectedCategories.length === 0 ? "text-[#868686]" : "text-gray-900 font-medium truncate pr-2"}>
+                    {selectedCategories.length === 0
+                      ? "Select categories (max 5)..."
+                      : `${selectedCategories.length} / 5 categories selected`}
+                  </span>
+                  <FiChevronDown
+                    className={`w-4 h-4 text-gray-500 shrink-0 transition-transform duration-200 ${isCategoryDropdownOpen ? "rotate-180" : ""
+                      }`}
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isCategoryDropdownOpen && (
+                  <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-[6px] shadow-lg z-50 p-2 max-h-60 overflow-y-auto">
+                    <div className="relative mb-2">
+                      <FiSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
+                      <input
+                        type="text"
+                        value={categorySearch}
+                        onChange={(e) => setCategorySearch(e.target.value)}
+                        placeholder="Search category..."
+                        className="w-full pl-7 pr-2.5 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-[4px] outline-none focus:border-[#0D6D5F] text-slate-800 placeholder:text-slate-400"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="space-y-0.5">
+                      {filteredCategories.length > 0 ? (
+                        filteredCategories.map((catName) => {
+                          const isSelected = selectedCategories.includes(catName);
+                          const isMaxReached = selectedCategories.length >= 5 && !isSelected;
+                          return (
+                            <button
+                              key={catName}
+                              type="button"
+                              onClick={() => toggleCategory(catName)}
+                              className={`w-full text-left px-2.5 py-2 rounded-[4px] text-xs flex items-center justify-between transition-colors cursor-pointer ${isSelected
+                                ? "bg-[#0D6D5F]/10 text-[#0D6D5F] font-semibold"
+                                : isMaxReached
+                                  ? "text-slate-400 opacity-60 hover:bg-slate-50"
+                                  : "text-slate-700 hover:bg-slate-50"
+                                }`}
+                            >
+                              <span className="truncate pr-2">{catName}</span>
+                              {isSelected && <FiCheck className="w-3.5 h-3.5 text-[#0D6D5F] shrink-0" />}
+                            </button>
+                          );
+                        })
+                      ) : (
+                        <p className="text-xs text-slate-400 py-2 text-center">No categories found</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Selected Category Tags Display */}
+                {selectedCategories.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                    {selectedCategories.map((cat) => (
+                      <span
+                        key={cat}
+                        className="bg-[#F1F3F5] text-slate-700 text-xs font-medium px-3 py-1.5 rounded-[6px] border border-slate-200/60 inline-flex items-center gap-1.5"
+                      >
+                        <span>{cat}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeCategory(cat)}
+                          className="text-slate-400 hover:text-slate-700 w-3.5 h-3.5 inline-flex items-center justify-center cursor-pointer"
+                          title={`Remove ${cat}`}
+                        >
+                          <FiX className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Select up to 5 categories that describe your professional services.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Bio */}

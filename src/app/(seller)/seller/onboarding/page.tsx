@@ -67,6 +67,10 @@ export default function SellerOnboardingPage() {
       if (prev.includes(catName)) {
         return prev.filter((item) => item !== catName);
       } else {
+        if (prev.length >= 5) {
+          toast.error("You can select up to 5 categories");
+          return prev;
+        }
         return [...prev, catName];
       }
     });
@@ -76,6 +80,11 @@ export default function SellerOnboardingPage() {
   const handleSubmit = async () => {
     if (selectedCategories.length === 0) {
       toast.error("Please select at least one category to proceed");
+      return;
+    }
+
+    if (selectedCategories.length > 5) {
+      toast.error("You can select a maximum of 5 categories");
       return;
     }
 
@@ -167,8 +176,7 @@ export default function SellerOnboardingPage() {
             Select your service categories
           </h2>
           <p className="text-xs sm:text-sm text-gray-500 mt-1 mb-8">
-            Choose at least one category to set up your seller workspace. You
-            can pick multiple.
+            Choose between 1 and 5 categories that describe your craft and services.
           </p>
 
           {/* Category Pills */}
@@ -185,22 +193,27 @@ export default function SellerOnboardingPage() {
             <div className="flex flex-wrap gap-2.5 sm:gap-3">
               {categoryNames.map((catName) => {
                 const isSelected = selectedCategories.includes(catName);
+                const isMaxReached = selectedCategories.length >= 5 && !isSelected;
                 return (
                   <button
                     key={catName}
                     type="button"
                     onClick={() => toggleCategory(catName)}
-                    className={`group inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-medium transition-all duration-150 cursor-pointer ${isSelected
-                      ? "bg-[#F0FDF4] border-[#0D6D5F] text-[#0D6D5F] shadow-xs"
-                      : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50/70"
-                      }`}
+                    className={`group inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-medium transition-all duration-150 cursor-pointer ${
+                      isSelected
+                        ? "bg-[#F0FDF4] border-[#0D6D5F] text-[#0D6D5F] shadow-xs"
+                        : isMaxReached
+                        ? "bg-white border-gray-200 text-gray-400 hover:border-gray-200 opacity-60"
+                        : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50/70"
+                    }`}
                   >
                     {/* Check / Radio Circle */}
                     <span
-                      className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 transition-colors ${isSelected
-                        ? "bg-[#0D6D5F] text-white"
-                        : "border border-gray-300 group-hover:border-gray-400 bg-white"
-                        }`}
+                      className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                        isSelected
+                          ? "bg-[#0D6D5F] text-white"
+                          : "border border-gray-300 group-hover:border-gray-400 bg-white"
+                      }`}
                     >
                       {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                     </span>
@@ -221,12 +234,12 @@ export default function SellerOnboardingPage() {
             {selectedCategories.length === 0 ? (
               <span className="text-amber-600 flex items-center gap-1.5">
                 <AlertCircle className="w-4 h-4 shrink-0" />
-                Select at least 1 category to continue
+                Select at least 1 category to continue (max 5)
               </span>
             ) : (
               <span className="text-[#0D6D5F] flex items-center gap-1.5">
                 <Check className="w-4 h-4 shrink-0" />
-                {selectedCategories.length}{" "}
+                {selectedCategories.length} / 5{" "}
                 {selectedCategories.length === 1
                   ? "category selected"
                   : "categories selected"}

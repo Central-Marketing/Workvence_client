@@ -1109,7 +1109,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                       </span>
                     </div>
                     <div className="flex items-center justify-between px-5 py-2.5 bg-rose-50/70 border-t border-rose-200/50 text-xs">
-                      <span className="text-rose-900 font-medium">Refund Awarded to Buyer</span>
+                      <span className="text-rose-900 font-medium">Refund to Buyer</span>
                       <span className="text-rose-700 font-bold">
                         -${Number(order.raw.refundedAmount).toFixed(2)}
                       </span>

@@ -797,14 +797,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     <h3 className="text-xl font-bold text-[#292929] font-inter">
                       {isAlreadyReviewed ? "Share Feedback and Reviews" : "Share Feedback & Review"}
                     </h3>
-                    {!isAlreadyReviewed && reviewDeadline && !isReviewDeadlinePassed && (
-                      <div className="mt-1 flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200/80 px-2.5 py-0.5 rounded-[4px] font-medium w-fit">
-                        <FiClock className="w-3.5 h-3.5 text-amber-600" />
-                        <span>
-                          Review deadline: {moment(reviewDeadline).isValid() ? moment(reviewDeadline).format("MMM D, YYYY [at] h:mm A") : String(reviewDeadline)}
-                        </span>
-                      </div>
-                    )}
+
                   </div>
                   <div className="flex items-center gap-1.5 px-3 py-1 bg-[#EDEDED] border border-[#C7C7C7] rounded-[6px] text-base font-semibold text-slate-700">
                     <span className="text-[#292929]">Total</span>

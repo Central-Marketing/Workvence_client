@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Pdf01Icon, File02Icon } from "@hugeicons/core-free-icons";
 import supportService from "@/utils/supportService";
 import { formatFileNameWithExtension } from "../../utils/chatMediaHelpers";
 
@@ -178,8 +180,12 @@ export const MessageAttachment: React.FC<MessageAttachmentProps> = ({
       }`}
       title="Click to open file in a new tab"
     >
-      <div className="w-8 h-8 rounded-[6px] bg-white flex items-center justify-center text-base shadow-2xs shrink-0 group-hover:scale-105 transition-transform">
-        {isPdf ? "📕" : "📄"}
+      <div className="w-8 h-8 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-105 transition-transform">
+        {isPdf ? (
+          <HugeiconsIcon icon={Pdf01Icon} size={18} className="text-rose-500" />
+        ) : (
+          <HugeiconsIcon icon={File02Icon} size={18} className="text-[#0D6D5F]" />
+        )}
       </div>
       <div className="flex flex-col min-w-0 flex-1">
         <span className="truncate text-slate-900 text-[12.5px] font-medium leading-tight group-hover:text-[#327C73] transition-colors">

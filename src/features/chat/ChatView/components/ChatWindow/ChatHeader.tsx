@@ -223,30 +223,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 
           {/* Actions */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-1 sm:ml-2">
-            {/* Create Offer - Visible on desktop, moved to 3-dots drawer on mobile */}
-            {user?.isSeller && (
-              <Button
-                type="button"
-                variant="dark"
-                size="md"
-                radius="fiverr"
-                onClick={() => {
-                  if (user?.isSuspended) {
-                    toast.error(
-                      "Account is suspended. You cannot send custom offers during restricted fulfillment mode."
-                    );
-                    return;
-                  }
-                  onOpenOfferModal();
-                }}
-                disabled={Boolean(user?.isSuspended)}
-                className={`hidden xl:inline-flex h-10 text-[16px] font-semibold px-4 whitespace-nowrap shrink-0 ${
-                  user?.isSuspended ? "opacity-60 cursor-not-allowed" : ""
-                }`}
-              >
-                {user?.isSuspended ? "Offer Restricted" : "Create Offer"}
-              </Button>
-            )}
+
 
             {/* Video Meeting */}
             <Button
@@ -294,12 +271,11 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 variant="ghost"
                 size="icon"
                 radius="lg"
-                className={`hidden sm:inline-flex w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] sm:rounded-[6px] transition-colors shrink-0 ${
-                  isTagPopoverOpen ||
-                  (activeConversation?.tags && activeConversation.tags.length > 0)
+                className={`hidden sm:inline-flex w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] sm:rounded-[6px] transition-colors shrink-0 ${isTagPopoverOpen ||
+                    (activeConversation?.tags && activeConversation.tags.length > 0)
                     ? " text-[#292929]"
                     : "hover:bg-slate-100 text-slate-600"
-                }`}
+                  }`}
                 onClick={() => setIsTagPopoverOpen(!isTagPopoverOpen)}
                 title="Private Tags"
                 aria-label="Private Tags"
@@ -308,9 +284,9 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               <ConversationTagsManager
                 conversationId={String(
                   activeConversation?.uuid ||
-                    activeConversation?.conversationID ||
-                    activeConversation?._id ||
-                    conversationID
+                  activeConversation?.conversationID ||
+                  activeConversation?._id ||
+                  conversationID
                 )}
                 tags={activeConversation?.tags || []}
                 mode="popover"
@@ -352,6 +328,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 radius="lg"
                 className="w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] sm:rounded-[6px] hover:bg-slate-100 text-slate-600 shrink-0"
                 onClick={() => setIsMsgSearchActive(true)}
+                title="Search messages"
                 aria-label="Search messages"
                 icon={
                   <svg
@@ -376,6 +353,49 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
+                  </svg>
+                }
+              />
+            )}
+
+            {/* Create Offer */}
+            {user?.isSeller && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                radius="lg"
+                onClick={() => {
+                  if (user?.isSuspended) {
+                    toast.error(
+                      "Account is suspended. You cannot send custom offers during restricted fulfillment mode."
+                    );
+                    return;
+                  }
+                  onOpenOfferModal();
+                }}
+                disabled={Boolean(user?.isSuspended)}
+                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-[6px] sm:rounded-[6px] hover:bg-slate-100 text-[#292929] transition-colors shrink-0 ${
+                  user?.isSuspended ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                }`}
+                title={user?.isSuspended ? "Offer Restricted" : "Create Offer"}
+                aria-label="Create Offer"
+                icon={
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#292929"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="12" y1="18" x2="12" y2="12" />
+                    <line x1="9" y1="15" x2="15" y2="15" />
                   </svg>
                 }
               />

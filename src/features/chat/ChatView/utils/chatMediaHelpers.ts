@@ -205,3 +205,16 @@ export const isImageFile = (file: { name: string; url: string }): boolean => {
     (url.includes('cloudinary.com') && url.includes('/image/upload/') && !url.includes('pdf'))
   );
 };
+
+// Check if a file is a PDF
+export const isPdfFile = (file: { name?: string; url?: string }): boolean => {
+  const url = (file?.url || '').toLowerCase();
+  const name = (file?.name || '').toLowerCase();
+  return (
+    url.includes('format=pdf') ||
+    url.includes('.pdf') ||
+    name.endsWith('.pdf') ||
+    /\.pdf($|[?#])/i.test(url)
+  );
+};
+

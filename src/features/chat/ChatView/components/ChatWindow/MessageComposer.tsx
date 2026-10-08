@@ -2,8 +2,11 @@
 
 import React from "react";
 import { RiAddLine } from "react-icons/ri";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Pdf01Icon, File02Icon } from "@hugeicons/core-free-icons";
 import { Loader, Button } from "@/components";
 import { AIPolishButton } from "@/components/ui";
+import { isPdfFile } from "../../utils/chatMediaHelpers";
 
 interface MessageComposerProps {
   attachment: any;
@@ -67,8 +70,12 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
               </span>
             </div>
           ) : (
-            <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 rounded-[6px] flex items-center justify-center font-bold text-xl flex-shrink-0">
-              📄
+            <div className="w-12 h-12 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center flex-shrink-0 shadow-2xs">
+              {isPdfFile({ name: attachment.name, url: attachment.url || attachment.previewUrl }) ? (
+                <HugeiconsIcon icon={Pdf01Icon} size={24} className="text-rose-500" />
+              ) : (
+                <HugeiconsIcon icon={File02Icon} size={24} className="text-[#0D6D5F]" />
+              )}
             </div>
           )}
           <div className="flex-1 min-w-0">

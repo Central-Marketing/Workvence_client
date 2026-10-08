@@ -344,6 +344,10 @@ export const OrderActivityLedgerDrawer: React.FC<OrderActivityLedgerDrawerProps>
       const isDisputed =
         statusLower === "disputed" || statusLower === "escalated_to_dispute";
       const disputeReason =
+        order.disputeSummary ||
+        order.raw?.disputeSummary ||
+        (typeof order.disputeDetails === "string" ? order.disputeDetails : order.disputeDetails?.decisionReason) ||
+        (typeof order.raw?.disputeDetails === "string" ? order.raw?.disputeDetails : order.raw?.disputeDetails?.decisionReason) ||
         order.raw?.disputeReason ||
         order.raw?.dispute?.reason ||
         order.raw?.dispute?.resolution ||

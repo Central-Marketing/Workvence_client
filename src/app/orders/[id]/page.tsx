@@ -58,6 +58,27 @@ export default function OrderDetailPage() {
     },
   });
 
+  // Query for linked dispute or escalated support ticket
+  const { data: linkedTicket } = useQuery({
+    queryKey: ["order-dispute-ticket", id],
+    queryFn: async () => {
+      try {
+        const res = await axiosFetch.get(`/support/tickets?orderID=${id}`).catch(() => null) ||
+                    await axiosFetch.get(`/admin/support/tickets?orderID=${id}`).catch(() => null);
+        const data = res?.data;
+        const list = Array.isArray(data) ? data : data?.tickets || data?.data || [];
+        const found = list.find((t: any) =>
+          (String(t.orderID || t.orderId || t.order?._id || t.order?.id) === String(id)) &&
+          (t.status === 'escalated_to_dispute' || t.disputeID || t.disputeId)
+        );
+        return found || null;
+      } catch {
+        return null;
+      }
+    },
+    staleTime: 10000,
+  });
+
   const activeRawOrder = rawOrder || lastValidOrderRef.current;
 
   // Real-time socket sync
@@ -150,7 +171,16 @@ export default function OrderDetailPage() {
     const packageTitle = o.packageTitle || o.title || o.gigID?.title || o.packageID?.title || "Standard Package";
     const coverImage = o.image || o.cover || o.packageID?.cover || o.packageID?.image || o.gigID?.cover || "/images/dashboard/orders/order_1.jpg";
     const price = typeof o.price === "number" ? o.price : 0;
-    const status = (o.status || "inprogress").toLowerCase();
+    const rawStatus = (o.status || "inprogress").toLowerCase();
+    const isCompleted = rawStatus === "completed" || rawStatus === "complete" || Boolean(o.isCompleted);
+    const isCancelled = rawStatus === "cancelled" || rawStatus === "canceled" || rawStatus === "failed";
+    const isDisputed = !isCompleted && !isCancelled && Boolean(
+      (rawStatus === "disputed" || rawStatus === "escalated_to_dispute") ||
+      (o.escrowStatus && String(o.escrowStatus).toLowerCase() === "disputed") ||
+      (linkedTicket && (linkedTicket.status === 'escalated_to_dispute' || linkedTicket.disputeID))
+    );
+
+    const status = isDisputed ? "disputed" : rawStatus;
     const paymentStatus = o.isPaid || o.status === "paid" || o.status === "delivered" || o.status === "completed"
       ? "Paid"
       : (o.paymentStatus || "Unpaid");
@@ -326,12 +356,22 @@ export default function OrderDetailPage() {
       deliveryText: o.deliveryText || o.deliveryMessage,
       extensionRequest,
       revisionReason: o.revisionReason || o.revision?.reason,
+      disputeSummary: o.disputeSummary || o.raw?.disputeSummary || o.dispute?.summary,
+      disputeDetails:
+        o.disputeDetails ||
+        o.raw?.disputeDetails ||
+        o.dispute?.details ||
+        o.dispute?.decisionReason ||
+        o.raw?.dispute?.decisionReason,
       hasReviewed: Boolean(o.hasReviewed || o.isReviewed || o.review || o.reviewID),
       reviewDeadline: o.reviewDeadline || o.review_deadline || o.raw?.reviewDeadline,
       replyDeadline: o.replyDeadline || o.reply_deadline || o.raw?.replyDeadline,
       isUserSeller,
       isUserBuyer,
-      raw: o,
+      raw: {
+        ...o,
+        supportTicketID: o.supportTicketID || o.supportTicketId || linkedTicket?.id || linkedTicket?._id,
+      },
     };
   }, [activeRawOrder, id, user]);
 

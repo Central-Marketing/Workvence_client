@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   Send,
@@ -18,6 +18,7 @@ import {
   X,
   Upload,
   FileText,
+  CheckCircle2,
 } from "lucide-react";
 import { supportService } from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
@@ -31,14 +32,17 @@ const CATEGORIES = [
   { id: "Platform Feedback", label: "Platform Feedback", icon: Sparkles, desc: "Feature requests, recommendations, or general platform feedback." },
 ];
 
-export default function CreateSupportTicketPage() {
-  const router = useRouter();
+function CreateSupportTicketForm() {
+    const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlOrderId = searchParams?.get("orderId") || "";
+  const urlCategory = searchParams?.get("category") || "";
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [category, setCategory] = useState<string>("Technical Support");
+  const [category, setCategory] = useState<string>(urlCategory || (urlOrderId ? "Payment & Escrow" : "Technical Support"));
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [selectedOrderID, setSelectedOrderID] = useState<string>("");
+  const [selectedOrderID, setSelectedOrderID] = useState<string>(urlOrderId || "");
   const [attachmentUrl, setAttachmentUrl] = useState("");
   const [attachments, setAttachments] = useState<{ name: string; url: string; public_id?: string }[]>([]);
 
@@ -49,6 +53,19 @@ export default function CreateSupportTicketPage() {
   const [error, setError] = useState<string | null>(null);
 
   const user = useUserStore((state: any) => state.user);
+
+  // Sync when URL query parameters update
+  useEffect(() => {
+    if (urlOrderId) {
+      setSelectedOrderID(urlOrderId);
+      if (!urlCategory) {
+        setCategory("Payment & Escrow");
+      }
+    }
+    if (urlCategory) {
+      setCategory(urlCategory);
+    }
+  }, [urlOrderId, urlCategory]);
 
   useEffect(() => {
     async function loadOrders() {
@@ -238,6 +255,24 @@ export default function CreateSupportTicketPage() {
               If this inquiry is related to a specific buyer or seller order, selecting it helps support agents inspect the order context immediately.
             </p>
 
+                        {selectedOrderID && (
+              <div className="flex items-center justify-between p-3 rounded-[6px] bg-[#327C73]/10 border border-[#327C73]/25 text-xs text-[#327C73] font-sf-pro">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#327C73] shrink-0" />
+                  <span>
+                    Linked to Order: <strong className="font-mono text-[#0f172a]">#{selectedOrderID}</strong>
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedOrderID("")}
+                  className="text-[11px] underline hover:text-rose-600 transition cursor-pointer"
+                >
+                  Clear link
+                </button>
+              </div>
+            )}
+
             <CustomSelect
               size="md"
               variant="filled"
@@ -373,5 +408,23 @@ export default function CreateSupportTicketPage() {
 
       </div>
     </div>
+  );
+}
+
+
+export default function CreateSupportTicketPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-8">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#64748b]">
+            <Loader2 className="w-4 h-4 animate-spin text-[#327C73]" />
+            <span>Loading support ticket form...</span>
+          </div>
+        </div>
+      }
+    >
+      <CreateSupportTicketForm />
+    </Suspense>
   );
 }

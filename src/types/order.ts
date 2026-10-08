@@ -33,6 +33,8 @@ export interface Order {
   isCompleted?: boolean;
   packageType?: 'basic' | 'standard' | 'premium' | string;
   hasReview?: boolean;
+  disputeSummary?: string;
+  disputeDetails?: string | Record<string, any>;
   createdAt: string;
   updatedAt: string;
 }

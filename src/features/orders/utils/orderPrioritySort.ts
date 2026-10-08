@@ -162,7 +162,13 @@ export const getOrderPriorityRank = (item: any, now = Date.now()): OrderPriority
   const isCompleted =
     statusStr === "completed" || statusStr === "complete" || Boolean(item.isCompleted || raw.isCompleted);
   const isCancelled = statusStr === "cancelled" || statusStr === "canceled" || statusStr === "failed";
-  const isDisputed = statusStr === "disputed" || statusStr === "escalated_to_dispute";
+  const isDisputed =
+    !isCompleted &&
+    !isCancelled &&
+    (statusStr === "disputed" ||
+      statusStr === "escalated_to_dispute" ||
+      raw.escrowStatus === "disputed" ||
+      Boolean(raw.isDisputed || raw.disputed));
   const isDelivered = statusStr === "delivered";
   const isRevision = statusStr === "revision" || statusStr === "in_revision";
 

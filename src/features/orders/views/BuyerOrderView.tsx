@@ -19,6 +19,8 @@ import {
   FiFileText,
   FiHome,
   FiShield,
+  FiInfo,
+  FiCheckCircle,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
@@ -348,7 +350,42 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
   const isDelivered = statusLower === "delivered";
   const isCancelled = statusLower === "cancelled" || statusLower === "canceled";
   const isRevision = statusLower === "in_revision" || statusLower === "revision";
-  const isDisputed = statusLower === "disputed" || statusLower === "escalated_to_dispute";
+  const disputeSummary =
+    order.disputeSummary ||
+    order.raw?.disputeSummary ||
+    order.raw?.dispute?.summary;
+  const disputeDetails =
+    order.disputeDetails ||
+    order.raw?.disputeDetails ||
+    order.raw?.dispute?.details ||
+    order.raw?.dispute?.decisionReason ||
+    order.raw?.disputeReason ||
+    order.raw?.dispute?.reason;
+  const disputeDetailsText =
+    typeof disputeDetails === "string"
+      ? disputeDetails
+      : disputeDetails?.decisionReason ||
+        disputeDetails?.reason ||
+        disputeDetails?.notes ||
+        (disputeDetails && typeof disputeDetails === "object" ? JSON.stringify(disputeDetails, null, 2) : "");
+  const hasDisputeHistory = Boolean(
+    disputeSummary ||
+    disputeDetails ||
+    order.raw?.disputeID ||
+    order.raw?.disputeId ||
+    order.raw?.dispute ||
+    order.raw?.isDisputed ||
+    order.raw?.hasDispute ||
+    order.raw?.disputed
+  );
+  const isDisputed =
+    !isCompleted &&
+    !isCancelled &&
+    (statusLower === "disputed" ||
+      statusLower === "escalated_to_dispute" ||
+      order.displayStatus === "disputed" ||
+      String(order.raw?.escrowStatus || "").toLowerCase() === "disputed" ||
+      Boolean(order.raw?.isDisputed || order.raw?.hasDispute || order.raw?.disputed));
   const isLate = Boolean(order.isLate || statusLower === "late" || order.displayStatus === "late") && !isCompleted && !isDelivered && !isCancelled && !isRevision && !isDisputed;
   const wasLateDelivered = isDelivered && Boolean(order.wasLateDelivered || order.displayStatus === "delivered_late");
   const deliveryText =
@@ -488,12 +525,21 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                       Our Support &amp; Administration team is actively investigating the details of this order. All payment releases
                       and work deliveries are temporarily paused while administrators review the communication history and deliverables.
                     </p>
+                    {disputeSummary && (
+                      <div className="mt-3.5 p-3.5 bg-white/90 border border-amber-300 rounded-[6px] text-xs sm:text-[13px] text-amber-950 leading-relaxed font-sf-pro shadow-2xs">
+                        <div className="flex items-center gap-1.5 font-semibold text-amber-900 mb-1">
+                          <FiInfo className="w-4 h-4 text-amber-600 shrink-0" />
+                          <span>Dispute Summary</span>
+                        </div>
+                        <p className="text-slate-800 font-medium">{disputeSummary}</p>
+                      </div>
+                    )}
                     <div className="flex flex-wrap gap-3 mt-4">
                       <Link
-                        href="/support"
+                        href={order.raw?.supportTicketID ? `/support/${order.raw.supportTicketID}` : `/support?orderId=${order.id}`}
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-black border border-[rgba(0,0,0,0.10)] text-white text-[16px] font-semibold font-sf-pro transition-colors shadow-xs"
                       >
-                        Go to Support Desk
+                        {order.raw?.supportTicketID ? "View Dispute Ticket" : "Go to Support Desk"}
                       </Link>
                       <a
                         href="mailto:support@workvence.com"
@@ -501,6 +547,99 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                       >
                         Email: support@workvence.com
                       </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Dispute Resolved & Completed Alert Banner */}
+            {isCompleted && (disputeSummary || disputeDetailsText) && (
+              <div className="bg-[#f0fdf4] border border-emerald-300 rounded-[6px] p-6 mb-6">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-10 h-10 rounded-[6px] bg-white border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0">
+                    <FiCheckCircle className="text-xl" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-base text-[#112131]">Dispute Resolved &amp; Order Completed</h4>
+                    <p className="text-xs sm:text-sm text-emerald-800 mt-1 leading-relaxed">
+                      Our Support &amp; Administration team has reviewed and finalized the dispute arbitration for this order.
+                      The order has been completed and escrow funds have been settled according to the final decision.
+                    </p>
+                    {disputeSummary && (
+                      <div className="mt-3.5 p-3.5 bg-white/95 border border-emerald-200 rounded-[6px] text-xs sm:text-[13px] text-emerald-950 leading-relaxed font-sf-pro shadow-2xs">
+                        <div className="flex items-center gap-1.5 font-semibold text-emerald-900 mb-1">
+                          <FiInfo className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span>Dispute Resolution Summary</span>
+                        </div>
+                        <p className="text-slate-800 font-medium">{disputeSummary}</p>
+                      </div>
+                    )}
+                    {disputeDetailsText && disputeDetailsText !== disputeSummary && (
+                      <div className="mt-2.5 p-3.5 bg-white/95 border border-emerald-200 rounded-[6px] text-xs sm:text-[13px] text-emerald-950 leading-relaxed font-sf-pro shadow-2xs">
+                        <div className="flex items-center gap-1.5 font-semibold text-emerald-900 mb-1">
+                          <FiFileText className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span>Resolution Details</span>
+                        </div>
+                        <p className="text-slate-700 font-normal whitespace-pre-line">{disputeDetailsText}</p>
+                      </div>
+                    )}
+                    <div className="flex flex-wrap gap-3 mt-4">
+                      <Link
+                        href={order.raw?.supportTicketID ? `/support/${order.raw.supportTicketID}` : `/support?orderId=${order.id}`}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-black border border-[rgba(0,0,0,0.10)] text-white text-[14px] sm:text-[15px] font-semibold font-sf-pro transition-colors shadow-xs"
+                      >
+                        {order.raw?.supportTicketID ? "View Dispute Ticket" : "Go to Support Desk"}
+                      </Link>
+                      <a
+                        href="mailto:support@workvence.com"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] text-black text-[14px] sm:text-[15px] font-semibold font-sf-pro transition-colors shadow-xs"
+                      >
+                        Email: support@workvence.com
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Cancelled Resolution Banner */}
+            {isCancelled && (
+              <div className="bg-[#f5f5f5] border border-rose-200 rounded-[6px] p-6 mb-6">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-10 h-10 rounded-[6px] bg-[#ffffff] border border-red-200 text-rose-700 flex items-center justify-center shrink-0">
+                    <FiAlertCircle className="text-xl" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-base text-[#292929]">This Order Has Been Cancelled</h4>
+                    <p className="text-xs sm:text-sm text-red-600 mt-1 leading-relaxed">
+                      This order was marked as cancelled. Any refunded funds have been returned to your payment balance or original payment method.
+                    </p>
+                    {disputeSummary && (
+                      <div className="mt-3.5 p-3.5 bg-white/90 border border-rose-200 rounded-[6px] text-xs sm:text-[13px] text-rose-950 leading-relaxed font-sf-pro shadow-2xs">
+                        <div className="flex items-center gap-1.5 font-semibold text-rose-900 mb-1">
+                          <FiInfo className="w-4 h-4 text-rose-600 shrink-0" />
+                          <span>Dispute Resolution Summary</span>
+                        </div>
+                        <p className="text-slate-800 font-medium">{disputeSummary}</p>
+                      </div>
+                    )}
+                    {disputeDetailsText && disputeDetailsText !== disputeSummary && (
+                      <div className="mt-2.5 p-3.5 bg-white/90 border border-rose-200 rounded-[6px] text-xs sm:text-[13px] text-rose-950 leading-relaxed font-sf-pro shadow-2xs">
+                        <div className="flex items-center gap-1.5 font-semibold text-rose-900 mb-1">
+                          <FiFileText className="w-4 h-4 text-rose-600 shrink-0" />
+                          <span>Resolution Details</span>
+                        </div>
+                        <p className="text-slate-700 font-normal whitespace-pre-line">{disputeDetailsText}</p>
+                      </div>
+                    )}
+                    <div className="flex flex-wrap gap-3 mt-4">
+                      <Link
+                        href="/support"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[#ffffff] border border-[rgba(0,0,0,0.10)] text-[#000000] text-xs sm:text-sm font-semibold transition-colors shadow-xs"
+                      >
+                        Contact Support
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -1073,6 +1212,25 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     ${order.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
+
+                {Boolean(order.raw?.refundedAmount && Number(order.raw.refundedAmount) > 0) && (
+                  <>
+                    <div className="flex items-center justify-between px-5 py-2.5 bg-amber-50/70 border-t border-amber-200/50 text-xs">
+                      <span className="text-amber-900 font-medium">Original Contract</span>
+                      <span className="text-slate-500 line-through">
+                        ${Number(order.raw?.originalPrice || (order.price + Number(order.raw.refundedAmount))).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between px-5 py-2.5 bg-emerald-50/70 border-t border-emerald-200/50 text-xs">
+                      <span className="text-emerald-900 font-medium">Refunded to You</span>
+                      <span className="text-emerald-700 font-bold">
+                        -${Number(order.raw.refundedAmount).toFixed(2)}
+                      </span>
+                    </div>
+                  </>
+                )}
+
+
               </div>
 
               {/* <div className="pt-4 flex items-center justify-between gap-2 text-xs text-emerald-700 bg-emerald-50/70 p-3 rounded-[6px] border border-emerald-100">
@@ -1140,6 +1298,17 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                   fullWidth
                 >
                   Become a seller
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={() => router.push(`/support/new?orderId=${order.id}&category=Payment%20%26%20Escrow`)}
+                  variant="soft"
+                  size="md"
+                  radius="fiverr"
+                  fullWidth
+                >
+                  Report Issue
                 </Button>
 
 

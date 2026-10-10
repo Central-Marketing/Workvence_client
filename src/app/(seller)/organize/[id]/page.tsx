@@ -649,7 +649,7 @@ const EditPackagePage = () => {
           images: (state.images || []).filter((img: string) => img !== url),
         },
       });
-      toast.success("Banner uploaded successfully!", { id: "upload-cover" });
+      toast.dismiss("upload-cover");
     } catch {
       toast.error("Failed to upload banner", { id: "upload-cover" });
     } finally {
@@ -698,7 +698,7 @@ const EditPackagePage = () => {
           images: Array.from(new Set(combinedSubImages.filter((img: string) => img !== newCover))),
         },
       });
-      toast.success("Sub images added successfully!", { id: "upload-subs" });
+      toast.dismiss("upload-subs");
     } catch {
       toast.error("Failed uploading images", { id: "upload-subs" });
     } finally {

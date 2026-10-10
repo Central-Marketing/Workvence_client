@@ -458,7 +458,7 @@ const OrganizePage = () => {
           images: state.images || [],
         },
       });
-      toast.success("Banner uploaded successfully!", { id: "upload-cover" });
+      toast.dismiss("upload-cover");
     } catch {
       toast.error("Failed to upload banner", { id: "upload-cover" });
     } finally {
@@ -496,7 +496,7 @@ const OrganizePage = () => {
           images: [...(state.images || []), ...validUrls],
         },
       });
-      toast.success("Sub images added successfully!", { id: "upload-subs" });
+      toast.dismiss("upload-subs");
     } catch {
       toast.error("Failed uploading images", { id: "upload-subs" });
     } finally {

@@ -351,7 +351,6 @@ export function useChatMessages({
     try {
       const uploadedData = await supportService.uploadCloudinaryFile(file);
       setAttachment(uploadedData);
-      toast.success("File attached successfully");
     } catch (err: any) {
       toast.error(err?.message || "Attachment upload failed");
     } finally {

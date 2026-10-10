@@ -144,28 +144,24 @@ export const KycVerificationForm: React.FC<KycVerificationFormProps> = ({
         const res = await kycService.uploadToCloudinary(file, (p) => setFrontProgress(p));
         setFrontUrl(res.public_id || res.secure_url);
         setFrontUploading(false);
-        toast.success("ID Front uploaded securely");
       } else if (type === "back") {
         setBackUploading(true);
         setBackProgress(10);
         const res = await kycService.uploadToCloudinary(file, (p) => setBackProgress(p));
         setBackUrl(res.public_id || res.secure_url);
         setBackUploading(false);
-        toast.success("ID Back uploaded securely");
       } else if (type === "selfie") {
         setSelfieUploading(true);
         setSelfieProgress(10);
         const res = await kycService.uploadToCloudinary(file, (p) => setSelfieProgress(p));
         setSelfieUrl(res.public_id || res.secure_url);
         setSelfieUploading(false);
-        toast.success("Selfie uploaded securely");
       } else if (type === "note") {
         setNoteUploading(true);
         setNoteProgress(10);
         const res = await kycService.uploadToCloudinary(file, (p) => setNoteProgress(p));
         setSelfieWithNoteUrl(res.public_id || res.secure_url);
         setNoteUploading(false);
-        toast.success("Note selfie uploaded securely");
       }
     } catch (err: any) {
       console.error("Cloudinary upload failed:", err);

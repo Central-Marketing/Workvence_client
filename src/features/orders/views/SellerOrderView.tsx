@@ -166,7 +166,6 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
           setUploadedFiles((prev) => [...prev, { name: file.name, size: sizeStr, url: localUrl }]);
         }
       }
-      toast.success("Files attached successfully!");
     } catch {
       toast.error("Failed to upload attached files.");
     } finally {

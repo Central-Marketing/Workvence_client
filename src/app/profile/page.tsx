@@ -354,7 +354,7 @@ export default function ProfilePage() {
             setUser(updatedUser);
             localStorage.setItem("user", JSON.stringify(updatedUser));
           }
-          toast.success("Cover image updated!", { id: "cover-upload" });
+          toast.dismiss("cover-upload");
         }
       } catch (err: any) {
         toast.error(err?.response?.data?.message || err.message || "Failed to upload cover image", { id: "cover-upload" });
@@ -481,7 +481,7 @@ export default function ProfilePage() {
       const cdnUrl = uploaded?.secure_url || uploaded?.url;
       if (cdnUrl) {
         handleUpdatePortfolio(index, "image", cdnUrl);
-        toast.success("Portfolio image uploaded!", { id: `port-up-${index}` });
+        toast.dismiss(`port-up-${index}`);
       } else {
         throw new Error("Upload succeeded but no URL returned");
       }

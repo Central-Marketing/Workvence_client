@@ -410,6 +410,14 @@ export function useChatMessages({
       });
     }
 
+    const attachmentObj = currentAttachment ? {
+      url: currentAttachment.url || currentAttachment.secure_url,
+      name: currentAttachment.name,
+      type: currentAttachment.type,
+      size: (currentAttachment as any).bytes || currentAttachment.size,
+      public_id: currentAttachment.public_id
+    } : null;
+
     const tempId = `temp-${Date.now()}`;
     const tempMessage = {
       _id: tempId,
@@ -425,6 +433,9 @@ export function useChatMessages({
       message: currentText,
       file: currentAttachment?.url || null,
       attachments: currentAttachment?.url ? [currentAttachment.url] : [],
+      attachment: attachmentObj,
+      fileName: currentAttachment?.name || null,
+      originalName: currentAttachment?.name || null,
       createdAt: new Date().toISOString(),
     };
 
@@ -448,6 +459,9 @@ export function useChatMessages({
       message: currentText,
       file: currentAttachment?.url || null,
       attachments: currentAttachment?.url ? [currentAttachment.url] : [],
+      attachment: attachmentObj,
+      fileName: currentAttachment?.name || null,
+      originalName: currentAttachment?.name || null,
       userID: user?._id || user?.id,
       from: user?._id || user?.id,
       to: targetOtherUserId || undefined,

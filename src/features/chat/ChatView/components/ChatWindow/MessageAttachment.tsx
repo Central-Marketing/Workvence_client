@@ -93,7 +93,8 @@ export const MessageAttachment: React.FC<MessageAttachmentProps> = ({
       (rawUrl.includes("cloudinary.com") && rawUrl.includes("/image/") && !isPdf && !isDoc) ||
       msg.fileType?.includes("image"));
 
-  const rawFileName = rawUrl.split("/").pop()?.split("?")[0] || "Attachment";
+  const explicitName = msg.attachment?.name || msg.fileName || msg.originalName || msg.name;
+  const rawFileName = explicitName || rawUrl.split("/").pop()?.split("?")[0] || "Attachment";
   const fileName = formatFileNameWithExtension(rawFileName, currentUrl, null, msg);
 
   // Always open in a new tab when clicked (for documents and files)

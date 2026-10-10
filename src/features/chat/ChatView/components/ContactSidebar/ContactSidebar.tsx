@@ -53,11 +53,15 @@ export const ContactSidebar: React.FC<ContactSidebarProps> = ({
   const [isOrdersExpanded, setIsOrdersExpanded] = useState(true);
 
   const conversationMediaFiles = useMemo<MediaFileItem[]>(() => {
+    const seenUrls = new Set<string>();
     return (messages || []).flatMap((m: any) => {
       const items: MediaFileItem[] = [];
       const parseItem = (item: any) => {
         if (!item) return;
         if (typeof item === "string" && item.trim().length > 0) {
+          if (seenUrls.has(item)) return;
+          seenUrls.add(item);
+          
           const rawName =
             m.attachment?.name ||
             m.fileName ||
@@ -75,6 +79,9 @@ export const ContactSidebar: React.FC<ContactSidebarProps> = ({
         } else if (typeof item === "object" && (item.url || item.file || item.secure_url)) {
           const url = item.url || item.file || item.secure_url;
           if (typeof url === "string" && url.trim().length > 0) {
+            if (seenUrls.has(url)) return;
+            seenUrls.add(url);
+            
             const rawName =
               item.name ||
               item.fileName ||

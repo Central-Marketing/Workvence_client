@@ -604,7 +604,7 @@ const Navbar = () => {
                         My Projects
                       </Link>
                       <hr className="my-1 border-gray-100" />
-                      <Link href="/support" onClick={() => setIsProfileDropdownOpen(false)} className={`px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3 ${pathname.startsWith("/support") ? "bg-teal-50/60 text-[#0D6D5F] font-semibold" : ""}`}>
+                      <Link href="/support" onClick={() => setIsProfileDropdownOpen(false)} className={`px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3 `}>
                         Customer Support
                       </Link>
                       <span onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }} className="px-3.5 py-2 bg-red-100 hover:bg-red-50 text-red-900 font-bold cursor-pointer transition-colors flex items-center gap-3">

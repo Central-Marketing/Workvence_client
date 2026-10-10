@@ -93,12 +93,22 @@ export function useSupportSocket({
         adminSocket.emit('join_ticket_room', payload);
         adminSocket.emit('join_room', `ticket_${ticketId}`);
         adminSocket.emit('join_room', `ticket:${ticketId}`);
+        if (thread && thread !== 'group') {
+          adminSocket.emit('join_room', `ticket:${ticketId}:${thread}`);
+          adminSocket.emit('join_room', `ticket_${ticketId}_${thread}`);
+          adminSocket.emit('join_room', `room:support:ticket:${ticketId}:${thread}`);
+        }
       }
 
       mainSocket.emit('join_ticket', payload);
       mainSocket.emit('join_ticket_room', payload);
       mainSocket.emit('join_room', `ticket_${ticketId}`);
       mainSocket.emit('join_room', `ticket:${ticketId}`);
+      if (thread && thread !== 'group') {
+        mainSocket.emit('join_room', `ticket:${ticketId}:${thread}`);
+        mainSocket.emit('join_room', `ticket_${ticketId}_${thread}`);
+        mainSocket.emit('join_room', `room:support:ticket:${ticketId}:${thread}`);
+      }
     };
 
     joinTicketRooms();
@@ -181,6 +191,11 @@ export function useSupportSocket({
         adminSocket.emit('leave_ticket_room', payload);
         adminSocket.emit('leave_room', `ticket_${ticketId}`);
         adminSocket.emit('leave_room', `ticket:${ticketId}`);
+        if (thread && thread !== 'group') {
+          adminSocket.emit('leave_room', `ticket:${ticketId}:${thread}`);
+          adminSocket.emit('leave_room', `ticket_${ticketId}_${thread}`);
+          adminSocket.emit('leave_room', `room:support:ticket:${ticketId}:${thread}`);
+        }
         adminSocket.off('connect', handleConnect);
         adminSocket.off('disconnect', handleDisconnect);
         adminSocket.off('receive_support_message', handleReceiveMessage);
@@ -194,6 +209,11 @@ export function useSupportSocket({
       mainSocket.emit('leave_ticket_room', payload);
       mainSocket.emit('leave_room', `ticket_${ticketId}`);
       mainSocket.emit('leave_room', `ticket:${ticketId}`);
+      if (thread && thread !== 'group') {
+        mainSocket.emit('leave_room', `ticket:${ticketId}:${thread}`);
+        mainSocket.emit('leave_room', `ticket_${ticketId}_${thread}`);
+        mainSocket.emit('leave_room', `room:support:ticket:${ticketId}:${thread}`);
+      }
       mainSocket.off('connect', handleConnect);
       mainSocket.off('disconnect', handleDisconnect);
       mainSocket.off('receive_support_message', handleReceiveMessage);
@@ -202,7 +222,7 @@ export function useSupportSocket({
       mainSocket.off('user_typing', handleUserTyping);
       mainSocket.off('user_stopped_typing', handleUserStoppedTyping);
     };
-  }, [ticketId]);
+  }, [ticketId, thread]);
 
   const sendSupportMessage = useCallback(
     (message: string, attachments: any[] = []) => {
@@ -210,7 +230,7 @@ export function useSupportSocket({
 
       const payload = {
         ticketId,
-        thread: 'group',
+        thread: thread || 'group',
         message: message.trim(),
         attachments,
         senderName: userDisplayName,
@@ -224,7 +244,7 @@ export function useSupportSocket({
         mainSocket.emit('send_support_message', payload);
       }
     },
-    [ticketId, userDisplayName]
+    [ticketId, userDisplayName, thread]
   );
 
   const startTyping = useCallback(() => {

@@ -26,6 +26,7 @@ import {
   Download,
   X,
   File,
+  Lock,
 } from "lucide-react";
 import { supportService, SupportTicketItem, SupportMessage } from "@/utils/supportService";
 import { useSupportSocket, SocketSupportMessage } from "@/hooks/useSupportSocket";
@@ -140,6 +141,7 @@ export default function TicketDetailsPage() {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [attachments, setAttachments] = useState<{ name: string; url: string; public_id?: string; type?: string }[]>([]);
   const [selectedPreviewImage, setSelectedPreviewImage] = useState<{ url: string; name: string } | null>(null);
+  const [activeTab, setActiveTab] = useState<"group" | "private">("group");
 
   const handleDownload = async (e: React.MouseEvent, url: string, fileName: string = "attachment") => {
     e.stopPropagation();
@@ -187,19 +189,63 @@ export default function TicketDetailsPage() {
     }
   }, [messages, scrollToBottom]);
 
-  const handleMessageReceived = useCallback((newMsg: SocketSupportMessage) => {
-    setMessages((prev) => {
-      // Dedupe incoming socket message against existing message list using id or createdAt
-      if (
-        prev.some(
-          (m) =>
-            (newMsg.id && m.id === newMsg.id) ||
-            (m.createdAt === newMsg.createdAt && (m.message === newMsg.message || m.senderID === newMsg.senderID))
-        )
-      ) {
-        return prev;
+  const extractThreadMessages = useCallback((ticketObj: any, threadName: string): SupportMessage[] => {
+    if (!ticketObj) return [];
+    const targetThread = (threadName || 'group').toLowerCase();
+
+    // 1. Thread array from ticketObj.threads (if backend provides threads object)
+    const threadArray = Array.isArray(ticketObj.threads?.[targetThread]) ? ticketObj.threads[targetThread] : [];
+
+    // 2. Filter from ticketObj.messages
+    const allMessages = Array.isArray(ticketObj.messages) ? ticketObj.messages : [];
+    const filteredMessages = allMessages.filter((m: any) => {
+      const mThread = (m.thread || 'group').toLowerCase();
+      if (targetThread === 'group') {
+        return !m.thread || mThread === 'group';
       }
-      const mappedMsg: SupportMessage = {
+      return mThread === targetThread;
+    });
+
+    // Deduplicate and sort chronologically by createdAt (oldest to newest)
+    const uniqueMap = new Map<string, SupportMessage>();
+    [...threadArray, ...filteredMessages].forEach((m: any) => {
+      const key = m.id || m._id || `${m.senderID || m.sender}-${m.createdAt}-${m.message || ""}`;
+      if (!uniqueMap.has(key)) {
+        uniqueMap.set(key, m);
+      }
+    });
+
+    return Array.from(uniqueMap.values()).sort(
+      (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+  }, []);
+
+  const [adminPrivateTarget, setAdminPrivateTarget] = useState<"buyer" | "seller">("buyer");
+
+  const currentUserParticipant = ticket?.participants?.find((p: any) => {
+    const pid = String(p.id || p._id || p.userId || "").trim();
+    return pid && pid === currentUserId;
+  });
+  let userRole = currentUserParticipant?.role?.toLowerCase();
+  if (!userRole || userRole === 'creator' || userRole === 'user') {
+    userRole = user?.isSeller ? "seller" : "buyer";
+  }
+  const isUserAdmin = Boolean(user?.isAdmin || userRole === 'admin');
+  const privateThreadId = isUserAdmin 
+    ? adminPrivateTarget 
+    : (userRole === "seller" ? "seller" : "buyer");
+  const hasPrivateThread = Boolean(privateThreadId);
+  const currentThreadName = (activeTab === "private" && privateThreadId) ? privateThreadId : "group";
+
+  const handleMessageReceived = useCallback((newMsg: SocketSupportMessage) => {
+    const incomingThread = (newMsg.thread || 'group').toLowerCase();
+    const activeThread = (currentThreadName || 'group').toLowerCase();
+
+    // Cache into ticket state so switching tabs preserves real-time incoming messages
+    setTicket((prevTicket: any) => {
+      if (!prevTicket) return prevTicket;
+      const updatedMessages = Array.isArray(prevTicket.messages) ? [...prevTicket.messages] : [];
+      const formattedMsg: SupportMessage = {
         id: newMsg.id || newMsg.createdAt,
         sender: newMsg.sender,
         senderID: newMsg.senderID || (newMsg.role === "admin" ? "support" : ""),
@@ -207,15 +253,60 @@ export default function TicketDetailsPage() {
         message: newMsg.message,
         attachments: newMsg.attachments || [],
         createdAt: newMsg.createdAt,
+        thread: incomingThread,
       };
-      return [...prev, mappedMsg];
+
+      if (!updatedMessages.some((m: any) => (newMsg.id && m.id === newMsg.id) || (m.createdAt === newMsg.createdAt && m.message === newMsg.message))) {
+        updatedMessages.push(formattedMsg);
+      }
+
+      const existingThreads = prevTicket.threads || {};
+      const threadArr = Array.isArray(existingThreads[incomingThread]) ? [...existingThreads[incomingThread]] : [];
+      if (!threadArr.some((m: any) => (newMsg.id && m.id === newMsg.id) || (m.createdAt === newMsg.createdAt && m.message === newMsg.message))) {
+        threadArr.push(formattedMsg);
+      }
+
+      return {
+        ...prevTicket,
+        messages: updatedMessages,
+        threads: {
+          ...existingThreads,
+          [incomingThread]: threadArr,
+        }
+      };
     });
-    setTimeout(scrollToBottom, 100);
-  }, [scrollToBottom]);
+
+    // Only update view if message belongs to current thread
+    if (incomingThread === activeThread) {
+      setMessages((prev) => {
+        if (
+          prev.some(
+            (m) =>
+              (newMsg.id && m.id === newMsg.id) ||
+              (m.createdAt === newMsg.createdAt && (m.message === newMsg.message || m.senderID === newMsg.senderID))
+          )
+        ) {
+          return prev;
+        }
+        const mappedMsg: SupportMessage = {
+          id: newMsg.id || newMsg.createdAt,
+          sender: newMsg.sender,
+          senderID: newMsg.senderID || (newMsg.role === "admin" ? "support" : ""),
+          role: (newMsg.role as any) || "admin",
+          message: newMsg.message,
+          attachments: newMsg.attachments || [],
+          createdAt: newMsg.createdAt,
+          thread: incomingThread,
+        };
+        return [...prev, mappedMsg];
+      });
+      setTimeout(scrollToBottom, 100);
+    }
+  }, [scrollToBottom, currentThreadName]);
 
   const { isConnected, isUnauthorized, typingUser, sendSupportMessage, startTyping, stopTyping } = useSupportSocket({
     ticketId,
-    thread: "group",
+    thread: currentThreadName,
     userDisplayName: user?.username || user?.name || user?.email || "User",
     onMessageReceived: handleMessageReceived,
   });
@@ -230,27 +321,7 @@ export default function TicketDetailsPage() {
       const ticketObj = (data as any)?.ticket || (data as any)?.data?.ticket || data;
       setTicket(ticketObj);
 
-      // Single shared messages stream
-      let allSupportMessages: SupportMessage[] = [];
-      if (Array.isArray(ticketObj?.messages)) {
-        allSupportMessages = ticketObj.messages;
-      } else if (Array.isArray(ticketObj?.threads?.group)) {
-        allSupportMessages = ticketObj.threads.group;
-      }
-
-      // Deduplicate and sort chronologically by createdAt (oldest to newest)
-      const uniqueMap = new Map<string, SupportMessage>();
-      allSupportMessages.forEach((m: any) => {
-        const key = m.id || `${m.senderID || m.sender}-${m.createdAt}-${m.message || ""}`;
-        if (!uniqueMap.has(key)) {
-          uniqueMap.set(key, m);
-        }
-      });
-
-      const sortedMessages = Array.from(uniqueMap.values()).sort(
-        (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
-
+      const sortedMessages = extractThreadMessages(ticketObj, currentThreadName);
       setMessages(sortedMessages);
     } catch (err: any) {
       console.error("Failed to load ticket details:", err);
@@ -263,11 +334,19 @@ export default function TicketDetailsPage() {
       setLoading(false);
       setTimeout(scrollToBottom, 150);
     }
-  }, [ticketId, scrollToBottom]);
+  }, [ticketId, scrollToBottom, currentThreadName, extractThreadMessages]);
 
   useEffect(() => {
     fetchTicketDetails();
   }, [fetchTicketDetails]);
+
+  // Sync messages immediately upon switching tabs or when ticket updates
+  useEffect(() => {
+    if (!ticket) return;
+    const threadMsgs = extractThreadMessages(ticket, currentThreadName);
+    setMessages(threadMsgs);
+    setTimeout(scrollToBottom, 50);
+  }, [activeTab, ticket, currentThreadName, extractThreadMessages, scrollToBottom]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -309,17 +388,19 @@ export default function TicketDetailsPage() {
     setSending(true);
 
     try {
-      // Post reply to backend HTTP API (clean payload: message and attachments, no thread/role)
+      // Post reply to backend HTTP API (clean payload: message and attachments, thread/role)
       const res = await supportService.replyTicket(ticketId, {
         message: messageContent,
         attachments: currentAttachments,
+        thread: currentThreadName,
       });
 
       // If backend returns updated ticket with messages, sync immediately
       const updatedTicket = res?.data?.ticket || res?.ticket || res;
-      if (updatedTicket && Array.isArray(updatedTicket.messages)) {
+      if (updatedTicket && (updatedTicket.id || updatedTicket._id)) {
         setTicket(updatedTicket);
-        setMessages(updatedTicket.messages);
+        const threadMsgs = extractThreadMessages(updatedTicket, currentThreadName);
+        setMessages(threadMsgs);
       } else {
         // Fallback: emit via socket if supported
         if (isConnected) {
@@ -577,16 +658,82 @@ export default function TicketDetailsPage() {
           <div className="lg:col-span-2 bg-white rounded-[6px] border border-[#e2e8f0] shadow-xs overflow-hidden flex flex-col min-h-[500px] max-h-[80vh]">
 
           {/* Chat Header */}
-          <div className="px-6 py-4 border-b border-[#e2e8f0] bg-[#f8fafc] flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#0D6D5F]" />
-              <span className="text-xs font-semibold text-[#0f172a]">
-                Shared Support Conversation
+          <div className="px-6 py-4 border-b border-[#e2e8f0] bg-[#f8fafc] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <ShieldCheck className="w-4 h-4 text-[#0D6D5F] shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold text-[#0f172a]">
+                  {activeTab === "private"
+                    ? (isUserAdmin ? `Private Support Conversation (${adminPrivateTarget.toUpperCase()})` : "Private Support Conversation")
+                    : "Shared Group Conversation"}
+                </span>
+                <span className="text-[11px] text-[#64748b]">
+                  {activeTab === "private"
+                    ? "🔒 Messages here are private between you and Support."
+                    : "👥 Messages here are visible to all participants (Buyer, Seller & Support)."}
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              {hasPrivateThread && (() => {
+                const groupCount = extractThreadMessages(ticket, "group").length;
+                const privateCount = extractThreadMessages(ticket, privateThreadId).length;
+                const buyerCount = extractThreadMessages(ticket, "buyer").length;
+                const sellerCount = extractThreadMessages(ticket, "seller").length;
+
+                return (
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <div className="flex items-center bg-white border border-[#e2e8f0] rounded-[6px] p-0.5 shadow-2xs shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab("group")}
+                        className={`px-3 py-1.5 text-[11px] font-semibold rounded-[4px] transition-colors flex items-center gap-1.5 ${activeTab === "group" ? "bg-[#0D6D5F] text-white" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"}`}
+                      >
+                        <span>Group Chat</span>
+                        <span className={`px-1.5 py-0.2 text-[10px] rounded-full font-bold ${activeTab === "group" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"}`}>
+                          {groupCount}
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab("private")}
+                        className={`px-3 py-1.5 text-[11px] font-semibold rounded-[4px] transition-colors flex items-center gap-1.5 ${activeTab === "private" ? "bg-[#0D6D5F] text-white" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"}`}
+                      >
+                        <span>Private with Support</span>
+                        <span className={`px-1.5 py-0.2 text-[10px] rounded-full font-bold ${activeTab === "private" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"}`}>
+                          {privateCount}
+                        </span>
+                      </button>
+                    </div>
+
+                    {isUserAdmin && activeTab === "private" && (
+                      <div className="flex items-center bg-white border border-[#e2e8f0] rounded-[6px] p-0.5 shadow-2xs shrink-0 text-[11px]">
+                        <button
+                          type="button"
+                          onClick={() => setAdminPrivateTarget("buyer")}
+                          className={`px-2.5 py-1 font-semibold rounded-[4px] transition-colors flex items-center gap-1.5 ${adminPrivateTarget === "buyer" ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-50"}`}
+                        >
+                          <span>Buyer</span>
+                          <span className="px-1 text-[9px] rounded bg-white/70 font-bold">{buyerCount}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setAdminPrivateTarget("seller")}
+                          className={`px-2.5 py-1 font-semibold rounded-[4px] transition-colors flex items-center gap-1.5 ${adminPrivateTarget === "seller" ? "bg-purple-600 text-white" : "text-slate-500 hover:bg-slate-50"}`}
+                        >
+                          <span>Seller</span>
+                          <span className="px-1 text-[9px] rounded bg-white/70 font-bold">{sellerCount}</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+              <span className="text-[11px] text-[#64748b] hidden sm:inline-block">
+                {messages.length} Message{messages.length === 1 ? "" : "s"}
               </span>
             </div>
-            <span className="text-xs text-[#64748b]">
-              {messages.length} Message{messages.length === 1 ? "" : "s"}
-            </span>
           </div>
 
           {/* Message List */}
@@ -634,7 +781,11 @@ export default function TicketDetailsPage() {
                       <div className={`flex items-center gap-2 text-[11px] font-semibold text-[#64748b] px-1 mb-1 ${isMe ? "justify-end" : "justify-start"}`}>
                         <span>{isMe ? "You" : displayName}</span>
                         {getRoleBadge(msg.role)}
-                        
+                        {(msg.thread === "buyer" || msg.thread === "seller" || activeTab === "private") && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <Lock className="w-2.5 h-2.5" /> Private
+                          </span>
+                        )}
                       </div>
 
                       <div
@@ -718,7 +869,11 @@ export default function TicketDetailsPage() {
               {/* Textarea */}
               <textarea
                 rows={3}
-                placeholder="Type your message reply..."
+                placeholder={
+                  activeTab === "private"
+                    ? `Type a private message to Support (only visible to you and Support)...`
+                    : "Type a group message (visible to all participants: Buyer, Seller & Support)..."
+                }
                 value={replyText}
                 onChange={(e) => {
                   setReplyText(e.target.value);
@@ -779,7 +934,7 @@ export default function TicketDetailsPage() {
                   rightIcon={<Send className="w-3.5 h-3.5" />}
                   className="px-5 sm:px-6 py-2 sm:py-2.5 text-xs font-semibold shadow-xs font-sf-pro shrink-0"
                 >
-                  Send Reply
+                  {sending ? "Sending..." : activeTab === "private" ? "Send Privately" : "Send Reply"}
                 </Button>
               </div>
             </form>

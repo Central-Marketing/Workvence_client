@@ -107,12 +107,59 @@ export const supportService = {
    * Get all support tickets submitted by current authenticated user
    */
   async getMyTickets(): Promise<SupportTicketItem[]> {
-    const res = await adminAxiosFetch.get('/admin/support/tickets/my-tickets');
-    const data = res.data;
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data?.tickets)) return data.tickets;
-    if (Array.isArray(data?.data)) return data.data;
-    return [];
+    const normalize = (list: any[]) => {
+      if (!Array.isArray(list)) return [];
+      return list.map((t: any) => {
+        const id = String(t.id || t._id || "");
+        const ticketNumber = t.ticketNumber || (id ? `#TK-${id.substring(0, 6).toUpperCase()}` : "#TK-000000");
+        return {
+          ...t,
+          id,
+          _id: t._id || id,
+          ticketNumber,
+        };
+      });
+    };
+
+    // 1. Try /admin/support/tickets/my-tickets
+    let myTicketsList: any[] = [];
+    try {
+      const res = await adminAxiosFetch.get('/admin/support/tickets/my-tickets');
+      const data = res.data;
+      myTicketsList = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.tickets)
+          ? data.tickets
+          : Array.isArray(data?.data?.tickets)
+            ? data.data.tickets
+            : Array.isArray(data?.data)
+              ? data.data
+              : [];
+    } catch (err) {
+      console.warn("Could not fetch from /my-tickets:", err);
+    }
+
+    if (myTicketsList.length > 0) {
+      return normalize(myTicketsList);
+    }
+
+    // 2. If my-tickets returned empty (e.g. admin user or participant query), fallback to /admin/support/tickets
+    try {
+      const res = await adminAxiosFetch.get('/admin/support/tickets');
+      const data = res.data;
+      const allList = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.tickets)
+          ? data.tickets
+          : Array.isArray(data?.data?.tickets)
+            ? data.data.tickets
+            : Array.isArray(data?.data)
+              ? data.data
+              : [];
+      return normalize(allList);
+    } catch {
+      return [];
+    }
   },
 
   /**
@@ -144,8 +191,9 @@ export const supportService = {
     payload: { message?: string; attachments?: any[]; thread?: string }
   ) {
     const text = payload.message?.trim();
-    const cleanPayload: { message: string; attachments?: any[] } = {
+    const cleanPayload: { message: string; attachments?: any[]; thread?: string } = {
       message: text && text.length > 0 ? text : 'attachment',
+      thread: payload.thread,
     };
     if (payload.attachments && payload.attachments.length > 0) {
       cleanPayload.attachments = payload.attachments;

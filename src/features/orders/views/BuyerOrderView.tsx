@@ -65,6 +65,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
   const [extensionProcessed, setExtensionProcessed] = useState<"approved" | "rejected" | null>(null);
   const [isRespondingExtension, setIsRespondingExtension] = useState(false);
   const [isDeclineModalOpen, setIsDeclineModalOpen] = useState(false);
+  const [isContacting, setIsContacting] = useState(false);
 
   // Check if extension is strictly pending (never show if accepted/approved/rejected)
   const extensionData = order.raw?.extensionRequest || order.raw?.extension || order.extensionRequest;
@@ -246,6 +247,69 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
       }
     } finally {
       setIsRespondingExtension(false);
+    }
+  };
+
+  // Contact seller with direct conversation check / creation
+  const handleContact = async () => {
+    if (isContacting) return;
+    setIsContacting(true);
+
+    const sellerID = order.seller?.id || order.raw?.sellerID?._id || order.raw?.sellerID;
+    const buyerID = order.buyer?.id || order.raw?.buyerID?._id || order.raw?.buyerID;
+    const sellerUsername = order.seller?.name || order.raw?.sellerID?.username;
+    const buyerUsername = order.buyer?.name || order.raw?.buyerID?.username;
+
+    if (!sellerID || !buyerID) {
+      router.push(`/message/${order.seller.id}`);
+      setIsContacting(false);
+      return;
+    }
+
+    try {
+      const { data } = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
+      const targetId =
+        data?.uuid ||
+        data?.conversationID ||
+        data?._id ||
+        data?.id ||
+        data?.data?.uuid ||
+        data?.data?.conversationID ||
+        data?.data?._id;
+      if (targetId) {
+        router.push(`/message/${targetId}`);
+        return;
+      }
+    } catch {
+      // If not existing, proceed to create conversation via POST
+    }
+
+    try {
+      const { data } = await axiosFetch.post("/conversations", {
+        sellerID,
+        buyerID,
+        to: sellerID,
+        from: buyerID,
+        seller_username: sellerUsername,
+        buyer_username: buyerUsername,
+      });
+      const targetId =
+        data?.uuid ||
+        data?.conversationID ||
+        data?._id ||
+        data?.id ||
+        data?.data?.uuid ||
+        data?.data?.conversationID ||
+        data?.data?._id;
+      if (targetId) {
+        router.push(`/message/${targetId}`);
+      } else {
+        router.push(`/message/${sellerID}`);
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to open conversation");
+    } finally {
+      setIsContacting(false);
     }
   };
 
@@ -1273,11 +1337,14 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
 
                 <Button
                   type="button"
-                  onClick={() => router.push(`/message/${order.seller.id}`)}
+                  onClick={handleContact}
                   variant="soft"
                   size="md"
                   radius="fiverr"
                   fullWidth
+                  disabled={isContacting}
+                  isLoading={isContacting}
+                  leftIcon={<FiMessageSquare className="text-base" />}
                 >
                   Message
                 </Button>

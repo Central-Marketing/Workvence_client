@@ -488,14 +488,6 @@ const Navbar = () => {
                     />
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => openAuthModal({ mode: "register", defaultIsSeller: true })}
-                    className="px-2 xl:px-4 py-[8px] xl:py-[10px] rounded-[6px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0 cursor-pointer bg-transparent border-0"
-                  >
-                    Become a Seller
-                  </button>
-
                   <Link
                     href="/briefs"
                     className="px-2 xl:px-4 py-[8px] xl:py-[10px] rounded-[6px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
@@ -535,9 +527,20 @@ const Navbar = () => {
               <div className="flex items-center gap-[20px] font-sf-pro font-medium text-[14px] xl:text-[16px] text-[#1E293B] shrink-0 whitespace-nowrap">
                 <Link
                   href="/orders"
-                  className="font-semibold text-[14px] xl:text-[15px] text-[#18181B] hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
+                  className={`font-semibold text-[14px] xl:text-[15px] transition-colors whitespace-nowrap shrink-0 ${
+                    pathname.startsWith("/orders") ? "text-[#327C73]" : "text-[#18181B] hover:text-[#327C73]"
+                  }`}
                 >
                   Order
+                </Link>
+
+                <Link
+                  href="/support"
+                  className={`font-semibold text-[14px] xl:text-[15px] transition-colors whitespace-nowrap shrink-0 ${
+                    pathname.startsWith("/support") ? "text-[#327C73]" : "text-[#18181B] hover:text-[#327C73]"
+                  }`}
+                >
+                  Customer Support
                 </Link>
 
                 <Link
@@ -611,6 +614,9 @@ const Navbar = () => {
                       <Link href="/briefs/my-briefs" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                         My Projects
                       </Link>
+                      <Link href="/support" onClick={() => setIsProfileDropdownOpen(false)} className={`px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3 ${pathname.startsWith("/support") ? "bg-teal-50/60 text-[#0D6D5F] font-semibold" : ""}`}>
+                        Customer Support
+                      </Link>
                       <hr className="my-1 border-gray-100" />
                       <span onClick={() => { setIsProfileDropdownOpen(false); handleLogout(); }} className="px-3.5 py-2 bg-red-100 hover:bg-red-50 text-red-900 font-bold cursor-pointer transition-colors flex items-center gap-3">
                         Logout
@@ -624,16 +630,29 @@ const Navbar = () => {
               <div className="flex items-center gap-[20px] font-sf-pro font-medium text-[14px] xl:text-[16px] text-[#1E293B] shrink-0 whitespace-nowrap">
                 <Link
                   href="/dashboard/seller"
-                  className="font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
+                  className={`font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] transition-colors whitespace-nowrap shrink-0 ${
+                    pathname === "/dashboard/seller" ? "text-[#327C73]" : "text-[#1E293B] hover:text-[#327C73]"
+                  }`}
                 >
                   Dashboard
                 </Link>
 
                 <Link
                   href="/briefs?view=feed"
-                  className="font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
+                  className={`font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] transition-colors whitespace-nowrap shrink-0 ${
+                    pathname.startsWith("/briefs") ? "text-[#327C73]" : "text-[#1E293B] hover:text-[#327C73]"
+                  }`}
                 >
                   Find Project
+                </Link>
+
+                <Link
+                  href="/support"
+                  className={`font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] transition-colors whitespace-nowrap shrink-0 ${
+                    pathname.startsWith("/support") ? "text-[#327C73]" : "text-[#1E293B] hover:text-[#327C73]"
+                  }`}
+                >
+                  Customer Support
                 </Link>
 
                 <HeaderInboxIcon
@@ -680,6 +699,9 @@ const Navbar = () => {
                       </Link>
                       <Link href="/briefs/my-proposals" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                         My Proposals
+                      </Link>
+                      <Link href="/support" onClick={() => setIsProfileDropdownOpen(false)} className={`px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3 ${pathname.startsWith("/support") ? "bg-teal-50/60 text-[#0D6D5F] font-semibold" : ""}`}>
+                        Customer Support
                       </Link>
                       <hr className="my-1 border-gray-100" />
                       <Link href="/my-packages" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
@@ -808,16 +830,6 @@ const Navbar = () => {
                 )}
               </div>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  openAuthModal({ mode: "register", defaultIsSeller: true });
-                }}
-                className="text-left hover:text-brand-green transition-colors cursor-pointer bg-transparent border-0 p-0 text-inherit font-inherit"
-              >
-                Become a Seller
-              </button>
               <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
               <hr className="my-2 border-gray-100" />
               <button
@@ -867,6 +879,7 @@ const Navbar = () => {
                   <Link href="/dashboard/seller" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname === "/dashboard/seller" ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Dashboard</Link>
                   <Link href="/manage-orders" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/manage-orders") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Manage Orders</Link>
                   <Link href="/briefs/my-proposals" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/briefs/my-proposals") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>My Proposals</Link>
+                  <Link href="/support" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/support") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Customer Support</Link>
                   <Link href="/my-packages" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/my-packages") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>My Packages</Link>
                   <Link href="/organize" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/organize") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Add New Package</Link>
                   <Link href="/earnings" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/earnings") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Earnings</Link>
@@ -907,6 +920,7 @@ const Navbar = () => {
                     <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">My Activity</span>
                     <Link href="/dashboard/buyer" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname === "/dashboard/buyer" ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Dashboard</Link>
                     <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/orders") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Orders</Link>
+                    <Link href="/support" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/support") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Customer Support</Link>
                     <Link href="/briefs/my-briefs" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/briefs/my-briefs") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>My Projects</Link>
                     <Link href="/message" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/message") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Messages</Link>
                     <Link href="/favorites" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname === "/favorites" ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>My Favorites</Link>

@@ -30,13 +30,17 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           unstyled: true,
           classNames: {
             toast:
-              "w-[356px] flex items-center gap-3 rounded-[6px] bg-white p-3 shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-gray-100 transition-all",
-            title: "text-[14px] font-semibold text-[#112131]",
-            description: "text-[13px] text-[#64748b] font-medium",
-            content: "flex-1 mr-6",
+              "w-[356px] flex items-start gap-3 rounded-[6px] bg-white p-3 shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-gray-100 transition-all overflow-hidden",
+            title: "text-[14px] font-semibold text-[#112131] truncate block w-full",
+            description: "text-[13px] text-[#64748b] font-medium line-clamp-2 mt-0.5",
+            content: "flex-1 min-w-0 flex flex-col justify-center",
+            actionButton:
+              "mt-auto mb-auto ml-2 shrink-0 bg-[#0D6D5F] hover:bg-[#0b5c50] text-white px-3 py-1.5 rounded-[6px] text-xs font-semibold transition-colors border-none cursor-pointer",
+            cancelButton:
+              "mt-auto mb-auto ml-2 shrink-0 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-[6px] text-xs font-semibold transition-colors border-none cursor-pointer",
             closeButton:
-              "absolute right-3 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg bg-transparent hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors border-none",
-            icon: "flex shrink-0 h-10 w-10 items-center justify-center rounded-[10px] text-white",
+              "absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-md bg-transparent hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors border-none cursor-pointer",
+            icon: "flex shrink-0 h-10 w-10 items-center justify-center rounded-[10px] text-white mt-0.5",
             success: "shadow-[0_8px_30px_-5px_rgba(34,197,94,0.15)] ring-0",
             error: "shadow-[0_8px_30px_-5px_rgba(239,68,68,0.15)] ring-0",
             warning: "shadow-[0_8px_30px_-5px_rgba(249,115,22,0.15)] ring-0",

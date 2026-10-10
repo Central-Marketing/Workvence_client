@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { ShieldAlert, ShieldCheck, ArrowRight, X, Lock, CheckCircle2 } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
-import { Button } from "@/components/ui";
+import { Button, Modal } from "@/components/ui";
 import kycService from "@/utils/kycService";
 
 export const KycPromptModal: React.FC = () => {
@@ -88,38 +88,48 @@ export const KycPromptModal: React.FC = () => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn select-none">
-      <div
-        className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col items-center text-center relative overflow-hidden transform transition-all animate-in zoom-in-95 duration-200"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Subtle Decorative Background Gradient */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-50 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-amber-50 rounded-full blur-3xl pointer-events-none" />
+    <Modal
+      isOpen={isOpen}
+      onClose={() => {
+        if (allowSkipKyc) handleDismiss();
+      }}
+      title="Verify Your Seller Identity"
+      maxWidth="max-w-[500px]"
+      showCloseButton={allowSkipKyc}
+      footer={
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
+          {allowSkipKyc && (
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              radius="fiverr"
+              onClick={handleDismiss}
+              className="w-full sm:flex-1 text-slate-700 font-semibold text-sm cursor-pointer"
+            >
+              Skip for Now
+            </Button>
+          )}
 
-        {/* Close / Skip button (if allowed) */}
-        {allowSkipKyc && (
           <Button
             type="button"
-            variant="ghost"
-            size="icon"
-            radius="full"
-            onClick={handleDismiss}
-            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors cursor-pointer w-8 h-8 min-h-[32px] p-0"
-            aria-label="Skip for now"
-            icon={<X size={20} />}
-          />
-        )}
-
+            variant="brand"
+            size="md"
+            radius="fiverr"
+            onClick={handleGoToKyc}
+            className="w-full sm:flex-1 font-bold text-sm shadow-md hover:shadow-lg cursor-pointer"
+            rightIcon={<ArrowRight size={16} />}
+          >
+            Verify Identity Now
+          </Button>
+        </div>
+      }
+    >
+      <div className="flex flex-col items-center text-center">
         {/* Header Icon */}
         <div className="w-16 h-16 rounded-[6px] bg-gradient-to-tr from-emerald-50 to-emerald-100 border border-emerald-200 flex items-center justify-center mb-5 text-brand-green shadow-xs">
           <ShieldAlert size={32} strokeWidth={2.2} />
         </div>
-
-        {/* Title */}
-        <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">
-          Verify Your Seller Identity
-        </h3>
 
         {/* Description */}
         <p className="text-sm text-slate-600 mb-6 leading-relaxed">
@@ -127,7 +137,7 @@ export const KycPromptModal: React.FC = () => {
         </p>
 
         {/* Benefits List */}
-        <div className="w-full bg-slate-50 border border-slate-100 rounded-[6px] p-4 mb-6 text-left space-y-2.5">
+        <div className="w-full bg-slate-50 border border-slate-100 rounded-[6px] p-4 text-left space-y-2.5">
           <div className="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700 font-medium">
             <CheckCircle2 size={16} className="text-brand-green shrink-0" />
             <span>Unlocks earnings withdrawals and Stripe payouts</span>
@@ -138,42 +148,14 @@ export const KycPromptModal: React.FC = () => {
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
-          {allowSkipKyc && (
-            <Button
-              type="button"
-              variant="outline"
-              size="md"
-              radius="xl"
-              onClick={handleDismiss}
-              className="w-full sm:flex-1 text-slate-700 font-semibold text-sm"
-            >
-              Skip for Now
-            </Button>
-          )}
-
-          <Button
-            type="button"
-            variant="brand"
-            size="md"
-            radius="xl"
-            onClick={handleGoToKyc}
-            className="w-full sm:flex-1 font-bold text-sm shadow-md hover:shadow-lg"
-            rightIcon={<ArrowRight size={16} />}
-          >
-            Verify Identity Now
-          </Button>
-        </div>
-
         {/* Subtitle helper note */}
         {allowSkipKyc && (
-          <p className="text-[11px] text-slate-400 mt-4">
+          <p className="text-[11px] text-slate-400 mt-4 text-center">
             You can also complete this anytime from your <span className="font-semibold text-slate-600">Profile Settings</span> or <span className="font-semibold text-slate-600">/kyc</span>.
           </p>
         )}
       </div>
-    </div>
+    </Modal>
   );
 };
 

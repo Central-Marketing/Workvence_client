@@ -7,6 +7,13 @@ import { toast } from "sonner";
 import { socket } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { playNotificationSound } from "@/utils/soundUtil";
+import { Info } from "lucide-react";
+
+const defaultIcon = (
+  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#94a3b8] shadow-sm">
+    <Info className="h-5 w-5 text-white" strokeWidth={2.5} />
+  </div>
+);
 
 const processedNotifIds = new Set<string>();
 const processedNotifMessageIds = new Set<string>();
@@ -218,6 +225,7 @@ export default function GlobalSocketListener() {
         id: `chat-toast-${toastKey}`,
         description: msgPreview,
         duration: 5000,
+        icon: defaultIcon,
         ...(targetConvId
           ? {
               action: {
@@ -436,6 +444,7 @@ export default function GlobalSocketListener() {
         id: `sys-notif-${notifId}`,
         description: newNotif.message,
         duration: 5000,
+        icon: defaultIcon,
         ...(hasAction
           ? {
               action: {

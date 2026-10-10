@@ -774,7 +774,7 @@ const OrganizePage = () => {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
-                  Package title
+                  Package title <span className="text-red-500">*</span>
                 </label>
                 <span
                   className={`text-[11px] font-medium transition-colors ${(state.title?.length || 0) > 80
@@ -806,7 +806,7 @@ const OrganizePage = () => {
             {/* Package Description (Rich Text Editor) */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-700 block">
-                Package description
+                Package description <span className="text-red-500">*</span>
               </label>
               <div className="bg-white rounded-[6px] overflow-hidden border border-gray-200">
                 <ReactQuill
@@ -1099,7 +1099,7 @@ const OrganizePage = () => {
             <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
-                  Package title
+                  Package title <span className="text-red-500">*</span>
                 </label>
                 <span
                   className={`text-[11px] font-medium transition-colors ${(currentTierData.title?.length || 0) > 80
@@ -1130,7 +1130,7 @@ const OrganizePage = () => {
             {/* Tier Description */}
             <div className="space-y-1">
               <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
-                Package description
+                Package description <span className="text-red-500">*</span>
               </label>
               <textarea
                 value={currentTierData.shortDesc || ""}
@@ -1146,7 +1146,7 @@ const OrganizePage = () => {
               {/* Add Delivery Time */}
               <div className="space-y-1">
                 <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
-                  Add delivery time
+                  Add delivery time <span className="text-red-500">*</span>
                 </label>
                 <CustomSelect
                   size="md"
@@ -1242,7 +1242,7 @@ const OrganizePage = () => {
             {/* Set Price */}
             <div className="space-y-1 pt-1">
               <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
-                Set price
+                Set price <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <input

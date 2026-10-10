@@ -527,20 +527,9 @@ const Navbar = () => {
               <div className="flex items-center gap-[20px] font-sf-pro font-medium text-[14px] xl:text-[16px] text-[#1E293B] shrink-0 whitespace-nowrap">
                 <Link
                   href="/orders"
-                  className={`font-semibold text-[14px] xl:text-[15px] transition-colors whitespace-nowrap shrink-0 ${
-                    pathname.startsWith("/orders") ? "text-[#327C73]" : "text-[#18181B] hover:text-[#327C73]"
-                  }`}
+                  className="font-semibold text-[14px] xl:text-[15px] text-[#18181B] hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
                 >
                   Order
-                </Link>
-
-                <Link
-                  href="/support"
-                  className={`font-semibold text-[14px] xl:text-[15px] transition-colors whitespace-nowrap shrink-0 ${
-                    pathname.startsWith("/support") ? "text-[#327C73]" : "text-[#18181B] hover:text-[#327C73]"
-                  }`}
-                >
-                  Customer Support
                 </Link>
 
                 <Link
@@ -630,29 +619,16 @@ const Navbar = () => {
               <div className="flex items-center gap-[20px] font-sf-pro font-medium text-[14px] xl:text-[16px] text-[#1E293B] shrink-0 whitespace-nowrap">
                 <Link
                   href="/dashboard/seller"
-                  className={`font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] transition-colors whitespace-nowrap shrink-0 ${
-                    pathname === "/dashboard/seller" ? "text-[#327C73]" : "text-[#1E293B] hover:text-[#327C73]"
-                  }`}
+                  className="font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
                 >
                   Dashboard
                 </Link>
 
                 <Link
                   href="/briefs?view=feed"
-                  className={`font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] transition-colors whitespace-nowrap shrink-0 ${
-                    pathname.startsWith("/briefs") ? "text-[#327C73]" : "text-[#1E293B] hover:text-[#327C73]"
-                  }`}
+                  className="font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
                 >
                   Find Project
-                </Link>
-
-                <Link
-                  href="/support"
-                  className={`font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] transition-colors whitespace-nowrap shrink-0 ${
-                    pathname.startsWith("/support") ? "text-[#327C73]" : "text-[#1E293B] hover:text-[#327C73]"
-                  }`}
-                >
-                  Customer Support
                 </Link>
 
                 <HeaderInboxIcon

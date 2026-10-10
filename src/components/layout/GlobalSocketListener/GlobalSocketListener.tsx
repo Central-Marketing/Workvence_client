@@ -7,13 +7,36 @@ import { toast } from "sonner";
 import { socket } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { playNotificationSound } from "@/utils/soundUtil";
-import { Info } from "lucide-react";
 
-const defaultIcon = (
-  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#94a3b8] shadow-sm">
-    <Info className="h-5 w-5 text-white" strokeWidth={2.5} />
-  </div>
-);
+const getNotificationType = (notif: any): "success" | "warning" | "error" | "info" | "default" => {
+  if (!notif) return "default";
+  const type = String(notif.type || "").toLowerCase();
+  const title = String(notif.title || "").toLowerCase();
+  const message = String(notif.message || notif.desc || notif.description || "").toLowerCase();
+  const fullText = `${type} ${title} ${message}`;
+
+  if (/cancel|dispute|reject|fail|decline|suspend|terminate|refund/i.test(fullText)) {
+    return "error";
+  }
+
+  if (/extension|extend|revision|warning|caution|pending|expire|action required|overdue|late/i.test(fullText)) {
+    return "warning";
+  }
+
+  if (
+    /new order|order received|order placed|placed an order|delivered|delivery accepted|complete|success|paid|payout|released|accepted|tip|verified|approved|congrat/i.test(
+      fullText
+    )
+  ) {
+    return "success";
+  }
+
+  if (/message|chat|support|ticket|proposal|brief|review|comment|feedback|update|notification/i.test(fullText)) {
+    return "info";
+  }
+
+  return "default";
+};
 
 const processedNotifIds = new Set<string>();
 const processedNotifMessageIds = new Set<string>();
@@ -221,11 +244,10 @@ export default function GlobalSocketListener() {
       const targetConvId = conversationId || newMsg.conversationID;
       const toastKey = contentFingerprint || msgId || `${senderIdStr}-${Date.now()}`;
 
-      toast(displayName, {
+      toast.info(displayName, {
         id: `chat-toast-${toastKey}`,
         description: msgPreview,
         duration: 5000,
-        icon: defaultIcon,
         ...(targetConvId
           ? {
               action: {
@@ -436,15 +458,26 @@ export default function GlobalSocketListener() {
         }
       };
 
+      const notifType = getNotificationType(newNotif);
+      const toastFn =
+        notifType === "success"
+          ? toast.success
+          : notifType === "warning"
+          ? toast.warning
+          : notifType === "error"
+          ? toast.error
+          : notifType === "info"
+          ? toast.info
+          : toast;
+
       const hasAction = Boolean(
         newNotif.link || targetOrderId || targetTicketId || targetBriefId || targetProposalId
       );
 
-      toast(newNotif.title || "Notification", {
+      toastFn(newNotif.title || "Notification", {
         id: `sys-notif-${notifId}`,
         description: newNotif.message,
         duration: 5000,
-        icon: defaultIcon,
         ...(hasAction
           ? {
               action: {

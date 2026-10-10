@@ -22,6 +22,8 @@ import {
   SlidersHorizontal,
   ChevronDown,
   X,
+  ShoppingBag,
+  User,
 } from "lucide-react";
 import { supportService, SupportTicketItem } from "@/utils/supportService";
 import { Button } from "@/components/ui";
@@ -44,6 +46,7 @@ export default function SupportDashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState<string>("All");
+  const [relationshipFilter, setRelationshipFilter] = useState<"all" | "created_by_me" | "linked_order">("all");
   const [showFilters, setShowFilters] = useState(false);
 
   const hasActiveFilters = selectedCategory !== "All" || selectedStatus !== "All";
@@ -75,11 +78,27 @@ export default function SupportDashboardPage() {
     return { total, open, inProgress, resolvedClosed };
   }, [tickets]);
 
+  const relationshipCounts = useMemo(() => {
+    const total = tickets.length;
+    const createdByMe = tickets.filter(
+      (t) => t.isCreator !== false && t.ticketRelationship !== "linked_order"
+    ).length;
+    const linkedOrders = tickets.filter(
+      (t) => t.ticketRelationship === "linked_order" || t.isCreator === false || Boolean(t.order)
+    ).length;
+    return { total, createdByMe, linkedOrders };
+  }, [tickets]);
+
   const filteredTickets = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     const cleanQ = q.replace(/^#/, "");
 
     return tickets.filter((t) => {
+      const matchesRelationship =
+        relationshipFilter === "all" ||
+        (relationshipFilter === "created_by_me" && t.isCreator !== false && t.ticketRelationship !== "linked_order") ||
+        (relationshipFilter === "linked_order" && (t.ticketRelationship === "linked_order" || t.isCreator === false || Boolean(t.order)));
+
       const matchesCat =
         selectedCategory === "All" ||
         t.category?.toLowerCase() === selectedCategory.toLowerCase();
@@ -93,6 +112,9 @@ export default function SupportDashboardPage() {
       const cleanTNumber = tNumber.replace(/^#/, "");
       const tId = String(t.id || t._id || "").toLowerCase();
 
+      const orderCode = t.order?.orderCode || t.order?.code || "";
+      const otherPartyName = t.otherParty?.name || "";
+
       const matchesSearch =
         !q ||
         t.subject?.toLowerCase().includes(q) ||
@@ -100,11 +122,13 @@ export default function SupportDashboardPage() {
         tNumber.includes(q) ||
         cleanTNumber.includes(cleanQ) ||
         tId.includes(cleanQ) ||
-        (t.orderID && String(t.orderID).toLowerCase().includes(cleanQ));
+        (t.orderID && String(t.orderID).toLowerCase().includes(cleanQ)) ||
+        (orderCode && orderCode.toLowerCase().includes(cleanQ)) ||
+        (otherPartyName && otherPartyName.toLowerCase().includes(q));
 
-      return matchesCat && matchesStatus && matchesSearch;
+      return matchesRelationship && matchesCat && matchesStatus && matchesSearch;
     });
-  }, [tickets, selectedCategory, selectedStatus, searchQuery]);
+  }, [tickets, relationshipFilter, selectedCategory, selectedStatus, searchQuery]);
 
   const formatStatusPill = (status: string) => {
     switch (status) {
@@ -184,43 +208,43 @@ export default function SupportDashboardPage() {
             </span>
             <div className="flex items-center justify-between">
               <span className="text-3xl font-bold text-[#0f172a]">{stats.total}</span>
-              <div className="p-2.5 rounded-[6px] bg-[#f1f5f9] text-[#475569]">
+              <div className="p-2.5 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)]">
                 <Inbox className="w-5 h-5" />
               </div>
             </div>
           </div>
 
-          <div className="bg-amber-50/50 p-5 rounded-[6px] border border-amber-200 shadow-xs space-y-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-amber-700">
+          <div className="bg-white p-5 rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-xs space-y-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#0f172a]">
               Open Tickets
             </span>
             <div className="flex items-center justify-between">
-              <span className="text-3xl font-bold text-amber-700">{stats.open}</span>
-              <div className="p-2.5 rounded-[6px] bg-amber-100 text-amber-700">
+              <span className="text-3xl font-bold text-[#0f172a]">{stats.open}</span>
+              <div className="p-2.5 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)]">
                 <AlertTriangle className="w-5 h-5" />
               </div>
             </div>
           </div>
 
-          <div className="bg-blue-50/50 p-5 rounded-[6px] border border-blue-200 shadow-xs space-y-2">
+          <div className="bg-white p-5 rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-xs space-y-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-blue-700">
               In Progress
             </span>
             <div className="flex items-center justify-between">
               <span className="text-3xl font-bold text-blue-700">{stats.inProgress}</span>
-              <div className="p-2.5 rounded-[6px] bg-blue-100 text-blue-700">
+              <div className="p-2.5 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)]">
                 <Clock className="w-5 h-5" />
               </div>
             </div>
           </div>
 
-          <div className="bg-emerald-50/50 p-5 rounded-[6px] border border-emerald-200 shadow-xs space-y-2">
+          <div className="bg-white p-5 rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-xs space-y-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-[#327C73]">
               Resolved / Closed
             </span>
             <div className="flex items-center justify-between">
               <span className="text-3xl font-bold text-[#327C73]">{stats.resolvedClosed}</span>
-              <div className="p-2.5 rounded-[6px] bg-[#327C73]/10 text-[#327C73]">
+              <div className="p-2.5 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)]">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
             </div>
@@ -229,6 +253,63 @@ export default function SupportDashboardPage() {
 
         {/* Filter and Search Bar */}
         <div className="bg-white p-4 sm:p-5 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-4">
+          {/* Relationship Filter Tabs (All / Created by Me / Linked Orders) */}
+          <div className="flex items-center gap-1.5 pb-3 border-b border-[#e2e8f0] overflow-x-auto scrollbar-none">
+            <button
+              type="button"
+              onClick={() => setRelationshipFilter("all")}
+              className={`px-3.5 py-1.5 rounded-[6px] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer font-sf-pro ${relationshipFilter === "all"
+                ? "bg-[#327C73] text-white shadow-xs"
+                : "bg-transparent text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9]"
+                }`}
+            >
+              <span>All Tickets</span>
+              <span
+                className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${relationshipFilter === "all" ? "bg-white/20 text-white" : "bg-[#f1f5f9] text-[#64748b]"
+                  }`}
+              >
+                {relationshipCounts.total}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setRelationshipFilter("created_by_me")}
+              className={`px-3.5 py-1.5 rounded-[6px] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer font-sf-pro ${relationshipFilter === "created_by_me"
+                ? "bg-[#327C73] text-white shadow-xs"
+                : "bg-transparent text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9]"
+                }`}
+            >
+              <span>Created by Me</span>
+              <span
+                className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${relationshipFilter === "created_by_me" ? "bg-white/20 text-white" : "bg-[#f1f5f9] text-[#64748b]"
+                  }`}
+              >
+                {relationshipCounts.createdByMe}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setRelationshipFilter("linked_order")}
+              className={`px-3.5 py-1.5 rounded-[6px] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer font-sf-pro ${relationshipFilter === "linked_order"
+                ? "bg-[#327C73] text-white shadow-xs"
+                : "bg-transparent text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9]"
+                }`}
+            >
+              <ShoppingBag className="w-3.5 h-3.5" />
+              <span>Linked Orders</span>
+              {relationshipCounts.linkedOrders > 0 && (
+                <span
+                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${relationshipFilter === "linked_order" ? "bg-white/20 text-white" : "bg-purple-100 text-purple-700"
+                    }`}
+                >
+                  {relationshipCounts.linkedOrders}
+                </span>
+              )}
+            </button>
+          </div>
+
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             {/* Search Input */}
             <div className="relative flex-1 max-w-xl">
@@ -269,11 +350,10 @@ export default function SupportDashboardPage() {
               <button
                 type="button"
                 onClick={() => setShowFilters((prev) => !prev)}
-                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer font-sf-pro ${
-                  showFilters || hasActiveFilters
-                    ? "bg-[#327C73]/10 border-[#327C73] text-[#327C73] shadow-xs"
-                    : "bg-[#f8fafc] border-[#e2e8f0] text-[#334155] hover:bg-[#f1f5f9] hover:border-[#cbd5e1]"
-                }`}
+                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer font-sf-pro ${showFilters || hasActiveFilters
+                  ? "bg-[#327C73]/10 border-[#327C73] text-[#327C73] shadow-xs"
+                  : "bg-[#f8fafc] border-[#e2e8f0] text-[#334155] hover:bg-[#f1f5f9] hover:border-[#cbd5e1]"
+                  }`}
               >
                 <SlidersHorizontal className="w-4 h-4" />
                 <span>Filters</span>
@@ -283,9 +363,8 @@ export default function SupportDashboardPage() {
                   </span>
                 )}
                 <ChevronDown
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                    showFilters ? "rotate-180" : ""
-                  }`}
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${showFilters ? "rotate-180" : ""
+                    }`}
                 />
               </button>
             </div>
@@ -404,17 +483,64 @@ export default function SupportDashboardPage() {
                       {formatStatusPill(ticket.status)}
                     </div>
 
-                    {/* Category & Responded Badges */}
+                    {/* Origin & Relationship Badges */}
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#f1f5f9] text-[#475569]">
+                      {/* Origin Badge */}
+                      {ticket.isCreator !== false ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          Opened by You
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10.5px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                          Opened by {ticket.otherParty?.role === "seller" ? "Seller" : ticket.otherParty?.role === "buyer" ? "Buyer" : "Other Party"}
+                        </span>
+                      )}
+
+                      {/* Category Badge */}
+                      <span className="px-2 py-0.5 rounded-[4px] text-[10.5px] font-semibold bg-[#f1f5f9] text-[#475569]">
                         {ticket.category || "General Support"}
                       </span>
+
+                      {/* Admin Responded Badge */}
                       {ticket.adminResponded && (
                         <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-bold bg-[#327C73]/10 text-[#327C73]">
                           Admin Responded
                         </span>
                       )}
                     </div>
+
+                    {/* Linked Order Reference */}
+                    {(ticket.order || ticket.orderID) && (
+                      <div className="flex items-center gap-2 p-2 rounded-[6px] bg-[#f8fafc] border border-[#e2e8f0] text-[11px] text-[#334155]">
+                        <ShoppingBag className="w-3.5 h-3.5 text-[#327C73] shrink-0" />
+                        <span className="font-semibold truncate">
+                          Order: #{ticket.order?.orderCode || ticket.order?.code || ticket.orderID}
+                        </span>
+                        {ticket.order?.price && (
+                          <span className="text-[#64748b] ml-auto shrink-0 font-medium">
+                            {ticket.order.price}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Counterparty Info */}
+                    {ticket.otherParty?.name && (
+                      <div className="flex items-center gap-2 text-[11px] text-[#64748b]">
+                        {ticket.otherParty.avatar ? (
+                          <img
+                            src={ticket.otherParty.avatar}
+                            alt={ticket.otherParty.name}
+                            className="w-4 h-4 rounded-full object-cover border border-[#e2e8f0]"
+                          />
+                        ) : (
+                          <User className="w-3.5 h-3.5 text-[#94a3b8]" />
+                        )}
+                        <span className="truncate">
+                          With: <strong className="text-[#0f172a]">{ticket.otherParty.name}</strong> ({ticket.otherParty.role || "Participant"})
+                        </span>
+                      </div>
+                    )}
 
                     {/* Ticket Subject */}
                     <Link href={`/support/${ticket.id}`} className="block">

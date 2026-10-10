@@ -60,11 +60,31 @@ export interface SupportTicketItem {
   status: 'open' | 'in_progress' | 'escalated_to_dispute' | 'resolved' | 'closed';
   adminResponded: boolean;
   orderID?: string | null;
+
+  // Multi-party & Linked Order fields
+  isCreator?: boolean;
+  userRole?: 'creator' | 'buyer' | 'seller' | 'admin';
+  ticketRelationship?: 'created_by_me' | 'linked_order';
+  creator?: {
+    id: string;
+    name: string;
+    avatar?: string;
+  } | null;
+  otherParty?: {
+    id: string;
+    name: string;
+    email?: string;
+    role?: 'buyer' | 'seller';
+    avatar?: string;
+  } | null;
   order?: {
     id: string;
-    code: string;
-    title: string;
-    price: string;
+    orderCode?: string;
+    code?: string;
+    title?: string;
+    price?: string;
+    buyerID?: string;
+    sellerID?: string;
   } | null;
   user?: {
     id: string;
@@ -104,7 +124,7 @@ export const supportService = {
   },
 
   /**
-   * Get all support tickets submitted by current authenticated user
+   * Get all support tickets submitted by or linked to current authenticated user
    */
   async getMyTickets(): Promise<SupportTicketItem[]> {
     const normalize = (list: any[]) => {
@@ -112,19 +132,25 @@ export const supportService = {
       return list.map((t: any) => {
         const id = String(t.id || t._id || "");
         const ticketNumber = t.ticketNumber || (id ? `#TK-${id.substring(0, 6).toUpperCase()}` : "#TK-000000");
+        const isCreator = typeof t.isCreator === "boolean" ? t.isCreator : true;
+        const ticketRelationship = t.ticketRelationship || (isCreator ? "created_by_me" : "linked_order");
         return {
           ...t,
           id,
           _id: t._id || id,
           ticketNumber,
+          isCreator,
+          ticketRelationship,
         };
       });
     };
 
-    // 1. Try /admin/support/tickets/my-tickets
+    // 1. Try /admin/support/my-tickets, fallback to /admin/support/tickets/my-tickets
     let myTicketsList: any[] = [];
     try {
-      const res = await adminAxiosFetch.get('/admin/support/tickets/my-tickets');
+      const res = await adminAxiosFetch.get('/admin/support/my-tickets').catch(() =>
+        adminAxiosFetch.get('/admin/support/tickets/my-tickets')
+      );
       const data = res.data;
       myTicketsList = Array.isArray(data)
         ? data

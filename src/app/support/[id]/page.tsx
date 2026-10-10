@@ -7,6 +7,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Pdf01Icon, File02Icon } from "@hugeicons/core-free-icons";
 import {
   ArrowLeft,
+  ArrowRight,
   Send,
   Loader2,
   AlertCircle,
@@ -226,13 +227,13 @@ export default function TicketDetailsPage() {
     const pid = String(p.id || p._id || p.userId || "").trim();
     return pid && pid === currentUserId;
   });
-  let userRole = currentUserParticipant?.role?.toLowerCase();
+  let userRole = ticket?.userRole || currentUserParticipant?.role?.toLowerCase();
   if (!userRole || userRole === 'creator' || userRole === 'user') {
     userRole = user?.isSeller ? "seller" : "buyer";
   }
   const isUserAdmin = Boolean(user?.isAdmin || userRole === 'admin');
-  const privateThreadId = isUserAdmin 
-    ? adminPrivateTarget 
+  const privateThreadId = isUserAdmin
+    ? adminPrivateTarget
     : (userRole === "seller" ? "seller" : "buyer");
   const hasPrivateThread = Boolean(privateThreadId);
   const currentThreadName = (activeTab === "private" && privateThreadId) ? privateThreadId : "group";
@@ -311,9 +312,16 @@ export default function TicketDetailsPage() {
     onMessageReceived: handleMessageReceived,
   });
 
-  const fetchTicketDetails = useCallback(async () => {
+  const currentThreadNameRef = useRef(currentThreadName);
+  useEffect(() => {
+    currentThreadNameRef.current = currentThreadName;
+  }, [currentThreadName]);
+
+  const fetchTicketDetails = useCallback(async (showLoader = false) => {
     if (!ticketId) return;
-    setLoading(true);
+    if (showLoader) {
+      setLoading(true);
+    }
     setError(null);
     setIs403(false);
     try {
@@ -321,7 +329,7 @@ export default function TicketDetailsPage() {
       const ticketObj = (data as any)?.ticket || (data as any)?.data?.ticket || data;
       setTicket(ticketObj);
 
-      const sortedMessages = extractThreadMessages(ticketObj, currentThreadName);
+      const sortedMessages = extractThreadMessages(ticketObj, currentThreadNameRef.current);
       setMessages(sortedMessages);
     } catch (err: any) {
       console.error("Failed to load ticket details:", err);
@@ -331,14 +339,16 @@ export default function TicketDetailsPage() {
       }
       setError(err?.response?.data?.message || err.message || "Failed to load support ticket details.");
     } finally {
-      setLoading(false);
+      if (showLoader) {
+        setLoading(false);
+      }
       setTimeout(scrollToBottom, 150);
     }
-  }, [ticketId, scrollToBottom, currentThreadName, extractThreadMessages]);
+  }, [ticketId, scrollToBottom, extractThreadMessages]);
 
   useEffect(() => {
-    fetchTicketDetails();
-  }, [fetchTicketDetails]);
+    fetchTicketDetails(true);
+  }, [ticketId, fetchTicketDetails]);
 
   // Sync messages immediately upon switching tabs or when ticket updates
   useEffect(() => {
@@ -432,7 +442,7 @@ export default function TicketDetailsPage() {
         );
       case "in_progress":
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#0D6D5F]/10 text-[#0D6D5F] border border-[#0D6D5F]/20">
             <Clock className="w-3.5 h-3.5" /> In Progress
           </span>
         );
@@ -467,7 +477,7 @@ export default function TicketDetailsPage() {
         );
       case "buyer":
         return (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200 uppercase">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 uppercase">
             Buyer
           </span>
         );
@@ -537,7 +547,7 @@ export default function TicketDetailsPage() {
               Back to Dashboard
             </Link>
             <Button
-              onClick={fetchTicketDetails}
+              onClick={() => fetchTicketDetails(true)}
               variant="brand"
               size="sm"
               radius="fiverr"
@@ -552,12 +562,30 @@ export default function TicketDetailsPage() {
   }
 
   // Participants list from backend, with fallback for backward compatibility
-  const participants = Array.isArray(ticket.participants) && ticket.participants.length > 0
-    ? ticket.participants
+  const rawParticipants = Array.isArray(ticket.participants) && ticket.participants.length > 0
+    ? [...ticket.participants]
     : [
       ticket.user ? { id: ticket.user.id, name: ticket.user.name, avatar: ticket.user.avatar, role: "creator" as const } : null,
       { id: "support", name: "Support Agent", role: "admin" as const },
     ].filter(Boolean);
+
+  if (ticket.otherParty && !rawParticipants.some((p: any) => p.id === ticket.otherParty?.id)) {
+    rawParticipants.push({
+      id: ticket.otherParty.id,
+      name: ticket.otherParty.name,
+      avatar: ticket.otherParty.avatar,
+      role: (ticket.otherParty.role as any) || "user",
+    });
+  }
+  if (ticket.creator && !rawParticipants.some((p: any) => p.id === ticket.creator?.id)) {
+    rawParticipants.unshift({
+      id: ticket.creator.id,
+      name: ticket.creator.name,
+      avatar: ticket.creator.avatar,
+      role: "creator",
+    });
+  }
+  const participants = rawParticipants;
 
   const canSendReply = !sending && !uploadingFile && (replyText.trim().length > 0 || attachments.length > 0);
 
@@ -583,366 +611,415 @@ export default function TicketDetailsPage() {
           </div>
         </div>
 
+        {/* Context Callout Banner for Linked Order / Non-Creator Tickets */}
+        {ticket.isCreator === false && (
+          <div className="p-4 rounded-[6px] bg-white border border-[rgba(0,0,0.10)] text-[#0f172a] flex items-start gap-3 shadow-2xs">
+            <div className="p-2 rounded-full bg-[#0D6D5F]/10 text-[#0D6D5F] shrink-0 mt-0.5">
+              <ShoppingBag className="w-4 h-4" />
+            </div>
+            <div className="space-y-1 flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold font-sf-pro text-[#0f172a]">
+                  Linked Order Support Ticket
+                </span>
+                <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-bold bg-[#0D6D5F]/10 text-[#0D6D5F] border border-[#0D6D5F]/20 uppercase">
+                  {ticket.userRole ? `${ticket.userRole} view` : user?.isSeller ? "Seller View" : "Buyer View"}
+                </span>
+              </div>
+              <p className="text-xs text-[#475569] leading-relaxed font-inter">
+                This support ticket was opened by{" "}
+                <strong className="text-[#0f172a]">{ticket.creator?.name || ticket.otherParty?.name || "the other party"}</strong>
+                {ticket.otherParty?.role ? ` (${ticket.otherParty.role})` : ""}{" "}
+                regarding Order{" "}
+                <strong className="font-mono text-[#0f172a]">
+                  #{ticket.order?.orderCode || ticket.order?.code || ticket.orderID}
+                </strong>
+                . You can participate in the group conversation with both parties and support, or send a private reply directly to support.
+              </p>
+              {ticket.order?.id && (
+                <div className="pt-1">
+                  <Link
+                    href={`/orders/${ticket.order.id}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0D6D5F] hover:text-[#094c42] underline underline-offset-2 transition-colors"
+                  >
+                    <span>View Order Details</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           {/* Ticket Header Details */}
           <div className="lg:col-span-1 bg-white p-6 md:p-6 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-4 self-start lg:sticky lg:top-24">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#e2e8f0] pb-4">
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-3 flex-wrap">
-                <span className="text-xs font-mono font-bold text-[#64748b]">
-                  {ticket.ticketNumber || `#TK-${ticketId.substring(0, 6).toUpperCase()}`}
-                </span>
-                {formatStatusPill(ticket.status)}
-                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#f1f5f9] text-[#475569]">
-                  {ticket.category || "General Support"}
-                </span>
-              </div>
-              <h1 className="text-xl md:text-2xl font-bold text-[#0f172a] font-sf-pro">
-                {ticket.subject}
-              </h1>
-            </div>
-
-            <Button
-              onClick={fetchTicketDetails}
-              variant="soft"
-              size="sm"
-              radius="fiverr"
-              leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
-              className="px-3.5 py-2 text-xs font-semibold self-start md:self-auto font-sf-pro"
-            >
-              Refresh
-            </Button>
-          </div>
-
-          {/* Linked Order Banner */}
-          {ticket.order && (
-            <div className="flex items-center gap-3 p-4 rounded-[6px] bg-[#0D6D5F]/5 border border-[#0D6D5F]/20 text-xs font-inter">
-              <ShoppingBag className="w-5 h-5 text-[#0D6D5F] flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <span className="font-bold text-[#0f172a] block truncate">
-                  Linked Order: {ticket.order.title || ticket.order.code}
-                </span>
-                <span className="text-[#64748b] text-[11px]">
-                  Price: {ticket.order.price}
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* Participants Strip */}
-          <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs border-t border-[#f1f5f9]">
-            <div className="flex items-center gap-2 text-[#64748b] font-medium">
-              <span>Participants:</span>
-              <div className="flex items-center gap-2 flex-wrap">
-                {participants.map((p: any, idx: number) => {
-                  const isUser = p.id === currentUserId;
-                  const displayName = p.role === "admin" ? "Support Agent" : p.name || "Member";
-                  return (
-                    <div
-                      key={p.id || idx}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f8fafc] border border-[#e2e8f0] text-[11px] font-semibold text-[#0f172a]"
-                    >
-                      <span className="w-2 h-2 rounded-full bg-[#0D6D5F]" />
-                      <span>{displayName} {isUser && "(You)"}</span>
-                      {getRoleBadge(p.role)}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Conversation Stream */}
-          <div className="lg:col-span-2 bg-white rounded-[6px] border border-[#e2e8f0] shadow-xs overflow-hidden flex flex-col min-h-[500px] max-h-[80vh]">
-
-          {/* Chat Header */}
-          <div className="px-6 py-4 border-b border-[#e2e8f0] bg-[#f8fafc] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <ShieldCheck className="w-4 h-4 text-[#0D6D5F] shrink-0" />
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold text-[#0f172a]">
-                  {activeTab === "private"
-                    ? (isUserAdmin ? `Private Support Conversation (${adminPrivateTarget.toUpperCase()})` : "Private Support Conversation")
-                    : "Shared Group Conversation"}
-                </span>
-                <span className="text-[11px] text-[#64748b]">
-                  {activeTab === "private"
-                    ? "🔒 Messages here are private between you and Support."
-                    : "👥 Messages here are visible to all participants (Buyer, Seller & Support)."}
-                </span>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              {hasPrivateThread && (() => {
-                const groupCount = extractThreadMessages(ticket, "group").length;
-                const privateCount = extractThreadMessages(ticket, privateThreadId).length;
-                const buyerCount = extractThreadMessages(ticket, "buyer").length;
-                const sellerCount = extractThreadMessages(ticket, "seller").length;
-
-                return (
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                    <div className="flex items-center bg-white border border-[#e2e8f0] rounded-[6px] p-0.5 shadow-2xs shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab("group")}
-                        className={`px-3 py-1.5 text-[11px] font-semibold rounded-[4px] transition-colors flex items-center gap-1.5 ${activeTab === "group" ? "bg-[#0D6D5F] text-white" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"}`}
-                      >
-                        <span>Group Chat</span>
-                        <span className={`px-1.5 py-0.2 text-[10px] rounded-full font-bold ${activeTab === "group" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"}`}>
-                          {groupCount}
-                        </span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab("private")}
-                        className={`px-3 py-1.5 text-[11px] font-semibold rounded-[4px] transition-colors flex items-center gap-1.5 ${activeTab === "private" ? "bg-[#0D6D5F] text-white" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"}`}
-                      >
-                        <span>Private with Support</span>
-                        <span className={`px-1.5 py-0.2 text-[10px] rounded-full font-bold ${activeTab === "private" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"}`}>
-                          {privateCount}
-                        </span>
-                      </button>
-                    </div>
-
-                    {isUserAdmin && activeTab === "private" && (
-                      <div className="flex items-center bg-white border border-[#e2e8f0] rounded-[6px] p-0.5 shadow-2xs shrink-0 text-[11px]">
-                        <button
-                          type="button"
-                          onClick={() => setAdminPrivateTarget("buyer")}
-                          className={`px-2.5 py-1 font-semibold rounded-[4px] transition-colors flex items-center gap-1.5 ${adminPrivateTarget === "buyer" ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-50"}`}
-                        >
-                          <span>Buyer</span>
-                          <span className="px-1 text-[9px] rounded bg-white/70 font-bold">{buyerCount}</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setAdminPrivateTarget("seller")}
-                          className={`px-2.5 py-1 font-semibold rounded-[4px] transition-colors flex items-center gap-1.5 ${adminPrivateTarget === "seller" ? "bg-purple-600 text-white" : "text-slate-500 hover:bg-slate-50"}`}
-                        >
-                          <span>Seller</span>
-                          <span className="px-1 text-[9px] rounded bg-white/70 font-bold">{sellerCount}</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
-              <span className="text-[11px] text-[#64748b] hidden sm:inline-block">
-                {messages.length} Message{messages.length === 1 ? "" : "s"}
-              </span>
-            </div>
-          </div>
-
-          {/* Message List */}
-          <div ref={messageContainerRef} className="flex-1 p-6 space-y-5 overflow-y-auto max-h-[600px] bg-[#f8fafc]/50 scroll-smooth">
-            {messages.length === 0 ? (
-              <div className="text-center py-12 space-y-2">
-                <User className="w-8 h-8 mx-auto text-[#cbd5e1]" />
-                <p className="text-xs text-[#64748b]">No messages yet. Send a reply below.</p>
-              </div>
-            ) : (
-              messages.map((msg, idx) => {
-                const isSystem = msg.role === "system";
-                const isAdmin = msg.role === "admin" || msg.senderID === "support";
-                const isMe = Boolean(currentUserId && msg.senderID && msg.senderID === currentUserId);
-                const displayName = isAdmin ? "Support Agent" : msg.sender || (isMe ? "You" : "Participant");
-                const timeStr = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "";
-
-                // System message rendering (e.g. escalated to dispute)
-                if (isSystem) {
-                  return (
-                    <div key={msg.id || idx} className="flex items-center justify-center my-3">
-                      <div className="px-4 py-2 rounded-[6px] bg-purple-50 border border-purple-200 text-purple-800 text-xs font-medium text-center max-w-md shadow-2xs">
-                        <span className="font-bold mr-1">System Notice:</span>
-                        <span>{msg.message}</span>
-                        {timeStr && <span className="block text-[10px] text-purple-600 mt-0.5">{timeStr}</span>}
-                      </div>
-                    </div>
-                  );
-                }
-
-                return (
-                  <div
-                    key={msg.id || idx}
-                    className={`flex gap-3 items-end max-w-[85%] sm:max-w-[75%] [overflow-wrap:anywhere] [word-break:break-word] ${isMe ? "self-end justify-end ml-auto" : "self-start mr-auto"}`}
-                  >
-                    {!isMe && (
-                      <div
-                        className={`w-8 h-8 rounded-full text-white flex items-center justify-center font-bold text-xs flex-shrink-0 border border-slate-100 ${isAdmin ? "bg-[#0D6D5F]" : "bg-[#0f172a]"}`}
-                      >
-                        {isAdmin ? "S" : displayName[0]?.toUpperCase() || "U"}
-                      </div>
-                    )}
-
-                    <div className="flex flex-col">
-                      <div className={`flex items-center gap-2 text-[11px] font-semibold text-[#64748b] px-1 mb-1 ${isMe ? "justify-end" : "justify-start"}`}>
-                        <span>{isMe ? "You" : displayName}</span>
-                        {getRoleBadge(msg.role)}
-                        {(msg.thread === "buyer" || msg.thread === "seller" || activeTab === "private") && (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <Lock className="w-2.5 h-2.5" /> Private
-                          </span>
-                        )}
-                      </div>
-
-                      <div
-                        className={`relative px-4 py-3 min-w-[100px] max-w-full shadow-2xs [overflow-wrap:anywhere] [word-break:break-word] ${isMe ? "rounded-[10px_10px_10px_0] border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-300,#F5F5F5)] text-slate-800" : "rounded-[10px_10px_10px_0] bg-[#FFF] border-0 text-[#0f172a]"}`}
-                      >
-                        {msg.message && <p className="text-[13.5px] m-0 whitespace-pre-wrap leading-relaxed">{msg.message}</p>}
-  <span className="text-[11px] text-slate-400 block mt-1">{timeStr}</span>
-
-                        {/* Attachments rendering with Signed URL resolution & Image Previews */}
-                        {/* Attachments Section */}
-                        {msg.attachments && msg.attachments.length > 0 && (
-                          <div className={`mt-3 pt-3 border-t ${isMe ? "border-white/20" : "border-[#e2e8f0]"} space-y-2`}>
-                            <p className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${isMe ? "text-white/80" : "text-[#64748b]"}`}>
-                              <FileText className="w-3 h-3" />
-                              <span>Attachments ({msg.attachments.length})</span>
-                            </p>
-
-                            <div className="grid grid-cols-1 gap-2">
-                              {msg.attachments.map((att: any, aIdx: number) => (
-                                <SupportAttachmentCard
-                                  key={att.id || att.public_id || `${att.name}-${aIdx}`}
-                                  att={att}
-                                  isMe={isMe}
-                                  onPreview={(img) => setSelectedPreviewImage(img)}
-                                  onDownload={handleDownload}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    
-                  </div>
-                );
-              })
-            )}
-
-            {/* Typing Indicator */}
-            {typingUser && (
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#0D6D5F] animate-pulse font-inter">
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>{typingUser} is typing a response...</span>
-              </div>
-            )}
-          </div>
-
-          {/* Reply Form */}
-          <div className="p-4 md:p-6 border-t border-[#e2e8f0] bg-white space-y-3">
-
-            {/* Attachment preview */}
-            {attachments.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {attachments.map((att, idx) => (
-                  <span
-                    key={idx}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[6px] bg-[#0D6D5F]/10 border border-[#0D6D5F]/20 text-[#0D6D5F] text-xs font-semibold font-inter"
-                  >
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>{att.name}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      radius="full"
-                      onClick={() => setAttachments((prev) => prev.filter((_, i) => i !== idx))}
-                      className="hover:text-rose-600 p-0 w-4 h-4 h-auto min-h-0 border-none shadow-none hover:bg-transparent"
-                    >
-                      ×
-                    </Button>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#e2e8f0] pb-4">
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="text-xs font-mono font-bold text-[#64748b]">
+                    {ticket.ticketNumber || `#TK-${ticketId.substring(0, 6).toUpperCase()}`}
                   </span>
-                ))}
-              </div>
-            )}
-
-            <form
-              onSubmit={handleSendReply}
-              className="bg-[#f8fafc] border border-[#e2e8f0] focus-within:border-[#0D6D5F] focus-within:ring-2 focus-within:ring-[#0D6D5F]/10 rounded-[6px] p-3 sm:p-4 transition-all space-y-3"
-            >
-              {/* Textarea */}
-              <textarea
-                rows={3}
-                placeholder={
-                  activeTab === "private"
-                    ? `Type a private message to Support (only visible to you and Support)...`
-                    : "Type a group message (visible to all participants: Buyer, Seller & Support)..."
-                }
-                value={replyText}
-                onChange={(e) => {
-                  setReplyText(e.target.value);
-                  startTyping();
-                }}
-                onKeyDown={(e) => {
-                  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-                    e.preventDefault();
-                    if (canSendReply) {
-                      handleSendReply(e);
-                    }
-                  }
-                }}
-                onBlur={stopTyping}
-                className="w-full bg-transparent border-0 text-xs sm:text-sm text-[#0f172a] placeholder-[#94a3b8] focus:outline-none focus:ring-0 resize-none font-inter leading-relaxed"
-              />
-
-              {/* Actions Bottom Bar */}
-              <div className="flex items-center justify-between gap-3 pt-2.5 border-t border-[#e2e8f0]">
-                {/* Left: Upload file attachment */}
-                <div className="flex items-center gap-2">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="xs"
-                    radius="fiverr"
-                    disabled={uploadingFile}
-                    isLoading={uploadingFile}
-                    loadingText="Uploading..."
-                    onClick={() => fileInputRef.current?.click()}
-                    leftIcon={<Upload className="w-3.5 h-3.5 text-[#0D6D5F]" />}
-                    className="bg-white border-[#e2e8f0] hover:border-[#0D6D5F]/40 text-[#475569] hover:text-[#0D6D5F] text-xs font-semibold font-sf-pro shadow-2xs"
-                  >
-                    Upload File
-                  </Button>
-
-                  <span className="text-[11px] text-[#94a3b8] hidden md:inline">
-                    Press Ctrl + Enter to send
+                  {formatStatusPill(ticket.status)}
+                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#f1f5f9] text-[#475569]">
+                    {ticket.category || "General Support"}
                   </span>
                 </div>
-
-                {/* Right: Send Button */}
-                <Button
-                  type="submit"
-                  variant="brand"
-                  size="sm"
-                  radius="xl"
-                  disabled={!canSendReply}
-                  isLoading={sending}
-                  loadingText="Sending..."
-                  rightIcon={<Send className="w-3.5 h-3.5" />}
-                  className="px-5 sm:px-6 py-2 sm:py-2.5 text-xs font-semibold shadow-xs font-sf-pro shrink-0"
-                >
-                  {sending ? "Sending..." : activeTab === "private" ? "Send Privately" : "Send Reply"}
-                </Button>
+                <h1 className="text-xl md:text-2xl font-bold text-[#0f172a] font-sf-pro">
+                  {ticket.subject}
+                </h1>
               </div>
-            </form>
+
+              <Button
+                onClick={() => fetchTicketDetails(true)}
+                variant="soft"
+                size="sm"
+                radius="fiverr"
+                leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+                className="px-3.5 py-2 text-xs font-semibold self-start md:self-auto font-sf-pro"
+              >
+                Refresh
+              </Button>
+            </div>
+
+            {/* Linked Order Banner */}
+            {(ticket.order || ticket.orderID) && (
+              <div className="flex items-center gap-3 p-4 rounded-[6px] bg-[#0D6D5F]/5 border border-[#0D6D5F]/20 text-xs font-inter">
+                <ShoppingBag className="w-5 h-5 text-[#0D6D5F] flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <span className="font-bold text-[#0f172a] block truncate">
+                    Linked Order: #{ticket.order?.orderCode || ticket.order?.code || ticket.orderID}
+                  </span>
+                  <span className="text-[#64748b] text-[11px] block truncate">
+                    {ticket.order?.title ? `${ticket.order.title} • ` : ""}{ticket.order?.price || ""}
+                  </span>
+                  {ticket.order?.id && (
+                    <Link
+                      href={`/orders/${ticket.order.id}`}
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0D6D5F] hover:underline mt-1"
+                    >
+                      <span>Open Order</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Participants Strip */}
+            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs border-t border-[#f1f5f9]">
+              <div className="flex items-center gap-2 text-[#64748b] font-medium">
+                <span>Participants:</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {participants.map((p: any, idx: number) => {
+                    const isUser = p.id === currentUserId;
+                    const displayName = p.role === "admin" ? "Support Agent" : p.name || "Member";
+                    return (
+                      <div
+                        key={p.id || idx}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f8fafc] border border-[#e2e8f0] text-[11px] font-semibold text-[#0f172a]"
+                      >
+                        <span className="w-2 h-2 rounded-full bg-[#0D6D5F]" />
+                        <span>{displayName} {isUser && "(You)"}</span>
+                        {getRoleBadge(p.role)}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Conversation Stream */}
+          <div className="lg:col-span-2 bg-white rounded-[6px] border border-[#e2e8f0] shadow-xs overflow-hidden flex flex-col min-h-[500px] max-h-[80vh]">
+
+            {/* Chat Header */}
+            <div className="px-6 py-4 border-b border-[#e2e8f0] bg-[#f8fafc] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <ShieldCheck className="w-4 h-4 text-[#0D6D5F] shrink-0" />
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-[#0f172a]">
+                    {activeTab === "private"
+                      ? (isUserAdmin ? `Private Support Conversation (${adminPrivateTarget.toUpperCase()})` : "Private Support Conversation")
+                      : "Shared Group Conversation"}
+                  </span>
+                  <span className="text-[11px] text-[#64748b]">
+                    {activeTab === "private"
+                      ? "🔒 Messages here are private between you and Support."
+                      : "👥 Messages here are visible to all participants (Buyer, Seller & Support)."}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                {hasPrivateThread && (() => {
+                  const groupCount = extractThreadMessages(ticket, "group").length;
+                  const privateCount = extractThreadMessages(ticket, privateThreadId).length;
+                  const buyerCount = extractThreadMessages(ticket, "buyer").length;
+                  const sellerCount = extractThreadMessages(ticket, "seller").length;
+
+                  return (
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                      <div className="flex items-center bg-white border border-[#e2e8f0] rounded-[6px] p-0.5 shadow-2xs shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("group")}
+                          className={`px-3 py-1.5 text-[11px] font-semibold rounded-[4px] transition-colors flex items-center gap-1.5 ${activeTab === "group" ? "bg-[#0D6D5F] text-white" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"}`}
+                        >
+                          <span>Group Chat</span>
+                          <span className={`px-1.5 py-0.2 text-[10px] rounded-full font-bold ${activeTab === "group" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"}`}>
+                            {groupCount}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("private")}
+                          className={`px-3 py-1.5 text-[11px] font-semibold rounded-[4px] transition-colors flex items-center gap-1.5 ${activeTab === "private" ? "bg-[#0D6D5F] text-white" : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"}`}
+                        >
+                          <span>Private with Support</span>
+                          <span className={`px-1.5 py-0.2 text-[10px] rounded-full font-bold ${activeTab === "private" ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"}`}>
+                            {privateCount}
+                          </span>
+                        </button>
+                      </div>
+
+                      {isUserAdmin && activeTab === "private" && (
+                        <div className="flex items-center bg-white border border-[#e2e8f0] rounded-[6px] p-0.5 shadow-2xs shrink-0 text-[11px]">
+                          <button
+                            type="button"
+                            onClick={() => setAdminPrivateTarget("buyer")}
+                            className={`px-2.5 py-1 font-semibold rounded-[4px] transition-colors flex items-center gap-1.5 ${adminPrivateTarget === "buyer" ? "bg-[#0D6D5F] text-white" : "text-slate-500 hover:bg-slate-50"}`}
+                          >
+                            <span>Buyer</span>
+                            <span className="px-1 text-[9px] rounded bg-white/70 font-bold">{buyerCount}</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAdminPrivateTarget("seller")}
+                            className={`px-2.5 py-1 font-semibold rounded-[4px] transition-colors flex items-center gap-1.5 ${adminPrivateTarget === "seller" ? "bg-purple-600 text-white" : "text-slate-500 hover:bg-slate-50"}`}
+                          >
+                            <span>Seller</span>
+                            <span className="px-1 text-[9px] rounded bg-white/70 font-bold">{sellerCount}</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+                <span className="text-[11px] text-[#64748b] hidden sm:inline-block">
+                  {messages.length} Message{messages.length === 1 ? "" : "s"}
+                </span>
+              </div>
+            </div>
+
+            {/* Message List */}
+            <div ref={messageContainerRef} className="flex-1 p-6 space-y-5 overflow-y-auto max-h-[600px] bg-[#f8fafc]/50 scroll-smooth">
+              {messages.length === 0 ? (
+                <div className="text-center py-12 space-y-2">
+                  <User className="w-8 h-8 mx-auto text-[#cbd5e1]" />
+                  <p className="text-xs text-[#64748b]">No messages yet. Send a reply below.</p>
+                </div>
+              ) : (
+                messages.map((msg, idx) => {
+                  const isSystem = msg.role === "system";
+                  const isAdmin = msg.role === "admin" || msg.senderID === "support";
+                  const isMe = Boolean(currentUserId && msg.senderID && msg.senderID === currentUserId);
+                  const displayName = isAdmin ? "Support Agent" : msg.sender || (isMe ? "You" : "Participant");
+                  const timeStr = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "";
+
+                  // System message rendering (e.g. escalated to dispute)
+                  if (isSystem) {
+                    return (
+                      <div key={msg.id || idx} className="flex items-center justify-center my-3">
+                        <div className="px-4 py-2 rounded-[6px] bg-purple-50 border border-purple-200 text-purple-800 text-xs font-medium text-center max-w-md shadow-2xs">
+                          <span className="font-bold mr-1">System Notice:</span>
+                          <span>{msg.message}</span>
+                          {timeStr && <span className="block text-[10px] text-purple-600 mt-0.5">{timeStr}</span>}
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div
+                      key={msg.id || idx}
+                      className={`flex gap-3 items-end max-w-[85%] sm:max-w-[75%] [overflow-wrap:anywhere] [word-break:break-word] ${isMe ? "self-end justify-end ml-auto" : "self-start mr-auto"}`}
+                    >
+                      {!isMe && (
+                        <div
+                          className={`w-8 h-8 rounded-full text-white flex items-center justify-center font-bold text-xs flex-shrink-0 border border-slate-100 ${isAdmin ? "bg-[#0D6D5F]" : "bg-[#0f172a]"}`}
+                        >
+                          {isAdmin ? "S" : displayName[0]?.toUpperCase() || "U"}
+                        </div>
+                      )}
+
+                      <div className="flex flex-col">
+                        <div className={`flex items-center gap-2 text-[11px] font-semibold text-[#64748b] px-1 mb-1 ${isMe ? "justify-end" : "justify-start"}`}>
+                          <span>{isMe ? "You" : displayName}</span>
+                          {getRoleBadge(msg.role)}
+                          {(msg.thread === "buyer" || msg.thread === "seller" || activeTab === "private") && (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              <Lock className="w-2.5 h-2.5" /> Private
+                            </span>
+                          )}
+                        </div>
+
+                        <div
+                          className={`relative px-4 py-3 min-w-[100px] max-w-full shadow-2xs [overflow-wrap:anywhere] [word-break:break-word] ${isMe ? "rounded-[10px_10px_10px_0] border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-300,#F5F5F5)] text-slate-800" : "rounded-[10px_10px_10px_0] bg-[#FFF] border-0 text-[#0f172a]"}`}
+                        >
+                          {msg.message && <p className="text-[13.5px] m-0 whitespace-pre-wrap leading-relaxed">{msg.message}</p>}
+                          <span className="text-[11px] text-slate-400 block mt-1">{timeStr}</span>
+
+                          {/* Attachments rendering with Signed URL resolution & Image Previews */}
+                          {/* Attachments Section */}
+                          {msg.attachments && msg.attachments.length > 0 && (
+                            <div className={`mt-3 pt-3 border-t ${isMe ? "border-white/20" : "border-[#e2e8f0]"} space-y-2`}>
+                              <p className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${isMe ? "text-white/80" : "text-[#64748b]"}`}>
+                                <FileText className="w-3 h-3" />
+                                <span>Attachments ({msg.attachments.length})</span>
+                              </p>
+
+                              <div className="grid grid-cols-1 gap-2">
+                                {msg.attachments.map((att: any, aIdx: number) => (
+                                  <SupportAttachmentCard
+                                    key={att.id || att.public_id || `${att.name}-${aIdx}`}
+                                    att={att}
+                                    isMe={isMe}
+                                    onPreview={(img) => setSelectedPreviewImage(img)}
+                                    onDownload={handleDownload}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+
+                    </div>
+                  );
+                })
+              )}
+
+              {/* Typing Indicator */}
+              {typingUser && (
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#0D6D5F] animate-pulse font-inter">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>{typingUser} is typing a response...</span>
+                </div>
+              )}
+            </div>
+
+            {/* Reply Form */}
+            <div className="p-4 md:p-6 border-t border-[#e2e8f0] bg-white space-y-3">
+
+              {/* Attachment preview */}
+              {attachments.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {attachments.map((att, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[6px] bg-[#0D6D5F]/10 border border-[#0D6D5F]/20 text-[#0D6D5F] text-xs font-semibold font-inter"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>{att.name}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        radius="full"
+                        onClick={() => setAttachments((prev) => prev.filter((_, i) => i !== idx))}
+                        className="hover:text-rose-600 p-0 w-4 h-4 h-auto min-h-0 border-none shadow-none hover:bg-transparent"
+                      >
+                        ×
+                      </Button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <form
+                onSubmit={handleSendReply}
+                className="bg-[#f8fafc] border border-[#e2e8f0] focus-within:border-[#0D6D5F] focus-within:ring-2 focus-within:ring-[#0D6D5F]/10 rounded-[6px] p-3 sm:p-4 transition-all space-y-3"
+              >
+                {/* Textarea */}
+                <textarea
+                  rows={3}
+                  placeholder={
+                    activeTab === "private"
+                      ? `Type a private message to Support (only visible to you and Support)...`
+                      : "Type a group message (visible to all participants: Buyer, Seller & Support)..."
+                  }
+                  value={replyText}
+                  onChange={(e) => {
+                    setReplyText(e.target.value);
+                    startTyping();
+                  }}
+                  onKeyDown={(e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                      e.preventDefault();
+                      if (canSendReply) {
+                        handleSendReply(e);
+                      }
+                    }
+                  }}
+                  onBlur={stopTyping}
+                  className="w-full bg-transparent border-0 text-xs sm:text-sm text-[#0f172a] placeholder-[#94a3b8] focus:outline-none focus:ring-0 resize-none font-inter leading-relaxed"
+                />
+
+                {/* Actions Bottom Bar */}
+                <div className="flex items-center justify-between gap-3 pt-2.5 border-t border-[#e2e8f0]">
+                  {/* Left: Upload file attachment */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="xs"
+                      radius="fiverr"
+                      disabled={uploadingFile}
+                      isLoading={uploadingFile}
+                      loadingText="Uploading..."
+                      onClick={() => fileInputRef.current?.click()}
+                      leftIcon={<Upload className="w-3.5 h-3.5 text-[#0D6D5F]" />}
+                      className="bg-white border-[#e2e8f0] hover:border-[#0D6D5F]/40 text-[#475569] hover:text-[#0D6D5F] text-xs font-semibold font-sf-pro shadow-2xs"
+                    >
+                      Upload File
+                    </Button>
+
+                    <span className="text-[11px] text-[#94a3b8] hidden md:inline">
+                      Press Ctrl + Enter to send
+                    </span>
+                  </div>
+
+                  {/* Right: Send Button */}
+                  <Button
+                    type="submit"
+                    variant="brand"
+                    size="sm"
+                    radius="xl"
+                    disabled={!canSendReply}
+                    isLoading={sending}
+                    loadingText="Sending..."
+                    rightIcon={<Send className="w-3.5 h-3.5" />}
+                    className="px-5 sm:px-6 py-2 sm:py-2.5 text-xs font-semibold shadow-xs font-sf-pro shrink-0"
+                  >
+                    {sending ? "Sending..." : activeTab === "private" ? "Send Privately" : "Send Reply"}
+                  </Button>
+                </div>
+              </form>
+            </div>
+
           </div>
 
         </div>
-
-      </div>
       </div>
 
       {/* High-Res Image Preview Lightbox Modal */}

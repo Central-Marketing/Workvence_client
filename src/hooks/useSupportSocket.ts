@@ -65,6 +65,11 @@ export function useSupportSocket({
   const [isUnauthorized, setIsUnauthorized] = useState(false);
   const [typingUser, setTypingUser] = useState<string | null>(null);
 
+  const threadRef = useRef(thread);
+  useEffect(() => {
+    threadRef.current = thread;
+  }, [thread]);
+
   const onMessageRef = useRef(onMessageReceived);
   useEffect(() => {
     onMessageRef.current = onMessageReceived;
@@ -93,22 +98,26 @@ export function useSupportSocket({
         adminSocket.emit('join_ticket_room', payload);
         adminSocket.emit('join_room', `ticket_${ticketId}`);
         adminSocket.emit('join_room', `ticket:${ticketId}`);
-        if (thread && thread !== 'group') {
-          adminSocket.emit('join_room', `ticket:${ticketId}:${thread}`);
-          adminSocket.emit('join_room', `ticket_${ticketId}_${thread}`);
-          adminSocket.emit('join_room', `room:support:ticket:${ticketId}:${thread}`);
-        }
+        adminSocket.emit('join_room', `ticket:${ticketId}:group`);
+        adminSocket.emit('join_room', `ticket:${ticketId}:buyer`);
+        adminSocket.emit('join_room', `ticket:${ticketId}:seller`);
+        adminSocket.emit('join_room', `ticket_${ticketId}_buyer`);
+        adminSocket.emit('join_room', `ticket_${ticketId}_seller`);
+        adminSocket.emit('join_room', `room:support:ticket:${ticketId}:buyer`);
+        adminSocket.emit('join_room', `room:support:ticket:${ticketId}:seller`);
       }
 
       mainSocket.emit('join_ticket', payload);
       mainSocket.emit('join_ticket_room', payload);
       mainSocket.emit('join_room', `ticket_${ticketId}`);
       mainSocket.emit('join_room', `ticket:${ticketId}`);
-      if (thread && thread !== 'group') {
-        mainSocket.emit('join_room', `ticket:${ticketId}:${thread}`);
-        mainSocket.emit('join_room', `ticket_${ticketId}_${thread}`);
-        mainSocket.emit('join_room', `room:support:ticket:${ticketId}:${thread}`);
-      }
+      mainSocket.emit('join_room', `ticket:${ticketId}:group`);
+      mainSocket.emit('join_room', `ticket:${ticketId}:buyer`);
+      mainSocket.emit('join_room', `ticket:${ticketId}:seller`);
+      mainSocket.emit('join_room', `ticket_${ticketId}_buyer`);
+      mainSocket.emit('join_room', `ticket_${ticketId}_seller`);
+      mainSocket.emit('join_room', `room:support:ticket:${ticketId}:buyer`);
+      mainSocket.emit('join_room', `room:support:ticket:${ticketId}:seller`);
     };
 
     joinTicketRooms();
@@ -209,11 +218,6 @@ export function useSupportSocket({
       mainSocket.emit('leave_ticket_room', payload);
       mainSocket.emit('leave_room', `ticket_${ticketId}`);
       mainSocket.emit('leave_room', `ticket:${ticketId}`);
-      if (thread && thread !== 'group') {
-        mainSocket.emit('leave_room', `ticket:${ticketId}:${thread}`);
-        mainSocket.emit('leave_room', `ticket_${ticketId}_${thread}`);
-        mainSocket.emit('leave_room', `room:support:ticket:${ticketId}:${thread}`);
-      }
       mainSocket.off('connect', handleConnect);
       mainSocket.off('disconnect', handleDisconnect);
       mainSocket.off('receive_support_message', handleReceiveMessage);
@@ -222,7 +226,7 @@ export function useSupportSocket({
       mainSocket.off('user_typing', handleUserTyping);
       mainSocket.off('user_stopped_typing', handleUserStoppedTyping);
     };
-  }, [ticketId, thread]);
+  }, [ticketId]);
 
   const sendSupportMessage = useCallback(
     (message: string, attachments: any[] = []) => {
@@ -230,7 +234,7 @@ export function useSupportSocket({
 
       const payload = {
         ticketId,
-        thread: thread || 'group',
+        thread: threadRef.current || 'group',
         message: message.trim(),
         attachments,
         senderName: userDisplayName,
@@ -244,7 +248,7 @@ export function useSupportSocket({
         mainSocket.emit('send_support_message', payload);
       }
     },
-    [ticketId, userDisplayName, thread]
+    [ticketId, userDisplayName]
   );
 
   const startTyping = useCallback(() => {

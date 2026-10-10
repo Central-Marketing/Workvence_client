@@ -342,16 +342,22 @@ export default function ProfilePage() {
         const uploaded = await supportService.uploadFileToCloudinary(file, "profile_covers");
         const cdnUrl = uploaded?.secure_url || uploaded?.url;
         if (cdnUrl) {
+          // Immediately update backend with cover photo
+          await axiosFetch.patch("/users", { coverPhotoUrl: cdnUrl }).catch(() => null);
+
           setCoverImageUrl(cdnUrl);
           if (typeof window !== "undefined") {
             localStorage.setItem("user_cover_image", cdnUrl);
+            
+            // Also update the cached user
+            const updatedUser = { ...user, coverPhotoUrl: cdnUrl, coverImage: cdnUrl };
+            setUser(updatedUser);
+            localStorage.setItem("user", JSON.stringify(updatedUser));
           }
           toast.success("Cover image updated!", { id: "cover-upload" });
         }
-      } catch {
-        const localUrl = URL.createObjectURL(file);
-        setCoverImageUrl(localUrl);
-        toast.success("Cover image preview updated!", { id: "cover-upload" });
+      } catch (err: any) {
+        toast.error(err?.response?.data?.message || err.message || "Failed to upload cover image", { id: "cover-upload" });
       }
     }
   };

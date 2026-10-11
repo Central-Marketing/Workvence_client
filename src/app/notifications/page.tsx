@@ -348,10 +348,7 @@ const NotificationsPage = () => {
                 }`}
             >
               <span className="whitespace-nowrap shrink-0">All</span>
-              <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 ${activeTab === "all" ? "bg-white/20 text-white" : "bg-gray-200/80 text-gray-700"
-                }`}>
-                {notifications.length}
-              </span>
+
             </Button>
 
             <Button
@@ -366,12 +363,16 @@ const NotificationsPage = () => {
                 }`}
             >
               <span className="whitespace-nowrap shrink-0">Unread</span>
-              {unreadCount > 0 && (
-                <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-bold leading-none shrink-0 ${activeTab === "unread" ? "bg-white/20 text-white" : "bg-amber-100 text-amber-800"
-                  }`}>
-                  {unreadCount}
-                </span>
-              )}
+              <span
+                className={`inline-flex items-center justify-center w-[22px] h-[22px] rounded-full aspect-square text-[10px] font-bold leading-none shrink-0 tabular-nums ${activeTab === "unread"
+                    ? "bg-white/20 text-white"
+                    : unreadCount > 0
+                      ? "bg-amber-100 text-amber-800"
+                      : "bg-gray-200/80 text-gray-700"
+                  }`}
+              >
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
             </Button>
 
 

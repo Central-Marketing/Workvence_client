@@ -24,7 +24,7 @@ test("all variants share SF Pro, geometry, semantic icons and colors", async ({ 
     await expect(card.locator("[data-title]")).toHaveText("Saved changes");
     await expect(card).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await expect(card).toHaveCSS("width", "440px");
-    await expect(card).toHaveCSS("border-radius", "14px");
+    await expect(card).toHaveCSS("border-radius", "6px");
     await expect(card.locator("[data-title]")).toHaveCSS("font-size", "15px");
     await expect(card.locator("[data-icon]")).toHaveCSS("color", color);
     await expect(card.locator("[data-icon]")).toHaveCSS("width", "40px");
@@ -154,7 +154,7 @@ test("short chat is compact, aligned, and has independent body and close targets
   await expect(card.locator(".workvence-toast-icon-badge")).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await expect(card.locator(".workvence-toast-icon-badge")).toHaveCSS("border-radius", "6px");
   await expect(card.locator(".workvence-toast-action-btn")).toHaveText("View");
-  await expect(card.locator(".workvence-toast-action-btn")).toHaveCSS("border-radius", "8px");
+  await expect(card.locator(".workvence-toast-action-btn")).toHaveCSS("border-radius", "6px");
   await expect(card.locator(".workvence-toast-action-btn")).toHaveCSS("height", "36px");
   await expect(card.locator("button button")).toHaveCount(0);
   await expect(close.locator("svg")).toHaveCSS("width", "16px");

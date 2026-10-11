@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 
 import { useUserStore } from "@/store/userStore";
+import type { User } from "@/types";
 import { axiosFetch, countriesFlags, getCountryShortName } from "@/utils";
 import supportService from "@/utils/supportService";
 import { Loader, KycVerificationForm, Button } from "@/components";
@@ -350,9 +351,11 @@ export default function ProfilePage() {
             localStorage.setItem("user_cover_image", cdnUrl);
             
             // Also update the cached user
-            const updatedUser = { ...user, coverPhotoUrl: cdnUrl, coverImage: cdnUrl };
-            setUser(updatedUser);
-            localStorage.setItem("user", JSON.stringify(updatedUser));
+            if (user) {
+              const updatedUser = { ...user, coverPhotoUrl: cdnUrl, coverImage: cdnUrl };
+              setUser(updatedUser as User);
+              localStorage.setItem("user", JSON.stringify(updatedUser));
+            }
           }
           toast.dismiss("cover-upload");
         }

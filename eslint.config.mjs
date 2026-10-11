@@ -22,6 +22,8 @@ const eslintConfig = defineConfig([
       "react-hooks/set-state-in-effect": "warn",
       "react-hooks/purity": "warn",
       "react-hooks/immutability": "warn",
+      "react-hooks/refs": "warn",
+      "react-hooks/preserve-manual-memoization": "warn",
       "@typescript-eslint/no-unused-vars": "warn",
       "@next/next/no-img-element": "warn",
     },

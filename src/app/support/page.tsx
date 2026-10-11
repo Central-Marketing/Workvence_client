@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
+import moment from "moment";
 import {
   LifeBuoy,
   PlusCircle,
@@ -24,6 +25,7 @@ import {
   X,
   ShoppingBag,
   User,
+  RotateCcw,
 } from "lucide-react";
 import { supportService, SupportTicketItem } from "@/utils/supportService";
 import { Button } from "@/components/ui";
@@ -37,7 +39,7 @@ const CATEGORIES = [
   { id: "Platform Feedback", label: "Platform Feedback", icon: Sparkles },
 ];
 
-const STATUSES = ["All", "open", "in_progress", "resolved", "closed"] as const;
+const STATUSES = ["All", "open", "in_progress", "escalated_to_dispute", "resolved", "closed"] as const;
 
 export default function SupportDashboardPage() {
   const [tickets, setTickets] = useState<SupportTicketItem[]>([]);
@@ -47,10 +49,26 @@ export default function SupportDashboardPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState<string>("All");
   const [relationshipFilter, setRelationshipFilter] = useState<"all" | "created_by_me" | "linked_order">("all");
-  const [showFilters, setShowFilters] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  const hasActiveFilters = selectedCategory !== "All" || selectedStatus !== "All";
-  const activeFiltersCount = (selectedCategory !== "All" ? 1 : 0) + (selectedStatus !== "All" ? 1 : 0);
+  const hasActiveFilters =
+    Boolean(searchQuery.trim()) ||
+    selectedCategory !== "All" ||
+    selectedStatus !== "All" ||
+    relationshipFilter !== "all";
+
+  const activeFiltersCount =
+    (searchQuery.trim() ? 1 : 0) +
+    (selectedCategory !== "All" ? 1 : 0) +
+    (selectedStatus !== "All" ? 1 : 0) +
+    (relationshipFilter !== "all" ? 1 : 0);
+
+  const clearAllFilters = () => {
+    setSearchQuery("");
+    setSelectedCategory("All");
+    setSelectedStatus("All");
+    setRelationshipFilter("all");
+  };
 
   const fetchTickets = useCallback(async () => {
     setLoading(true);
@@ -87,6 +105,30 @@ export default function SupportDashboardPage() {
       (t) => t.ticketRelationship === "linked_order" || t.isCreator === false || Boolean(t.order)
     ).length;
     return { total, createdByMe, linkedOrders };
+  }, [tickets]);
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = { All: tickets.length };
+    STATUSES.forEach((st) => {
+      if (st !== "All") {
+        counts[st] = tickets.filter(
+          (t) => t.status?.toLowerCase() === st.toLowerCase()
+        ).length;
+      }
+    });
+    return counts;
+  }, [tickets]);
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { All: tickets.length };
+    CATEGORIES.forEach((cat) => {
+      if (cat.id !== "All") {
+        counts[cat.id] = tickets.filter(
+          (t) => t.category?.toLowerCase() === cat.id.toLowerCase()
+        ).length;
+      }
+    });
+    return counts;
   }, [tickets]);
 
   const filteredTickets = useMemo(() => {
@@ -134,37 +176,42 @@ export default function SupportDashboardPage() {
     switch (status) {
       case "open":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-            <AlertTriangle className="w-3 h-3" /> Open
+          <span className="bg-amber-50 text-amber-800 border border-amber-200/80 text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap tracking-tight inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            Open
           </span>
         );
       case "in_progress":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
-            <Clock className="w-3 h-3" /> In Progress
+          <span className="bg-blue-50 text-blue-800 border border-blue-200/80 text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap tracking-tight inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+            In Progress
           </span>
         );
       case "escalated_to_dispute":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
-            <ShieldAlert className="w-3 h-3" /> Escalated to Dispute
+          <span className="bg-purple-50 text-purple-800 border border-purple-200/80 text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap tracking-tight inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+            Escalated
           </span>
         );
       case "resolved":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <CheckCircle2 className="w-3 h-3" /> Resolved
+          <span className="bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap tracking-tight inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Resolved
           </span>
         );
       case "closed":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700 border border-gray-200">
+          <span className="bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1 rounded-full whitespace-nowrap tracking-tight inline-flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
             Closed
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
+          <span className="bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1 rounded-full whitespace-nowrap tracking-tight capitalize">
             {status}
           </span>
         );
@@ -251,329 +298,389 @@ export default function SupportDashboardPage() {
           </div>
         </div>
 
-        {/* Filter and Search Bar */}
-        <div className="bg-white p-4 sm:p-5 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-4">
-          {/* Relationship Filter Tabs (All / Created by Me / Linked Orders) */}
-          <div className="flex items-center gap-1.5 pb-3 border-b border-[#e2e8f0] overflow-x-auto scrollbar-none">
-            <button
-              type="button"
-              onClick={() => setRelationshipFilter("all")}
-              className={`px-3.5 py-1.5 rounded-[6px] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer font-sf-pro ${relationshipFilter === "all"
-                ? "bg-[#327C73] text-white shadow-xs"
-                : "bg-transparent text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9]"
-                }`}
-            >
-              <span>All Tickets</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${relationshipFilter === "all" ? "bg-white/20 text-white" : "bg-[#f1f5f9] text-[#64748b]"
-                  }`}
-              >
-                {relationshipCounts.total}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setRelationshipFilter("created_by_me")}
-              className={`px-3.5 py-1.5 rounded-[6px] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer font-sf-pro ${relationshipFilter === "created_by_me"
-                ? "bg-[#327C73] text-white shadow-xs"
-                : "bg-transparent text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9]"
-                }`}
-            >
-              <span>Created by Me</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${relationshipFilter === "created_by_me" ? "bg-white/20 text-white" : "bg-[#f1f5f9] text-[#64748b]"
-                  }`}
-              >
-                {relationshipCounts.createdByMe}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setRelationshipFilter("linked_order")}
-              className={`px-3.5 py-1.5 rounded-[6px] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer font-sf-pro ${relationshipFilter === "linked_order"
-                ? "bg-[#327C73] text-white shadow-xs"
-                : "bg-transparent text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9]"
-                }`}
-            >
-              <ShoppingBag className="w-3.5 h-3.5" />
-              <span>Linked Orders</span>
-              {relationshipCounts.linkedOrders > 0 && (
-                <span
-                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${relationshipFilter === "linked_order" ? "bg-white/20 text-white" : "bg-purple-100 text-purple-700"
-                    }`}
-                >
-                  {relationshipCounts.linkedOrders}
-                </span>
-              )}
-            </button>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            {/* Search Input */}
-            <div className="relative flex-1 max-w-xl">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
-              <input
-                type="text"
-                placeholder="Search ticket subject or #ID (e.g. TK-F290F6)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-9 py-2.5 rounded-[6px] text-xs border border-[#e2e8f0] bg-[#f8fafc] text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-2 focus:ring-[#327C73]/10 outline-none font-inter transition-all"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94a3b8] hover:text-[#0f172a] p-0.5 cursor-pointer"
-                  title="Clear search"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-
-            {/* Filter Toggle Button */}
-            <div className="flex items-center gap-2 justify-end">
-              {hasActiveFilters && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedCategory("All");
-                    setSelectedStatus("All");
-                  }}
-                  className="text-xs font-semibold text-[#64748b] hover:text-rose-600 transition-colors px-2 py-1 cursor-pointer"
-                >
-                  Reset
-                </button>
-              )}
+        {/* Main Content Layout: Left Filter Sidebar (Desktop) + Right Tickets Content */}
+        <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-7">
+          {/* Left Filter Sidebar */}
+          <aside className="w-full lg:w-[280px] xl:w-[300px] shrink-0 lg:sticky lg:top-24">
+            {/* Mobile Filter Toggle Bar (Visible on mobile/tablet < lg) */}
+            <div className="lg:hidden mb-3">
               <button
                 type="button"
-                onClick={() => setShowFilters((prev) => !prev)}
-                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer font-sf-pro ${showFilters || hasActiveFilters
-                  ? "bg-[#327C73]/10 border-[#327C73] text-[#327C73] shadow-xs"
-                  : "bg-[#f8fafc] border-[#e2e8f0] text-[#334155] hover:bg-[#f1f5f9] hover:border-[#cbd5e1]"
-                  }`}
+                onClick={() => setShowMobileFilters((prev) => !prev)}
+                className="w-full flex items-center justify-between px-4 py-3 bg-white border border-[#e2e8f0] rounded-[6px] shadow-xs text-xs font-semibold text-[#0f172a] hover:bg-[#f8fafc] transition-colors cursor-pointer"
               >
-                <SlidersHorizontal className="w-4 h-4" />
-                <span>Filters</span>
-                {activeFiltersCount > 0 && (
-                  <span className="w-4 h-4 rounded-full bg-[#327C73] text-white text-[10px] font-bold flex items-center justify-center">
-                    {activeFiltersCount}
-                  </span>
-                )}
-                <ChevronDown
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${showFilters ? "rotate-180" : ""
-                    }`}
-                />
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-[#327C73]" />
+                  <span>Filters & Search</span>
+                  {activeFiltersCount > 0 && (
+                    <span className="w-5 h-5 rounded-full bg-[#327C73] text-white text-[10px] font-bold flex items-center justify-center">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5 text-[#64748b]">
+                  <span className="text-[11px] font-medium">{showMobileFilters ? "Hide" : "Show"}</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showMobileFilters ? "rotate-180" : ""}`} />
+                </div>
               </button>
             </div>
-          </div>
 
-          {/* Collapsible Filter Panel (Initially false, shown on click) */}
-          {showFilters && (
-            <div className="pt-4 border-t border-[#e2e8f0] space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
-              {/* Category Tabs */}
+            {/* Filter Card: sticky + scrollable on desktop, collapsible on mobile */}
+            <div
+              className={`${showMobileFilters ? "block" : "hidden"
+                } lg:block bg-white rounded-[6px] border border-[#e2e8f0] shadow-xs p-5 space-y-6 lg:max-h-[calc(100vh-7.5rem)] lg:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200`}
+            >
+              {/* 1. Header: Filter Title + Active Count + Reset */}
+              <div className="flex items-center justify-between pb-3 border-b border-[#f1f5f9]">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-[#327C73]" />
+                  <h3 className="text-sm font-bold text-[#0f172a] font-sf-pro">Filter Tickets</h3>
+                  {activeFiltersCount > 0 && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-[#327C73]/10 text-[#327C73] text-[10px] font-bold">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </div>
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    onClick={clearAllFilters}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#64748b] hover:text-[#0f172a] transition-colors cursor-pointer"
+                    title="Reset all filters"
+                  >
+                    <RotateCcw className="w-3 h-3 text-[#94a3b8]" />
+                    <span>Reset</span>
+                  </button>
+                )}
+              </div>
+
+              {/* 2. Search Input */}
               <div className="space-y-1.5">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#64748b]">
-                  Category:
-                </span>
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-                  {CATEGORIES.map((cat) => {
-                    const Icon = cat.icon;
-                    const isSelected = selectedCategory === cat.id;
-                    return (
-                      <Button
-                        key={cat.id}
-                        onClick={() => setSelectedCategory(cat.id)}
-                        variant={isSelected ? "brand" : "soft"}
-                        size="sm"
-                        radius="fiverr"
-                        leftIcon={<Icon className="w-3.5 h-3.5" />}
-                        className="px-3.5 py-1.5 text-xs font-semibold whitespace-nowrap shadow-xs"
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[#64748b] font-sf-pro">
+                  Search
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
+                  <input
+                    type="text"
+                    placeholder="Search #ID, subject, order..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-8 py-2 rounded-[6px] text-xs border border-[#e2e8f0] bg-[#f8fafc] text-[#0f172a] focus:bg-white focus:border-[#327C73] focus:ring-1 focus:ring-[#327C73]/20 outline-none font-inter transition-all"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#94a3b8] hover:text-[#0f172a] p-0.5 cursor-pointer"
+                      title="Clear search"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* 3. Ticket Scope / Relationship Filter */}
+              <div className="space-y-2 pt-2 border-t border-[#f1f5f9]">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[#64748b] font-sf-pro">
+                  Ticket Scope
+                </label>
+                <div className="space-y-1">
+                  <button
+                    type="button"
+                    onClick={() => setRelationshipFilter("all")}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[6px] text-xs font-semibold transition-all cursor-pointer font-sf-pro ${relationshipFilter === "all"
+                      ? "bg-[#327C73] text-white shadow-xs"
+                      : "bg-transparent text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a]"
+                      }`}
+                  >
+                    <span>All Tickets</span>
+                    <span
+                      className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${relationshipFilter === "all" ? "bg-white/20 text-white" : "bg-[#f1f5f9] text-[#64748b]"
+                        }`}
+                    >
+                      {relationshipCounts.total}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setRelationshipFilter("created_by_me")}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[6px] text-xs font-semibold transition-all cursor-pointer font-sf-pro ${relationshipFilter === "created_by_me"
+                      ? "bg-[#327C73] text-white shadow-xs"
+                      : "bg-transparent text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a]"
+                      }`}
+                  >
+                    <span>Created by Me</span>
+                    <span
+                      className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${relationshipFilter === "created_by_me" ? "bg-white/20 text-white" : "bg-[#f1f5f9] text-[#64748b]"
+                        }`}
+                    >
+                      {relationshipCounts.createdByMe}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setRelationshipFilter("linked_order")}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[6px] text-xs font-semibold transition-all cursor-pointer font-sf-pro ${relationshipFilter === "linked_order"
+                      ? "bg-[#327C73] text-white shadow-xs"
+                      : "bg-transparent text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a]"
+                      }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
+                      <span>Linked Orders</span>
+                    </div>
+                    {relationshipCounts.linkedOrders > 0 && (
+                      <span
+                        className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${relationshipFilter === "linked_order" ? "bg-white/20 text-white" : "bg-purple-100 text-purple-700"
+                          }`}
                       >
-                        {cat.label}
-                      </Button>
+                        {relationshipCounts.linkedOrders}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* 4. Status Filter */}
+              <div className="space-y-2 pt-2 border-t border-[#f1f5f9]">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[#64748b] font-sf-pro">
+                  Status
+                </label>
+                <div className="space-y-1">
+                  {STATUSES.map((st) => {
+                    const isSelected = selectedStatus === st;
+                    const count = statusCounts[st as keyof typeof statusCounts] ?? 0;
+                    return (
+                      <button
+                        key={st}
+                        type="button"
+                        onClick={() => setSelectedStatus(st)}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-[6px] text-xs font-semibold capitalize transition-all cursor-pointer font-sf-pro ${isSelected
+                          ? "bg-[#0f172a] text-white shadow-xs"
+                          : "bg-transparent text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a]"
+                          }`}
+                      >
+                        <span>
+                          {st === "All"
+                            ? "All Statuses"
+                            : st === "escalated_to_dispute"
+                              ? "Escalated to Dispute"
+                              : st.replace(/_/g, " ")}
+                        </span>
+                        <span
+                          className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${isSelected ? "bg-white/20 text-white" : "bg-[#f1f5f9] text-[#64748b]"
+                            }`}
+                        >
+                          {count}
+                        </span>
+                      </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Status Pills */}
-              <div className="space-y-1.5 pt-2 border-t border-[#f1f5f9]">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#64748b]">
-                  Status:
-                </span>
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-                  {STATUSES.map((st) => (
-                    <Button
-                      key={st}
-                      onClick={() => setSelectedStatus(st)}
-                      variant={selectedStatus === st ? "dark" : "ghost"}
-                      size="xs"
-                      radius="fiverr"
-                      className="px-3 py-1.5 font-semibold capitalize text-xs"
-                    >
-                      {st.replace(/_/g, " ")}
-                    </Button>
-                  ))}
+              {/* 5. Category Filter */}
+              <div className="space-y-2 pt-2 border-t border-[#f1f5f9]">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[#64748b] font-sf-pro">
+                  Category
+                </label>
+                <div className="space-y-1">
+                  {CATEGORIES.map((cat) => {
+                    const Icon = cat.icon;
+                    const isSelected = selectedCategory === cat.id;
+                    const count = categoryCounts[cat.id] ?? 0;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setSelectedCategory(cat.id)}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-[6px] text-xs font-semibold transition-all cursor-pointer font-sf-pro ${isSelected
+                          ? "bg-[#327C73]/10 text-[#327C73] border border-[#327C73]/30 font-bold"
+                          : "bg-transparent text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a] border border-transparent"
+                          }`}
+                      >
+                        <div className="flex items-center gap-2 truncate pr-1">
+                          <Icon className={`w-3.5 h-3.5 shrink-0 ${isSelected ? "text-[#327C73]" : "text-[#94a3b8]"}`} />
+                          <span className="truncate">{cat.label}</span>
+                        </div>
+                        <span
+                          className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${isSelected ? "bg-[#327C73] text-white" : "bg-[#f1f5f9] text-[#64748b]"
+                            }`}
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
-          )}
-        </div>
+          </aside>
 
-        {/* Tickets Grid / List */}
-        <div className="space-y-4">
-          {loading ? (
-            <div className="bg-white p-12 rounded-[6px] border border-[#e2e8f0] text-center space-y-3">
-              <Loader2 className="w-8 h-8 mx-auto animate-spin text-[#327C73]" />
-              <p className="text-xs font-semibold text-[#64748b]">Loading your support tickets...</p>
-            </div>
-          ) : error ? (
-            <div className="bg-rose-50 p-8 rounded-[6px] border border-rose-200 text-center space-y-4">
-              <AlertTriangle className="w-10 h-10 mx-auto text-rose-600" />
-              <div className="space-y-1">
-                <h3 className="text-base font-bold text-rose-900">Unable to load tickets</h3>
-                <p className="text-xs text-rose-700 max-w-md mx-auto">{error}</p>
+          {/* Right Side: Results Summary Header & Tickets Grid */}
+          <div className="flex-1 min-w-0 w-full space-y-4">
+
+
+            {/* Tickets Grid / List */}
+            {loading ? (
+              <div className="bg-white p-12 rounded-[6px] border border-[#e2e8f0] text-center space-y-3">
+                <Loader2 className="w-8 h-8 mx-auto animate-spin text-[#327C73]" />
+                <p className="text-xs font-semibold text-[#64748b]">Loading your support tickets...</p>
               </div>
-              <Button
-                onClick={fetchTickets}
-                variant="danger"
-                size="sm"
-                radius="fiverr"
-                leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
-                className="px-5 py-2.5 font-semibold text-xs shadow-xs"
-              >
-                Retry
-              </Button>
-            </div>
-          ) : filteredTickets.length === 0 ? (
-            <div className="bg-white p-12 rounded-[6px] border border-[#e2e8f0] text-center space-y-4">
-              <MessageSquare className="w-12 h-12 mx-auto text-[#cbd5e1]" />
-              <div className="space-y-1">
-                <h3 className="text-base font-bold text-[#0f172a] font-sf-pro">No support tickets found</h3>
-                <p className="text-xs text-[#64748b] max-w-md mx-auto font-inter">
-                  {searchQuery || selectedCategory !== "All" || selectedStatus !== "All"
-                    ? "No tickets match your search or filter selection."
-                    : "You haven't submitted any support tickets yet. Need help? Create a ticket to reach out to our team."}
-                </p>
-              </div>
-              <Link
-                href="/support/new"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs transition cursor-pointer font-sf-pro shadow-xs active:scale-95"
-              >
-                <PlusCircle className="w-4 h-4" />
-                <span>Submit New Request</span>
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-              {filteredTickets.map((ticket) => (
-                <div
-                  key={ticket.id}
-                  className="bg-white p-5 rounded-[6px] border border-[#e2e8f0] shadow-xs hover:border-[#327C73] hover:shadow-md transition-all duration-200 flex flex-col justify-between group"
+            ) : error ? (
+              <div className="bg-rose-50 p-8 rounded-[6px] border border-rose-200 text-center space-y-4">
+                <AlertTriangle className="w-10 h-10 mx-auto text-rose-600" />
+                <div className="space-y-1">
+                  <h3 className="text-base font-bold text-rose-900">Unable to load tickets</h3>
+                  <p className="text-xs text-rose-700 max-w-md mx-auto">{error}</p>
+                </div>
+                <Button
+                  onClick={fetchTickets}
+                  variant="danger"
+                  size="sm"
+                  radius="fiverr"
+                  leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+                  className="px-5 py-2.5 font-semibold text-xs shadow-xs"
                 >
-                  <div className="space-y-3">
-                    {/* Top Row: Ticket ID & Status */}
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-mono font-bold text-[#64748b]">
-                        {ticket.ticketNumber || `#TK-${String(ticket.id || ticket._id).substring(0, 6).toUpperCase()}`}
-                      </span>
-                      {formatStatusPill(ticket.status)}
-                    </div>
-
-                    {/* Origin & Relationship Badges */}
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {/* Origin Badge */}
-                      {ticket.isCreator !== false ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          Opened by You
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10.5px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                          Opened by {ticket.otherParty?.role === "seller" ? "Seller" : ticket.otherParty?.role === "buyer" ? "Buyer" : "Other Party"}
-                        </span>
-                      )}
-
-                      {/* Category Badge */}
-                      <span className="px-2 py-0.5 rounded-[4px] text-[10.5px] font-semibold bg-[#f1f5f9] text-[#475569]">
-                        {ticket.category || "General Support"}
-                      </span>
-
-                      {/* Admin Responded Badge */}
-                      {ticket.adminResponded && (
-                        <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-bold bg-[#327C73]/10 text-[#327C73]">
-                          Admin Responded
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Linked Order Reference */}
-                    {(ticket.order || ticket.orderID) && (
-                      <div className="flex items-center gap-2 p-2 rounded-[6px] bg-[#f8fafc] border border-[#e2e8f0] text-[11px] text-[#334155]">
-                        <ShoppingBag className="w-3.5 h-3.5 text-[#327C73] shrink-0" />
-                        <span className="font-semibold truncate">
-                          Order: #{ticket.order?.orderCode || ticket.order?.code || ticket.orderID}
-                        </span>
-                        {ticket.order?.price && (
-                          <span className="text-[#64748b] ml-auto shrink-0 font-medium">
-                            {ticket.order.price}
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Counterparty Info */}
-                    {ticket.otherParty?.name && (
-                      <div className="flex items-center gap-2 text-[11px] text-[#64748b]">
-                        {ticket.otherParty.avatar ? (
-                          <img
-                            src={ticket.otherParty.avatar}
-                            alt={ticket.otherParty.name}
-                            className="w-4 h-4 rounded-full object-cover border border-[#e2e8f0]"
-                          />
-                        ) : (
-                          <User className="w-3.5 h-3.5 text-[#94a3b8]" />
-                        )}
-                        <span className="truncate">
-                          With: <strong className="text-[#0f172a]">{ticket.otherParty.name}</strong> ({ticket.otherParty.role || "Participant"})
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Ticket Subject */}
-                    <Link href={`/support/${ticket.id}`} className="block">
-                      <h3 className="text-sm sm:text-[15px] font-bold text-[#0f172a] group-hover:text-[#327C73] transition-colors font-sf-pro line-clamp-2 leading-snug">
-                        {ticket.subject}
-                      </h3>
-                    </Link>
-
-                    {/* Preview Message */}
-                    <p className="text-xs text-[#64748b] line-clamp-2 bg-[#f8fafc] p-2.5 rounded-[6px] border border-[#e2e8f0] leading-relaxed">
-                      {ticket.message || "No preview available."}
-                    </p>
-                  </div>
-
-                  {/* Footer Meta & Button */}
-                  <div className="pt-3 mt-4 border-t border-[#f1f5f9] space-y-3">
-                    <div className="flex items-center justify-between text-[11px] text-[#94a3b8]">
-                      <span>{new Date(ticket.createdAt).toLocaleDateString()}</span>
-                      <span>{ticket.messageCount || 1} Message(s)</span>
-                    </div>
-
-                    <Link
-                      href={`/support/${ticket.id}`}
-                      className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-[6px] bg-[#f8fafc] group-hover:bg-[#327C73] group-hover:text-white text-[#334155] border border-[#e2e8f0] group-hover:border-[#327C73] font-semibold text-xs transition duration-150 cursor-pointer font-sf-pro shadow-2xs"
-                    >
-                      <span>View Ticket</span>
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                    </Link>
-                  </div>
+                  Retry
+                </Button>
+              </div>
+            ) : filteredTickets.length === 0 ? (
+              <div className="bg-white p-12 rounded-[6px] border border-[#e2e8f0] text-center space-y-4">
+                <MessageSquare className="w-12 h-12 mx-auto text-[#cbd5e1]" />
+                <div className="space-y-1">
+                  <h3 className="text-base font-bold text-[#0f172a] font-sf-pro">No support tickets found</h3>
+                  <p className="text-xs text-[#64748b] max-w-md mx-auto font-inter">
+                    {searchQuery || selectedCategory !== "All" || selectedStatus !== "All" || relationshipFilter !== "all"
+                      ? "No tickets match your search or filter selection."
+                      : "You haven't submitted any support tickets yet. Need help? Create a ticket to reach out to our team."}
+                  </p>
                 </div>
-              ))}
-            </div>
-          )}
+                <Link
+                  href="/support/new"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs transition cursor-pointer font-sf-pro shadow-xs active:scale-95"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>Submit New Request</span>
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                {filteredTickets.map((ticket) => {
+                  const ticketId = ticket.id || ticket._id;
+                  const ticketNumber =
+                    ticket.ticketNumber || `#TK-${String(ticketId).substring(0, 6).toUpperCase()}`;
+                  const messagesCount = ticket.messageCount || 1;
+                  const otherUser = ticket.otherParty;
+
+                  return (
+                    <Link
+                      key={ticketId}
+                      href={`/support/${ticketId}`}
+                      className="relative overflow-hidden bg-white rounded-[6px] border border-gray-200/90 hover:border-[#327C73] p-6 sm:p-7 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer group select-none"
+                    >
+                      {/* Top Content Area */}
+                      <div>
+                        {/* Header Row: Title, Meta, Badges */}
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <div className="flex-1 min-w-0 pr-2">
+                            <h3 className="text-base sm:text-[17px] font-bold text-gray-900 group-hover:text-[#327C73] transition-colors line-clamp-1 tracking-tight">
+                              {ticket.subject}
+                            </h3>
+                          </div>
+
+                          {/* Right Badges */}
+                          <div className="flex items-center gap-2 shrink-0">
+                            {formatStatusPill(ticket.status)}
+                            {ticket.category && (
+                              <span className="bg-gray-100 text-gray-800 text-xs font-medium px-3 py-1 rounded-full whitespace-nowrap hidden sm:inline-block tracking-tight">
+                                {ticket.category}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Ticket Message Excerpt */}
+                        <p className="text-[13px] text-gray-600 line-clamp-2 my-4 leading-relaxed font-normal">
+                          {ticket.message || "No preview available for this ticket."}
+                        </p>
+
+                        {/* Tags / Pills Row */}
+                        <div className="flex flex-wrap items-center gap-2 mb-5">
+                          {/* {ticket.isCreator !== false ? (
+                            <span className="text-xs font-medium text-gray-600 bg-[#F5F5F7] border border-gray-200/80 px-2.5 py-1 rounded-[6px]">
+                              Opened by You
+                            </span>
+                          ) : (
+                            <span className="text-xs font-medium text-blue-700 bg-blue-50/70 border border-blue-200/60 px-2.5 py-1 rounded-[6px]">
+                              Opened by {otherUser?.role === "seller" ? "Seller" : otherUser?.role === "buyer" ? "Buyer" : "Other Party"}
+                            </span>
+                          )} */}
+
+                          {(ticket.order || ticket.orderID) && (
+                            <span className="text-xs font-medium text-gray-700 bg-[#F5F5F7] border border-gray-200/80 px-2.5 py-1 rounded-[6px] inline-flex items-center gap-1.5">
+                              <ShoppingBag className="w-3.5 h-3.5 text-[#327C73]" />
+                              <span>Order #{ticket.order?.orderCode || ticket.order?.code || ticket.orderID}</span>
+                              {ticket.order?.price && (
+                                <span className="text-gray-500 font-semibold ml-0.5">{ticket.order.price}</span>
+                              )}
+                            </span>
+                          )}
+
+
+                        </div>
+                      </div>
+
+                      {/* Divider & Bottom Counterparty / Activity Bar */}
+                      <div className="border-t border-gray-100 pt-4 mt-auto flex items-center justify-between">
+                        {/* User / Requester Info */}
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          {otherUser?.avatar ? (
+                            <img
+                              src={otherUser.avatar}
+                              alt={otherUser.name || "User"}
+                              className="w-8 h-8 rounded-full object-cover border border-slate-200/80 shadow-2xs shrink-0"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200/80 shadow-2xs shrink-0">
+                              <User className="w-3.5 h-3.5 text-slate-500" />
+                            </div>
+                          )}
+
+                          <div className="min-w-0">
+                            <p className="text-xs sm:text-[13px] font-semibold text-gray-900 leading-tight truncate">
+                              {otherUser?.name || "Support Ticket"}
+                            </p>
+                            <p className="text-[11px] text-gray-500 leading-tight mt-0.5 truncate">
+                              {otherUser?.role
+                                ? `${otherUser.role.charAt(0).toUpperCase() + otherUser.role.slice(1)} • `
+                                : ""}
+                              {ticket.category || "General Support"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Messages count and view arrow */}
+                        <div className="text-right shrink-0">
+                          <p className="text-xs sm:text-[13px] font-bold text-gray-900 leading-tight">
+                            {messagesCount} {messagesCount === 1 ? "message" : "messages"}
+                          </p>
+                          <p className="text-[11px] text-[#327C73] font-semibold leading-tight mt-0.5 inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                            <span>View ticket</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
       </div>

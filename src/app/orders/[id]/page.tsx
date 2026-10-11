@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import moment from "moment";
 import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";

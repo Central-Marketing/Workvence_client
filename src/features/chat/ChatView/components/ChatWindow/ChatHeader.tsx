@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { ArrowLeft } from "lucide-react";
 import { RiMenuLine } from "react-icons/ri";
 import { BsThreeDotsVertical } from "react-icons/bs";

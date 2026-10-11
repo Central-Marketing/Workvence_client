@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { RiCloseLine } from "react-icons/ri";
 import { Button, Skeleton } from "@/components";
 import { formatFileSize } from "@/lib";

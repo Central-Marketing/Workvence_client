@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { useAuthModalStore } from "@/store/authModalStore";

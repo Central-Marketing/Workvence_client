@@ -17,7 +17,7 @@ import {
   X
 } from "lucide-react";
 import { Button } from "@/components";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 interface CreativeMember {
   id: string;

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useMemo, useCallback } from "react";
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { axiosFetch, socket, getAvatarUrl, parseRevisionNumber } from "@/utils";
 import { isTargetConversation } from "@/utils/chatHelpers";
 import supportService from "@/utils/supportService";

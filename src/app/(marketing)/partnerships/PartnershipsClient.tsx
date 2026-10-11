@@ -27,7 +27,7 @@ import {
 } from "react-icons/fa6";
 import { Button, Breadcrumb, CTA } from "@/components";
 import { CustomSelect, CustomSelectOption } from "@/components/ui";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 const PARTNER_TRACK_OPTIONS: CustomSelectOption[] = [
   { value: "Agency & Solutions Partners", label: "Agency & Solutions Partners" },

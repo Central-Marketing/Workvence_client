@@ -8,7 +8,7 @@ import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FiHome } from "react-icons/fi";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { Heart } from "lucide-react";
 
 const FavoritesPage = () => {

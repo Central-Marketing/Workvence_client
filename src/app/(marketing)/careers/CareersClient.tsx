@@ -20,7 +20,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { Button } from "@/components";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 interface JobOpening {
   id: string;

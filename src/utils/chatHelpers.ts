@@ -1,6 +1,6 @@
 import React from 'react';
 import axiosFetch from './axiosFetch';
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 export const getOtherUser = (conversation: any, currentUser: any) => {
   if (!conversation || !currentUser) return null;

@@ -15,7 +15,7 @@ import {
   Share2
 } from "lucide-react";
 import { Button } from "@/components";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 interface Guide {
   id: string;

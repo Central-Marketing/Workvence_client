@@ -1,0 +1,216 @@
+[data-sonner-toaster].workvence-toaster {
+  width: 440px;
+  max-width: 520px;
+  font-family: var(--font-sf-pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+}
+
+.workvence-toaster [data-sonner-toast] {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 520px;
+  padding: 14px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #111827;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+  font-family: var(--font-sf-pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  box-sizing: border-box;
+}
+
+.workvence-toaster [data-content] {
+  flex: 1;
+  min-width: 0;
+  max-height: none !important;
+  overflow: hidden;
+}
+
+.workvence-toaster .workvence-toast-copy {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.workvence-toaster [data-title],
+.workvence-toaster [data-toast-title],
+.workvence-toaster .workvence-toast-title {
+  font-family: var(--font-sf-pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workvence-toaster [data-description],
+.workvence-toaster .workvence-toast-desc {
+  margin-top: 2px;
+  font-family: var(--font-sf-pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workvence-toaster [data-icon],
+.workvence-toaster .workvence-toast-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  color: #52525b;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+
+.workvence-toaster [data-icon] svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+/* Standard Semantic Palette */
+.workvence-toaster [data-type="info"] [data-icon],
+.workvence-toaster [data-type="loading"] [data-icon] {
+  color: #2563eb;
+}
+
+.workvence-toaster [data-type="success"] [data-icon] {
+  color: #16a34a;
+}
+
+.workvence-toaster [data-type="warning"] [data-icon] {
+  color: #d97706;
+}
+
+.workvence-toaster [data-type="error"] [data-icon] {
+  color: #dc2626;
+}
+
+.workvence-toaster .workvence-toast-action-btn {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #374151;
+  font-family: var(--font-sf-pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.workvence-toaster .workvence-toast-action-btn:hover {
+  background: #f9fafb;
+}
+
+.workvence-toaster .workvence-toast-action-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.workvence-toaster [data-close-button] {
+  position: static !important;
+  transform: none !important;
+  order: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  color: #6b7280;
+  background: transparent;
+  border: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.workvence-toaster [data-close-button] svg {
+  width: 16px;
+  height: 16px;
+}
+
+.workvence-toaster [data-close-button]:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.workvence-toaster [data-close-button]:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.workvence-toaster .workvence-toast-navigation [data-content] {
+  flex: 1;
+  min-width: 0;
+  max-height: none !important;
+  overflow: visible;
+}
+
+.workvence-toaster .workvence-toast-navigation [data-title] {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: normal;
+  color: inherit;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.workvence-toaster .workvence-toast-nav-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.workvence-toast-spinner {
+  animation: workvence-toast-spin 1s linear infinite;
+}
+
+@keyframes workvence-toast-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 600px) {
+  [data-sonner-toaster].workvence-toaster {
+    width: calc(100vw - 32px);
+    max-width: calc(100vw - 32px);
+  }
+
+  [data-sonner-toaster].workvence-toaster [data-sonner-toast] {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workvence-toaster .workvence-toast-spinner {
+    animation: none;
+  }
+}

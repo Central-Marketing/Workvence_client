@@ -2,7 +2,7 @@
 
 import React from "react";
 import moment from "moment";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { RiStarFill, RiArrowDownSLine } from "react-icons/ri";
 import { Button, AiGradientButton } from "@/components";
 import { Tag } from "@/components/ui";

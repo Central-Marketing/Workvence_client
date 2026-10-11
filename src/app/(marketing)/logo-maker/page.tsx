@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components";
 import { CustomSelect, CustomSelectOption } from "@/components/ui";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 const INDUSTRY_OPTIONS: CustomSelectOption[] = [
   { value: "Tech & AI", label: "Tech & AI" },

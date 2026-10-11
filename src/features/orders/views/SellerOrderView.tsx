@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import moment from "moment";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -455,7 +455,10 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
         </div>
 
         {/* Order Main Title */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-6">
+        <h1
+          title={order.title || order.packageTitle}
+          className="block w-full min-w-0 truncate text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-6"
+        >
           {order.title || order.packageTitle}
         </h1>
 
@@ -500,32 +503,33 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             )}
 
             {/* CARD: Order Summary */}
-            <div className="bg-[#f5f5f5] rounded-[6px] border border-slate-200/90 shadow-sm p-5 sm:p-6">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                <h2 className="text-xl font-bold text-[#292929] font-inter">Order Summary</h2>
+            <div className="bg-[#f5f5f5] rounded-[6px] border border-slate-200/90 shadow-sm p-5 sm:p-6 min-w-0 w-full">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 min-w-0">
+                <h2 className="text-xl font-bold text-[#292929] font-inter">
+                  Order Summary
+                </h2>
               </div>
 
-              <hr className="text-[rgba(0,0,0,0.10)] my-4" />
+              <hr className="border-0 border-t border-[rgba(0,0,0,0.10)] my-4" />
 
-
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100">
-                <div>
-                  <span className="text-xs font-semibold text-slate-600 font-inter">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100 min-w-0">
+                <div className="min-w-0 flex-1">
+                  <span className="block text-xs font-semibold text-slate-600 font-inter">
                     Order #{order.orderCode}
                   </span>
-                  <h3 className="font-bold text-sm sm:text-base text-slate-900 line-clamp-2">
+
+                  <h3 className="font-bold text-sm sm:text-base text-slate-900 truncate">
                     {order.title || order.packageTitle}
                   </h3>
                 </div>
               </div>
-              <hr className="text-[rgba(0,0,0,0.10)] my-4" />
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-base sm:text-lg font-bold text-slate-900">
-                    ${netEarnings}
-                  </span>
-                </div>
 
+              <hr className="border-0 border-t border-[rgba(0,0,0,0.10)] my-4" />
+
+              <div className="flex items-center justify-between min-w-0">
+                <span className="text-base sm:text-lg font-bold text-slate-900">
+                  ${netEarnings}
+                </span>
               </div>
             </div>
 

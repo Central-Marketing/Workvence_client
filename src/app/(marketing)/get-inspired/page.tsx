@@ -17,7 +17,7 @@ import {
   Share2
 } from "lucide-react";
 import { Button } from "@/components";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 interface ProjectInspiration {
   id: string;
@@ -146,7 +146,7 @@ export default function GetInspiredPage() {
       if (next) {
         toast.success("Saved project to your inspiration board!");
       } else {
-        toast("Removed from saved inspirations", { icon: "ℹ️" });
+        toast.info("Removed from saved inspirations");
       }
       return { ...prev, [id]: next };
     });

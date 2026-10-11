@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import moment from "moment";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { useQuery } from "@tanstack/react-query";
 import {
   FiCheck,
@@ -494,7 +494,10 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
         </div>
 
         {/* Order Title */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-6">
+        <h1
+          title={order.title || order.packageTitle}
+          className="block w-full min-w-0 truncate text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-6"
+        >
           {order.title || order.packageTitle}
         </h1>
 
@@ -545,33 +548,36 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
             {/* CARD: Order Summary */}
             <div className="bg-[#f5f5f5] rounded-[6px] border border-slate-200/90 shadow-sm p-5 sm:p-6">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                <h2 className="text-xl font-bold text-[#292929] font-inter">Order Summary</h2>
-
+                <h2 className="text-xl font-bold text-[#292929] font-inter">
+                  Order Summary
+                </h2>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100">
-                <div className="flex items-center gap-3.5">
-
-                  <div>
-                    <span className="text-xs font-semibold text-slate-600 font-inter">
+                <div className="flex min-w-0 w-full flex-1 items-center gap-3.5">
+                  <div className="min-w-0 w-full flex-1">
+                    <span className="block text-xs font-semibold text-slate-600 font-inter">
                       Order #{order.orderCode}
                     </span>
-                    <h3 className="font-bold text-sm sm:text-base text-slate-900 line-clamp-2">
+
+                    <h3
+                      title={order.title || order.packageTitle}
+                      className="block w-full max-w-full truncate font-bold text-sm sm:text-base text-slate-900"
+                    >
                       {order.title || order.packageTitle}
                     </h3>
-
                   </div>
-
                 </div>
-
-
-
-
               </div>
-              <hr className="text-[rgba(0,0,0,0.10)] my-4" />
+
+              <hr className="border-slate-200 my-4" />
+
               <div className="shrink-0">
                 <span className="text-base sm:text-lg font-bold text-slate-900">
-                  ${Number(order.price || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  ${Number(order.price || 0).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </span>
               </div>
             </div>

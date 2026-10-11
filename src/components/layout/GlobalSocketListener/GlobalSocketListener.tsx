@@ -3,40 +3,11 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { socket } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { playNotificationSound } from "@/utils/soundUtil";
-
-const getNotificationType = (notif: any): "success" | "warning" | "error" | "info" | "default" => {
-  if (!notif) return "default";
-  const type = String(notif.type || "").toLowerCase();
-  const title = String(notif.title || "").toLowerCase();
-  const message = String(notif.message || notif.desc || notif.description || "").toLowerCase();
-  const fullText = `${type} ${title} ${message}`;
-
-  if (/cancel|dispute|reject|fail|decline|suspend|terminate|refund/i.test(fullText)) {
-    return "error";
-  }
-
-  if (/extension|extend|revision|warning|caution|pending|expire|action required|overdue|late/i.test(fullText)) {
-    return "warning";
-  }
-
-  if (
-    /new order|order received|order placed|placed an order|delivered|delivery accepted|complete|success|paid|payout|released|accepted|tip|verified|approved|congrat/i.test(
-      fullText
-    )
-  ) {
-    return "success";
-  }
-
-  if (/message|chat|support|ticket|proposal|brief|review|comment|feedback|update|notification/i.test(fullText)) {
-    return "info";
-  }
-
-  return "default";
-};
+import { getNotificationDescription, getNotificationPresentation } from "@/utils/notificationToast";
 
 const processedNotifIds = new Set<string>();
 const processedNotifMessageIds = new Set<string>();
@@ -245,13 +216,16 @@ export default function GlobalSocketListener() {
       const toastKey = contentFingerprint || msgId || `${senderIdStr}-${Date.now()}`;
 
       toast.info(displayName, {
+        kind: "chat",
         id: `chat-toast-${toastKey}`,
         description: msgPreview,
         duration: 5000,
+        timestamp: "Just now",
         ...(targetConvId
           ? {
-              action: {
-                label: "View",
+              navigation: {
+                label: `Open conversation with ${displayName}`,
+                actionLabel: "Open conversation",
                 onClick: () => {
                   router.push(`/message/${targetConvId}`);
                 },
@@ -458,7 +432,8 @@ export default function GlobalSocketListener() {
         }
       };
 
-      const notifType = getNotificationType(newNotif);
+      const presentation = getNotificationPresentation(newNotif);
+      const notifType = presentation.variant;
       const toastFn =
         notifType === "success"
           ? toast.success
@@ -474,14 +449,19 @@ export default function GlobalSocketListener() {
         newNotif.link || targetOrderId || targetTicketId || targetBriefId || targetProposalId
       );
 
-      toastFn(newNotif.title || "Notification", {
+      const titleText = newNotif.title || presentation.title || "Notification";
+
+      toastFn(titleText, {
         id: `sys-notif-${notifId}`,
-        description: newNotif.message,
+        description: getNotificationDescription(newNotif),
         duration: 5000,
+        icon: presentation.icon,
+        timestamp: "Just now",
         ...(hasAction
           ? {
-              action: {
-                label: "View",
+              navigation: {
+                label: `Open notification: ${titleText}`,
+                actionLabel: presentation.actionLabel,
                 onClick: handleOpenNotification,
               },
             }

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 export default function IpClaimForm() {
   const [claimForm, setClaimForm] = useState({

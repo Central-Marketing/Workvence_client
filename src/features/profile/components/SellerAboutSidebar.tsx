@@ -9,7 +9,7 @@ import { SELLER_FALLBACK_IMAGES } from "../utils/sellerProfileNormalizer";
 import { useUserStore } from "@/store/userStore";
 import { useAuthModalStore } from "@/store/authModalStore";
 import { axiosFetch } from "@/utils";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 interface SellerAboutSidebarProps {
   name: string;

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import moment from "moment";
 import { CornerDownRight, MessageSquareReply, Edit3, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { submitSellerReviewReply } from "@/services/reviewService";

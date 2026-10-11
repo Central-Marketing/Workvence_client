@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { useUserStore } from "@/store/userStore";
 import { User } from "@/types";
 import {

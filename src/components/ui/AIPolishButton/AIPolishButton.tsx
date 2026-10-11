@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { axiosFetch } from '@/utils';
-import { toast } from 'sonner';
+import { toast } from '@/utils/toast';
 import { Button } from '@/components/ui';
 import { Loader } from '@/components';
 

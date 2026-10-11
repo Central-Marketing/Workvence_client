@@ -12,7 +12,7 @@ import {
   Share2,
 } from "lucide-react";
 import { EventItem } from "@/types";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 interface EventJoinActionCardProps {
   event: EventItem;

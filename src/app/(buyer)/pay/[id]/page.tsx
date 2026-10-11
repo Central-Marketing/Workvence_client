@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, Suspense } from 'react';
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { Loader } from "@/components";

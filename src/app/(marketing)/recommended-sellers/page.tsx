@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Star, MapPin, Briefcase } from "lucide-react";
 import { axiosFetch } from "@/utils";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 const RecommendedSellers = () => {
   const [sellers, setSellers] = useState<any[]>([]);

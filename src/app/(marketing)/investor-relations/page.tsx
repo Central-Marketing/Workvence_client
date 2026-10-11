@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { Button, Breadcrumb } from "@/components";
 import { CustomSelect, CustomSelectOption } from "@/components/ui";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 const INQUIRY_TYPE_OPTIONS: CustomSelectOption[] = [
   { value: "Institutional Investor", label: "Institutional Investor" },

@@ -11,7 +11,7 @@ import { KycRequiredModal, PayoneerLogo, PayoneerIcon, Button } from "@/componen
 import { Breadcrumb, EarningsSkeleton, AccountStandingBanner, Modal } from "@/components/ui";
 import { FaStripe } from "react-icons/fa";
 import moment from "moment";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import {
   Home,
   RefreshCw,
@@ -550,7 +550,7 @@ const Earnings = () => {
                 }
                 if (!hasAnyConnected) {
                   setShowWalletModal(true);
-                  toast("Please connect Stripe or Payoneer before withdrawing funds.", { icon: "💳" });
+                  toast.warning("Please connect Stripe or Payoneer before withdrawing funds.");
                 } else if (availableBalance < MIN_PAYOUT_AMOUNT) {
                   toast.error(`Minimum payout request amount is $${MIN_PAYOUT_AMOUNT}.00. Your available balance is $${availableBalance.toFixed(2)}.`);
                 } else {

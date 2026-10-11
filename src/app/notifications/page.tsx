@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch, socket } from "@/utils";
 import { Breadcrumb } from "@/components/ui";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import moment from "moment";
 import {
   Bell,
@@ -292,11 +292,7 @@ const NotificationsPage = () => {
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight font-sf-pro m-0">
                 Notifications
               </h1>
-              {unreadCount > 0 && (
-                <span className="bg-[#0E3834] text-white text-xs font-bold px-3 py-1 rounded-full shadow-2xs">
-                  {unreadCount} unread
-                </span>
-              )}
+
             </div>
             <p className="text-sm text-slate-500 m-0 leading-relaxed max-w-xl">
               Stay updated on your active orders, client discussions, project offers, and account notifications.

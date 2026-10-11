@@ -13,7 +13,7 @@ import {
   X,
   Mail
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { Button, Breadcrumb } from "@/components";
 
 interface BlogPost {

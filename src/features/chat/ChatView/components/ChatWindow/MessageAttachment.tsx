@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Pdf01Icon, File02Icon } from "@hugeicons/core-free-icons";
 import supportService from "@/utils/supportService";

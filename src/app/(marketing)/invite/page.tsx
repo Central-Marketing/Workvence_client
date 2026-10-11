@@ -16,7 +16,7 @@ import {
   ChevronDown
 } from "lucide-react";
 import { Button } from "@/components";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 const referralFaqs = [
   {

@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import moment from "moment";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import {
   FiMoreVertical,
   FiPlus,

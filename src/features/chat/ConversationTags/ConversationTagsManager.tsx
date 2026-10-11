@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { FiTag, FiPlus, FiX, FiLock, FiCheck } from "react-icons/fi";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { PRESET_TAGS, sanitizeTags, updateConversationTagsApi } from "@/utils/chatHelpers";
 import { ConversationTagBadge } from "./ConversationTagBadge";

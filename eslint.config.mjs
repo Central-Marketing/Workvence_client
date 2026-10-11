@@ -6,6 +6,16 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
+    files: ["src/**/*.{ts,tsx,js,jsx}"],
+    ignores: ["src/utils/toast.ts", "src/components/ui/WorkvenceToaster/WorkvenceToaster.tsx"],
+    rules: {
+      "no-restricted-imports": ["error", {
+        paths: [{ name: "sonner", message: "Use @/utils/toast so every notification follows the Workvence design system." }],
+        patterns: ["sonner/*"],
+      }],
+    },
+  },
+  {
     rules: {
       "@typescript-eslint/no-explicit-any": "warn",
       "react/no-unescaped-entities": "warn",

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 
 import { axiosFetch, getOnlineStatus } from "@/utils";
 import { getOtherUser, isConversationUnread, isTargetConversation } from "@/utils/chatHelpers";

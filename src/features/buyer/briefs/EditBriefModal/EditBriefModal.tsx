@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { X, Plus, DollarSign, Calendar, Tag, AlertCircle } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/utils/toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";

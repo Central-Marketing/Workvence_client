@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components";
-import { Breadcrumb, OrdersTableSkeleton, Tag } from "@/components/ui";
+import { Breadcrumb, OrdersTableSkeleton, Tag, PageHeader } from "@/components/ui";
 import { FiSearch } from "react-icons/fi";
 import { sortOrdersByPriority } from "@/features/orders";
 
@@ -206,28 +206,13 @@ const ManageOrders = () => {
     <div className="min-h-screen bg-[#F8F9FA] pt-10 sm:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       {isLoading ? (
         <div className="container mx-auto px-4 md:px-6 space-y-6">
-          <Breadcrumb
+          <PageHeader
             homeHref="/dashboard/seller"
             homeTitle="Dashboard"
-            items={[
-              {
-                name: "Dashboard",
-                href: "/dashboard/seller",
-              },
-              {
-                name: "Manage Orders",
-                isLast: true,
-              },
-            ]}
+            breadcrumbs={[{ name: "Manage Orders", isLast: true }]}
+            title="Manage Orders"
+            subtitle="View, track, and manage all your orders, from recent purchases to upcoming deliveries, in one place."
           />
-          <div className="space-y-1.5">
-            <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
-              Manage Orders
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 font-normal">
-              Track and manage all buyer orders and milestones.
-            </p>
-          </div>
           <OrdersTableSkeleton />
         </div>
       ) : error ? (
@@ -236,32 +221,13 @@ const ManageOrders = () => {
         </div>
       ) : (
         <div className="container mx-auto px-4 md:px-6 space-y-6">
-
-          {/* Breadcrumb Navigation */}
-          <Breadcrumb
+          <PageHeader
             homeHref="/dashboard/seller"
             homeTitle="Dashboard"
-            items={[
-              // {
-              //   name: "Dashboard",
-              //   href: "/dashboard/seller",
-              // },
-              {
-                name: "Manage Orders",
-                isLast: true,
-              },
-            ]}
+            breadcrumbs={[{ name: "Manage Orders", isLast: true }]}
+            title="Manage Orders"
+            subtitle="View, track, and manage all your orders, from recent purchases to upcoming deliveries, in one place."
           />
-
-          {/* Page Heading */}
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold font-sf-pro text-[#292929]">
-              Manage Orders
-            </h1>
-            <p className="text-xs sm:text-[14px] text-[#6E6E6E] mt-1.5 leading-relaxed">
-              View, track, and manage all your orders, from recent purchases to upcoming deliveries, in one place.
-            </p>
-          </div>
 
           {/* Main Card Container */}
           <div className="bg-[#F5F5F5] rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">

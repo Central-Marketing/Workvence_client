@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch, socket } from "@/utils";
-import { Breadcrumb } from "@/components/ui";
+import { Breadcrumb, PageHeader } from "@/components/ui";
 import { toast } from "@/utils/toast";
 import moment from "moment";
 import {
@@ -266,71 +266,47 @@ const NotificationsPage = () => {
   const dashboardRoute = user?.isSeller ? "/dashboard/seller" : "/dashboard/buyer";
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] pt-6 sm:pt-8 pb-[80px] min-[1400px]:pb-[100px] font-sans">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 space-y-7">
-        {/* Breadcrumb Navigation */}
-        <Breadcrumb
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        <PageHeader
           homeHref={dashboardRoute}
           homeTitle="Dashboard"
-          className="mb-4 select-none"
-          items={[
-            {
-              name: "Dashboard",
-              href: dashboardRoute,
-            },
-            {
-              name: "Notifications",
-              isLast: true,
-            },
-          ]}
-        />
+          breadcrumbs={[{ name: "Notifications", isLast: true }]}
+          title="Notifications"
+          subtitle="Stay updated on your active orders, client discussions, project offers, and account notifications."
+          actions={
+            <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                radius="fiverr"
+                onClick={() => fetchNotifications(true)}
+                disabled={isRefreshing}
+                leftIcon={<RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-[#0E3834]" : ""}`} />}
+                className="px-3.5 py-2 text-xs font-semibold shadow-2xs"
+                title="Refresh notifications"
+              >
+                Refresh
+              </Button>
 
-        {/* Page Header */}
-        <div className="bg-white rounded-[6px] p-6 sm:p-8 border border-slate-200/80 shadow-xs mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight font-sf-pro m-0">
-                Notifications
-              </h1>
-
+              <Button
+                type="button"
+                variant="brand"
+                size="sm"
+                radius="fiverr"
+                onClick={handleMarkAllAsRead}
+                disabled={isMarkingAll || unreadCount === 0}
+                isLoading={isMarkingAll}
+                loadingText="Marking all..."
+                leftIcon={<CheckCheck className="w-4 h-4" />}
+                className="px-4 py-2 bg-[#0E3834] hover:bg-[#092724] text-xs font-semibold shadow-xs"
+              >
+                Mark all as read
+              </Button>
             </div>
-            <p className="text-sm text-slate-500 m-0 leading-relaxed max-w-xl">
-              Stay updated on your active orders, client discussions, project offers, and account notifications.
-            </p>
-          </div>
-
-          {/* Top Actions */}
-          <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              radius="xl"
-              onClick={() => fetchNotifications(true)}
-              disabled={isRefreshing}
-              leftIcon={<RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-[#0E3834]" : ""}`} />}
-              className="px-3.5 py-2.5 text-xs font-semibold shadow-2xs"
-              title="Refresh notifications"
-            >
-              Refresh
-            </Button>
-
-            <Button
-              type="button"
-              variant="brand"
-              size="sm"
-              radius="xl"
-              onClick={handleMarkAllAsRead}
-              disabled={isMarkingAll || unreadCount === 0}
-              isLoading={isMarkingAll}
-              loadingText="Marking all..."
-              leftIcon={<CheckCheck className="w-4 h-4" />}
-              className="px-4 py-2.5 bg-[#0E3834] hover:bg-[#092724] text-xs font-semibold shadow-xs"
-            >
-              Mark all as read
-            </Button>
-          </div>
-        </div>
+          }
+        />
 
         {/* Filters & Search Control Bar */}
         <div className="bg-white rounded-[6px] p-3 sm:p-4 border border-slate-200/80 shadow-xs mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

@@ -8,7 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/userStore";
 import { axiosFetch } from "@/utils";
 import { KycRequiredModal, PayoneerLogo, PayoneerIcon, Button } from "@/components";
-import { Breadcrumb, EarningsSkeleton, AccountStandingBanner, Modal } from "@/components/ui";
+import { Breadcrumb, EarningsSkeleton, AccountStandingBanner, Modal, PageHeader } from "@/components/ui";
 import { FaStripe } from "react-icons/fa";
 import moment from "moment";
 import { toast } from "@/utils/toast";
@@ -434,11 +434,14 @@ const Earnings = () => {
     <div className="min-h-screen bg-[#F8F9FA] pt-10 sm:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-7">
 
-        {/* 1. Breadcrumb */}
-        <Breadcrumb
+        {/* Account Standing Warning / Suspension Banner */}
+        <AccountStandingBanner />
+
+        {/* 1. Header & Breadcrumb Section */}
+        <PageHeader
           homeHref="/dashboard/seller"
           homeTitle="Dashboard"
-          items={[
+          breadcrumbs={[
             {
               name: "Earnings",
               onClick: () => setActiveTab("payout"),
@@ -448,125 +451,104 @@ const Earnings = () => {
               isLast: true,
             },
           ]}
+          title="My Earnings"
+          subtitle="Track your income, awaiting clearance and multi channel payout"
+          actions={
+            <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0 flex-wrap sm:flex-nowrap">
+              <Button
+                type="button"
+                onClick={() => syncClearanceMutation.mutate()}
+                disabled={syncClearanceMutation.isPending}
+                variant="outline"
+                size="md"
+                radius="fiverr"
+                className="bg-[#ffffff] hover:bg-gray-50 border border-[rgba(0,0,0,0.10)] text-gray-800 shadow-2xs"
+                title="Sync mature completed orders into your available balance"
+                leftIcon={
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className={`w-3.5 h-3.5 shrink-0 ${syncClearanceMutation.isPending ? "animate-spin text-gray-500" : "text-[#292929]"
+                      }`}
+                  >
+                    <path
+                      d="M16.5 8H18C19.4142 8 20.1213 8 20.5607 7.56066C21 7.12132 21 6.41421 21 5V3.5"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M3 12C3 7.02943 7.0293 3 12 3C15.571 3 18.0948 4.73053 20 7.08371M21 12C21 16.9705 16.9707 21 12 21C8.42904 21 5.90524 19.2694 4 16.9162"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M7.5 16H6C4.58579 16 3.87868 16 3.43934 16.4393C3 16.8786 3 17.5857 3 19V20.5"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                }
+              >
+                <span>{syncClearanceMutation.isPending ? "Syncing..." : "Sync funds"}</span>
+                {readyToSync > 0 && !syncClearanceMutation.isPending && (
+                  <span className="ml-1 bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                    ${readyToSync.toFixed(2)}
+                  </span>
+                )}
+              </Button>
+
+              <Button
+                type="button"
+                onClick={() => setShowWalletModal(true)}
+                variant="soft"
+                size="md"
+                radius="fiverr"
+                className="bg-[#F1F3F5] hover:bg-gray-200 text-gray-800 shadow-2xs"
+                leftIcon={
+                  hasAnyConnected ? (
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200 shrink-0" />
+                  ) : undefined
+                }
+              >
+                {hasAnyConnected ? "Payout Channels" : "Connect Wallet"}
+              </Button>
+
+              <Button
+                type="button"
+                onClick={() => {
+                  if (user?.isSuspended) {
+                    toast.error("Account is suspended. Payout withdrawals are frozen during restricted fulfillment mode.");
+                    return;
+                  }
+                  if (!hasAnyConnected) {
+                    setShowWalletModal(true);
+                    toast.warning("Please connect Stripe or Payoneer before withdrawing funds.");
+                  } else if (availableBalance < MIN_PAYOUT_AMOUNT) {
+                    toast.error(`Minimum payout request amount is $${MIN_PAYOUT_AMOUNT}.00. Your available balance is $${availableBalance.toFixed(2)}.`);
+                  } else {
+                    setShowPayoutModal(true);
+                  }
+                }}
+                disabled={availableBalance <= 0 || Boolean(user?.isSuspended)}
+                variant="dark"
+                size="md"
+                radius="fiverr"
+                className={user?.isSuspended ? "opacity-60 cursor-not-allowed" : ""}
+              >
+                {user?.isSuspended ? "Payouts Frozen" : "Request Payout"}
+              </Button>
+            </div>
+          }
         />
-
-        {/* Account Standing Warning / Suspension Banner */}
-        <AccountStandingBanner />
-
-        {/* 2. Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex flex-col gap-[10px]">
-            <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
-              My Earnings
-            </h1>
-            <p className="text-[14px]
-  sm:text-[14px]
-  md:text-[15px]
-  lg:text-[16px]
-  font-normal
-  font-inter
-  leading-[22px]
-  tracking-normal
-  text-[#6E6E6E]">
-              Track your income, awaiting clearance and multi channel payout
-            </p>
-          </div>
-
-          {/* Action Buttons: Sync funds, Connect Wallet, Request Payout */}
-          <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0 flex-wrap sm:flex-nowrap">
-            <Button
-              type="button"
-              onClick={() => syncClearanceMutation.mutate()}
-              disabled={syncClearanceMutation.isPending}
-              variant="outline"
-              size="md"
-              radius="fiverr"
-              className="bg-[#ffffff] hover:bg-gray-50 border border-[rgba(0,0,0,0.10)] text-gray-800 shadow-2xs"
-              title="Sync mature completed orders into your available balance"
-              leftIcon={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className={`w-3.5 h-3.5 shrink-0 ${syncClearanceMutation.isPending ? "animate-spin text-gray-500" : "text-[#292929]"
-                    }`}
-                >
-                  <path
-                    d="M16.5 8H18C19.4142 8 20.1213 8 20.5607 7.56066C21 7.12132 21 6.41421 21 5V3.5"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M3 12C3 7.02943 7.0293 3 12 3C15.571 3 18.0948 4.73053 20 7.08371M21 12C21 16.9705 16.9707 21 12 21C8.42904 21 5.90524 19.2694 4 16.9162"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M7.5 16H6C4.58579 16 3.87868 16 3.43934 16.4393C3 16.8786 3 17.5857 3 19V20.5"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              }
-            >
-              <span>{syncClearanceMutation.isPending ? "Syncing..." : "Sync funds"}</span>
-              {readyToSync > 0 && !syncClearanceMutation.isPending && (
-                <span className="ml-1 bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                  ${readyToSync.toFixed(2)}
-                </span>
-              )}
-            </Button>
-
-            <Button
-              type="button"
-              onClick={() => setShowWalletModal(true)}
-              variant="soft"
-              size="md"
-              radius="fiverr"
-              className="bg-[#F1F3F5] hover:bg-gray-200 text-gray-800 shadow-2xs"
-              leftIcon={
-                hasAnyConnected ? (
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200 shrink-0" />
-                ) : undefined
-              }
-            >
-              {hasAnyConnected ? "Payout Channels" : "Connect Wallet"}
-            </Button>
-
-            <Button
-              type="button"
-              onClick={() => {
-                if (user?.isSuspended) {
-                  toast.error("Account is suspended. Payout withdrawals are frozen during restricted fulfillment mode.");
-                  return;
-                }
-                if (!hasAnyConnected) {
-                  setShowWalletModal(true);
-                  toast.warning("Please connect Stripe or Payoneer before withdrawing funds.");
-                } else if (availableBalance < MIN_PAYOUT_AMOUNT) {
-                  toast.error(`Minimum payout request amount is $${MIN_PAYOUT_AMOUNT}.00. Your available balance is $${availableBalance.toFixed(2)}.`);
-                } else {
-                  setShowPayoutModal(true);
-                }
-              }}
-              disabled={availableBalance <= 0 || Boolean(user?.isSuspended)}
-              variant="dark"
-              size="md"
-              radius="fiverr"
-              className={user?.isSuspended ? "opacity-60 cursor-not-allowed" : ""}
-            >
-              {user?.isSuspended ? "Payouts Frozen" : "Request Payout"}
-            </Button>
-          </div>
-        </div>
 
         {/* 3. Stat Cards: Next Income, Awaiting Clearance, Available Balance */}
         <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] overflow-hidden">

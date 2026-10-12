@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { axiosFetch, getAvatarUrl } from "@/utils";
 import { PackageCard, FavoriteSellerButton, Button } from "@/components";
-import { Breadcrumb, GigsGridSkeleton } from "@/components/ui";
+import { Breadcrumb, GigsGridSkeleton, PageHeader } from "@/components/ui";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -139,23 +139,15 @@ const FavoritesPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA] pt-10 sm:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
-        <div className="container mx-auto px-4 md:px-6 space-y-6">
-          <Breadcrumb
+      <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+        <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+          <PageHeader
             homeHref={user?.isSeller ? "/dashboard/seller" : "/dashboard/buyer"}
             homeTitle="Dashboard"
-            items={[
-              { name: "Favorites", isLast: true },
-            ]}
+            breadcrumbs={[{ name: "Favorites", isLast: true }]}
+            title="My Favorites"
+            subtitle="Manage your saved services and favorite freelancers in one place."
           />
-          <div className="space-y-1.5">
-            <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
-              Saved
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 font-normal">
-              Keep track of packages and freelancers you want to work with.
-            </p>
-          </div>
           <GigsGridSkeleton count={4} />
         </div>
       </div>
@@ -188,30 +180,15 @@ const FavoritesPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/30 pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px]">
-      <div className="container mx-auto px-4 md:px-6">
-        {/* Breadcrumb */}
-        <Breadcrumb
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        <PageHeader
           homeHref={user?.isSeller ? "/dashboard/seller" : "/dashboard/buyer"}
           homeTitle="Dashboard"
-          className="mb-6"
-          items={[
-            {
-              name: "Favorites",
-              isLast: true,
-            },
-          ]}
+          breadcrumbs={[{ name: "Favorites", isLast: true }]}
+          title="My Favorites"
+          subtitle="Manage your saved services and favorite freelancers in one place."
         />
-
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-[28px] md:text-[32px] font-bold text-gray-900 tracking-tight flex items-center gap-3">
-            My Favorites
-          </h1>
-          <p className="text-gray-500 mt-1.5 text-[15px]">
-            Manage your saved services and favorite freelancers in one place.
-          </p>
-        </div>
 
         {/* Tab Switcher */}
         <div className="inline-flex items-center h-[46px] bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 mb-8">

@@ -24,6 +24,8 @@ export type { InputProps } from "./ui/Input";
 export * from "./ui/Skeletons";
 export { SearchSuggestionsDropdown } from "./ui/SearchSuggestions/SearchSuggestionsDropdown";
 export * from "./ui/AccountStanding";
+export { PageHeader } from "./ui/PageHeader/PageHeader";
+export type { PageHeaderProps } from "./ui/PageHeader/PageHeader";
 
 // Marketing components
 export { default as Featured } from "./marketing/Featured/Featured";

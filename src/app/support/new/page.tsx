@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { supportService } from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
-import { Button, CustomSelect, CustomSelectOption } from "@/components/ui";
+import { Button, CustomSelect, CustomSelectOption, PageHeader } from "@/components/ui";
 
 const CATEGORIES = [
   { id: "Account & Billing", label: "Account & Billing", icon: UserCheck, desc: "Login issues, profile settings, verification, or invoice questions." },
@@ -33,7 +33,7 @@ const CATEGORIES = [
 ];
 
 function CreateSupportTicketForm() {
-    const router = useRouter();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const urlOrderId = searchParams?.get("orderId") || "";
   const urlCategory = searchParams?.get("category") || "";
@@ -76,11 +76,11 @@ function CreateSupportTicketForm() {
         const currentUid = String(user?._id || user?.id || "").trim();
         const validList = Array.isArray(list)
           ? list.filter((o: any) => {
-              if (!currentUid) return true;
-              const buyerId = String(o.buyerID?._id || o.buyerID?.id || o.buyerID || "").trim();
-              const sellerId = String(o.sellerID?._id || o.sellerID?.id || o.sellerID || "").trim();
-              return buyerId === currentUid || sellerId === currentUid;
-            })
+            if (!currentUid) return true;
+            const buyerId = String(o.buyerID?._id || o.buyerID?.id || o.buyerID || "").trim();
+            const sellerId = String(o.sellerID?._id || o.sellerID?.id || o.sellerID || "").trim();
+            return buyerId === currentUid || sellerId === currentUid;
+          })
           : [];
         setOrders(validList);
       } catch (err) {
@@ -174,27 +174,19 @@ function CreateSupportTicketForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pt-10 pb-[80px] min-[1400px]:pb-[100px] px-4 sm:px-6 lg:px-8">
-      <div className="container mx-auto px-4 md:px-6 space-y-8">
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        <PageHeader
+          homeHref="/dashboard/seller"
+          homeTitle="Dashboard"
+          breadcrumbs={[
+            { name: "Support", href: "/support" },
+            { name: "Create Ticket", isLast: true },
+          ]}
 
-        {/* Back Link */}
-        <Link
-          href="/support"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-[#64748b] hover:text-[#327C73] transition font-sf-pro"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Support Dashboard</span>
-        </Link>
-
-        {/* Header Title */}
-        <div className="space-y-1.5">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#0f172a] tracking-tight font-sf-pro">
-            Create Support Ticket
-          </h1>
-          <p className="text-sm text-[#64748b] font-inter">
-            Submit a support ticket and our customer assistance team will review your inquiry and respond shortly.
-          </p>
-        </div>
+          title="Create Support Ticket"
+          subtitle="Submit a support ticket and our customer assistance team will review your inquiry and respond shortly."
+        />
 
         {/* Error Alert */}
         {error && (
@@ -255,7 +247,7 @@ function CreateSupportTicketForm() {
               If this inquiry is related to a specific buyer or seller order, selecting it helps support agents inspect the order context immediately.
             </p>
 
-                        {selectedOrderID && (
+            {selectedOrderID && (
               <div className="flex items-center justify-between p-3 rounded-[6px] bg-[#327C73]/10 border border-[#327C73]/25 text-xs text-[#327C73] font-sf-pro">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-[#327C73] shrink-0" />

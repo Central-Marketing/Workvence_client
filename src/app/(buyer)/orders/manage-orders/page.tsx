@@ -10,7 +10,7 @@ import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { ManageOrderItem } from "@/features/dashboard/data/mockBuyerDashboard";
 import { Loader, Button } from "@/components";
-import { Breadcrumb, Tag, Modal } from "@/components/ui";
+import { Breadcrumb, Tag, Modal, PageHeader } from "@/components/ui";
 import { sortOrdersByPriority } from "@/features/orders";
 
 export default function BuyerManageOrdersPage() {
@@ -253,13 +253,12 @@ export default function BuyerManageOrdersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F8F8] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px]">
-      <div className="container mx-auto px-4 md:px-6">
-        {/* Breadcrumb */}
-        <Breadcrumb
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        <PageHeader
           homeHref="/dashboard/buyer"
           homeTitle="Dashboard"
-          items={[
+          breadcrumbs={[
             {
               name: "Orders",
               href: "/orders",
@@ -269,17 +268,9 @@ export default function BuyerManageOrdersPage() {
               isLast: true,
             },
           ]}
+          title="Manage Orders"
+          subtitle="View, track, and manage all your orders, from recent purchases to upcoming deliveries, in one place."
         />
-
-        {/* Page Title & Subtitle */}
-        <div className="mb-7 sm:mb-8">
-          <h1 className="text-xl md:text-2xl font-bold font-sf-pro text-[#292929]">
-            Manage Orders
-          </h1>
-          <p className="text-xs sm:text-[14px] text-[#6E6E6E] mt-1.5 leading-relaxed">
-            View, track, and manage all your orders, from recent purchases to upcoming deliveries, in one place.
-          </p>
-        </div>
 
         {/* Main Card */}
         <div className="bg-[#F5F5F5] rounded-[6px] border border-slate-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-8">

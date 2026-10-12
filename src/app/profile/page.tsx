@@ -34,7 +34,7 @@ import type { User } from "@/types";
 import { axiosFetch, countriesFlags, getCountryShortName } from "@/utils";
 import supportService from "@/utils/supportService";
 import { Loader, KycVerificationForm, Button } from "@/components";
-import { CustomSelect, CustomSelectOption, AccountStandingCard } from "@/components/ui";
+import { CustomSelect, CustomSelectOption, AccountStandingCard, PageHeader } from "@/components/ui";
 import { calculateProfileCompletion } from "@/features/dashboard";
 import useAdminCategories from "@/hooks/useAdminCategories";
 
@@ -708,26 +708,24 @@ export default function ProfilePage() {
   }, [isSeller]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pt-6 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
-      <div className="container mx-auto px-4 md:px-6">
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        <PageHeader
+          homeHref={isSeller ? "/dashboard/seller" : "/dashboard/buyer"}
+          homeTitle="Dashboard"
+          breadcrumbs={[{ name: "Profile Settings", isLast: true }]}
+          title="Edit Profile Settings"
+          subtitle="Update your personal information, professional details, and portfolio."
+        />
 
-        {/* Page Title & Navigation Tabs (Sticky) */}
+        {/* Navigation Tabs (Sticky) */}
         <div
           style={{
             top: `calc(var(--navbar-height, ${isSeller ? "82px" : "136px"}) + 0px)`,
           }}
-          className={`sticky z-30 py-2.5 sm:py-3.5 -my-1 bg-[#F8FAFC]/95 backdrop-blur-md transition-[top] duration-200 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 ${isSeller ? "top-[74px] md:top-[88px]" : "top-[128px] md:top-[142px]"
+          className={`sticky z-30 py-2.5 sm:py-3.5 -my-1 bg-[#F8F9FA]/95 backdrop-blur-md transition-[top] duration-200 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 ${isSeller ? "top-[74px] md:top-[88px]" : "top-[128px] md:top-[142px]"
             }`}
         >
-          <div>
-            <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
-              Edit Profile Settings
-            </h1>
-            <p className="text-slate-500 text-xs sm:text-sm mt-1">
-              Update your personal information, professional details, and portfolio.
-            </p>
-          </div>
-
           {/* Section Pill Tabs */}
           <div className="bg-white border border-slate-200/80 rounded-[6px] p-1 flex items-center gap-1 self-start md:self-auto overflow-x-auto max-w-full scrollbar-none shadow-xs shrink-0">
             <Button

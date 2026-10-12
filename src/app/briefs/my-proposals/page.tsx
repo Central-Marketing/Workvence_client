@@ -23,7 +23,7 @@ import {
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components";
-import { Breadcrumb, BriefsListSkeleton } from "@/components/ui";
+import { Breadcrumb, BriefsListSkeleton, PageHeader } from "@/components/ui";
 import { Home } from "lucide-react";
 
 type StatusFilter = "all" | "open" | "closed";
@@ -143,32 +143,20 @@ export default function MyProposalsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] pt-6 sm:pt-10 pb-20 font-sans">
-      <div className="container mx-auto px-4 md:px-6 space-y-7">
-
-        {/* 1. Breadcrumb */}
-        <Breadcrumb
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        <PageHeader
           homeHref="/dashboard/seller"
-          homeTitle="Home"
-          items={[
+          homeTitle="Dashboard"
+          breadcrumbs={[
             {
               name: "My Proposals",
               isLast: true,
             },
           ]}
-        />
-        {/* Header section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl sm:text-[28px] font-medium text-gray-950 tracking-tight font-sf-pro">
-              My Submitted Proposals
-            </h1>
-            <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-2xl leading-relaxed">
-              Keep track of your bids, client responses, and proposal status for open client projects.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0 self-start sm:self-center">
+          title="My Submitted Proposals"
+          subtitle="Keep track of your bids, client responses, and proposal status for open client projects."
+          actions={
             <Button
               href="/briefs?view=feed"
               variant="brand"
@@ -178,8 +166,8 @@ export default function MyProposalsPage() {
             >
               Explore Projects
             </Button>
-          </div>
-        </div>
+          }
+        />
 
         {/* Controls: Status Filters & Search Bar */}
         <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-4 sm:p-5 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">

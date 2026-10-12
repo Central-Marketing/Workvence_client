@@ -32,7 +32,7 @@ import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { SubmitProposalModal, AuthModal } from "@/components";
-import { Button, Breadcrumb, BriefDetailSkeleton, ConfirmModal, AiGradientButton } from "@/components/ui";
+import { Button, Breadcrumb, BriefDetailSkeleton, ConfirmModal, AiGradientButton, PageHeader } from "@/components/ui";
 import { EditBriefModal } from "@/features/buyer";
 import { ArrowRight, Timer } from "lucide-react";
 
@@ -514,14 +514,12 @@ const BriefDetail = () => {
   const categoryFormatted = formatCategoryName(brief.category);
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-slate-800 pt-6 sm:pt-8 pb-[80px] min-[1400px]:pb-[100px] font-sans">
-      <div className="container mx-auto px-4">
-        {/* Top Breadcrumb */}
-        <Breadcrumb
+    <div className="min-h-screen bg-[#F8F9FA] text-slate-800 pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        <PageHeader
           homeHref={user?.isSeller ? "/dashboard/seller" : user ? "/dashboard/buyer" : "/"}
-          homeTitle={user ? (user.isSeller ? "Seller Dashboard" : "Buyer Dashboard") : "Home"}
-          className="mb-5 select-none"
-          items={[
+          homeTitle="Dashboard"
+          breadcrumbs={[
             isOwner || (!isSeller && user)
               ? {
                 name: "My Projects",
@@ -536,52 +534,31 @@ const BriefDetail = () => {
               isLast: true,
             },
           ]}
+          title={brief.title}
+          subtitle="Explore briefs from clients looking for the right talent, skills, and expertise to bring their ideas to life."
+          actions={
+            <div className="flex items-center gap-2.5 shrink-0 self-start">
+              {/* Purple Rate / Budget Badge */}
+              <span className="bg-[#ECEBFE] text-[#6B5AED] text-xs font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap tracking-tight">
+                {rateBadge}
+              </span>
+
+              {/* Category Pill */}
+              {categoryFormatted && (
+                <span className="bg-white border border-slate-200 text-slate-800 text-xs font-medium px-4 py-1.5 rounded-full whitespace-nowrap shadow-2xs tracking-tight">
+                  {categoryFormatted}
+                </span>
+              )}
+
+              {/* Closed Status Pill */}
+              {isClosed && (
+                <span className="bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold px-3 py-1.5 rounded-full whitespace-nowrap tracking-tight">
+                  Closed
+                </span>
+              )}
+            </div>
+          }
         />
-
-        {/* Main Title & Header */}
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-[26px] lg:text-[28px] font-bold text-slate-900 tracking-tight font-sf-pro leading-tight">
-              {brief.title}
-            </h1>
-            <p className="text-slate-500 text-xs sm:text-sm mt-1.5 leading-relaxed font-normal font-inter">
-              Explore briefs from clients looking for the right talent, skills, and expertise to bring their ideas to life.
-            </p>
-          </div>
-
-
-          {/* Right Badges & Heart Icon */}
-          <div className="flex items-center gap-2.5 shrink-0 self-start">
-            {/* Purple Rate / Budget Badge */}
-            <span className="bg-[#ECEBFE] text-[#6B5AED] text-xs font-semibold px-3.5 py-1.5 rounded-full whitespace-nowrap tracking-tight">
-              {rateBadge}
-            </span>
-
-            {/* Category Pill */}
-            {categoryFormatted && (
-              <span className="bg-white border border-slate-200 text-slate-800 text-xs font-medium px-4 py-1.5 rounded-full whitespace-nowrap shadow-2xs tracking-tight">
-                {categoryFormatted}
-              </span>
-            )}
-
-            {/* Closed Status Pill */}
-            {isClosed && (
-              <span className="bg-rose-50 text-rose-700 border border-rose-200 text-xs font-semibold px-3 py-1.5 rounded-full whitespace-nowrap tracking-tight">
-                Closed
-              </span>
-            )}
-
-            {/* Favorite Button */}
-            {/* <button
-              type="button"
-              onClick={() => setIsFavorited(!isFavorited)}
-              className="w-9 h-9 rounded-full border border-slate-200/90 bg-white flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50/40 transition-colors cursor-pointer shrink-0 shadow-2xs"
-              title="Save project"
-            >
-              <FiHeart className={`w-4 h-4 transition-colors ${isFavorited ? "fill-red-500 text-red-500" : ""}`} />
-            </button> */}
-          </div>
-        </div>
 
         <div className="flex items-center gap-3">
           {isOwner && (

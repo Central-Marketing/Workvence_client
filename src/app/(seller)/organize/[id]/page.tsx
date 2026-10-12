@@ -13,7 +13,7 @@ import useAdminCategories from "@/hooks/useAdminCategories";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components";
-import { CustomSelect, CustomSelectOption, OrganizeSkeleton, AccountStandingBanner } from "@/components/ui";
+import { CustomSelect, CustomSelectOption, OrganizeSkeleton, AccountStandingBanner, PageHeader } from "@/components/ui";
 
 // Dynamically import ReactQuill to ensure SSG/SSR compatibility
 const ReactQuill = dynamic(() => import("react-quill-new"), {
@@ -1017,58 +1017,46 @@ const EditPackagePage = () => {
         <AccountStandingBanner />
 
         {/* 1. Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
+        <PageHeader
+          homeHref="/dashboard/seller"
+          homeTitle="Dashboard"
+          breadcrumbs={[
+            { name: "My Packages", href: "/my-packages" },
+            { name: "Edit Package", isLast: true },
+          ]}
+          onBack={() => router.push("/my-packages")}
+          title={`Edit Package: ${state.title || ""}`}
+          subtitle="Update your package details, pricing tiers, deliverables, and attachments so clients know exactly what you provide."
+          actions={
+            <div className="flex items-center gap-3">
               <Button
                 type="button"
-                variant="ghost"
-                size="icon"
+                variant="soft"
+                size="sm"
                 radius="fiverr"
-                onClick={() => router.push("/my-packages")}
-                className="text-gray-400 hover:text-gray-700 -ml-1 w-8 h-8 hover:bg-gray-100"
-                title="Back to my packages"
+                onClick={() => handleSubmit(true)}
+                disabled={mutation.isPending || user?.isSuspended}
+                className="bg-[#F1F3F5] hover:bg-gray-200 text-[#353535] hover:text-gray-900 font-semibold px-5 py-2.5 disabled:opacity-50"
               >
-                <ArrowLeft className="w-5 h-5" />
+                Draft and Save
               </Button>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-gray-950 truncate max-w-xl">
-                Edit Package: {state.title || ""}
-              </h1>
+
+              <Button
+                type="button"
+                variant="dark"
+                size="sm"
+                radius="fiverr"
+                onClick={() => handleSubmit(false)}
+                disabled={user?.isSuspended}
+                isLoading={mutation.isPending}
+                loadingText="Updating..."
+                className="font-semibold px-5 py-2.5 shadow-2xs disabled:opacity-50"
+              >
+                Update Package
+              </Button>
             </div>
-            <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-2xl leading-relaxed">
-              Update your package details, pricing tiers, deliverables, and attachments so clients know exactly what you provide.
-            </p>
-          </div>
-
-          {/* Action Buttons: Draft and Save & Update Package */}
-          <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
-            <Button
-              type="button"
-              variant="soft"
-              size="sm"
-              radius="fiverr"
-              onClick={() => handleSubmit(true)}
-              disabled={mutation.isPending || user?.isSuspended}
-              className="bg-[#F1F3F5] hover:bg-gray-200 text-[#353535] hover:text-gray-900 font-semibold px-5 py-2.5 disabled:opacity-50"
-            >
-              Draft and Save
-            </Button>
-
-            <Button
-              type="button"
-              variant="dark"
-              size="sm"
-              radius="fiverr"
-              onClick={() => handleSubmit(false)}
-              disabled={user?.isSuspended}
-              isLoading={mutation.isPending}
-              loadingText="Updating..."
-              className="font-semibold px-5 py-2.5 shadow-2xs disabled:opacity-50"
-            >
-              Update Package
-            </Button>
-          </div>
-        </div>
+          }
+        />
 
         {/* 2. Top Navigation Tabs (Sticky & Scroll-Based) */}
         <div className="sticky top-[69px] z-30 py-3 bg-[#F8F9FA]/95 backdrop-blur-md -my-1">

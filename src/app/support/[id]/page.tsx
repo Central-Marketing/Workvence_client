@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import moment from "moment";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Pdf01Icon, File02Icon } from "@hugeicons/core-free-icons";
 import {
@@ -32,7 +33,7 @@ import {
 import { supportService, SupportTicketItem, SupportMessage } from "@/utils/supportService";
 import { useSupportSocket, SocketSupportMessage } from "@/hooks/useSupportSocket";
 import { useUserStore } from "@/store/userStore";
-import { Button } from "@/components/ui";
+import { Button, PageHeader } from "@/components/ui";
 
 interface SupportAttachmentCardProps {
   att: any;
@@ -126,6 +127,7 @@ function SupportAttachmentCard({ att, isMe, onPreview, onDownload }: SupportAtta
 }
 
 export default function TicketDetailsPage() {
+  const router = useRouter();
   const params = useParams();
   const ticketId = params?.id as string;
   const { user } = useUserStore();
@@ -590,26 +592,26 @@ export default function TicketDetailsPage() {
   const canSendReply = !sending && !uploadingFile && (replyText.trim().length > 0 || attachments.length > 0);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pt-8 pb-[80px] min-[1400px]:pb-[100px] px-4 sm:px-6 lg:px-8">
-      <div className="container mx-auto px-4 md:px-6 space-y-6">
-
-        {/* Top Navigation */}
-        <div className="flex items-center justify-between">
-          <Link
-            href="/support"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-[#64748b] hover:text-[#0D6D5F] transition font-sf-pro"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Support Dashboard</span>
-          </Link>
-
-          <div className="flex items-center gap-2 font-inter">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#0D6D5F] animate-pulse" />
-            <span className="text-xs font-semibold text-[#0D6D5F]">
-              {isConnected ? "Real-time Support Connected" : "Connecting..."}
-            </span>
-          </div>
-        </div>
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        <PageHeader
+          homeHref="/dashboard/seller"
+          homeTitle="Dashboard"
+          breadcrumbs={[
+            { name: "Support", href: "/support" },
+            { name: ticket.ticketNumber || `#TK-${ticketId.substring(0, 6).toUpperCase()}`, isLast: true },
+          ]}
+          title={ticket.subject}
+          subtitle={`Support Ticket ${ticket.ticketNumber || `#TK-${ticketId.substring(0, 6).toUpperCase()}`} • Created ${moment(ticket.createdAt).fromNow()}`}
+          actions={
+            <div className="flex items-center gap-2 font-inter">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#0D6D5F] animate-pulse" />
+              <span className="text-xs font-semibold text-[#0D6D5F]">
+                {isConnected ? "Real-time Support Connected" : "Connecting..."}
+              </span>
+            </div>
+          }
+        />
 
         {/* Context Callout Banner for Linked Order / Non-Creator Tickets */}
         {ticket.isCreator === false && (

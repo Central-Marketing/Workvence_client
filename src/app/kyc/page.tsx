@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, Clock, Sparkles, ArrowRight } from "lucide-react";
 import moment from "moment";
 import { KycVerificationForm, Loader } from "@/components";
+import { PageHeader } from "@/components/ui";
 import { useUserStore } from "@/store/userStore";
 import kycService from "@/utils/kycService";
 
@@ -57,23 +58,18 @@ export default function KycPage() {
     <div className="min-h-screen bg-[#F8F9FA] pt-10 sm:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-7">
 
-        {/* 2. Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-[28px] font-inter font-medium text-[#292929]">
-              ID Verification
-            </h1>
-            <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-2xl font-inter">
-              Update your personal information, professional details, and portfolio.
-            </p>
-          </div>
-
-          <div className="self-start sm:self-auto shrink-0">
+        <PageHeader
+          homeHref={user?.isSeller ? "/dashboard/seller" : "/dashboard/buyer"}
+          homeTitle="Dashboard"
+          breadcrumbs={[{ name: "ID Verification", isLast: true }]}
+          title="ID Verification"
+          subtitle="Verify your identity with official government-issued documentation to ensure security and unlock full marketplace privileges."
+          actions={
             <span className="border border-gray-200 text-gray-800 text-xs font-semibold px-4 py-1.5 rounded-full bg-white shadow-2xs inline-flex items-center">
               256-Bit Encryption Verification
             </span>
-          </div>
-        </div>
+          }
+        />
 
         {/* 3. Main Content Area */}
         {isLoading ? (

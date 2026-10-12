@@ -22,3 +22,5 @@ export { default as AIPolishButton } from './AIPolishButton/AIPolishButton';
 export type { AIPolishButtonProps } from './AIPolishButton/AIPolishButton';
 export { Modal, default as ModalComponent } from './Modal';
 export type { ModalProps } from './Modal';
+export { PageHeader, default as PageHeaderComponent } from './PageHeader/PageHeader';
+export type { PageHeaderProps } from './PageHeader/PageHeader';

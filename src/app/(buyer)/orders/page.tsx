@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components";
-import { OrdersTableSkeleton } from "@/components/ui";
+import { OrdersTableSkeleton, PageHeader } from "@/components/ui";
 
 export default function BuyerOrdersPage() {
   const router = useRouter();
@@ -182,20 +182,26 @@ export default function BuyerOrdersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F8F8] pt-6 sm:pt-8 pb-[80px] min-[1400px]:pb-[100px] font-sans">
-      <div className="container mx-auto px-4 md:px-6 space-y-7 sm:space-y-8">
-
-        {user?.isSeller && (
-          <div className="flex justify-end">
-            <Link
-              href="/manage-orders"
-              className="text-xs font-semibold text-[#327C73] hover:underline flex items-center gap-1"
-            >
-              <span>Go to Seller Manage Orders</span>
-              <span>→</span>
-            </Link>
-          </div>
-        )}
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        <PageHeader
+          homeHref="/dashboard/buyer"
+          homeTitle="Dashboard"
+          breadcrumbs={[{ name: "My Orders", isLast: true }]}
+          title="Orders"
+          subtitle="Get a quick overview of your orders, spending, and current order activity in one place."
+          actions={
+            user?.isSeller ? (
+              <Link
+                href="/manage-orders"
+                className="text-xs font-semibold text-[#327C73] hover:underline flex items-center gap-1"
+              >
+                <span>Go to Seller Manage Orders</span>
+                <span>→</span>
+              </Link>
+            ) : undefined
+          }
+        />
 
         {/* Top Hero Banner: Shown when there is an active brief project */}
         {activeBrief && (
@@ -232,14 +238,6 @@ export default function BuyerOrdersPage() {
 
         {/* Order Summary Section */}
         <div className="space-y-3">
-          <div>
-            <h1 className="text-[20px] font-bold text-slate-900">
-              Order Summary
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Get a quick overview of your orders, spending, and current order activity in one place.
-            </p>
-          </div>
 
           {/* 4-Stat Metric Bar */}
           <div className="bg-[#f5f5f5] rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.03)] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 overflow-hidden">

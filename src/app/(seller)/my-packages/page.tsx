@@ -8,7 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Button, GigsGridSkeleton, AccountStandingBanner, Modal } from "@/components/ui";
+import { Button, GigsGridSkeleton, AccountStandingBanner, Modal, PageHeader } from "@/components/ui";
 
 const MyPackages = () => {
   const user = useUserStore((state: any) => state.user);
@@ -76,16 +76,13 @@ const MyPackages = () => {
     <div className="min-h-screen bg-[#F8F9FA] pt-10 sm:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       {isLoading ? (
         <div className="container mx-auto px-4 md:px-6 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
-                My Packages
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-500 font-normal mt-0.5">
-                Manage, edit, and organize all your services in one place.
-              </p>
-            </div>
-          </div>
+          <PageHeader
+            homeHref="/dashboard/seller"
+            homeTitle="Dashboard"
+            breadcrumbs={[{ name: "My Packages", isLast: true }]}
+            title="My Packages"
+            subtitle="Manage, edit, and organize all your services in one place."
+          />
           <GigsGridSkeleton count={6} />
         </div>
       ) : error ? (
@@ -98,39 +95,37 @@ const MyPackages = () => {
           <AccountStandingBanner />
 
           {/* Page Heading & Create New Package Button */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
-                My Packages
-              </h1>
-              <p className="text-xs sm:text-[13px] text-gray-500 mt-1.5 leading-relaxed max-w-2xl">
-                Create, manage, and showcase your service packages in one place. Track your package status and keep your offerings ready for clients.
-              </p>
-            </div>
-
-            {user?.isSuspended ? (
-              <Button
-                variant="outline"
-                size="sm"
-                radius="fiverr"
-                disabled
-                onClick={() => toast.error("Account is suspended. Package creation is temporarily disabled.")}
-                className="bg-gray-200 text-gray-500 border-transparent shadow-none cursor-not-allowed opacity-75 self-start sm:self-auto shrink-0"
-              >
-                Create New Package (Suspended)
-              </Button>
-            ) : (
-              <Button
-                href="/organize"
-                variant="outline"
-                size="sm"
-                radius="fiverr"
-                className="bg-gradient-to-r from-[#98FDE8] to-[#80B6FD] hover:opacity-95 text-[#0A3B32] border-transparent shadow-2xs self-start sm:self-auto shrink-0"
-              >
-                Create New Package
-              </Button>
-            )}
-          </div>
+          <PageHeader
+            homeHref="/dashboard/seller"
+            homeTitle="Dashboard"
+            breadcrumbs={[{ name: "My Packages", isLast: true }]}
+            title="My Packages"
+            subtitle="Create, manage, and showcase your service packages in one place. Track your package status and keep your offerings ready for clients."
+            actions={
+              user?.isSuspended ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  radius="fiverr"
+                  disabled
+                  onClick={() => toast.error("Account is suspended. Package creation is temporarily disabled.")}
+                  className="bg-gray-200 text-gray-500 border-transparent shadow-none cursor-not-allowed opacity-75 shrink-0"
+                >
+                  Create New Package (Suspended)
+                </Button>
+              ) : (
+                <Button
+                  href="/organize"
+                  variant="outline"
+                  size="sm"
+                  radius="fiverr"
+                  className="bg-gradient-to-r from-[#98FDE8] to-[#80B6FD] hover:opacity-95 text-[#0A3B32] border-transparent shadow-2xs shrink-0"
+                >
+                  Create New Package
+                </Button>
+              )
+            }
+          />
 
           {/* Tab Filter: Published and Draft */}
           <div className="inline-flex items-center h-[46px] bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50">

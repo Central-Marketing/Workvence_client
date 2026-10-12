@@ -14,7 +14,7 @@ import useAdminCategories from "@/hooks/useAdminCategories";
 import supportService from "@/utils/supportService";
 import { useUserStore } from "@/store/userStore";
 import { Loader, Button } from "@/components";
-import { CustomSelect, CustomSelectOption, AccountStandingBanner } from "@/components/ui";
+import { CustomSelect, CustomSelectOption, AccountStandingBanner, PageHeader } from "@/components/ui";
 
 // Dynamically import ReactQuill to ensure SSG/SSR compatibility
 const ReactQuill = dynamic(() => import("react-quill-new"), {
@@ -685,45 +685,45 @@ const OrganizePage = () => {
         <AccountStandingBanner />
 
         {/* 1. Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-[28px] font-medium font-inter text-[#292929]">
-              Create New Package
-            </h1>
-            <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-2xl font-inter">
-              Set up your package with clear details, pricing, and deliverables so clients know exactly what to expect before they hire you.
-            </p>
-          </div>
+        <PageHeader
+          homeHref="/dashboard/seller"
+          homeTitle="Dashboard"
+          breadcrumbs={[
+            { name: "My Packages", href: "/my-packages" },
+            { name: "Create New Package", isLast: true },
+          ]}
+          title="Create New Package"
+          subtitle="Set up your package with clear details, pricing, and deliverables so clients know exactly what to expect before they hire you."
+          actions={
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                variant="soft"
+                size="sm"
+                radius="fiverr"
+                onClick={() => handleSubmit(true)}
+                disabled={mutation.isPending || user?.isSuspended}
+                className="bg-[#F1F3F5] hover:bg-gray-200 text-[#353535] hover:text-gray-900 font-semibold px-5 py-2.5 disabled:opacity-50"
+              >
+                Draft and Save
+              </Button>
 
-          {/* Action Buttons: Draft and Save & Save and Publish */}
-          <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
-            <Button
-              type="button"
-              variant="soft"
-              size="sm"
-              radius="fiverr"
-              onClick={() => handleSubmit(true)}
-              disabled={mutation.isPending || user?.isSuspended}
-              className="bg-[#F1F3F5] hover:bg-gray-200 text-[#353535] hover:text-gray-900 font-semibold px-5 py-2.5 disabled:opacity-50"
-            >
-              Draft and Save
-            </Button>
-
-            <Button
-              type="button"
-              variant="dark"
-              size="sm"
-              radius="fiverr"
-              onClick={() => handleSubmit(false)}
-              disabled={user?.isSuspended}
-              isLoading={mutation.isPending}
-              loadingText="Publishing..."
-              className="font-semibold px-5 py-2.5 shadow-2xs disabled:opacity-50"
-            >
-              Save and Publish
-            </Button>
-          </div>
-        </div>
+              <Button
+                type="button"
+                variant="dark"
+                size="sm"
+                radius="fiverr"
+                onClick={() => handleSubmit(false)}
+                disabled={user?.isSuspended}
+                isLoading={mutation.isPending}
+                loadingText="Publishing..."
+                className="font-semibold px-5 py-2.5 shadow-2xs disabled:opacity-50"
+              >
+                Save and Publish
+              </Button>
+            </div>
+          }
+        />
 
         {/* 2. Top Navigation Tabs (Sticky & Scroll-Based) */}
         <div className="sticky top-[69px] z-30 py-3 bg-[#F8F9FA]/95 backdrop-blur-md -my-1">

@@ -28,7 +28,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { supportService, SupportTicketItem } from "@/utils/supportService";
-import { Button } from "@/components/ui";
+import { Button, PageHeader } from "@/components/ui";
 
 const CATEGORIES = [
   { id: "All", label: "All Categories", icon: Inbox },
@@ -219,33 +219,27 @@ export default function SupportDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pt-10 pb-[80px] min-[1400px]:pb-[100px] px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-
-        {/* Header Banner */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 md:p-8 rounded-[6px] border border-[#e2e8f0] shadow-xs">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#327C73]/10 text-[#327C73] flex items-center justify-center">
-                <LifeBuoy className="w-5 h-5" />
-              </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-[#0f172a] tracking-tight font-sf-pro">
-                Support & Help Desk
-              </h1>
-            </div>
-            <p className="text-sm text-[#64748b] max-w-2xl font-inter">
-              Track your open support inquiries, submit new help requests, and communicate directly with platform administrators.
-            </p>
-          </div>
-
-          <Link
-            href="/support/new"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-[6px] bg-[#327C73] hover:bg-[#28635c] text-white font-semibold text-xs shadow-xs transition active:scale-95 cursor-pointer whitespace-nowrap font-sf-pro"
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>Create Support Ticket</span>
-          </Link>
-        </div>
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        <PageHeader
+          homeHref="/dashboard/seller"
+          homeTitle="Dashboard"
+          breadcrumbs={[{ name: "Support & Help Desk", isLast: true }]}
+          title="Support & Help Desk"
+          subtitle="Track your open support inquiries, submit new help requests, and communicate directly with platform administrators."
+          actions={
+            <Button
+              href="/support/new"
+              variant="brand"
+              size="sm"
+              radius="fiverr"
+              leftIcon={<PlusCircle className="w-4 h-4" />}
+              className="px-5 py-2.5 font-semibold"
+            >
+              Create Support Ticket
+            </Button>
+          }
+        />
 
         {/* KPI Counter Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

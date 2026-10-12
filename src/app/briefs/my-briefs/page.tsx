@@ -24,7 +24,7 @@ import {
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Button, AiGradientButton } from "@/components";
-import { CustomSelect, CustomSelectOption, BriefsListSkeleton, ConfirmModal } from "@/components/ui";
+import { CustomSelect, CustomSelectOption, BriefsListSkeleton, ConfirmModal, PageHeader } from "@/components/ui";
 import { EditBriefModal } from "@/features/buyer";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { FolderKanbanIcon } from "@hugeicons/core-free-icons";
@@ -298,8 +298,15 @@ const MyBriefs = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#F5F5F5] pt-6 sm:pt-10 pb-[80px] font-sans">
-        <div className="container mx-auto px-4 md:px-6">
+      <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+        <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+          <PageHeader
+            homeHref="/dashboard/buyer"
+            homeTitle="Dashboard"
+            breadcrumbs={[{ name: "My Projects", isLast: true }]}
+            title="My Projects"
+            subtitle="Keep track of your projects, progress, milestones, and updates all in one place."
+          />
           <BriefsListSkeleton />
         </div>
       </div>
@@ -307,34 +314,31 @@ const MyBriefs = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] pt-6 sm:pt-10 pb-[80px] min-[1400px]:pb-[100px] font-sans">
-      <div className="container mx-auto px-4 md:px-6">
-
-        {/* Title Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-xl sm:text-[34px] font-bold text-slate-900 tracking-tight">
-              My Projects
-            </h1>
-            <p className="text-slate-500 text-xs sm:text-sm mt-1.5">
-              Keep track of your projects, progress, milestones, and updates all in one place.
-            </p>
-          </div>
-          {!user?.isSeller && (
-            <AiGradientButton
-              href="/briefs/create?ai=true"
-              text="Post a Project with AI"
-              icon={
-                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
-                  <path d="M0.75 7.60886C3.56875 4.84296 10.19 -0.808996 12.025 1.15511C14.3438 3.63702 2.15937 9.91366 4.03854 12.6791C6.0234 15.6001 12.9646 5.30336 15.3135 7.14726C17.6625 8.99126 9.676 13.1401 11.5552 15.4451C12.3069 16.367 14.3739 14.9841 15.3135 14.0621" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              }
-              px="px-3.5 sm:px-4.5"
-              py="py-2 sm:py-2.5"
-              className="h-[40px] rounded-[6px] text-[16px] font-semibold text-[#112131] shadow-none shrink-0 whitespace-nowrap self-start sm:self-center"
-            />
-          )}
-        </div>
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        <PageHeader
+          homeHref={user?.isSeller ? "/dashboard/seller" : "/dashboard/buyer"}
+          homeTitle="Dashboard"
+          breadcrumbs={[{ name: "My Projects", isLast: true }]}
+          title="My Projects"
+          subtitle="Keep track of your projects, progress, milestones, and updates all in one place."
+          actions={
+            !user?.isSeller ? (
+              <AiGradientButton
+                href="/briefs/create?ai=true"
+                text="Post a Project with AI"
+                icon={
+                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                    <path d="M0.75 7.60886C3.56875 4.84296 10.19 -0.808996 12.025 1.15511C14.3438 3.63702 2.15937 9.91366 4.03854 12.6791C6.0234 15.6001 12.9646 5.30336 15.3135 7.14726C17.6625 8.99126 9.676 13.1401 11.5552 15.4451C12.3069 16.367 14.3739 14.9841 15.3135 14.0621" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                }
+                px="px-3.5 sm:px-4.5"
+                py="py-2 sm:py-2.5"
+                className="h-[40px] rounded-[6px] text-[16px] font-semibold text-[#112131] shadow-none shrink-0 whitespace-nowrap self-start sm:self-center"
+              />
+            ) : undefined
+          }
+        />
 
         {/* Filter Pills & Search / Sort Toolbar */}
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3.5 sm:gap-4 mb-6 sm:mb-8 w-full min-w-0 max-w-full">

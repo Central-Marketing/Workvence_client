@@ -5,12 +5,23 @@ export interface CustomOffer {
   id?: string;
   title: string;
   description: string;
+  desc?: string;
   price: number | string;
-  deliveryTime: number | string;
+  deliveryTime?: number | string;
+  deliveryTimeDays?: number | string;
   revisionNumber?: number | string;
+  revisions?: number | string;
   status?: 'pending' | 'accepted' | 'rejected' | 'withdrawn' | string;
   packageId?: string;
+  packageID?: string;
+  packageTitle?: string;
+  gigID?: string | null;
+  gigTitle?: string | null;
   briefId?: string;
+  briefID?: string | null;
+  briefTitle?: string | null;
+  sellerID?: string;
+  withdrawn?: boolean;
 }
 
 export interface MeetingInvite {
@@ -57,7 +68,16 @@ export interface ChatMessage {
   message?: string;
   file?: string | null;
   attachment?: MessageAttachment | null;
+  isCustomOffer?: boolean;
+  offerStatus?: 'active' | 'withdrawn' | 'accepted' | string;
+  withdrawn?: boolean;
+  senderID?: string;
   customOffer?: CustomOffer | null;
+  gigID?: string | null;
+  gigTitle?: string | null;
+  briefID?: string | null;
+  briefTitle?: string | null;
+  orderID?: string | null;
   isAudio?: boolean;
   audioUrl?: string;
   createdAt: string;

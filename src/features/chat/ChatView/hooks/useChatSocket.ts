@@ -225,6 +225,7 @@ export function useChatSocket({
           const arr = Array.isArray(oldData) ? oldData : [];
           const newMsgId = newMsg?._id || newMsg?.id;
           const incomingText = (
+            newMsg.customOffer?.description ||
             newMsg.description ||
             newMsg.desc ||
             newMsg.text ||
@@ -258,7 +259,14 @@ export function useChatSocket({
             const mId = String(m._id || m.id || "");
             if (mId.startsWith("temp-")) return false;
 
-            const mText = (m.description || m.desc || m.text || m.message || "").trim();
+            const mText = (
+              m.customOffer?.description ||
+              m.description ||
+              m.desc ||
+              m.text ||
+              m.message ||
+              ""
+            ).trim();
             const mFile = m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
             if (mText !== incomingText || mFile !== incomingFile) return false;
 
@@ -284,7 +292,17 @@ export function useChatSocket({
           const withoutTemp = arr.filter((m: any) => {
             const mId = String(m._id || m.id || "");
             if (mId.startsWith("temp-")) {
-              const tempText = (m.description || m.desc || m.text || m.message || "").trim();
+              if (m.isCustomOffer && (newMsg.isCustomOffer || newMsg.customOffer)) {
+                return false;
+              }
+              const tempText = (
+                m.customOffer?.description ||
+                m.description ||
+                m.desc ||
+                m.text ||
+                m.message ||
+                ""
+              ).trim();
               return tempText !== incomingText;
             }
             return true;
@@ -355,7 +373,32 @@ export function useChatSocket({
       }
     };
 
+    const handleOfferWithdrawn = (data: any) => {
+      const targetMsgId = data?.messageId || data?.id || data?._id;
+      if (!targetMsgId) return;
+
+      const updateMessagesWithdrawn = (oldData: any = []) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.map((m: any) =>
+          String(m._id || m.id) === String(targetMsgId)
+            ? { ...m, withdrawn: true, offerStatus: "withdrawn" }
+            : m
+        );
+      };
+
+      queryClient.setQueryData(["messages", conversationID], updateMessagesWithdrawn);
+      if (convIdRef.current && convIdRef.current !== conversationID) {
+        queryClient.setQueryData(["messages", convIdRef.current], updateMessagesWithdrawn);
+      }
+      const incomingCid = data?.conversationUUID || data?.conversationID;
+      if (incomingCid) {
+        queryClient.setQueryData(["messages", incomingCid], updateMessagesWithdrawn);
+      }
+      queryClient.invalidateQueries({ queryKey: ["messages", conversationID] });
+    };
+
     socket.on("receive_message", handleReceiveMessage);
+    socket.on("offer_withdrawn", handleOfferWithdrawn);
     socket.on("typing_start", handleUserTyping);
     socket.on("user_typing", handleUserTyping);
     socket.on("typing_stop", handleUserStoppedTyping);
@@ -364,6 +407,7 @@ export function useChatSocket({
     return () => {
       socket.off("connect", handleConnect);
       socket.off("receive_message", handleReceiveMessage);
+      socket.off("offer_withdrawn", handleOfferWithdrawn);
       socket.off("typing_start", handleUserTyping);
       socket.off("user_typing", handleUserTyping);
       socket.off("typing_stop", handleUserStoppedTyping);

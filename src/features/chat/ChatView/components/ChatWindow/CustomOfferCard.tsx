@@ -23,7 +23,7 @@ interface CustomOfferCardProps {
     isWithdrawn: boolean
   ) => void;
   onViewOrder: (targetOrderId?: string | null) => void;
-  onAcceptOffer: (offer: any) => void;
+  onAcceptOffer: (offer: any, msgId?: string) => void;
   onWithdraw: (msgId: string) => void;
 }
 
@@ -98,7 +98,8 @@ export const CustomOfferCard: React.FC<CustomOfferCardProps> = ({
         <span className="text-[15px] font-medium text-slate-900">Title</span>
         <p className="text-[14px] text-slate-600 leading-relaxed m-0 font-normal">
           {renderMessageTextWithLinks(
-            offer.desc ||
+            offer.description ||
+              offer.desc ||
               "1 Screen -Clean Dashboard UI UX design - Developer-ready Figma files - Unlimited revisions"
           )}
         </p>
@@ -179,7 +180,7 @@ export const CustomOfferCard: React.FC<CustomOfferCardProps> = ({
               <circle cx="12" cy="12" r="9" />
               <polyline points="12 7 12 12 15 14" />
             </svg>
-            <span>{offer.delivery} Day Delivery</span>
+            <span>{offer.delivery || offer.deliveryTimeDays} Day Delivery</span>
           </div>
         </div>
       </div>
@@ -239,7 +240,7 @@ export const CustomOfferCard: React.FC<CustomOfferCardProps> = ({
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
             }
-            onClick={() => onAcceptOffer(offer)}
+            onClick={() => onAcceptOffer(offer, msg._id || msg.id)}
             className="h-10 font-semibold shadow-xs"
           >
             Accept Offer

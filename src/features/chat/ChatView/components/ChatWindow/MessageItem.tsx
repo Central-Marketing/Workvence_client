@@ -28,7 +28,7 @@ interface MessageItemProps {
     isWithdrawn: boolean
   ) => void;
   onViewOrder: (targetOrderId?: string | null) => void;
-  onAcceptOffer: (offer: any) => void;
+  onAcceptOffer: (offer: any, msgId?: string) => void;
   onWithdraw: (msgId: string) => void;
   onCopyText: (text: string, msg?: string) => void;
 }

@@ -61,6 +61,22 @@ export const CreateOfferModal: React.FC<CreateOfferModalProps> = ({
     onSubmit(e);
   };
 
+  const handleSelectPackage = (val: string | number) => {
+    const newVal = String(val || "");
+    setSelectedPackageId(newVal);
+    if (newVal) {
+      setSelectedBriefId("");
+    }
+  };
+
+  const handleSelectBrief = (val: string | number) => {
+    const newVal = String(val || "");
+    setSelectedBriefId(newVal);
+    if (newVal) {
+      setSelectedPackageId("");
+    }
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -107,7 +123,7 @@ export const CreateOfferModal: React.FC<CreateOfferModalProps> = ({
               })),
             ]}
             value={selectedPackageId}
-            onChange={(val) => setSelectedPackageId(String(val))}
+            onChange={handleSelectPackage}
             placeholder="-- Select one of your Packages --"
             ariaLabel="Package Reference"
           />
@@ -123,12 +139,12 @@ export const CreateOfferModal: React.FC<CreateOfferModalProps> = ({
             options={[
               { value: "", label: "-- Select a Project --" },
               ...chatBriefs.map((b: any) => ({
-                value: b._id,
+                value: b._id || b.id,
                 label: `${b.title} — $${b.budget}`,
               })),
             ]}
             value={selectedBriefId}
-            onChange={(val) => setSelectedBriefId(String(val))}
+            onChange={handleSelectBrief}
             placeholder={
               chatBriefs.length === 0
                 ? "No projects available for this chat"

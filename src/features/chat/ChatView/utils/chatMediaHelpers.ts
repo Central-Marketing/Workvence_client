@@ -136,21 +136,46 @@ export const formatFileNameWithExtension = (name: string, url: string, itemObj?:
 // Parse JSON payload from custom offer string or object
 export const parseOffer = (desc?: any) => {
   if (!desc) return null;
-  if (typeof desc === 'object' && (desc.price !== undefined || desc.packageID || desc.delivery)) {
-    return desc;
-  }
-  if (typeof desc !== 'string') return null;
-  const str = desc.trim();
-  if (str.includes('[CUSTOM_OFFER]')) {
-    try {
-      const jsonPart = str.substring(str.indexOf('[CUSTOM_OFFER]') + '[CUSTOM_OFFER]'.length).trim();
-      return JSON.parse(jsonPart);
-    } catch (err) {
-      console.error("Failed to parse custom offer json:", err);
-      return null;
+  let raw: any = null;
+
+  if (
+    typeof desc === 'object' &&
+    (desc.price !== undefined || desc.packageID || desc.delivery || desc.deliveryTimeDays || desc.title || desc.customOffer)
+  ) {
+    raw = desc.customOffer || desc;
+  } else if (typeof desc === 'string') {
+    const str = desc.trim();
+    if (str.includes('[CUSTOM_OFFER]')) {
+      try {
+        const jsonPart = str.substring(str.indexOf('[CUSTOM_OFFER]') + '[CUSTOM_OFFER]'.length).trim();
+        raw = JSON.parse(jsonPart);
+      } catch (err) {
+        console.error("Failed to parse custom offer json:", err);
+        return null;
+      }
     }
   }
-  return null;
+
+  if (!raw) return null;
+
+  return {
+    ...raw,
+    title: raw.title || raw.packageTitle || raw.gigTitle || raw.briefTitle || "",
+    description: raw.description || raw.desc || "",
+    desc: raw.description || raw.desc || "",
+    price: Number(raw.price || 0),
+    delivery: Number(raw.deliveryTimeDays || raw.delivery || 3),
+    deliveryTimeDays: Number(raw.deliveryTimeDays || raw.delivery || 3),
+    revisions: raw.revisionNumber ?? raw.revisions ?? raw.revision ?? 0,
+    revisionNumber: raw.revisionNumber ?? raw.revisions ?? raw.revision ?? 0,
+    gigID: raw.gigID || raw.packageID || raw.packageId || null,
+    packageID: raw.gigID || raw.packageID || raw.packageId || null,
+    gigTitle: raw.gigTitle || raw.packageTitle || null,
+    packageTitle: raw.gigTitle || raw.packageTitle || null,
+    briefID: raw.briefID || raw.briefId || null,
+    briefTitle: raw.briefTitle || null,
+    sellerID: raw.sellerID || null,
+  };
 };
 
 // Parse JSON payload from video meeting invite string or object

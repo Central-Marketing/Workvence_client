@@ -27,6 +27,8 @@ interface UseChatMessagesOptions {
   setSelectedPackageId: (id: string) => void;
   selectedBriefId: string;
   setSelectedBriefId: (id: string) => void;
+  offerTitle?: string;
+  setOfferTitle?: (title: string) => void;
   offerDesc: string;
   setOfferDesc: (desc: string) => void;
   offerPrice: string;
@@ -61,6 +63,8 @@ export function useChatMessages({
   setSelectedPackageId,
   selectedBriefId,
   setSelectedBriefId,
+  offerTitle,
+  setOfferTitle,
   offerDesc,
   setOfferDesc,
   offerPrice,
@@ -260,6 +264,38 @@ export function useChatMessages({
   const mutation = useMutation({
     mutationFn: async (msg: any) => {
       const targetId = activeRoomID || conversationID;
+
+      // Strict backend DTO for Call A: Send Custom Offer
+      if (msg.isCustomOffer) {
+        const customOfferPayload: Record<string, any> = {
+          conversationUUID: targetId,
+          gigID: msg.gigID ?? null,
+          briefID: msg.briefID ?? null,
+          isCustomOffer: true,
+          customOffer: {
+            title: msg.customOffer?.title || "",
+            description: msg.customOffer?.description || "",
+            price: Number(msg.customOffer?.price || 0),
+            deliveryTimeDays: Number(msg.customOffer?.deliveryTimeDays || 3),
+          },
+        };
+
+        if (
+          msg.customOffer?.revisionNumber !== undefined &&
+          msg.customOffer?.revisionNumber !== null &&
+          msg.customOffer?.revisionNumber !== ""
+        ) {
+          customOfferPayload.customOffer.revisionNumber = Number(msg.customOffer.revisionNumber);
+        }
+
+        try {
+          return await axiosFetch.post("/messages", customOfferPayload);
+        } catch (err) {
+          return await axiosFetch.post(`/conversations/${targetId}/messages`, customOfferPayload);
+        }
+      }
+
+      // Normal chat messages
       const httpPayload: Record<string, any> = {
         description: msg.description || msg.desc || msg.text || msg.message || "",
       };
@@ -274,6 +310,7 @@ export function useChatMessages({
         return await axiosFetch.post("/messages", {
           ...httpPayload,
           conversationID: targetId,
+          conversationUUID: targetId,
         });
       }
     },
@@ -289,7 +326,9 @@ export function useChatMessages({
             ""
         ).trim();
         const incomingText =
-          newMsg.description || newMsg.desc || newMsg.text || newMsg.message || "";
+          newMsg?.isCustomOffer || newMsg?.customOffer
+            ? "📋 Custom Offer"
+            : newMsg.description || newMsg.desc || newMsg.text || newMsg.message || "";
         return oldConvs
           .map((c: any) => {
             if (isTargetConversation(c, incomingCid)) {
@@ -314,6 +353,7 @@ export function useChatMessages({
       const msgId = savedMsg?._id || savedMsg?.id;
       if (savedMsg && typeof savedMsg === "object" && msgId) {
         const savedText = (
+          savedMsg.customOffer?.description ||
           savedMsg.description ||
           savedMsg.desc ||
           savedMsg.text ||
@@ -326,7 +366,17 @@ export function useChatMessages({
             const mId = String(m._id || m.id || "");
             if (mId === String(msgId)) return false;
             if (mId.startsWith("temp-")) {
-              const tempText = (m.description || m.desc || m.text || m.message || "").trim();
+              if (m.isCustomOffer && (savedMsg.isCustomOffer || savedMsg.customOffer)) {
+                return false;
+              }
+              const tempText = (
+                m.customOffer?.description ||
+                m.description ||
+                m.desc ||
+                m.text ||
+                m.message ||
+                ""
+              ).trim();
               return tempText !== savedText;
             }
             return true;
@@ -514,34 +564,57 @@ export function useChatMessages({
       );
       return;
     }
-    if (!selectedPackageId && !selectedBriefId) {
-      toast.error("Select at least a Package or a Project.");
+    const hasContext = Boolean(
+      (selectedPackageId && !selectedBriefId) || (!selectedPackageId && selectedBriefId)
+    );
+    if (!hasContext) {
+      toast.error("Please select at least a Package or a Project.");
       return;
     }
-    if (!offerDesc || !offerPrice || !offerDelivery) {
-      toast.error("Fill all fields.");
+    if (!offerDesc.trim() || !offerPrice || !offerDelivery) {
+      toast.error("Please fill in all required fields.");
       return;
     }
 
-    const payload: any = {
+    const selectedPkg = sellerPackages.find((p: any) => (p._id || p.id) === selectedPackageId);
+    const selectedBrf = chatBriefs.find((b: any) => (b._id || b.id) === selectedBriefId);
+
+    // Automatically derive title from selected package or brief
+    const autoTitle =
+      (selectedPackageId ? selectedPkg?.title : selectedBrf?.title) ||
+      offerTitle?.trim() ||
+      offerDesc.trim().slice(0, 60) ||
+      "Custom Offer";
+
+    const contextFields = selectedPackageId
+      ? {
+          gigID: selectedPackageId,
+          gigTitle: selectedPkg?.title || "",
+          packageID: selectedPackageId,
+          packageTitle: selectedPkg?.title || "",
+          briefID: null,
+          briefTitle: null,
+        }
+      : {
+          gigID: null,
+          gigTitle: null,
+          packageID: null,
+          packageTitle: null,
+          briefID: selectedBriefId,
+          briefTitle: selectedBrf?.title || "",
+        };
+
+    const customOfferData = {
+      title: autoTitle,
+      description: offerDesc.trim(),
       price: Number(offerPrice),
-      desc: offerDesc,
-      delivery: Number(offerDelivery),
-      revisions: parseRevisionNumber(offerRevisions, 0),
-      sellerID: user._id,
+      deliveryTimeDays: Number(offerDelivery),
+      revisionNumber: parseRevisionNumber(offerRevisions, 0),
+      ...contextFields,
+      sellerID: user?._id || user?.id,
     };
-    if (selectedPackageId) {
-      payload.packageID = selectedPackageId;
-      const pkg = sellerPackages.find((p: any) => (p._id || p.id) === selectedPackageId);
-      if (pkg?.title) payload.title = pkg.title;
-    }
-    if (selectedBriefId) {
-      payload.briefID = selectedBriefId;
-      const brief = chatBriefs.find((b: any) => (b._id || b.id) === selectedBriefId);
-      if (brief?.title) payload.title = brief.title;
-    }
 
-    const offerText = `[CUSTOM_OFFER]${JSON.stringify(payload)}`;
+    const cleanDescription = offerDesc.trim();
     const targetRoomId = activeRoomID || conversationID;
 
     const tempId = `temp-${Date.now()}`;
@@ -558,11 +631,14 @@ export function useChatMessages({
       senderID: user?._id || user?.id,
       sender: user,
       user: user,
-      description: offerText,
-      desc: offerText,
-      text: offerText,
-      message: offerText,
       isCustomOffer: true,
+      offerStatus: "active",
+      customOffer: customOfferData,
+      ...contextFields,
+      description: cleanDescription,
+      desc: cleanDescription,
+      text: cleanDescription,
+      message: cleanDescription,
       file: null,
       attachments: [],
       isSeller: true,
@@ -580,19 +656,19 @@ export function useChatMessages({
     }
 
     const msgPayload = {
-      conversationID: targetRoomId,
       conversationUUID: targetRoomId,
-      conversationId: targetRoomId,
-      description: offerText,
-      desc: offerText,
-      text: offerText,
-      message: offerText,
+      gigID: selectedPackageId || null,
+      briefID: selectedBriefId || null,
       isCustomOffer: true,
-      file: null,
-      attachments: [],
-      userID: user?._id || user?.id,
-      from: user?._id || user?.id,
-      to: targetOtherUserId || undefined,
+      customOffer: {
+        title: autoTitle,
+        description: cleanDescription,
+        price: Number(offerPrice),
+        deliveryTimeDays: Number(offerDelivery),
+        ...(offerRevisions !== undefined && offerRevisions !== ""
+          ? { revisionNumber: parseRevisionNumber(offerRevisions, 0) }
+          : {}),
+      },
     };
 
     mutation.mutate(msgPayload);
@@ -600,11 +676,11 @@ export function useChatMessages({
     if (socket) {
       if (!socket.connected) socket.connect();
       socket.emit("send_message", msgPayload);
-      socket.emit("sendMessage", msgPayload);
     }
 
     setSelectedPackageId("");
     setSelectedBriefId("");
+    if (setOfferTitle) setOfferTitle("");
     setOfferDesc("");
     setOfferPrice("");
     setOfferDelivery("");
@@ -613,23 +689,45 @@ export function useChatMessages({
     toast.success("Custom offer sent!");
   };
 
-  const handleAcceptOffer = async (offer: any) => {
+  const handleAcceptOffer = async (offer: any, msgId?: string) => {
     if (offer?.withdrawn || offer?.offerStatus === "withdrawn") {
       toast.error("This proposal has been withdrawn by the seller.");
       return;
     }
     try {
-      const { data } = await axiosFetch.post("/orders/create-payment-intent/custom", {
-        packageID: offer.packageID,
-        briefID: offer.briefID,
-        customPrice: offer.price,
-        customTitle: offer.desc,
-        sellerID: offer.sellerID,
-        delivery: offer.delivery,
-      });
-      if (data.url) window.location.href = data.url;
-    } catch {
-      toast.error("Failed to initiate payment.");
+      const resolvedMessageId = msgId || offer.messageId || offer._id || offer.id || "";
+      const resolvedSellerId = offer.sellerID || finalRecipientUser?._id || finalRecipientUser?.id;
+      const resolvedTitle = offer.title || offer.desc || "Custom Offer";
+      const resolvedPrice = Number(offer.price || 0);
+      const resolvedDelivery = Number(offer.deliveryTimeDays || offer.delivery || 3);
+      const resolvedGigId = offer.gigID || offer.packageID || null;
+      const resolvedGigTitle = offer.gigTitle || offer.packageTitle || null;
+      const resolvedBriefId = offer.briefID || null;
+      const resolvedBriefTitle = offer.briefTitle || null;
+
+      const origin = typeof window !== "undefined" ? window.location.origin : "https://workvence.com";
+
+      const paymentIntentPayload = {
+        gigId: "custom",
+        messageId: resolvedMessageId,
+        sellerID: resolvedSellerId,
+        customPrice: resolvedPrice,
+        customTitle: resolvedTitle,
+        deliveryTimeDays: resolvedDelivery,
+        gigID: resolvedGigId,
+        gigTitle: resolvedGigTitle,
+        briefID: resolvedBriefId,
+        briefTitle: resolvedBriefTitle,
+        successUrl: `${origin}/orders`,
+        cancelUrl: `${origin}/messages`,
+      };
+
+      const { data } = await axiosFetch.post("/orders/create-payment-intent", paymentIntentPayload);
+      if (data?.url || data?.checkoutUrl) {
+        window.location.href = data.url || data.checkoutUrl;
+      }
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to initiate payment.");
     }
   };
 

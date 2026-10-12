@@ -11,7 +11,7 @@ interface OfferDetailsModalProps {
   details: ViewingOfferDetailsState | null;
   messages: any[];
   onClose: () => void;
-  onAccept: (offer: any) => void;
+  onAccept: (offer: any, msgId?: string) => void;
   onWithdraw: (msgId: string) => void;
   onViewOrder: (orderId?: string) => void;
 }
@@ -176,7 +176,7 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
                 Delivery Time
               </span>
               <span className="text-sm sm:text-base font-bold text-slate-800 font-sf-pro">
-                {activeDetails.offer?.delivery} Days
+                {activeDetails.offer?.delivery || activeDetails.offer?.deliveryTimeDays} Days
               </span>
             </div>
           </div>
@@ -259,8 +259,9 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
                   className="font-bold cursor-pointer"
                   onClick={() => {
                     const offer = activeDetails.offer;
+                    const msgId = activeDetails.msgId;
                     handleRequestClose();
-                    onAccept(offer);
+                    onAccept(offer, msgId);
                   }}
                 >
                   Accept &amp; Proceed to Checkout
@@ -273,5 +274,3 @@ export const OfferDetailsModal: React.FC<OfferDetailsModalProps> = ({
     </div>
   );
 };
-
-

@@ -481,7 +481,7 @@ const Earnings = () => {
               variant="outline"
               size="md"
               radius="fiverr"
-              className="bg-[rgb(239_252_250_/_50%)] hover:bg-gray-50 border border-black/10 text-gray-800 shadow-2xs"
+              className="bg-[#ffffff] hover:bg-gray-50 border border-[rgba(0,0,0,0.10)] text-gray-800 shadow-2xs"
               title="Sync mature completed orders into your available balance"
               leftIcon={
                 <svg
@@ -648,7 +648,7 @@ const Earnings = () => {
         </div>
 
         {/* 5. Main Card for Tab Content */}
-        <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+        <div className="bg-[#F5F5F5] rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
 
           {/* Tab Header with Search & Controls */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -667,7 +667,7 @@ const Earnings = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="What are you looking for"
-                  className="w-full h-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] rounded-[6px] pl-9 pr-3.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none focus:border-gray-300 focus:bg-white transition-colors"
+                  className="w-full h-10 bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] pl-9 pr-3.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none focus:border-gray-300 transition-colors"
                 />
               </div>
 
@@ -689,20 +689,20 @@ const Earnings = () => {
 
           {/* TAB 1: Payout Request Table */}
           {activeTab === "payout" && (
-            <div className="w-full overflow-x-auto">
+            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)]">
               <table className="w-full border-collapse text-left min-w-[700px]">
                 <thead>
-                  <tr className="border-b border-gray-100">
-                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Date</th>
-                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Payment Menthod</th>
-                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Amount</th>
-                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Status</th>
+                  <tr className="border-b border-slate-100 text-base font-sf-pro font-bold text-[#434343] bg-white">
+                    <th className="py-3 px-4 whitespace-nowrap">Date</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Payment Method</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Amount</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100/90">
                   {filteredPayouts.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="py-12 text-center text-xs text-gray-400">
+                      <td colSpan={4} className="py-16 text-center text-xs sm:text-sm text-gray-400 font-medium">
                         No payout requests recorded yet.
                       </td>
                     </tr>
@@ -713,11 +713,14 @@ const Earnings = () => {
                       const status = (p.status || "pending").toLowerCase();
 
                       return (
-                        <tr key={p._id || p.id} className="hover:bg-gray-50/60 transition-colors">
-                          <td className="py-4 px-4 text-xs sm:text-[13px] font-medium text-gray-700 whitespace-nowrap">
+                        <tr
+                          key={p._id || p.id}
+                          className="group relative transition-colors odd:bg-[#F5F5F5] even:bg-white after:pointer-events-none after:absolute after:inset-0 after:border-transparent hover:after:border-[rgba(0,0,0,0.10)]"
+                        >
+                          <td className="py-3.5 px-4 text-xs sm:text-[13px] font-medium text-gray-700 whitespace-nowrap">
                             {moment(p.createdAt).format("DD MMM, YYYY")}
                           </td>
-                          <td className="py-4 px-4 align-middle whitespace-nowrap">
+                          <td className="py-3.5 px-4 align-middle whitespace-nowrap">
                             {isPayoneer ? (
                               <PayoneerLogo className="h-5" />
                             ) : (
@@ -726,13 +729,13 @@ const Earnings = () => {
                               </div>
                             )}
                           </td>
-                          <td className="py-4 px-4 text-xs sm:text-[13px] font-bold text-gray-900 whitespace-nowrap">
+                          <td className="py-3.5 px-4 text-xs sm:text-[13px] font-bold text-gray-900 whitespace-nowrap">
                             {Number(p.amount).toLocaleString("en-US", {
                               style: "currency",
                               currency: "USD",
                             })}
                           </td>
-                          <td className="py-4 px-4 align-middle whitespace-nowrap">
+                          <td className="py-3.5 px-4 align-middle whitespace-nowrap">
                             {status === "approved" || status === "processed" || status === "cleared" ? (
                               <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-[#E6F7F3] text-[#0D6D5F]">
                                 Approved
@@ -758,22 +761,22 @@ const Earnings = () => {
 
           {/* TAB 2: Order Clearance Table */}
           {activeTab === "clearance" && (
-            <div className="w-full overflow-x-auto">
+            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)]">
               <table className="w-full border-collapse text-left min-w-[800px]">
                 <thead>
-                  <tr className="border-b border-gray-100">
-                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Date</th>
-                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Order Id</th>
-                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Gross Price</th>
-                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Net Earning</th>
-                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Clearance Date</th>
-                    <th className="py-3.5 px-4 text-xs font-bold text-gray-900">Status</th>
+                  <tr className="border-b border-slate-100 text-base font-sf-pro font-bold text-[#434343] bg-white">
+                    <th className="py-3 px-4 whitespace-nowrap">Date</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Order ID</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Gross Price</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Net Earning</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Clearance Date</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100/90">
                   {filteredOrders.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-12 text-center text-xs text-gray-400">
+                      <td colSpan={6} className="py-16 text-center text-xs sm:text-sm text-gray-400 font-medium">
                         No financial orders recorded yet.
                       </td>
                     </tr>
@@ -800,23 +803,26 @@ const Earnings = () => {
                       const isCleared = order.isCleared === true;
 
                       return (
-                        <tr key={order._id || order.id} className="hover:bg-gray-50/60 transition-colors">
-                          <td className="py-4 px-4 text-xs sm:text-[13px] font-medium text-gray-700 whitespace-nowrap">
+                        <tr
+                          key={order._id || order.id}
+                          className="group relative transition-colors odd:bg-[#F5F5F5] even:bg-white after:pointer-events-none after:absolute after:inset-0 after:border-transparent hover:after:border-[rgba(0,0,0,0.10)]"
+                        >
+                          <td className="py-3.5 px-4 text-xs sm:text-[13px] font-medium text-gray-700 whitespace-nowrap">
                             {moment(order.createdAt).format("DD MMM, YYYY")}
                           </td>
-                          <td className="py-4 px-4 text-xs sm:text-[13px] font-mono text-gray-800 whitespace-nowrap">
+                          <td className="py-3.5 px-4 text-xs sm:text-[13px] font-mono text-gray-800 whitespace-nowrap">
                             {orderRef}
                           </td>
-                          <td className="py-4 px-4 text-xs sm:text-[13px] font-semibold text-gray-800 whitespace-nowrap">
+                          <td className="py-3.5 px-4 text-xs sm:text-[13px] font-semibold text-gray-800 whitespace-nowrap">
                             {gross.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                           </td>
-                          <td className="py-4 px-4 text-xs sm:text-[13px] font-bold text-[#0D6D5F] whitespace-nowrap">
+                          <td className="py-3.5 px-4 text-xs sm:text-[13px] font-bold text-[#0D6D5F] whitespace-nowrap">
                             +{net.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                           </td>
-                          <td className="py-4 px-4 text-xs sm:text-[13px] text-gray-700 whitespace-nowrap">
+                          <td className="py-3.5 px-4 text-xs sm:text-[13px] text-gray-700 whitespace-nowrap">
                             {clearanceDate}
                           </td>
-                          <td className="py-4 px-4 align-middle whitespace-nowrap">
+                          <td className="py-3.5 px-4 align-middle whitespace-nowrap">
                             {isCleared ? (
                               <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-[#E6F7F3] text-[#0D6D5F]">
                                 Cleared

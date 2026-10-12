@@ -11,3 +11,4 @@ export * from './OrdersTableSkeleton';
 export * from './EarningsSkeleton';
 export * from './BriefsListSkeleton';
 export * from './OrganizeSkeleton';
+export * from './SupportTicketSkeleton';

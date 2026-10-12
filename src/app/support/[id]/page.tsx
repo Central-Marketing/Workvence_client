@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import moment from "moment";
+import { RiAddLine } from "react-icons/ri";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Pdf01Icon, File02Icon } from "@hugeicons/core-free-icons";
 import {
@@ -33,7 +34,7 @@ import {
 import { supportService, SupportTicketItem, SupportMessage } from "@/utils/supportService";
 import { useSupportSocket, SocketSupportMessage } from "@/hooks/useSupportSocket";
 import { useUserStore } from "@/store/userStore";
-import { Button, PageHeader } from "@/components/ui";
+import { Button, PageHeader, SupportTicketSkeleton, AIPolishButton } from "@/components/ui";
 
 interface SupportAttachmentCardProps {
   att: any;
@@ -136,15 +137,18 @@ export default function TicketDetailsPage() {
   const [ticket, setTicket] = useState<SupportTicketItem | null>(null);
   const [messages, setMessages] = useState<SupportMessage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [is403, setIs403] = useState(false);
 
   const [replyText, setReplyText] = useState("");
   const [sending, setSending] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [isPolishing, setIsPolishing] = useState(false);
   const [attachments, setAttachments] = useState<{ name: string; url: string; public_id?: string; type?: string }[]>([]);
   const [selectedPreviewImage, setSelectedPreviewImage] = useState<{ url: string; name: string } | null>(null);
   const [activeTab, setActiveTab] = useState<"group" | "private">("group");
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const handleDownload = async (e: React.MouseEvent, url: string, fileName: string = "attachment") => {
     e.stopPropagation();
@@ -348,6 +352,15 @@ export default function TicketDetailsPage() {
     }
   }, [ticketId, scrollToBottom, extractThreadMessages]);
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchTicketDetails(false);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   useEffect(() => {
     fetchTicketDetails(true);
   }, [ticketId, fetchTicketDetails]);
@@ -359,6 +372,21 @@ export default function TicketDetailsPage() {
     setMessages(threadMsgs);
     setTimeout(scrollToBottom, 50);
   }, [activeTab, ticket, currentThreadName, extractThreadMessages, scrollToBottom]);
+
+  // Auto-sync when user switches back to this browser tab (production best practice)
+  useEffect(() => {
+    const handleFocus = () => {
+      if (document.visibilityState === "visible") {
+        fetchTicketDetails(false);
+      }
+    };
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
+    };
+  }, [fetchTicketDetails]);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -501,14 +529,7 @@ export default function TicketDetailsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#f8fafc] py-16 px-4 flex items-center justify-center">
-        <div className="text-center space-y-3">
-          <Loader2 className="w-9 h-9 mx-auto animate-spin text-[#0D6D5F]" />
-          <p className="text-xs font-semibold text-[#64748b]">Loading support conversation...</p>
-        </div>
-      </div>
-    );
+    return <SupportTicketSkeleton />;
   }
 
   // Unauthorized (403) or socket unauthorized state
@@ -602,118 +623,153 @@ export default function TicketDetailsPage() {
             { name: ticket.ticketNumber || `#TK-${ticketId.substring(0, 6).toUpperCase()}`, isLast: true },
           ]}
           title={ticket.subject}
-          subtitle={`Support Ticket ${ticket.ticketNumber || `#TK-${ticketId.substring(0, 6).toUpperCase()}`} • Created ${moment(ticket.createdAt).fromNow()}`}
+
           actions={
-            <div className="flex items-center gap-2 font-inter">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#0D6D5F] animate-pulse" />
-              <span className="text-xs font-semibold text-[#0D6D5F]">
-                {isConnected ? "Real-time Support Connected" : "Connecting..."}
-              </span>
+            <div className="flex items-center gap-2.5">
+              {/* Alert indicator when socket is disconnected or reconnecting */}
+              {!isConnected ? (
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-[6px] bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium font-inter animate-in fade-in duration-200">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  <span>Connection lost • Reconnecting...</span>
+                  <button
+                    type="button"
+                    onClick={handleRefresh}
+                    disabled={refreshing}
+                    className="ml-0.5 text-xs font-bold text-amber-900 underline hover:no-underline cursor-pointer disabled:opacity-50"
+                  >
+                    {refreshing ? "Syncing..." : "Sync Now"}
+                  </button>
+                </div>
+              ) : (
+                /* Subtle status indicator when live & healthy */
+                <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-semibold font-inter">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                  <span>Live</span>
+                </div>
+              )}
+
+              {/* Discreet manual refresh icon button */}
+              <button
+                type="button"
+                onClick={handleRefresh}
+                disabled={refreshing}
+                title="Refresh conversation"
+                aria-label="Refresh conversation"
+                className="p-2 rounded-[6px] text-slate-500 hover:text-slate-900 hover:bg-white border border-transparent hover:border-slate-200 shadow-2xs hover:shadow-xs transition-all cursor-pointer disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin text-[#0D6D5F]" : ""}`} />
+              </button>
             </div>
           }
         />
 
-        {/* Context Callout Banner for Linked Order / Non-Creator Tickets */}
-        {ticket.isCreator === false && (
-          <div className="p-4 rounded-[6px] bg-white border border-[rgba(0,0,0.10)] text-[#0f172a] flex items-start gap-3 shadow-2xs">
-            <div className="p-2 rounded-full bg-[#0D6D5F]/10 text-[#0D6D5F] shrink-0 mt-0.5">
-              <ShoppingBag className="w-4 h-4" />
-            </div>
-            <div className="space-y-1 flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-bold font-sf-pro text-[#0f172a]">
-                  Linked Order Support Ticket
-                </span>
-                <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-bold bg-[#0D6D5F]/10 text-[#0D6D5F] border border-[#0D6D5F]/20 uppercase">
-                  {ticket.userRole ? `${ticket.userRole} view` : user?.isSeller ? "Seller View" : "Buyer View"}
-                </span>
-              </div>
-              <p className="text-xs text-[#475569] leading-relaxed font-inter">
-                This support ticket was opened by{" "}
-                <strong className="text-[#0f172a]">{ticket.creator?.name || ticket.otherParty?.name || "the other party"}</strong>
-                {ticket.otherParty?.role ? ` (${ticket.otherParty.role})` : ""}{" "}
-                regarding Order{" "}
-                <strong className="font-mono text-[#0f172a]">
-                  #{ticket.order?.orderCode || ticket.order?.code || ticket.orderID}
-                </strong>
-                . You can participate in the group conversation with both parties and support, or send a private reply directly to support.
-              </p>
-              {ticket.order?.id && (
-                <div className="pt-1">
-                  <Link
-                    href={`/orders/${ticket.order.id}`}
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0D6D5F] hover:text-[#094c42] underline underline-offset-2 transition-colors"
-                  >
-                    <span>View Order Details</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-          {/* Ticket Header Details */}
-          <div className="lg:col-span-1 bg-white p-6 md:p-6 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-4 self-start lg:sticky lg:top-24">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#e2e8f0] pb-4">
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <span className="text-xs font-mono font-bold text-[#64748b]">
-                    {ticket.ticketNumber || `#TK-${ticketId.substring(0, 6).toUpperCase()}`}
-                  </span>
-                  {formatStatusPill(ticket.status)}
-                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#f1f5f9] text-[#475569]">
-                    {ticket.category || "General Support"}
-                  </span>
-                </div>
-                <h1 className="text-xl md:text-2xl font-bold text-[#0f172a] font-sf-pro">
-                  {ticket.subject}
-                </h1>
-              </div>
+          {/* Left Column: Ticket Details & Context Sidebar (Fiverr/Upwork Style) */}
+          <div className="lg:col-span-1 space-y-4 self-start lg:sticky lg:top-24">
 
-              <Button
-                onClick={() => fetchTicketDetails(true)}
-                variant="soft"
-                size="sm"
-                radius="fiverr"
-                leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
-                className="px-3.5 py-2 text-xs font-semibold self-start md:self-auto font-sf-pro"
-              >
-                Refresh
-              </Button>
-            </div>
-
-            {/* Linked Order Banner */}
+            {/* 1. Linked Order Context Card (if order linked) */}
             {(ticket.order || ticket.orderID) && (
-              <div className="flex items-center gap-3 p-4 rounded-[6px] bg-[#0D6D5F]/5 border border-[#0D6D5F]/20 text-xs font-inter">
-                <ShoppingBag className="w-5 h-5 text-[#0D6D5F] flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <span className="font-bold text-[#0f172a] block truncate">
-                    Linked Order: #{ticket.order?.orderCode || ticket.order?.code || ticket.orderID}
-                  </span>
-                  <span className="text-[#64748b] text-[11px] block truncate">
-                    {ticket.order?.title ? `${ticket.order.title} • ` : ""}{ticket.order?.price || ""}
-                  </span>
-                  {ticket.order?.id && (
-                    <Link
-                      href={`/orders/${ticket.order.id}`}
-                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#0D6D5F] hover:underline mt-1"
-                    >
-                      <span>Open Order</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </Link>
+              <div className="bg-white p-5 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-3">
+                <div className="flex items-center justify-between pb-2.5 border-b border-[#f1f5f9]">
+                  <div className="flex items-center gap-2">
+                    <ShoppingBag className="w-4 h-4 text-[#0D6D5F]" />
+                    <span className="text-xs font-bold font-sf-pro text-[#0f172a] uppercase tracking-wider">
+                      Linked Order
+                    </span>
+                  </div>
+                  {ticket.isCreator === false && (
+                    <span className="px-2 py-0.5 rounded-[4px] text-[10px] font-bold bg-[#0D6D5F]/10 text-[#0D6D5F] border border-[#0D6D5F]/20 uppercase">
+                      {ticket.userRole ? `${ticket.userRole} view` : user?.isSeller ? "Seller View" : "Buyer View"}
+                    </span>
                   )}
                 </div>
+
+                <div className="space-y-1.5 text-xs font-inter">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="font-mono font-bold text-[#0f172a] text-sm">
+                      {ticket.order?.orderCode || ticket.order?.code || ticket.orderID}
+                    </span>
+                    {ticket.order?.price && (
+                      <span className="font-bold text-[#0D6D5F] text-sm">
+                        {typeof ticket.order.price === "number" ? `$${ticket.order.price}` : ticket.order.price.startsWith("$") ? ticket.order.price : `$${ticket.order.price}`}
+                      </span>
+                    )}
+                  </div>
+                  {ticket.order?.title && (
+                    <p className="text-[#475569] text-xs line-clamp-2 leading-relaxed">
+                      {ticket.order.title}
+                    </p>
+                  )}
+                </div>
+
+                {ticket.isCreator === false && (
+                  <p className="text-[11px] text-[#64748b] leading-relaxed pt-1 border-t border-[#f8fafc]">
+                    Opened by <strong className="text-[#0f172a]">{ticket.creator?.name || ticket.otherParty?.name || "the other party"}</strong>. You can participate in the group chat or reply privately to support.
+                  </p>
+                )}
+
+                {ticket.order?.id && (
+                  <div className="pt-2 border-t border-[#f1f5f9]">
+                    <Link
+                      href={`/orders/${ticket.order.id}`}
+                      className="inline-flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-[6px] bg-[#f8fafc] hover:bg-[#f1f5f9] text-[#0D6D5F] border border-[#e2e8f0] text-xs font-bold transition-colors"
+                    >
+                      <span>View Order Details</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Participants Strip */}
-            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs border-t border-[#f1f5f9]">
-              <div className="flex items-center gap-2 text-[#64748b] font-medium">
-                <span>Participants:</span>
-                <div className="flex items-center gap-2 flex-wrap">
+            {/* 2. Ticket Information & Timeline Card */}
+            <div className="bg-white p-5 rounded-[6px] border border-[#e2e8f0] shadow-xs space-y-4">
+              <h3 className="text-xs font-bold font-sf-pro text-[#0f172a] uppercase tracking-wider pb-2.5 border-b border-[#f1f5f9]">
+                Ticket Information
+              </h3>
+
+              <div className="space-y-2.5 text-xs font-inter">
+                <div className="flex items-center justify-between py-1 border-b border-[#f8fafc]">
+                  <span className="text-[#64748b]">Ticket ID:</span>
+                  <span className="font-mono font-bold text-[#0f172a]">
+                    {ticket.ticketNumber || `#TK-${ticketId.substring(0, 6).toUpperCase()}`}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between py-1 border-b border-[#f8fafc]">
+                  <span className="text-[#64748b]">Category:</span>
+                  <span className="font-semibold text-[#0f172a] text-right">
+                    {ticket.category || "General Support"}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between py-1 border-b border-[#f8fafc]">
+                  <span className="text-[#64748b]">Status:</span>
+                  <div>{formatStatusPill(ticket.status)}</div>
+                </div>
+
+                <div className="flex items-center justify-between py-1 border-b border-[#f8fafc]">
+                  <span className="text-[#64748b]">Created:</span>
+                  <span className="text-[#0f172a] font-medium">
+                    {ticket.createdAt ? moment(ticket.createdAt).format("MMM D, YYYY") : "Recently"}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between py-1">
+                  <span className="text-[#64748b]">Relationship:</span>
+                  <span className="text-[#0f172a] font-medium">
+                    {ticket.isCreator !== false ? "Created by you" : "Linked Order Participant"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Participants */}
+              <div className="pt-3 border-t border-[#f1f5f9] space-y-2.5">
+                <span className="text-[11px] font-bold text-[#64748b] uppercase tracking-wider block font-sf-pro">
+                  Participants ({participants.length})
+                </span>
+                <div className="flex flex-wrap gap-1.5">
                   {participants.map((p: any, idx: number) => {
                     const isUser = p.id === currentUserId;
                     const displayName = p.role === "admin" ? "Support Agent" : p.name || "Member";
@@ -722,7 +778,7 @@ export default function TicketDetailsPage() {
                         key={p.id || idx}
                         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f8fafc] border border-[#e2e8f0] text-[11px] font-semibold text-[#0f172a]"
                       >
-                        <span className="w-2 h-2 rounded-full bg-[#0D6D5F]" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#0D6D5F]" />
                         <span>{displayName} {isUser && "(You)"}</span>
                         {getRoleBadge(p.role)}
                       </div>
@@ -731,6 +787,18 @@ export default function TicketDetailsPage() {
                 </div>
               </div>
             </div>
+
+            {/* 3. Safety Notice (Fiverr / Upwork Trust & Safety Banner) */}
+            <div className="p-4 rounded-[6px] bg-slate-50 border border-slate-200/80 text-[11.5px] text-[#64748b] leading-relaxed space-y-1">
+              <div className="flex items-center gap-1.5 text-[#0f172a] font-bold">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#0D6D5F]" />
+                <span>Workvence Trust & Safety</span>
+              </div>
+              <p>
+                All communications and order escalations are monitored by Workvence. Never share passwords, bank credentials, or take payments outside the platform.
+              </p>
+            </div>
+
           </div>
 
           {/* Conversation Stream */}
@@ -913,45 +981,103 @@ export default function TicketDetailsPage() {
               )}
             </div>
 
-            {/* Reply Form */}
-            <div className="p-4 md:p-6 border-t border-[#e2e8f0] bg-white space-y-3">
+            {/* Message Composer (ChatView Style) */}
+            <div className="p-4 sm:px-5 sm:py-4 bg-[#f0f0f0] border-t border-[#e2e8f0] relative max-md:p-3 shrink-0">
 
-              {/* Attachment preview */}
+              {/* Attachment Previews */}
               {attachments.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {attachments.map((att, idx) => (
-                    <span
-                      key={idx}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[6px] bg-[#0D6D5F]/10 border border-[#0D6D5F]/20 text-[#0D6D5F] text-xs font-semibold font-inter"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>{att.name}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        radius="full"
-                        onClick={() => setAttachments((prev) => prev.filter((_, i) => i !== idx))}
-                        className="hover:text-rose-600 p-0 w-4 h-4 h-auto min-h-0 border-none shadow-none hover:bg-transparent"
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {attachments.map((att, idx) => {
+                    const isImg =
+                      att.type?.includes("image") ||
+                      /\.(png|jpe?g|gif|webp|svg)/i.test(att.name) ||
+                      att.url?.includes("/image/upload/");
+                    const isPdf =
+                      att.type?.includes("pdf") ||
+                      /\.pdf$/i.test(att.name) ||
+                      att.url?.includes(".pdf");
+
+                    return (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-3 p-2 bg-white rounded-[6px] border border-gray-200 shadow-xs max-w-sm"
                       >
-                        ×
-                      </Button>
-                    </span>
-                  ))}
+                        {isImg ? (
+                          <img
+                            src={att.url}
+                            alt="Attachment preview"
+                            className="w-12 h-12 rounded-[4px] object-cover border border-gray-200 shrink-0"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-[4px] bg-slate-50 border border-gray-200 flex items-center justify-center shrink-0">
+                            {isPdf ? (
+                              <HugeiconsIcon icon={Pdf01Icon} size={22} className="text-rose-500" />
+                            ) : (
+                              <HugeiconsIcon icon={File02Icon} size={22} className="text-[#0D6D5F]" />
+                            )}
+                          </div>
+                        )}
+
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-slate-800 truncate">
+                            {att.name}
+                          </p>
+                          <p className="text-[11px] text-slate-500 font-medium">
+                            Ready to send
+                          </p>
+                        </div>
+
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          radius="full"
+                          onClick={() => setAttachments((prev) => prev.filter((_, i) => i !== idx))}
+                          className="w-6 h-6 min-h-0 !p-0 text-slate-400 hover:text-red-500 font-bold hover:bg-slate-100"
+                          title="Remove attachment"
+                          aria-label="Remove attachment"
+                        >
+                          ✕
+                        </Button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
               <form
                 onSubmit={handleSendReply}
-                className="bg-[#f8fafc] border border-[#e2e8f0] focus-within:border-[#0D6D5F] focus-within:ring-2 focus-within:ring-[#0D6D5F]/10 rounded-[6px] p-3 sm:p-4 transition-all space-y-3"
+                className="relative flex items-end gap-2 p-2 bg-white border border-gray-200 rounded-[6px] shadow-sm max-md:px-2 max-md:py-1.5 max-md:gap-1.5"
               >
-                {/* Textarea */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+
+                {/* Plus / Attach Button */}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  radius="xl"
+                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 flex-shrink-0 mb-0.5"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingFile}
+                  title="Attach file or image"
+                  aria-label="Attach file or image"
+                  icon={uploadingFile ? <Loader2 className="w-4 h-4 animate-spin text-[#0D6D5F]" /> : <RiAddLine className="w-5 h-5" />}
+                />
+
+                {/* Message Textarea */}
                 <textarea
-                  rows={3}
+                  ref={textareaRef}
+                  rows={1}
                   placeholder={
                     activeTab === "private"
-                      ? `Type a private message to Support (only visible to you and Support)...`
-                      : "Type a group message (visible to all participants: Buyer, Seller & Support)..."
+                      ? "Type a private message to Support..."
+                      : "Type a group message (visible to all participants)..."
                   }
                   value={replyText}
                   onChange={(e) => {
@@ -959,7 +1085,7 @@ export default function TicketDetailsPage() {
                     startTyping();
                   }}
                   onKeyDown={(e) => {
-                    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                    if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
                       if (canSendReply) {
                         handleSendReply(e);
@@ -967,55 +1093,55 @@ export default function TicketDetailsPage() {
                     }
                   }}
                   onBlur={stopTyping}
-                  className="w-full bg-transparent border-0 text-xs sm:text-sm text-[#0f172a] placeholder-[#94a3b8] focus:outline-none focus:ring-0 resize-none font-inter leading-relaxed"
+                  disabled={isPolishing}
+                  className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 resize-none text-gray-800 placeholder-gray-400 text-sm py-1.5 px-1 min-h-[36px] max-h-32 overflow-y-auto scrollbar-hide scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden font-inter leading-relaxed"
                 />
 
-                {/* Actions Bottom Bar */}
-                <div className="flex items-center justify-between gap-3 pt-2.5 border-t border-[#e2e8f0]">
-                  {/* Left: Upload file attachment */}
-                  <div className="flex items-center gap-2">
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      onChange={handleFileSelect}
-                      className="hidden"
-                    />
+                {/* AI Polish Button */}
+                <AIPolishButton
+                  text={replyText}
+                  onSuccess={(polishedText) => setReplyText(polishedText)}
+                  onStateChange={setIsPolishing}
+                  className="mb-0.5"
+                />
 
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="xs"
-                      radius="fiverr"
-                      disabled={uploadingFile}
-                      isLoading={uploadingFile}
-                      loadingText="Uploading..."
-                      onClick={() => fileInputRef.current?.click()}
-                      leftIcon={<Upload className="w-3.5 h-3.5 text-[#0D6D5F]" />}
-                      className="bg-white border-[#e2e8f0] hover:border-[#0D6D5F]/40 text-[#475569] hover:text-[#0D6D5F] text-xs font-semibold font-sf-pro shadow-2xs"
+                {/* Send Button */}
+                <button
+                  type="submit"
+                  disabled={!canSendReply || isPolishing}
+                  aria-label="Send message"
+                  title={activeTab === "private" ? "Send Privately" : "Send Reply"}
+                  className="w-[28px] h-[28px] rounded-[60px] bg-[var(--Foundation-Grey-grey-900,#1F1F1F)] hover:bg-[#111111] active:scale-95 disabled:opacity-30 disabled:hover:bg-[var(--Foundation-Grey-grey-900,#1F1F1F)] disabled:cursor-not-allowed flex items-center justify-center shrink-0 transition-all duration-200 cursor-pointer shadow-sm mb-0.5"
+                >
+                  {sending ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className="w-5 h-5 shrink-0"
+                      aria-hidden="true"
                     >
-                      Upload File
-                    </Button>
-
-                    <span className="text-[11px] text-[#94a3b8] hidden md:inline">
-                      Press Ctrl + Enter to send
-                    </span>
-                  </div>
-
-                  {/* Right: Send Button */}
-                  <Button
-                    type="submit"
-                    variant="brand"
-                    size="sm"
-                    radius="xl"
-                    disabled={!canSendReply}
-                    isLoading={sending}
-                    loadingText="Sending..."
-                    rightIcon={<Send className="w-3.5 h-3.5" />}
-                    className="px-5 sm:px-6 py-2 sm:py-2.5 text-xs font-semibold shadow-xs font-sf-pro shrink-0"
-                  >
-                    {sending ? "Sending..." : activeTab === "private" ? "Send Privately" : "Send Reply"}
-                  </Button>
-                </div>
+                      <path
+                        d="M12 5.5V19"
+                        stroke="white"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M18 11C18 11 13.5811 5.00001 12 5C10.4188 4.99999 6 11 6 11"
+                        stroke="white"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </button>
               </form>
             </div>
 

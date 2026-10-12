@@ -22,13 +22,14 @@ import {
   UserCheck,
   SlidersHorizontal,
   ChevronDown,
+  ChevronUp,
   X,
   ShoppingBag,
   User,
   RotateCcw,
 } from "lucide-react";
 import { supportService, SupportTicketItem } from "@/utils/supportService";
-import { Button, PageHeader } from "@/components/ui";
+import { Button, PageHeader, SupportTicketsListSkeleton } from "@/components/ui";
 
 const CATEGORIES = [
   { id: "All", label: "All Categories", icon: Inbox },
@@ -50,6 +51,8 @@ export default function SupportDashboardPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>("All");
   const [relationshipFilter, setRelationshipFilter] = useState<"all" | "created_by_me" | "linked_order">("all");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showAllStatuses, setShowAllStatuses] = useState(false);
+  const [showAllCategories, setShowAllCategories] = useState(false);
 
   const hasActiveFilters =
     Boolean(searchQuery.trim()) ||
@@ -322,7 +325,7 @@ export default function SupportDashboardPage() {
             {/* Filter Card: sticky + scrollable on desktop, collapsible on mobile */}
             <div
               className={`${showMobileFilters ? "block" : "hidden"
-                } lg:block bg-white rounded-[6px] border border-[#e2e8f0] shadow-xs p-5 space-y-6 lg:max-h-[calc(100vh-7.5rem)] lg:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200`}
+                } lg:block bg-white rounded-[6px] border border-[#e2e8f0] shadow-xs p-5 space-y-6 lg:max-h-[calc(100vh-7.5rem)] lg:overflow-y-auto scrollbar-none`}
             >
               {/* 1. Header: Filter Title + Active Count + Reset */}
               <div className="flex items-center justify-between pb-3 border-b border-[#f1f5f9]">
@@ -445,7 +448,7 @@ export default function SupportDashboardPage() {
                   Status
                 </label>
                 <div className="space-y-1">
-                  {STATUSES.map((st) => {
+                  {(showAllStatuses ? STATUSES : STATUSES.slice(0, 3)).map((st) => {
                     const isSelected = selectedStatus === st;
                     const count = statusCounts[st as keyof typeof statusCounts] ?? 0;
                     return (
@@ -474,6 +477,20 @@ export default function SupportDashboardPage() {
                       </button>
                     );
                   })}
+                  {STATUSES.length > 2 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllStatuses((prev) => !prev)}
+                      className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold text-[#327C73] hover:text-[#28635c] transition-colors cursor-pointer font-sf-pro"
+                    >
+                      <span>{showAllStatuses ? "See Less" : "See More"}</span>
+                      {showAllStatuses ? (
+                        <ChevronUp className="w-3.5 h-3.5" />
+                      ) : (
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -483,7 +500,7 @@ export default function SupportDashboardPage() {
                   Category
                 </label>
                 <div className="space-y-1">
-                  {CATEGORIES.map((cat) => {
+                  {(showAllCategories ? CATEGORIES : CATEGORIES.slice(0, 3)).map((cat) => {
                     const Icon = cat.icon;
                     const isSelected = selectedCategory === cat.id;
                     const count = categoryCounts[cat.id] ?? 0;
@@ -510,6 +527,20 @@ export default function SupportDashboardPage() {
                       </button>
                     );
                   })}
+                  {CATEGORIES.length > 2 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllCategories((prev) => !prev)}
+                      className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold text-[#327C73] hover:text-[#28635c] transition-colors cursor-pointer font-sf-pro"
+                    >
+                      <span>{showAllCategories ? "See Less" : "See More"}</span>
+                      {showAllCategories ? (
+                        <ChevronUp className="w-3.5 h-3.5" />
+                      ) : (
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -521,10 +552,7 @@ export default function SupportDashboardPage() {
 
             {/* Tickets Grid / List */}
             {loading ? (
-              <div className="bg-white p-12 rounded-[6px] border border-[#e2e8f0] text-center space-y-3">
-                <Loader2 className="w-8 h-8 mx-auto animate-spin text-[#327C73]" />
-                <p className="text-xs font-semibold text-[#64748b]">Loading your support tickets...</p>
-              </div>
+              <SupportTicketsListSkeleton count={4} />
             ) : error ? (
               <div className="bg-rose-50 p-8 rounded-[6px] border border-rose-200 text-center space-y-4">
                 <AlertTriangle className="w-10 h-10 mx-auto text-rose-600" />
@@ -618,7 +646,7 @@ export default function SupportDashboardPage() {
                           {(ticket.order || ticket.orderID) && (
                             <span className="text-xs font-medium text-gray-700 bg-[#F5F5F7] border border-gray-200/80 px-2.5 py-1 rounded-[6px] inline-flex items-center gap-1.5">
                               <ShoppingBag className="w-3.5 h-3.5 text-[#327C73]" />
-                              <span>Order #{ticket.order?.orderCode || ticket.order?.code || ticket.orderID}</span>
+                              <span>Order {ticket.order?.orderCode || ticket.order?.code || ticket.orderID}</span>
                               {ticket.order?.price && (
                                 <span className="text-gray-500 font-semibold ml-0.5">{ticket.order.price}</span>
                               )}

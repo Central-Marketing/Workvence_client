@@ -20,8 +20,8 @@ import { axiosFetch } from "@/utils";
 import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
 import { useAuthModalStore } from "@/store/authModalStore";
-import { Button, Breadcrumb, AiGradientButton } from "@/components";
-import { CustomSelect, CustomSelectOption, Tag } from "@/components/ui";
+import { Button, AiGradientButton } from "@/components";
+import { CustomSelect, CustomSelectOption, Tag, PageHeader } from "@/components/ui";
 
 const CATEGORIES = [
   "AI",
@@ -451,14 +451,12 @@ const CreateBrief = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-slate-800 pt-6 sm:pt-8 pb-[80px] min-[1400px]:pb-[100px] font-sans">
-      <div className="container mx-auto px-4 max-w-4xl">
-        {/* Top Breadcrumb */}
-        <Breadcrumb
+    <div className="min-h-screen bg-[#F8F9FA] text-slate-800 pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="container mx-auto px-4 max-w-4xl space-y-6 sm:space-y-7">
+        <PageHeader
           homeHref={user?.isSeller ? "/dashboard/seller" : "/dashboard/buyer"}
           homeTitle="Dashboard"
-          className="mb-6 select-none"
-          items={[
+          breadcrumbs={[
             {
               name: "Find Projects",
               href: "/briefs",
@@ -468,34 +466,23 @@ const CreateBrief = () => {
               isLast: true,
             },
           ]}
+          title="Post a Job Project"
+          subtitle="Describe your project specifications to receive competitive proposals from vetted freelance professionals."
+          actions={
+            <AiGradientButton
+              onClick={handleOpenAiModal}
+              text="Create with AI"
+              icon={
+                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                  <path d="M0.75 7.60886C3.56875 4.84296 10.19 -0.808996 12.025 1.15511C14.3438 3.63702 2.15937 9.91366 4.03854 12.6791C6.0234 15.6001 12.9646 5.30336 15.3135 7.14726C17.6625 8.99126 9.676 13.1401 11.5552 15.4451C12.3069 16.367 14.3739 14.9841 15.3135 14.0621" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              }
+              px="px-4"
+              py="py-2"
+              className="self-start sm:self-auto shrink-0 text-sm font-semibold rounded-[6px]"
+            />
+          }
         />
-
-        {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-bold text-slate-900 tracking-tight font-sf-pro leading-tight mb-2">
-              Post a Job Project
-            </h1>
-            <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-normal max-w-xl">
-              Describe your project specifications to receive competitive proposals from
-              vetted freelance professionals.
-            </p>
-          </div>
-
-          <AiGradientButton
-            onClick={handleOpenAiModal}
-            text="Create with AI"
-            icon={
-              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
-                <path d="M0.75 7.60886C3.56875 4.84296 10.19 -0.808996 12.025 1.15511C14.3438 3.63702 2.15937 9.91366 4.03854 12.6791C6.0234 15.6001 12.9646 5.30336 15.3135 7.14726C17.6625 8.99126 9.676 13.1401 11.5552 15.4451C12.3069 16.367 14.3739 14.9841 15.3135 14.0621" stroke="#292929" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            }
-            px="px-4"
-            py="py-2"
-
-            className="self-start sm:self-auto shrink-0 text-sm font-semibold rounded-[6px]"
-          />
-        </div>
 
 
 

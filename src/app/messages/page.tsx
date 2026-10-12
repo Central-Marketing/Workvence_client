@@ -9,6 +9,7 @@ import { useUserStore } from "@/store/userStore";
 import { Conversation } from "@/types";
 
 import { Loader, Skeleton } from "@/components";
+import { PageHeader } from "@/components/ui";
 
 const Messages = () => {
   const user = useUserStore((state) => state.user);
@@ -45,10 +46,17 @@ const Messages = () => {
 
   if (!user) {
     return (
-      <div className="flex justify-center bg-[#f8fafc] py-10 min-h-[80vh]">
-        <div className="w-[90%] max-w-[1200px] flex flex-col gap-[30px]">
-          <div className="bg-white rounded-[12px] border border-[#e2e8f0] shadow-sm overflow-hidden p-[60px_20px] text-center">
-            <h2 className="text-xl font-semibold text-[#0f172a]">Please log in to view your messages</h2>
+      <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+        <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+          <PageHeader
+            homeHref="/dashboard/buyer"
+            homeTitle="Dashboard"
+            breadcrumbs={[{ name: "Messages", isLast: true }]}
+            title="Messages & Conversations"
+            subtitle="Interact with your active buyers and sellers, discuss milestones, and keep your communication in one place."
+          />
+          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] overflow-hidden p-12 text-center">
+            <h2 className="text-lg font-bold text-[#0f172a] font-sf-pro">Please log in to view your messages</h2>
           </div>
         </div>
       </div>
@@ -56,12 +64,19 @@ const Messages = () => {
   }
 
   return (
-    <div className="flex justify-center bg-[#f8fafc] py-10 min-h-[80vh]">
-      <div className="w-[90%] max-w-[1200px] flex flex-col gap-[30px]">
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+      <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        <PageHeader
+          homeHref={user?.isSeller ? "/dashboard/seller" : "/dashboard/buyer"}
+          homeTitle="Dashboard"
+          breadcrumbs={[{ name: "Messages", isLast: true }]}
+          title="Messages & Conversations"
+          subtitle="Interact with your active buyers and sellers, discuss milestones, and keep your communication in one place."
+        />
         {
           isLoading
             ? (
-              <div className="bg-white rounded-[12px] border border-[#e2e8f0] shadow-sm overflow-hidden space-y-4 p-6">
+              <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] overflow-hidden space-y-4 p-6">
                 <Skeleton className="w-48 h-8" />
                 <Skeleton className="w-64 h-4 mb-6" />
                 {[1, 2, 3, 4, 5].map((i) => (
@@ -78,11 +93,7 @@ const Messages = () => {
             )
             : error
               ? <div className="text-red-500 font-medium">Something went wrong!</div>
-              : <div className="bg-white rounded-[12px] border border-[#e2e8f0] shadow-sm overflow-hidden">
-                <div className="p-6 sm:px-[30px] border-b border-[#e2e8f0] bg-white">
-                  <h1 className="text-[24px] font-bold text-[#0f172a] mb-1.5">Conversations</h1>
-                  <p className="text-[14px] text-[#64748b]">Interact with your active buyers and sellers</p>
-                </div>
+              : <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] overflow-hidden">
 
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse text-left">

@@ -8,6 +8,14 @@ export interface ChatAttachment {
   secure_url?: string;
 }
 
+export interface AttachmentMetaItem {
+  url: string;
+  name: string;
+  size: number;
+  type: string;
+  publicId?: string;
+}
+
 export interface CustomOfferPayload {
   packageID?: string;
   briefID?: string;

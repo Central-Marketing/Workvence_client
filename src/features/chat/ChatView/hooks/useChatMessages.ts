@@ -6,7 +6,7 @@ import { toast } from "@/utils/toast";
 import { axiosFetch, socket, getAvatarUrl, parseRevisionNumber } from "@/utils";
 import { isTargetConversation } from "@/utils/chatHelpers";
 import supportService from "@/utils/supportService";
-import { ChatAttachment } from "../types";
+import { ChatAttachment, AttachmentMetaItem } from "../types";
 import { parseMeeting } from "../utils/chatMediaHelpers";
 
 interface UseChatMessagesOptions {
@@ -303,6 +303,9 @@ export function useChatMessages({
       if (Array.isArray(msg.attachments) && msg.attachments.length > 0) {
         httpPayload.attachments = msg.attachments;
       }
+      if (Array.isArray(msg.attachmentMeta) && msg.attachmentMeta.length > 0) {
+        httpPayload.attachmentMeta = msg.attachmentMeta;
+      }
 
       try {
         return await axiosFetch.post(`/conversations/${targetId}/messages`, httpPayload);
@@ -460,8 +463,21 @@ export function useChatMessages({
       });
     }
 
+    const attachmentUrl = currentAttachment?.url || currentAttachment?.secure_url || null;
+    const attachmentMeta: AttachmentMetaItem[] = (currentAttachment && attachmentUrl)
+      ? [
+          {
+            url: attachmentUrl,
+            name: currentAttachment.name || "attachment",
+            size: Number((currentAttachment as any).bytes || currentAttachment.size) || 0,
+            type: currentAttachment.type || "application/octet-stream",
+            ...(currentAttachment.public_id ? { publicId: currentAttachment.public_id } : {}),
+          },
+        ]
+      : [];
+
     const attachmentObj = currentAttachment ? {
-      url: currentAttachment.url || currentAttachment.secure_url,
+      url: attachmentUrl,
       name: currentAttachment.name,
       type: currentAttachment.type,
       size: (currentAttachment as any).bytes || currentAttachment.size,
@@ -481,8 +497,9 @@ export function useChatMessages({
       desc: currentText,
       text: currentText,
       message: currentText,
-      file: currentAttachment?.url || null,
-      attachments: currentAttachment?.url ? [currentAttachment.url] : [],
+      file: attachmentUrl,
+      attachments: attachmentUrl ? [attachmentUrl] : [],
+      attachmentMeta,
       attachment: attachmentObj,
       fileName: currentAttachment?.name || null,
       originalName: currentAttachment?.name || null,
@@ -507,8 +524,9 @@ export function useChatMessages({
       desc: currentText,
       text: currentText,
       message: currentText,
-      file: currentAttachment?.url || null,
-      attachments: currentAttachment?.url ? [currentAttachment.url] : [],
+      file: attachmentUrl,
+      attachments: attachmentUrl ? [attachmentUrl] : [],
+      ...(attachmentMeta.length > 0 ? { attachmentMeta } : {}),
       attachment: attachmentObj,
       fileName: currentAttachment?.name || null,
       originalName: currentAttachment?.name || null,

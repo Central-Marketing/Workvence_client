@@ -93,18 +93,43 @@ export const MessageAttachment: React.FC<MessageAttachmentProps> = ({
       (rawUrl.includes("cloudinary.com") && rawUrl.includes("/image/") && !isPdf && !isDoc) ||
       msg.fileType?.includes("image"));
 
-  const explicitName = msg.attachment?.name || msg.fileName || msg.originalName || msg.name;
+  const meta = Array.isArray(msg.attachmentMeta)
+    ? msg.attachmentMeta.find(
+        (m: any) => m?.url === currentUrl || m?.url === rawUrl
+      )
+    : null;
+
+  const explicitName = meta?.name || msg.attachment?.name || msg.fileName || msg.originalName || msg.name;
   const rawFileName = explicitName || rawUrl.split("/").pop()?.split("?")[0] || "Attachment";
   const fileName = formatFileNameWithExtension(rawFileName, currentUrl, null, msg);
 
-  // Always open in a new tab when clicked (for documents and files)
+  // Download file client-side preserving original name without altering signed Cloudinary URL
+  const downloadFileWithOriginalName = async (url: string, name: string) => {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = name || meta?.name || "download";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    } catch (err) {
+      console.warn("Client-side blob download failed (likely CORS), falling back to open in tab:", err);
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  // Always open/download when clicked (for documents and files)
   const handleOpenInNewTab = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     // If authenticated Cloudinary asset and signed URL hasn't arrived or doesn't have signature query params
     if (isAuthenticated && (!resolvedUrl || resolvedUrl === rawUrl || !resolvedUrl.includes("?"))) {
-      const toastId = toast.loading("Opening secure attachment in new tab...");
+      const toastId = toast.loading("Opening secure attachment...");
       const publicId = supportService.extractPublicId(rawUrl);
       const withoutExt = publicId.replace(/\.[^/.]+$/, "");
       try {
@@ -114,7 +139,7 @@ export const MessageAttachment: React.FC<MessageAttachmentProps> = ({
         }
         if (signed) {
           toast.dismiss(toastId);
-          window.open(signed, "_blank", "noopener,noreferrer");
+          await downloadFileWithOriginalName(signed, fileName);
           return;
         }
       } catch (err) {
@@ -123,7 +148,7 @@ export const MessageAttachment: React.FC<MessageAttachmentProps> = ({
       toast.dismiss(toastId);
     }
 
-    window.open(currentUrl, "_blank", "noopener,noreferrer");
+    await downloadFileWithOriginalName(currentUrl, fileName);
   };
 
   // Image attachment view - Opens directly in lightbox preview modal without opening new tab
@@ -179,7 +204,7 @@ export const MessageAttachment: React.FC<MessageAttachmentProps> = ({
       className={`flex items-center gap-2.5 px-3.5 py-2.5 mt-1 bg-slate-100 hover:bg-slate-200/80 text-slate-800 rounded-[6px] transition-all border border-slate-200/90 text-xs font-semibold cursor-pointer select-none max-w-[280px] group shadow-2xs ${
         !hasMsgText ? "mb-5" : "mb-1.5"
       }`}
-      title="Click to open file in a new tab"
+      title={`Click to download ${fileName}`}
     >
       <div className="w-8 h-8 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] flex items-center justify-center shadow-2xs shrink-0 group-hover:scale-105 transition-transform">
         {isPdf ? (
@@ -193,11 +218,15 @@ export const MessageAttachment: React.FC<MessageAttachmentProps> = ({
           {fileName}
         </span>
         <span className="text-[10.5px] text-slate-400 font-normal mt-0.5 flex items-center gap-1">
-          <span>Click to open in new tab</span>
+          {meta?.size ? (
+            <span>{(meta.size / 1024).toFixed(1)} KB • Download</span>
+          ) : (
+            <span>Download file</span>
+          )}
         </span>
       </div>
       <span className="text-slate-400 group-hover:text-slate-700 text-sm shrink-0">
-        {isResolving ? "⏳" : "↗"}
+        {isResolving ? "⏳" : "↓"}
       </span>
     </div>
   );

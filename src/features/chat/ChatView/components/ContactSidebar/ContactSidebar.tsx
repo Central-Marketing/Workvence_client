@@ -62,7 +62,11 @@ export const ContactSidebar: React.FC<ContactSidebarProps> = ({
           if (seenUrls.has(item)) return;
           seenUrls.add(item);
           
+          const meta = Array.isArray(m.attachmentMeta)
+            ? m.attachmentMeta.find((metaItem: any) => metaItem?.url === item)
+            : null;
           const rawName =
+            meta?.name ||
             m.attachment?.name ||
             m.fileName ||
             m.name ||
@@ -70,7 +74,7 @@ export const ContactSidebar: React.FC<ContactSidebarProps> = ({
             item.split("/").pop()?.split("?")[0] ||
             "Attachment";
           const fileName = formatFileNameWithExtension(rawName, item, null, m);
-          const rawSize = m.fileSize || m.size || m.bytes || m.attachment?.size;
+          const rawSize = meta?.size || m.fileSize || m.size || m.bytes || m.attachment?.size;
           items.push({
             name: fileName,
             sizeText: formatFileSize(rawSize),
@@ -82,7 +86,11 @@ export const ContactSidebar: React.FC<ContactSidebarProps> = ({
             if (seenUrls.has(url)) return;
             seenUrls.add(url);
             
+            const meta = Array.isArray(m.attachmentMeta)
+              ? m.attachmentMeta.find((metaItem: any) => metaItem?.url === url)
+              : null;
             const rawName =
+              meta?.name ||
               item.name ||
               item.fileName ||
               item.original_filename ||
@@ -93,7 +101,13 @@ export const ContactSidebar: React.FC<ContactSidebarProps> = ({
               "Attachment";
             const fileName = formatFileNameWithExtension(rawName, url, item, m);
             const rawSize =
-              item.sizeText || item.size || item.bytes || m.fileSize || m.size || m.attachment?.size;
+              meta?.size ||
+              item.sizeText ||
+              item.size ||
+              item.bytes ||
+              m.fileSize ||
+              m.size ||
+              m.attachment?.size;
             items.push({
               name: fileName,
               sizeText: formatFileSize(rawSize),

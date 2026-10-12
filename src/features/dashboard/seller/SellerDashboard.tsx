@@ -309,6 +309,19 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
     enabled: !!user,
   });
 
+  // Fetch statement data for official Net Income
+  const { data: statementData } = useQuery({
+    queryKey: ["seller-earnings-statement"],
+    queryFn: () =>
+      axiosFetch
+        .get("/earnings/statement")
+        .then(({ data }) => data)
+        .catch(() => ({ orders: [], summary: {} })),
+    staleTime: 0,
+    refetchOnMount: "always",
+    enabled: !!user,
+  });
+
   // Fetch conversations
   const { data: conversations = [] } = useQuery({
     queryKey: ["seller-dashboard-convs"],
@@ -375,7 +388,22 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
       !o.status
     );
   });
-  const totalFinancialAmount = completedOrders.reduce((sum: number, order: any) => sum + (order.price || 0), 0);
+  // Calculate Total Earned (Net Income) matching /earnings statement
+  const statementSummary = statementData?.summary || {};
+  const totalFinancialAmount =
+    statementSummary.lifetimeTotalIncome !== undefined
+      ? Number(statementSummary.lifetimeTotalIncome)
+      : statementSummary.clearedIncome !== undefined
+        ? Number(statementSummary.clearedIncome)
+        : completedOrders.reduce((acc: number, curr: any) => {
+            const net =
+              curr.netEarnings !== undefined
+                ? curr.netEarnings
+                : curr.grossPrice
+                  ? curr.grossPrice - (curr.platformFee || 0)
+                  : curr.price || 0;
+            return acc + (Number(net) || 0);
+          }, 0);
   const unreadMessagesCount = conversations.filter((c: any) => !c.readBySeller).length;
 
   // Filtered orders by type tab (All, Packages, Briefs)
@@ -485,14 +513,16 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           <div className="bg-[#f5f5f5] rounded-[6px] border border-[#DADADA] shadow-[0_1px_3px_rgba(0,0,0,0.03)] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[rgba(0,0,0,0.10)] overflow-hidden">
             <div className="p-5 sm:p-6 flex items-center justify-between">
               <div>
-                <p className="text-xs text-slate-500 font-medium">Total Revenue</p>
+                <p className="text-xs text-slate-500 font-medium">Total Earned</p>
                 <p className="text-[24px] font-semibold text-slate-900 mt-1 tracking-tight">
                   {displayRevenue.toLocaleString("en-US", {
                     style: "currency",
                     currency: "USD",
                   })}
                 </p>
-                <p className="text-xs text-slate-400 mt-1">Cleared earning from {completedOrders.length} packages</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Net income from {completedOrders.length} {completedOrders.length === 1 ? "order" : "orders"}
+                </p>
               </div>
               <div className="w-10 h-10 p-2 rounded-[6px] border border-[rgba(0,0,0,0.10)] bg-[#fff] flex items-center justify-center text-[#E07A24] shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">
@@ -682,14 +712,16 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
         <div className="bg-[#f5f5f5] rounded-[6px] border border-[#DADADA] shadow-[0_1px_3px_rgba(0,0,0,0.03)] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[rgba(0,0,0,0.10)] overflow-hidden">
           <div className="p-5 sm:p-6 flex items-center justify-between">
             <div>
-              <p className="text-xs text-slate-500 font-medium">Total Revenue</p>
+              <p className="text-xs text-slate-500 font-medium">Total Earned</p>
               <p className="text-[24px] font-semibold text-slate-900 mt-1 tracking-tight">
                 {displayRevenue.toLocaleString("en-US", {
                   style: "currency",
                   currency: "USD",
                 })}
               </p>
-              <p className="text-xs text-slate-400 mt-1">Cleared earning from {completedOrders.length} packages</p>
+              <p className="text-xs text-slate-400 mt-1">
+                Net income from {completedOrders.length} {completedOrders.length === 1 ? "order" : "orders"}
+              </p>
             </div>
             <div className="w-10 h-10 p-2 rounded-[6px] border border-[rgba(0,0,0,0.10)] bg-[#fff] flex items-center justify-center text-[#E07A24] shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45" fill="none">

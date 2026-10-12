@@ -618,10 +618,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
       aria-modal="true"
       aria-labelledby="auth-modal-title"
     >
+      {/* 3px Gradient Border Outer Shell */}
       <div
-        className="relative w-full max-w-[900px] h-[640px] max-h-[92vh] bg-white rounded-[6px] sm:rounded-[6px] shadow-2xl flex flex-col md:flex-row overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-[900px] h-[640px] max-h-[92vh] p-[3px] rounded-[9px] bg-gradient-to-br from-[#00A6FF] via-[#3ED419] to-[#F29EFF] shadow-[0_0_54px_0_rgba(0,0,0,0.15)] animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
+        <div className="w-full h-full bg-white rounded-[6px] flex flex-col md:flex-row overflow-hidden relative">
         {/* Close Button */}
         <Button
           type="button"
@@ -1369,6 +1371,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
         </div>
       </div>
     </div>
+  </div>
   );
 };
 

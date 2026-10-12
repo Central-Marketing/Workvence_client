@@ -172,15 +172,17 @@ export const CustomDesignOfferModal: React.FC<CustomDesignOfferModalProps> = ({
       className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs select-none animate-fadeIn"
       onClick={onClose}
     >
+      {/* 3px Gradient Border Outer Shell */}
       <div
         ref={modalRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="custom-modal-title"
         aria-describedby="custom-modal-desc"
-        className="bg-white rounded-[20px] max-w-[480px] w-full overflow-hidden shadow-2xl border border-slate-100 flex flex-col items-center text-center relative transform transition-all duration-300"
+        className="max-w-[480px] w-full p-[3px] rounded-[23px] bg-gradient-to-br from-[#00A6FF] via-[#3ED419] to-[#F29EFF] shadow-[0_0_54px_0_rgba(0,0,0,0.15)] relative transform transition-all duration-300"
         onClick={(e) => e.stopPropagation()}
       >
+        <div className="bg-white rounded-[20px] w-full overflow-hidden flex flex-col items-center text-center relative">
         {/* Top Split Visual Banner */}
         <div className="relative w-full h-44 sm:h-52 bg-gradient-to-r from-pink-500 via-rose-400 to-lime-200 overflow-hidden shrink-0">
           <img
@@ -277,6 +279,7 @@ export const CustomDesignOfferModal: React.FC<CustomDesignOfferModalProps> = ({
         </div>
       </div>
     </div>
+  </div>
   );
 };
 

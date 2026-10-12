@@ -524,13 +524,13 @@ const BriefDetail = () => {
           items={[
             isOwner || (!isSeller && user)
               ? {
-                  name: "My Projects",
-                  href: "/briefs/my-briefs",
-                }
+                name: "My Projects",
+                href: "/briefs/my-briefs",
+              }
               : {
-                  name: "Find Projects",
-                  href: "/briefs",
-                },
+                name: "Find Projects",
+                href: "/briefs",
+              },
             {
               name: brief.title || "Project Details",
               isLast: true,
@@ -1014,7 +1014,7 @@ const BriefDetail = () => {
             {/* Background 3D Layered Cards Image */}
             <div className="absolute inset-0 z-0">
               <Image
-                src="/media/find_project_banner1.jpg"
+                src="https://res.cloudinary.com/dlqhnyh8r/image/upload/f_auto,q_auto/v1791777896/find_project_banner1_pxlwhg.webp"
                 alt="Find the Right Project"
                 fill
                 className="object-cover object-right md:object-center"

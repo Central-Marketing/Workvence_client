@@ -259,7 +259,7 @@ const VerifyEmailContent = () => {
       <div className="hidden lg:flex flex-1 h-screen sticky top-0">
         <div className="relative w-full h-full overflow-hidden bg-[#0a0f1d] shadow-sm">
           <Image
-            src="/images/auth/verifyImage.png"
+            src="https://res.cloudinary.com/dlqhnyh8r/image/upload/f_auto,q_auto/v1791777910/verifyImage_wi7srr.webp"
             alt="Workvence"
             fill
             priority

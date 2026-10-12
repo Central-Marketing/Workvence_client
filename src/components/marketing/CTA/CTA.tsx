@@ -143,7 +143,7 @@ const CTA: React.FC<CTAProps> = ({
   secondaryButton,
   actions,
   rightContent,
-  bgImage = "/media/AFreelancerBG.png",
+  bgImage = "https://res.cloudinary.com/dlqhnyh8r/image/upload/f_auto,q_auto/v1791777896/AFreelancerBG_lg0bw8.webp",
   bgAlt,
   aspectRatioClass = "lg:aspect-[1760/700] 2xl:h-[700px]",
   className = "",

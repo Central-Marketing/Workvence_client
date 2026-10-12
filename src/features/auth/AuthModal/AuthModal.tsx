@@ -573,7 +573,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
     switch (mode) {
       case "register":
         return {
-          image: "/images/auth/registerImage.png",
+          image: "https://res.cloudinary.com/dlqhnyh8r/image/upload/v1791778457/registerImage_lnytwg.webp",
           tag: "Join Workvence",
           title: "Your creative journey starts here.",
           subtitle:
@@ -581,7 +581,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
         };
       case "verify":
         return {
-          image: "/images/auth/verifyImage.png",
+          image: "https://res.cloudinary.com/dlqhnyh8r/image/upload/f_auto,q_auto/v1791777910/verifyImage_wi7srr.webp",
           tag: "Account Security",
           title: "Confirm your email.",
           subtitle:
@@ -590,7 +590,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       case "forgot":
       case "reset":
         return {
-          image: "/images/auth/loginImage.png",
+          image: "https://res.cloudinary.com/dlqhnyh8r/image/upload/v1791778458/loginImage_cf5vyu.webp",
           tag: "Account Recovery",
           title: "Seamless security recovery.",
           subtitle:
@@ -599,7 +599,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
       case "login":
       default:
         return {
-          image: "/images/auth/loginImage.png",
+          image: "https://res.cloudinary.com/dlqhnyh8r/image/upload/v1791778458/loginImage_cf5vyu.webp",
           tag: "Welcome Back",
           title: "Build, scale & collaborate.",
           subtitle:
@@ -680,411 +680,462 @@ const AuthModal: React.FC<AuthModalProps> = ({
         {/* ── RIGHT PANE: Auth Forms & State Machine (50% Split) ── */}
         <div className="w-full md:w-1/2 min-w-0 h-full px-6 sm:px-8 py-5 sm:py-6 flex flex-col overflow-y-auto scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <div className="my-auto w-full flex flex-col justify-center py-2">
-          {/* Mobile Brand Header */}
-          <div className="flex md:hidden items-center justify-between mb-4">
-            <Image
-              src="/Workvence-logo-Horizontal3.png"
-              alt="Workvence"
-              width={120}
-              height={28}
-              className="h-6 w-auto object-contain"
-            />
-          </div>
-
-          {/* Mode Switcher Tabs for Login & Register */}
-          {mode === "login" || mode === "register" ? (
-            <div className="flex items-center border-b border-gray-100 mb-3.5 gap-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setMode("login");
-                  setError(null);
-                }}
-                className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative cursor-pointer ${mode === "login"
-                  ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
-                  : "text-gray-400 hover:text-gray-600"
-                  }`}
-              >
-                Sign In
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setMode("register");
-                  setError(null);
-                }}
-                className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative cursor-pointer ${mode === "register"
-                  ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
-                  : "text-gray-400 hover:text-gray-600"
-                  }`}
-              >
-                Join Workvence
-              </button>
+            {/* Mobile Brand Header */}
+            <div className="flex md:hidden items-center justify-between mb-4">
+              <Image
+                src="/Workvence-logo-Horizontal3.png"
+                alt="Workvence"
+                width={120}
+                height={28}
+                className="h-6 w-auto object-contain"
+              />
             </div>
-          ) : (
-            /* Sub-mode Breadcrumb Back Navigation */
-            <div className="mb-3.5">
-              <button
-                type="button"
-                onClick={() => {
-                  if (mode === "verify") {
-                    setMode("register");
-                  } else {
-                    setMode("login");
-                  }
-                  setError(null);
-                }}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#0D6D5F] transition-colors cursor-pointer"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Back</span>
-              </button>
-            </div>
-          )}
 
-          {/* Title & Subtitle for non-verify modes */}
-          {mode !== "verify" && (
-            <div className="mb-3">
-              <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-bold text-gray-900 font-sf-pro">
-                {mode === "login" && "Sign in to your account"}
-                {mode === "register" && "Create an account"}
-                {mode === "forgot" && "Forgot your password?"}
-                {mode === "reset" && "Reset your password"}
-              </h2>
-              <p className="text-xs sm:text-[13px] text-gray-500 mt-0.5">
-                {mode === "login" && "Welcome back! Enter your credentials to continue."}
-                {mode === "register" && "Join Workvence to discover client projects and submit proposals."}
-                {mode === "forgot" && "Enter your email address and we'll send you a 6-digit reset code."}
-                {mode === "reset" && `Enter the 6-digit code sent to ${resetEmail || "your email"} and a new password.`}
-              </p>
-            </div>
-          )}
-
-          {/* Inline Error Banner */}
-          {error && (
-            <div
-              className="mb-3 p-2.5 rounded-[6px] bg-red-50 border border-red-200/80 text-red-600 text-xs sm:text-[13px] font-medium flex items-center gap-2 cursor-help"
-              title={error}
-            >
-              <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
-                !
-              </span>
-              <span className="truncate" title={error}>
-                {error.toLowerCase().includes("account locked") ? "Account locked" : error}
-              </span>
-            </div>
-          )}
-
-          {/* ─────────────────────────────────────────────────────────────
-              MODE 1: SIGN IN (LOGIN)
-          ───────────────────────────────────────────────────────────── */}
-          {mode === "login" && (
-            <div className="flex flex-col w-full">
-              {/* Social Buttons */}
-              <div className="grid grid-cols-2 gap-2.5 w-full mb-3">
-                <div className="relative">
-                  <button
-                    data-testid="modal-login-google-btn"
-                    type="button"
-                    onClick={() => onSocialAuthClick("google")}
-                    disabled={loading || !!loadingProvider}
-                    className="w-full h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {loadingProvider === "google" ? (
-                      <span className="inline-block w-3.5 h-3.5 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
-                    ) : (
-                      <FcGoogle className="text-base shrink-0" />
-                    )}
-                    <span className="truncate">Google</span>
-                  </button>
-                  <div
-                    ref={loginGoogleBtnRef}
-                    className="absolute inset-0 overflow-hidden opacity-[0.0001] cursor-pointer pointer-events-auto [&>div]:!w-full [&>div]:!h-full [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!scale-150"
-                  />
-                </div>
-
+            {/* Mode Switcher Tabs for Login & Register */}
+            {mode === "login" || mode === "register" ? (
+              <div className="flex items-center border-b border-gray-100 mb-3.5 gap-6">
                 <button
-                  data-testid="modal-login-apple-btn"
                   type="button"
-                  onClick={() => onSocialAuthClick("apple")}
-                  disabled={true}
-                  className="w-full h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-not-allowed opacity-60"
-                  title="Apple Sign-In coming soon"
+                  onClick={() => {
+                    setMode("login");
+                    setError(null);
+                  }}
+                  className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative cursor-pointer ${mode === "login"
+                    ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
+                    : "text-gray-400 hover:text-gray-600"
+                    }`}
                 >
-                  <FaApple className="text-base text-black shrink-0" />
-                  <span className="truncate">Apple</span>
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("register");
+                    setError(null);
+                  }}
+                  className={`pb-2.5 text-sm sm:text-[15px] font-semibold transition-all relative cursor-pointer ${mode === "register"
+                    ? "text-[#0D6D5F] border-b-2 border-[#0D6D5F]"
+                    : "text-gray-400 hover:text-gray-600"
+                    }`}
+                >
+                  Join Workvence
                 </button>
               </div>
+            ) : (
+              /* Sub-mode Breadcrumb Back Navigation */
+              <div className="mb-3.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (mode === "verify") {
+                      setMode("register");
+                    } else {
+                      setMode("login");
+                    }
+                    setError(null);
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#0D6D5F] transition-colors cursor-pointer"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back</span>
+                </button>
+              </div>
+            )}
 
-              {/* Divider */}
-              <div className="relative flex items-center justify-center w-full mb-4">
-                <div className="w-full border-t border-gray-200/80" />
-                <span className="absolute px-3 bg-white text-[11px] text-gray-400 uppercase tracking-wider font-medium">
-                  or with email
+            {/* Title & Subtitle for non-verify modes */}
+            {mode !== "verify" && (
+              <div className="mb-3">
+                <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-bold text-gray-900 font-sf-pro">
+                  {mode === "login" && "Sign in to your account"}
+                  {mode === "register" && "Create an account"}
+                  {mode === "forgot" && "Forgot your password?"}
+                  {mode === "reset" && "Reset your password"}
+                </h2>
+                <p className="text-xs sm:text-[13px] text-gray-500 mt-0.5">
+                  {mode === "login" && "Welcome back! Enter your credentials to continue."}
+                  {mode === "register" && "Join Workvence to discover client projects and submit proposals."}
+                  {mode === "forgot" && "Enter your email address and we'll send you a 6-digit reset code."}
+                  {mode === "reset" && `Enter the 6-digit code sent to ${resetEmail || "your email"} and a new password.`}
+                </p>
+              </div>
+            )}
+
+            {/* Inline Error Banner */}
+            {error && (
+              <div
+                className="mb-3 p-2.5 rounded-[6px] bg-red-50 border border-red-200/80 text-red-600 text-xs sm:text-[13px] font-medium flex items-center gap-2 cursor-help"
+                title={error}
+              >
+                <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+                  !
+                </span>
+                <span className="truncate" title={error}>
+                  {error.toLowerCase().includes("account locked") ? "Account locked" : error}
                 </span>
               </div>
+            )}
 
-              {/* Sign In Form */}
-              <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3.5 w-full">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email Address</label>
-                  <input
-                    data-testid="modal-login-email-input"
-                    type="text"
-                    placeholder="name@email.com"
-                    value={loginInput.identifier}
-                    onChange={(e) =>
-                      setLoginInput((prev) => ({ ...prev, identifier: e.target.value }))
-                    }
-                    required
-                    className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
-                  />
+            {/* ─────────────────────────────────────────────────────────────
+              MODE 1: SIGN IN (LOGIN)
+          ───────────────────────────────────────────────────────────── */}
+            {mode === "login" && (
+              <div className="flex flex-col w-full">
+                {/* Social Buttons */}
+                <div className="grid grid-cols-2 gap-2.5 w-full mb-3">
+                  <div className="relative">
+                    <button
+                      data-testid="modal-login-google-btn"
+                      type="button"
+                      onClick={() => onSocialAuthClick("google")}
+                      disabled={loading || !!loadingProvider}
+                      className="w-full h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {loadingProvider === "google" ? (
+                        <span className="inline-block w-3.5 h-3.5 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
+                      ) : (
+                        <FcGoogle className="text-base shrink-0" />
+                      )}
+                      <span className="truncate">Google</span>
+                    </button>
+                    <div
+                      ref={loginGoogleBtnRef}
+                      className="absolute inset-0 overflow-hidden opacity-[0.0001] cursor-pointer pointer-events-auto [&>div]:!w-full [&>div]:!h-full [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!scale-150"
+                    />
+                  </div>
+
+                  <button
+                    data-testid="modal-login-apple-btn"
+                    type="button"
+                    onClick={() => onSocialAuthClick("apple")}
+                    disabled={true}
+                    className="w-full h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-not-allowed opacity-60"
+                    title="Apple Sign-In coming soon"
+                  >
+                    <FaApple className="text-base text-black shrink-0" />
+                    <span className="truncate">Apple</span>
+                  </button>
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs sm:text-[13px] font-medium text-gray-700">Password</label>
+                {/* Divider */}
+                <div className="relative flex items-center justify-center w-full mb-4">
+                  <div className="w-full border-t border-gray-200/80" />
+                  <span className="absolute px-3 bg-white text-[11px] text-gray-400 uppercase tracking-wider font-medium">
+                    or with email
+                  </span>
+                </div>
+
+                {/* Sign In Form */}
+                <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3.5 w-full">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email Address</label>
+                    <input
+                      data-testid="modal-login-email-input"
+                      type="text"
+                      placeholder="name@email.com"
+                      value={loginInput.identifier}
+                      onChange={(e) =>
+                        setLoginInput((prev) => ({ ...prev, identifier: e.target.value }))
+                      }
+                      required
+                      className="w-full h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs sm:text-[13px] font-medium text-gray-700">Password</label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForgotEmail(loginInput.identifier);
+                          setMode("forgot");
+                          setError(null);
+                        }}
+                        className="text-xs text-gray-500 hover:text-[#0D6D5F] hover:underline cursor-pointer"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
+                    <div className="relative flex items-center">
+                      <input
+                        data-testid="modal-login-password-input"
+                        type={showLoginPassword ? "text" : "password"}
+                        placeholder="Enter password"
+                        value={loginInput.password}
+                        onChange={(e) =>
+                          setLoginInput((prev) => ({ ...prev, password: e.target.value }))
+                        }
+                        required
+                        className="w-full h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
+                        onClick={() => setShowLoginPassword(!showLoginPassword)}
+                        aria-label={showLoginPassword ? "Hide password" : "Show password"}
+                      >
+                        {showLoginPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <Button
+                    data-testid="modal-login-submit-btn"
+                    type="submit"
+                    variant="dark"
+                    size="md"
+                    fullWidth
+                    radius="fiverr"
+                    disabled={loading}
+                    isLoading={loading}
+                    className="mt-2 bg-black hover:bg-gray-900 text-white font-medium shadow-sm transition-all"
+                    rightIcon={<ArrowRight className="w-4 h-4" />}
+                  >
+                    Sign in
+                  </Button>
+
+                  <div className="mt-2 text-center text-xs text-gray-500">
+                    Don&apos;t have an account?{" "}
                     <button
                       type="button"
                       onClick={() => {
-                        setForgotEmail(loginInput.identifier);
-                        setMode("forgot");
+                        setMode("register");
                         setError(null);
                       }}
-                      className="text-xs text-gray-500 hover:text-[#0D6D5F] hover:underline cursor-pointer"
+                      className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
                     >
-                      Forgot password?
+                      Join now
                     </button>
                   </div>
-                  <div className="relative flex items-center">
-                    <input
-                      data-testid="modal-login-password-input"
-                      type={showLoginPassword ? "text" : "password"}
-                      placeholder="Enter password"
-                      value={loginInput.password}
-                      onChange={(e) =>
-                        setLoginInput((prev) => ({ ...prev, password: e.target.value }))
-                      }
-                      required
-                      className="w-full h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
-                      onClick={() => setShowLoginPassword(!showLoginPassword)}
-                      aria-label={showLoginPassword ? "Hide password" : "Show password"}
-                    >
-                      {showLoginPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-                </div>
+                </form>
+              </div>
+            )}
 
-                <Button
-                  data-testid="modal-login-submit-btn"
-                  type="submit"
-                  variant="dark"
-                  size="md"
-                  fullWidth
-                  radius="fiverr"
-                  disabled={loading}
-                  isLoading={loading}
-                  className="mt-2 bg-black hover:bg-gray-900 text-white font-medium shadow-sm transition-all"
-                  rightIcon={<ArrowRight className="w-4 h-4" />}
-                >
-                  Sign in
-                </Button>
-
-                <div className="mt-2 text-center text-xs text-gray-500">
-                  Don&apos;t have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode("register");
-                      setError(null);
-                    }}
-                    className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
-                  >
-                    Join now
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-
-          {/* ─────────────────────────────────────────────────────────────
+            {/* ─────────────────────────────────────────────────────────────
               MODE 2: CREATE ACCOUNT (REGISTER - NO USERNAME INPUT!)
           ───────────────────────────────────────────────────────────── */}
-          {mode === "register" && (
-            <div className="flex flex-col w-full">
-              {/* Role Toggle */}
-              <div className="space-y-1 mb-2.5">
-                <label className="text-xs font-semibold text-gray-700">I want to</label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: true }))}
-                    className={`flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${registerInput.isSeller
-                      ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
-                      : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
-                      }`}
-                  >
-                    <Briefcase className="w-3.5 h-3.5" />
-                    <span>Work as Freelancer</span>
-                  </button>
+            {mode === "register" && (
+              <div className="flex flex-col w-full">
+                {/* Role Toggle */}
+                <div className="space-y-1 mb-2.5">
+                  <label className="text-xs font-semibold text-gray-700">I want to</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: true }))}
+                      className={`flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${registerInput.isSeller
+                        ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
+                        : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
+                        }`}
+                    >
+                      <Briefcase className="w-3.5 h-3.5" />
+                      <span>Work as Freelancer</span>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: false }))}
-                    className={`flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${!registerInput.isSeller
-                      ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
-                      : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
-                      }`}
-                  >
-                    <User className="w-3.5 h-3.5" />
-                    <span>Hire as Client</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Social Sign Up Buttons */}
-              <div className="grid grid-cols-2 gap-2.5 w-full mb-2.5">
-                <div className="relative">
-                  <button
-                    data-testid="modal-register-google-btn"
-                    type="button"
-                    onClick={() => onSocialAuthClick("google", registerInput.isSeller)}
-                    disabled={loading || !!loadingProvider}
-                    className="w-full h-9 sm:h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {loadingProvider === "google" ? (
-                      <span className="inline-block w-3.5 h-3.5 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
-                    ) : (
-                      <FcGoogle className="text-base shrink-0" />
-                    )}
-                    <span className="truncate">Sign up with Google</span>
-                  </button>
-                  <div
-                    ref={registerGoogleBtnRef}
-                    className="absolute inset-0 overflow-hidden opacity-[0.0001] cursor-pointer pointer-events-auto [&>div]:!w-full [&>div]:!h-full [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!scale-150"
-                  />
-                </div>
-
-                <button
-                  data-testid="modal-register-apple-btn"
-                  type="button"
-                  onClick={() => onSocialAuthClick("apple", registerInput.isSeller)}
-                  disabled={true}
-                  className="w-full h-9 sm:h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-not-allowed opacity-60"
-                  title="Apple Sign-Up coming soon"
-                >
-                  <FaApple className="text-base text-black shrink-0" />
-                  <span className="truncate">Sign up with Apple</span>
-                </button>
-              </div>
-
-              {/* Divider */}
-              <div className="relative flex items-center justify-center w-full mb-2.5">
-                <div className="w-full border-t border-gray-200/80" />
-                <span className="absolute px-3 bg-white text-[11px] text-gray-400 uppercase tracking-wider font-medium">
-                  or continue with email
-                </span>
-              </div>
-
-              {/* Register Form (No Username Field!) */}
-              <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-2.5 w-full">
-                {/* Email Address */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email Address</label>
-                  <input
-                    data-testid="modal-register-email-input"
-                    type="email"
-                    placeholder="name@example.com"
-                    value={registerInput.email}
-                    onChange={(e) =>
-                      setRegisterInput((prev) => ({ ...prev, email: e.target.value }))
-                    }
-                    required
-                    className="w-full h-9 sm:h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
-                  />
-                </div>
-
-                {/* Password & Confirm Password Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs sm:text-[13px] font-medium text-gray-700">Password</label>
-                    <div className="relative flex items-center">
-                      <input
-                        data-testid="modal-register-password-input"
-                        type={showRegisterPassword ? "text" : "password"}
-                        placeholder="At least 8 chars"
-                        value={registerInput.password}
-                        onChange={(e) =>
-                          setRegisterInput((prev) => ({ ...prev, password: e.target.value }))
-                        }
-                        required
-                        className="w-full h-9 sm:h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
-                      />
-                      <button
-                        type="button"
-                        className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
-                        onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                        aria-label={showRegisterPassword ? "Hide password" : "Show password"}
-                      >
-                        {showRegisterPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs sm:text-[13px] font-medium text-gray-700">Confirm Password</label>
-                    <div className="relative flex items-center">
-                      <input
-                        data-testid="modal-register-confirm-password-input"
-                        type={showRegisterConfirmPassword ? "text" : "password"}
-                        placeholder="Repeat password"
-                        value={registerInput.confirmPassword}
-                        onChange={(e) =>
-                          setRegisterInput((prev) => ({ ...prev, confirmPassword: e.target.value }))
-                        }
-                        required
-                        className="w-full h-9 sm:h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
-                      />
-                      <button
-                        type="button"
-                        className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
-                        onClick={() => setShowRegisterConfirmPassword(!showRegisterConfirmPassword)}
-                        aria-label={showRegisterConfirmPassword ? "Hide password" : "Show password"}
-                      >
-                        {showRegisterConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: false }))}
+                      className={`flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${!registerInput.isSeller
+                        ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
+                        : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
+                        }`}
+                    >
+                      <User className="w-3.5 h-3.5" />
+                      <span>Hire as Client</span>
+                    </button>
                   </div>
                 </div>
 
-                {/* Agree to Terms */}
-                <label className="flex items-start gap-2 mt-0.5 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={agreeToTerms}
-                    onChange={(e) => setAgreeToTerms(e.target.checked)}
-                    className="mt-0.5 rounded text-[#0D6D5F] focus:ring-[#0D6D5F]"
-                  />
-                  <span className="text-[11px] text-gray-500 leading-tight">
-                    I agree to the{" "}
-                    <Link href="/trust-safety" target="_blank" className="text-[#0D6D5F] underline font-medium">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link href="/trust-safety" target="_blank" className="text-[#0D6D5F] underline font-medium">
-                      Privacy Policy
-                    </Link>
-                    .
+                {/* Social Sign Up Buttons */}
+                <div className="grid grid-cols-2 gap-2.5 w-full mb-2.5">
+                  <div className="relative">
+                    <button
+                      data-testid="modal-register-google-btn"
+                      type="button"
+                      onClick={() => onSocialAuthClick("google", registerInput.isSeller)}
+                      disabled={loading || !!loadingProvider}
+                      className="w-full h-9 sm:h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {loadingProvider === "google" ? (
+                        <span className="inline-block w-3.5 h-3.5 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
+                      ) : (
+                        <FcGoogle className="text-base shrink-0" />
+                      )}
+                      <span className="truncate">Sign up with Google</span>
+                    </button>
+                    <div
+                      ref={registerGoogleBtnRef}
+                      className="absolute inset-0 overflow-hidden opacity-[0.0001] cursor-pointer pointer-events-auto [&>div]:!w-full [&>div]:!h-full [&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!scale-150"
+                    />
+                  </div>
+
+                  <button
+                    data-testid="modal-register-apple-btn"
+                    type="button"
+                    onClick={() => onSocialAuthClick("apple", registerInput.isSeller)}
+                    disabled={true}
+                    className="w-full h-9 sm:h-10 px-2 border border-gray-200/90 rounded-[6px] bg-white hover:bg-gray-50/80 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-[#1f2937] shadow-2xs cursor-not-allowed opacity-60"
+                    title="Apple Sign-Up coming soon"
+                  >
+                    <FaApple className="text-base text-black shrink-0" />
+                    <span className="truncate">Sign up with Apple</span>
+                  </button>
+                </div>
+
+                {/* Divider */}
+                <div className="relative flex items-center justify-center w-full mb-2.5">
+                  <div className="w-full border-t border-gray-200/80" />
+                  <span className="absolute px-3 bg-white text-[11px] text-gray-400 uppercase tracking-wider font-medium">
+                    or continue with email
                   </span>
-                </label>
+                </div>
 
-                {/* Submit Button */}
+                {/* Register Form (No Username Field!) */}
+                <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-2.5 w-full">
+                  {/* Email Address */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs sm:text-[13px] font-medium text-gray-700">Email Address</label>
+                    <input
+                      data-testid="modal-register-email-input"
+                      type="email"
+                      placeholder="name@example.com"
+                      value={registerInput.email}
+                      onChange={(e) =>
+                        setRegisterInput((prev) => ({ ...prev, email: e.target.value }))
+                      }
+                      required
+                      className="w-full h-9 sm:h-10 px-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                    />
+                  </div>
+
+                  {/* Password & Confirm Password Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs sm:text-[13px] font-medium text-gray-700">Password</label>
+                      <div className="relative flex items-center">
+                        <input
+                          data-testid="modal-register-password-input"
+                          type={showRegisterPassword ? "text" : "password"}
+                          placeholder="At least 8 chars"
+                          value={registerInput.password}
+                          onChange={(e) =>
+                            setRegisterInput((prev) => ({ ...prev, password: e.target.value }))
+                          }
+                          required
+                          className="w-full h-9 sm:h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
+                          onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                          aria-label={showRegisterPassword ? "Hide password" : "Show password"}
+                        >
+                          {showRegisterPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs sm:text-[13px] font-medium text-gray-700">Confirm Password</label>
+                      <div className="relative flex items-center">
+                        <input
+                          data-testid="modal-register-confirm-password-input"
+                          type={showRegisterConfirmPassword ? "text" : "password"}
+                          placeholder="Repeat password"
+                          value={registerInput.confirmPassword}
+                          onChange={(e) =>
+                            setRegisterInput((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                          }
+                          required
+                          className="w-full h-9 sm:h-10 px-3.5 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
+                          onClick={() => setShowRegisterConfirmPassword(!showRegisterConfirmPassword)}
+                          aria-label={showRegisterConfirmPassword ? "Hide password" : "Show password"}
+                        >
+                          {showRegisterConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Agree to Terms */}
+                  <label className="flex items-start gap-2 mt-0.5 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={agreeToTerms}
+                      onChange={(e) => setAgreeToTerms(e.target.checked)}
+                      className="mt-0.5 rounded text-[#0D6D5F] focus:ring-[#0D6D5F]"
+                    />
+                    <span className="text-[11px] text-gray-500 leading-tight">
+                      I agree to the{" "}
+                      <Link href="/trust-safety" target="_blank" className="text-[#0D6D5F] underline font-medium">
+                        Terms of Service
+                      </Link>{" "}
+                      and{" "}
+                      <Link href="/trust-safety" target="_blank" className="text-[#0D6D5F] underline font-medium">
+                        Privacy Policy
+                      </Link>
+                      .
+                    </span>
+                  </label>
+
+                  {/* Submit Button */}
+                  <Button
+                    data-testid="modal-register-submit-btn"
+                    type="submit"
+                    variant="brand"
+                    size="md"
+                    fullWidth
+                    radius="fiverr"
+                    disabled={loading}
+                    isLoading={loading}
+                    className="mt-0.5 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
+                    rightIcon={<ArrowRight className="w-4 h-4" />}
+                  >
+                    Join Workvence
+                  </Button>
+
+                  <div className="mt-0.5 text-center text-xs text-gray-500">
+                    Already have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMode("login");
+                        setError(null);
+                      }}
+                      className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
+                    >
+                      Sign in
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* ─────────────────────────────────────────────────────────────
+              MODE 3: FORGOT PASSWORD
+          ───────────────────────────────────────────────────────────── */}
+            {mode === "forgot" && (
+              <form onSubmit={handleForgotSubmit} className="flex flex-col gap-4 w-full">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Account Email</label>
+                  <div className="relative flex items-center">
+                    <Mail className="absolute left-3.5 text-gray-400 w-4 h-4 pointer-events-none" />
+                    <input
+                      type="email"
+                      placeholder="name@email.com"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      required
+                      className="w-full h-10 pl-10 pr-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                    />
+                  </div>
+                </div>
+
                 <Button
-                  data-testid="modal-register-submit-btn"
                   type="submit"
                   variant="brand"
                   size="md"
@@ -1092,14 +1143,14 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   radius="fiverr"
                   disabled={loading}
                   isLoading={loading}
-                  className="mt-0.5 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
+                  className="mt-2 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
                   rightIcon={<ArrowRight className="w-4 h-4" />}
                 >
-                  Join Workvence
+                  Send Reset Code
                 </Button>
 
-                <div className="mt-0.5 text-center text-xs text-gray-500">
-                  Already have an account?{" "}
+                <div className="text-center text-xs text-gray-500 mt-2">
+                  Remembered your password?{" "}
                   <button
                     type="button"
                     onClick={() => {
@@ -1112,219 +1163,94 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   </button>
                 </div>
               </form>
-            </div>
-          )}
+            )}
 
-          {/* ─────────────────────────────────────────────────────────────
-              MODE 3: FORGOT PASSWORD
-          ───────────────────────────────────────────────────────────── */}
-          {mode === "forgot" && (
-            <form onSubmit={handleForgotSubmit} className="flex flex-col gap-4 w-full">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs sm:text-[13px] font-medium text-gray-700">Account Email</label>
-                <div className="relative flex items-center">
-                  <Mail className="absolute left-3.5 text-gray-400 w-4 h-4 pointer-events-none" />
-                  <input
-                    type="email"
-                    placeholder="name@email.com"
-                    value={forgotEmail}
-                    onChange={(e) => setForgotEmail(e.target.value)}
-                    required
-                    className="w-full h-10 pl-10 pr-3.5 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
-                  />
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                variant="brand"
-                size="md"
-                fullWidth
-                radius="fiverr"
-                disabled={loading}
-                isLoading={loading}
-                className="mt-2 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
-                rightIcon={<ArrowRight className="w-4 h-4" />}
-              >
-                Send Reset Code
-              </Button>
-
-              <div className="text-center text-xs text-gray-500 mt-2">
-                Remembered your password?{" "}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode("login");
-                    setError(null);
-                  }}
-                  className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
-                >
-                  Sign in
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* ─────────────────────────────────────────────────────────────
+            {/* ─────────────────────────────────────────────────────────────
               MODE 4: RESET PASSWORD
           ───────────────────────────────────────────────────────────── */}
-          {mode === "reset" && (
-            <form onSubmit={handleResetSubmit} className="flex flex-col gap-3.5 w-full">
-              {/* 6-box OTP Input */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs sm:text-[13px] font-medium text-gray-700">6-Digit Reset Code</label>
-                <div className="flex gap-2 sm:gap-2.5 justify-center w-full my-1">
-                  {resetOtp.map((digit, idx) => (
+            {mode === "reset" && (
+              <form onSubmit={handleResetSubmit} className="flex flex-col gap-3.5 w-full">
+                {/* 6-box OTP Input */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">6-Digit Reset Code</label>
+                  <div className="flex gap-2 sm:gap-2.5 justify-center w-full my-1">
+                    {resetOtp.map((digit, idx) => (
+                      <input
+                        key={idx}
+                        id={`auth-modal-reset-otp-${idx}`}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={1}
+                        value={digit}
+                        onChange={(e) =>
+                          handleOtpInput(
+                            idx,
+                            e.target.value,
+                            resetOtp,
+                            setResetOtp,
+                            "auth-modal-reset-otp"
+                          )
+                        }
+                        onKeyDown={(e) =>
+                          handleOtpKeyDown(idx, e, resetOtp, "auth-modal-reset-otp")
+                        }
+                        onPaste={(e) =>
+                          handleOtpPaste(e, setResetOtp, "auth-modal-reset-otp")
+                        }
+                        className="w-10 sm:w-11 h-12 text-center text-lg sm:text-xl font-bold border border-gray-200 rounded-[6px] bg-[#F9FAFB] focus:bg-white focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F] outline-none transition-all"
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* New Password */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">New Password</label>
+                  <div className="relative flex items-center">
+                    <Lock className="absolute left-3.5 text-gray-400 w-4 h-4 pointer-events-none" />
                     <input
-                      key={idx}
-                      id={`auth-modal-reset-otp-${idx}`}
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={1}
-                      value={digit}
+                      type={showResetPassword ? "text" : "password"}
+                      placeholder="At least 8 characters"
+                      value={resetPasswords.newPassword}
                       onChange={(e) =>
-                        handleOtpInput(
-                          idx,
-                          e.target.value,
-                          resetOtp,
-                          setResetOtp,
-                          "auth-modal-reset-otp"
-                        )
+                        setResetPasswords((prev) => ({ ...prev, newPassword: e.target.value }))
                       }
-                      onKeyDown={(e) =>
-                        handleOtpKeyDown(idx, e, resetOtp, "auth-modal-reset-otp")
-                      }
-                      onPaste={(e) =>
-                        handleOtpPaste(e, setResetOtp, "auth-modal-reset-otp")
-                      }
-                      className="w-10 sm:w-11 h-12 text-center text-lg sm:text-xl font-bold border border-gray-200 rounded-[6px] bg-[#F9FAFB] focus:bg-white focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F] outline-none transition-all"
+                      required
+                      className="w-full h-10 pl-10 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
                     />
-                  ))}
-                </div>
-              </div>
-
-              {/* New Password */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs sm:text-[13px] font-medium text-gray-700">New Password</label>
-                <div className="relative flex items-center">
-                  <Lock className="absolute left-3.5 text-gray-400 w-4 h-4 pointer-events-none" />
-                  <input
-                    type={showResetPassword ? "text" : "password"}
-                    placeholder="At least 8 characters"
-                    value={resetPasswords.newPassword}
-                    onChange={(e) =>
-                      setResetPasswords((prev) => ({ ...prev, newPassword: e.target.value }))
-                    }
-                    required
-                    className="w-full h-10 pl-10 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
-                    onClick={() => setShowResetPassword(!showResetPassword)}
-                  >
-                    {showResetPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Confirm New Password */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs sm:text-[13px] font-medium text-gray-700">Confirm New Password</label>
-                <div className="relative flex items-center">
-                  <Lock className="absolute left-3.5 text-gray-400 w-4 h-4 pointer-events-none" />
-                  <input
-                    type={showResetConfirmPassword ? "text" : "password"}
-                    placeholder="Repeat new password"
-                    value={resetPasswords.confirmPassword}
-                    onChange={(e) =>
-                      setResetPasswords((prev) => ({ ...prev, confirmPassword: e.target.value }))
-                    }
-                    required
-                    className="w-full h-10 pl-10 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
-                    onClick={() => setShowResetConfirmPassword(!showResetConfirmPassword)}
-                  >
-                    {showResetConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                variant="brand"
-                size="md"
-                fullWidth
-                radius="fiverr"
-                disabled={loading}
-                isLoading={loading}
-                className="mt-2 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
-                rightIcon={<ArrowRight className="w-4 h-4" />}
-              >
-                Reset Password
-              </Button>
-            </form>
-          )}
-
-          {/* ─────────────────────────────────────────────────────────────
-              MODE 5: EMAIL OTP VERIFICATION (Confirm your email)
-          ───────────────────────────────────────────────────────────── */}
-          {mode === "verify" && (
-            <div className="my-auto flex flex-col w-full py-2">
-              <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-bold text-gray-900 font-sf-pro mb-5">
-                Confirm your email
-              </h2>
-
-              <form onSubmit={handleVerifySubmit} className="flex flex-col w-full">
-                <div className="flex gap-2 sm:gap-2.5 justify-start w-full mb-4">
-                  {verifyOtp.map((digit, idx) => (
-                    <input
-                      key={idx}
-                      id={`auth-modal-verify-otp-${idx}`}
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={1}
-                      placeholder="0"
-                      value={digit}
-                      onChange={(e) =>
-                        handleOtpInput(
-                          idx,
-                          e.target.value,
-                          verifyOtp,
-                          setVerifyOtp,
-                          "auth-modal-verify-otp"
-                        )
-                      }
-                      onKeyDown={(e) =>
-                        handleOtpKeyDown(idx, e, verifyOtp, "auth-modal-verify-otp")
-                      }
-                      onPaste={(e) =>
-                        handleOtpPaste(e, setVerifyOtp, "auth-modal-verify-otp")
-                      }
-                      className="flex-1 min-w-0 max-w-[56px] aspect-square text-center text-xl sm:text-2xl font-bold border border-gray-200 rounded-[6px] bg-[#f9fafb] text-gray-900 placeholder:text-[#868686] placeholder:font-normal placeholder:text-[24px] placeholder:leading-none placeholder:tracking-[0px] font-['SF_Pro',-apple-system,BlinkMacSystemFont,sans-serif] focus:bg-white focus:outline-none focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F] transition-all"
-                    />
-                  ))}
-                </div>
-
-                {/* Resend OTP Bar */}
-                <div className="text-left w-full text-xs sm:text-[13px] text-[#6b7280] mb-5">
-                  <span>Didn’t receive the email?</span>{" "}
-                  {resendTimer > 0 ? (
-                    <span className="text-gray-900 font-semibold">
-                      Retry in <strong className="font-bold">{resendTimer}</strong> seconds
-                    </span>
-                  ) : (
                     <button
                       type="button"
-                      onClick={handleResendOtp}
-                      className="font-bold text-gray-900 hover:text-[#0D6D5F] transition-colors cursor-pointer"
+                      className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
+                      onClick={() => setShowResetPassword(!showResetPassword)}
                     >
-                      Retry
+                      {showResetPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
-                  )}
+                  </div>
+                </div>
+
+                {/* Confirm New Password */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs sm:text-[13px] font-medium text-gray-700">Confirm New Password</label>
+                  <div className="relative flex items-center">
+                    <Lock className="absolute left-3.5 text-gray-400 w-4 h-4 pointer-events-none" />
+                    <input
+                      type={showResetConfirmPassword ? "text" : "password"}
+                      placeholder="Repeat new password"
+                      value={resetPasswords.confirmPassword}
+                      onChange={(e) =>
+                        setResetPasswords((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                      }
+                      required
+                      className="w-full h-10 pl-10 pr-10 bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal transition-colors outline-none"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-2.5 text-gray-400 hover:text-gray-600 transition-colors p-1 flex items-center justify-center cursor-pointer"
+                      onClick={() => setShowResetConfirmPassword(!showResetConfirmPassword)}
+                    >
+                      {showResetConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
                 </div>
 
                 <Button
@@ -1333,30 +1259,104 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   size="md"
                   fullWidth
                   radius="fiverr"
-                  disabled={loading || verifyOtp.join("").length < 6}
+                  disabled={loading}
                   isLoading={loading}
-                  className="mt-1 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
+                  className="mt-2 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
                   rightIcon={<ArrowRight className="w-4 h-4" />}
                 >
-                  Submit
+                  Reset Password
                 </Button>
-
-                <div className="text-center text-xs text-gray-500 mt-3">
-                  Wrong email address?{" "}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode("register");
-                      setError(null);
-                    }}
-                    className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
-                  >
-                    Change email
-                  </button>
-                </div>
               </form>
-            </div>
-          )}
+            )}
+
+            {/* ─────────────────────────────────────────────────────────────
+              MODE 5: EMAIL OTP VERIFICATION (Confirm your email)
+          ───────────────────────────────────────────────────────────── */}
+            {mode === "verify" && (
+              <div className="my-auto flex flex-col w-full py-2">
+                <h2 id="auth-modal-title" className="text-xl sm:text-2xl font-bold text-gray-900 font-sf-pro mb-5">
+                  Confirm your email
+                </h2>
+
+                <form onSubmit={handleVerifySubmit} className="flex flex-col w-full">
+                  <div className="flex gap-2 sm:gap-2.5 justify-start w-full mb-4">
+                    {verifyOtp.map((digit, idx) => (
+                      <input
+                        key={idx}
+                        id={`auth-modal-verify-otp-${idx}`}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={1}
+                        placeholder="0"
+                        value={digit}
+                        onChange={(e) =>
+                          handleOtpInput(
+                            idx,
+                            e.target.value,
+                            verifyOtp,
+                            setVerifyOtp,
+                            "auth-modal-verify-otp"
+                          )
+                        }
+                        onKeyDown={(e) =>
+                          handleOtpKeyDown(idx, e, verifyOtp, "auth-modal-verify-otp")
+                        }
+                        onPaste={(e) =>
+                          handleOtpPaste(e, setVerifyOtp, "auth-modal-verify-otp")
+                        }
+                        className="flex-1 min-w-0 max-w-[56px] aspect-square text-center text-xl sm:text-2xl font-bold border border-gray-200 rounded-[6px] bg-[#f9fafb] text-gray-900 placeholder:text-[#868686] placeholder:font-normal placeholder:text-[24px] placeholder:leading-none placeholder:tracking-[0px] font-['SF_Pro',-apple-system,BlinkMacSystemFont,sans-serif] focus:bg-white focus:outline-none focus:border-[#0D6D5F] focus:ring-1 focus:ring-[#0D6D5F] transition-all"
+                      />
+                    ))}
+                  </div>
+
+                  {/* Resend OTP Bar */}
+                  <div className="text-left w-full text-xs sm:text-[13px] text-[#6b7280] mb-5">
+                    <span>Didn’t receive the email?</span>{" "}
+                    {resendTimer > 0 ? (
+                      <span className="text-gray-900 font-semibold">
+                        Retry in <strong className="font-bold">{resendTimer}</strong> seconds
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleResendOtp}
+                        className="font-bold text-gray-900 hover:text-[#0D6D5F] transition-colors cursor-pointer"
+                      >
+                        Retry
+                      </button>
+                    )}
+                  </div>
+
+                  <Button
+                    type="submit"
+                    variant="brand"
+                    size="md"
+                    fullWidth
+                    radius="fiverr"
+                    disabled={loading || verifyOtp.join("").length < 6}
+                    isLoading={loading}
+                    className="mt-1 bg-[#0D6D5F] hover:bg-[#0B403F] text-white font-semibold shadow-sm transition-all"
+                    rightIcon={<ArrowRight className="w-4 h-4" />}
+                  >
+                    Submit
+                  </Button>
+
+                  <div className="text-center text-xs text-gray-500 mt-3">
+                    Wrong email address?{" "}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMode("register");
+                        setError(null);
+                      }}
+                      className="text-[#0D6D5F] font-semibold hover:underline cursor-pointer"
+                    >
+                      Change email
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
           </div>
 
           {/* Bottom Copyright & Terms Disclaimer */}

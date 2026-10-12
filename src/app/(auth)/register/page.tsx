@@ -524,7 +524,7 @@ const RegisterContent = () => {
       <div className="hidden lg:flex flex-1  h-screen sticky top-0">
         <div className="relative w-full h-full rounded-[6px] lg:rounded-[6px] overflow-hidden bg-[#0a0f1d] shadow-sm">
           <Image
-            src="/images/auth/registerImage.png"
+            src="https://res.cloudinary.com/dlqhnyh8r/image/upload/v1791778457/registerImage_lnytwg.webp"
             alt="Workvence"
             fill
             priority

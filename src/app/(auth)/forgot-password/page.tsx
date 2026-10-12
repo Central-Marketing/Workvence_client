@@ -108,7 +108,7 @@ const ForgotPassword = () => {
 
         {/* Right Pane */}
         <div className="hidden md:flex flex-1 relative bg-black">
-          <Image fill src="/loginImg.jpg" alt="Workvence user" className="w-full h-full object-cover opacity-80" />
+          <Image fill src="https://res.cloudinary.com/dlqhnyh8r/image/upload/v1791778458/loginImage_cf5vyu.webp" alt="Workvence user" className="w-full h-full object-cover opacity-80" />
           <div className="absolute bottom-10 left-10 right-10">
             <p className="text-white text-lg leading-relaxed font-medium drop-shadow-lg">&ldquo;Workvence has revolutionized how I outsource my business tasks. It&apos;s incredibly efficient, and the talent pool is unmatched. A game-changer for my startup!&rdquo;</p>
           </div>

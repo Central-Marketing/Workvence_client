@@ -133,7 +133,7 @@ export default function BuyerManageOrdersPage() {
 
       // Tab filtering
       if (activeTab === "Active") {
-        return order.status === "inprogress" || order.status === "revision" || order.status === "pending" || order.status === "late";
+        return !order.isCompleted && order.status !== "completed" && order.status !== "cancelled" && order.status !== "failed";
       }
       if (activeTab === "Delivered") {
         return order.status === "delivered";

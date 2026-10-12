@@ -228,7 +228,7 @@ const PrivacyPolicy = () => {
         {/* 2. Hero Banner Image */}
         <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-12 w-full aspect-[16/8] sm:aspect-[2.2/1] md:aspect-[44/15] rounded-[6px] overflow-hidden bg-gray-100 shadow-xs border border-black/[0.04] shrink-0">
           <img
-            src="/media/privacypolicy.png"
+            src="https://res.cloudinary.com/dlqhnyh8r/image/upload/f_auto,q_auto/v1791777896/privacypolicy_e98lvo.webp"
             alt="Privacy and Data Security Banner"
             className="w-full h-full object-cover select-none"
             loading="lazy"

@@ -156,10 +156,13 @@ const ManageOrders = () => {
 
     if (activeTab === "priority") {
       if (isCompleted || isCancelled) return false;
-      return true;
+      if (isDisputed || isRevision) return true;
+      if (isDelivered) return false;
+      const isUrgent = Boolean(deadlineTime && deadlineTime - Date.now() <= 24 * 60 * 60 * 1000);
+      return isLate || st === "late" || isUrgent;
     }
     if (activeTab === "active") {
-      if (isCompleted || isCancelled || isDelivered || isDisputed) return false;
+      if (isCompleted || isCancelled) return false;
       return true;
     }
     if (activeTab === "late") return isLate || st === "late";

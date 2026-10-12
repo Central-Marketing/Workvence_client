@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { axiosFetch } from "@/utils";
 import { toast } from "@/utils/toast";
-import { Button, Modal } from "@/components/ui";
+import { Button, Modal, AIPolishButton } from "@/components/ui";
 
 interface SubmitProposalModalProps {
   brief: any;
@@ -23,6 +23,7 @@ const SubmitProposalModal: React.FC<SubmitProposalModalProps> = ({
   const [coverLetter, setCoverLetter] = useState("");
   const [attachmentUrl, setAttachmentUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isPolishing, setIsPolishing] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,7 +72,7 @@ const SubmitProposalModal: React.FC<SubmitProposalModalProps> = ({
       onClose={onClose}
       title="Submit Proposal"
       maxWidth="max-w-[620px]"
-      isLoading={loading}
+      isLoading={loading || isPolishing}
       footer={
         <>
           <Button
@@ -80,7 +81,7 @@ const SubmitProposalModal: React.FC<SubmitProposalModalProps> = ({
             size="md"
             radius="fiverr"
             onClick={onClose}
-            disabled={loading}
+            disabled={loading || isPolishing}
             className="cursor-pointer font-semibold text-xs sm:text-[13px] bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200/80"
           >
             Cancel
@@ -91,7 +92,7 @@ const SubmitProposalModal: React.FC<SubmitProposalModalProps> = ({
             variant="dark"
             size="md"
             radius="fiverr"
-            disabled={loading}
+            disabled={loading || isPolishing}
             isLoading={loading}
             loadingText="Submitting..."
             className="cursor-pointer py-2.5 px-6 font-semibold text-xs sm:text-[13px] shadow-xs"
@@ -156,14 +157,26 @@ const SubmitProposalModal: React.FC<SubmitProposalModalProps> = ({
           <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
             Cover Letter & Proposal Pitch
           </label>
-          <textarea
-            rows={6}
-            value={coverLetter}
-            onChange={(e) => setCoverLetter(e.target.value)}
-            placeholder="Explain why you are the best fit for this project, your approach, and experience..."
-            required
-            className="w-full bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors font-normal resize-y min-h-[110px]"
-          />
+          <div className="relative">
+            <textarea
+              rows={6}
+              value={coverLetter}
+              onChange={(e) => setCoverLetter(e.target.value)}
+              placeholder="Explain why you are the best fit for this project, your approach, and experience..."
+              required
+              disabled={isPolishing}
+              className="w-full bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 pb-9 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors font-normal resize-y min-h-[110px]"
+            />
+            <div className="absolute right-2 bottom-2 z-10 flex items-center">
+              <AIPolishButton
+                text={coverLetter}
+                onSuccess={(polishedText) => setCoverLetter(polishedText)}
+                onStateChange={setIsPolishing}
+                className="p-1 hover:bg-gray-200/80 rounded-full text-brand-green"
+                tooltip="Polish cover letter with AI"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Attachment URL */}

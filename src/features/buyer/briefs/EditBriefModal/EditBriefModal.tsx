@@ -6,7 +6,7 @@ import { toast } from "@/utils/toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import useAdminCategories, { isCategoryRoot } from "@/hooks/useAdminCategories";
-import { Button } from "@/components/ui";
+import { Button, BorderBeam } from "@/components/ui";
 
 const DEFAULT_CATEGORIES = [
   "AI",
@@ -189,9 +189,10 @@ export const EditBriefModal: React.FC<EditBriefModalProps> = ({
       onClick={() => !loading && onClose()}
     >
       <div
-        className="bg-white rounded-[6px] max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100 relative overflow-hidden"
+        className="bg-white rounded-[6px] max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
+        <BorderBeam withBase radius={6} thickness={4} />
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
           <div>

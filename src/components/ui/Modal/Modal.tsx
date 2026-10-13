@@ -3,6 +3,7 @@
 import React, { ReactNode, useEffect, useId } from "react";
 import { X } from "lucide-react";
 import { Button } from "../Button";
+import { BorderBeam } from "../BorderBeam";
 
 export interface ModalProps {
   isOpen: boolean;
@@ -58,13 +59,13 @@ export const Modal: React.FC<ModalProps> = ({
       className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn select-none"
       onClick={() => !isLoading && onClose()}
     >
-      {/* 3px Gradient Border Outer Shell */}
+      {/* 4px Gradient Border Outer Shell */}
       <div
-        className={`w-full ${maxWidth} p-[3px] rounded-[6px] shadow-[0_0_54px_0_rgba(0,0,0,0.15)] bg-gradient-to-br from-[#00A6FF] via-[#3ED419] to-[#F29EFF] animate-in zoom-in-95 duration-200 ${className}`}
+        className={`relative w-full ${maxWidth} p-[4px] rounded-[6px] shadow-[0_0_54px_0_rgba(0,0,0,0.15)] bg-gradient-to-br from-[#00A6FF] via-[#3ED419] to-[#F29EFF] animate-in zoom-in-95 duration-200 ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Inner White Container */}
-        <div className="bg-white rounded-[3px] p-6 sm:p-10 flex flex-col gap-6 sm:gap-8 max-h-[calc(100dvh-3rem)] overflow-y-auto">
+        <div className="bg-white rounded-[2px] p-6 sm:p-10 flex flex-col gap-6 sm:gap-8 max-h-[calc(100dvh-3rem)] overflow-y-auto">
           {/* Header */}
           {title && (
             <div className="flex items-center justify-between pb-4 border-b border-gray-100 shrink-0">
@@ -99,6 +100,7 @@ export const Modal: React.FC<ModalProps> = ({
             </div>
           )}
         </div>
+        <BorderBeam radius={6} thickness={4} />
       </div>
     </div>
   );

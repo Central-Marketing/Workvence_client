@@ -15,7 +15,7 @@ import {
   X
 } from "lucide-react";
 import { Button } from "@/components";
-import { CustomSelect, CustomSelectOption } from "@/components/ui";
+import { CustomSelect, CustomSelectOption, BorderBeam } from "@/components/ui";
 import { toast } from "@/utils/toast";
 
 const SPEND_OPTIONS: CustomSelectOption[] = [
@@ -115,7 +115,8 @@ export default function WorkvenceSelectPage() {
       {/* Join Select Modal */}
       {isJoining && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative border border-gray-100 my-8">
+          <div className="bg-white rounded-[6px] max-w-lg w-full p-6 sm:p-8 shadow-2xl relative my-8">
+            <BorderBeam withBase radius={6} thickness={4} />
             <Button
               onClick={() => setIsJoining(false)}
               variant="soft"

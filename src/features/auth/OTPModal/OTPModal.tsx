@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Mail, RefreshCw, X } from 'lucide-react';
-import { Button } from '@/components/ui';
+import { Button, BorderBeam } from '@/components/ui';
 
 interface OTPModalProps {
   isOpen: boolean;
@@ -44,9 +44,10 @@ const OTPModal: React.FC<OTPModalProps> = ({
       onClick={() => !isLoading && onClose()}
     >
       <div
-        className="bg-white rounded-[6px] max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col items-center text-center relative overflow-hidden"
+        className="bg-white rounded-[6px] max-w-md w-full p-6 sm:p-8 shadow-2xl flex flex-col items-center text-center relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
+        <BorderBeam withBase radius={6} thickness={4} />
         {/* Close Button */}
         <Button
           type="button"

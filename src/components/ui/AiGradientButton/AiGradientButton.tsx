@@ -71,7 +71,6 @@ export const AiGradientButton: React.FC<AiGradientButtonProps> = ({
 
   const innerContent = (
     <>
-      {/* Fiverr/Upwork AI Style Shimmer Light Sweep */}
       <span
         className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out bg-gradient-to-r from-transparent via-white/35 to-transparent pointer-events-none"
         aria-hidden="true"

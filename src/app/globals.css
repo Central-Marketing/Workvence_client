@@ -379,6 +379,60 @@ body.hide-navbar nav {
   -webkit-background-clip: padding-box, border-box !important;
 }
 
+/* One-shot border reveal: render <BorderBeam /> as the last child of a `relative`
+   gradient-border shell that has p-[3px]. The 3px border starts solid white, then the white
+   is erased along the perimeter (top-left -> right -> bottom-right -> bottom-left -> back to
+   top-left), revealing the gradient underneath. Replays on every mount (every modal open). */
+.border-beam {
+  position: absolute;
+  /* centre the stroke on the shell's outer edge so it covers the border exactly;
+     --beam-thickness is set per modal by <BorderBeam thickness={...} /> */
+  inset: calc(var(--beam-thickness, 3px) / 2);
+  width: calc(100% - var(--beam-thickness, 3px));
+  height: calc(100% - var(--beam-thickness, 3px));
+  z-index: 10;
+  overflow: visible;
+  pointer-events: none;
+  --beam-hold: 200ms;
+  /* wait before the wipe starts */
+  --beam-duration: 1000ms;
+  /* length of the wipe */
+}
+
+.border-beam rect {
+  fill: none;
+  stroke: #fff;
+  stroke-width: var(--beam-thickness, 3px);
+  /* pathLength=1: one dash covering the whole path, then an equal gap */
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 0;
+  animation: border-beam-wipe var(--beam-duration) cubic-bezier(0.65, 0, 0.35, 1) var(--beam-hold) 1 both;
+}
+
+@keyframes border-beam-wipe {
+  0% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  99% {
+    opacity: 1;
+  }
+
+  100% {
+    /* erased from the start point to the end of the path */
+    stroke-dashoffset: -1;
+    opacity: 0;
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .border-beam rect:not(.border-beam__base) {
+    display: none;
+  }
+}
+
 /* Global Container - 1400px Max Width */
 .container {
   box-sizing: border-box !important;

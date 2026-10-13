@@ -276,14 +276,14 @@ const FavoritesPage = () => {
                 <p className="text-gray-500 mb-8 max-w-md text-sm">
                   You haven't added any freelancers to your favorite sellers list. Visit seller profiles and click the heart icon to save them here!
                 </p>
-                <Button
+                {/* <Button
                   href="/packages?category=ai-services"
                   variant="dark"
                   size="md"
                   radius="fiverr"
                 >
                   Explore Freelancers
-                </Button>
+                </Button> */}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

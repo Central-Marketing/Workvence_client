@@ -45,10 +45,30 @@ export const TidalWaveCursor = () => {
         let targetUsesCustomCursor = false;
         let clickAnimation: Animation | null = null;
 
+        // Smooth trailing physics (LERP)
+        let targetX = 0;
+        let targetY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        let initialized = false;
+        let rafId: number | null = null;
+
+        // Follow factor: lower = slower/heavier trail (e.g. 0.12), higher = faster/snappier (e.g. 0.35)
+        const TRAILING_SPEED = 0.22;
+
         const setVisible = (next: boolean) => {
             if (next === visible) return;
             visible = next;
             cursor.style.opacity = next ? "1" : "0";
+        };
+
+        const updatePosition = () => {
+            if (initialized) {
+                currentX += (targetX - currentX) * TRAILING_SPEED;
+                currentY += (targetY - currentY) * TRAILING_SPEED;
+                cursor.style.transform = `translate3d(${currentX - HOTSPOT_X}px, ${currentY - HOTSPOT_Y}px, 0)`;
+            }
+            rafId = requestAnimationFrame(updatePosition);
         };
 
         // Decides whether the custom arrow should replace the native cursor over `target`.
@@ -69,7 +89,15 @@ export const TidalWaveCursor = () => {
         };
 
         const handleMove = (e: MouseEvent) => {
-            cursor.style.transform = `translate3d(${e.clientX - HOTSPOT_X}px, ${e.clientY - HOTSPOT_Y}px, 0)`;
+            targetX = e.clientX;
+            targetY = e.clientY;
+
+            if (!initialized) {
+                currentX = targetX;
+                currentY = targetY;
+                initialized = true;
+                cursor.style.transform = `translate3d(${currentX - HOTSPOT_X}px, ${currentY - HOTSPOT_Y}px, 0)`;
+            }
 
             const target = e.target as Element | null;
             if (target !== lastTarget) {
@@ -95,13 +123,18 @@ export const TidalWaveCursor = () => {
             );
         };
 
-        const handleLeave = () => setVisible(false);
+        const handleLeave = () => {
+            setVisible(false);
+            initialized = false;
+        };
 
+        rafId = requestAnimationFrame(updatePosition);
         window.addEventListener("mousemove", handleMove, { passive: true });
         window.addEventListener("mousedown", handleDown, { passive: true });
         root.addEventListener("mouseleave", handleLeave);
 
         return () => {
+            if (rafId) cancelAnimationFrame(rafId);
             window.removeEventListener("mousemove", handleMove);
             window.removeEventListener("mousedown", handleDown);
             root.removeEventListener("mouseleave", handleLeave);

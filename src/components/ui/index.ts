@@ -24,3 +24,6 @@ export { Modal, default as ModalComponent } from './Modal';
 export type { ModalProps } from './Modal';
 export { PageHeader, default as PageHeaderComponent } from './PageHeader/PageHeader';
 export type { PageHeaderProps } from './PageHeader/PageHeader';
+export { Pagination, default as PaginationComponent } from './Pagination';
+export type { PaginationProps } from './Pagination';
+

@@ -27,6 +27,7 @@ import { axiosFetch } from "@/utils";
 import useAdminCategories from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
 import { BriefsListSkeleton, Button, Breadcrumb, LeftFilterSidebar } from "@/components";
+import { Pagination } from "@/components/ui";
 import { ClientBrief } from "@/types";
 import useDebounce from "@/hooks/useDebounce";
 import useDragScroll from "@/hooks/useDragScroll";
@@ -517,37 +518,6 @@ function BriefsContent() {
 
   const totalBriefsCount = apiResponse?.total ?? allBriefs.length;
   const totalPages = Math.max(1, apiResponse?.totalPages ?? Math.ceil(totalBriefsCount / 10));
-
-  // Generate smart pagination range with ellipsis to prevent responsive blowout
-  const paginationRange = useMemo(() => {
-    if (totalPages <= 1) return [];
-    if (totalPages <= 7) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-
-    const leftSibling = Math.max(currentPage - 1, 1);
-    const rightSibling = Math.min(currentPage + 1, totalPages);
-
-    const showLeftEllipsis = leftSibling > 2;
-    const showRightEllipsis = rightSibling < totalPages - 1;
-
-    if (!showLeftEllipsis && showRightEllipsis) {
-      const leftRange = [1, 2, 3, 4];
-      return [...leftRange, "...", totalPages];
-    }
-
-    if (showLeftEllipsis && !showRightEllipsis) {
-      const rightRange = [
-        totalPages - 3,
-        totalPages - 2,
-        totalPages - 1,
-        totalPages,
-      ];
-      return [1, "...", ...rightRange];
-    }
-
-    return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
-  }, [currentPage, totalPages]);
 
   // Dynamic pill filters from real backend categories & briefs
   const pillFilters = useMemo(() => {
@@ -1234,73 +1204,13 @@ function BriefsContent() {
 
                     {/* Pagination Controls from Real Backend totalPages */}
                     {totalPages > 1 && (
-                      <div className="w-full flex justify-center mt-10">
-                        <nav
-                          aria-label="Pagination Navigation"
-                          className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 max-w-full px-2"
-                        >
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            radius="xl"
-                            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                            disabled={currentPage === 1}
-                            className="!inline-flex !flex-row !items-center !justify-center !gap-1.5 px-3 sm:px-3.5 !h-9 !min-h-[36px] !text-xs font-semibold shadow-2xs shrink-0 whitespace-nowrap"
-                            leftIcon={<FiChevronLeft className="w-3.5 h-3.5 shrink-0" />}
-                            aria-label="Previous page"
-                          >
-                            <span className="whitespace-nowrap">Previous</span>
-                          </Button>
-
-                          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-                            {paginationRange.map((pageNum, idx) => {
-                              if (typeof pageNum === "string") {
-                                return (
-                                  <span
-                                    key={`ellipsis-${idx}`}
-                                    className="w-7 sm:w-9 !h-9 !min-h-[36px] flex items-center justify-center text-xs text-slate-400 font-bold select-none shrink-0"
-                                  >
-                                    ...
-                                  </span>
-                                );
-                              }
-
-                              const isActive = currentPage === pageNum;
-                              return (
-                                <Button
-                                  key={`page-${pageNum}`}
-                                  type="button"
-                                  variant={isActive ? "brand" : "outline"}
-                                  size="sm"
-                                  radius="xl"
-                                  onClick={() => handlePageChange(pageNum)}
-                                  className={`!w-9 !h-9 !min-h-[36px] p-0 !text-xs font-semibold shadow-2xs shrink-0 !inline-flex !items-center !justify-center ${isActive ? "pointer-events-none !bg-[#0D6D5F] text-white" : "hover:border-gray-900"
-                                    }`}
-                                  aria-label={`Page ${pageNum}`}
-                                  aria-current={isActive ? "page" : undefined}
-                                >
-                                  {pageNum}
-                                </Button>
-                              );
-                            })}
-                          </div>
-
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            radius="xl"
-                            onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                            disabled={currentPage === totalPages}
-                            className="!inline-flex !flex-row !items-center !justify-center !gap-1.5 px-3 sm:px-3.5 !h-9 !min-h-[36px] !text-xs font-semibold shadow-2xs shrink-0 whitespace-nowrap"
-                            rightIcon={<FiChevronRight className="w-3.5 h-3.5 shrink-0" />}
-                            aria-label="Next page"
-                          >
-                            <span className="whitespace-nowrap">Next</span>
-                          </Button>
-                        </nav>
-                      </div>
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                        scrollToTop
+                        className="mt-10"
+                      />
                     )}
                   </>
                 )}

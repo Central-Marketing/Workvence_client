@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo, Suspense } from 'react';
 import { PackageCard, TopRatedSellers, GigsGridSkeleton, Skeleton, Button } from '@/components';
-import { CustomSelect, CustomSelectOption } from '@/components/ui';
+import { CustomSelect, CustomSelectOption, Pagination } from '@/components/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useSearchParams } from "next/navigation";
 import { axiosFetch } from "@/utils";
@@ -220,6 +220,9 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
     if (Array.isArray(data?.data)) return data.data;
     return [];
   }, [data]);
+
+  const totalResultsCount = data?.pagination?.total ?? (data?.total || 0);
+  const totalPages = totalResultsCount > 0 ? Math.ceil(totalResultsCount / 20) : undefined;
 
   const recommendedList = useMemo(() => {
     if (Array.isArray(recommendedPackages)) return recommendedPackages;
@@ -817,37 +820,14 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
 
         {/* Pagination Controls */}
         {packagesList && packagesList.length > 0 && (
-          <div className="flex justify-center items-center gap-4 mt-12 mb-4">
-            <Button
-              type="button"
-              variant="outline"
-              size="md"
-              radius="xl"
-              onClick={() => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                syncUrlWithFilters({ page: page - 1 });
-              }}
-              disabled={page === 1}
-              className="px-6 py-2.5 font-semibold shadow-sm"
-            >
-              Previous
-            </Button>
-            <span className="font-semibold text-gray-800 bg-gray-100 px-4 py-2 rounded-[6px]">Page {page}</span>
-            <Button
-              type="button"
-              variant="dark"
-              size="md"
-              radius="xl"
-              onClick={() => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                syncUrlWithFilters({ page: page + 1 });
-              }}
-              disabled={packagesList.length < 20}
-              className="px-6 py-2.5 font-semibold shadow-sm"
-            >
-              Next
-            </Button>
-          </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            hasNextPage={packagesList.length >= 20}
+            onPageChange={(newPage) => syncUrlWithFilters({ page: newPage })}
+            scrollToTop
+            className="mt-12 mb-4"
+          />
         )}
       </div>
 

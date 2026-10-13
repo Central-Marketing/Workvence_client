@@ -12,7 +12,8 @@ import {
 } from "@/features/events/components";
 import { eventService } from "@/features/events/services/eventService";
 import { EventTimeline } from "@/types";
-import { Calendar, ChevronLeft, ChevronRight, Sparkles, Inbox } from "lucide-react";
+import { Calendar, Sparkles, Inbox } from "lucide-react";
+import { Pagination } from "@/components/ui";
 
 export default function EventsPage() {
   const [timeline, setTimeline] = useState<EventTimeline>("upcoming");
@@ -151,32 +152,13 @@ export default function EventsPage() {
 
               {/* Pagination Controls */}
               {totalPages > 1 && (
-                <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
-                  <button
-                    type="button"
-                    disabled={page <= 1 || isFetching}
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] border border-gray-200 text-xs font-medium text-[#112131] hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none transition-colors"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    <span>Previous</span>
-                  </button>
-
-                  <span className="text-xs text-[#64748b] font-inter">
-                    Page <span className="font-semibold text-[#112131]">{page}</span> of{" "}
-                    <span className="font-semibold text-[#112131]">{totalPages}</span>
-                  </span>
-
-                  <button
-                    type="button"
-                    disabled={page >= totalPages || isFetching}
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] border border-gray-200 text-xs font-medium text-[#112131] hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none transition-colors"
-                  >
-                    <span>Next</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={(p) => setPage(p)}
+                  scrollToTop
+                  className="pt-6 border-t border-gray-100"
+                />
               )}
             </div>
           )}

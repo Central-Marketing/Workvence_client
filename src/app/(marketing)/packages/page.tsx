@@ -13,7 +13,7 @@ import {
   LeftFilterSidebar,
   Button,
 } from '@/components';
-import { Breadcrumb, CustomSelect, CustomSelectOption } from '@/components/ui';
+import { Breadcrumb, CustomSelect, CustomSelectOption, Pagination } from '@/components/ui';
 import { getCategoryTaxonomy, SubcategoryItem } from '@/data/categoryTaxonomy';
 import { STATIC_SUBCATEGORY_GIGS, getStaticSubcategoryGigs } from '@/data/staticSubcategoryGigs';
 import { useQuery } from "@tanstack/react-query";
@@ -507,6 +507,13 @@ const Packages = () => {
     return displayPackages.length;
   }, [data, displayPackages, sellerLevels]);
 
+  const totalPages = useMemo(() => {
+    if (typeof data?.totalPages === 'number') return data.totalPages;
+    if (typeof data?.pagination?.totalPages === 'number') return data.pagination.totalPages;
+    if (typeof totalResultsCount === 'number' && totalResultsCount > 0) return Math.ceil(totalResultsCount / 20);
+    return undefined;
+  }, [data, totalResultsCount]);
+
   // Determine subcategory node and active tag from category ancestry:
   // Root: categoryAncestry[0]
   // Subcategory (depth 2): categoryAncestry[1]
@@ -992,37 +999,14 @@ const Packages = () => {
 
                   {/* Pagination Controls */}
                   {displayPackages.length > 0 && (
-                    <div className="flex justify-center items-center gap-4 mt-12 mb-0">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="md"
-                        radius="xl"
-                        onClick={() => {
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                          syncUrlWithFilters({ page: page - 1 });
-                        }}
-                        disabled={page === 1}
-                        className="px-6 py-2.5 font-semibold shadow-sm"
-                      >
-                        Previous
-                      </Button>
-                      <span className="font-semibold text-gray-800 bg-gray-100 px-4 py-2 rounded-[6px]">Page {page}</span>
-                      <Button
-                        type="button"
-                        variant="dark"
-                        size="md"
-                        radius="xl"
-                        onClick={() => {
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                          syncUrlWithFilters({ page: page + 1 });
-                        }}
-                        disabled={displayPackages.length < 8}
-                        className="px-6 py-2.5 font-semibold shadow-sm"
-                      >
-                        Next
-                      </Button>
-                    </div>
+                    <Pagination
+                      currentPage={page}
+                      totalPages={totalPages}
+                      hasNextPage={displayPackages.length >= 20}
+                      hasPrevPage={page > 1}
+                      onPageChange={(newPage) => syncUrlWithFilters({ page: newPage })}
+                      className="mt-12 mb-0"
+                    />
                   )}
                 </>
               )}
@@ -1270,37 +1254,14 @@ const Packages = () => {
 
           {/* Pagination Controls */}
           {packagesList && packagesList.length > 0 && (
-            <div className="flex justify-center items-center gap-4 mt-12 mb-0">
-              <Button
-                type="button"
-                variant="outline"
-                size="md"
-                radius="xl"
-                onClick={() => {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                  syncUrlWithFilters({ page: page - 1 });
-                }}
-                disabled={page === 1}
-                className="px-6 py-2.5 font-semibold shadow-sm"
-              >
-                Previous
-              </Button>
-              <span className="font-semibold text-gray-800 bg-gray-100 px-4 py-2 rounded-[6px]">Page {page}</span>
-              <Button
-                type="button"
-                variant="dark"
-                size="md"
-                radius="xl"
-                onClick={() => {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                  syncUrlWithFilters({ page: page + 1 });
-                }}
-                disabled={packagesList.length < 20}
-                className="px-6 py-2.5 font-semibold shadow-sm"
-              >
-                Next
-              </Button>
-            </div>
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages > 0 ? totalPages : undefined}
+              hasNextPage={packagesList.length >= 20}
+              onPageChange={(newPage) => syncUrlWithFilters({ page: newPage })}
+              scrollToTop
+              className="mt-12"
+            />
           )}
         </div>
       )}

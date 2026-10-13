@@ -36,7 +36,7 @@ import {
   List,
   Eye,
 } from "lucide-react";
-import { Button, CustomSelect } from "@/components/ui";
+import { Button, CustomSelect, Pagination } from "@/components/ui";
 import { PackageCard } from "@/features/gigs";
 import { CardSkeleton } from "@/components/ui/Skeletons/Skeleton";
 
@@ -446,6 +446,10 @@ function SearchPageContent() {
     if (typeof data?.totalCount === "number") return data.totalCount;
     return packagesList.length;
   }, [data, packagesList]);
+
+  const totalPages = useMemo(() => {
+    return totalResults > 0 ? Math.ceil(totalResults / 20) : undefined;
+  }, [totalResults]);
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] flex flex-col">
@@ -1028,45 +1032,17 @@ function SearchPageContent() {
 
             {/* Pagination Controls */}
             {!isLoading && !isError && packagesList.length > 0 && (
-              <div className="flex justify-center items-center gap-3 pt-6 border-t border-gray-100">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  radius="md"
-                  onClick={() => {
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                    const prevPage = Math.max(1, currentPage - 1);
-                    setCurrentPage(prevPage);
-                    updateUrl({ page: prevPage });
-                  }}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 text-xs font-semibold"
-                >
-                  Previous
-                </Button>
-
-                <span className="text-xs font-semibold text-gray-700 bg-gray-100 px-3.5 py-1.5 rounded-[6px]">
-                  Page {currentPage}
-                </span>
-
-                <Button
-                  type="button"
-                  variant="dark"
-                  size="sm"
-                  radius="md"
-                  onClick={() => {
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                    const nextPage = currentPage + 1;
-                    setCurrentPage(nextPage);
-                    updateUrl({ page: nextPage });
-                  }}
-                  disabled={packagesList.length < 20}
-                  className="px-4 py-2 text-xs font-semibold bg-[#0D6D5F] hover:bg-[#0b5c50]"
-                >
-                  Next
-                </Button>
-              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                hasNextPage={packagesList.length >= 20}
+                onPageChange={(newPage) => {
+                  setCurrentPage(newPage);
+                  updateUrl({ page: newPage });
+                }}
+                scrollToTop
+                className="pt-6 border-t border-gray-100"
+              />
             )}
           </div>
         </div>

@@ -196,8 +196,8 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
       >
         <FiBell className={iconClassName || `text-[22px] transition-transform ${isAnimating ? 'animate-bounce text-brand-green' : ''}`} />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center pointer-events-none">
-            {unreadCount > 99 ? "99+" : unreadCount}
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-semibold w-5 h-5 rounded-full flex items-center justify-center pointer-events-none">
+            {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>

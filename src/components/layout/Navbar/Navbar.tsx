@@ -380,6 +380,7 @@ const Navbar = () => {
                 height={44}
                 alt="Workvence"
                 priority
+                unoptimized
                 className="h-7 sm:h-8 md:h-9 lg:h-9 xl:h-10 2xl:h-[44px] w-auto aspect-[19/4] object-contain shrink-0"
               />
             </Link>
@@ -761,7 +762,7 @@ const Navbar = () => {
           }`}
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <Image src="/Workvence-logo-Horizontal3.png" width={140} height={32} alt="Workvence" className="h-8 w-auto object-contain" style={{ width: "auto", height: "auto" }} />
+          <Image src="/Workvence-logo-Horizontal3.png" width={140} height={32} alt="Workvence" unoptimized className="h-8 w-auto object-contain" style={{ width: "auto", height: "auto" }} />
           <Button
             type="button"
             variant="ghost"

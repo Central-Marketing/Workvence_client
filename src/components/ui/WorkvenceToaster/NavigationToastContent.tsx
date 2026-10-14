@@ -4,6 +4,7 @@ import { useRef, useState, type ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   Bell,
+  Check,
   CircleAlert,
   CircleCheck,
   Info,
@@ -11,6 +12,7 @@ import {
   MessageSquare,
   Paperclip,
   TriangleAlert,
+  X,
 } from "lucide-react";
 
 export type ToastVariant = "default" | "neutral" | "success" | "error" | "warning" | "info" | "loading";
@@ -33,15 +35,21 @@ export function ToastIcon({
     : {
         default: Bell,
         neutral: Bell,
-        success: CircleCheck,
-        error: CircleAlert,
+        success: Check,
+        error: X,
         warning: TriangleAlert,
         info: Info,
         loading: Loader2,
       }[variant] || Bell;
 
+  const strokeWidth = variant === "success" ? 3 : variant === "error" ? 2.5 : 2;
+
   return (
-    <Icon aria-hidden="true" className={variant === "loading" ? "workvence-toast-spinner" : undefined} />
+    <Icon
+      aria-hidden="true"
+      strokeWidth={strokeWidth}
+      className={variant === "loading" ? "workvence-toast-spinner" : undefined}
+    />
   );
 }
 
@@ -167,12 +175,12 @@ export default function NavigationToastContent({
             </p>
           ) : null}
 
-          {/* Action: Single Reply button with brand-green bg, rounded-[6px] */}
+          {/* Action: Single Reply button with black bg, rounded-[6px] */}
           {navigation && (
             <div className="mt-2.5 flex items-center gap-2">
               <button
                 type="button"
-                className="px-4 py-1.5 bg-brand-green hover:bg-[#28635c] text-white text-xs font-semibold rounded-[6px] shadow-xs transition-colors cursor-pointer"
+                className="workvence-toast-reply-btn px-4 py-1.5 bg-black hover:bg-gray-800 text-white text-xs font-semibold rounded-[6px] shadow-xs transition-colors cursor-pointer"
                 aria-label={navigation.label}
                 onClick={handleAction}
               >
@@ -185,7 +193,7 @@ export default function NavigationToastContent({
     );
   }
 
-  // Standard Non-Chat Notification Layout
+  // Design 2: System Action / Navigation Toast (Dark Card Layout)
   const getActionLabel = (nav?: ToastNavigation) => {
     if (!nav) return "View";
     if (nav.actionLabel) {
@@ -193,7 +201,7 @@ export default function NavigationToastContent({
       if (/review/i.test(nav.actionLabel)) return "Review";
       if (/open|conversation|chat/i.test(nav.actionLabel)) return "View";
       if (/details/i.test(nav.actionLabel)) return "Details";
-      return nav.actionLabel.length <= 12 ? nav.actionLabel : "View";
+      return nav.actionLabel.length <= 16 ? nav.actionLabel : "View";
     }
     return "View";
   };
@@ -201,30 +209,50 @@ export default function NavigationToastContent({
   const actionText = getActionLabel(navigation);
 
   return (
-    <div className="workvence-toast-nav-wrapper">
-      <span data-icon="" className="workvence-toast-icon-badge">
+    <div className="workvence-toast-system-card flex items-start gap-3 w-full pr-6 select-none">
+      {/* 6px Icon Badge with dark background & subtle border */}
+      <div className="shrink-0 w-10 h-10 rounded-[6px] bg-zinc-800/90 border border-white/10 flex items-center justify-center text-zinc-300">
         <ToastIcon variant={variant} kind={kind} icon={icon} />
-      </span>
-      <div className="workvence-toast-copy min-w-0 flex-1">
-        <div data-toast-title="" className="workvence-toast-title truncate">
-          {displayTitle}
+      </div>
+
+      {/* Content Details */}
+      <div className="min-w-0 flex-1">
+        {/* Header Row: Title | Tag / Timestamp */}
+        <div className="flex items-center gap-2 text-sm leading-none pt-0.5">
+          <span className="font-semibold text-white truncate">
+            {displayTitle}
+          </span>
+          {timestamp && (
+            <>
+              <span className="text-zinc-600 select-none">|</span>
+              <span className="text-xs text-zinc-400 font-normal shrink-0">
+                {timestamp}
+              </span>
+            </>
+          )}
         </div>
+
+        {/* Description body */}
         {displayBody != null && (
-          <div data-description="" className="workvence-toast-desc truncate">
+          <p className="mt-1 text-[13px] text-zinc-300 leading-snug line-clamp-2 break-words">
             {displayBody}
+          </p>
+        )}
+
+        {/* Action Button: Rounded 6px dark action button */}
+        {navigation && (
+          <div className="mt-2.5 flex items-center gap-2">
+            <button
+              type="button"
+              className="workvence-toast-system-btn px-3.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-[6px] border border-zinc-700 shadow-xs transition-colors cursor-pointer"
+              aria-label={navigation.label}
+              onClick={handleAction}
+            >
+              {actionText}
+            </button>
           </div>
         )}
       </div>
-      {navigation && (
-        <button
-          type="button"
-          className="workvence-toast-action-btn"
-          aria-label={navigation.label}
-          onClick={handleAction}
-        >
-          {actionText}
-        </button>
-      )}
     </div>
   );
 }

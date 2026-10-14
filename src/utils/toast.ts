@@ -83,7 +83,10 @@ function emit(type: ToastVariant, message: unknown, data: ToastOptions = {}) {
       action: undefined,
       cancel: undefined,
       classNames: {
-        toast: kind === "chat" ? "workvence-toast-navigation workvence-toast-chat" : "workvence-toast-navigation",
+        toast:
+          kind === "chat"
+            ? "workvence-toast-navigation workvence-toast-chat"
+            : "workvence-toast-navigation workvence-toast-system",
       },
     });
     return id;

@@ -49,7 +49,11 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
       <img
         src={avatarSrc}
         alt={contactName}
-        className="w-11 h-11 rounded-full object-cover shrink-0 border border-slate-100 shadow-2xs"
+        className={`w-11 h-11 rounded-full object-cover shrink-0 transition-all ${
+          unreadCountBadge > 0
+            ? "border-2 border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs"
+            : "border border-slate-100 shadow-2xs"
+        }`}
       />
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-1 mb-0.5">

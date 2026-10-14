@@ -16,6 +16,7 @@ import { useAuthModalStore } from "@/store/authModalStore";
 import { Loader, NotificationBell, HeaderInboxIcon, AiGradientButton, Button, SearchSuggestionsDropdown } from '@/components';
 import CategoryBar from "../CategoryBar/CategoryBar";
 import ExploreCategoryMegaMenu from "./ExploreCategoryMegaMenu";
+import { Chat01Icon, Notification01Icon } from "@hugeicons/core-free-icons";
 
 const Navbar = () => {
   const navRef = useRef<HTMLElement>(null);
@@ -541,12 +542,14 @@ const Navbar = () => {
                 </Link>
 
                 <HeaderInboxIcon
+                  icon={Chat01Icon}
                   currentUser={effectiveUser}
                   className="w-9 h-9 xl:w-10 xl:h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer shrink-0"
                   iconClassName="text-[17px] xl:text-[19px]"
                 />
 
                 <NotificationBell
+                  icon={Notification01Icon}
                   currentUser={effectiveUser}
                   triggerClassName="w-9 h-9 xl:w-10 xl:h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer shrink-0"
                   iconClassName="text-[17px] xl:text-[19px]"
@@ -632,12 +635,14 @@ const Navbar = () => {
                 </Link>
 
                 <HeaderInboxIcon
+                  icon={Chat01Icon}
                   currentUser={effectiveUser}
                   className="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer shrink-0"
                   iconClassName="text-[19px]"
                 />
 
                 <NotificationBell
+                  icon={Notification01Icon}
                   currentUser={effectiveUser}
                   triggerClassName="w-10 h-10 rounded-full bg-[#F5F5F7] hover:bg-gray-200 flex items-center justify-center text-gray-700 transition-colors relative cursor-pointer shrink-0"
                   iconClassName="text-[19px]"

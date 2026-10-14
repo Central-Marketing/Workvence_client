@@ -3,19 +3,21 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { socket } from "@/utils/socket";
-import { FiBell } from "react-icons/fi";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useUserStore } from "@/store/userStore";
 import { Button } from "@/components/ui";
+import { Notification01Icon } from "@hugeicons/core-free-icons";
 
 interface NotificationBellProps {
   currentUser: any;
   triggerClassName?: string;
   iconClassName?: string;
+  icon?: any;
 }
 
 const processedNotifIds = new Set<string>();
 
-const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, triggerClassName, iconClassName }) => {
+const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, triggerClassName, iconClassName, icon }) => {
   const storeUser = useUserStore((state) => state.user);
   const activeUser = currentUser || storeUser;
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -194,7 +196,11 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
         title="Notifications"
         aria-label="Notifications"
       >
-        <FiBell className={iconClassName || `text-[22px] transition-transform ${isAnimating ? 'animate-bounce text-brand-green' : ''}`} />
+        <HugeiconsIcon
+          icon={icon || Notification01Icon}
+          size={19}
+          className={iconClassName || `transition-transform ${isAnimating ? 'animate-bounce text-brand-green' : ''}`}
+        />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-semibold w-5 h-5 rounded-full flex items-center justify-center pointer-events-none">
             {unreadCount > 9 ? "9+" : unreadCount}

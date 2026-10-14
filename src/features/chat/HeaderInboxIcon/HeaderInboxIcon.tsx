@@ -3,17 +3,19 @@
 import React, { useMemo, useEffect, useState } from "react";
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { FiMessageSquare } from "react-icons/fi";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { axiosFetch, socket } from "@/utils";
 import { isConversationUnread, isTargetConversation } from "@/utils/chatHelpers";
+import { Chat01Icon } from "@hugeicons/core-free-icons";
 
 interface HeaderInboxIconProps {
   currentUser: any;
   className?: string;
   iconClassName?: string;
+  icon?: any;
 }
 
-const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser, className, iconClassName }) => {
+const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser, className, iconClassName, icon }) => {
   const queryClient = useQueryClient();
   const [isAnimating, setIsAnimating] = useState(false);
   const userId = currentUser?._id || currentUser?.id;
@@ -126,7 +128,11 @@ const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser, classNam
       className={className || "text-gray-500 hover:text-brand-green transition-colors relative"}
       title="Messages"
     >
-      <FiMessageSquare className={iconClassName || `text-[22px] transition-transform ${isAnimating ? 'animate-bounce text-brand-green' : ''}`} />
+      <HugeiconsIcon
+        icon={icon || Chat01Icon}
+        size={19}
+        className={iconClassName || `transition-transform ${isAnimating ? 'animate-bounce text-brand-green' : ''}`}
+      />
       {unreadChatsCount > 0 && (
         <span className="absolute -top-1 -right-1 bg-brand-green text-white text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center shadow-sm border-2 border-white">
           {unreadChatsCount > 99 ? "99+" : unreadChatsCount}

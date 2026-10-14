@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components";
 import { MessageItem } from "./MessageItem";
 import { FirstMessageMilestone } from "./FirstMessageMilestone";
@@ -33,6 +34,9 @@ interface MessageListProps {
   onAcceptOffer: (offer: any) => void;
   onWithdraw: (msgId: string) => void;
   onCopyText: (text: string, msg?: string) => void;
+  showScrollBottom?: boolean;
+  unreadCountBelow?: number;
+  onScrollToBottom?: () => void;
 }
 
 export const MessageList: React.FC<MessageListProps> = ({
@@ -57,13 +61,17 @@ export const MessageList: React.FC<MessageListProps> = ({
   onAcceptOffer,
   onWithdraw,
   onCopyText,
+  showScrollBottom = false,
+  unreadCountBelow = 0,
+  onScrollToBottom,
 }) => {
   return (
-    <div
-      ref={messagesContainerRef}
-      onScroll={onScroll}
-      className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 flex flex-col gap-4 bg-[#F0F0F0] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full"
-    >
+    <div className="relative flex-1 min-h-0 flex flex-col">
+      <div
+        ref={messagesContainerRef}
+        onScroll={onScroll}
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 flex flex-col gap-4 bg-[#F0F0F0] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full"
+      >
       {msgsError ? (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-red-50/50 dark:bg-red-950/20 m-6 rounded-[6px] border border-red-200 dark:border-red-900/50 shadow-sm">
           <div className="w-16 h-16 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center text-3xl mb-4 font-bold">
@@ -154,6 +162,26 @@ export const MessageList: React.FC<MessageListProps> = ({
         </div>
       )}
       <div ref={messagesEndRef} className="h-3 shrink-0" aria-hidden="true" />
+      </div>
+
+      {/* WhatsApp-style Floating Scroll to Bottom Button */}
+      {showScrollBottom && (
+        <div className="absolute right-5 bottom-4 z-20 transition-all duration-300 animate-in fade-in zoom-in-95">
+          <button
+            type="button"
+            onClick={onScrollToBottom}
+            aria-label="Scroll to bottom"
+            className="relative flex items-center justify-center w-10 h-10 rounded-full bg-white text-slate-700 shadow-md border border-slate-200/80 hover:bg-slate-50 hover:text-slate-900 hover:shadow-lg active:scale-95 transition-all cursor-pointer group"
+          >
+            <ChevronDown className="w-5 h-5 transition-transform group-hover:translate-y-0.5" />
+            {unreadCountBelow > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full bg-[#10b981] text-white text-[11px] font-bold shadow-xs">
+                {unreadCountBelow > 99 ? "99+" : unreadCountBelow}
+              </span>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

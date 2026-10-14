@@ -383,7 +383,14 @@ export const ChatView = () => {
   });
 
   // Auto-scroll hook
-  const { messagesContainerRef, messagesEndRef, handleMessagesScroll } = useChatScroll({
+  const {
+    messagesContainerRef,
+    messagesEndRef,
+    handleMessagesScroll,
+    scrollToBottom,
+    showScrollBottom,
+    unreadCountBelow,
+  } = useChatScroll({
     conversationID,
     isValidId,
     msgsLoading,
@@ -523,6 +530,9 @@ export const ChatView = () => {
                 onAcceptOffer={handleAcceptOffer}
                 onWithdraw={handleWithdraw}
                 onCopyText={handleCopyText}
+                showScrollBottom={showScrollBottom}
+                unreadCountBelow={unreadCountBelow}
+                onScrollToBottom={() => scrollToBottom("smooth")}
               />
 
               {/* Compose Area */}

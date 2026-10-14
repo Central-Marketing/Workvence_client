@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 
 interface UseChatScrollOptions {
   conversationID: string;
@@ -23,6 +23,9 @@ export function useChatScroll({
   const prevMessageCountRef = useRef(0);
   const lastConversationIdRef = useRef<string | null>(null);
 
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
+  const [unreadCountBelow, setUnreadCountBelow] = useState(0);
+
   const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
     if (messagesContainerRef.current) {
       const container = messagesContainerRef.current;
@@ -37,13 +40,21 @@ export function useChatScroll({
     } else if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior, block: "end" });
     }
+    setShowScrollBottom(false);
+    setUnreadCountBelow(0);
+    isNearBottomRef.current = true;
   }, []);
 
   const handleMessagesScroll = useCallback(() => {
     if (!messagesContainerRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
     const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
-    isNearBottomRef.current = distanceFromBottom <= 150;
+    const nearBottom = distanceFromBottom <= 160;
+    isNearBottomRef.current = nearBottom;
+    setShowScrollBottom(!nearBottom);
+    if (nearBottom) {
+      setUnreadCountBelow(0);
+    }
   }, []);
 
   // Auto-scroll on initial load, conversation switch, or new messages
@@ -54,6 +65,8 @@ export function useChatScroll({
     if (isNewConv) {
       lastConversationIdRef.current = conversationID;
       isNearBottomRef.current = true;
+      setShowScrollBottom(false);
+      setUnreadCountBelow(0);
     }
 
     if (!msgsLoading && filteredMessages.length > 0) {
@@ -81,6 +94,10 @@ export function useChatScroll({
           if (isOwnMessage || isNearBottomRef.current) {
             scrollToBottom("smooth");
             requestAnimationFrame(() => scrollToBottom("smooth"));
+          } else {
+            // User is scrolled up and a new message arrived from the other participant
+            setUnreadCountBelow((prev) => prev + (newCount - prevCount));
+            setShowScrollBottom(true);
           }
         }
       }
@@ -118,5 +135,7 @@ export function useChatScroll({
     scrollToBottom,
     handleMessagesScroll,
     isNearBottomRef,
+    showScrollBottom,
+    unreadCountBelow,
   };
 }

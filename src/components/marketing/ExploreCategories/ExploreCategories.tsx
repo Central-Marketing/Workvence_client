@@ -135,10 +135,14 @@ const ExploreCategories = () => {
   });
   const aiSlug = aiCategory?.slug || 'ai-services';
 
+  const totalCategories = dynamicCategories.length > 7 ? dynamicCategories.length : rawList.length;
+  const remainingCount = Math.max(0, totalCategories - 7);
+  const seeMoreTitle = remainingCount > 0 ? `+${remainingCount} More` : 'See More';
+
   const seeMoreCard = {
     _id: 'see-more-card',
-    name: 'See More',
-    title: 'See More',
+    name: seeMoreTitle,
+    title: seeMoreTitle,
     slug: aiSlug,
     href: `/packages?category=${encodeURIComponent(aiSlug)}`,
     icon: 'arrow-right',
@@ -185,13 +189,13 @@ const ExploreCategories = () => {
               category.href ||
               `/packages?category=${encodeURIComponent(
                 category.slug ||
-                  title
-                    .toLowerCase()
-                    .trim()
-                    .replace(/&/g, 'and')
-                    .replace(/\s+/g, '-')
-                    .replace(/[^a-z0-9-]/g, '')
-                    .replace(/-+/g, '-')
+                title
+                  .toLowerCase()
+                  .trim()
+                  .replace(/&/g, 'and')
+                  .replace(/\s+/g, '-')
+                  .replace(/[^a-z0-9-]/g, '')
+                  .replace(/-+/g, '-')
               )}`;
 
             return (

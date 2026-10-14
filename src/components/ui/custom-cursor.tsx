@@ -33,14 +33,6 @@ const CURSOR_CSS = `
   html.has-custom-cursor .cursor-not-allowed {
     cursor: not-allowed !important;
   }
-
-  html.has-custom-cursor .cursor-grab {
-    cursor: grab !important;
-  }
-
-  html.has-custom-cursor .cursor-grabbing {
-    cursor: grabbing !important;
-  }
 }
 `;
 
@@ -82,11 +74,6 @@ export const TidalWaveCursor = () => {
 
             // Allow native cursor for disabled states
             if (target.closest(':disabled, [aria-disabled="true"], .cursor-not-allowed')) {
-                return false;
-            }
-
-            // Allow native cursor for grab interactions
-            if (target.closest('.cursor-grab, .cursor-grabbing')) {
                 return false;
             }
 

@@ -139,6 +139,41 @@ export const deduplicateCategories = <T extends { id?: any; _id?: any; slug?: st
   return result;
 };
 
+export const isOtherOrGeneralCategory = (item: any): boolean => {
+  if (!item) return false;
+  const name = typeof item === "string" ? item : item.name || item.title || item.slug || "";
+  const normalized = name.toLowerCase().trim();
+  const tokens = normalized.split(/[\s-_&,]+/);
+  return (
+    tokens.includes("other") ||
+    tokens.includes("others") ||
+    tokens.includes("general") ||
+    tokens.includes("miscellaneous") ||
+    normalized === "other" ||
+    normalized === "others" ||
+    normalized === "general" ||
+    normalized.startsWith("other ") ||
+    normalized.startsWith("others ") ||
+    normalized.startsWith("general ")
+  );
+};
+
+export const sortCategoriesWithOtherLast = <T extends { name?: string; title?: string; slug?: string } | any>(items: T[]): T[] => {
+  if (!Array.isArray(items)) return [];
+  const regular: T[] = [];
+  const others: T[] = [];
+
+  for (const item of items) {
+    if (isOtherOrGeneralCategory(item)) {
+      others.push(item);
+    } else {
+      regular.push(item);
+    }
+  }
+
+  return [...regular, ...others];
+};
+
 export const useAdminCategories = () => {
   const query = useQuery({
     queryKey: ADMIN_CATEGORIES_QUERY_KEY,
@@ -160,7 +195,7 @@ export const useAdminCategories = () => {
   const rawChildren = rawList.filter((c: any) => !isCategoryRoot(c, rawList));
 
   // Build parent categories with children as their sub categories
-  const parentCategories: AdminCategory[] = rawParents.map((cat: any) => {
+  const mappedParents: AdminCategory[] = rawParents.map((cat: any) => {
     if (typeof cat === 'string') {
       const slug = cat.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       return {
@@ -209,20 +244,22 @@ export const useAdminCategories = () => {
 
       const rawNiches = deduplicateCategories([...nestedNiches, ...flatNiches]);
 
-      const formattedNiches: AdminCategory[] = rawNiches.map((n: any) => {
-        const nId = n.id || n._id;
-        const nTitle = n.name || n.title || String(n);
-        const nSlug = n.slug || nTitle.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        return {
-          ...n,
-          id: nId || nSlug,
-          name: nTitle,
-          slug: nSlug,
-          parentId: n.parentId || subId,
-          parentName: n.parentName || subTitle,
-          children: n.children || [],
-        };
-      });
+      const formattedNiches: AdminCategory[] = sortCategoriesWithOtherLast(
+        rawNiches.map((n: any) => {
+          const nId = n.id || n._id;
+          const nTitle = n.name || n.title || String(n);
+          const nSlug = n.slug || nTitle.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+          return {
+            ...n,
+            id: nId || nSlug,
+            name: nTitle,
+            slug: nSlug,
+            parentId: n.parentId || subId,
+            parentName: n.parentName || subTitle,
+            children: n.children || [],
+          };
+        })
+      );
 
       return {
         ...sub,
@@ -244,11 +281,13 @@ export const useAdminCategories = () => {
       name: catName,
       slug: cat.slug || catName.toLowerCase().trim().replace(/&/g, 'and').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
       // children will be sub categories
-      children: formattedSubCats,
-      subCategories: formattedSubCats,
-      subcategories: formattedSubCats,
+      children: sortCategoriesWithOtherLast(formattedSubCats),
+      subCategories: sortCategoriesWithOtherLast(formattedSubCats),
+      subcategories: sortCategoriesWithOtherLast(formattedSubCats),
     };
   });
+
+  const parentCategories: AdminCategory[] = sortCategoriesWithOtherLast(mappedParents);
 
   // All sub categories (all children across all parents)
   const subCategories: AdminCategory[] = deduplicateCategories(parentCategories.flatMap((p) => p.children || []));

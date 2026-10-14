@@ -24,9 +24,9 @@ import {
 import { RiSearchLine } from "react-icons/ri";
 
 import { axiosFetch } from "@/utils";
-import useAdminCategories from "@/hooks/useAdminCategories";
+import useAdminCategories, { sortCategoriesWithOtherLast } from "@/hooks/useAdminCategories";
 import { useUserStore } from "@/store/userStore";
-import { BriefsListSkeleton, Button, Breadcrumb, LeftFilterSidebar } from "@/components";
+import { BriefsListSkeleton, Button, Breadcrumb, LeftFilterSidebar, CategoryHubDirectory } from "@/components";
 import { Pagination } from "@/components/ui";
 import { ClientBrief } from "@/types";
 import useDebounce from "@/hooks/useDebounce";
@@ -298,7 +298,7 @@ function BriefsContent() {
   const apiCategories = useMemo<ProjectCategorySection[]>(() => {
     if (!parentCategories || parentCategories.length === 0) return [];
 
-    return parentCategories.map((cat: any) => {
+    const mapped: ProjectCategorySection[] = parentCategories.map((cat: any) => {
       const rawName = cat.name || cat.title || "";
       const slug = (cat.slug || rawName)
         .toLowerCase()
@@ -396,9 +396,11 @@ function BriefsContent() {
           cat.description && cat.description !== "No description provided."
             ? cat.description
             : `Browse ${rawName} projects and start earning by bidding on work that matches your skills.`,
-        subcategories,
+        subcategories: sortCategoriesWithOtherLast(subcategories),
       };
     });
+
+    return sortCategoriesWithOtherLast(mapped);
   }, [parentCategories, categoryList]);
 
   // Categories displayed in hub view (filterable by hubActivePill)
@@ -549,15 +551,17 @@ function BriefsContent() {
       }
     });
 
-    const pills = Array.from(map.entries()).map(([id, title]) => ({ id, title }));
-    return [{ id: "all", title: "All Projects" }, ...pills];
+    const pills = Array.from(map.entries()).map(([id, title]) => ({ id, title, name: title, slug: id }));
+    return [{ id: "all", title: "All Projects" }, ...sortCategoriesWithOtherLast(pills)];
   }, [categoryList, allBriefs]);
 
   // Categories formatted for LeftFilterSidebar
   const sidebarCategories = useMemo(() => {
-    return pillFilters
-      .filter((p) => p.id !== "all")
-      .map((p) => ({ name: p.title, slug: p.id }));
+    return sortCategoriesWithOtherLast(
+      pillFilters
+        .filter((p) => p.id !== "all")
+        .map((p) => ({ name: p.title, slug: p.id }))
+    );
   }, [pillFilters]);
 
   // Server-side filtering is executed directly by GET /api/briefs.
@@ -615,157 +619,17 @@ function BriefsContent() {
         {viewMode === "categories" && !isSeller ? (
           /* ============================================================ */
           /* CATEGORY HUB VIEW (Default View)                             */
-          /* ============================================================ */
-          <div className="animate-fadeIn">
-            {/* Project Category Hub Hero Banner */}
-            <div
-              className="relative w-full max-w-[1760px] mx-auto aspect-[1760/500] max-h-[500px] min-h-[200px] sm:min-h-[220px] md:min-h-[240px] rounded-[6px] overflow-hidden bg-[#130d2a] flex items-center justify-center text-center shadow-xs select-none mb-7"
-            >
-              <Image
-                src="/media/ProjectBg.png"
-                alt="Find Projects"
-                fill
-                priority
-                quality={100}
-                className="object-cover object-center pointer-events-none"
-                sizes="(max-width: 1760px) 100vw, 1760px"
-              />
-              {/* Center Content: Breadcrumb + Italic Projects Title */}
-              <div className="relative z-10 flex flex-col items-center justify-center px-4">
-                <Breadcrumb
-                  variant="inverted"
-                  className="mb-2 sm:mb-3 select-none [&>ol]:justify-center text-xs"
-                  items={[
-                    {
-                      name: "Find Projects",
-                      isLast: true,
-                    },
-                  ]}
-                />
-                <h1 className="italic text-4xl sm:text-5xl md:text-[54px] lg:text-[58px] leading-tight text-white font-normal tracking-tight drop-shadow-2xs font-sf-pro">
-                  Projects
-                </h1>
-              </div>
-            </div>
-
-            {/* Category Hub Filter Toolbar */}
-            <div className="flex items-center justify-between gap-3 mb-8 pb-3 border-b border-gray-200/80">
-              <div
-                ref={hubScrollRef}
-                {...hubDragEvents}
-                className={`flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0 select-none ${isHubDragging ? "cursor-grabbing" : "cursor-grab"
-                  }`}
-              >
-                {/* Filter Button */}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  radius="lg"
-                  onClick={() => {
-                    setViewMode("feed");
-                    setIsFilterOpen(true);
-                  }}
-                  leftIcon={<FiSliders className="w-3.5 h-3.5 text-gray-600" />}
-                  className="text-gray-700 font-medium text-xs sm:text-[13px] hover:text-black transition-colors px-3 py-1.5 hover:bg-gray-200/50 shrink-0 mr-1 border-none shadow-none"
-                >
-                  Filter
-                </Button>
-
-                {/* Dynamic Category Hub Pills */}
-                <Button
-                  type="button"
-                  variant={hubActivePill === "all" ? "dark" : "outline"}
-                  size="sm"
-                  radius="full"
-                  onClick={() => handleHubPillClick("all")}
-                  className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${hubActivePill === "all"
-                    ? "shadow-xs border-gray-900 bg-black text-white"
-                    : "hover:border-gray-900 hover:text-black bg-white"
-                    }`}
-                >
-                  All Projects
-                </Button>
-
-                {apiCategories.map((cat) => {
-                  const isActive = hubActivePill === cat.slug;
-                  return (
-                    <Button
-                      key={cat.id || cat.slug}
-                      type="button"
-                      variant={isActive ? "dark" : "outline"}
-                      size="sm"
-                      radius="full"
-                      onClick={() => handleHubPillClick(cat.slug)}
-                      className={`px-4 text-xs sm:text-[13px] font-medium whitespace-nowrap shrink-0 ${isActive
-                        ? "shadow-xs border-gray-900 bg-black text-white"
-                        : "hover:border-gray-900 hover:text-black bg-white"
-                        }`}
-                    >
-                      {cat.name}
-                    </Button>
-                  );
-                })}
-              </div>
-
-              {/* Right: Explore All Projects */}
-              <button
-                type="button"
-                onClick={handleExploreAll}
-                className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-semibold text-gray-800 hover:text-[#0D6D5F] transition-colors shrink-0 pl-3 group whitespace-nowrap cursor-pointer"
-              >
-                <span>Explore All Projects</span>
-                <FiArrowRight className="w-3.5 h-3.5 text-gray-600 group-hover:text-[#0D6D5F] group-hover:translate-x-0.5 transition-all" />
-              </button>
-            </div>
-
-            {/* Category Sections & 4-Column Card Grids */}
-            <div className="space-y-12 sm:space-y-14">
-              {displayedCategories.map((cat) => (
-                <section key={cat.id || cat.slug} id={`cat-section-${cat.slug}`} className="scroll-mt-6">
-                  {/* Category Title & Subtitle */}
-                  <div className="mb-4">
-                    <h2 className="text-xl sm:text-[22px] font-bold text-gray-900 font-sf-pro tracking-tight">
-                      {cat.name}
-                    </h2>
-                    {cat.subtitle && (
-                      <p className="text-xs sm:text-[13px] text-gray-500 mt-1 max-w-3xl leading-relaxed">
-                        {cat.subtitle}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* 4-Column Subcategory Cards Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4">
-                    {cat.subcategories.map((subcat) => (
-                      <div
-                        key={subcat.id || subcat.slug}
-                        onClick={() => handleSelectSubcategory(cat.slug, subcat.slug)}
-                        className="group bg-white rounded-[6px] border border-gray-200/80 hover:border-gray-400/80 p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 min-h-[86px]"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-sm sm:text-[15px] font-semibold text-gray-900 group-hover:text-[#0D6D5F] transition-colors leading-snug truncate">
-                            {subcat.title}
-                          </h3>
-                          <p className="text-xs text-gray-500 mt-1 leading-relaxed line-clamp-2">
-                            {subcat.description}
-                          </p>
-                        </div>
-
-                        {/* Clean arrow with NO background, vertically centered without text overlap */}
-                        <div
-                          className="shrink-0 text-gray-400 group-hover:text-gray-900 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-200"
-                          aria-hidden="true"
-                        >
-                          <FiArrowRight className="w-4 h-4" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          </div>
+          <CategoryHubDirectory
+            mode="projects"
+            categories={apiCategories}
+            onExploreAll={handleExploreAll}
+            onSelectSubcategory={handleSelectSubcategory}
+            onFilterClick={() => {
+              setViewMode("feed");
+              setIsFilterOpen(true);
+            }}
+            syncUrlParam={false}
+          />
         ) : (
           /* ============================================================ */
           /* FEED VIEW (Search, Filters, Project Brief Cards, Pagination)  */
@@ -814,8 +678,7 @@ function BriefsContent() {
               <div
                 ref={feedScrollRef}
                 {...feedDragEvents}
-                className={`flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0 select-none ${isFeedDragging ? "cursor-grabbing" : "cursor-grab"
-                  }`}
+                className="flex items-center gap-2 overflow-x-auto no-scrollbar [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 flex-1 min-w-0 select-none"
               >
                 {/* Filter Drawer Toggle */}
                 <Button

@@ -700,7 +700,7 @@ const Featured = ({
             ))}
 
             <Link
-              href="/packages"
+              href="/categories"
               className="inline-flex items-center text-white text-xs sm:text-[13px] font-medium underline underline-offset-4 hover:text-white/80 transition-colors ml-1.5 shrink-0 cursor-pointer"
             >
               {remainingCategoriesCount > 0 ? `+${remainingCategoriesCount} More` : 'Explore All'}

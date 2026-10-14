@@ -143,8 +143,8 @@ const ExploreCategories = () => {
     _id: 'see-more-card',
     name: seeMoreTitle,
     title: seeMoreTitle,
-    slug: aiSlug,
-    href: `/packages?category=${encodeURIComponent(aiSlug)}`,
+    slug: 'all-categories',
+    href: '/categories',
     icon: 'arrow-right',
     isSeeMore: true,
   };

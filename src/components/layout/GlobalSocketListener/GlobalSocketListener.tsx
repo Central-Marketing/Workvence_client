@@ -208,9 +208,31 @@ export default function GlobalSocketListener() {
       playNotificationSound("message");
 
       const displayName = senderName || "Someone";
+      const senderAvatar =
+        newMsg.userID?.img ||
+        newMsg.userID?.image ||
+        newMsg.userID?.avatar ||
+        newMsg.userID?.profilePic ||
+        newMsg.sender?.img ||
+        newMsg.sender?.image ||
+        newMsg.sender?.avatar ||
+        newMsg.sender?.profilePic ||
+        newMsg.user?.img ||
+        newMsg.user?.image ||
+        newMsg.user?.avatar ||
+        newMsg.from?.img ||
+        newMsg.from?.image ||
+        newMsg.from?.avatar ||
+        newMsg.senderImg ||
+        newMsg.avatar ||
+        newMsg.image ||
+        newMsg.img ||
+        newMsg.profilePic ||
+        "";
+
       const msgPreview = newMsg.description?.startsWith("[CUSTOM_OFFER]")
         ? "sent you a custom proposal"
-        : rawText.slice(0, 60) || (fileAttachment ? "sent an attachment" : "sent a message");
+        : rawText || (fileAttachment ? "" : "sent a message");
 
       const targetConvId = conversationId || newMsg.conversationID;
       const toastKey = contentFingerprint || msgId || `${senderIdStr}-${Date.now()}`;
@@ -219,13 +241,17 @@ export default function GlobalSocketListener() {
         kind: "chat",
         id: `chat-toast-${toastKey}`,
         description: msgPreview,
-        duration: 5000,
+        avatar: senderAvatar,
+        image: senderAvatar,
+        isOnline: true,
+        attachment: fileAttachment || undefined,
+        duration: 6000,
         timestamp: "Just now",
         ...(targetConvId
           ? {
               navigation: {
-                label: `Open conversation with ${displayName}`,
-                actionLabel: "Open conversation",
+                label: `Reply to ${displayName}`,
+                actionLabel: "Reply",
                 onClick: () => {
                   router.push(`/message/${targetConvId}`);
                 },

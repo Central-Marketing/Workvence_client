@@ -214,3 +214,34 @@
     animation: none;
   }
 }
+
+/* Specialized Chat Message Toast */
+.workvence-toaster [data-sonner-toast].workvence-toast-chat {
+  position: relative !important;
+  align-items: flex-start !important;
+  padding: 14px 16px !important;
+  border-radius: 6px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04) !important;
+}
+
+.workvence-toaster [data-sonner-toast].workvence-toast-chat [data-close-button] {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 6px !important;
+  color: #9ca3af !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.workvence-toaster [data-sonner-toast].workvence-toast-chat [data-close-button]:hover {
+  color: #374151 !important;
+  background: #f3f4f6 !important;
+}
+
+.workvence-toaster [data-sonner-toast].workvence-toast-chat [data-close-button] svg {
+  width: 14px !important;
+  height: 14px !important;
+}

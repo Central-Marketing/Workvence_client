@@ -13,6 +13,11 @@ export type ToastOptions = Pick<ExternalToast,
   icon?: LucideIcon;
   event?: string;
   timestamp?: string;
+  avatar?: string;
+  image?: string;
+  img?: string;
+  isOnline?: boolean;
+  attachment?: string;
 };
 
 /** API validation arrays stay readable; arbitrary response objects never reach React. */
@@ -47,6 +52,10 @@ function emit(type: ToastVariant, message: unknown, data: ToastOptions = {}) {
   const navigation = "navigation" in data ? data.navigation : previous?.navigation;
   const kind = data.kind ?? previous?.kind;
   const icon = data.icon ?? previous?.icon;
+  const timestamp = data.timestamp ?? previous?.timestamp;
+  const avatar = data.avatar ?? data.image ?? data.img ?? previous?.avatar ?? previous?.image ?? (previous as any)?.img;
+  const isOnline = data.isOnline ?? previous?.isOnline;
+  const attachment = data.attachment ?? previous?.attachment;
   const effectiveType = type === "neutral" ? "default" : type;
   const publish = effectiveType === "default" ? sonnerToast : sonnerToast[effectiveType];
   const toastOptions = options(data);
@@ -54,12 +63,28 @@ function emit(type: ToastVariant, message: unknown, data: ToastOptions = {}) {
   if (navigation && effectiveType !== "loading") {
     const description = "description" in data ? content(data.description) : previous?.description ?? existing?.description;
     const title = createElement(NavigationToastContent, {
-      title: content(message), description, variant: type, kind, icon, navigation,
+      title: content(message),
+      description,
+      variant: type,
+      kind,
+      icon,
+      navigation,
+      timestamp,
+      avatar,
+      image: avatar,
+      isOnline,
+      attachment,
       dismiss: () => sonnerToast.dismiss(id),
     });
     const id = publish(title, {
-      ...toastOptions, icon: null, description: undefined, action: undefined, cancel: undefined,
-      classNames: { toast: "workvence-toast-navigation" },
+      ...toastOptions,
+      icon: null,
+      description: undefined,
+      action: undefined,
+      cancel: undefined,
+      classNames: {
+        toast: kind === "chat" ? "workvence-toast-navigation workvence-toast-chat" : "workvence-toast-navigation",
+      },
     });
     return id;
   }

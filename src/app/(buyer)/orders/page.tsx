@@ -172,7 +172,7 @@ export default function BuyerOrdersPage() {
     } else if (activeTab === "Briefs") {
       list = list.filter((o) => o.itemType === "brief");
     }
-    return showAllOrders ? list : list.slice(0, 5);
+    return showAllOrders ? list : list.slice(0, 10);
   }, [normalizedOrders, activeTab, showAllOrders]);
 
   const handleRowClick = (orderId: string) => {
@@ -383,10 +383,10 @@ export default function BuyerOrdersPage() {
           {isLoading ? (
             <OrdersTableSkeleton />
           ) : (
-            <div className="w-full overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch] rounded-[6px]">
-              <table className="w-full bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] min-w-[760px] border-collapse text-left">
+            <div className="w-full bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-sm overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
+              <table className="w-full min-w-[760px] border-collapse text-left">
                 <thead className="">
-                  <tr className="border-b border-slate-100 text-base  font-sf-pro font-bold text-[#434343]">
+                  <tr className="border-b border-slate-100 text-base font-sf-pro font-bold text-[#434343]">
                     <th className="py-3 px-4 font-bold">Order Name</th>
                     <th className="py-3 px-4 font-bold whitespace-nowrap">Order Date</th>
                     <th className="py-3 px-4 font-bold whitespace-nowrap">Due on</th>
@@ -407,13 +407,13 @@ export default function BuyerOrdersPage() {
                         <tr
                           key={order.id}
                           onClick={() => handleRowClick(order.id)}
-                          className="group relative cursor-pointer transition-colors hover:bg-[#F5F5F5]
+                          className="group relative cursor-pointer transition-colors odd:bg-[#F5F5F5] even:bg-white
     after:pointer-events-none after:absolute after:inset-0
-     after:border after:border-transparent
+     after:border-transparent
     hover:after:border-[rgba(0,0,0,0.10)]"
                         >
                           {/* Order Name */}
-                          <td className="py-4 px-3 align-middle max-w-[380px]">
+                          <td className="py-4 px-4 align-middle max-w-[380px]">
                             <div className="flex items-center gap-4">
                               <div className="relative w-24 sm:w-36 md:w-[180px] lg:w-[220px] aspect-[11/6] rounded-[6px] overflow-hidden bg-gray-100 border border-gray-200/80 shrink-0">
                                 <Image
@@ -440,22 +440,22 @@ export default function BuyerOrdersPage() {
                           </td>
 
                           {/* Order Date */}
-                          <td className="py-4 px-3 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
+                          <td className="py-4 px-4 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
                             {order.orderDate}
                           </td>
 
                           {/* Due Date */}
-                          <td className="py-4 px-3 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
+                          <td className="py-4 px-4 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
                             {order.dueDate}
                           </td>
 
                           {/* Total */}
-                          <td className="py-4 px-3 align-middle text-xs sm:text-sm font-bold text-slate-900 whitespace-nowrap">
+                          <td className="py-4 px-4 align-middle text-xs sm:text-sm font-bold text-slate-900 whitespace-nowrap">
                             {order.price.toLocaleString("en-US", { style: "currency", currency: "USD" })}
                           </td>
 
                           {/* Status */}
-                          <td className="py-4 px-3 align-middle whitespace-nowrap">
+                          <td className="py-4 px-4 align-middle whitespace-nowrap">
                             {order.status === "revision" ? (
                               <span className="bg-[#F5F0FF] text-[#8B5CF6] border border-[#DDD6FE] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">
                                 Revision

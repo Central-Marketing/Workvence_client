@@ -34,7 +34,7 @@ import type { User } from "@/types";
 import { axiosFetch, countriesFlags, getCountryShortName } from "@/utils";
 import supportService from "@/utils/supportService";
 import { Loader, KycVerificationForm, Button } from "@/components";
-import { CustomSelect, CustomSelectOption, AccountStandingCard, PageHeader } from "@/components/ui";
+import { CustomSelect, CustomSelectOption, AccountStandingCard, PageHeader, ProgressBar } from "@/components/ui";
 import { calculateProfileCompletion } from "@/features/dashboard";
 import useAdminCategories from "@/hooks/useAdminCategories";
 
@@ -914,9 +914,7 @@ export default function ProfilePage() {
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                     <span>Profile 100% Completed</span>
                   </div>
-                  <div className="w-full sm:w-44 h-1.5 bg-emerald-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full transition-all duration-500 w-full" />
-                  </div>
+                  <ProgressBar value={100} className="w-full sm:w-44" />
                 </div>
               ) : (
                 <>
@@ -926,12 +924,7 @@ export default function ProfilePage() {
                     </span>
                     <span className="font-bold text-slate-900">{profileCompletion}%</span>
                   </div>
-                  <div className="w-full sm:w-44 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full transition-all duration-500"
-                      style={{ width: `${profileCompletion}%` }}
-                    />
-                  </div>
+                  <ProgressBar value={profileCompletion} className="w-full sm:w-44" />
                 </>
               )}
             </div>

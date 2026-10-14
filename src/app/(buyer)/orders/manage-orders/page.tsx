@@ -389,7 +389,7 @@ export default function BuyerManageOrdersPage() {
                         <tr
                           key={order.id}
                           onClick={() => handleRowClick(order.id)}
-                          className="group relative cursor-pointer transition-colors odd:bg-[#F5F5F5]
+                          className="group relative cursor-pointer transition-colors odd:bg-[#F5F5F5] even:bg-white
     after:pointer-events-none after:absolute after:inset-0
      after:border-transparent
     hover:after:border-[rgba(0,0,0,0.10)]"

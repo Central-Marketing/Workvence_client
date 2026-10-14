@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { FiCalendar, FiArrowRight, FiCheckCircle } from "react-icons/fi";
-import { Button, Tag, AccountStandingBanner } from "@/components/ui";
+import { Button, Tag, AccountStandingBanner, ProgressBar } from "@/components/ui";
 import { calculateProfileCompletion } from "../utils/dashboardNormalizer";
 import { sortOrdersByPriority } from "@/features/orders";
 
@@ -451,12 +451,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                   </Link>
                   <span className="font-bold text-gray-900">{completionPercentage}%</span>
                 </div>
-                <div className="w-56 sm:w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-700 bg-[#00E599]"
-                    style={{ width: `${completionPercentage}%` }}
-                  />
-                </div>
+                <ProgressBar value={completionPercentage} className="w-56 sm:w-64" />
               </div>
             )}
           </div>
@@ -651,12 +646,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                 </Link>
                 <span className="font-bold text-gray-900">{completionPercentage}%</span>
               </div>
-              <div className="w-56 sm:w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-700 bg-[#00E599]"
-                  style={{ width: `${completionPercentage}%` }}
-                />
-              </div>
+              <ProgressBar value={completionPercentage} className="w-56 sm:w-64" />
             </div>
           )}
         </div>

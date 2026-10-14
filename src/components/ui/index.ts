@@ -27,4 +27,4 @@ export type { PageHeaderProps } from './PageHeader/PageHeader';
 export { Pagination, default as PaginationComponent } from './Pagination';
 export type { PaginationProps } from './Pagination';
 export { BorderBeam, default as BorderBeamComponent } from './BorderBeam';
-
+export * from './ProgressBar';

@@ -46,6 +46,9 @@ const isChatMessageNotif = (notif: any) => {
     type === "direct_message" ||
     type === "dm" ||
     type === "inbox" ||
+    type === "attachment" ||
+    type === "file" ||
+    type === "media" ||
     Boolean(
       notif.conversationID ||
         notif.conversationId ||
@@ -57,9 +60,13 @@ const isChatMessageNotif = (notif: any) => {
     );
 
   if (isChatType) return true;
-  if (link.includes("/message") || link.includes("/messages")) return true;
-  if (/message|chat|conversation|custom proposal|custom offer/i.test(title)) return true;
-  if (/sent you a message|sent a message|new message|sent you a custom proposal|sent you an offer/i.test(msg))
+  if (link.includes("/message") || link.includes("/messages") || link.includes("/chat")) return true;
+  if (/message|chat|conversation|custom proposal|custom offer|attachment|file|upload/i.test(title)) return true;
+  if (
+    /sent you a message|sent a message|new message|sent you a custom proposal|sent you an offer|sent an attachment|sent you an attachment|sent a file|sent you a file|sent an image|sent you an image|attachment|file/i.test(
+      msg
+    )
+  )
     return true;
   return false;
 };
@@ -185,6 +192,10 @@ export default function GlobalSocketListener() {
         processedNotifMessageIds.add(senderIdStr);
         setTimeout(() => processedNotifMessageIds.delete(senderIdStr), 3000);
       }
+      if (convIdStr) {
+        processedNotifMessageIds.add(convIdStr);
+        setTimeout(() => processedNotifMessageIds.delete(convIdStr), 10000);
+      }
 
       // Check if user is currently looking at this active conversation
       const pathname = typeof window !== "undefined" ? window.location.pathname : "";
@@ -208,34 +219,14 @@ export default function GlobalSocketListener() {
       playNotificationSound("message");
 
       const displayName = senderName || "Someone";
-      const senderAvatar =
-        newMsg.userID?.img ||
-        newMsg.userID?.image ||
-        newMsg.userID?.avatar ||
-        newMsg.userID?.profilePic ||
-        newMsg.sender?.img ||
-        newMsg.sender?.image ||
-        newMsg.sender?.avatar ||
-        newMsg.sender?.profilePic ||
-        newMsg.user?.img ||
-        newMsg.user?.image ||
-        newMsg.user?.avatar ||
-        newMsg.from?.img ||
-        newMsg.from?.image ||
-        newMsg.from?.avatar ||
-        newMsg.senderImg ||
-        newMsg.avatar ||
-        newMsg.image ||
-        newMsg.img ||
-        newMsg.profilePic ||
-        "";
+      const senderAvatar = newMsg.sender?.image || newMsg.userID?.image || "";
 
       const msgPreview = newMsg.description?.startsWith("[CUSTOM_OFFER]")
         ? "sent you a custom proposal"
         : rawText || (fileAttachment ? "" : "sent a message");
 
       const targetConvId = conversationId || newMsg.conversationID;
-      const toastKey = contentFingerprint || msgId || `${senderIdStr}-${Date.now()}`;
+      const toastKey = targetConvId || senderIdStr || contentFingerprint || msgId;
 
       toast.info(displayName, {
         kind: "chat",
@@ -410,6 +401,14 @@ export default function GlobalSocketListener() {
 
       // Skip chat messages (handled exclusively by handleReceiveMessage)
       if (isChatMessageNotif(newNotif)) {
+        return;
+      }
+
+      // If notification belongs to a recently handled chat message/conversation, skip duplicate
+      const notifConvId = String(
+        newNotif.conversationID || newNotif.conversationId || newNotif.conversationUUID || newNotif.chatId || ""
+      ).trim();
+      if (notifConvId && processedNotifMessageIds.has(notifConvId)) {
         return;
       }
 

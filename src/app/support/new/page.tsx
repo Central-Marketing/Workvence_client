@@ -37,11 +37,13 @@ function CreateSupportTicketForm() {
   const searchParams = useSearchParams();
   const urlOrderId = searchParams?.get("orderId") || "";
   const urlCategory = searchParams?.get("category") || "";
+  const urlSubject = searchParams?.get("subject") || "";
+  const urlMessage = searchParams?.get("message") || "";
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [category, setCategory] = useState<string>(urlCategory || (urlOrderId ? "Payment & Escrow" : "Technical Support"));
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
+  const [subject, setSubject] = useState(urlSubject || "");
+  const [message, setMessage] = useState(urlMessage || "");
   const [selectedOrderID, setSelectedOrderID] = useState<string>(urlOrderId || "");
   const [attachmentUrl, setAttachmentUrl] = useState("");
   const [attachments, setAttachments] = useState<{ name: string; url: string; public_id?: string }[]>([]);
@@ -65,7 +67,13 @@ function CreateSupportTicketForm() {
     if (urlCategory) {
       setCategory(urlCategory);
     }
-  }, [urlOrderId, urlCategory]);
+    if (urlSubject && !subject) {
+      setSubject(urlSubject);
+    }
+    if (urlMessage && !message) {
+      setMessage(urlMessage);
+    }
+  }, [urlOrderId, urlCategory, urlSubject, urlMessage]);
 
   useEffect(() => {
     async function loadOrders() {

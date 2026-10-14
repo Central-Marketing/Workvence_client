@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import moment from "moment";
 import { toast } from "@/utils/toast";
 import { RiStarFill, RiArrowDownSLine } from "react-icons/ri";
@@ -363,6 +364,28 @@ export const ContactProfileTab: React.FC<ContactProfileTabProps> = ({
             )}
           </>
         )}
+      </div>
+
+      {/* Card 4: Safety & Report */}
+      <div className="bg-white rounded-[6px] p-5 border border-slate-200/80 shadow-xs flex flex-col gap-2">
+        <h3 className="text-base sm:text-[17px] font-bold text-slate-800 tracking-tight">
+          Safety
+        </h3>
+        <p className="text-sm text-slate-500 font-normal leading-relaxed">
+          Report safety, conduct, spam, or off-platform contact concerns for review.
+        </p>
+        <div className="pt-2">
+          <Link
+            href={`/support/new?category=Content%20%26%20Listing%20Violation&subject=${encodeURIComponent(
+              `Report conversation with @${finalRecipientUser?.username || "user"}`
+            )}&message=${encodeURIComponent(
+              `Reporting conversation ID: ${conversationID || activeConversation?.uuid || ""}\nUser: @${finalRecipientUser?.username || ""}\nReason: `
+            )}`}
+            className="inline-flex items-center justify-center px-4 py-2 border border-slate-200/90 rounded-[6px] text-sm font-medium text-slate-800 bg-white hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-2xs"
+          >
+            Report conversation
+          </Link>
+        </div>
       </div>
     </>
   );

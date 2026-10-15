@@ -16,7 +16,23 @@ export const MessageAttachment: React.FC<MessageAttachmentProps> = ({
   msg,
   onImagePreview,
 }) => {
-  const rawUrl = msg.file || (Array.isArray(msg.attachments) && msg.attachments[0]) || null;
+  const rawUrl: string | null = (() => {
+    if (typeof msg.file === "string" && msg.file) return msg.file;
+    if (Array.isArray(msg.attachments) && msg.attachments.length > 0) {
+      const first = msg.attachments[0];
+      const url = typeof first === "string" ? first : first?.url || first?.secure_url || first?.path;
+      if (typeof url === "string" && url) return url;
+    }
+    if (msg.attachment) {
+      const url = typeof msg.attachment === "string" ? msg.attachment : msg.attachment?.url || msg.attachment?.secure_url;
+      if (typeof url === "string" && url) return url;
+    }
+    if (Array.isArray(msg.attachmentMeta) && msg.attachmentMeta.length > 0) {
+      const url = msg.attachmentMeta[0]?.url;
+      if (typeof url === "string" && url) return url;
+    }
+    return null;
+  })();
   const [resolvedUrl, setResolvedUrl] = useState<string>(rawUrl || "");
   const [imgError, setImgError] = useState<boolean>(false);
   const [isResolving, setIsResolving] = useState<boolean>(false);
@@ -97,7 +113,7 @@ export const MessageAttachment: React.FC<MessageAttachmentProps> = ({
     ? msg.attachmentMeta.find(
         (m: any) => m?.url === currentUrl || m?.url === rawUrl
       )
-    : null;
+    : (Array.isArray(msg.attachments) && typeof msg.attachments[0] === "object" ? msg.attachments[0] : null);
 
   const explicitName = meta?.name || msg.attachment?.name || msg.fileName || msg.originalName || msg.name;
   const rawFileName = explicitName || rawUrl.split("/").pop()?.split("?")[0] || "Attachment";

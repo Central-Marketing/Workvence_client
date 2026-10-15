@@ -164,9 +164,14 @@ export default function GlobalSocketListener() {
       const rawText = String(
         newMsg.description || newMsg.desc || newMsg.text || newMsg.message || ""
       ).trim();
-      const fileAttachment = String(
-        newMsg.file || (Array.isArray(newMsg.attachments) && newMsg.attachments[0]) || ""
-      ).trim();
+      const fileAttachment = (() => {
+        if (typeof newMsg.file === "string") return newMsg.file;
+        if (Array.isArray(newMsg.attachments) && newMsg.attachments.length > 0) {
+          const first = newMsg.attachments[0];
+          return typeof first === "string" ? first : first?.url || first?.secure_url || "";
+        }
+        return "";
+      })().trim();
       const contentSnippet = rawText.slice(0, 100);
 
       // Deterministic fingerprint for deduplication

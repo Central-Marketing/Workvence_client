@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { socket } from "@/utils";
-import { isTargetConversation } from "@/utils/chatHelpers";
+import { isTargetConversation, getMessageText, getAttachmentUrl } from "@/utils/chatHelpers";
 
 interface UseChatSocketOptions {
   user: any;
@@ -225,16 +225,8 @@ export function useChatSocket({
         const updateCache = (oldData: any = []) => {
           const arr = Array.isArray(oldData) ? oldData : [];
           const newMsgId = newMsg?._id || newMsg?.id;
-          const incomingText = (
-            newMsg.customOffer?.description ||
-            newMsg.description ||
-            newMsg.desc ||
-            newMsg.text ||
-            newMsg.message ||
-            ""
-          ).trim();
-          const incomingFile =
-            newMsg.file || (Array.isArray(newMsg.attachments) && newMsg.attachments[0]) || "";
+          const incomingText = getMessageText(newMsg);
+          const incomingFile = getAttachmentUrl(newMsg);
           const incomingSender = String(
             (typeof newMsg.sender === "object" && (newMsg.sender?._id || newMsg.sender?.id)) ||
               (typeof newMsg.user === "object" && (newMsg.user?._id || newMsg.user?.id)) ||
@@ -257,16 +249,8 @@ export function useChatSocket({
                   if (newMsg.tempId && (m.tempId === newMsg.tempId || mId === String(newMsg.tempId))) {
                     return false;
                   }
-                  const tempText = (
-                    m.customOffer?.description ||
-                    m.description ||
-                    m.desc ||
-                    m.text ||
-                    m.message ||
-                    ""
-                  ).trim();
-                  const tempFile =
-                    m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
+                  const tempText = getMessageText(m);
+                  const tempFile = getAttachmentUrl(m);
                   if (tempText === incomingText && tempFile === incomingFile) {
                     return false;
                   }
@@ -283,15 +267,8 @@ export function useChatSocket({
             const mId = String(m._id || m.id || "");
             if (mId.startsWith("temp-")) return false;
 
-            const mText = (
-              m.customOffer?.description ||
-              m.description ||
-              m.desc ||
-              m.text ||
-              m.message ||
-              ""
-            ).trim();
-            const mFile = m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
+            const mText = getMessageText(m);
+            const mFile = getAttachmentUrl(m);
             if (mText !== incomingText || mFile !== incomingFile) return false;
 
             const mSender = String(
@@ -315,16 +292,8 @@ export function useChatSocket({
             return arr.filter((m: any) => {
               const mId = String(m._id || m.id || "");
               if (mId.startsWith("temp-")) {
-                const tempText = (
-                  m.customOffer?.description ||
-                  m.description ||
-                  m.desc ||
-                  m.text ||
-                  m.message ||
-                  ""
-                ).trim();
-                const tempFile =
-                  m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
+                const tempText = getMessageText(m);
+                const tempFile = getAttachmentUrl(m);
                 if (tempText === incomingText && tempFile === incomingFile) {
                   return false;
                 }
@@ -343,16 +312,8 @@ export function useChatSocket({
               if (m.isCustomOffer && (newMsg.isCustomOffer || newMsg.customOffer)) {
                 return false;
               }
-              const tempText = (
-                m.customOffer?.description ||
-                m.description ||
-                m.desc ||
-                m.text ||
-                m.message ||
-                ""
-              ).trim();
-              const tempFile =
-                m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
+              const tempText = getMessageText(m);
+              const tempFile = getAttachmentUrl(m);
               if (tempText === incomingText && tempFile === incomingFile) {
                 return false;
               }
@@ -388,8 +349,9 @@ export function useChatSocket({
             ""
         ).trim();
         if (!incomingCid) return oldConvs;
+        const incomingFile = getAttachmentUrl(newMsg);
         const incomingText =
-          newMsg.description || newMsg.desc || newMsg.text || newMsg.message || "";
+          newMsg.description || newMsg.desc || newMsg.text || newMsg.message || (incomingFile ? "📎 Attachment" : "");
         return oldConvs
           .map((c: any) => {
             if (isTargetConversation(c, incomingCid)) {

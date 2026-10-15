@@ -167,3 +167,32 @@ export const updateConversationTagsApi = async (conversationId: string, tags: st
     return res.data;
   }
 };
+
+export const getMessageText = (m: any): string => {
+  if (!m) return "";
+  return (
+    m.customOffer?.description ||
+    m.description ||
+    m.desc ||
+    m.text ||
+    m.message ||
+    ""
+  ).trim();
+};
+
+export const getAttachmentUrl = (m: any): string => {
+  if (!m) return "";
+  let raw: any = m.file;
+  if (!raw && Array.isArray(m.attachments) && m.attachments.length > 0) {
+    const first = m.attachments[0];
+    raw = typeof first === "string" ? first : first?.url || first?.secure_url || first?.path || "";
+  }
+  if (!raw && m.attachment) {
+    raw = typeof m.attachment === "string" ? m.attachment : m.attachment.url || m.attachment.secure_url || "";
+  }
+  if (!raw && Array.isArray(m.attachmentMeta) && m.attachmentMeta.length > 0) {
+    raw = m.attachmentMeta[0]?.url || "";
+  }
+  if (!raw || typeof raw !== "string") return "";
+  return raw.replace(/^https?:\/\//, "").split(/[?#]/)[0].trim().toLowerCase();
+};

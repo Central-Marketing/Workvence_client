@@ -4,7 +4,7 @@ import { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 import { toast } from "@/utils/toast";
 import { axiosFetch, socket, getAvatarUrl, parseRevisionNumber } from "@/utils";
-import { isTargetConversation } from "@/utils/chatHelpers";
+import { isTargetConversation, getMessageText, getAttachmentUrl } from "@/utils/chatHelpers";
 import supportService from "@/utils/supportService";
 import { ChatAttachment, AttachmentMetaItem } from "../types";
 import { parseMeeting } from "../utils/chatMediaHelpers";
@@ -233,8 +233,8 @@ export function useChatMessages({
       .filter((msg: any, index: number, self: any[]) => {
         const msgId = String(msg._id || msg.id || "");
         const isTemp = !msgId || msgId.startsWith("temp-") || Boolean(msg.tempId);
-        const text = (msg.description || msg.desc || msg.text || msg.message || "").trim();
-        const fileUrl = msg.file || (Array.isArray(msg.attachments) && msg.attachments[0]) || "";
+        const text = getMessageText(msg);
+        const fileUrl = getAttachmentUrl(msg);
 
         // 1. Exact ID and rapid duplicate suppression for confirmed server messages
         if (!isTemp) {
@@ -243,8 +243,8 @@ export function useChatMessages({
             if (mId === msgId) return true;
             if (mId.startsWith("temp-")) return false;
 
-            const otherText = (m.description || m.desc || m.text || m.message || "").trim();
-            const otherFile = m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
+            const otherText = getMessageText(m);
+            const otherFile = getAttachmentUrl(m);
             if (otherText !== text || otherFile !== fileUrl) return false;
 
             const t1 = msg.createdAt ? new Date(msg.createdAt).getTime() : 0;
@@ -269,8 +269,8 @@ export function useChatMessages({
             if (m.clientTempId && (m.clientTempId === tempId || String(m.clientTempId) === tempId)) return true;
 
             // Content match
-            const otherText = (m.description || m.desc || m.text || m.message || "").trim();
-            const otherFile = m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
+            const otherText = getMessageText(m);
+            const otherFile = getAttachmentUrl(m);
             if (otherText !== text || otherFile !== fileUrl) return false;
 
             // If both messages are in the recent tail of the chat stream (last 6 messages)
@@ -416,16 +416,23 @@ export function useChatMessages({
             conversationID ||
             ""
         ).trim();
+        const incomingFile = getAttachmentUrl(newMsg);
         const incomingText =
           newMsg?.isCustomOffer || newMsg?.customOffer
             ? "📋 Custom Offer"
-            : newMsg.description || newMsg.desc || newMsg.text || newMsg.message || "";
+            : (
+                newMsg.description ||
+                newMsg.desc ||
+                newMsg.text ||
+                newMsg.message ||
+                (incomingFile ? "📎 Attachment" : "")
+              );
         return oldConvs
           .map((c: any) => {
             if (isTargetConversation(c, incomingCid)) {
               return {
                 ...c,
-                lastMessage: incomingText,
+                lastMessage: incomingText || c.lastMessage,
                 updatedAt: new Date().toISOString(),
                 readBySeller: user?.isSeller ? true : false,
                 readByBuyer: user?.isSeller ? false : true,
@@ -458,16 +465,8 @@ export function useChatMessages({
       );
 
       if (savedMsg && typeof savedMsg === "object" && msgId) {
-        const savedText = (
-          savedMsg.customOffer?.description ||
-          savedMsg.description ||
-          savedMsg.desc ||
-          savedMsg.text ||
-          savedMsg.message ||
-          ""
-        ).trim();
-        const savedFile =
-          savedMsg.file || (Array.isArray(savedMsg.attachments) && savedMsg.attachments[0]) || "";
+        const savedText = getMessageText(savedMsg);
+        const savedFile = getAttachmentUrl(savedMsg);
         const confirmedMsg = { ...savedMsg, status: "sent" };
 
         const updateMsgCache = (oldData: any = []) => {
@@ -486,16 +485,8 @@ export function useChatMessages({
               if (m.isCustomOffer && (savedMsg.isCustomOffer || savedMsg.customOffer)) {
                 return false;
               }
-              const tempText = (
-                m.customOffer?.description ||
-                m.description ||
-                m.desc ||
-                m.text ||
-                m.message ||
-                ""
-              ).trim();
-              const tempFile =
-                m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
+              const tempText = getMessageText(m);
+              const tempFile = getAttachmentUrl(m);
               if (tempText === savedText && tempFile === savedFile) {
                 return false;
               }

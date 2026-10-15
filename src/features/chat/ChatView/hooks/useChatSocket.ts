@@ -48,6 +48,7 @@ export function useChatSocket({
         activeConversation._id,
         activeConversation.uuid,
         activeConversation.conversationID,
+        activeConversation.id,
       ]
         .filter(Boolean)
         .map((id) => String(id).trim());
@@ -62,11 +63,12 @@ export function useChatSocket({
 
   // Global socket: connection and online users
   useEffect(() => {
-    if (!user?._id) return;
+    const currentUserId = user?._id || user?.id || (user as any)?.userId || (user as any)?.userID;
+    if (!currentUserId) return;
     if (!socket.connected) {
       socket.connect();
     }
-    socket.emit("user_connected", user._id);
+    socket.emit("user_connected", currentUserId);
 
     const handleOnlineUsers = (users: any) => setOnlineUsers(users);
 
@@ -82,6 +84,7 @@ export function useChatSocket({
           newMsg?.conversationID ||
           newMsg?.conversationId ||
           newMsg?.uuid ||
+          newMsg?.id ||
           convFieldId ||
           ""
       ).trim();
@@ -120,12 +123,16 @@ export function useChatSocket({
 
     socket.on("online_users", handleOnlineUsers);
     socket.on("receive_message", handleGlobalReceiveMessage);
+    socket.on("new_message", handleGlobalReceiveMessage);
+    socket.on("message", handleGlobalReceiveMessage);
 
     return () => {
       socket.off("online_users", handleOnlineUsers);
       socket.off("receive_message", handleGlobalReceiveMessage);
+      socket.off("new_message", handleGlobalReceiveMessage);
+      socket.off("message", handleGlobalReceiveMessage);
     };
-  }, [user?._id, queryClient, conversationID, user?.isSeller]);
+  }, [user?._id, user?.id, queryClient, conversationID, user?.isSeller]);
 
   // Manage room subscription & realtime events for active conversation
   useEffect(() => {
@@ -134,7 +141,7 @@ export function useChatSocket({
     const joinRoom = () => {
       const convDoc = activeConvRef.current;
       const idsToJoin = new Set(
-        [conversationID, convDoc?._id, convDoc?.uuid, convDoc?.conversationID]
+        [conversationID, convDoc?._id, convDoc?.uuid, convDoc?.conversationID, convDoc?.id]
           .filter(Boolean)
           .map((id) => String(id).trim())
       );
@@ -144,7 +151,8 @@ export function useChatSocket({
         socket.emit("join_room", id);
         socket.emit("join", id);
       });
-      if (user?._id) socket.emit("user_connected", user._id);
+      const currentUserId = user?._id || user?.id || (user as any)?.userId || (user as any)?.userID;
+      if (currentUserId) socket.emit("user_connected", currentUserId);
     };
 
     socket.connect();
@@ -181,6 +189,7 @@ export function useChatSocket({
           data?.conversationID ||
           data?.conversationId ||
           data?.uuid ||
+          data?.id ||
           convFieldId ||
           ""
       ).trim();
@@ -445,25 +454,35 @@ export function useChatSocket({
     };
 
     socket.on("receive_message", handleReceiveMessage);
+    socket.on("new_message", handleReceiveMessage);
+    socket.on("message", handleReceiveMessage);
+    socket.on("chat_message", handleReceiveMessage);
     socket.on("offer_withdrawn", handleOfferWithdrawn);
     socket.on("offer_accepted", handleOfferAccepted);
     socket.on("typing_start", handleUserTyping);
     socket.on("user_typing", handleUserTyping);
+    socket.on("typing", handleUserTyping);
     socket.on("typing_stop", handleUserStoppedTyping);
     socket.on("user_stopped_typing", handleUserStoppedTyping);
+    socket.on("stop_typing", handleUserStoppedTyping);
 
     return () => {
       socket.off("connect", handleConnect);
       socket.off("receive_message", handleReceiveMessage);
+      socket.off("new_message", handleReceiveMessage);
+      socket.off("message", handleReceiveMessage);
+      socket.off("chat_message", handleReceiveMessage);
       socket.off("offer_withdrawn", handleOfferWithdrawn);
       socket.off("offer_accepted", handleOfferAccepted);
       socket.off("typing_start", handleUserTyping);
       socket.off("user_typing", handleUserTyping);
+      socket.off("typing", handleUserTyping);
       socket.off("typing_stop", handleUserStoppedTyping);
       socket.off("user_stopped_typing", handleUserStoppedTyping);
+      socket.off("stop_typing", handleUserStoppedTyping);
       if (recipientTypingTimerRef.current) clearTimeout(recipientTypingTimerRef.current);
     };
-  }, [isValidId, conversationID, queryClient, user?.isSeller, user?._id]);
+  }, [isValidId, conversationID, queryClient, user?.isSeller, user?._id, user?.id]);
 
   const activeRoomID =
     activeConversation?._id ||

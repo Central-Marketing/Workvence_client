@@ -2,15 +2,16 @@ import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 import { getCookie, refreshAccessToken, handleAuthExpired } from "./tokenRefresh";
 
 const getBaseURL = (): string => {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_SERVER_API_URL || "";
   if (typeof window !== "undefined") {
-    return "/api";
+    try {
+      const pathname = new URL(envUrl, window.location.origin).pathname.replace(/\/$/, "");
+      return pathname || "/api/v1";
+    } catch {
+      return "/api/v1";
+    }
   }
-  const envUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL;
-  if (envUrl) {
-    const cleaned = envUrl.trim().replace(/\/$/, '');
-    return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
-  }
-  return "https://devadmin.workvence.com/api";
+  return envUrl.trim().replace(/\/$/, "");
 };
 
 const axiosFetch: AxiosInstance = axios.create({
@@ -19,9 +20,17 @@ const axiosFetch: AxiosInstance = axios.create({
 });
 
 axiosFetch.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  // Strip duplicate /api/ prefix if URL starts with /api/
-  if (config.url && config.url.startsWith("/api/")) {
-    config.url = config.url.replace(/^\/api\//, "/");
+  // Strip duplicate prefix if caller already included baseURL or /api
+  if (config.url) {
+    const base = getBaseURL();
+    if (base && base !== "/" && config.url.startsWith(base)) {
+      config.url = config.url.slice(base.length) || "/";
+    }
+    if (config.url.startsWith("/api/v1/")) {
+      config.url = config.url.replace(/^\/api\/v1\//, "/");
+    } else if (config.url.startsWith("/api/")) {
+      config.url = config.url.replace(/^\/api\//, "/");
+    }
   }
 
   // Attach access token header if available in cookie or localStorage

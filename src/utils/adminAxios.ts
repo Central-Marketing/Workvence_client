@@ -2,17 +2,16 @@ import axios, { InternalAxiosRequestConfig } from "axios";
 import { getCookie, refreshAccessToken, handleAuthExpired } from "./tokenRefresh";
 
 const getAdminBaseURL = () => {
+  const envUrl = process.env.NEXT_PUBLIC_ADMIN_API_URL || process.env.NEXT_PUBLIC_ADMIN_BACKEND_URL || "";
   if (typeof window !== "undefined") {
-    return "/api/admin";
+    try {
+      const pathname = new URL(envUrl, window.location.origin).pathname.replace(/\/$/, "");
+      return pathname || "/api/v1/admin";
+    } catch {
+      return "/api/v1/admin";
+    }
   }
-
-  const envUrl = process.env.NEXT_PUBLIC_ADMIN_API_URL || process.env.NEXT_PUBLIC_ADMIN_BACKEND_URL;
-  if (envUrl) {
-    const cleanUrl = envUrl.replace(/\/$/, "");
-    return cleanUrl.endsWith("/admin") ? cleanUrl : `${cleanUrl}/admin`;
-  }
-
-  return "https://devadmin.workvence.com/api/admin";
+  return envUrl.trim().replace(/\/$/, "");
 };
 
 const adminAxios = axios.create({

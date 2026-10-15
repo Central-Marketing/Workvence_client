@@ -2,16 +2,17 @@ import { io, Socket } from 'socket.io-client';
 
 const getSocketURL = (): string => {
   if (process.env.NEXT_PUBLIC_SOCKET_URL) {
-    return process.env.NEXT_PUBLIC_SOCKET_URL.replace(/\/api\/?$/, '');
+    return process.env.NEXT_PUBLIC_SOCKET_URL.trim().replace(/\/$/, '');
   }
-  const envUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL;
+  const envUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_SERVER_API_URL;
   if (envUrl) {
-    return envUrl.replace(/\/api\/?$/, '');
+    try {
+      return new URL(envUrl).origin;
+    } catch {
+      return envUrl.trim().replace(/\/$/, '');
+    }
   }
-  const hostname = typeof window !== 'undefined' && window.location.hostname
-    ? window.location.hostname
-    : 'localhost';
-  return `http://${hostname}:8080`;
+  return typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8080';
 };
 
 const options = {
@@ -35,13 +36,26 @@ const getAuthToken = (): string | null => {
 let realSocket: Socket | null = null;
 
 const getSocket = (): Socket | null => {
-  if (!realSocket && typeof window !== 'undefined') {
-    const token = getAuthToken();
+  if (typeof window === 'undefined') return null;
+  const token = getAuthToken();
+  if (!realSocket) {
     realSocket = io(getSocketURL(), {
       ...options,
       auth: token ? { token } : undefined,
       query: token ? { token } : undefined,
     });
+    if (process.env.NODE_ENV === 'development') {
+      realSocket.on('connect', () => console.log('[Socket] Connected:', realSocket?.id));
+      realSocket.on('disconnect', (reason) => console.log('[Socket] Disconnected:', reason));
+      realSocket.on('connect_error', (err) => console.warn('[Socket] Connect error:', err.message));
+    }
+  } else if (token) {
+    if ((realSocket.auth as any)?.token !== token) {
+      realSocket.auth = { token };
+      if (realSocket.io?.opts) {
+        (realSocket.io.opts as any).query = { token };
+      }
+    }
   }
   return realSocket;
 };

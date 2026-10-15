@@ -508,6 +508,8 @@ export default function GlobalSocketListener() {
     joinUser();
     socket.on("connect", joinUser);
     socket.on("receive_message", handleReceiveMessage);
+    socket.on("new_message", handleReceiveMessage);
+    socket.on("message", handleReceiveMessage);
     socket.on("offer_accepted", handleOfferAccepted);
     socket.on("order_updated", handleOrderUpdate);
     socket.on("order_status_changed", handleOrderUpdate);
@@ -519,6 +521,8 @@ export default function GlobalSocketListener() {
     return () => {
       socket.off("connect", joinUser);
       socket.off("receive_message", handleReceiveMessage);
+      socket.off("new_message", handleReceiveMessage);
+      socket.off("message", handleReceiveMessage);
       socket.off("offer_accepted", handleOfferAccepted);
       socket.off("order_updated", handleOrderUpdate);
       socket.off("order_status_changed", handleOrderUpdate);

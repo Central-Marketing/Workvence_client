@@ -96,12 +96,11 @@ export async function proxy(req: NextRequest) {
 
   if (!isJwtValid && isRefreshTokenValid && refreshCookie) {
     try {
-      const rawMainUrl = (
+      const mainApiUrl = (
         process.env.NEXT_PUBLIC_SERVER_API_URL ||
         process.env.NEXT_PUBLIC_API_URL ||
-        "http://localhost:8080/api"
+        "http://localhost:8080/api/v1"
       ).trim().replace(/\/$/, "");
-      const mainApiUrl = rawMainUrl.endsWith("/api") ? rawMainUrl : `${rawMainUrl}/api`;
 
       const refreshRes = await fetch(`${mainApiUrl}/auth/refresh-token`, {
         method: "POST",

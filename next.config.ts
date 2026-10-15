@@ -48,45 +48,45 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
-    const rawMainUrl = (
-      process.env.NEXT_PUBLIC_SERVER_API_URL ||
+    const mainApiUrl = (
       process.env.NEXT_PUBLIC_API_URL ||
-      'http://localhost:8080/api'
+      process.env.NEXT_PUBLIC_SERVER_API_URL ||
+      'http://localhost:8080/api/v1'
     ).trim().replace(/\/$/, '');
 
-    // Ensure mainApiUrl always ends with /api
-    const mainApiUrl = rawMainUrl.endsWith('/api') ? rawMainUrl : `${rawMainUrl}/api`;
-
-    const rawAdminUrl = (
+    const adminApiUrl = (
       process.env.NEXT_PUBLIC_ADMIN_API_URL ||
       process.env.NEXT_PUBLIC_ADMIN_BACKEND_URL ||
-      'http://localhost:8082/api/admin'
+      'http://localhost:8082/api/v1/admin'
     ).trim().replace(/\/$/, '');
 
-    // Ensure adminApiUrl always ends with /api/admin
-    let adminApiUrl = rawAdminUrl;
-    if (!adminApiUrl.endsWith('/admin')) {
-      adminApiUrl = adminApiUrl.endsWith('/api') ? `${adminApiUrl}/admin` : `${adminApiUrl}/api/admin`;
-    }
+    let mainPath = '/api/v1';
+    try {
+      mainPath = new URL(mainApiUrl).pathname.replace(/\/$/, '') || '/api/v1';
+    } catch {}
 
-    return [
-      {
-        source: '/api/support/:path*',
-        destination: `${mainApiUrl}/support/:path*`,
-      },
-      {
-        source: '/api/storage/:path*',
-        destination: `${mainApiUrl}/storage/:path*`,
-      },
-      {
-        source: '/api/admin/:path*',
-        destination: `${adminApiUrl}/:path*`,
-      },
-      {
-        source: '/api/:path*',
-        destination: `${mainApiUrl}/:path*`,
-      },
+    let adminPath = '/api/v1/admin';
+    try {
+      adminPath = new URL(adminApiUrl).pathname.replace(/\/$/, '') || '/api/v1/admin';
+    } catch {}
+
+    const rules = [
+      { source: `${mainPath}/support/:path*`, destination: `${mainApiUrl}/support/:path*` },
+      { source: '/api/support/:path*', destination: `${mainApiUrl}/support/:path*` },
+      { source: `${mainPath}/storage/:path*`, destination: `${mainApiUrl}/storage/:path*` },
+      { source: '/api/storage/:path*', destination: `${mainApiUrl}/storage/:path*` },
+      { source: `${adminPath}/:path*`, destination: `${adminApiUrl}/:path*` },
+      { source: '/api/admin/:path*', destination: `${adminApiUrl}/:path*` },
+      { source: `${mainPath}/:path*`, destination: `${mainApiUrl}/:path*` },
+      { source: '/api/:path*', destination: `${mainApiUrl}/:path*` },
     ];
+
+    const seen = new Set<string>();
+    return rules.filter((r) => {
+      if (seen.has(r.source)) return false;
+      seen.add(r.source);
+      return true;
+    });
   },
 
 };

@@ -2,10 +2,16 @@ import axios from 'axios';
 import axiosFetch from './axiosFetch';
 
 const getAdminApiUrl = () => {
+  const envUrl = process.env.NEXT_PUBLIC_ADMIN_API_URL || process.env.NEXT_PUBLIC_SERVER_API_URL || "";
   if (typeof window !== "undefined") {
-    return "/api";
+    try {
+      const pathname = new URL(envUrl, window.location.origin).pathname.replace(/\/$/, "");
+      return pathname || "/api/v1";
+    } catch {
+      return "/api/v1";
+    }
   }
-  return process.env.NEXT_PUBLIC_ADMIN_API_URL || process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_ADMIN_BACKEND_URL || "https://devadmin.workvence.com/api";
+  return envUrl.trim().replace(/\/$/, "");
 };
 
 const getAuthToken = () => {

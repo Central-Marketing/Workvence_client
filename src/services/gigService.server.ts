@@ -1,12 +1,8 @@
 
 
 const getBackendBaseUrl = (): string => {
-  const envUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL;
-  if (envUrl) {
-    const cleaned = envUrl.trim().replace(/\/$/, '');
-    return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
-  }
-  return "https://devadmin.workvence.com/api";
+  const envUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL || "";
+  return envUrl.trim().replace(/\/$/, "");
 };
 
 export async function getInitialPackages(params?: Record<string, string | string[] | undefined>) {

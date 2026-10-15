@@ -170,15 +170,16 @@ export function handleAuthExpired(redirectPath?: string): void {
  * Base URL resolver for auth endpoints
  */
 const getAuthBaseURL = (): string => {
+  const envUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL || "";
   if (typeof window !== "undefined") {
-    return "/api";
+    try {
+      const pathname = new URL(envUrl, window.location.origin).pathname.replace(/\/$/, "");
+      return pathname || "/api/v1";
+    } catch {
+      return "/api/v1";
+    }
   }
-  const envUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || process.env.NEXT_PUBLIC_API_URL;
-  if (envUrl) {
-    const cleaned = envUrl.trim().replace(/\/$/, "");
-    return cleaned.endsWith("/api") ? cleaned : `${cleaned}/api`;
-  }
-  return "https://devadmin.workvence.com/api";
+  return envUrl.trim().replace(/\/$/, "");
 };
 
 /**

@@ -37,6 +37,7 @@ interface MessageListProps {
   onAcceptOffer: (offer: any) => void;
   onWithdraw: (msgId: string) => void;
   onCopyText: (text: string, msg?: string) => void;
+  onRetrySend?: (msg: any) => void;
   showScrollBottom?: boolean;
   unreadCountBelow?: number;
   onScrollToBottom?: () => void;
@@ -67,6 +68,7 @@ export const MessageList: React.FC<MessageListProps> = ({
   onAcceptOffer,
   onWithdraw,
   onCopyText,
+  onRetrySend,
   showScrollBottom = false,
   unreadCountBelow = 0,
   onScrollToBottom,
@@ -160,6 +162,7 @@ export const MessageList: React.FC<MessageListProps> = ({
               onAcceptOffer={onAcceptOffer}
               onWithdraw={onWithdraw}
               onCopyText={onCopyText}
+              onRetrySend={onRetrySend}
             />
           ))}
         </>

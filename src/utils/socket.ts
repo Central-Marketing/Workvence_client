@@ -54,6 +54,7 @@ export interface SocketClient {
   once: (event: string, cb: (...args: any[]) => void) => void;
   off: (event: string, cb?: (...args: any[]) => void) => void;
   readonly connected: boolean;
+  getSocket: () => Socket | null;
 }
 
 export const socket: SocketClient = {
@@ -91,6 +92,9 @@ export const socket: SocketClient = {
   },
   get connected(): boolean {
     return !!(realSocket && realSocket.connected);
+  },
+  getSocket() {
+    return getSocket();
   }
 };
 

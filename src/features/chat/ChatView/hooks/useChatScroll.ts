@@ -183,7 +183,12 @@ export function useChatScroll({
             lastMsg?.userID ||
             ""
           );
-          const isOwnMessage = Boolean(user?._id && String(user._id) === senderId);
+          const currentUserId = String(user?._id || user?.id || "");
+          const isOwnMessage = Boolean(
+            String(lastMsg?._id || lastMsg?.id || "").startsWith("temp-") ||
+            Boolean(lastMsg?.tempId) ||
+            (currentUserId && senderId && currentUserId === senderId)
+          );
 
           if (isOwnMessage || isNearBottomRef.current) {
             scrollToBottomSmooth();
@@ -196,7 +201,7 @@ export function useChatScroll({
       }
       prevMessageCountRef.current = filteredMessages.length;
     }
-  }, [filteredMessages, isValidId, msgsLoading, scrollToBottomSmooth, user?._id]);
+  }, [filteredMessages, isValidId, msgsLoading, scrollToBottomSmooth, user?._id, user?.id]);
 
   // Handle dynamic height changes (images, attachments, proposals loading asynchronously)
   useEffect(() => {

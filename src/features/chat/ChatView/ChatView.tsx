@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/utils/toast";
@@ -12,7 +12,9 @@ import { ChatSkeleton } from "@/components";
 
 import { ViewingOfferDetailsState } from "./types";
 import { useChatScroll, useChatSocket, useChatMessages } from "./hooks";
+import { useNetworkStatus } from "./hooks/useNetworkStatus";
 import { ChatHeader, MessageList, MessageComposer } from "./components/ChatWindow";
+import { ChatConnectionBanner } from "./components/ChatWindow/ChatConnectionBanner";
 import { ConversationList } from "./components/ConversationList";
 import { ContactSidebar } from "./components/ContactSidebar";
 import {
@@ -31,6 +33,9 @@ export const ChatView = () => {
   );
   const queryClient = useQueryClient();
   const navigate = useRouter();
+
+  // Network and server connection status
+  const { connectionState, justReconnected, reconnect } = useNetworkStatus();
 
   // Modals state
   const [showOfferModal, setShowOfferModal] = useState(false);
@@ -323,6 +328,8 @@ export const ChatView = () => {
     });
   }, [conversations, convFilterTab, selectedTagFilter, convSearchQuery, user]);
 
+  const scrollToBottomRef = useRef<(behavior?: ScrollBehavior) => void>(() => {});
+
   // Messages hook
   const {
     messages,
@@ -351,6 +358,7 @@ export const ChatView = () => {
     handleAcceptOffer,
     handleWithdraw,
     handleCreateMeeting,
+    handleRetrySend,
   } = useChatMessages({
     user,
     conversationID,
@@ -383,6 +391,8 @@ export const ChatView = () => {
     isCreatingMeeting,
     setIsCreatingMeeting,
     setShowMeetingModal,
+    connectionState,
+    onScrollToBottom: (b) => scrollToBottomRef.current?.(b),
   });
 
   // Auto-scroll hook
@@ -404,6 +414,8 @@ export const ChatView = () => {
     isFetchingOlder,
     onLoadOlder: fetchOlderMessages,
   });
+
+  scrollToBottomRef.current = scrollToBottom;
 
   const handleCopyText = (text: string, msg: string = "Copied to clipboard!") => {
     if (!text) return;
@@ -503,6 +515,13 @@ export const ChatView = () => {
                 onOpenRightSide={() => setIsRightSideOpen(true)}
               />
 
+              {/* Network connection status banner (offline / reconnecting / reconnected) */}
+              <ChatConnectionBanner
+                connectionState={connectionState}
+                justReconnected={justReconnected}
+                onRetry={reconnect}
+              />
+
               {/* Messages Stream */}
               <MessageList
                 messagesContainerRef={messagesContainerRef}
@@ -540,6 +559,7 @@ export const ChatView = () => {
                 onAcceptOffer={handleAcceptOffer}
                 onWithdraw={handleWithdraw}
                 onCopyText={handleCopyText}
+                onRetrySend={handleRetrySend}
                 showScrollBottom={showScrollBottom}
                 unreadCountBelow={unreadCountBelow}
                 onScrollToBottom={() => scrollToBottom("smooth")}

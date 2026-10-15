@@ -8,6 +8,7 @@ import { isTargetConversation } from "@/utils/chatHelpers";
 import supportService from "@/utils/supportService";
 import { ChatAttachment, AttachmentMetaItem } from "../types";
 import { parseMeeting } from "../utils/chatMediaHelpers";
+import { ChatConnectionState } from "./useNetworkStatus";
 
 interface UseChatMessagesOptions {
   user: any;
@@ -43,6 +44,8 @@ interface UseChatMessagesOptions {
   isCreatingMeeting: boolean;
   setIsCreatingMeeting: (creating: boolean) => void;
   setShowMeetingModal: (show: boolean) => void;
+  connectionState?: ChatConnectionState;
+  onScrollToBottom?: (behavior?: ScrollBehavior) => void;
 }
 
 export function useChatMessages({
@@ -79,6 +82,8 @@ export function useChatMessages({
   isCreatingMeeting,
   setIsCreatingMeeting,
   setShowMeetingModal,
+  connectionState = "connected",
+  onScrollToBottom,
 }: UseChatMessagesOptions) {
   // Composer state
   const [messageText, setMessageText] = useState("");
@@ -88,6 +93,10 @@ export function useChatMessages({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isSendingRef = useRef(false);
+
+  // Offline Outbox Queue (WhatsApp-style)
+  const outboxQueueRef = useRef<any[]>([]);
+  const isFlushingOutboxRef = useRef(false);
 
   // Cursor pagination state
   const [hasMore, setHasMore] = useState(true);
@@ -223,69 +232,60 @@ export function useChatMessages({
     return messages
       .filter((msg: any, index: number, self: any[]) => {
         const msgId = String(msg._id || msg.id || "");
-        if (msgId && !msgId.startsWith("temp-")) {
-          const firstIdx = self.findIndex((m: any) => String(m._id || m.id || "") === msgId);
+        const isTemp = !msgId || msgId.startsWith("temp-") || Boolean(msg.tempId);
+        const text = (msg.description || msg.desc || msg.text || msg.message || "").trim();
+        const fileUrl = msg.file || (Array.isArray(msg.attachments) && msg.attachments[0]) || "";
+
+        // 1. Exact ID and rapid duplicate suppression for confirmed server messages
+        if (!isTemp) {
+          const firstIdx = self.findIndex((m: any) => {
+            const mId = String(m._id || m.id || "");
+            if (mId === msgId) return true;
+            if (mId.startsWith("temp-")) return false;
+
+            const otherText = (m.description || m.desc || m.text || m.message || "").trim();
+            const otherFile = m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
+            if (otherText !== text || otherFile !== fileUrl) return false;
+
+            const t1 = msg.createdAt ? new Date(msg.createdAt).getTime() : 0;
+            const t2 = m.createdAt ? new Date(m.createdAt).getTime() : 0;
+            return t1 > 0 && t2 > 0 && Math.abs(t1 - t2) < 3000;
+          });
           if (firstIdx !== index) return false;
         }
 
-        const text = (msg.description || msg.desc || msg.text || msg.message || "").trim();
-        const fileUrl = msg.file || (Array.isArray(msg.attachments) && msg.attachments[0]) || "";
-        const isTemp = !msgId || msgId.startsWith("temp-");
-
+        // 2. Temp message replacement: if the real server message has arrived, hide the temp message
         if (isTemp) {
-          const hasRealDuplicate = self.some((m: any, mIdx: number) => {
+          const tempId = String(msg.tempId || msg._id || msg.id || "");
+          const tempTime = msg.createdAt ? new Date(msg.createdAt).getTime() : Date.now();
+
+          const hasConfirmedServerMessage = self.some((m: any, mIdx: number) => {
             if (mIdx === index) return false;
             const otherId = String(m._id || m.id || "");
             if (!otherId || otherId.startsWith("temp-")) return false;
+
+            // Direct tempId match if server echoed it
+            if (m.tempId && (m.tempId === tempId || String(m.tempId) === tempId)) return true;
+            if (m.clientTempId && (m.clientTempId === tempId || String(m.clientTempId) === tempId)) return true;
+
+            // Content match
             const otherText = (m.description || m.desc || m.text || m.message || "").trim();
             const otherFile = m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
-            return otherText === text && otherFile === fileUrl;
+            if (otherText !== text || otherFile !== fileUrl) return false;
+
+            // If both messages are in the recent tail of the chat stream (last 6 messages)
+            // or created within 5 minutes, they correspond to the same message event
+            const isNearRecentStream =
+              mIdx >= Math.max(0, self.length - 6) && index >= Math.max(0, self.length - 6);
+            if (isNearRecentStream) return true;
+
+            const otherTime = m.createdAt ? new Date(m.createdAt).getTime() : 0;
+            if (otherTime && Math.abs(otherTime - tempTime) <= 300000) return true;
+
+            return false;
           });
-          if (hasRealDuplicate) return false;
-        }
 
-        const senderId = String(
-          (typeof msg.sender === "object" && (msg.sender?._id || msg.sender?.id)) ||
-            (typeof msg.user === "object" && (msg.user?._id || msg.user?.id)) ||
-            (typeof msg.userID === "object" && (msg.userID?._id || msg.userID?.id)) ||
-            msg.sender ||
-            msg.user ||
-            msg.senderID ||
-            msg.userID ||
-            msg.from ||
-            ""
-        );
-
-        const firstDuplicateIdx = self.findIndex((m: any) => {
-          const otherText = (m.description || m.desc || m.text || m.message || "").trim();
-          const otherFile = m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
-          if (otherText !== text || otherFile !== fileUrl) return false;
-
-          const otherSenderId = String(
-            (typeof m.sender === "object" && (m.sender?._id || m.sender?.id)) ||
-              (typeof m.user === "object" && (m.user?._id || m.user?.id)) ||
-              (typeof m.userID === "object" && (m.userID?._id || m.userID?.id)) ||
-              m.sender ||
-              m.user ||
-              m.senderID ||
-              m.userID ||
-              m.from ||
-              ""
-          );
-          if (senderId && otherSenderId && senderId !== otherSenderId) return false;
-
-          const t1 = msg.createdAt ? new Date(msg.createdAt).getTime() : 0;
-          const t2 = m.createdAt ? new Date(m.createdAt).getTime() : 0;
-          if (t1 && t2 && Math.abs(t1 - t2) > 15000) return false;
-
-          return true;
-        });
-
-        if (firstDuplicateIdx !== index) {
-          const otherMsg = self[firstDuplicateIdx];
-          const otherId = String(otherMsg?._id || otherMsg?.id || "");
-          if (isTemp && otherId && !otherId.startsWith("temp-")) return false;
-          if (firstDuplicateIdx < index) return false;
+          if (hasConfirmedServerMessage) return false;
         }
 
         const meeting = parseMeeting(msg.meeting || msg.meetingPayload || text);
@@ -439,9 +439,24 @@ export function useChatMessages({
           );
       });
     },
-    onSuccess: (res: any) => {
+    onSuccess: (res: any, variables: any) => {
       const savedMsg = res?.data?.data || res?.data?.message || res?.data;
       const msgId = savedMsg?._id || savedMsg?.id;
+      const outgoingTempId = String(variables?.tempId || variables?._id || "");
+
+      const targetKeys = new Set(
+        [
+          conversationID,
+          activeRoomID,
+          activeConversation?.uuid,
+          activeConversation?._id,
+          activeConversation?.conversationID,
+          activeConversation?.id,
+        ]
+          .filter(Boolean)
+          .map((k) => String(k).trim())
+      );
+
       if (savedMsg && typeof savedMsg === "object" && msgId) {
         const savedText = (
           savedMsg.customOffer?.description ||
@@ -451,11 +466,22 @@ export function useChatMessages({
           savedMsg.message ||
           ""
         ).trim();
+        const savedFile =
+          savedMsg.file || (Array.isArray(savedMsg.attachments) && savedMsg.attachments[0]) || "";
+        const confirmedMsg = { ...savedMsg, status: "sent" };
+
         const updateMsgCache = (oldData: any = []) => {
           const arr = Array.isArray(oldData) ? oldData : [];
           const filtered = arr.filter((m: any) => {
             const mId = String(m._id || m.id || "");
             if (mId === String(msgId)) return false;
+
+            // Remove the exact matching tempId
+            if (outgoingTempId && (mId === outgoingTempId || String(m.tempId) === outgoingTempId)) {
+              return false;
+            }
+
+            // Also clean up any optimistic message matching the same text/file
             if (mId.startsWith("temp-")) {
               if (m.isCustomOffer && (savedMsg.isCustomOffer || savedMsg.customOffer)) {
                 return false;
@@ -468,18 +494,58 @@ export function useChatMessages({
                 m.message ||
                 ""
               ).trim();
-              return tempText !== savedText;
+              const tempFile =
+                m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
+              if (tempText === savedText && tempFile === savedFile) {
+                return false;
+              }
             }
             return true;
           });
-          return [...filtered, savedMsg];
+          return [...filtered, confirmedMsg];
         };
-        queryClient.setQueryData(["messages", conversationID], updateMsgCache);
-        if (activeRoomID && activeRoomID !== conversationID) {
-          queryClient.setQueryData(["messages", activeRoomID], updateMsgCache);
+
+        targetKeys.forEach((key) => {
+          queryClient.setQueryData(["messages", key], updateMsgCache);
+        });
+      } else if (outgoingTempId) {
+        // Even if response payload shape was non-standard, remove the temp message
+        targetKeys.forEach((key) => {
+          queryClient.setQueryData(["messages", key], (oldData: any = []) => {
+            const arr = Array.isArray(oldData) ? oldData : [];
+            return arr.filter(
+              (m: any) =>
+                String(m._id || m.id) !== outgoingTempId &&
+                String(m.tempId) !== outgoingTempId
+            );
+          });
+        });
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["messages", conversationID] });
+    },
+    onError: (err: any, variables: any) => {
+      const isNetErr =
+        !err?.response ||
+        err?.code === "ERR_NETWORK" ||
+        (typeof navigator !== "undefined" && !navigator.onLine);
+      const tempId = variables?.tempId || variables?._id;
+      if (tempId) {
+        if (isNetErr) {
+          // Network drop: ensure message stays in outbox queue for auto-retry
+          if (!outboxQueueRef.current.some((m: any) => (m.tempId || m._id) === tempId)) {
+            outboxQueueRef.current.push(variables);
+          }
+        } else {
+          // Server / validation error: mark status as failed so user sees retry alert
+          queryClient.setQueryData(["messages", conversationID], (old: any = []) => {
+            if (!Array.isArray(old)) return old;
+            return old.map((m: any) =>
+              String(m._id || m.id) === String(tempId) ? { ...m, status: "failed" } : m
+            );
+          });
         }
       }
-      queryClient.invalidateQueries({ queryKey: ["messages", conversationID] });
     },
   });
 
@@ -573,15 +639,29 @@ export function useChatMessages({
       public_id: currentAttachment.public_id
     } : null;
 
+    const senderDisplayName = String(user?.username || "User");
+    const userAvatar = getAvatarUrl(user?.image, senderDisplayName);
+    const userObj = {
+      _id: currentUid,
+      id: currentUid,
+      username: senderDisplayName,
+      image: userAvatar,
+      avatar: userAvatar,
+    };
+
     const tempId = `temp-${Date.now()}`;
     const tempMessage = {
       _id: tempId,
+      id: tempId,
+      tempId,
+      status: "pending",
       conversationID: activeRoomID || conversationID,
-      userID: {
-        _id: user?._id || user?.id,
-        username: user?.username || "User",
-        image: getAvatarUrl(user?.image, user?.username || "User"),
-      },
+      sender: userObj,
+      user: userObj,
+      userID: userObj,
+      senderID: userObj,
+      from: currentUid,
+      username: senderDisplayName,
       description: currentText,
       desc: currentText,
       text: currentText,
@@ -600,12 +680,52 @@ export function useChatMessages({
       return [...arr, tempMessage];
     };
 
-    queryClient.setQueryData(["messages", conversationID], appendTempMessage);
-    if (activeRoomID && activeRoomID !== conversationID) {
-      queryClient.setQueryData(["messages", activeRoomID], appendTempMessage);
-    }
+    const targetKeys = new Set(
+      [
+        conversationID,
+        activeRoomID,
+        activeConversation?.uuid,
+        activeConversation?._id,
+        activeConversation?.conversationID,
+        activeConversation?.id,
+      ]
+        .filter(Boolean)
+        .map((k) => String(k).trim())
+    );
+
+    targetKeys.forEach((key) => {
+      queryClient.setQueryData(["messages", key], appendTempMessage);
+    });
+
+    queryClient.setQueryData(["conversations"], (oldConvs: any) => {
+      if (!Array.isArray(oldConvs)) return oldConvs;
+      return oldConvs
+        .map((c: any) => {
+          if (
+            targetKeys.has(String(c.uuid)) ||
+            targetKeys.has(String(c._id)) ||
+            targetKeys.has(String(c.conversationID)) ||
+            targetKeys.has(String(c.id))
+          ) {
+            return {
+              ...c,
+              lastMessage: currentText || (attachmentUrl ? "📎 Attachment" : c.lastMessage),
+              updatedAt: new Date().toISOString(),
+            };
+          }
+          return c;
+        })
+        .sort(
+          (a: any, b: any) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
+    });
+
+    onScrollToBottom?.("smooth");
 
     const msgPayload = {
+      tempId,
+      _id: tempId,
       conversationID: activeRoomID || conversationID,
       conversationUUID: activeRoomID || conversationID,
       conversationId: activeRoomID || conversationID,
@@ -625,6 +745,16 @@ export function useChatMessages({
       isSeller: Boolean(user?.isSeller),
     };
 
+    const isOffline =
+      connectionState === "offline" ||
+      (typeof navigator !== "undefined" && !navigator.onLine);
+
+    if (isOffline) {
+      outboxQueueRef.current.push(msgPayload);
+      isSendingRef.current = false;
+      return;
+    }
+
     mutation.mutate(msgPayload, {
       onSettled: () => {
         isSendingRef.current = false;
@@ -636,6 +766,130 @@ export function useChatMessages({
       socket.emit("send_message", msgPayload);
     }
   };
+
+  // Flush offline outbox queue when connection is restored
+  const flushOutbox = useCallback(async () => {
+    if (isFlushingOutboxRef.current || outboxQueueRef.current.length === 0) return;
+    if (typeof navigator !== "undefined" && !navigator.onLine) return;
+
+    isFlushingOutboxRef.current = true;
+
+    try {
+      while (outboxQueueRef.current.length > 0) {
+        if (typeof navigator !== "undefined" && !navigator.onLine) break;
+
+        const nextMsg = outboxQueueRef.current[0];
+        try {
+          await mutation.mutateAsync(nextMsg);
+          outboxQueueRef.current.shift();
+
+          if (socket) {
+            if (!socket.connected) socket.connect();
+            socket.emit("send_message", nextMsg);
+          }
+        } catch (err: any) {
+          const isNetErr = !err?.response || err?.code === "ERR_NETWORK";
+          if (isNetErr) {
+            // Still experiencing network issues; pause and wait for next connection
+            break;
+          } else {
+            // Validation or permanent server failure; remove from queue and flag message as failed
+            const failedId = nextMsg.tempId || nextMsg._id;
+            outboxQueueRef.current.shift();
+            queryClient.setQueryData(["messages", conversationID], (old: any = []) => {
+              if (!Array.isArray(old)) return old;
+              return old.map((m: any) =>
+                String(m._id || m.id) === String(failedId) ? { ...m, status: "failed" } : m
+              );
+            });
+          }
+        }
+      }
+    } finally {
+      isFlushingOutboxRef.current = false;
+    }
+  }, [conversationID, mutation, queryClient]);
+
+  // Trigger flush whenever connection is restored
+  useEffect(() => {
+    if (
+      connectionState === "connected" ||
+      (typeof navigator !== "undefined" && navigator.onLine && socket?.connected)
+    ) {
+      flushOutbox();
+    }
+  }, [connectionState, flushOutbox]);
+
+  // Retry sending a failed message
+  const handleRetrySend = useCallback(
+    (failedMsg: any) => {
+      const msgId = failedMsg?._id || failedMsg?.id;
+      if (!msgId) return;
+
+      const targetKeys = new Set(
+        [
+          conversationID,
+          activeRoomID,
+          activeConversation?.uuid,
+          activeConversation?._id,
+          activeConversation?.conversationID,
+          activeConversation?.id,
+        ]
+          .filter(Boolean)
+          .map((k) => String(k).trim())
+      );
+
+      // Mark status back to pending across all active keys
+      targetKeys.forEach((key) => {
+        queryClient.setQueryData(["messages", key], (old: any = []) => {
+          if (!Array.isArray(old)) return old;
+          return old.map((m: any) =>
+            String(m._id || m.id) === String(msgId) ? { ...m, status: "pending" } : m
+          );
+        });
+      });
+
+      const payload = {
+        tempId: msgId,
+        _id: msgId,
+        conversationID: activeRoomID || conversationID,
+        conversationUUID: activeRoomID || conversationID,
+        conversationId: activeRoomID || conversationID,
+        description: failedMsg.description || failedMsg.desc || failedMsg.text || failedMsg.message || "",
+        desc: failedMsg.description || failedMsg.desc || failedMsg.text || failedMsg.message || "",
+        text: failedMsg.description || failedMsg.desc || failedMsg.text || failedMsg.message || "",
+        message: failedMsg.description || failedMsg.desc || failedMsg.text || failedMsg.message || "",
+        file: failedMsg.file || null,
+        attachments: failedMsg.attachments || [],
+        attachmentMeta: failedMsg.attachmentMeta || [],
+        attachment: failedMsg.attachment || null,
+        userID: user?._id || user?.id,
+        from: user?._id || user?.id,
+        to: targetOtherUserId || undefined,
+        isSeller: Boolean(user?.isSeller),
+      };
+
+      const isOffline =
+        connectionState === "offline" ||
+        (typeof navigator !== "undefined" && !navigator.onLine);
+
+      if (isOffline) {
+        if (!outboxQueueRef.current.some((m) => (m.tempId || m._id) === msgId)) {
+          outboxQueueRef.current.push(payload);
+        }
+      } else {
+        mutation.mutate(payload, {
+          onSuccess: () => {
+            if (socket) {
+              if (!socket.connected) socket.connect();
+              socket.emit("send_message", payload);
+            }
+          },
+        });
+      }
+    },
+    [conversationID, activeRoomID, user, targetOtherUserId, connectionState, mutation, queryClient]
+  );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {
@@ -999,5 +1253,7 @@ export function useChatMessages({
     handleAcceptOffer,
     handleWithdraw,
     handleCreateMeeting,
+    handleRetrySend,
+    outboxCount: outboxQueueRef.current.length,
   };
 }

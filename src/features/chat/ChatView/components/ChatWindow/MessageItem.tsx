@@ -2,6 +2,7 @@
 
 import React from "react";
 import moment from "moment";
+import { Clock, AlertCircle } from "lucide-react";
 import { MessageModerationBadge } from "@/features/chat";
 import { renderMessageTextWithLinks } from "@/utils/chatHelpers";
 import { parseOffer, parseMeeting } from "../../utils/chatMediaHelpers";
@@ -31,6 +32,7 @@ interface MessageItemProps {
   onAcceptOffer: (offer: any, msgId?: string) => void;
   onWithdraw: (msgId: string) => void;
   onCopyText: (text: string, msg?: string) => void;
+  onRetrySend?: (msg: any) => void;
 }
 
 export const MessageItem: React.FC<MessageItemProps> = ({
@@ -49,6 +51,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   onAcceptOffer,
   onWithdraw,
   onCopyText,
+  onRetrySend,
 }) => {
   const senderObj =
     (typeof msg.sender === "object" && msg.sender) ||
@@ -63,7 +66,9 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   const currentUserIdStr = String(user?._id || user?.id || "");
   const currentUsername = String(user?.username || "").toLowerCase();
   const senderUsername = String(senderObj?.username || msg.username || "").toLowerCase();
+  const isTemp = String(msg._id || msg.id || "").startsWith("temp-") || Boolean(msg.tempId);
   const isOwner = Boolean(
+    isTemp ||
     (currentUserIdStr && senderIdStr && currentUserIdStr === senderIdStr) ||
     (currentUsername && senderUsername && currentUsername === senderUsername)
   );
@@ -128,7 +133,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                 renderMessageTextWithLinks(part)
               )
             )}
-            <span className="inline-block w-12 h-3" aria-hidden="true" />
+            <span className={`inline-block ${isOwner ? "w-14" : "w-12"} h-3`} aria-hidden="true" />
           </p>
         );
       } catch {}
@@ -137,7 +142,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
     return (
       <p className="text-[13.5px] text-slate-800 m-0 whitespace-pre-wrap [overflow-wrap:anywhere] [word-break:break-word] leading-relaxed inline">
         {renderMessageTextWithLinks(text)}
-        <span className="inline-block w-12 h-3" aria-hidden="true" />
+        <span className={`inline-block ${isOwner ? "w-14" : "w-12"} h-3`} aria-hidden="true" />
       </p>
     );
   };
@@ -203,8 +208,27 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                 <MessageAttachment msg={msg} onImagePreview={onImagePreview} />
               </div>
               {renderMessageContent()}
-              <span className="float-right ml-2 mt-1.5 -mb-0.5 text-[11px] leading-none text-slate-400 select-none whitespace-nowrap">
-                {moment(msg.createdAt).format("h:mm A")}
+              <span className="float-right ml-2 mt-1.5 -mb-0.5 text-[11px] leading-none text-slate-400 select-none whitespace-nowrap inline-flex items-center gap-1">
+                <span>{moment(msg.createdAt).format("h:mm A")}</span>
+                {isOwner && (
+                  msg.status === "failed" ? (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRetrySend?.(msg);
+                      }}
+                      title="Failed to send. Click to retry."
+                      className="text-red-500 hover:text-red-600 cursor-pointer p-0 m-0 inline-flex items-center"
+                    >
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                    </button>
+                  ) : msg.status === "pending" || String(msg._id || msg.id || "").startsWith("temp-") ? (
+                    <span title="Waiting for network..." className="inline-flex items-center">
+                      <Clock className="w-2.5 h-2.5 text-slate-400 shrink-0 animate-pulse" />
+                    </span>
+                  ) : null
+                )}
               </span>
             </div>
             {isModerated && (

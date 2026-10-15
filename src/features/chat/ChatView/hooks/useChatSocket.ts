@@ -152,6 +152,7 @@ export function useChatSocket({
 
     const handleConnect = () => {
       joinRoom();
+      queryClient.invalidateQueries({ queryKey: ["messages", conversationID] });
     };
     socket.on("connect", handleConnect);
 
@@ -247,11 +248,34 @@ export function useChatSocket({
           );
           const incomingTime = newMsg.createdAt ? new Date(newMsg.createdAt).getTime() : Date.now();
 
-          // 1. If already in cache by ID, update existing message in place
+          // 1. If already in cache by ID, update existing message in place and clean up any leftover temp messages
           if (newMsgId && arr.some((m: any) => String(m._id || m.id) === String(newMsgId))) {
-            return arr.map((m: any) =>
-              String(m._id || m.id) === String(newMsgId) ? { ...m, ...newMsg } : m
-            );
+            return arr
+              .filter((m: any) => {
+                const mId = String(m._id || m.id || "");
+                if (mId.startsWith("temp-")) {
+                  if (newMsg.tempId && (m.tempId === newMsg.tempId || mId === String(newMsg.tempId))) {
+                    return false;
+                  }
+                  const tempText = (
+                    m.customOffer?.description ||
+                    m.description ||
+                    m.desc ||
+                    m.text ||
+                    m.message ||
+                    ""
+                  ).trim();
+                  const tempFile =
+                    m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
+                  if (tempText === incomingText && tempFile === incomingFile) {
+                    return false;
+                  }
+                }
+                return true;
+              })
+              .map((m: any) =>
+                String(m._id || m.id) === String(newMsgId) ? { ...m, ...newMsg } : m
+              );
           }
 
           // 2. Only skip duplicate socket echoes if same text/file AND same sender AND created within 15 seconds
@@ -286,12 +310,36 @@ export function useChatSocket({
             const mTime = m.createdAt ? new Date(m.createdAt).getTime() : 0;
             return mTime > 0 && Math.abs(incomingTime - mTime) < 15000;
           });
-          if (isDuplicateEcho) return arr;
+
+          if (isDuplicateEcho) {
+            return arr.filter((m: any) => {
+              const mId = String(m._id || m.id || "");
+              if (mId.startsWith("temp-")) {
+                const tempText = (
+                  m.customOffer?.description ||
+                  m.description ||
+                  m.desc ||
+                  m.text ||
+                  m.message ||
+                  ""
+                ).trim();
+                const tempFile =
+                  m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
+                if (tempText === incomingText && tempFile === incomingFile) {
+                  return false;
+                }
+              }
+              return true;
+            });
+          }
 
           // 3. Replace matching temp message or remove matching temp- messages
           const withoutTemp = arr.filter((m: any) => {
             const mId = String(m._id || m.id || "");
             if (mId.startsWith("temp-")) {
+              if (newMsg.tempId && (m.tempId === newMsg.tempId || mId === String(newMsg.tempId))) {
+                return false;
+              }
               if (m.isCustomOffer && (newMsg.isCustomOffer || newMsg.customOffer)) {
                 return false;
               }
@@ -303,7 +351,11 @@ export function useChatSocket({
                 m.message ||
                 ""
               ).trim();
-              return tempText !== incomingText;
+              const tempFile =
+                m.file || (Array.isArray(m.attachments) && m.attachments[0]) || "";
+              if (tempText === incomingText && tempFile === incomingFile) {
+                return false;
+              }
             }
             return true;
           });

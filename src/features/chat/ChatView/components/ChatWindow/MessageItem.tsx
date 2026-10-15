@@ -2,7 +2,7 @@
 
 import React from "react";
 import moment from "moment";
-import { Clock, AlertCircle } from "lucide-react";
+import { Clock, AlertCircle, Flag } from "lucide-react";
 import { MessageModerationBadge } from "@/features/chat";
 import { renderMessageTextWithLinks } from "@/utils/chatHelpers";
 import { parseOffer, parseMeeting } from "../../utils/chatMediaHelpers";
@@ -78,12 +78,12 @@ export const MessageItem: React.FC<MessageItemProps> = ({
     msg.isCustomOffer || (typeof msgRawText === "string" && msgRawText.includes("[CUSTOM_OFFER]"))
       ? parseOffer(msg.offer || msg.customOffer || msgRawText)
       : msg.offer
-      ? parseOffer(msg.offer)
-      : null;
+        ? parseOffer(msg.offer)
+        : null;
   const meeting =
     (typeof msgRawText === "string" && msgRawText.includes("[MEETING_INVITE]")) ||
-    msg.meeting ||
-    msg.meetingPayload
+      msg.meeting ||
+      msg.meetingPayload
       ? parseMeeting(msg.meeting || msg.meetingPayload || msgRawText)
       : null;
 
@@ -100,16 +100,35 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   const currentMsgOrderId = msg.orderId || msg.orderID;
   const acceptedOrder = offer
     ? contactOrders.find(
-        (o: any) =>
-          (currentMsgOrderId && (o._id === currentMsgOrderId || o.id === currentMsgOrderId)) ||
-          (o.title === offer.desc && Number(o.price) === Number(offer.price))
-      )
+      (o: any) =>
+        (currentMsgOrderId && (o._id === currentMsgOrderId || o.id === currentMsgOrderId)) ||
+        (o.title === offer.desc && Number(o.price) === Number(offer.price))
+    )
     : null;
   const targetOrderId = currentMsgOrderId || acceptedOrder?._id || acceptedOrder?.id;
   const isAccepted = isOfferAccepted || Boolean(acceptedOrder);
   const isModerated = Boolean(msg.moderation?.flagged);
+  const severity = String(msg.moderation?.severity || "high").toLowerCase();
+  const severityBubbleClass =
+    severity === "low"
+      ? "!border-amber-300 !bg-amber-50/80 dark:!bg-amber-950/30 dark:!border-amber-700/60"
+      : severity === "medium"
+        ? "!border-orange-300 !bg-orange-50/80 dark:!bg-orange-950/30 dark:!border-orange-700/60"
+        : severity === "critical"
+          ? "!border-red-500 !bg-red-100/90 dark:!bg-red-950/50 dark:!border-red-600"
+          : "!border-rose-400 !bg-rose-50/80 dark:!bg-rose-950/30 dark:!border-rose-700/60";
+
+  const severityIconColor =
+    severity === "low"
+      ? "text-amber-500"
+      : severity === "medium"
+        ? "text-orange-500"
+        : severity === "critical"
+          ? "text-red-600"
+          : "text-rose-500";
+
   const bubbleModerationClass = isModerated
-    ? "!rounded-[10px_10px_10px_0] !border !border-[var(--warning-500,#F00000)] !bg-[#FFF]"
+    ? `!rounded-[10px_10px_10px_0] !border ${severityBubbleClass}`
     : "";
 
   const msgDateKey = moment(msg.createdAt).format("YYYY-MM-DD");
@@ -123,9 +142,10 @@ export const MessageItem: React.FC<MessageItemProps> = ({
     if (!text) return null;
 
     const matchedWord = msg.moderation?.matchedWord || "";
-    if (msg.moderation?.flagged && matchedWord && matchedWord.trim().length > 0) {
+    const cleanWord = matchedWord.replace(/[.,;:!?()[\]{}"']+$/, "").trim();
+    if (msg.moderation?.flagged && cleanWord && cleanWord.length > 0) {
       try {
-        const escaped = matchedWord.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const escaped = cleanWord.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         const regex = new RegExp(`(${escaped})`, "gi");
         const parts = text.split(regex);
         return (
@@ -145,7 +165,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
             <span className={`inline-block ${isOwner ? "w-14" : "w-12"} h-3`} aria-hidden="true" />
           </p>
         );
-      } catch {}
+      } catch { }
     }
 
     return (
@@ -166,9 +186,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
         </div>
       )}
       <div
-        className={`flex gap-3 items-end max-w-[85%] sm:max-w-[75%] [overflow-wrap:anywhere] [word-break:break-word] ${
-          isOwner ? "self-end justify-end ml-auto" : "self-start mr-auto"
-        } ${offer || meeting ? "!max-w-[95%] xl:!max-w-[85%]" : ""}`}
+        className={`flex gap-3 items-end max-w-[85%] sm:max-w-[75%] [overflow-wrap:anywhere] [word-break:break-word] ${isOwner ? "self-end justify-end ml-auto" : "self-start mr-auto"
+          } ${offer || meeting ? "!max-w-[95%] xl:!max-w-[85%]" : ""}`}
       >
         {!isOwner && (
           <img
@@ -207,17 +226,17 @@ export const MessageItem: React.FC<MessageItemProps> = ({
         ) : (
           <>
             <div
-              className={`relative px-2.5 pt-2 pb-1.5 min-w-[85px] max-w-full shadow-2xs [overflow-wrap:anywhere] [word-break:break-word] ${bubbleModerationClass} ${
-                isOwner
+              className={`relative px-2.5 pt-2 pb-1.5 min-w-[85px] max-w-full shadow-2xs [overflow-wrap:anywhere] [word-break:break-word] ${bubbleModerationClass} ${isOwner
                   ? "rounded-[10px_10px_10px_0] border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-300,#F5F5F5)]"
                   : "rounded-[10px_10px_10px_0] bg-[#FFF] border-0"
-              }`}
+                }`}
             >
               <div className="clear-both">
                 <MessageAttachment msg={msg} onImagePreview={onImagePreview} />
               </div>
               {renderMessageContent()}
               <span className="float-right ml-2 mt-1.5 -mb-0.5 text-[11px] leading-none text-slate-400 select-none whitespace-nowrap inline-flex items-center gap-1">
+
                 <span>{moment(msg.createdAt).format("h:mm A")}</span>
                 {isOwner && (
                   msg.status === "failed" ? (

@@ -150,6 +150,33 @@ export default function TicketDetailsPage() {
   const [activeTab, setActiveTab] = useState<"group" | "private">("group");
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
+  // Auto-resize textarea as content changes, lifting like WhatsApp
+  const MIN_TEXTAREA_HEIGHT = 36;
+  const MAX_TEXTAREA_HEIGHT = 144;
+
+  const adjustTextareaHeight = useCallback(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    const scrollH = el.scrollHeight;
+    const newHeight = Math.min(Math.max(scrollH, MIN_TEXTAREA_HEIGHT), MAX_TEXTAREA_HEIGHT);
+    el.style.height = `${newHeight}px`;
+    if (scrollH > MAX_TEXTAREA_HEIGHT) {
+      el.style.overflowY = "auto";
+    } else {
+      el.style.overflowY = "hidden";
+    }
+  }, []);
+
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [replyText, adjustTextareaHeight]);
+
+  useEffect(() => {
+    window.addEventListener("resize", adjustTextareaHeight);
+    return () => window.removeEventListener("resize", adjustTextareaHeight);
+  }, [adjustTextareaHeight]);
+
   const handleDownload = async (e: React.MouseEvent, url: string, fileName: string = "attachment") => {
     e.stopPropagation();
     e.preventDefault();
@@ -425,6 +452,10 @@ export default function TicketDetailsPage() {
 
     setReplyText("");
     setAttachments([]);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.overflowY = "hidden";
+    }
     setSending(true);
 
     try {
@@ -936,15 +967,23 @@ export default function TicketDetailsPage() {
                         </div>
 
                         <div
-                          className={`relative px-4 py-3 min-w-[100px] max-w-full shadow-2xs [overflow-wrap:anywhere] [word-break:break-word] ${isMe ? "rounded-[10px_10px_10px_0] border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-300,#F5F5F5)] text-slate-800" : "rounded-[10px_10px_10px_0] bg-[#FFF] border-0 text-[#0f172a]"}`}
+                          className={`relative px-2.5 pt-2 pb-1.5 min-w-[85px] max-w-full shadow-2xs [overflow-wrap:anywhere] [word-break:break-word] ${isMe ? "rounded-[10px_10px_10px_0] border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-300,#F5F5F5)] text-slate-800" : "rounded-[10px_10px_10px_0] bg-[#FFF] border-0 text-[#0f172a]"}`}
                         >
-                          {msg.message && <p className="text-[13.5px] m-0 whitespace-pre-wrap leading-relaxed">{msg.message}</p>}
-                          <span className="text-[11px] text-slate-400 block mt-1">{timeStr}</span>
+                          {msg.message && (
+                            <p className="text-[13.5px] m-0 whitespace-pre-wrap leading-relaxed inline">
+                              {msg.message}
+                              {/* Invisible spacer so multi-line text doesn't collide with floating timestamp */}
+                              <span className="inline-block w-12 h-3" aria-hidden="true" />
+                            </p>
+                          )}
+                          <span className="float-right ml-2 mt-1.5 -mb-0.5 text-[11px] leading-none text-slate-400 select-none whitespace-nowrap">
+                            {timeStr}
+                          </span>
 
                           {/* Attachments rendering with Signed URL resolution & Image Previews */}
                           {/* Attachments Section */}
                           {msg.attachments && msg.attachments.length > 0 && (
-                            <div className={`mt-3 pt-3 border-t ${isMe ? "border-white/20" : "border-[#e2e8f0]"} space-y-2`}>
+                            <div className={`mt-2.5 pt-2.5 border-t ${isMe ? "border-black/10" : "border-[#e2e8f0]"} space-y-2 clear-both`}>
                               <p className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 ${isMe ? "text-white/80" : "text-[#64748b]"}`}>
                                 <FileText className="w-3 h-3" />
                                 <span>Attachments ({msg.attachments.length})</span>
@@ -1083,6 +1122,7 @@ export default function TicketDetailsPage() {
                   onChange={(e) => {
                     setReplyText(e.target.value);
                     startTyping();
+                    adjustTextareaHeight();
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
@@ -1094,7 +1134,7 @@ export default function TicketDetailsPage() {
                   }}
                   onBlur={stopTyping}
                   disabled={isPolishing}
-                  className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 resize-none text-gray-800 placeholder-gray-400 text-sm py-1.5 px-1 min-h-[36px] max-h-32 overflow-y-auto scrollbar-hide scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden font-inter leading-relaxed"
+                  className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 resize-none text-gray-800 placeholder-gray-400 text-sm py-1.5 px-1 min-h-[36px] overflow-y-hidden font-inter leading-5 transition-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                 />
 
                 {/* AI Polish Button */}

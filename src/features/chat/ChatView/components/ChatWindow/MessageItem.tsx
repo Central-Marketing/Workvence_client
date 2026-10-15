@@ -115,7 +115,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
         const regex = new RegExp(`(${escaped})`, "gi");
         const parts = text.split(regex);
         return (
-          <p className="text-[13.5px] text-slate-900 m-0 whitespace-pre-wrap [overflow-wrap:anywhere] [word-break:break-word] leading-relaxed">
+          <p className="text-[13.5px] text-slate-900 m-0 whitespace-pre-wrap [overflow-wrap:anywhere] [word-break:break-word] leading-relaxed inline">
             {parts.map((part: string, idx: number) =>
               regex.test(part) ? (
                 <mark
@@ -128,14 +128,16 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                 renderMessageTextWithLinks(part)
               )
             )}
+            <span className="inline-block w-12 h-3" aria-hidden="true" />
           </p>
         );
       } catch {}
     }
 
     return (
-      <p className="text-[13.5px] text-slate-800 m-0 whitespace-pre-wrap [overflow-wrap:anywhere] [word-break:break-word] leading-relaxed">
+      <p className="text-[13.5px] text-slate-800 m-0 whitespace-pre-wrap [overflow-wrap:anywhere] [word-break:break-word] leading-relaxed inline">
         {renderMessageTextWithLinks(text)}
+        <span className="inline-block w-12 h-3" aria-hidden="true" />
       </p>
     );
   };
@@ -191,15 +193,17 @@ export const MessageItem: React.FC<MessageItemProps> = ({
         ) : (
           <>
             <div
-              className={`relative px-4 py-3 min-w-[100px] max-w-full shadow-2xs [overflow-wrap:anywhere] [word-break:break-word] ${bubbleModerationClass} ${
+              className={`relative px-2.5 pt-2 pb-1.5 min-w-[85px] max-w-full shadow-2xs [overflow-wrap:anywhere] [word-break:break-word] ${bubbleModerationClass} ${
                 isOwner
                   ? "rounded-[10px_10px_10px_0] border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-300,#F5F5F5)]"
                   : "rounded-[10px_10px_10px_0] bg-[#FFF] border-0"
               }`}
             >
-              <MessageAttachment msg={msg} onImagePreview={onImagePreview} />
+              <div className="clear-both">
+                <MessageAttachment msg={msg} onImagePreview={onImagePreview} />
+              </div>
               {renderMessageContent()}
-              <span className="text-[11px] text-slate-400 block mt-1">
+              <span className="float-right ml-2 mt-1.5 -mb-0.5 text-[11px] leading-none text-slate-400 select-none whitespace-nowrap">
                 {moment(msg.createdAt).format("h:mm A")}
               </span>
             </div>

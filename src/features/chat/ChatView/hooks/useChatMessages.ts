@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useMemo, useCallback } from "react";
+import { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import { useQuery, useMutation, QueryClient } from "@tanstack/react-query";
 import { toast } from "@/utils/toast";
 import { axiosFetch, socket, getAvatarUrl, parseRevisionNumber } from "@/utils";
@@ -89,6 +89,20 @@ export function useChatMessages({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isSendingRef = useRef(false);
 
+  // Cursor pagination state
+  const [hasMore, setHasMore] = useState(true);
+  const [isFetchingOlder, setIsFetchingOlder] = useState(false);
+  const nextCursorRef = useRef<string | null>(null);
+  const isFetchingOlderRef = useRef(false);
+
+  // Reset pagination state when switching conversations
+  useEffect(() => {
+    nextCursorRef.current = null;
+    setHasMore(true);
+    isFetchingOlderRef.current = false;
+    setIsFetchingOlder(false);
+  }, [conversationID]);
+
   // Fetch messages history
   const {
     isLoading: msgsLoading,
@@ -97,29 +111,54 @@ export function useChatMessages({
   } = useQuery({
     queryKey: ["messages", conversationID],
     queryFn: async () => {
-      const extractMessages = (data: any): any[] | null => {
-        if (!data) return null;
-        if (Array.isArray(data) && data.length > 0) return data;
-        if (Array.isArray(data?.data) && data.data.length > 0) return data.data;
-        if (Array.isArray(data?.messages) && data.messages.length > 0) return data.messages;
-        if (Array.isArray(data?.data?.messages) && data.data.messages.length > 0)
+      const handleResponse = (data: any): any[] => {
+        if (!data) return [];
+        // Structured paginated response
+        if (data.messages && Array.isArray(data.messages)) {
+          nextCursorRef.current = data.nextCursor ?? null;
+          setHasMore(Boolean(data.hasMore));
+          return data.messages;
+        }
+        if (data.data?.messages && Array.isArray(data.data.messages)) {
+          nextCursorRef.current = data.data.nextCursor ?? null;
+          setHasMore(Boolean(data.data.hasMore));
           return data.data.messages;
-        if (Array.isArray(data?.result) && data.result.length > 0) return data.result;
-        return null;
+        }
+        // Legacy plain array fallbacks
+        if (Array.isArray(data)) {
+          nextCursorRef.current = null;
+          setHasMore(false);
+          return data;
+        }
+        if (Array.isArray(data?.data)) {
+          nextCursorRef.current = null;
+          setHasMore(false);
+          return data.data;
+        }
+        if (Array.isArray(data?.result)) {
+          nextCursorRef.current = null;
+          setHasMore(false);
+          return data.result;
+        }
+        return [];
       };
 
       const targetId = conversationID || activeConversation?.uuid || activeConversation?._id;
       if (!targetId) return [];
 
       try {
-        const { data } = await axiosFetch.get(`/conversations/${targetId}/messages`);
-        return extractMessages(data) || [];
+        const { data } = await axiosFetch.get(`/conversations/${targetId}/messages`, {
+          params: { limit: 30 },
+        });
+        return handleResponse(data);
       } catch (err: any) {
         const altId = activeConversation?._id;
         if (altId && String(altId) !== String(targetId)) {
           try {
-            const { data } = await axiosFetch.get(`/conversations/${altId}/messages`);
-            return extractMessages(data) || [];
+            const { data } = await axiosFetch.get(`/conversations/${altId}/messages`, {
+              params: { limit: 30 },
+            });
+            return handleResponse(data);
           } catch {}
         }
         return [];
@@ -129,6 +168,55 @@ export function useChatMessages({
     retry: false,
     staleTime: 5000,
   });
+
+  // Fetch older messages using cursor pagination
+  const fetchOlderMessages = useCallback(async () => {
+    const cursor = nextCursorRef.current;
+    if (!hasMore || isFetchingOlderRef.current || !cursor) return;
+
+    const targetId = conversationID || activeConversation?.uuid || activeConversation?._id;
+    if (!targetId) return;
+
+    isFetchingOlderRef.current = true;
+    setIsFetchingOlder(true);
+
+    try {
+      const { data } = await axiosFetch.get(`/conversations/${targetId}/messages`, {
+        params: { limit: 30, before: cursor },
+      });
+
+      const olderMessages: any[] =
+        (data && Array.isArray(data.messages) ? data.messages : null) ||
+        (data?.data && Array.isArray(data.data.messages) ? data.data.messages : null) ||
+        (Array.isArray(data) ? data : []) ||
+        [];
+
+      const newNextCursor = data?.nextCursor ?? data?.data?.nextCursor ?? null;
+      const newHasMore = Boolean(data?.hasMore ?? data?.data?.hasMore ?? false);
+
+      nextCursorRef.current = newNextCursor;
+      setHasMore(newHasMore);
+
+      if (olderMessages.length > 0) {
+        queryClient.setQueryData(["messages", conversationID], (current: any = []) => {
+          const currentArr = Array.isArray(current) ? current : [];
+          const existingIds = new Set(
+            currentArr.map((m: any) => String(m._id || m.id)).filter(Boolean)
+          );
+          const uniqueOlder = olderMessages.filter((m: any) => {
+            const id = String(m._id || m.id);
+            return !id || !existingIds.has(id);
+          });
+          return [...uniqueOlder, ...currentArr];
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch older messages:", err);
+    } finally {
+      isFetchingOlderRef.current = false;
+      setIsFetchingOlder(false);
+    }
+  }, [conversationID, activeConversation, hasMore, queryClient]);
 
   // Filtered messages with robust deduplication
   const filteredMessages = useMemo(() => {
@@ -889,6 +977,9 @@ export function useChatMessages({
     msgsLoading,
     msgsError,
     filteredMessages,
+    hasMore,
+    isFetchingOlder,
+    fetchOlderMessages,
     isAwaitingFirstReply,
     messageText,
     setMessageText,

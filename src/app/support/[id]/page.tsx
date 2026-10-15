@@ -30,6 +30,7 @@ import {
   X,
   File,
   Lock,
+  ChevronDown,
 } from "lucide-react";
 import { supportService, SupportTicketItem, SupportMessage } from "@/utils/supportService";
 import { useSupportSocket, SocketSupportMessage } from "@/hooks/useSupportSocket";
@@ -148,6 +149,7 @@ export default function TicketDetailsPage() {
   const [attachments, setAttachments] = useState<{ name: string; url: string; public_id?: string; type?: string }[]>([]);
   const [selectedPreviewImage, setSelectedPreviewImage] = useState<{ url: string; name: string } | null>(null);
   const [activeTab, setActiveTab] = useState<"group" | "private">("group");
+  const [adminPrivateTarget, setAdminPrivateTarget] = useState<"buyer" | "seller">("buyer");
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   // Auto-resize textarea as content changes, lifting like WhatsApp
@@ -203,25 +205,100 @@ export default function TicketDetailsPage() {
 
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   const currentUserId = String(user?._id || user?.id || "").trim();
+  const isNearBottomRef = useRef(true);
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
+  const [isInitialScrolled, setIsInitialScrolled] = useState(false);
+  const prevMsgCountRef = useRef(0);
 
-  const scrollToBottom = useCallback(() => {
+  // WhatsApp-style instant bottom anchor (0ms, no animation) for initial mount or tab change
+  const scrollToBottomInstant = useCallback(() => {
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+      isNearBottomRef.current = true;
+      setShowScrollBottom(false);
+    }
+  }, []);
+
+  // Smooth scroll used ONLY when user sends a message or clicks "scroll to bottom"
+  const scrollToBottomSmooth = useCallback(() => {
+    if (messageContainerRef.current) {
       messageContainerRef.current.scrollTo({
         top: messageContainerRef.current.scrollHeight,
         behavior: "smooth",
       });
+      isNearBottomRef.current = true;
+      setShowScrollBottom(false);
     }
   }, []);
 
-  // Auto-scroll only the chat container (NOT the page window) when messages load or change
+  const scrollToBottom = scrollToBottomSmooth;
+
+  const handleContainerScroll = useCallback(() => {
+    const el = messageContainerRef.current;
+    if (!el) return;
+    const distanceFromBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
+    const nearBottom = distanceFromBottom <= 120;
+    isNearBottomRef.current = nearBottom;
+    setShowScrollBottom(!nearBottom);
+  }, []);
+
+  // Frame-0 Instant Pre-Scroll: Jump immediately before revealing to eliminate visible scroll down
   useEffect(() => {
     if (messages.length > 0 && messageContainerRef.current) {
-      scrollToBottom();
-      const timer = setTimeout(scrollToBottom, 150);
-      return () => clearTimeout(timer);
+      if (!isInitialScrolled) {
+        scrollToBottomInstant();
+        requestAnimationFrame(() => {
+          scrollToBottomInstant();
+          setIsInitialScrolled(true);
+        });
+      } else {
+        const prevCount = prevMsgCountRef.current;
+        const newCount = messages.length;
+        if (newCount > prevCount) {
+          const lastMsg = messages[messages.length - 1];
+          const isOwnMessage =
+            lastMsg?.senderID === currentUserId ||
+            lastMsg?.sender === "You" ||
+            (lastMsg?.role as string) === "user";
+
+          if (isOwnMessage || isNearBottomRef.current) {
+            scrollToBottomSmooth();
+          } else {
+            setShowScrollBottom(true);
+          }
+        }
+      }
+      prevMsgCountRef.current = messages.length;
     }
-  }, [messages, scrollToBottom]);
+  }, [messages, isInitialScrolled, currentUserId, scrollToBottomInstant, scrollToBottomSmooth]);
+
+  // When switching between Group and Private tabs, instantly re-anchor to bottom without jumping
+  useEffect(() => {
+    setIsInitialScrolled(false);
+  }, [activeTab, adminPrivateTarget]);
+
+  // ResizeObserver: Keep anchored at bottom as images/attachments load asynchronously
+  useEffect(() => {
+    const container = messageContainerRef.current;
+    if (!container) return;
+
+    let prevHeight = container.scrollHeight;
+    const ro = new ResizeObserver(() => {
+      if (!messageContainerRef.current) return;
+      const currentHeight = messageContainerRef.current.scrollHeight;
+      if (currentHeight !== prevHeight) {
+        prevHeight = currentHeight;
+        if (isNearBottomRef.current) {
+          messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+        }
+      }
+    });
+
+    Array.from(container.children).forEach((child) => ro.observe(child));
+    ro.observe(container);
+
+    return () => ro.disconnect();
+  }, [messages.length]);
 
   const extractThreadMessages = useCallback((ticketObj: any, threadName: string): SupportMessage[] => {
     if (!ticketObj) return [];
@@ -253,8 +330,6 @@ export default function TicketDetailsPage() {
       (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
   }, []);
-
-  const [adminPrivateTarget, setAdminPrivateTarget] = useState<"buyer" | "seller">("buyer");
 
   const currentUserParticipant = ticket?.participants?.find((p: any) => {
     const pid = String(p.id || p._id || p.userId || "").trim();
@@ -489,7 +564,7 @@ export default function TicketDetailsPage() {
     } finally {
       setSending(false);
       stopTyping();
-      setTimeout(scrollToBottom, 100);
+      setTimeout(scrollToBottomSmooth, 50);
     }
   };
 
@@ -915,8 +990,15 @@ export default function TicketDetailsPage() {
             </div>
 
             {/* Message List */}
-            <div ref={messageContainerRef} className="flex-1 p-6 space-y-5 overflow-y-auto max-h-[600px] bg-[#f8fafc]/50 scroll-smooth">
-              {messages.length === 0 ? (
+            <div className="relative flex-1 min-h-0 flex flex-col">
+              <div
+                ref={messageContainerRef}
+                onScroll={handleContainerScroll}
+                className={`flex-1 p-6 space-y-5 overflow-y-auto max-h-[600px] bg-[#f8fafc]/50 transition-opacity duration-150 [overflow-anchor:auto] ${
+                  isInitialScrolled ? "opacity-100" : "opacity-0 pointer-events-none"
+                }`}
+              >
+                {messages.length === 0 ? (
                 <div className="text-center py-12 space-y-2">
                   <User className="w-8 h-8 mx-auto text-[#cbd5e1]" />
                   <p className="text-xs text-[#64748b]">No messages yet. Send a reply below.</p>
@@ -1017,6 +1099,19 @@ export default function TicketDetailsPage() {
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   <span>{typingUser} is typing a response...</span>
                 </div>
+              )}
+            </div>
+
+              {/* Floating scroll to bottom button */}
+              {showScrollBottom && (
+                <button
+                  type="button"
+                  onClick={scrollToBottomSmooth}
+                  aria-label="Scroll to latest messages"
+                  className="absolute bottom-4 right-6 z-10 w-9 h-9 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-md hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center transition-all cursor-pointer animate-in fade-in zoom-in-95 duration-200"
+                >
+                  <ChevronDown className="w-5 h-5" />
+                </button>
               )}
             </div>
 

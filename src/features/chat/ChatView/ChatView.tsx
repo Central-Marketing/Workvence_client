@@ -329,6 +329,9 @@ export const ChatView = () => {
     msgsLoading,
     msgsError,
     filteredMessages,
+    hasMore,
+    isFetchingOlder,
+    fetchOlderMessages,
     isAwaitingFirstReply,
     messageText,
     setMessageText,
@@ -390,12 +393,16 @@ export const ChatView = () => {
     scrollToBottom,
     showScrollBottom,
     unreadCountBelow,
+    isInitialScrolled,
   } = useChatScroll({
     conversationID,
     isValidId,
     msgsLoading,
     filteredMessages,
     user,
+    hasMore,
+    isFetchingOlder,
+    onLoadOlder: fetchOlderMessages,
   });
 
   const handleCopyText = (text: string, msg: string = "Copied to clipboard!") => {
@@ -504,6 +511,9 @@ export const ChatView = () => {
                 msgsError={msgsError}
                 msgsLoading={msgsLoading}
                 filteredMessages={filteredMessages}
+                hasMore={hasMore}
+                isFetchingOlder={isFetchingOlder}
+                isInitialScrolled={isInitialScrolled}
                 msgSearchQuery={msgSearchQuery}
                 user={user}
                 finalRecipientUser={finalRecipientUser}

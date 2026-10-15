@@ -13,6 +13,9 @@ interface MessageListProps {
   msgsError: any;
   msgsLoading: boolean;
   filteredMessages: any[];
+  hasMore?: boolean;
+  isFetchingOlder?: boolean;
+  isInitialScrolled?: boolean;
   msgSearchQuery: string;
   user: any;
   finalRecipientUser?: any;
@@ -46,6 +49,9 @@ export const MessageList: React.FC<MessageListProps> = ({
   msgsError,
   msgsLoading,
   filteredMessages,
+  hasMore = true,
+  isFetchingOlder = false,
+  isInitialScrolled = false,
   msgSearchQuery,
   user,
   finalRecipientUser,
@@ -70,7 +76,9 @@ export const MessageList: React.FC<MessageListProps> = ({
       <div
         ref={messagesContainerRef}
         onScroll={onScroll}
-        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 flex flex-col gap-4 bg-[#F0F0F0] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full"
+        className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 flex flex-col gap-4 bg-[#F0F0F0] [overflow-anchor:auto] transition-opacity duration-150 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full ${
+          msgsLoading || isInitialScrolled ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
       >
       {msgsError ? (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-red-50/50 dark:bg-red-950/20 m-6 rounded-[6px] border border-red-200 dark:border-red-900/50 shadow-sm">
@@ -114,26 +122,47 @@ export const MessageList: React.FC<MessageListProps> = ({
           {msgSearchQuery ? "No messages found" : "Send the first message!"}
         </div>
       ) : (
-        filteredMessages.map((msg: any, index: number) => (
-          <MessageItem
-            key={msg._id || msg.id}
-            msg={msg}
-            index={index}
-            user={user}
-            prevMsg={index > 0 ? filteredMessages[index - 1] : undefined}
-            finalRecipientUser={finalRecipientUser}
-            partnerUsername={partnerUsername}
-            contactOrders={contactOrders}
-            sellerPackages={sellerPackages}
-            chatBriefs={chatBriefs}
-            onImagePreview={onImagePreview}
-            onReadFullProposal={onReadFullProposal}
-            onViewOrder={onViewOrder}
-            onAcceptOffer={onAcceptOffer}
-            onWithdraw={onWithdraw}
-            onCopyText={onCopyText}
-          />
-        ))
+        <>
+          {/* Top pagination loader */}
+          {isFetchingOlder && (
+            <div className="flex items-center justify-center py-2 shrink-0">
+              <div className="flex items-center gap-2 px-3 py-1 bg-white/90 backdrop-blur-xs rounded-full shadow-2xs border border-slate-200/60 text-[11px] text-slate-500 font-medium">
+                <div className="w-3.5 h-3.5 border-2 border-[#10b981] border-t-transparent rounded-full animate-spin" />
+                <span>Loading older messages...</span>
+              </div>
+            </div>
+          )}
+
+          {/* Beginning of conversation banner */}
+          {!hasMore && !isFetchingOlder && (
+            <div className="flex items-center justify-center py-2 shrink-0 select-none">
+              <span className="text-[11px] text-slate-400 font-medium bg-slate-200/60 px-3 py-1 rounded-full border border-slate-300/40">
+                Beginning of conversation
+              </span>
+            </div>
+          )}
+
+          {filteredMessages.map((msg: any, index: number) => (
+            <MessageItem
+              key={msg._id || msg.id}
+              msg={msg}
+              index={index}
+              user={user}
+              prevMsg={index > 0 ? filteredMessages[index - 1] : undefined}
+              finalRecipientUser={finalRecipientUser}
+              partnerUsername={partnerUsername}
+              contactOrders={contactOrders}
+              sellerPackages={sellerPackages}
+              chatBriefs={chatBriefs}
+              onImagePreview={onImagePreview}
+              onReadFullProposal={onReadFullProposal}
+              onViewOrder={onViewOrder}
+              onAcceptOffer={onAcceptOffer}
+              onWithdraw={onWithdraw}
+              onCopyText={onCopyText}
+            />
+          ))}
+        </>
       )}
 
       {/* First Message Sent Milestone Card */}

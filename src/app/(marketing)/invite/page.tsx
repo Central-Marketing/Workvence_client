@@ -89,10 +89,10 @@ export default function InviteAFriendPage() {
 
       {/* Share Box Container */}
       <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 md:px-6 max-w-3xl space-y-12">
+        <div className="container mx-auto px-4 md:px-6 space-y-16">
 
           {/* Main Referral Generator Card */}
-          <div className="bg-[#f8fafc] border border-gray-200 rounded-[6px] p-8 sm:p-10 shadow-xs space-y-8">
+          <div className="max-w-3xl mx-auto bg-[#f8fafc] border border-gray-200 rounded-[6px] p-8 sm:p-10 shadow-xs space-y-8">
             <div className="space-y-2 text-center">
               <h3 className="text-xl font-bold text-[#0f172a]">Your Unique Referral Link</h3>
               <p className="text-xs text-gray-500">Share this link anywhere online to automatically track your bonuses.</p>
@@ -187,9 +187,9 @@ export default function InviteAFriendPage() {
           </div>
 
           {/* Referral FAQ */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold text-[#0f172a] text-center">Referral Program FAQ</h3>
-            <div className="bg-white border border-gray-100 rounded-[6px] p-6 sm:p-8 shadow-2xs">
+          <div className="space-y-4 w-full">
+            <h3 className="text-xl sm:text-2xl font-bold text-[#0f172a] text-center">Referral Program FAQ</h3>
+            <div className="w-full bg-white border border-gray-100 rounded-[6px] p-6 sm:p-8 shadow-2xs">
               <FaqAccordion items={referralFaqs} defaultOpenIndex={0} />
             </div>
           </div>

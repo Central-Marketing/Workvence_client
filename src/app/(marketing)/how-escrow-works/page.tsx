@@ -520,7 +520,7 @@ export default function HowEscrowWorksPage() {
 
       {/* 6. FREQUENTLY ASKED QUESTIONS */}
       <section className="w-full py-16 sm:py-20 bg-white">
-        <div className="container mx-auto px-4 md:px-6 max-w-4xl">
+        <div className="container mx-auto px-4 md:px-6">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-xs font-bold uppercase tracking-wider text-[#0D6D5F]">
               Got Questions?

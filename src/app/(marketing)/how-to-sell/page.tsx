@@ -223,7 +223,7 @@ export default function HowToSellPage() {
 
       {/* Seller FAQ */}
       <section className="pt-20 pb-[80px] min-[1400px]:pb-[100px] bg-[#f8fafc] border-t border-[rgba(0,0,0,0.10)]">
-        <div className="container mx-auto px-4 md:px-6 max-w-3xl">
+        <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-12 space-y-2">
             <span className="text-xs font-bold text-[#0D6D5F] uppercase tracking-wider">Questions & Answers</span>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#0f172a] tracking-tight">Frequently Asked Questions</h2>

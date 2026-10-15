@@ -1104,6 +1104,40 @@ export function useChatMessages({
     }
   };
 
+  const handleDirectAcceptOffer = async (msgId: string, orderId?: string) => {
+    try {
+      const res = await axiosFetch.post(`/messages/accept/${msgId}`, { orderId });
+      const updatedMsg = res.data?.messageDoc || res.data?.message;
+      const returnedOrderId =
+        orderId ||
+        res.data?.orderId ||
+        res.data?.orderID ||
+        updatedMsg?.orderId ||
+        updatedMsg?.orderID;
+      toast.success(res.data?.message || "Offer accepted successfully!");
+      queryClient.setQueryData(["messages", conversationID], (oldData: any = []) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.map((m: any) =>
+          String(m._id || m.id) === String(msgId)
+            ? {
+                ...m,
+                ...(typeof updatedMsg === "object" ? updatedMsg : {}),
+                offerStatus: "accepted",
+                isOfferAccepted: true,
+                orderId: returnedOrderId || m.orderId || m.orderID,
+                orderID: returnedOrderId || m.orderID || m.orderId,
+              }
+            : m
+        );
+      });
+      queryClient.invalidateQueries({ queryKey: ["messages", conversationID] });
+      queryClient.invalidateQueries({ queryKey: ["contactOrders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to accept offer.");
+    }
+  };
+
   // Video meeting creation
   const handleCreateMeeting = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -1242,6 +1276,7 @@ export function useChatMessages({
     handleInputChange,
     handleOfferSubmit,
     handleAcceptOffer,
+    handleDirectAcceptOffer,
     handleWithdraw,
     handleCreateMeeting,
     handleRetrySend,

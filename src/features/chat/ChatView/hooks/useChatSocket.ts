@@ -411,8 +411,42 @@ export function useChatSocket({
       queryClient.invalidateQueries({ queryKey: ["messages", conversationID] });
     };
 
+    const handleOfferAccepted = (data: any) => {
+      const targetMsgId = data?.messageId || data?.id || data?._id;
+      const orderId = data?.orderId || data?.orderID || data?.order?._id || data?.order?.id;
+      if (!targetMsgId) return;
+
+      const updateMessagesAccepted = (oldData: any = []) => {
+        if (!Array.isArray(oldData)) return oldData;
+        return oldData.map((m: any) =>
+          String(m._id || m.id) === String(targetMsgId)
+            ? {
+                ...m,
+                offerStatus: "accepted",
+                isOfferAccepted: true,
+                orderId: orderId || m.orderId || m.orderID,
+                orderID: orderId || m.orderID || m.orderId,
+              }
+            : m
+        );
+      };
+
+      queryClient.setQueryData(["messages", conversationID], updateMessagesAccepted);
+      if (convIdRef.current && convIdRef.current !== conversationID) {
+        queryClient.setQueryData(["messages", convIdRef.current], updateMessagesAccepted);
+      }
+      const incomingCid = data?.conversationUUID || data?.conversationID;
+      if (incomingCid) {
+        queryClient.setQueryData(["messages", incomingCid], updateMessagesAccepted);
+      }
+      queryClient.invalidateQueries({ queryKey: ["messages", conversationID] });
+      queryClient.invalidateQueries({ queryKey: ["contactOrders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    };
+
     socket.on("receive_message", handleReceiveMessage);
     socket.on("offer_withdrawn", handleOfferWithdrawn);
+    socket.on("offer_accepted", handleOfferAccepted);
     socket.on("typing_start", handleUserTyping);
     socket.on("user_typing", handleUserTyping);
     socket.on("typing_stop", handleUserStoppedTyping);
@@ -422,6 +456,7 @@ export function useChatSocket({
       socket.off("connect", handleConnect);
       socket.off("receive_message", handleReceiveMessage);
       socket.off("offer_withdrawn", handleOfferWithdrawn);
+      socket.off("offer_accepted", handleOfferAccepted);
       socket.off("typing_start", handleUserTyping);
       socket.off("user_typing", handleUserTyping);
       socket.off("typing_stop", handleUserStoppedTyping);

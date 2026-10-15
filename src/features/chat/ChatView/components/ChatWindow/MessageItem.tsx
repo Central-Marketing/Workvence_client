@@ -87,16 +87,25 @@ export const MessageItem: React.FC<MessageItemProps> = ({
       ? parseMeeting(msg.meeting || msg.meetingPayload || msgRawText)
       : null;
 
-  const isOfferAccepted = Boolean(msg.isOfferAccepted || msg.offerStatus === "accepted");
-  const isWithdrawn = Boolean(msg.withdrawn || msg.offerStatus === "withdrawn");
+  const isOfferAccepted = Boolean(
+    msg.isOfferAccepted ||
+    msg.offerStatus === "accepted" ||
+    msg.status === "accepted"
+  );
+  const isWithdrawn = Boolean(
+    msg.withdrawn ||
+    msg.offerStatus === "withdrawn" ||
+    msg.status === "withdrawn"
+  );
+  const currentMsgOrderId = msg.orderId || msg.orderID;
   const acceptedOrder = offer
     ? contactOrders.find(
         (o: any) =>
-          (msg.orderID && (o._id === msg.orderID || o.id === msg.orderID)) ||
+          (currentMsgOrderId && (o._id === currentMsgOrderId || o.id === currentMsgOrderId)) ||
           (o.title === offer.desc && Number(o.price) === Number(offer.price))
       )
     : null;
-  const targetOrderId = msg.orderID || acceptedOrder?._id || acceptedOrder?.id;
+  const targetOrderId = currentMsgOrderId || acceptedOrder?._id || acceptedOrder?.id;
   const isAccepted = isOfferAccepted || Boolean(acceptedOrder);
   const isModerated = Boolean(msg.moderation?.flagged);
   const bubbleModerationClass = isModerated

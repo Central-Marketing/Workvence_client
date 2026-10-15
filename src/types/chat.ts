@@ -78,6 +78,8 @@ export interface ChatMessage {
   briefID?: string | null;
   briefTitle?: string | null;
   orderID?: string | null;
+  orderId?: string | null;
+  isOfferAccepted?: boolean;
   isAudio?: boolean;
   audioUrl?: string;
   createdAt: string;

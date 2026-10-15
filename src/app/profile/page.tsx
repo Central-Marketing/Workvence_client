@@ -349,7 +349,7 @@ export default function ProfilePage() {
           setCoverImageUrl(cdnUrl);
           if (typeof window !== "undefined") {
             localStorage.setItem("user_cover_image", cdnUrl);
-            
+
             // Also update the cached user
             if (user) {
               const updatedUser = { ...user, coverPhotoUrl: cdnUrl, coverImage: cdnUrl };
@@ -710,6 +710,8 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
+        {/* Account Standing Status Card (only renders if warning or suspended) */}
+        <AccountStandingCard className="mb-6" />
         <PageHeader
           homeHref={isSeller ? "/dashboard/seller" : "/dashboard/buyer"}
           homeTitle="Dashboard"
@@ -723,11 +725,11 @@ export default function ProfilePage() {
           style={{
             top: `calc(var(--navbar-height, ${isSeller ? "82px" : "136px"}) + 0px)`,
           }}
-          className={`sticky z-30 py-2.5 sm:py-3.5 -my-1 bg-[#F8F9FA]/95 backdrop-blur-md transition-[top] duration-200 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 ${isSeller ? "top-[74px] md:top-[88px]" : "top-[128px] md:top-[142px]"
+          className={`sticky z-30 py-2.5 sm:py-3.5 -my-1 bg-[#F8F9FA]/95 backdrop-blur-md transition-[top] duration-200 mb-6 flex items-center justify-between gap-2.5 sm:gap-4 ${isSeller ? "top-[74px] md:top-[88px]" : "top-[128px] md:top-[142px]"
             }`}
         >
           {/* Section Pill Tabs */}
-          <div className="bg-white border border-slate-200/80 rounded-[6px] p-1 flex items-center gap-1 self-start md:self-auto overflow-x-auto max-w-full scrollbar-none shadow-xs shrink-0">
+          <div className="bg-white border border-slate-200/80 rounded-[6px] p-1 flex items-center gap-1 overflow-x-auto max-w-full scrollbar-none shadow-xs w-fit min-w-0">
             <Button
               type="button"
               size="sm"
@@ -808,10 +810,27 @@ export default function ProfilePage() {
               </Button>
             )}
           </div>
+
+          {/* Right-aligned Save Changes Action */}
+          <div className="shrink-0 flex items-center">
+            <Button
+              type="button"
+              variant="dark"
+              size="sm"
+              radius="fiverr"
+              disabled={isUpdating}
+              isLoading={isUpdating}
+              loadingText="Saving..."
+              onClick={() => handleSubmit()}
+              className="px-3.5 sm:px-5 py-2 font-semibold shadow-xs whitespace-nowrap text-xs sm:text-sm"
+            >
+              <span className="hidden min-[360px]:inline">Save Changes</span>
+              <span className="inline min-[360px]:hidden">Save</span>
+            </Button>
+          </div>
         </div>
 
-        {/* Account Standing Status Card (only renders if warning or suspended) */}
-        <AccountStandingCard className="mb-6" />
+
 
         {/* HERO BANNER CARD */}
         <div className="bg-white rounded-[6px] border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.02)] p-4 sm:p-5 mb-7">
@@ -1978,32 +1997,6 @@ export default function ProfilePage() {
           </>
         )}
 
-        {/* BOTTOM ACTION BAR */}
-        <div className="flex items-center justify-end gap-3 pt-2">
-          <Button
-            type="button"
-            variant="ghost"
-            size="md"
-            radius="fiverr"
-            onClick={() => router.back()}
-            className="text-slate-600 hover:bg-slate-200/60 font-semibold px-5 py-2.5"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            variant="dark"
-            size="md"
-            radius="fiverr"
-            disabled={isUpdating}
-            isLoading={isUpdating}
-            loadingText="Saving..."
-            onClick={() => handleSubmit()}
-            className="px-6 py-2.5 font-semibold shadow-xs"
-          >
-            Save Changes
-          </Button>
-        </div>
       </div>
     </div>
   );

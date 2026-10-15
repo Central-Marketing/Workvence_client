@@ -124,17 +124,72 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.scrollbar-hide::-webkit-scrollbar,
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
+/* -------------------------------------------------------------------------- */
+/* Global Consistent Slim Scrollbar with Hover-Reveal Behavior                */
+/* -------------------------------------------------------------------------- */
+
+/* Standard (Firefox) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.2s ease-in-out;
 }
 
+*:hover {
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* WebKit (Chrome, Safari, Edge, Opera, Android) */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 9999px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1; /* slate-300 */
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8; /* slate-400 */
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background-color: #64748b; /* slate-500 */
+}
+
+/* Utility classes to completely suppress scrollbars when explicitly requested */
 .scrollbar-hide,
-.scrollbar-none {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.scrollbar-none,
+.no-scrollbar,
+[data-no-scrollbar] {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.scrollbar-hide::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar,
+[data-no-scrollbar]::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.scrollbar-hide:hover::-webkit-scrollbar-thumb,
+.scrollbar-none:hover::-webkit-scrollbar-thumb,
+.no-scrollbar:hover::-webkit-scrollbar-thumb,
+[data-no-scrollbar]:hover::-webkit-scrollbar-thumb {
+  background-color: transparent !important;
 }
 
 /* Quill Rich Text Editor Custom Overrides */
@@ -479,19 +534,6 @@ body.hide-navbar nav {
   }
 }
 
-/* Hide scrollbar across all browsers */
-.no-scrollbar::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none !important;
-  /* IE and Edge */
-  scrollbar-width: none !important;
-  /* Firefox */
-}
 
 /* Maintain 6px border-radius across all textareas and search input boxes across the site */
 textarea,

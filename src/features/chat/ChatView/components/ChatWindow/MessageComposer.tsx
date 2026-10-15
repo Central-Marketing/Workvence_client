@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { RiAddLine } from "react-icons/ri";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Pdf01Icon, File02Icon } from "@hugeicons/core-free-icons";
@@ -26,6 +26,9 @@ interface MessageComposerProps {
   isPending: boolean;
 }
 
+const MIN_TEXTAREA_HEIGHT = 36; // px (~1 line)
+const MAX_TEXTAREA_HEIGHT = 144; // px (~5-6 lines, WhatsApp-style cap)
+
 export const MessageComposer: React.FC<MessageComposerProps> = ({
   attachment,
   isUploadingAttachment,
@@ -43,6 +46,35 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
   msgsError,
   isPending,
 }) => {
+  // Automatically adjust textarea height as lines are typed, lifting like WhatsApp
+  const adjustHeight = useCallback(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+
+    // Reset height temporarily to accurately calculate scrollHeight of the current content
+    el.style.height = "auto";
+    const scrollH = el.scrollHeight;
+    const newHeight = Math.min(Math.max(scrollH, MIN_TEXTAREA_HEIGHT), MAX_TEXTAREA_HEIGHT);
+    el.style.height = `${newHeight}px`;
+
+    // Only show scrollbar when exceeding max height
+    if (scrollH > MAX_TEXTAREA_HEIGHT) {
+      el.style.overflowY = "auto";
+    } else {
+      el.style.overflowY = "hidden";
+    }
+  }, [textareaRef]);
+
+  // Recalculate on any messageText changes (typing, paste, clearing on send, AI polish)
+  useEffect(() => {
+    adjustHeight();
+  }, [messageText, adjustHeight]);
+
+  // Adjust on window resize
+  useEffect(() => {
+    window.addEventListener("resize", adjustHeight);
+    return () => window.removeEventListener("resize", adjustHeight);
+  }, [adjustHeight]);
   return (
     <div className="p-4 sm:px-5 sm:py-4 bg-[#f0f0f0] relative max-md:p-3 shrink-0">
       {attachment && (
@@ -135,11 +167,14 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
             ref={textareaRef}
             placeholder="Message"
             value={messageText}
-            onChange={onInputChange}
+            onChange={(e) => {
+              onInputChange(e);
+              adjustHeight();
+            }}
             onKeyDown={onKeyDown}
             disabled={isPolishing}
             rows={1}
-            className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 resize-none text-gray-800 placeholder-gray-400 text-sm py-1.5 px-1 min-h-[36px] max-h-32 overflow-y-auto scrollbar-hide scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 resize-none text-gray-800 placeholder-gray-400 text-sm py-1.5 px-1 min-h-[36px] overflow-y-hidden leading-5 transition-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           />
 
           {/* AI Polish Button */}

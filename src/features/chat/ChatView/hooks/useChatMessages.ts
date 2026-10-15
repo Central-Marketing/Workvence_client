@@ -442,6 +442,7 @@ export function useChatMessages({
     setAttachment(null);
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
+      textareaRef.current.style.overflowY = "hidden";
     }
 
     const currentUid = String(user?._id || user?.id || "");
@@ -562,8 +563,10 @@ export function useChatMessages({
 
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
-      if (textareaRef.current.scrollHeight > 150) {
+      const maxHeight = 144;
+      const scrollHeight = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height = `${Math.min(Math.max(scrollHeight, 36), maxHeight)}px`;
+      if (scrollHeight > maxHeight) {
         textareaRef.current.style.overflowY = "auto";
       } else {
         textareaRef.current.style.overflowY = "hidden";

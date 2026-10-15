@@ -72,7 +72,7 @@ const staticFooterColumns: FooterColumn[] = [
       // { name: "Community Hub", href: "/community" },
       // { name: "Forum", href: "/forum" },
       { name: "Events", href: "/events" },
-      { name: "Blog", href: "/blog" },
+      // { name: "Blog", href: "/blog" },
       // { name: "Influencers", href: "/influencers" },
       // { name: "Affiliates", href: "/affiliates" },
       // { name: "Podcast", href: "/podcast" },

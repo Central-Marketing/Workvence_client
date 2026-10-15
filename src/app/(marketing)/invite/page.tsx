@@ -16,6 +16,7 @@ import {
   ChevronDown
 } from "lucide-react";
 import { Button } from "@/components";
+import { FaqAccordion } from "@/components/ui";
 import { toast } from "@/utils/toast";
 
 const referralFaqs = [
@@ -36,7 +37,6 @@ const referralFaqs = [
 export default function InviteAFriendPage() {
   const [copied, setCopied] = useState(false);
   const [emails, setEmails] = useState("");
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const referralLink = "https://workvence.com/join?ref=WV-FRIEND25";
 
@@ -189,27 +189,8 @@ export default function InviteAFriendPage() {
           {/* Referral FAQ */}
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-[#0f172a] text-center">Referral Program FAQ</h3>
-            <div className="space-y-3">
-              {referralFaqs.map((faq, i) => (
-                <div
-                  key={i}
-                  className="bg-[#f8fafc] border border-gray-200/90 rounded-[6px] p-5 cursor-pointer"
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                >
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-bold text-[#0f172a]">{faq.q}</h4>
-                    <ChevronDown
-                      className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${openFaq === i ? "rotate-180 text-[#327C73]" : ""
-                        }`}
-                    />
-                  </div>
-                  {openFaq === i && (
-                    <p className="text-xs text-gray-600 pt-3 mt-3 border-t border-gray-200 leading-relaxed font-normal">
-                      {faq.a}
-                    </p>
-                  )}
-                </div>
-              ))}
+            <div className="bg-white border border-gray-100 rounded-[6px] p-6 sm:p-8 shadow-2xs">
+              <FaqAccordion items={referralFaqs} defaultOpenIndex={0} />
             </div>
           </div>
 

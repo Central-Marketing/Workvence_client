@@ -778,8 +778,8 @@ const OrganizePage = () => {
                 </label>
                 <span
                   className={`text-[11px] font-medium transition-colors ${(state.title?.length || 0) > 80
-                      ? "text-red-500 font-semibold"
-                      : "text-gray-400"
+                    ? "text-red-500 font-semibold"
+                    : "text-gray-400"
                     }`}
                 >
                   {state.title?.length || 0}/80
@@ -792,8 +792,8 @@ const OrganizePage = () => {
                 onChange={handleInputChange}
                 placeholder="e.g I will do something i am really good at"
                 className={`w-full h-10 px-3.5 bg-[#F0F0F0] border rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors ${(state.title?.length || 0) > 80
-                    ? "border-red-400 focus:border-red-500 bg-red-50/10"
-                    : "border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white"
+                  ? "border-red-400 focus:border-red-500 bg-red-50/10"
+                  : "border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white"
                   }`}
               />
               {(state.title?.length || 0) > 80 && (
@@ -1103,8 +1103,8 @@ const OrganizePage = () => {
                 </label>
                 <span
                   className={`text-[11px] font-medium transition-colors ${(currentTierData.title?.length || 0) > 80
-                      ? "text-red-500 font-semibold"
-                      : "text-gray-400"
+                    ? "text-red-500 font-semibold"
+                    : "text-gray-400"
                     }`}
                 >
                   {currentTierData.title?.length || 0}/80
@@ -1116,8 +1116,8 @@ const OrganizePage = () => {
                 onChange={(e) => handleTierInputChange("title", e.target.value)}
                 placeholder="e.g I will do something i am really good at"
                 className={`w-full h-10 px-3.5 bg-[#F0F0F0] border rounded-[6px] text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors ${(currentTierData.title?.length || 0) > 80
-                    ? "border-red-400 focus:border-red-500 bg-red-50/10"
-                    : "border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white"
+                  ? "border-red-400 focus:border-red-500 bg-red-50/10"
+                  : "border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white"
                   }`}
               />
               {(currentTierData.title?.length || 0) > 80 && (
@@ -1420,7 +1420,7 @@ const OrganizePage = () => {
         </div>
 
         {/* 6. Section: Frequently asked questions */}
-        <div id="section-faq" className="scroll-mt-36 bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+        <div id="section-faq" className="scroll-mt-36 bg-[#f5f5f5] rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
           <div className="flex items-center justify-between gap-4 border-b border-gray-100 pb-4">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-950">
               Frequently asked questions

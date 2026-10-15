@@ -26,7 +26,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import { Button, Breadcrumb, CTA } from "@/components";
-import { CustomSelect, CustomSelectOption, BorderBeam } from "@/components/ui";
+import { CustomSelect, CustomSelectOption, BorderBeam, FaqAccordion } from "@/components/ui";
 import { toast } from "@/utils/toast";
 
 const TRAFFIC_SOURCE_OPTIONS: CustomSelectOption[] = [
@@ -160,7 +160,6 @@ export default function AffiliatesPage() {
   const [referredUsers, setReferredUsers] = useState(25);
   const [avgOrderValue, setAvgOrderValue] = useState(120);
   const [isJoining, setIsJoining] = useState(false);
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [affiliateForm, setAffiliateForm] = useState({
     name: "",
     email: "",
@@ -569,43 +568,8 @@ export default function AffiliatesPage() {
             </p>
           </div>
 
-          <div className="space-y-3.5 max-w-3xl mx-auto">
-            {affiliateFaqs.map((faq, idx) => {
-              const isOpen = openFaqIndex === idx;
-              return (
-                <div
-                  key={idx}
-                  className={`border rounded-[6px] transition-colors duration-200 overflow-hidden ${isOpen
-                    ? "bg-white border-[#0D6D5F]/40 shadow-xs"
-                    : "bg-white hover:bg-white border-[rgba(0,0,0,0.10)]"
-                    }`}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                    className="w-full px-5 py-4 text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none"
-                    aria-expanded={isOpen}
-                  >
-                    <span className="font-semibold text-sm sm:text-base text-[#0f172a]">
-                      {faq.q}
-                    </span>
-                    <span
-                      className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-transform duration-200 ${isOpen
-                        ? "bg-[#0D6D5F]/10 text-[#0D6D5F] rotate-180"
-                        : "bg-gray-100 text-gray-500"
-                        }`}
-                    >
-                      <ChevronDown className="w-4 h-4" />
-                    </span>
-                  </button>
-                  {isOpen && (
-                    <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-gray-600 leading-relaxed border-t border-gray-100/80">
-                      {faq.a}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          <div className="max-w-3xl mx-auto bg-white border border-gray-100 rounded-[6px] p-6 sm:p-8 shadow-2xs">
+            <FaqAccordion items={affiliateFaqs} defaultOpenIndex={0} />
           </div>
         </div>
       </section>

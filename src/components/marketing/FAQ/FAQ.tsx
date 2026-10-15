@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui';
+import { FaqAccordion } from '@/components/ui/FaqAccordion';
 
 const faqData = [
   {
@@ -35,11 +35,6 @@ const faqData = [
 ];
 
 const FAQ = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  const toggleFaq = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
 
   return (
     <section className="w-full bg-white py-20">
@@ -79,50 +74,8 @@ const FAQ = () => {
           </div>
 
           {/* Right Column - Accordion */}
-          <div className="flex-1 w-full flex flex-col gap-4">
-            {faqData.map((item, index) => (
-              <div
-                key={index}
-                className={`border border-gray-200 rounded-[6px] bg-white transition-all duration-200 hover:border-gray-300 hover:shadow-sm ${openIndex === index ? 'border-gray-300 shadow-sm' : ''}`}
-              >
-                <div
-                  className="flex items-center justify-between p-6 cursor-pointer"
-                  onClick={() => toggleFaq(index)}
-                >
-                  <span className="text-[16px] font-semibold text-gray-900 leading-snug">
-                    {item.question}
-                  </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    radius="full"
-                    aria-label="Toggle answer"
-                    className="flex-shrink-0 ml-4 text-gray-600 hover:text-gray-900 transition-colors p-0 h-auto min-h-0 w-6 h-6 border-none shadow-none hover:bg-transparent"
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="1.2" />
-                      {openIndex === index ? (
-                        <path d="M8 12H16" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                      ) : (
-                        <>
-                          <path d="M12 8V16" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                          <path d="M8 12H16" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                        </>
-                      )}
-                    </svg>
-                  </Button>
-                </div>
-                <div
-                  className={`overflow-hidden transition-all duration-300 ease-in-out ${openIndex === index ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'
-                    }`}
-                >
-                  <p className="px-6 pb-6 text-[14.5px] text-gray-500 leading-relaxed m-0 pt-0">
-                    {item.answer}
-                  </p>
-                </div>
-              </div>
-            ))}
+          <div className="flex-1 w-full bg-white border border-gray-100 rounded-[6px] p-6 sm:p-8 shadow-2xs">
+            <FaqAccordion items={faqData} defaultOpenIndex={0} />
           </div>
 
         </div>

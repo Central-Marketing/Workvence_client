@@ -1,71 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
-import { FiChevronDown } from "react-icons/fi";
+import React from "react";
 import { SellerFaqItem } from "../utils/sellerProfileNormalizer";
+import { FaqCard } from "@/components/ui/FaqAccordion";
 
 interface SellerFaqSectionProps {
   faqs?: SellerFaqItem[];
 }
 
 export const SellerFaqSection: React.FC<SellerFaqSectionProps> = ({ faqs = [] }) => {
-  // First item open by default
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
   if (!Array.isArray(faqs) || faqs.length === 0) {
     return null;
   }
 
-  const toggleFaq = (idx: number) => {
-    setOpenIndex((prev) => (prev === idx ? null : idx));
-  };
-
   return (
-    <div id="section-faq" className="scroll-mt-36 bg-white border border-gray-100 rounded-[6px] p-6 sm:p-8 shadow-2xs">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4 mb-6 pb-2 border-b border-gray-100">
-        <h2 className="text-xl sm:text-2xl font-bold font-sf-pro text-gray-900 tracking-tight">
-          Frequently asked questions
-        </h2>
-        {/* <span className="text-xs font-medium text-gray-500 bg-gray-100/80 border border-gray-200/60 px-3 py-1 rounded-[6px]">
-          {faqs.length} {faqs.length === 1 ? "Question" : "Questions"}
-        </span> */}
-      </div>
-
-      {/* Accordion List */}
-      <div className="divide-y divide-gray-100">
-        {faqs.slice(0, 5).map((faq, idx) => {
-          const isOpen = openIndex === idx;
-
-          return (
-            <div key={idx} className="py-4 sm:py-5 first:pt-0 last:pb-0">
-              <button
-                type="button"
-                onClick={() => toggleFaq(idx)}
-                className="w-full flex items-center justify-between gap-4 text-left group hover:bg-transparent p-0 min-h-0 h-auto cursor-pointer focus:outline-none"
-                aria-expanded={isOpen}
-              >
-                <span className="text-sm sm:text-[15px] font-semibold font-sf-pro text-gray-900 group-hover:text-teal-700 transition-colors">
-                  {faq.question}
-                </span>
-                <span
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-teal-600 transition-transform duration-200 shrink-0 ${isOpen ? "rotate-180 text-teal-700" : ""
-                    }`}
-                >
-                  <FiChevronDown className="w-4 h-4" />
-                </span>
-              </button>
-
-              {isOpen && (
-                <div className="mt-3 text-xs sm:text-sm text-gray-500 leading-relaxed font-normal font-sf-pro pr-4 sm:pr-8 animate-fadeIn">
-                  <p>{faq.answer}</p>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    <FaqCard
+      id="section-faq"
+      title="Frequently asked questions"
+      items={faqs}
+      maxItems={5}
+      defaultOpenIndex={0}
+      headerBorder={true}
+    />
   );
 };
 

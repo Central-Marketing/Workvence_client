@@ -80,7 +80,6 @@ export default function EventsPage() {
           <Breadcrumb
             items={[
               { label: "Home", href: "/" },
-              { label: "Community", href: "/community" },
               { label: "Events", isLast: true },
             ]}
           />

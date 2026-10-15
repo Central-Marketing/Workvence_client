@@ -23,6 +23,7 @@ export function useNetworkStatus(): NetworkStatusReturn {
   });
 
   const [justReconnected, setJustReconnected] = useState(false);
+  const hasInitiallyConnectedRef = useRef(socket.connected);
   const wasDisconnectedRef = useRef(false);
   const reconnectedTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -60,8 +61,11 @@ export function useNetworkStatus(): NetworkStatusReturn {
   useEffect(() => {
     const handleConnect = () => {
       setIsSocketConnected(true);
-      if (wasDisconnectedRef.current) {
-        wasDisconnectedRef.current = false;
+      const wasLost = wasDisconnectedRef.current;
+      hasInitiallyConnectedRef.current = true;
+      wasDisconnectedRef.current = false;
+
+      if (wasLost) {
         setJustReconnected(true);
         if (reconnectedTimerRef.current) clearTimeout(reconnectedTimerRef.current);
         reconnectedTimerRef.current = setTimeout(() => {
@@ -72,12 +76,17 @@ export function useNetworkStatus(): NetworkStatusReturn {
 
     const handleDisconnect = () => {
       setIsSocketConnected(false);
-      wasDisconnectedRef.current = true;
+      // Only treat as a connection drop if we had already initially connected
+      if (hasInitiallyConnectedRef.current) {
+        wasDisconnectedRef.current = true;
+      }
     };
 
     const handleConnectError = () => {
       setIsSocketConnected(false);
-      wasDisconnectedRef.current = true;
+      if (hasInitiallyConnectedRef.current) {
+        wasDisconnectedRef.current = true;
+      }
     };
 
     socket.on("connect", handleConnect);
@@ -85,7 +94,10 @@ export function useNetworkStatus(): NetworkStatusReturn {
     socket.on("connect_error", handleConnectError);
 
     // Initial check
-    setIsSocketConnected(socket.connected);
+    if (socket.connected) {
+      setIsSocketConnected(true);
+      hasInitiallyConnectedRef.current = true;
+    }
 
     return () => {
       socket.off("connect", handleConnect);
@@ -95,11 +107,13 @@ export function useNetworkStatus(): NetworkStatusReturn {
     };
   }, []);
 
-  // Derive composite connection state
+  // Derive composite connection state:
+  // On reload/initial mount when user is online, do not show "reconnecting" banner
+  // while initial socket connection is quietly completing.
   let connectionState: ChatConnectionState = "connected";
   if (!isOnline) {
     connectionState = "offline";
-  } else if (!isSocketConnected) {
+  } else if (!isSocketConnected && wasDisconnectedRef.current) {
     connectionState = "reconnecting";
   }
 

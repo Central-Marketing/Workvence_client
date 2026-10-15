@@ -210,8 +210,8 @@ export default function NavigationToastContent({
 
   return (
     <div className="workvence-toast-system-card flex items-start gap-3 w-full pr-6 select-none">
-      {/* 6px Icon Badge with dark background & subtle border */}
-      <div className="shrink-0 w-10 h-10 rounded-[6px] bg-zinc-800/90 border border-white/10 flex items-center justify-center text-zinc-300">
+      {/* 6px Icon Badge with light background & subtle border */}
+      <div className="shrink-0 w-10 h-10 rounded-[6px] bg-gray-100 border border-gray-200/80 flex items-center justify-center text-gray-700">
         <ToastIcon variant={variant} kind={kind} icon={icon} />
       </div>
 
@@ -219,13 +219,13 @@ export default function NavigationToastContent({
       <div className="min-w-0 flex-1">
         {/* Header Row: Title | Tag / Timestamp */}
         <div className="flex items-center gap-2 text-sm leading-none pt-0.5">
-          <span className="font-semibold text-white truncate">
+          <span className="font-semibold text-gray-900 truncate">
             {displayTitle}
           </span>
           {timestamp && (
             <>
-              <span className="text-zinc-600 select-none">|</span>
-              <span className="text-xs text-zinc-400 font-normal shrink-0">
+              <span className="text-gray-300 select-none">|</span>
+              <span className="text-xs text-gray-500 font-normal shrink-0">
                 {timestamp}
               </span>
             </>
@@ -234,17 +234,17 @@ export default function NavigationToastContent({
 
         {/* Description body */}
         {displayBody != null && (
-          <p className="mt-1 text-[13px] text-zinc-300 leading-snug line-clamp-2 break-words">
+          <p className="mt-1 text-[13px] text-gray-600 leading-snug line-clamp-2 break-words">
             {displayBody}
           </p>
         )}
 
-        {/* Action Button: Rounded 6px dark action button */}
+        {/* Action Button: Rounded 6px dark action button on light card */}
         {navigation && (
           <div className="mt-2.5 flex items-center gap-2">
             <button
               type="button"
-              className="workvence-toast-system-btn px-3.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold rounded-[6px] border border-zinc-700 shadow-xs transition-colors cursor-pointer"
+              className="workvence-toast-system-btn px-3.5 py-1.5 bg-black hover:bg-gray-800 text-white text-xs font-semibold rounded-[6px] border border-black shadow-xs transition-colors cursor-pointer"
               aria-label={navigation.label}
               onClick={handleAction}
             >

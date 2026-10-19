@@ -7,11 +7,13 @@ import { Breadcrumb, GigsGridSkeleton, PageHeader } from "@/components/ui";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { FiHome } from "react-icons/fi";
 import { toast } from "@/utils/toast";
 import { Heart } from "lucide-react";
 
 const FavoritesPage = () => {
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"gigs" | "sellers">("gigs");
   const [favoriteGigs, setFavoriteGigs] = useState<any[]>([]);
   const [favoriteSellers, setFavoriteSellers] = useState<any[]>([]);
@@ -108,8 +110,16 @@ const FavoritesPage = () => {
 
     try {
       const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
-      const targetId = res.data?.uuid || res.data?.conversationID || res.data?._id;
+      const targetId =
+        res.data?.uuid ||
+        res.data?.conversationID ||
+        res.data?.conversation?.uuid ||
+        res.data?.conversation?._id ||
+        res.data?.conversation?.id ||
+        res.data?.id ||
+        res.data?._id;
       if (targetId) {
+        queryClient.invalidateQueries({ queryKey: ["conversations"] });
         router.push(`/message/${targetId}`);
         return;
       }
@@ -126,8 +136,16 @@ const FavoritesPage = () => {
         seller_username: seller.username || null,
         buyer_username: user.username || null,
       });
-      const targetId = res.data?.uuid || res.data?.conversationID || res.data?._id;
+      const targetId =
+        res.data?.uuid ||
+        res.data?.conversationID ||
+        res.data?.conversation?.uuid ||
+        res.data?.conversation?._id ||
+        res.data?.conversation?.id ||
+        res.data?.id ||
+        res.data?._id;
       if (targetId) {
+        queryClient.invalidateQueries({ queryKey: ["conversations"] });
         router.push(`/message/${targetId}`);
       } else {
         toast.error("Could not resolve conversation ID");

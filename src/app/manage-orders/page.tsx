@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
@@ -34,6 +34,7 @@ type FilterTab = "priority" | "active" | "late" | "delivered" | "completed" | "c
 
 const ManageOrders = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const user = useUserStore((state) => state.user);
 
   // Filter and search state
@@ -67,20 +68,52 @@ const ManageOrders = () => {
     const sellerID = typeof order.sellerID === "object" ? order.sellerID?._id : order.sellerID;
     const buyerID = typeof order.buyerID === "object" ? order.buyerID?._id : order.buyerID;
 
-    axiosFetch
-      .get(`/conversations/single/${sellerID}/${buyerID}`)
-      .then(({ data }) => {
-        const targetId = data.uuid || data.conversationID || data._id;
+    const extractTargetId = (d: any) =>
+      d?.uuid ||
+      d?.conversationID ||
+      d?._id ||
+      d?.id ||
+      d?.data?.uuid ||
+      d?.data?.conversationID ||
+      d?.data?._id ||
+      d?.data?.id ||
+      d?.conversation?.uuid ||
+      d?.conversation?.conversationID ||
+      d?.conversation?._id ||
+      d?.conversation?.id;
+
+    if (!sellerID || !buyerID) {
+      router.push("/message");
+      return;
+    }
+
+    try {
+      const { data } = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
+      const targetId = extractTargetId(data);
+      if (targetId) {
+        queryClient.invalidateQueries({ queryKey: ["conversations"] });
         router.push(`/message/${targetId}`);
-      })
-      .catch(async () => {
-        const { data } = await axiosFetch.post("/conversations", {
-          to: buyerID,
-          from: sellerID,
-        });
-        const targetId = data.uuid || data.conversationID || data._id;
-        router.push(`/message/${targetId}`);
+        return;
+      }
+    } catch {}
+
+    try {
+      const { data } = await axiosFetch.post("/conversations", {
+        to: buyerID,
+        from: sellerID,
+        sellerID,
+        buyerID,
       });
+      const targetId = extractTargetId(data);
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      if (targetId) {
+        router.push(`/message/${targetId}`);
+      } else {
+        router.push(`/message/${buyerID || sellerID}`);
+      }
+    } catch {
+      router.push(`/message/${buyerID || sellerID}`);
+    }
   };
 
   // Helper for status badge style matching the mockup

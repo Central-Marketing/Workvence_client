@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { FiMapPin, FiClock, FiPackage, FiArrowRight } from "react-icons/fi";
 import { AiGradientButton, Button } from "@/components/ui";
 import { getOnlineStatus } from "@/utils/userStatus";
@@ -53,6 +54,7 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
   onAnalyzeProfile,
 }) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const user = useUserStore((state: any) => state.user);
   const openAuthModal = useAuthModalStore((state: any) => state.openAuthModal);
   const [internalLoading, setInternalLoading] = useState(false);
@@ -115,8 +117,11 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
             res.data?.uuid ||
             res.data?.conversationID ||
             res.data?.id ||
-            res.data?._id;
+            res.data?._id ||
+            res.data?.conversation?.uuid ||
+            res.data?.conversation?._id;
           if (targetId) {
+            queryClient.invalidateQueries({ queryKey: ["conversations"] });
             router.push(`/message/${targetId}`);
             return;
           }
@@ -137,9 +142,12 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
           data?.uuid ||
           data?.conversationID ||
           data?.id ||
-          data?._id;
+          data?._id ||
+          data?.conversation?.uuid ||
+          data?.conversation?._id;
 
         if (targetId) {
+          queryClient.invalidateQueries({ queryKey: ["conversations"] });
           router.push(`/message/${targetId}`);
           return;
         }

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/utils/toast";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
@@ -25,6 +25,7 @@ import {
 } from "@/features/package";
 
 const PackageContent = () => {
+  const queryClient = useQueryClient();
   const params = useParams();
   const router = useRouter();
   const rawId = params?.id || params?._id;
@@ -183,8 +184,16 @@ const PackageContent = () => {
 
     try {
       const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
-      const targetId = res.data?.uuid || res.data?.conversationID || res.data?.id || res.data?._id;
+      const targetId =
+        res.data?.uuid ||
+        res.data?.conversationID ||
+        res.data?.conversation?.uuid ||
+        res.data?.conversation?._id ||
+        res.data?.conversation?.id ||
+        res.data?.id ||
+        res.data?._id;
       if (targetId) {
+        queryClient.invalidateQueries({ queryKey: ["conversations"] });
         router.push(`/message/${targetId}`);
         return;
       }
@@ -202,8 +211,16 @@ const PackageContent = () => {
         buyer_username: buyerUsername,
       });
 
-      const targetId = data?.uuid || data?.conversationID || data?.id || data?._id;
+      const targetId =
+        data?.uuid ||
+        data?.conversationID ||
+        data?.conversation?.uuid ||
+        data?.conversation?._id ||
+        data?.conversation?.id ||
+        data?.id ||
+        data?._id;
       if (targetId) {
+        queryClient.invalidateQueries({ queryKey: ["conversations"] });
         router.push(`/message/${targetId}`);
         return;
       }

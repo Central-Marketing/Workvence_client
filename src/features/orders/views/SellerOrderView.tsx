@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { toast } from "@/utils/toast";
 import moment from "moment";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   FiClock,
   FiUploadCloud,
@@ -43,6 +43,7 @@ interface SellerOrderViewProps {
 
 export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch }) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const currentUser = useUserStore((state) => state.user);
 
   // Modals & form state
@@ -244,28 +245,39 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
   // Contact buyer with direct conversation check / creation
   const handleContact = async () => {
     setIsContacting(true);
+
+    const extractTargetId = (d: any) =>
+      d?.uuid ||
+      d?.conversationID ||
+      d?._id ||
+      d?.id ||
+      d?.data?.uuid ||
+      d?.data?.conversationID ||
+      d?.data?._id ||
+      d?.data?.id ||
+      d?.conversation?.uuid ||
+      d?.conversation?.conversationID ||
+      d?.conversation?._id ||
+      d?.conversation?.id;
+
     const sellerID = order.seller?.id || order.raw?.sellerID?._id || order.raw?.sellerID;
     const buyerID = order.buyer?.id || order.raw?.buyerID?._id || order.raw?.buyerID;
     const sellerUsername = order.seller?.name || order.raw?.sellerID?.username;
     const buyerUsername = order.buyer?.name || order.raw?.buyerID?.username;
 
     if (!sellerID || !buyerID) {
-      router.push(`/message/${order.buyer.id}`);
+      const fallbackId = buyerID || order.buyer?.id;
+      if (fallbackId) router.push(`/message/${fallbackId}`);
+      else router.push("/message");
       setIsContacting(false);
       return;
     }
 
     try {
       const { data } = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
-      const targetId =
-        data?.uuid ||
-        data?.conversationID ||
-        data?._id ||
-        data?.id ||
-        data?.data?.uuid ||
-        data?.data?.conversationID ||
-        data?.data?._id;
+      const targetId = extractTargetId(data);
       if (targetId) {
+        queryClient.invalidateQueries({ queryKey: ["conversations"] });
         router.push(`/message/${targetId}`);
         return;
       }
@@ -282,14 +294,8 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
         seller_username: sellerUsername,
         buyer_username: buyerUsername,
       });
-      const targetId =
-        data?.uuid ||
-        data?.conversationID ||
-        data?._id ||
-        data?.id ||
-        data?.data?.uuid ||
-        data?.data?.conversationID ||
-        data?.data?._id;
+      const targetId = extractTargetId(data);
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
       if (targetId) {
         router.push(`/message/${targetId}`);
       } else {

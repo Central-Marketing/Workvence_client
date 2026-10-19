@@ -104,13 +104,69 @@ export function useChatMessages({
   const nextCursorRef = useRef<string | null>(null);
   const isFetchingOlderRef = useRef(false);
 
+  // Derive reactive verified conversation identifier for query key and cache
+  const effectiveConvId = useMemo(() => {
+    return (
+      activeConversation?._id ||
+      activeConversation?.uuid ||
+      activeConversation?.conversationID ||
+      activeConversation?.id ||
+      activeRoomID ||
+      (conversationID !== "undefined" && conversationID !== "null" ? conversationID : "") ||
+      ""
+    );
+  }, [activeConversation, activeRoomID, conversationID]);
+
+  // Derive candidate conversation IDs in prioritized order, filtering out raw user IDs
+  const candidateIds = useMemo(() => {
+    const rawIds = [
+      activeConversation?._id,
+      activeConversation?.uuid,
+      activeConversation?.conversationID,
+      activeConversation?.id,
+      activeRoomID,
+      conversationID,
+    ];
+
+    const excludedUserIds = new Set(
+      [
+        user?._id,
+        user?.id,
+        targetOtherUserId,
+        finalRecipientUser?._id,
+        finalRecipientUser?.id,
+      ]
+        .filter(Boolean)
+        .map((id) => String(id).trim())
+    );
+
+    const validIds: string[] = [];
+    const seen = new Set<string>();
+
+    for (const raw of rawIds) {
+      if (!raw || raw === "undefined" || raw === "null") continue;
+      const str = String(raw).trim();
+      if (!str || seen.has(str)) continue;
+      // Do not treat plain user IDs as conversation endpoints
+      if (excludedUserIds.has(str)) continue;
+      seen.add(str);
+      validIds.push(str);
+    }
+
+    if (validIds.length === 0 && conversationID && conversationID !== "undefined" && conversationID !== "null") {
+      validIds.push(String(conversationID).trim());
+    }
+
+    return validIds;
+  }, [activeConversation, activeRoomID, conversationID, user, targetOtherUserId, finalRecipientUser]);
+
   // Reset pagination state when switching conversations
   useEffect(() => {
     nextCursorRef.current = null;
     setHasMore(true);
     isFetchingOlderRef.current = false;
     setIsFetchingOlder(false);
-  }, [conversationID]);
+  }, [effectiveConvId]);
 
   // Fetch messages history
   const {
@@ -118,7 +174,7 @@ export function useChatMessages({
     isError: msgsError,
     data: messages = [],
   } = useQuery({
-    queryKey: ["messages", conversationID],
+    queryKey: ["messages", effectiveConvId],
     queryFn: async () => {
       const handleResponse = (data: any): any[] => {
         if (!data) return [];
@@ -152,28 +208,32 @@ export function useChatMessages({
         return [];
       };
 
-      const targetId = conversationID || activeConversation?.uuid || activeConversation?._id;
-      if (!targetId) return [];
+      if (candidateIds.length === 0) return [];
 
-      try {
-        const { data } = await axiosFetch.get(`/conversations/${targetId}/messages`, {
-          params: { limit: 30 },
-        });
-        return handleResponse(data);
-      } catch (err: any) {
-        const altId = activeConversation?._id;
-        if (altId && String(altId) !== String(targetId)) {
-          try {
-            const { data } = await axiosFetch.get(`/conversations/${altId}/messages`, {
-              params: { limit: 30 },
-            });
-            return handleResponse(data);
-          } catch {}
+      let lastParsedEmpty: any[] | null = null;
+
+      // Sequentially query candidate IDs: if one has messages, return immediately
+      for (const targetId of candidateIds) {
+        try {
+          const { data } = await axiosFetch.get(`/conversations/${targetId}/messages`, {
+            params: { limit: 30 },
+          });
+          const parsed = handleResponse(data);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+          if (Array.isArray(parsed) && lastParsedEmpty === null) {
+            lastParsedEmpty = parsed;
+          }
+        } catch {
+          // If this ID failed (404/400), seamlessly try next candidate ID
+          continue;
         }
-        return [];
       }
+
+      return lastParsedEmpty || [];
     },
-    enabled: isValidId,
+    enabled: Boolean(effectiveConvId && effectiveConvId !== "undefined"),
     retry: false,
     staleTime: 5000,
   });
@@ -181,18 +241,26 @@ export function useChatMessages({
   // Fetch older messages using cursor pagination
   const fetchOlderMessages = useCallback(async () => {
     const cursor = nextCursorRef.current;
-    if (!hasMore || isFetchingOlderRef.current || !cursor) return;
-
-    const targetId = conversationID || activeConversation?.uuid || activeConversation?._id;
-    if (!targetId) return;
+    if (!hasMore || isFetchingOlderRef.current || !cursor || candidateIds.length === 0) return;
 
     isFetchingOlderRef.current = true;
     setIsFetchingOlder(true);
 
     try {
-      const { data } = await axiosFetch.get(`/conversations/${targetId}/messages`, {
-        params: { limit: 30, before: cursor },
-      });
+      let data: any = null;
+      for (const targetId of candidateIds) {
+        try {
+          const res = await axiosFetch.get(`/conversations/${targetId}/messages`, {
+            params: { limit: 30, before: cursor },
+          });
+          if (res?.data) {
+            data = res.data;
+            break;
+          }
+        } catch {}
+      }
+
+      if (!data) return;
 
       const olderMessages: any[] =
         (data && Array.isArray(data.messages) ? data.messages : null) ||
@@ -207,16 +275,32 @@ export function useChatMessages({
       setHasMore(newHasMore);
 
       if (olderMessages.length > 0) {
-        queryClient.setQueryData(["messages", conversationID], (current: any = []) => {
-          const currentArr = Array.isArray(current) ? current : [];
-          const existingIds = new Set(
-            currentArr.map((m: any) => String(m._id || m.id)).filter(Boolean)
-          );
-          const uniqueOlder = olderMessages.filter((m: any) => {
-            const id = String(m._id || m.id);
-            return !id || !existingIds.has(id);
+        const targetKeys = new Set(
+          [
+            effectiveConvId,
+            conversationID,
+            activeRoomID,
+            activeConversation?.uuid,
+            activeConversation?._id,
+            activeConversation?.conversationID,
+            activeConversation?.id,
+          ]
+            .filter(Boolean)
+            .map((k) => String(k).trim())
+        );
+
+        targetKeys.forEach((key) => {
+          queryClient.setQueryData(["messages", key], (current: any = []) => {
+            const currentArr = Array.isArray(current) ? current : [];
+            const existingIds = new Set(
+              currentArr.map((m: any) => String(m._id || m.id)).filter(Boolean)
+            );
+            const uniqueOlder = olderMessages.filter((m: any) => {
+              const id = String(m._id || m.id);
+              return !id || !existingIds.has(id);
+            });
+            return [...uniqueOlder, ...currentArr];
           });
-          return [...uniqueOlder, ...currentArr];
         });
       }
     } catch (err) {
@@ -225,7 +309,7 @@ export function useChatMessages({
       isFetchingOlderRef.current = false;
       setIsFetchingOlder(false);
     }
-  }, [conversationID, activeConversation, hasMore, queryClient]);
+  }, [candidateIds, effectiveConvId, conversationID, activeRoomID, activeConversation, hasMore, queryClient]);
 
   // Filtered messages with robust deduplication
   const filteredMessages = useMemo(() => {
@@ -351,7 +435,7 @@ export function useChatMessages({
   // Message mutation
   const mutation = useMutation({
     mutationFn: async (msg: any) => {
-      const targetId = activeRoomID || conversationID;
+      const targetId = activeRoomID || candidateIds[0] || effectiveConvId || conversationID;
 
       // Strict backend DTO for Call A: Send Custom Offer
       if (msg.isCustomOffer) {
@@ -413,6 +497,7 @@ export function useChatMessages({
             newMsg?.conversationID ||
             newMsg?.uuid ||
             newMsg?.id ||
+            effectiveConvId ||
             conversationID ||
             ""
         ).trim();
@@ -453,6 +538,7 @@ export function useChatMessages({
 
       const targetKeys = new Set(
         [
+          effectiveConvId,
           conversationID,
           activeRoomID,
           activeConversation?.uuid,
@@ -513,7 +599,9 @@ export function useChatMessages({
         });
       }
 
-      queryClient.invalidateQueries({ queryKey: ["messages", conversationID] });
+      targetKeys.forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: ["messages", key] });
+      });
     },
     onError: (err: any, variables: any) => {
       const isNetErr =
@@ -1004,10 +1092,23 @@ export function useChatMessages({
       return [...arr, tempMessage];
     };
 
-    queryClient.setQueryData(["messages", conversationID], appendTempMessage);
-    if (activeRoomID && activeRoomID !== conversationID) {
-      queryClient.setQueryData(["messages", activeRoomID], appendTempMessage);
-    }
+    const targetKeys = new Set(
+      [
+        effectiveConvId,
+        conversationID,
+        activeRoomID,
+        activeConversation?.uuid,
+        activeConversation?._id,
+        activeConversation?.conversationID,
+        activeConversation?.id,
+      ]
+        .filter(Boolean)
+        .map((k) => String(k).trim())
+    );
+
+    targetKeys.forEach((key) => {
+      queryClient.setQueryData(["messages", key], appendTempMessage);
+    });
 
     const msgPayload = {
       conversationUUID: targetRoomId,
@@ -1195,10 +1296,23 @@ export function useChatMessages({
           return [...arr, tempMessage];
         };
 
-        queryClient.setQueryData(["messages", conversationID], appendTempMessage);
-        if (activeRoomID && activeRoomID !== conversationID) {
-          queryClient.setQueryData(["messages", activeRoomID], appendTempMessage);
-        }
+        const targetKeys = new Set(
+          [
+            effectiveConvId,
+            conversationID,
+            activeRoomID,
+            activeConversation?.uuid,
+            activeConversation?._id,
+            activeConversation?.conversationID,
+            activeConversation?.id,
+          ]
+            .filter(Boolean)
+            .map((k) => String(k).trim())
+        );
+
+        targetKeys.forEach((key) => {
+          queryClient.setQueryData(["messages", key], appendTempMessage);
+        });
 
         if (socket && socket.connected) {
           const socketPayload = {

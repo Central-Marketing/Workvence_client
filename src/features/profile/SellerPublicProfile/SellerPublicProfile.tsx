@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/utils/toast";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
@@ -22,6 +23,7 @@ interface SellerPublicProfileProps {
 
 const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user } = useUserStore((state: any) => state);
   const openAuthModal = useAuthModalStore((state) => state.openAuthModal);
   const isSeller = Boolean(user?.isSeller);
@@ -192,6 +194,7 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
           res.data?.conversation?.uuid ||
           res.data?.conversation?._id;
         if (targetId) {
+          queryClient.invalidateQueries({ queryKey: ["conversations"] });
           router.push(`/message/${targetId}`);
           return;
         }
@@ -219,6 +222,7 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
         data?.conversation?._id;
 
       if (targetId) {
+        queryClient.invalidateQueries({ queryKey: ["conversations"] });
         router.push(`/message/${targetId}`);
         return;
       }

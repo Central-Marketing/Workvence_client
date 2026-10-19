@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { X, ArrowRight, Loader2 } from "lucide-react";
 import { Button, BorderBeam } from "@/components/ui";
 import { useUserStore } from "@/store/userStore";
@@ -33,6 +34,7 @@ export const CustomDesignOfferModal: React.FC<CustomDesignOfferModalProps> = ({
   onCtaClick,
 }) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const modalRef = useRef<HTMLDivElement>(null);
   const triggerElementRef = useRef<HTMLElement | null>(null);
 
@@ -78,8 +80,15 @@ export const CustomDesignOfferModal: React.FC<CustomDesignOfferModalProps> = ({
 
     try {
       const res = await axiosFetch.get(`/conversations/single/${sellerID}/${buyerID}`);
-      const targetId = res.data?.uuid || res.data?.conversationID || res.data?.id || res.data?._id;
+      const targetId =
+        res.data?.uuid ||
+        res.data?.conversationID ||
+        res.data?.id ||
+        res.data?._id ||
+        res.data?.conversation?.uuid ||
+        res.data?.conversation?._id;
       if (targetId) {
+        queryClient.invalidateQueries({ queryKey: ["conversations"] });
         onClose();
         router.push(`/message/${targetId}`);
         return;
@@ -98,8 +107,15 @@ export const CustomDesignOfferModal: React.FC<CustomDesignOfferModalProps> = ({
         buyer_username: activeUser?.username || null,
       });
 
-      const targetId = data?.uuid || data?.conversationID || data?.id || data?._id;
+      const targetId =
+        data?.uuid ||
+        data?.conversationID ||
+        data?.id ||
+        data?._id ||
+        data?.conversation?.uuid ||
+        data?.conversation?._id;
       if (targetId) {
+        queryClient.invalidateQueries({ queryKey: ["conversations"] });
         onClose();
         router.push(`/message/${targetId}`);
         return;

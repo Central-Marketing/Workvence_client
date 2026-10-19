@@ -100,27 +100,129 @@ export const ChatView = () => {
         .get("/conversations")
         .then(({ data }) => (Array.isArray(data) ? data : data?.conversations || data?.data || []))
         .catch(() => []),
-    staleTime: 15000,
+    staleTime: 5000,
+    refetchOnMount: true,
   });
 
-  // Auto-navigate to first conversation if none selected or invalid ID
+  // Fetch single conversation details if needed (supports conversation ID or User ID)
+  const { data: activeConvData } = useQuery({
+    queryKey: ["conversation-detail", conversationID],
+    queryFn: async () => {
+      if (!conversationID || conversationID === "undefined" || conversationID === "null") return null;
+
+      // 1. Direct conversation lookup
+      try {
+        const { data } = await axiosFetch.get(`/conversations/${conversationID}`);
+        const conv = data?.conversation || data?.data || data;
+        if (conv && (conv._id || conv.uuid || conv.conversationID || conv.id)) {
+          return conv;
+        }
+      } catch {}
+
+      // 2. If conversationID is actually a User ID, query /conversations/single
+      const currentUid = user?._id || user?.id;
+      if (currentUid && conversationID && String(conversationID) !== String(currentUid)) {
+        try {
+          const { data } = await axiosFetch.get(`/conversations/single/${conversationID}/${currentUid}`);
+          const conv = data?.conversation || data?.data || data;
+          if (conv && (conv._id || conv.uuid || conv.conversationID || conv.id)) {
+            return conv;
+          }
+        } catch {}
+        try {
+          const { data } = await axiosFetch.get(`/conversations/single/${currentUid}/${conversationID}`);
+          const conv = data?.conversation || data?.data || data;
+          if (conv && (conv._id || conv.uuid || conv.conversationID || conv.id)) {
+            return conv;
+          }
+        } catch {}
+      }
+      return null;
+    },
+    enabled: isValidId && !conversations.some((c: any) => isTargetConversation(c, conversationID)),
+    staleTime: 10000,
+  });
+
+  // Sync activeConvData into conversations cache if missing
   useEffect(() => {
-    if (!isValidId && conversations.length > 0) {
-      const firstId =
-        conversations[0].uuid || conversations[0].conversationID || conversations[0]._id;
-      if (firstId && firstId !== "undefined") {
-        navigate.replace(`/message/${firstId}`);
+    if (activeConvData && (activeConvData._id || activeConvData.uuid)) {
+      queryClient.setQueryData(["conversations"], (oldConvs: any = []) => {
+        const list = Array.isArray(oldConvs) ? oldConvs : [];
+        const exists = list.some((c: any) => isTargetConversation(c, activeConvData._id || activeConvData.uuid));
+        if (!exists) {
+          return [activeConvData, ...list];
+        }
+        return list;
+      });
+    }
+  }, [activeConvData, queryClient]);
+
+  // Resolve effective active conversation
+  const resolvedConv = useMemo(() => {
+    if (isValidId) {
+      return (
+        activeConvData ||
+        conversations.find((c: any) => isTargetConversation(c, conversationID)) ||
+        null
+      );
+    }
+    // On /message with no ID in URL: pick first unread or first available conversation
+    if (conversations.length > 0) {
+      return (
+        conversations.find((c: any) => isConversationUnread(c, user)) ||
+        conversations[0]
+      );
+    }
+    return null;
+  }, [isValidId, conversationID, activeConvData, conversations, user]);
+
+  const activeConversation = resolvedConv;
+
+  const canonicalConvId = useMemo(() => {
+    if (!activeConversation) return null;
+    return (
+      activeConversation.uuid ||
+      activeConversation.conversationID ||
+      activeConversation._id ||
+      activeConversation.id ||
+      null
+    );
+  }, [activeConversation]);
+
+  const effectiveConversationId =
+    canonicalConvId ||
+    (conversationID !== "undefined" && conversationID !== "null" ? conversationID : "");
+
+  const hasActiveChat = Boolean(activeConversation || effectiveConversationId);
+
+  // Sync URL to canonical conversation ID:
+  // 1. If route was /message (no ID), navigate.replace(`/message/${canonicalConvId}`)
+  // 2. If route parameter was a User ID (or non-canonical), normalize it to the real conversation ID
+  useEffect(() => {
+    if (!canonicalConvId || canonicalConvId === "undefined" || canonicalConvId === "null") return;
+
+    if (!isValidId) {
+      navigate.replace(`/message/${canonicalConvId}`);
+    } else if (conversationID && conversationID !== canonicalConvId) {
+      const isCurrentIdAlias =
+        conversationID === String(activeConversation?.sellerID?._id || activeConversation?.sellerID) ||
+        conversationID === String(activeConversation?.buyerID?._id || activeConversation?.buyerID) ||
+        isTargetConversation(activeConversation, conversationID);
+
+      if (isCurrentIdAlias) {
+        navigate.replace(`/message/${canonicalConvId}`);
       }
     }
-  }, [isValidId, conversations, navigate]);
+  }, [isValidId, conversationID, canonicalConvId, activeConversation, navigate]);
 
   // Mark conversation as read when opened
   useEffect(() => {
-    if (isValidId) {
+    const targetToMark = canonicalConvId || conversationID;
+    if (targetToMark && targetToMark !== "undefined" && targetToMark !== "null") {
       queryClient.setQueryData(["conversations"], (oldConvs: any) => {
         if (!Array.isArray(oldConvs)) return oldConvs;
         return oldConvs.map((c: any) => {
-          if (isTargetConversation(c, conversationID)) {
+          if (isTargetConversation(c, targetToMark)) {
             return {
               ...c,
               readBySeller: true,
@@ -130,24 +232,9 @@ export const ChatView = () => {
           return c;
         });
       });
-      axiosFetch.patch(`/conversations/${conversationID}/mark-read`).catch(console.error);
+      axiosFetch.patch(`/conversations/${targetToMark}/mark-read`).catch(() => {});
     }
-  }, [isValidId, conversationID, queryClient]);
-
-  // Fetch single conversation details if needed
-  const { data: activeConvData } = useQuery({
-    queryKey: ["conversation-detail", conversationID],
-    queryFn: () =>
-      axiosFetch
-        .get(`/conversations/${conversationID}`)
-        .then(({ data }) => data?.conversation || data?.data || data)
-        .catch(() => null),
-    enabled: isValidId && !conversations.some((c: any) => isTargetConversation(c, conversationID)),
-    staleTime: 30000,
-  });
-
-  const activeConversation =
-    activeConvData || conversations.find((c: any) => isTargetConversation(c, conversationID));
+  }, [canonicalConvId, conversationID, queryClient]);
 
   const recipientUser = getOtherUser(activeConversation, user);
 
@@ -212,8 +299,8 @@ export const ChatView = () => {
     handleTypingKeypress,
   } = useChatSocket({
     user,
-    conversationID,
-    isValidId,
+    conversationID: effectiveConversationId,
+    isValidId: hasActiveChat,
     activeConversation,
     queryClient,
   });
@@ -273,9 +360,9 @@ export const ChatView = () => {
 
   // Fetch active briefs
   const { data: chatBriefs = [] } = useQuery({
-    queryKey: ["chat-briefs", conversationID, conversations.length],
+    queryKey: ["chat-briefs", effectiveConversationId, conversations.length],
     queryFn: async () => {
-      const activeConvDoc = conversations.find((c: any) => isTargetConversation(c, conversationID));
+      const activeConvDoc = conversations.find((c: any) => isTargetConversation(c, effectiveConversationId));
       const targetUser = getOtherUser(activeConvDoc, user);
       const targetUserId = targetUser?._id || targetUser?.id;
       if (!targetUserId) return [];
@@ -289,7 +376,7 @@ export const ChatView = () => {
       if (Array.isArray(data?.data)) return data.data;
       return [];
     },
-    enabled: !!user?.isSeller && isValidId,
+    enabled: !!user?.isSeller && hasActiveChat,
   });
 
   // Filtered conversations
@@ -361,8 +448,8 @@ export const ChatView = () => {
     handleRetrySend,
   } = useChatMessages({
     user,
-    conversationID,
-    isValidId,
+    conversationID: effectiveConversationId,
+    isValidId: hasActiveChat,
     activeConversation,
     activeRoomID,
     targetOtherUserId,
@@ -405,8 +492,8 @@ export const ChatView = () => {
     unreadCountBelow,
     isInitialScrolled,
   } = useChatScroll({
-    conversationID,
-    isValidId,
+    conversationID: effectiveConversationId,
+    isValidId: hasActiveChat,
     msgsLoading,
     filteredMessages,
     user,
@@ -452,7 +539,7 @@ export const ChatView = () => {
           setIsTagFilterMenuOpen={setIsTagFilterMenuOpen}
           convsLoading={convsLoading}
           displayedConversations={filteredConversations}
-          conversationID={conversationID}
+          conversationID={effectiveConversationId}
           onSelectConversation={(canonicalId) => {
             if (canonicalId) navigate.push(`/message/${canonicalId}`);
           }}
@@ -460,7 +547,7 @@ export const ChatView = () => {
 
         {/* ── CENTER: Chat Window ── */}
         <main className="flex-1 flex flex-col overflow-hidden bg-white min-w-0">
-          {!conversationID || (!isValidId && conversations.length === 0) ? (
+          {!hasActiveChat && (!convsLoading && conversations.length === 0) ? (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white gap-3 select-none">
               <div className="w-16 h-16 rounded-[6px] bg-[#E6F7F3] text-[#0D6D5F] flex items-center justify-center shadow-2xs mb-1">
                 <svg
@@ -493,7 +580,7 @@ export const ChatView = () => {
               <ChatHeader
                 finalRecipientUser={finalRecipientUser}
                 activeConversation={activeConversation}
-                conversationID={conversationID}
+                conversationID={effectiveConversationId}
                 isRecipientTyping={isRecipientTyping}
                 isRecipientOnline={recipientStatus.isOnline}
                 recipientLastSeenText={recipientStatus.lastSeenText}

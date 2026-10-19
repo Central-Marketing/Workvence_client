@@ -75,10 +75,11 @@ export default function BuyerOrdersPage() {
   // Filter orders for buyer
   const buyerOrders = useMemo(() => {
     if (!apiOrders || !Array.isArray(apiOrders)) return [];
-    if (!user?._id) return apiOrders;
+    if (!user?._id && !user?.id) return apiOrders;
+    const currentUid = String(user?._id || user?.id || "");
     return apiOrders.filter((order: any) => {
-      const buyerId = typeof order.buyerID === "object" ? order.buyerID?._id : order.buyerID;
-      return String(buyerId) === String(user._id);
+      const buyerId = typeof order.buyerID === "object" ? order.buyerID?._id || order.buyerID?.id : order.buyerID;
+      return String(buyerId) === currentUid;
     });
   }, [apiOrders, user]);
 
@@ -94,22 +95,54 @@ export default function BuyerOrdersPage() {
       }
 
       let dueDate = "-";
+      let deadlineTime: number | null = null;
       if (order.deadline) {
         const d = new Date(order.deadline);
         if (!isNaN(d.getTime())) {
           dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          deadlineTime = d.getTime();
+        }
+      } else if (order.deliveryDate) {
+        const d = new Date(order.deliveryDate);
+        if (!isNaN(d.getTime())) {
+          dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          deadlineTime = d.getTime();
+        }
+      } else if (order.createdAt && order.deliveryTime) {
+        const d = new Date(order.createdAt);
+        if (!isNaN(d.getTime())) {
+          d.setDate(d.getDate() + Number(order.deliveryTime));
+          dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          deadlineTime = d.getTime();
         }
       }
 
-      const isCompleted = order.status === "completed" || order.isCompleted === true;
-      const st = (order.status || "inprogress").toLowerCase();
+      const isCompleted = order.status === "completed" || order.status === "complete" || order.isCompleted === true;
+      const st = String(order.status || "inprogress").toLowerCase().trim();
+      const isDisputed =
+        st === "disputed" ||
+        st === "escalated_to_dispute" ||
+        order.escrowStatus === "disputed" ||
+        Boolean(order.isDisputed || order.disputed);
+      const isCancelled = st === "failed" || st === "cancelled" || st === "canceled";
+      const isDelivered = st === "delivered";
+      const isRevision = st === "revision" || st === "in_revision";
+      const isLate =
+        !isCompleted &&
+        !isCancelled &&
+        !isDelivered &&
+        !isRevision &&
+        !isDisputed &&
+        Boolean(st === "late" || (deadlineTime !== null && deadlineTime < Date.now()));
+
       let status = "inprogress";
       if (isCompleted) status = "completed";
-      else if (st === "disputed" || st === "escalated_to_dispute") status = "disputed";
-      else if (st === "delivered") status = "delivered";
-      else if (st === "revision" || st === "in_revision") status = "revision";
-      else if (st === "failed" || st === "cancelled") status = "cancelled";
-      else if (st === "late") status = "late";
+      else if (isDisputed) status = "disputed";
+      else if (isDelivered) status = "delivered";
+      else if (isRevision) status = "revision";
+      else if (isCancelled) status = "cancelled";
+      else if (isLate) status = "late";
+      else if (st === "pending" || st === "paid") status = "pending";
       else status = "inprogress";
 
       const isBrief = Boolean(order.briefID || order.type === "brief");
@@ -133,6 +166,8 @@ export default function BuyerOrdersPage() {
         dueDate,
         price: Number(order.price) || 0,
         status,
+        isCompleted,
+        raw: order,
       };
     });
   }, [buyerOrders]);
@@ -145,8 +180,10 @@ export default function BuyerOrdersPage() {
   const totalOrdersCount = buyerOrders.length;
   const activeOrdersCount = useMemo(() => {
     return buyerOrders.filter((o: any) => {
-      const isCompleted = o.status === "completed" || o.isCompleted === true;
-      return !isCompleted && o.status !== "cancelled" && o.status !== "failed";
+      const isCompleted = o.status === "completed" || o.status === "complete" || o.isCompleted === true;
+      const st = (o.status || "").toLowerCase();
+      const isCancelled = st === "cancelled" || st === "canceled" || st === "failed";
+      return !isCompleted && !isCancelled;
     }).length;
   }, [buyerOrders]);
 
@@ -456,9 +493,9 @@ export default function BuyerOrdersPage() {
 
                           {/* Status */}
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            {order.status === "revision" ? (
+                            {order.status === "revision" || order.status === "in_revision" ? (
                               <span className="bg-[#F5F0FF] text-[#8B5CF6] border border-[#DDD6FE] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">
-                                Revision
+                                In Revision
                               </span>
                             ) : order.status === "delivered" ? (
                               <span className="bg-[#E6FFFA] text-[#0D9488] border border-[#99F6E4] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">
@@ -475,6 +512,14 @@ export default function BuyerOrdersPage() {
                             ) : order.status === "disputed" ? (
                               <span className="bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">
                                 Disputed
+                              </span>
+                            ) : order.status === "cancelled" || order.status === "failed" ? (
+                              <span className="bg-[#FEE2E2] text-[#EF4444] border border-[#FECACA] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">
+                                Cancelled
+                              </span>
+                            ) : order.status === "pending" ? (
+                              <span className="bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">
+                                Pending
                               </span>
                             ) : (
                               <span className="bg-[#EEF2FF] text-[#6366F1] border border-[#C7D2FE] text-xs font-semibold px-3 py-1 rounded-full text-center inline-block">

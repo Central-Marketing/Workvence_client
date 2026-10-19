@@ -60,6 +60,12 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
           dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
           deadlineTime = d.getTime();
         }
+      } else if (order.deliveryDate) {
+        const d = new Date(order.deliveryDate);
+        if (!isNaN(d.getTime())) {
+          dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+          deadlineTime = d.getTime();
+        }
       } else if (order.createdAt && order.deliveryTime) {
         const d = new Date(order.createdAt);
         if (!isNaN(d.getTime())) {
@@ -69,13 +75,23 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
         }
       }
 
-      const isCompleted = order.status === "completed" || order.isCompleted === true;
-      const st = (order.status || "inprogress").toLowerCase();
-      const isDisputed = st === "disputed" || st === "escalated_to_dispute";
-      const isCancelled = st === "failed" || st === "cancelled";
+      const isCompleted = order.status === "completed" || order.status === "complete" || order.isCompleted === true;
+      const st = String(order.status || "inprogress").toLowerCase().trim();
+      const isDisputed =
+        st === "disputed" ||
+        st === "escalated_to_dispute" ||
+        order.escrowStatus === "disputed" ||
+        Boolean(order.isDisputed || order.disputed);
+      const isCancelled = st === "failed" || st === "cancelled" || st === "canceled";
       const isDelivered = st === "delivered";
       const isRevision = st === "revision" || st === "in_revision";
-      const isLate = !isCompleted && !isCancelled && !isDelivered && !isRevision && !isDisputed && Boolean(deadlineTime && deadlineTime < Date.now());
+      const isLate =
+        !isCompleted &&
+        !isCancelled &&
+        !isDelivered &&
+        !isRevision &&
+        !isDisputed &&
+        Boolean(st === "late" || (deadlineTime !== null && deadlineTime < Date.now()));
 
       let status = "inprogress";
       if (isCompleted) status = "completed";
@@ -83,7 +99,8 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
       else if (isDelivered) status = "delivered";
       else if (isRevision) status = "revision";
       else if (isCancelled) status = "cancelled";
-      else if (isLate || st === "late") status = "late";
+      else if (isLate) status = "late";
+      else if (st === "pending" || st === "paid") status = "pending";
       else status = "inprogress";
 
       const isBrief = Boolean(order.briefID || order.type === "brief");

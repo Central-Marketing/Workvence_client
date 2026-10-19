@@ -117,7 +117,7 @@ const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser, classNam
     if (!conversations || conversations.length === 0) return "/message";
     const unreadConv = conversations.find((c: any) => isConversationUnread(c, currentUser));
     const target = unreadConv || conversations[0];
-    const targetId = target?.uuid || target?.conversationID || target?._id || target?.id;
+    const targetId = target?._id || target?.uuid || target?.conversationID || target?.id;
     return targetId ? `/message/${targetId}` : "/message";
   }, [conversations, currentUser]);
 

@@ -79,7 +79,7 @@ export const MessageList: React.FC<MessageListProps> = ({
         ref={messagesContainerRef}
         onScroll={onScroll}
         className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 flex flex-col gap-4 bg-[#F0F0F0] [overflow-anchor:auto] transition-opacity duration-150 ${
-          msgsLoading || isInitialScrolled ? "opacity-100" : "opacity-0 pointer-events-none"
+          msgsLoading || isInitialScrolled || (filteredMessages && filteredMessages.length > 0) ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
       {msgsError ? (

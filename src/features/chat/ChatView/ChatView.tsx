@@ -181,9 +181,9 @@ export const ChatView = () => {
   const canonicalConvId = useMemo(() => {
     if (!activeConversation) return null;
     return (
+      activeConversation._id ||
       activeConversation.uuid ||
       activeConversation.conversationID ||
-      activeConversation._id ||
       activeConversation.id ||
       null
     );

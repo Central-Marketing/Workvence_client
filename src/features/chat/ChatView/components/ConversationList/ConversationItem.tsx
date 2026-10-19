@@ -34,7 +34,7 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
     : conv.lastMessage?.startsWith("[MEETING_INVITE]")
     ? "📹 Video Meeting Invitation"
     : conv.lastMessage || "No messages yet";
-  const canonicalId = conv.uuid || conv.conversationID || conv._id || conv.id;
+  const canonicalId = conv._id || conv.uuid || conv.conversationID || conv.id;
   const isActive = isTargetConversation(conv, activeConversationID);
   const timeText = conv.updatedAt ? moment(conv.updatedAt).format("h:mm A") : "";
   const unreadCountBadge = conv.unreadCount || (isUnread ? 1 : 0);

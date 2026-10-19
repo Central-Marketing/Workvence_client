@@ -109,8 +109,9 @@ export function useChatScroll({
     }
   }, [filteredMessages]);
 
-  // Reset initial scroll status when switching conversations
-  useEffect(() => {
+  // Frame-0 synchronous layout jump to bottom BEFORE browser paint
+  useLayoutEffect(() => {
+    // Synchronously reset scroll tracking when switching conversations
     if (currentConvIdRef.current !== conversationID) {
       currentConvIdRef.current = conversationID;
       initialScrollDoneRef.current = false;
@@ -121,10 +122,7 @@ export function useChatScroll({
       setShowScrollBottom(false);
       setUnreadCountBelow(0);
     }
-  }, [conversationID]);
 
-  // Frame-0 synchronous layout jump to bottom BEFORE browser paint
-  useLayoutEffect(() => {
     if (!isValidId || msgsLoading) return;
 
     if (filteredMessages.length === 0) {
@@ -135,26 +133,30 @@ export function useChatScroll({
       return;
     }
 
-    if (!initialScrollDoneRef.current && messagesContainerRef.current) {
+    if (messagesContainerRef.current) {
       const container = messagesContainerRef.current;
-      container.scrollTop = container.scrollHeight;
-      initialScrollDoneRef.current = true;
-      lastMessageIdRef.current = String(
-        filteredMessages[filteredMessages.length - 1]?._id ||
-          filteredMessages[filteredMessages.length - 1]?.id ||
-          ""
-      );
-      prevMessageCountRef.current = filteredMessages.length;
-      setIsInitialScrolled(true);
+      if (!initialScrollDoneRef.current) {
+        container.scrollTop = container.scrollHeight;
+        initialScrollDoneRef.current = true;
+        lastMessageIdRef.current = String(
+          filteredMessages[filteredMessages.length - 1]?._id ||
+            filteredMessages[filteredMessages.length - 1]?.id ||
+            ""
+        );
+        prevMessageCountRef.current = filteredMessages.length;
+        setIsInitialScrolled(true);
 
-      // Re-verify on next frame in case images or fonts expanded layout height
-      requestAnimationFrame(() => {
-        if (messagesContainerRef.current) {
-          messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-        }
-      });
+        // Re-verify on next frame in case images or fonts expanded layout height
+        requestAnimationFrame(() => {
+          if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+          }
+        });
+      } else if (!isInitialScrolled) {
+        setIsInitialScrolled(true);
+      }
     }
-  }, [conversationID, isValidId, msgsLoading, filteredMessages]);
+  }, [conversationID, isValidId, msgsLoading, filteredMessages, isInitialScrolled]);
 
   // Auto-scroll on NEW incoming messages after initial load is complete
   useEffect(() => {

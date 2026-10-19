@@ -489,7 +489,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
             className="mb-0"
             items={[
               { name: "Orders", href: "/orders" },
-              { name: `Order #${order.orderCode}`, isLast: true },
+              { name: `Order #${order.id}`, isLast: true },
             ]}
           />
 
@@ -562,7 +562,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                 <div className="flex min-w-0 w-full flex-1 items-center gap-3.5">
                   <div className="min-w-0 w-full flex-1">
                     <span className="block text-xs font-semibold text-slate-600 font-inter">
-                      Order #{order.orderCode}
+                      Order #{order.id}
                     </span>
 
                     <h3
@@ -1205,7 +1205,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                 {/* Order Number */}
                 <div className="flex items-center justify-between px-5 py-4">
                   <span className="text-[#6E6E6E] font-inter text-[14px]">Order number</span>
-                  <span className="text-[#292929] text-[14px] font-inter font-semibold">#{order.orderCode}</span>
+                  <span className="text-[#292929] text-[14px] font-inter font-semibold">#{order.id}</span>
                 </div>
 
                 {/* Status */}

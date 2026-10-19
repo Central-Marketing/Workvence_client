@@ -168,15 +168,16 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
           setUploadedFiles((prev) => [...prev, { name: file.name, size: sizeStr, url: localUrl, byteSize: file.size, type: fileType, publicId: null }]);
         }
         if (false) {
-        if (res?.url) {
-          const sizeStr = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
-          setUploadedFiles((prev) => [...prev, { name: file.name, size: sizeStr, url: res.url }]);
-        } else {
-          // Fallback object URL if external upload service fails
-          const localUrl = URL.createObjectURL(file);
-          const sizeStr = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
-          setUploadedFiles((prev) => [...prev, { name: file.name, size: sizeStr, url: localUrl }]);
-        }}
+          if (res?.url) {
+            const sizeStr = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+            setUploadedFiles((prev) => [...prev, { name: file.name, size: sizeStr, url: res.url }]);
+          } else {
+            // Fallback object URL if external upload service fails
+            const localUrl = URL.createObjectURL(file);
+            const sizeStr = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+            setUploadedFiles((prev) => [...prev, { name: file.name, size: sizeStr, url: localUrl }]);
+          }
+        }
       }
     } catch {
       toast.error("Failed to upload attached files.");
@@ -498,7 +499,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             <OrderTimelineStepper order={order} />
 
             {/* Delivery Countdown Banner when in progress */}
-            {!['delivered', 'completed', 'cancelled', 'failed'].includes(order.status) && !isDisputed && (
+            {/* {!['delivered', 'completed', 'cancelled', 'failed'].includes(order.status) && !isDisputed && (
               <div
                 className={`flex items-center justify-between gap-3.5 sm:gap-4 px-4 sm:px-5 py-3.5 rounded-[8px] transition-colors ${isLate
                   ? "bg-[#f5f5f5] border border-[#FECDD3] text-rose-800"
@@ -526,7 +527,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
 
                 <DeliveryCountdown deliveryDate={deliveryDeadline} />
               </div>
-            )}
+            )} */}
 
             {/* CARD: Order Summary */}
             <div className="bg-[#f5f5f5] rounded-[6px] border border-slate-200/90 shadow-sm p-5 sm:p-6 min-w-0 w-full">

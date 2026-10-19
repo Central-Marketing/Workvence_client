@@ -11,7 +11,7 @@ import { useUserStore } from "@/store/userStore";
 import { ChatSkeleton } from "@/components";
 
 import { ViewingOfferDetailsState } from "./types";
-import { useChatScroll, useChatSocket, useChatMessages } from "./hooks";
+import { useChatScroll, useChatSocket, useChatMessages, useConversationsCursor } from "./hooks";
 import { useNetworkStatus } from "./hooks/useNetworkStatus";
 import { ChatHeader, MessageList, MessageComposer } from "./components/ChatWindow";
 import { ChatConnectionBanner } from "./components/ChatWindow/ChatConnectionBanner";
@@ -92,16 +92,22 @@ export const ChatView = () => {
     }
   }, [user]);
 
-  // Fetch all conversations
-  const { isLoading: convsLoading, data: conversations = [] } = useQuery({
+  // Fetch conversations with cursor pagination
+  const {
+    loading: convsLoading,
+    isFetchingNextPage: isFetchingNextConvs,
+    hasMore: hasNextConvs,
+    loadMore: loadMoreConvs,
+  } = useConversationsCursor({
+    selectedTag: selectedTagFilter,
+    queryClient,
+  });
+
+  const { data: conversations = [] } = useQuery<any[]>({
     queryKey: ["conversations"],
-    queryFn: () =>
-      axiosFetch
-        .get("/conversations")
-        .then(({ data }) => (Array.isArray(data) ? data : data?.conversations || data?.data || []))
-        .catch(() => []),
-    staleTime: 5000,
-    refetchOnMount: true,
+    queryFn: () => queryClient.getQueryData(["conversations"]) || [],
+    initialData: () => queryClient.getQueryData(["conversations"]) || [],
+    staleTime: Infinity,
   });
 
   // Fetch single conversation details if needed (supports conversation ID or User ID)
@@ -415,6 +421,56 @@ export const ChatView = () => {
     });
   }, [conversations, convFilterTab, selectedTagFilter, convSearchQuery, user]);
 
+  // Debounce global conversation search query (300ms)
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(convSearchQuery.trim());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [convSearchQuery]);
+
+  // Server-side global conversation search across all inbox items
+  const { data: serverSearchResults = [], isLoading: isSearchLoading } = useQuery({
+    queryKey: ["conversations-search", debouncedSearchQuery],
+    queryFn: async () => {
+      if (!debouncedSearchQuery) return [];
+      try {
+        const { data } = await axiosFetch.get(
+          `/conversations/search?q=${encodeURIComponent(debouncedSearchQuery)}&limit=30`
+        );
+        if (Array.isArray(data)) return data;
+        return Array.isArray(data?.conversations)
+          ? data.conversations
+          : Array.isArray(data?.data)
+          ? data.data
+          : [];
+      } catch {
+        try {
+          const { data } = await axiosFetch.get(
+            `/conversations?search=${encodeURIComponent(debouncedSearchQuery)}&paginate=cursor&limit=30`
+          );
+          if (Array.isArray(data)) return data;
+          return data?.conversations || [];
+        } catch {
+          return [];
+        }
+      }
+    },
+    enabled: Boolean(debouncedSearchQuery.length > 0),
+    staleTime: 10000,
+  });
+
+  const displayedConversations = useMemo(() => {
+    if (debouncedSearchQuery.length > 0) {
+      if (serverSearchResults.length > 0) {
+        return serverSearchResults;
+      }
+      return filteredConversations;
+    }
+    return filteredConversations;
+  }, [debouncedSearchQuery, serverSearchResults, filteredConversations]);
+
   const scrollToBottomRef = useRef<(behavior?: ScrollBehavior) => void>(() => {});
 
   // Messages hook
@@ -537,12 +593,15 @@ export const ChatView = () => {
           allAvailableTags={allAvailableTags}
           isTagFilterMenuOpen={isTagFilterMenuOpen}
           setIsTagFilterMenuOpen={setIsTagFilterMenuOpen}
-          convsLoading={convsLoading}
-          displayedConversations={filteredConversations}
+          convsLoading={debouncedSearchQuery.length > 0 ? isSearchLoading : convsLoading}
+          displayedConversations={displayedConversations}
           conversationID={effectiveConversationId}
           onSelectConversation={(canonicalId) => {
             if (canonicalId) navigate.push(`/message/${canonicalId}`);
           }}
+          hasNextPage={!debouncedSearchQuery && hasNextConvs}
+          isFetchingNextPage={isFetchingNextConvs}
+          onLoadMore={loadMoreConvs}
         />
 
         {/* ── CENTER: Chat Window ── */}

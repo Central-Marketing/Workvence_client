@@ -24,6 +24,9 @@ interface ConversationListProps {
   displayedConversations: any[];
   conversationID: string;
   onSelectConversation: (id: string) => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  onLoadMore?: () => void;
 }
 
 export const ConversationList: React.FC<ConversationListProps> = ({
@@ -44,7 +47,16 @@ export const ConversationList: React.FC<ConversationListProps> = ({
   displayedConversations,
   conversationID,
   onSelectConversation,
+  hasNextPage = false,
+  isFetchingNextPage = false,
+  onLoadMore,
 }) => {
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+    if (scrollHeight - (scrollTop + clientHeight) < 120 && hasNextPage && !isFetchingNextPage && onLoadMore) {
+      onLoadMore();
+    }
+  };
   return (
     <>
       <div
@@ -92,7 +104,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
         </div>
 
         {/* Conversation Items List */}
-        <div className="flex-1 overflow-y-auto px-2 py-2 flex flex-col gap-0.5">
+        <div
+          className="flex-1 overflow-y-auto px-2 py-2 flex flex-col gap-0.5"
+          onScroll={handleScroll}
+        >
           {convsLoading ? (
             <div className="list-loader py-10 flex justify-center">
               <Loader size={28} />
@@ -102,18 +117,25 @@ export const ConversationList: React.FC<ConversationListProps> = ({
               {convSearchQuery ? "No conversations found" : "No conversations yet"}
             </div>
           ) : (
-            displayedConversations.map((conv: any) => (
-              <ConversationItem
-                key={conv._id || conv.uuid || conv.conversationID || conv.id}
-                conv={conv}
-                user={user}
-                activeConversationID={conversationID}
-                onSelect={(id) => {
-                  onSelectConversation(id);
-                  onCloseLeftSide();
-                }}
-              />
-            ))
+            <>
+              {displayedConversations.map((conv: any) => (
+                <ConversationItem
+                  key={conv._id || conv.uuid || conv.conversationID || conv.id}
+                  conv={conv}
+                  user={user}
+                  activeConversationID={conversationID}
+                  onSelect={(id) => {
+                    onSelectConversation(id);
+                    onCloseLeftSide();
+                  }}
+                />
+              ))}
+              {isFetchingNextPage && (
+                <div className="py-2.5 flex items-center justify-center shrink-0">
+                  <Loader size={20} />
+                </div>
+              )}
+            </>
           )}
         </div>
       </aside>

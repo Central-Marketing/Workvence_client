@@ -44,7 +44,7 @@ export const DeliveryCountdown: React.FC<CountdownPillProps> = ({
 
     if (timeState.isOverdue) {
         return (
-            <span className={`px-3.5 py-1 rounded-full text-xs font-semibold border border-rose-200 bg-[#FFF1F2] text-rose-700 shadow-2xs inline-flex items-center tracking-wide ${className}`}>
+            <span className={`px-3.5 py-1 rounded-full text-xs font-semibold border border-rose-200 bg-[#FFF1F2] text-rose-600 shadow-2xs inline-flex items-center tracking-wide ${className}`}>
                 Late · {timeState.overdueText}
             </span>
         );

@@ -10,19 +10,30 @@ import { MediaFileItem } from "../../types";
 
 interface ContactMediaTabProps {
   conversationMediaFiles: MediaFileItem[];
+  isLoading?: boolean;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
   onPreviewMedia: (file: MediaFileItem) => void;
   onDownloadMedia: (file: MediaFileItem) => void;
 }
 
 export const ContactMediaTab: React.FC<ContactMediaTabProps> = ({
   conversationMediaFiles,
+  isLoading = false,
+  hasMore = false,
+  onLoadMore,
   onPreviewMedia,
   onDownloadMedia,
 }) => {
   return (
     <div className="flex flex-col gap-2.5 pt-0.5">
-      {conversationMediaFiles.length > 0 ? (
-        conversationMediaFiles.map((file, idx) => {
+      {isLoading && conversationMediaFiles.length === 0 ? (
+        <div className="bg-white rounded-[16px] p-6 text-center border border-slate-100/90 shadow-2xs">
+          <p className="text-xs text-slate-400 font-normal m-0">Loading shared files...</p>
+        </div>
+      ) : conversationMediaFiles.length > 0 ? (
+        <>
+          {conversationMediaFiles.map((file, idx) => {
           const isPdf = isPdfFile(file);
           const isImage = !isPdf && isImageFile(file);
 
@@ -98,7 +109,23 @@ export const ContactMediaTab: React.FC<ContactMediaTabProps> = ({
               </div>
             </div>
           );
-        })
+        })}
+        {hasMore && onLoadMore && (
+          <div className="pt-2 flex justify-center">
+            <Button
+              type="button"
+              variant="outline"
+              size="xs"
+              radius="full"
+              disabled={isLoading}
+              onClick={onLoadMore}
+              className="text-xs text-slate-600 hover:text-slate-900 border-slate-200"
+            >
+              {isLoading ? "Loading..." : "Load older files"}
+            </Button>
+          </div>
+        )}
+      </>
       ) : (
         <div className="bg-white rounded-[16px] p-6 text-center border border-slate-100/90 shadow-2xs">
           <p className="text-xs text-slate-400 font-normal m-0">No media shared yet</p>

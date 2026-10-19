@@ -75,7 +75,7 @@ const RecentOrdersCard: React.FC<RecentOrdersCardProps> = ({
                 : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                 }`}
             >
-              Briefs
+              Projects
             </Button>
           </div>
 
@@ -396,14 +396,14 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
       : statementSummary.clearedIncome !== undefined
         ? Number(statementSummary.clearedIncome)
         : completedOrders.reduce((acc: number, curr: any) => {
-            const net =
-              curr.netEarnings !== undefined
-                ? curr.netEarnings
-                : curr.grossPrice
-                  ? curr.grossPrice - (curr.platformFee || 0)
-                  : curr.price || 0;
-            return acc + (Number(net) || 0);
-          }, 0);
+          const net =
+            curr.netEarnings !== undefined
+              ? curr.netEarnings
+              : curr.grossPrice
+                ? curr.grossPrice - (curr.platformFee || 0)
+                : curr.price || 0;
+          return acc + (Number(net) || 0);
+        }, 0);
   const unreadMessagesCount = conversations.filter((c: any) => !c.readBySeller).length;
 
   // Filtered orders by type tab (All, Packages, Briefs)

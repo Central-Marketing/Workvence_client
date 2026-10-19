@@ -20,7 +20,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
   orders,
 }) => {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"All" | "Packages" | "Briefs">("All");
+  const [activeTab, setActiveTab] = useState<"All" | "Packages" | "Projects">("All");
 
   // Fetch favorites count for the metrics bar
   const { data: apiFavorites } = useQuery({
@@ -140,7 +140,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
     let list = normalizedOrders;
     if (activeTab === "Packages") {
       list = list.filter((o) => o.itemType === "package");
-    } else if (activeTab === "Briefs") {
+    } else if (activeTab === "Projects") {
       list = list.filter((o) => o.itemType === "brief");
     }
     return sortOrdersByPriority(list).slice(0, 10);
@@ -265,7 +265,7 @@ export const BuyerDashboardOrdersView: React.FC<BuyerDashboardOrdersViewProps> =
           <div className="flex items-center gap-5 justify-between sm:justify-end">
             {/* Pill Switcher */}
             <div className="flex items-center h-[46px] bg-[#fff] p-[4px] rounded-[6px] border border-gray-200/50 overflow-x-auto scrollbar-none">
-              {(["All", "Packages", "Briefs"] as const).map((tab) => (
+              {(["All", "Packages", "Projects"] as const).map((tab) => (
                 <Button
                   key={tab}
                   type="button"

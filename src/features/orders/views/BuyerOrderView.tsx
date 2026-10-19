@@ -520,7 +520,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
             <OrderTimelineStepper order={order} />
 
             {/* when delivery in progress */}
-            {!['delivered', 'completed', 'cancelled', 'failed'].includes(order.status) && !isDisputed && (
+            {/* {!['delivered', 'completed', 'cancelled', 'failed'].includes(order.status) && !isDisputed && (
               <div
                 className={`flex items-center justify-between gap-3.5 sm:gap-4 px-4 sm:px-5 py-3.5 rounded-[8px] transition-colors ${isLate
                   ? "bg-[#f5f5f5] border border-[#FECDD3] text-rose-800"
@@ -548,7 +548,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
 
                 <DeliveryCountdown deliveryDate={deliveryDeadline} />
               </div>
-            )}
+            )} */}
 
             {/* CARD: Order Summary */}
             <div className="bg-[#f5f5f5] rounded-[6px] border border-slate-200/90 shadow-sm p-5 sm:p-6">

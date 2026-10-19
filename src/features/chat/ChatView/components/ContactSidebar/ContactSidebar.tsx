@@ -4,11 +4,11 @@ import React, { useState, useMemo } from "react";
 import { toast } from "@/utils/toast";
 import { RiCloseLine } from "react-icons/ri";
 import { Button, Skeleton } from "@/components";
-import { formatFileSize } from "@/lib";
-import { formatFileNameWithExtension, isImageFile } from "../../utils/chatMediaHelpers";
+import { isImageFile } from "../../utils/chatMediaHelpers";
 import { MediaFileItem } from "../../types";
 import { ContactProfileTab } from "./ContactProfileTab";
 import { ContactMediaTab } from "./ContactMediaTab";
+import { useConversationMedia } from "../../hooks/useConversationMedia";
 
 interface ContactSidebarProps {
   isValidId: boolean;
@@ -52,76 +52,22 @@ export const ContactSidebar: React.FC<ContactSidebarProps> = ({
   const [contactSidebarTab, setContactSidebarTab] = useState<"profile" | "media">("profile");
   const [isOrdersExpanded, setIsOrdersExpanded] = useState(true);
 
-  const conversationMediaFiles = useMemo<MediaFileItem[]>(() => {
-    const seenUrls = new Set<string>();
-    return (messages || []).flatMap((m: any) => {
-      const items: MediaFileItem[] = [];
-      const parseItem = (item: any) => {
-        if (!item) return;
-        if (typeof item === "string" && item.trim().length > 0) {
-          if (seenUrls.has(item)) return;
-          seenUrls.add(item);
-          
-          const meta = Array.isArray(m.attachmentMeta)
-            ? m.attachmentMeta.find((metaItem: any) => metaItem?.url === item)
-            : null;
-          const rawName =
-            meta?.name ||
-            m.attachment?.name ||
-            m.fileName ||
-            m.name ||
-            m.originalName ||
-            item.split("/").pop()?.split("?")[0] ||
-            "Attachment";
-          const fileName = formatFileNameWithExtension(rawName, item, null, m);
-          const rawSize = meta?.size || m.fileSize || m.size || m.bytes || m.attachment?.size;
-          items.push({
-            name: fileName,
-            sizeText: formatFileSize(rawSize),
-            url: item,
-          });
-        } else if (typeof item === "object" && (item.url || item.file || item.secure_url)) {
-          const url = item.url || item.file || item.secure_url;
-          if (typeof url === "string" && url.trim().length > 0) {
-            if (seenUrls.has(url)) return;
-            seenUrls.add(url);
-            
-            const meta = Array.isArray(m.attachmentMeta)
-              ? m.attachmentMeta.find((metaItem: any) => metaItem?.url === url)
-              : null;
-            const rawName =
-              meta?.name ||
-              item.name ||
-              item.fileName ||
-              item.original_filename ||
-              m.attachment?.name ||
-              m.fileName ||
-              m.name ||
-              url.split("/").pop()?.split("?")[0] ||
-              "Attachment";
-            const fileName = formatFileNameWithExtension(rawName, url, item, m);
-            const rawSize =
-              meta?.size ||
-              item.sizeText ||
-              item.size ||
-              item.bytes ||
-              m.fileSize ||
-              m.size ||
-              m.attachment?.size;
-            items.push({
-              name: fileName,
-              sizeText: formatFileSize(rawSize),
-              url,
-            });
-          }
-        }
-      };
-      if (m.file) parseItem(m.file);
-      if (m.attachment && m.attachment.url && m.attachment.url !== m.file) parseItem(m.attachment);
-      if (Array.isArray(m.attachments)) m.attachments.forEach(parseItem);
-      return items;
-    });
-  }, [messages]);
+  const effectiveConvId =
+    activeConversation?._id ||
+    activeConversation?.uuid ||
+    activeConversation?.conversationID ||
+    activeConversation?.id ||
+    conversationID;
+
+  const {
+    media: conversationMediaFiles,
+    loading: isMediaLoading,
+    hasMore: hasMoreMedia,
+    loadMore: loadMoreMedia,
+  } = useConversationMedia({
+    conversationId: effectiveConvId,
+    messages,
+  });
 
   const handlePreviewMedia = (file: MediaFileItem) => {
     if (!file.url || file.url === "#") {
@@ -270,6 +216,9 @@ export const ContactSidebar: React.FC<ContactSidebarProps> = ({
           ) : (
             <ContactMediaTab
               conversationMediaFiles={conversationMediaFiles}
+              isLoading={isMediaLoading}
+              hasMore={hasMoreMedia}
+              onLoadMore={loadMoreMedia}
               onPreviewMedia={handlePreviewMedia}
               onDownloadMedia={handleDownloadMedia}
             />

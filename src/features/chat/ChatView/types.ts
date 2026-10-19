@@ -57,7 +57,49 @@ export interface ViewingOfferDetailsState {
 }
 
 export interface MediaFileItem {
+  id?: string;
   name: string;
   sizeText: string | null;
   url: string;
+  mimeType?: string;
+  type?: 'image' | 'video' | 'audio' | 'document' | string;
+  sizeBytes?: number;
+  createdAt?: string;
+  messageId?: string;
+  sender?: {
+    id?: string;
+    username?: string;
+    image?: string;
+  };
+}
+
+export interface MediaItemDTO {
+  id: string;
+  url: string;
+  name: string;
+  mimeType: string;
+  type: 'image' | 'video' | 'audio' | 'document' | string;
+  sizeBytes: number;
+  createdAt: string;
+  messageId?: string;
+  sender?: {
+    id: string;
+    username: string;
+    image?: string;
+  };
+}
+
+export interface MediaGalleryResponse {
+  success: boolean;
+  media: MediaItemDTO[];
+  total: number;
+  hasMore: boolean;
+  nextCursor?: string | null;
+}
+
+export interface ConversationCursorResponse {
+  success: boolean;
+  conversations: any[];
+  hasMore: boolean;
+  nextCursor: string | null;
 }

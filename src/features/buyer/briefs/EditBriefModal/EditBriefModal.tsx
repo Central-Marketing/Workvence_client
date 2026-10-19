@@ -189,10 +189,10 @@ export const EditBriefModal: React.FC<EditBriefModalProps> = ({
       onClick={() => !loading && onClose()}
     >
       <div
-        className="bg-white rounded-[6px] max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden"
+        className="bg-white rounded-[20px] max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <BorderBeam withBase radius={6} thickness={4} />
+        <BorderBeam withBase radius={20} thickness={4} />
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
           <div>

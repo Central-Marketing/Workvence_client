@@ -61,11 +61,11 @@ export const Modal: React.FC<ModalProps> = ({
     >
       {/* 4px Gradient Border Outer Shell */}
       <div
-        className={`relative w-full ${maxWidth} p-[4px] rounded-[6px] shadow-[0_0_54px_0_rgba(0,0,0,0.15)] bg-gradient-to-br from-[#00A6FF] via-[#3ED419] to-[#F29EFF] animate-in zoom-in-95 duration-200 ${className}`}
+        className={`relative w-full ${maxWidth} p-[4px] rounded-[20px] shadow-[0_0_54px_0_rgba(0,0,0,0.15)] bg-gradient-to-br from-[#00A6FF] via-[#3ED419] to-[#F29EFF] animate-in zoom-in-95 duration-200 ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Inner White Container */}
-        <div className="bg-white rounded-[2px] p-6 sm:p-10 flex flex-col gap-6 sm:gap-8 max-h-[calc(100dvh-3rem)] overflow-y-auto">
+        <div className="bg-white rounded-[16px] p-6 sm:p-10 flex flex-col gap-6 sm:gap-8 max-h-[calc(100dvh-3rem)] overflow-y-auto">
           {/* Header */}
           {title && (
             <div className="flex items-center justify-between pb-4 border-b border-gray-100 shrink-0">
@@ -100,7 +100,7 @@ export const Modal: React.FC<ModalProps> = ({
             </div>
           )}
         </div>
-        <BorderBeam radius={6} thickness={4} />
+        <BorderBeam radius={20} thickness={4} />
       </div>
     </div>
   );

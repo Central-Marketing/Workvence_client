@@ -273,8 +273,8 @@ export default function GetInspiredPage() {
       {/* Project Detail Modal */}
       {selectedProject && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-[6px] max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative my-8">
-            <BorderBeam withBase radius={6} thickness={4} />
+          <div className="bg-white rounded-[20px] max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative my-8">
+            <BorderBeam withBase radius={20} thickness={4} />
             <Button
               onClick={() => setSelectedProject(null)}
               variant="soft"

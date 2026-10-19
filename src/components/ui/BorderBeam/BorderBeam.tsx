@@ -27,7 +27,7 @@ interface BorderBeamProps {
   withBase?: boolean;
 }
 
-export const BorderBeam = ({ radius = 6, thickness = 3, withBase = false }: BorderBeamProps) => {
+export const BorderBeam = ({ radius = 20, thickness = 3, withBase = false }: BorderBeamProps) => {
   const gradientId = useId();
   const rx = Math.max(radius - thickness / 2, 0);
 

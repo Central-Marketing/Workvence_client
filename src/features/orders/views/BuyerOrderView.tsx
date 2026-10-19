@@ -910,19 +910,19 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                           key: "communication" as const,
                           label: "Seller communication level",
                           ques: "How responsive and clear was the seller throughout the order?",
-                          score: Number(existingReview?.communication ?? feedbackData.communication ?? 0),
+                          score: Number(existingReview?.communicationRating),
                         },
                         {
                           key: "quality" as const,
                           label: "Quality of delivery",
                           ques: "Did the completed work meet your requirements and expectations?",
-                          score: Number(existingReview?.quality ?? feedbackData.quality ?? 0),
+                          score: Number(existingReview?.qualityRating),
                         },
                         {
                           key: "service" as const,
                           label: "Seller communication level",
                           ques: "How responsive and clear was the seller throughout the order?",
-                          score: Number(existingReview?.service ?? feedbackData.service ?? 0),
+                          score: Number(existingReview?.valueRating),
                         },
                       ].map((crit, idx) => (
                         <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

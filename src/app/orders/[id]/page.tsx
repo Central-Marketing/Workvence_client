@@ -6,11 +6,11 @@ import { useParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/utils/toast";
 import moment from "moment";
-import { axiosFetch } from "@/utils";
+import { axiosFetch, formatBytes } from "@/utils";
 import { socket } from "@/utils/socket";
 import { useUserStore } from "@/store/userStore";
 import { OrderSkeleton } from "@/components/ui";
-import { BuyerOrderView, SellerOrderView, NormalizedOrder, ExtensionRequestData } from "@/features/orders";
+import { BuyerOrderView, SellerOrderView, NormalizedOrder, ExtensionRequestData, DeliveryFileMetaDTO } from "@/features/orders";
 
 export default function OrderDetailPage() {
   const { id } = useParams();
@@ -159,6 +159,47 @@ export default function OrderDetailPage() {
     };
   }, [id, queryClient]);
 
+  // Helper to resolve delivery files with real names and sizes from metadata
+  const resolveDeliveryFiles = (rawFiles: any[], metaList: DeliveryFileMetaDTO[]) => {
+    if (!Array.isArray(rawFiles)) return [];
+    return rawFiles.map((f: any, idx: number) => {
+      const url = typeof f === "string" ? f : f?.url || "#";
+      const meta = metaList.find((m: any) => m?.url === url) || metaList[idx];
+      let name = "";
+      let size = "-";
+      let byteSize: number | undefined = undefined;
+      let type: string | undefined = undefined;
+      let publicId: string | null = null;
+
+      if (meta) {
+        name = meta.name || "";
+        if (meta.size !== undefined && meta.size !== null) {
+          byteSize = Number(meta.size);
+          size = formatBytes(meta.size);
+        }
+        type = meta.type;
+        publicId = meta.publicId || null;
+      }
+
+      if (!name) {
+        if (typeof f === "object" && f?.name) {
+          name = f.name;
+        } else if (typeof f === "string") {
+          const urlClean = f.split("?")[0].split("#")[0];
+          name = urlClean.split("/").pop() || `Deliverable_${idx + 1}`;
+        } else {
+          name = `Deliverable_${idx + 1}`;
+        }
+      }
+
+      if (size === "-" && typeof f === "object" && f?.size) {
+        size = typeof f.size === "number" ? formatBytes(f.size) : String(f.size);
+      }
+
+      return { name, size, url, byteSize, type, publicId };
+    });
+  };
+
   // Normalized order data
   const normalizedOrder: NormalizedOrder | null = useMemo(() => {
     if (!activeRawOrder) return null;
@@ -294,14 +335,26 @@ export default function OrderDetailPage() {
     const isUserBuyer = !isUserSeller;
 
     // Delivery files
-    const rawFiles = o.deliveryFiles || o.deliverables || [];
-    const deliveryFiles = Array.isArray(rawFiles)
+    const deliveries = Array.isArray(o.deliveries) ? o.deliveries : [];
+    const latestDelivery = deliveries.length > 0 ? deliveries[deliveries.length - 1] : null;
+    const deliveryFilesMeta: DeliveryFileMetaDTO[] = Array.isArray(o.deliveryFilesMeta)
+      ? o.deliveryFilesMeta
+      : Array.isArray(o.attachmentMeta)
+      ? o.attachmentMeta
+      : Array.isArray(latestDelivery?.deliveryFilesMeta)
+      ? latestDelivery.deliveryFilesMeta
+      : Array.isArray(latestDelivery?.attachmentMeta)
+      ? latestDelivery.attachmentMeta
+      : [];
+    const rawFiles = o.deliveryFiles || o.deliverables || latestDelivery?.deliveryFiles || [];
+    const deliveryFiles = resolveDeliveryFiles(rawFiles, deliveryFilesMeta);
+    const _ignoredOldFiles: any[] = []; /*
       ? rawFiles.map((f: any, idx: number) => ({
         name: typeof f === "string" ? f.split("/").pop() || `Deliverable_${idx + 1}` : f.name || `Deliverable_${idx + 1}`,
         size: typeof f === "object" && f.size ? f.size : "-",
         url: typeof f === "string" ? f : f.url || "#",
       }))
-      : [];
+      : []; */
 
     // Requirements
     const reqs = o.requirements || o.projectRequirements || {};
@@ -352,6 +405,9 @@ export default function OrderDetailPage() {
       buyer,
       requirements,
       deliveryFiles,
+      deliveryFilesMeta,
+      attachmentMeta: deliveryFilesMeta,
+      deliveries,
       deliveryMessage: o.deliveryMessage || o.deliveryText,
       deliveryText: o.deliveryText || o.deliveryMessage,
       extensionRequest,

@@ -10,3 +10,4 @@ export { default as getOnlineStatus } from './userStatus';
 export * from './userStatus';
 export * from './tokenRefresh';
 export * from './revision';
+export * from './formatBytes';

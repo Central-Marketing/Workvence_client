@@ -26,6 +26,8 @@ export interface Order {
   deliveryTime?: number | string;
   deliveryText?: string;
   deliveryFiles?: OrderDeliveryFile[];
+  deliveryFilesMeta?: any[];
+  deliveries?: any[];
   deliveredAt?: string;
   completedAt?: string;
   revisionsUsed?: number;

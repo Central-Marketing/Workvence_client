@@ -24,7 +24,7 @@ import {
   FiInfo,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
-import { axiosFetch } from "@/utils";
+import { axiosFetch, formatBytes } from "@/utils";
 import generateImageURL from "@/utils/generateImageURL";
 import { ExtensionModal } from "@/components";
 import { Breadcrumb, Button, Tag, Modal } from "@/components/ui";
@@ -53,7 +53,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
   const [showDeliverModal, setShowDeliverModal] = useState(false);
   const [isLedgerOpen, setIsLedgerOpen] = useState(false);
   const [deliveryNotes, setDeliveryNotes] = useState("");
-  const [uploadedFiles, setUploadedFiles] = useState<Array<{ name: string; size: string; url: string }>>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<Array<{ name: string; size: string; url: string; byteSize?: number; type?: string; publicId?: string | null }>>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmittingDelivery, setIsSubmittingDelivery] = useState(false);
   const [isContacting, setIsContacting] = useState(false);
@@ -156,7 +156,18 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const res = await generateImageURL(file, "order_deliveries");
+        const res: any = await generateImageURL(file, "order_deliveries");
+        const uploadedUrl = res?.url || res?.secure_url || "";
+        const sizeStr = formatBytes(file.size);
+        const fileType = file.type || "application/octet-stream";
+        const publicId = res?.public_id || res?.publicId || null;
+        if (uploadedUrl) {
+          setUploadedFiles((prev) => [...prev, { name: file.name, size: sizeStr, url: uploadedUrl, byteSize: file.size, type: fileType, publicId }]);
+        } else {
+          const localUrl = URL.createObjectURL(file);
+          setUploadedFiles((prev) => [...prev, { name: file.name, size: sizeStr, url: localUrl, byteSize: file.size, type: fileType, publicId: null }]);
+        }
+        if (false) {
         if (res?.url) {
           const sizeStr = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
           setUploadedFiles((prev) => [...prev, { name: file.name, size: sizeStr, url: res.url }]);
@@ -165,7 +176,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
           const localUrl = URL.createObjectURL(file);
           const sizeStr = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
           setUploadedFiles((prev) => [...prev, { name: file.name, size: sizeStr, url: localUrl }]);
-        }
+        }}
       }
     } catch {
       toast.error("Failed to upload attached files.");
@@ -191,10 +202,19 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
     setIsSubmittingDelivery(true);
     try {
       const fileUrls = uploadedFiles.map((f) => f.url);
+      const deliveryFilesMeta = uploadedFiles.map((f) => ({
+        url: f.url,
+        name: f.name,
+        size: f.byteSize !== undefined ? f.byteSize : 0,
+        type: f.type || "application/octet-stream",
+        publicId: f.publicId || null,
+      }));
       await axiosFetch.post(`/orders/deliver/${order.id}`, {
         deliveryText: deliveryNotes,
         deliveryFile: fileUrls[0] || "",
         deliveryFiles: fileUrls,
+        deliveryFilesMeta,
+        attachmentMeta: deliveryFilesMeta,
       });
       toast.success("Work delivered to buyer successfully!");
       setShowDeliverModal(false);

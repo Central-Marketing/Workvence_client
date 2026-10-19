@@ -32,13 +32,18 @@ export const OrderDeliverablesList: React.FC<OrderDeliverablesListProps> = ({
             key={idx}
             className="bg-white border border-slate-200/90 rounded-[6px] p-4 flex items-center justify-between hover:border-slate-300 transition-colors shadow-2xs"
           >
-            <div className="min-w-0 pr-3">
+            <div className="flex items-center gap-2.5 min-w-0 pr-3">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 uppercase shrink-0">
+                {file.name?.includes('.') ? file.name.split('.').pop()?.toUpperCase() : 'FILE'}
+              </span>
+              <div className="min-w-0">
               <p className="font-bold text-sm sm:text-[15px] text-slate-900 truncate" title={file.name}>
                 {file.name}
               </p>
               <p className="text-xs text-slate-400 mt-1">
                 file size <span className="font-semibold text-slate-700">{file.size}</span>
               </p>
+              </div>
             </div>
             <a
               href={file.url}

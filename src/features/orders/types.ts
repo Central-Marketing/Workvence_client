@@ -11,10 +11,33 @@ export interface OrderUser {
   joinedDate?: string;
 }
 
+export interface DeliveryFileMetaDTO {
+  url: string;
+  name: string;
+  size: number;
+  type: string;
+  publicId?: string | null;
+}
+
+export interface OrderDeliveryDTO {
+  deliveryRound: number;
+  deliveryText: string;
+  deliveryFiles: string[];
+  files?: string[];
+  deliveryFilesMeta?: DeliveryFileMetaDTO[];
+  attachmentMeta?: DeliveryFileMetaDTO[];
+  deliveredAt: string;
+  wasLateDelivered?: boolean | null;
+  performedBy?: string;
+}
+
 export interface DeliverableFile {
   name: string;
   size: string;
   url: string;
+  byteSize?: number;
+  type?: string;
+  publicId?: string | null;
 }
 
 export interface ExtensionRequestData {
@@ -58,6 +81,9 @@ export interface NormalizedOrder {
     submittedAt?: string;
   };
   deliveryFiles: DeliverableFile[];
+  deliveryFilesMeta?: DeliveryFileMetaDTO[];
+  attachmentMeta?: DeliveryFileMetaDTO[];
+  deliveries?: OrderDeliveryDTO[];
   deliveryMessage?: string;
   deliveryText?: string;
   extensionRequest: ExtensionRequestData | null;

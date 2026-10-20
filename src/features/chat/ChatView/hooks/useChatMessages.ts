@@ -257,7 +257,7 @@ export function useChatMessages({
             data = res.data;
             break;
           }
-        } catch {}
+        } catch { }
       }
 
       if (!data) return;
@@ -422,7 +422,7 @@ export function useChatMessages({
 
       const isMyMsg = Boolean(
         (currentUid && senderIdStr && currentUid === senderIdStr) ||
-          (currentUsername && senderUsername && currentUsername === senderUsername)
+        (currentUsername && senderUsername && currentUsername === senderUsername)
       );
 
       if (isMyMsg) buyerMsgCount++;
@@ -494,33 +494,43 @@ export function useChatMessages({
         if (!Array.isArray(oldConvs)) return oldConvs;
         const incomingCid = String(
           newMsg?.conversationUUID ||
-            newMsg?.conversationID ||
-            newMsg?.uuid ||
-            newMsg?.id ||
-            effectiveConvId ||
-            conversationID ||
-            ""
+          newMsg?.conversationID ||
+          newMsg?.uuid ||
+          newMsg?.id ||
+          effectiveConvId ||
+          conversationID ||
+          ""
         ).trim();
         const incomingFile = getAttachmentUrl(newMsg);
         const incomingText =
           newMsg?.isCustomOffer || newMsg?.customOffer
             ? "📋 Custom Offer"
             : (
-                newMsg.description ||
-                newMsg.desc ||
-                newMsg.text ||
-                newMsg.message ||
-                (incomingFile ? "📎 Attachment" : "")
-              );
+              newMsg.description ||
+              newMsg.desc ||
+              newMsg.text ||
+              newMsg.message ||
+              (incomingFile ? "📎 Attachment" : "")
+            );
         return oldConvs
           .map((c: any) => {
             if (isTargetConversation(c, incomingCid)) {
+              const currentUid = String(user?._id || user?.id || "");
+              const currentUsername = String(user?.username || "").toLowerCase();
+              const sellerObj = c.sellerID || c.seller || c.sellerId || c.sellerDetails;
+              const sellerId = String(sellerObj?._id || sellerObj?.id || (typeof sellerObj === "string" ? sellerObj : ""));
+              const sellerUsername = String(c.seller_username || sellerObj?.username || "").toLowerCase();
+              const isCurrentUserSeller = (sellerId && sellerId === currentUid) || (sellerUsername && sellerUsername === currentUsername);
+
               return {
                 ...c,
                 lastMessage: incomingText || c.lastMessage,
+                lastMessageSender: currentUid,
                 updatedAt: new Date().toISOString(),
-                readBySeller: user?.isSeller ? true : false,
-                readByBuyer: user?.isSeller ? false : true,
+                readBySeller: isCurrentUserSeller ? true : false,
+                readByBuyer: isCurrentUserSeller ? false : true,
+                unread: false,
+                unreadCount: 0,
               };
             }
             return c;
@@ -700,14 +710,14 @@ export function useChatMessages({
     const attachmentUrl = currentAttachment?.url || currentAttachment?.secure_url || null;
     const attachmentMeta: AttachmentMetaItem[] = (currentAttachment && attachmentUrl)
       ? [
-          {
-            url: attachmentUrl,
-            name: currentAttachment.name || "attachment",
-            size: Number((currentAttachment as any).bytes || currentAttachment.size) || 0,
-            type: currentAttachment.type || "application/octet-stream",
-            ...(currentAttachment.public_id ? { publicId: currentAttachment.public_id } : {}),
-          },
-        ]
+        {
+          url: attachmentUrl,
+          name: currentAttachment.name || "attachment",
+          size: Number((currentAttachment as any).bytes || currentAttachment.size) || 0,
+          type: currentAttachment.type || "application/octet-stream",
+          ...(currentAttachment.public_id ? { publicId: currentAttachment.public_id } : {}),
+        },
+      ]
       : [];
 
     const attachmentObj = currentAttachment ? {
@@ -786,10 +796,22 @@ export function useChatMessages({
             targetKeys.has(String(c.conversationID)) ||
             targetKeys.has(String(c.id))
           ) {
+            const currentUid = String(user?._id || user?.id || "");
+            const currentUsername = String(user?.username || "").toLowerCase();
+            const sellerObj = c.sellerID || c.seller || c.sellerId || c.sellerDetails;
+            const sellerId = String(sellerObj?._id || sellerObj?.id || (typeof sellerObj === "string" ? sellerObj : ""));
+            const sellerUsername = String(c.seller_username || sellerObj?.username || "").toLowerCase();
+            const isCurrentUserSeller = (sellerId && sellerId === currentUid) || (sellerUsername && sellerUsername === currentUsername);
+
             return {
               ...c,
               lastMessage: currentText || (attachmentUrl ? "📎 Attachment" : c.lastMessage),
+              lastMessageSender: currentUid,
               updatedAt: new Date().toISOString(),
+              readBySeller: isCurrentUserSeller ? true : false,
+              readByBuyer: isCurrentUserSeller ? false : true,
+              unread: false,
+              unreadCount: 0,
             };
           }
           return c;
@@ -1030,21 +1052,21 @@ export function useChatMessages({
 
     const contextFields = selectedPackageId
       ? {
-          gigID: selectedPackageId,
-          gigTitle: selectedPkg?.title || "",
-          packageID: selectedPackageId,
-          packageTitle: selectedPkg?.title || "",
-          briefID: null,
-          briefTitle: null,
-        }
+        gigID: selectedPackageId,
+        gigTitle: selectedPkg?.title || "",
+        packageID: selectedPackageId,
+        packageTitle: selectedPkg?.title || "",
+        briefID: null,
+        briefTitle: null,
+      }
       : {
-          gigID: null,
-          gigTitle: null,
-          packageID: null,
-          packageTitle: null,
-          briefID: selectedBriefId,
-          briefTitle: selectedBrf?.title || "",
-        };
+        gigID: null,
+        gigTitle: null,
+        packageID: null,
+        packageTitle: null,
+        briefID: selectedBriefId,
+        briefTitle: selectedBrf?.title || "",
+      };
 
     const customOfferData = {
       title: autoTitle,
@@ -1221,13 +1243,13 @@ export function useChatMessages({
         return oldData.map((m: any) =>
           String(m._id || m.id) === String(msgId)
             ? {
-                ...m,
-                ...(typeof updatedMsg === "object" ? updatedMsg : {}),
-                offerStatus: "accepted",
-                isOfferAccepted: true,
-                orderId: returnedOrderId || m.orderId || m.orderID,
-                orderID: returnedOrderId || m.orderID || m.orderId,
-              }
+              ...m,
+              ...(typeof updatedMsg === "object" ? updatedMsg : {}),
+              offerStatus: "accepted",
+              isOfferAccepted: true,
+              orderId: returnedOrderId || m.orderId || m.orderID,
+              orderID: returnedOrderId || m.orderID || m.orderId,
+            }
             : m
         );
       });

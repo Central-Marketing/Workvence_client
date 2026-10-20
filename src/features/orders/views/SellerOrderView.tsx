@@ -449,7 +449,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
             className="mb-0"
             items={[
               { name: "Manage Orders", href: "/manage-orders" },
-              { name: `Order #${order.orderCode}`, isLast: true },
+              { name: `Order #${order.id}`, isLast: true },
             ]}
           />
 
@@ -540,13 +540,22 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
               <hr className="border-0 border-t border-[rgba(0,0,0,0.10)] my-4" />
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100 min-w-0">
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 w-full flex-1">
                   <span className="block text-xs font-semibold text-slate-600 font-inter">
-                    Order #{order.orderCode}
+                    Order #{order.id}
                   </span>
 
-                  <h3 className="font-bold text-sm sm:text-base text-slate-900 truncate">
-                    {order.title || order.packageTitle}
+                  <h3
+                    title={
+                      order.raw?.packageType === "custom" && order.raw?.packageDetails?.shortDesc
+                        ? order.raw.packageDetails.shortDesc
+                        : (order.title || order.packageTitle)
+                    }
+                    className="block w-full max-w-full truncate font-bold text-sm sm:text-base text-slate-900"
+                  >
+                    {order.raw?.packageType === "custom" && order.raw?.packageDetails?.shortDesc
+                      ? order.raw.packageDetails.shortDesc
+                      : (order.title || order.packageTitle)}
                   </h3>
                 </div>
               </div>
@@ -1062,7 +1071,7 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
                 {/* Order Number */}
                 <div className="flex items-center justify-between px-5 py-4">
                   <span className="text-[#6E6E6E] font-inter text-[14px]">Order number</span>
-                  <span className="text-[#292929] text-[14px] font-inter font-semibold">#{order.orderCode}</span>
+                  <span className="text-[#292929] text-[14px] font-inter font-semibold">#{order.id}</span>
                 </div>
 
                 {/* Status */}

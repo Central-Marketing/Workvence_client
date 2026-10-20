@@ -7,10 +7,11 @@ import { RiSearchLine } from "react-icons/ri";
 import { useQuery } from "@tanstack/react-query";
 import { axiosFetch } from "@/utils";
 import { useUserStore } from "@/store/userStore";
-import { Loader, Button } from "@/components";
-import { Breadcrumb, Tag, Modal } from "@/components/ui";
+import { Button } from "@/components";
+import { Breadcrumb, Tag, Modal, OrdersTableSkeleton } from "@/components/ui";
+import { sortOrdersByPriority, getOrderDeadlineTime } from "@/features/orders";
 
-type FilterTab = "priority" | "active" | "late" | "delivered" | "completed" | "cancelled" | "starred";
+type FilterTab = "priority" | "active" | "late" | "delivered" | "completed" | "cancelled";
 
 export default function ContactOrdersPage() {
   const router = useRouter();
@@ -79,45 +80,55 @@ export default function ContactOrdersPage() {
     });
   }, [apiOrders, user, contactId, isSeller]);
 
-  // Status badge helper for seller view
-  const getSellerStatusBadge = (status?: string, isCompleted?: boolean) => {
-    if (isCompleted || status === "completed") {
-      return { label: "Completed", style: "bg-[#D1FAE5] text-[#059669]" };
-    }
-    const st = (status || "inprogress").toLowerCase();
-    if (st === "delivered") return { label: "Delivered", style: "bg-[#D1FAE5] text-[#059669]" };
-    if (st === "revision" || st === "in_revision") return { label: "Revision", style: "bg-[#F3E8FF] text-[#9333EA]" };
-    if (st === "late") return { label: "Late", style: "bg-[#FEE2E2] text-[#DC2626]" };
-    if (st === "failed" || st === "cancelled") return { label: "Failed", style: "bg-[#FEE2E2] text-[#EF4444]" };
-    if (st === "pending") return { label: "Pending", style: "bg-[#FEF3C7] text-[#D97706]" };
-    return { label: "Inprogress", style: "bg-[#E0F2FE] text-[#0284C7]" };
-  };
+  // Status resolver helper following canonical orders business logic
+  const resolveOrderStatus = (item: any, now = Date.now()): { label: string; variant: string } => {
+    const raw = item.raw || item;
+    const statusStr = String(item.status || raw.status || "inprogress").toLowerCase().trim();
 
-  // Status pill helper for buyer view
-  const renderBuyerStatusPill = (status?: string, isCompleted?: boolean) => {
-    if (isCompleted || status === "completed") {
-      return <span className="bg-[#ECFDF5] text-[#10B981] text-xs font-semibold px-4 py-1.5 rounded-full inline-block">Completed</span>;
+    const isCompleted =
+      statusStr === "completed" ||
+      statusStr === "complete" ||
+      Boolean(item.isCompleted || raw.isCompleted);
+    if (isCompleted) {
+      return { label: "Completed", variant: "completed" };
     }
-    const st = (status || "inprogress").toLowerCase();
-    if (st === "delivered") {
-      return <span className="bg-[#E6FFFA] text-[#0D9488] text-xs font-semibold px-4 py-1.5 rounded-full inline-block">Delivered</span>;
+
+    const isCancelled =
+      statusStr === "cancelled" || statusStr === "canceled" || statusStr === "failed";
+    if (isCancelled) {
+      return { label: "Cancelled", variant: "cancelled" };
     }
-    if (st === "revision" || st === "in_revision") {
-      return <span className="bg-[#F5F0FF] text-[#8B5CF6] text-xs font-semibold px-4 py-1.5 rounded-full inline-block">Revision</span>;
+
+    const isDisputed =
+      statusStr === "disputed" ||
+      statusStr === "escalated_to_dispute" ||
+      String(raw.escrowStatus || "").toLowerCase() === "disputed" ||
+      Boolean(raw.isDisputed || item.isDisputed);
+    if (isDisputed) {
+      return { label: "Disputed", variant: "disputed" };
     }
-    if (st === "late") {
-      return <span className="bg-[#FEE2E2] text-[#DC2626] text-xs font-semibold px-4 py-1.5 rounded-full inline-block">Late</span>;
+
+    const isRevision = statusStr === "revision" || statusStr === "in_revision";
+    if (isRevision) {
+      return { label: "In Revision", variant: "in_revision" };
     }
-    if (st === "failed") {
-      return <span className="bg-[#FEE2E2] text-[#EF4444] text-xs font-semibold px-4 py-1.5 rounded-full inline-block">Failed</span>;
+
+    const isDelivered = statusStr === "delivered";
+    if (isDelivered) {
+      return { label: "Delivered", variant: "delivered" };
     }
-    if (st === "cancelled") {
-      return <span className="bg-slate-100 text-slate-600 text-xs font-semibold px-4 py-1.5 rounded-full inline-block">Cancelled</span>;
+
+    const deadlineTime = getOrderDeadlineTime(item);
+    const isLate = statusStr === "late" || Boolean(deadlineTime !== null && deadlineTime < now);
+    if (isLate) {
+      return { label: "Late", variant: "late" };
     }
-    if (st === "pending") {
-      return <span className="bg-[#FEF9C3] text-[#CA8A04] text-xs font-semibold px-4 py-1.5 rounded-full inline-block">Pending</span>;
+
+    if (statusStr === "pending" || statusStr === "paid") {
+      return { label: "Pending", variant: "pending" };
     }
-    return <span className="bg-[#EEF2FF] text-[#6366F1] text-xs font-semibold px-4 py-1.5 rounded-full inline-block">Inprogress</span>;
+
+    return { label: "Inprogress", variant: "inprogress" };
   };
 
   const renderBadge = (badge?: "Expert" | "Pro" | "Legend") => {
@@ -146,49 +157,78 @@ export default function ContactOrdersPage() {
     return null;
   };
 
-  // Filter orders by active tab and search query
-  const filteredOrders = useMemo(() => {
-    return mutualOrders.filter((order: any) => {
-      const isCompleted = order.status === "completed" || order.isCompleted === true;
-      const st = (order.status || "inprogress").toLowerCase();
+  const formatDueDate = (order: any): string => {
+    const raw = order.raw || order;
+    const deadline = order.deadline || raw.deadline || order.dueDate || raw.dueDate;
+    if (deadline) {
+      const d = new Date(deadline);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      }
+    }
+    const createdAt = order.createdAt || raw.createdAt;
+    const deliveryDays = Number(order.deliveryTime ?? raw.deliveryTime);
+    if (createdAt && !isNaN(deliveryDays) && deliveryDays > 0) {
+      const d = new Date(new Date(createdAt).getTime() + deliveryDays * 86400000);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      }
+    }
+    return "-";
+  };
+
+  // Filter orders by active tab and search query with accurate status resolution
+  const tabFilteredOrders = useMemo(() => {
+    const now = Date.now();
+    return mutualOrders.filter((item: any) => {
+      const statusInfo = resolveOrderStatus(item, now);
+      const deadlineTime = getOrderDeadlineTime(item);
 
       // Search matching
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
-        const title = (order.title || order.projectTitle || order.gigID?.title || "").toLowerCase();
-        const desc = (order.description || order.projectDescription || "").toLowerCase();
-        const code = String(order._id || order.id || "").toLowerCase();
+        const title = (item.title || item.projectTitle || item.gigID?.title || "").toLowerCase();
+        const desc = (item.description || item.projectDescription || item.instructions || "").toLowerCase();
+        const code = String(item._id || item.id || "").toLowerCase();
         if (!title.includes(q) && !desc.includes(q) && !code.includes(q)) {
           return false;
         }
       }
 
       // Tab filtering
-      if (activeTab === "priority") return true;
-      if (activeTab === "active") {
-        if (isCompleted) return false;
-        if (st === "cancelled" || st === "failed") return false;
-        return (
-          order.isCompleted === false ||
-          st === "paid" ||
-          st === "in_progress" ||
-          st === "inprogress" ||
-          st === "delivered" ||
-          st === "in_revision" ||
-          st === "revision" ||
-          st === "pending" ||
-          st === "late" ||
-          !order.status
-        );
+      if (activeTab === "priority") {
+        if (
+          statusInfo.variant === "completed" ||
+          statusInfo.variant === "cancelled" ||
+          statusInfo.variant === "delivered"
+        ) {
+          return false;
+        }
+        if (
+          statusInfo.variant === "disputed" ||
+          statusInfo.variant === "in_revision" ||
+          statusInfo.variant === "late"
+        ) {
+          return true;
+        }
+        const isUrgent = Boolean(deadlineTime && deadlineTime - now <= 24 * 60 * 60 * 1000);
+        return isUrgent;
       }
-      if (activeTab === "late") return st === "late";
-      if (activeTab === "delivered") return st === "delivered";
-      if (activeTab === "completed") return isCompleted;
-      if (activeTab === "cancelled") return st === "cancelled" || st === "failed";
-      if (activeTab === "starred") return Boolean(order.starred);
+      if (activeTab === "active") {
+        return statusInfo.variant !== "completed" && statusInfo.variant !== "cancelled";
+      }
+      if (activeTab === "late") return statusInfo.variant === "late";
+      if (activeTab === "delivered") return statusInfo.variant === "delivered";
+      if (activeTab === "completed") return statusInfo.variant === "completed";
+      if (activeTab === "cancelled") return statusInfo.variant === "cancelled";
       return true;
     });
   }, [mutualOrders, activeTab, searchQuery]);
+
+  // Apply canonical multi-tier priority sort
+  const displayedOrders = useMemo(() => {
+    return sortOrdersByPriority(tabFilteredOrders);
+  }, [tabFilteredOrders]);
 
   const tabs: { id: FilterTab; label: string }[] = [
     { id: "priority", label: "Priority" },
@@ -197,7 +237,6 @@ export default function ContactOrdersPage() {
     { id: "delivered", label: "Delivered" },
     { id: "completed", label: "Completed" },
     { id: "cancelled", label: "Cancelled" },
-    { id: "starred", label: "Starred" },
   ];
 
   const contactDisplayName =
@@ -283,11 +322,11 @@ export default function ContactOrdersPage() {
         </div>
 
         {/* Main Orders Table Card */}
-        <div className="bg-white rounded-[6px] border border-slate-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
-          {/* Controls Bar: Tabs + Calendar + Search Input */}
+        <div className="bg-[#F5F5F5] rounded-[6px] border border-slate-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.02)] p-6 sm:p-8 space-y-6">
+          {/* Controls Bar: Tabs + Search Input */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-slate-100">
             {/* Pill Tabs */}
-            <div className="bg-[#F4F4F6] p-[4px] rounded-[6px] border border-gray-200/50 inline-flex items-center h-[46px] overflow-x-auto scrollbar-none max-w-full">
+            <div className="bg-[#fff] p-[4px] rounded-[6px] border border-gray-200/50 inline-flex items-center h-[46px] overflow-x-auto scrollbar-none max-w-full">
               {tabs.map((tab) => {
                 const isActive = activeTab === tab.id;
                 return (
@@ -298,10 +337,11 @@ export default function ContactOrdersPage() {
                     size="sm"
                     radius="fiverr"
                     onClick={() => setActiveTab(tab.id)}
-                    className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 whitespace-nowrap transition-all cursor-pointer ${isActive
-                      ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
-                      : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
-                      }`}
+                    className={`h-full font-sf-pro font-medium text-[14px] sm:text-[15px] px-3 sm:px-4 whitespace-nowrap transition-all cursor-pointer ${
+                      isActive
+                        ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                        : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
+                    }`}
                   >
                     {tab.label}
                   </Button>
@@ -309,15 +349,13 @@ export default function ContactOrdersPage() {
               })}
             </div>
 
-            {/* Right Tools: Calendar button + Search box */}
+            {/* Right Tools: Search box */}
             <div className="flex items-center gap-3">
-
-
               <div className="relative flex items-center w-full sm:w-64">
                 <RiSearchLine className="absolute left-3.5 text-slate-400 text-sm pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search project or ID"
+                  placeholder="What you are looking for"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-[6px] border border-slate-200 bg-white placeholder:text-slate-400 focus:outline-none focus:border-[#0D3B34] transition-colors"
@@ -328,36 +366,36 @@ export default function ContactOrdersPage() {
 
           {/* Table Area */}
           {isLoading ? (
-            <div className="py-24 flex justify-center items-center">
-              <Loader size={45} />
-            </div>
-          ) : isSeller ? (
-            /* ══════════════════════════════════════════════════════════
-               SELLER VIEW: Manage Orders Style (Buyer, Project, Due on, Price, Status)
-               ══════════════════════════════════════════════════════════ */
-            <div className="w-full overflow-x-auto">
+            <OrdersTableSkeleton />
+          ) : (
+            <div className="w-full bg-white rounded-[6px] border border-[rgba(0,0,0,0.10)] shadow-sm overflow-x-auto scrollbar-thin [-webkit-overflow-scrolling:touch]">
               <table className="w-full min-w-[820px] border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-slate-100 text-xs sm:text-[13px] font-bold text-gray-900 tracking-tight">
-                    <th className="py-3.5 px-4 font-bold">BUYER</th>
-                    <th className="py-3.5 px-4 font-bold">PROJECT</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">DUE ON</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">TOTAL</th>
-                    <th className="py-3.5 px-4 font-bold whitespace-nowrap">STATUS</th>
+                  <tr className="border-b border-slate-100 text-base font-sf-pro font-bold text-[#434343]">
+                    <th className="py-3 px-4">{isSeller ? "Buyer" : "Seller"}</th>
+                    <th className="py-3 px-4">Project</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Due on</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Price</th>
+                    <th className="py-3 px-4 whitespace-nowrap">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {filteredOrders.length === 0 ? (
+                  {displayedOrders.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="py-20 text-center text-slate-400 text-sm font-medium">
-                        No orders found with this buyer in this view.
+                      <td colSpan={5} className="py-16 text-center text-slate-400 text-xs sm:text-sm font-medium">
+                        No orders found with this {isSeller ? "buyer" : "seller"} in this view.
                       </td>
                     </tr>
                   ) : (
-                    filteredOrders.map((order: any) => {
-                      const buyerObj = typeof order.buyerID === "object" && order.buyerID !== null ? order.buyerID : {};
-                      const buyerName = buyerObj.username || buyerObj.name || contactDisplayName;
-                      const buyerAvatarUrl = buyerObj.image || buyerObj.avatar || contactAvatar;
+                    displayedOrders.map((order: any) => {
+                      const counterpartObj = isSeller
+                        ? (typeof order.buyerID === "object" && order.buyerID !== null ? order.buyerID : (order.buyer || {}))
+                        : (typeof order.sellerID === "object" && order.sellerID !== null ? order.sellerID : (order.seller || {}));
+
+                      const counterpartName = counterpartObj.name || counterpartObj.username || contactDisplayName;
+                      const counterpartAvatar = counterpartObj.image || counterpartObj.avatar || counterpartObj.img || contactAvatar;
+                      const counterpartRole = counterpartObj.shortTitle || counterpartObj.title || counterpartObj.role || contactRole;
+                      const counterpartBadge = counterpartObj.badge || contactUser?.badge;
 
                       const projectTitle =
                         order.title ||
@@ -367,46 +405,39 @@ export default function ContactOrdersPage() {
                         "Custom Deliverable";
                       const projectDescription =
                         order.projectDescription ||
-                        order.gigID?.desc ||
                         order.description ||
+                        order.gigID?.desc ||
+                        order.gigID?.description ||
                         order.instructions ||
                         "";
 
-                      let dueDateDisplay = "-";
-                      if (order.deadline) {
-                        const d = new Date(order.deadline);
-                        if (!isNaN(d.getTime())) {
-                          dueDateDisplay = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-                        }
-                      } else if (order.createdAt) {
-                        const d = new Date(order.createdAt);
-                        if (!isNaN(d.getTime())) {
-                          dueDateDisplay = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-                        }
-                      }
-
-                      const statusBadge = getSellerStatusBadge(order.status, order.isCompleted);
+                      const dueDate = formatDueDate(order);
+                      const statusInfo = resolveOrderStatus(order);
+                      const price = Number(order.price) || 0;
 
                       return (
                         <tr
                           key={order._id || order.id}
                           onClick={() => router.push(`/orders/${order._id || order.id}`)}
-                          className="hover:bg-slate-50/70 cursor-pointer transition-colors group"
+                          className="group relative cursor-pointer transition-colors odd:bg-[#F5F5F5] even:bg-white after:pointer-events-none after:absolute after:inset-0 after:border-transparent hover:after:border-[rgba(0,0,0,0.10)]"
                         >
-                          {/* Buyer Column */}
+                          {/* Counterpart Column */}
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
                             <div className="flex items-center gap-3">
                               <img
-                                src={buyerAvatarUrl}
-                                alt={buyerName}
-                                className="w-10 h-10 rounded-full object-cover border border-gray-200 shrink-0"
+                                src={counterpartAvatar}
+                                alt={counterpartName}
+                                className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0 bg-slate-100"
                               />
                               <div className="flex flex-col">
-                                <span className="text-xs sm:text-[13px] font-semibold text-gray-950 group-hover:text-[#0D3B34] transition-colors">
-                                  {buyerName}
-                                </span>
-                                <span className="text-[11px] text-gray-500 mt-0.5">
-                                  {contactRole}
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-sm font-[510] font-sf-pro text-black group-hover:text-[#0D3B34] transition-colors">
+                                    {counterpartName}
+                                  </span>
+                                  {!isSeller && renderBadge(counterpartBadge)}
+                                </div>
+                                <span className="text-xs text-slate-500 font-normal">
+                                  {counterpartRole}
                                 </span>
                               </div>
                             </div>
@@ -417,7 +448,7 @@ export default function ContactOrdersPage() {
                             <div className="flex items-center justify-between gap-2">
                               <div className="flex flex-col min-w-0">
                                 <span
-                                  className="text-[13px] font-semibold text-gray-900 line-clamp-1 leading-snug group-hover:text-[#0D3B34] transition-colors"
+                                  className="text-[14px] font-[700] font-sf-pro text-[#434343] line-clamp-1 group-hover:text-[#0D3B34] transition-colors"
                                   title={projectTitle}
                                 >
                                   {projectTitle}
@@ -442,7 +473,7 @@ export default function ContactOrdersPage() {
                                     e.stopPropagation();
                                     setActiveNotesOrder({
                                       projectTitle,
-                                      sellerOrBuyerName: buyerName,
+                                      sellerOrBuyerName: counterpartName,
                                       notes: order.notes || order.instructions,
                                     });
                                   }}
@@ -456,13 +487,13 @@ export default function ContactOrdersPage() {
                           </td>
 
                           {/* Due Date Column */}
-                          <td className="py-4 px-4 align-middle text-xs sm:text-[13px] text-gray-700 font-normal whitespace-nowrap">
-                            {dueDateDisplay}
+                          <td className="py-5 px-4 align-middle text-xs sm:text-sm font-[400] font-sf-pro text-[#434343] whitespace-nowrap">
+                            {dueDate}
                           </td>
 
                           {/* Price Column */}
                           <td className="py-4 px-4 align-middle text-xs sm:text-[13.5px] font-bold text-gray-950 whitespace-nowrap">
-                            {(Number(order.price) || 0).toLocaleString("en-US", {
+                            {price.toLocaleString("en-US", {
                               style: "currency",
                               currency: "USD",
                             })}
@@ -470,160 +501,9 @@ export default function ContactOrdersPage() {
 
                           {/* Status Column */}
                           <td className="py-4 px-4 align-middle whitespace-nowrap">
-                            <Tag variant={order.status || statusBadge.label}>
-                              {statusBadge.label}
+                            <Tag variant={statusInfo.variant} size="sm">
+                              {statusInfo.label}
                             </Tag>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            /* ══════════════════════════════════════════════════════════
-               BUYER VIEW: Manage Orders Style (Seller, Project, Due on, Price, Status)
-               ══════════════════════════════════════════════════════════ */
-            <div className="w-full overflow-x-auto">
-              <table className="w-full min-w-[820px] border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-slate-100 text-xs sm:text-sm font-bold text-slate-800">
-                    <th className="py-4 px-4 font-bold">Seller</th>
-                    <th className="py-4 px-4 font-bold">Project</th>
-                    <th className="py-4 px-4 font-bold whitespace-nowrap">Due on</th>
-                    <th className="py-4 px-4 font-bold whitespace-nowrap">Price</th>
-                    <th className="py-4 px-4 font-bold whitespace-nowrap">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {filteredOrders.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="py-20 text-center text-slate-400 text-sm font-medium">
-                        No orders found with this seller in this view.
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredOrders.map((order: any) => {
-                      const sellerObj = typeof order.sellerID === "object" && order.sellerID !== null ? order.sellerID : {};
-                      const sellerName = sellerObj.username || sellerObj.name || contactDisplayName;
-                      const sellerAvatarUrl = sellerObj.image || sellerObj.avatar || contactAvatar;
-                      const sellerRole = sellerObj.title || sellerObj.shortTitle || contactRole;
-                      const sellerBadge = sellerObj.badge || contactUser?.badge;
-
-                      const projectTitle =
-                        order.title ||
-                        order.projectTitle ||
-                        order.gigID?.title ||
-                        order.packageID?.title ||
-                        "Custom Deliverable";
-                      const projectDescription =
-                        order.description ||
-                        order.projectDescription ||
-                        order.gigID?.description ||
-                        order.instructions ||
-                        "";
-
-                      let dueDate = "-";
-                      if (order.deadline) {
-                        const d = new Date(order.deadline);
-                        if (!isNaN(d.getTime())) {
-                          dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-                        }
-                      } else if (order.createdAt) {
-                        const d = new Date(order.createdAt);
-                        if (!isNaN(d.getTime())) {
-                          dueDate = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-                        }
-                      }
-
-                      return (
-                        <tr
-                          key={order._id || order.id}
-                          onClick={() => router.push(`/orders/${order._id || order.id}`)}
-                          className="hover:bg-slate-50/70 cursor-pointer transition-colors group"
-                        >
-                          {/* Seller info */}
-                          <td className="py-5 px-4 align-middle whitespace-nowrap">
-                            <div className="flex items-center gap-3">
-                              <img
-                                src={sellerAvatarUrl}
-                                alt={sellerName}
-                                className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0 bg-slate-100"
-                              />
-                              <div className="flex flex-col">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-sm font-bold text-slate-900 group-hover:text-[#0D3B34] transition-colors">
-                                    {sellerName}
-                                  </span>
-                                  {renderBadge(sellerBadge)}
-                                </div>
-                                <span className="text-xs text-slate-500 font-normal">
-                                  {sellerRole}
-                                </span>
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* Project info + Notes button */}
-                          <td className="py-5 px-4 align-middle max-w-[340px]">
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="flex flex-col min-w-0">
-                                <span
-                                  className="text-sm font-bold text-slate-900 line-clamp-1 group-hover:text-[#0D3B34] transition-colors"
-                                  title={projectTitle}
-                                >
-                                  {projectTitle}
-                                </span>
-                                {projectDescription && (
-                                  <span
-                                    className="text-xs text-slate-500 line-clamp-1 mt-0.5"
-                                    title={projectDescription}
-                                  >
-                                    {projectDescription}
-                                  </span>
-                                )}
-                              </div>
-
-                              {(order.notes || order.instructions) && (
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="icon"
-                                  radius="lg"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setActiveNotesOrder({
-                                      projectTitle,
-                                      sellerOrBuyerName: sellerName,
-                                      notes: order.notes || order.instructions,
-                                    });
-                                  }}
-                                  className="shrink-0 p-1.5 w-8 h-8 text-slate-500 hover:text-slate-800 border-slate-200"
-                                  title="View requirement notes"
-                                >
-                                  <FiFileText className="text-sm" />
-                                </Button>
-                              )}
-                            </div>
-                          </td>
-
-                          {/* Due date */}
-                          <td className="py-5 px-4 align-middle text-xs sm:text-sm font-medium text-slate-700 whitespace-nowrap">
-                            {dueDate}
-                          </td>
-
-                          {/* Price */}
-                          <td className="py-5 px-4 align-middle text-xs sm:text-sm font-bold text-slate-900 whitespace-nowrap">
-                            {(Number(order.price) || 0).toLocaleString("en-US", {
-                              style: "currency",
-                              currency: "USD",
-                            })}
-                          </td>
-
-                          {/* Status pill */}
-                          <td className="py-5 px-4 align-middle whitespace-nowrap">
-                            {renderBuyerStatusPill(order.status, order.isCompleted)}
                           </td>
                         </tr>
                       );

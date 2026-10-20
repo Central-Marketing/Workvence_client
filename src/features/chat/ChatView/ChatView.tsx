@@ -27,7 +27,30 @@ import {
 export const ChatView = () => {
   const user = useUserStore((state: any) => state.user);
   const params = useParams();
-  const conversationID = (params?.id || params?.conversationID) as string;
+  const routeParamId = (params?.id || params?.conversationID) as string;
+  const [selectedConversationId, setSelectedConversationId] = useState<string>(routeParamId || "");
+
+  useEffect(() => {
+    if (routeParamId && routeParamId !== selectedConversationId) {
+      setSelectedConversationId(routeParamId);
+    }
+  }, [routeParamId]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (typeof window !== "undefined") {
+        const parts = window.location.pathname.split("/message/");
+        if (parts[1]) {
+          const nextId = parts[1].split("?")[0].split("/")[0];
+          if (nextId) setSelectedConversationId(nextId);
+        }
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  const conversationID = selectedConversationId || routeParamId;
   const isValidId = Boolean(
     conversationID && conversationID !== "undefined" && conversationID !== "null"
   );
@@ -88,7 +111,7 @@ export const ChatView = () => {
             useUserStore.getState().setUser(data.user);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [user]);
 
@@ -123,7 +146,7 @@ export const ChatView = () => {
         if (conv && (conv._id || conv.uuid || conv.conversationID || conv.id)) {
           return conv;
         }
-      } catch {}
+      } catch { }
 
       // 2. If conversationID is actually a User ID, query /conversations/single
       const currentUid = user?._id || user?.id;
@@ -134,14 +157,14 @@ export const ChatView = () => {
           if (conv && (conv._id || conv.uuid || conv.conversationID || conv.id)) {
             return conv;
           }
-        } catch {}
+        } catch { }
         try {
           const { data } = await axiosFetch.get(`/conversations/single/${currentUid}/${conversationID}`);
           const conv = data?.conversation || data?.data || data;
           if (conv && (conv._id || conv.uuid || conv.conversationID || conv.id)) {
             return conv;
           }
-        } catch {}
+        } catch { }
       }
       return null;
     },
@@ -208,7 +231,10 @@ export const ChatView = () => {
     if (!canonicalConvId || canonicalConvId === "undefined" || canonicalConvId === "null") return;
 
     if (!isValidId) {
-      navigate.replace(`/message/${canonicalConvId}`);
+      if (typeof window !== "undefined") {
+        window.history.replaceState(null, "", `/message/${canonicalConvId}`);
+      }
+      setSelectedConversationId(canonicalConvId);
     } else if (conversationID && conversationID !== canonicalConvId) {
       const isCurrentIdAlias =
         conversationID === String(activeConversation?.sellerID?._id || activeConversation?.sellerID) ||
@@ -216,10 +242,13 @@ export const ChatView = () => {
         isTargetConversation(activeConversation, conversationID);
 
       if (isCurrentIdAlias) {
-        navigate.replace(`/message/${canonicalConvId}`);
+        if (typeof window !== "undefined") {
+          window.history.replaceState(null, "", `/message/${canonicalConvId}`);
+        }
+        setSelectedConversationId(canonicalConvId);
       }
     }
-  }, [isValidId, conversationID, canonicalConvId, activeConversation, navigate]);
+  }, [isValidId, conversationID, canonicalConvId, activeConversation]);
 
   // Mark conversation as read when opened
   useEffect(() => {
@@ -233,12 +262,14 @@ export const ChatView = () => {
               ...c,
               readBySeller: true,
               readByBuyer: true,
+              unread: false,
+              unreadCount: 0,
             };
           }
           return c;
         });
       });
-      axiosFetch.patch(`/conversations/${targetToMark}/mark-read`).catch(() => {});
+      axiosFetch.patch(`/conversations/${targetToMark}/mark-read`).catch(() => { });
     }
   }, [canonicalConvId, conversationID, queryClient]);
 
@@ -313,17 +344,17 @@ export const ChatView = () => {
 
   const socketIsRecipientOnline = Boolean(
     finalRecipientUser &&
-      onlineUsers?.some((u: any) => {
-        const uId = String(typeof u === "string" ? u : u?.userId || u?._id || u?.id || "");
-        const rId = String(finalRecipientUser?._id || finalRecipientUser?.id || "");
-        return Boolean(uId && rId && uId === rId);
-      })
+    onlineUsers?.some((u: any) => {
+      const uId = String(typeof u === "string" ? u : u?.userId || u?._id || u?.id || "");
+      const rId = String(finalRecipientUser?._id || finalRecipientUser?.id || "");
+      return Boolean(uId && rId && uId === rId);
+    })
   );
 
   const recipientStatus = getOnlineStatus(
     finalRecipientUser?.lastActiveAt ||
-      finalRecipientUser?.updatedAt ||
-      finalRecipientUser?.lastSeen,
+    finalRecipientUser?.updatedAt ||
+    finalRecipientUser?.lastSeen,
     socketIsRecipientOnline,
     10
   );
@@ -443,8 +474,8 @@ export const ChatView = () => {
         return Array.isArray(data?.conversations)
           ? data.conversations
           : Array.isArray(data?.data)
-          ? data.data
-          : [];
+            ? data.data
+            : [];
       } catch {
         try {
           const { data } = await axiosFetch.get(
@@ -471,7 +502,7 @@ export const ChatView = () => {
     return filteredConversations;
   }, [debouncedSearchQuery, serverSearchResults, filteredConversations]);
 
-  const scrollToBottomRef = useRef<(behavior?: ScrollBehavior) => void>(() => {});
+  const scrollToBottomRef = useRef<(behavior?: ScrollBehavior) => void>(() => { });
 
   // Messages hook
   const {
@@ -597,7 +628,31 @@ export const ChatView = () => {
           displayedConversations={displayedConversations}
           conversationID={effectiveConversationId}
           onSelectConversation={(canonicalId) => {
-            if (canonicalId) navigate.push(`/message/${canonicalId}`);
+            if (canonicalId) {
+              if (canonicalId !== conversationID) {
+                setSelectedConversationId(canonicalId);
+                if (typeof window !== "undefined") {
+                  window.history.pushState(null, "", `/message/${canonicalId}`);
+                }
+              }
+              // Immediately clear unreadCount and mark read flags in cache
+              queryClient.setQueryData(["conversations"], (oldConvs: any) => {
+                if (!Array.isArray(oldConvs)) return oldConvs;
+                return oldConvs.map((c: any) => {
+                  if (isTargetConversation(c, canonicalId)) {
+                    return {
+                      ...c,
+                      readBySeller: true,
+                      readByBuyer: true,
+                      unread: false,
+                      unreadCount: 0,
+                    };
+                  }
+                  return c;
+                });
+              });
+              axiosFetch.patch(`/conversations/${canonicalId}/mark-read`).catch(() => { });
+            }
           }}
           hasNextPage={!debouncedSearchQuery && hasNextConvs}
           isFetchingNextPage={isFetchingNextConvs}

@@ -3,36 +3,81 @@ import axiosFetch from './axiosFetch';
 import { toast } from "@/utils/toast";
 
 export const getOtherUser = (conversation: any, currentUser: any) => {
-  if (!conversation || !currentUser) return null;
-  const currentUid = String(currentUser._id || currentUser.id || '');
-
-  const sellerId = String(conversation.sellerID?._id || conversation.sellerID || '');
-  const buyerId = String(conversation.buyerID?._id || conversation.buyerID || '');
-
-  if (sellerId === currentUid) {
-    return typeof conversation.buyerID === 'object' ? conversation.buyerID : null;
+  if (!conversation) return null;
+  if (conversation.otherUser && typeof conversation.otherUser === 'object') {
+    return conversation.otherUser;
   }
-  if (buyerId === currentUid) {
-    return typeof conversation.sellerID === 'object' ? conversation.sellerID : null;
+
+  const currentUid = String(currentUser?._id || currentUser?.id || '');
+  const currentUsername = String(currentUser?.username || '').toLowerCase();
+
+  const sellerObj = conversation.sellerID || conversation.seller || conversation.sellerId || conversation.sellerDetails;
+  const buyerObj = conversation.buyerID || conversation.buyer || conversation.buyerId || conversation.buyerDetails;
+
+  const sellerId = String(sellerObj?._id || sellerObj?.id || (typeof sellerObj === 'string' ? sellerObj : ''));
+  const buyerId = String(buyerObj?._id || buyerObj?.id || (typeof buyerObj === 'string' ? buyerObj : ''));
+  const sellerUsername = String(conversation.seller_username || sellerObj?.username || '').toLowerCase();
+  const buyerUsername = String(conversation.buyer_username || buyerObj?.username || '').toLowerCase();
+
+  if ((sellerId && sellerId === currentUid) || (sellerUsername && sellerUsername === currentUsername)) {
+    return typeof buyerObj === 'object' ? buyerObj : null;
   }
-  return conversation.sellerID?._id === currentUid ? conversation.buyerID : conversation.sellerID;
+  if ((buyerId && buyerId === currentUid) || (buyerUsername && buyerUsername === currentUsername)) {
+    return typeof sellerObj === 'object' ? sellerObj : null;
+  }
+
+  return currentUser?.isSeller ? buyerObj : sellerObj;
 };
 
 export const isConversationUnread = (conversation: any, currentUser: any) => {
-  if (!conversation || !currentUser) return false;
+  if (!conversation) return false;
 
-  const currentUid = String(currentUser._id || currentUser.id || '');
-  const sellerId = String(conversation.sellerID?._id || conversation.sellerID?.id || conversation.sellerID || '');
-  const buyerId = String(conversation.buyerID?._id || conversation.buyerID?.id || conversation.buyerID || '');
+  const currentUid = String(currentUser?._id || currentUser?.id || currentUser?.userId || currentUser?.userID || '');
+  const currentUsername = String(currentUser?.username || '').toLowerCase();
 
-  if (sellerId === currentUid) {
+  // 1. If the last message was sent by the current user, it is NEVER unread for the current user!
+  const lastSender = String(
+    conversation.lastMessageSender ||
+    conversation.lastSender ||
+    (typeof conversation.lastMessage === 'object' && (conversation.lastMessage?.sender || conversation.lastMessage?.user || conversation.lastMessage?.userID)) ||
+    ''
+  ).trim();
+
+  if (lastSender && currentUid && (lastSender === currentUid || (currentUsername && lastSender.toLowerCase() === currentUsername))) {
+    return false;
+  }
+
+  // 2. Explicit unreadCount from real-time socket tracking
+  if (typeof conversation.unreadCount === "number") {
+    return conversation.unreadCount > 0;
+  }
+
+  // 3. Direct boolean unread flag returned by backend
+  if (typeof conversation.unread === "boolean") {
+    return conversation.unread;
+  }
+
+  if (!currentUser) return false;
+
+  // 4. Role-based read flag fallback:
+  const sellerObj = conversation.sellerID || conversation.seller || conversation.sellerId || conversation.sellerDetails;
+  const buyerObj = conversation.buyerID || conversation.buyer || conversation.buyerId || conversation.buyerDetails;
+
+  const sellerId = String(sellerObj?._id || sellerObj?.id || (typeof sellerObj === 'string' ? sellerObj : ''));
+  const buyerId = String(buyerObj?._id || buyerObj?.id || (typeof buyerObj === 'string' ? buyerObj : ''));
+  const sellerUsername = String(conversation.seller_username || sellerObj?.username || '').toLowerCase();
+  const buyerUsername = String(conversation.buyer_username || buyerObj?.username || '').toLowerCase();
+
+  if ((sellerId && sellerId === currentUid) || (sellerUsername && sellerUsername === currentUsername)) {
     return conversation.readBySeller === false;
   }
-  if (buyerId === currentUid) {
+  if ((buyerId && buyerId === currentUid) || (buyerUsername && buyerUsername === currentUsername)) {
     return conversation.readByBuyer === false;
   }
 
-  return currentUser.isSeller ? conversation.readBySeller === false : conversation.readByBuyer === false;
+  return currentUser?.isSeller
+    ? conversation.readBySeller === false
+    : conversation.readByBuyer === false;
 };
 
 export const handleStartChat = async (targetUsername: string, currentUser: any, navigate: any) => {
@@ -62,23 +107,31 @@ export const handleStartChat = async (targetUsername: string, currentUser: any, 
 
 export const isTargetConversation = (conversation: any, targetId: string) => {
   if (!conversation || !targetId) return false;
-  const tid = String(targetId).trim();
+  const tid = String(targetId).trim().toLowerCase();
   if (!tid) return false;
 
-  const cUuid = conversation.uuid ? String(conversation.uuid).trim() : '';
-  const cConvId = conversation.conversationID ? String(conversation.conversationID).trim() : '';
-  const cId = conversation._id ? String(conversation._id).trim() : '';
-  const cGenId = conversation.id ? String(conversation.id).trim() : '';
+  const cUuid = (conversation.uuid ? String(conversation.uuid).trim() : '').toLowerCase();
+  const cConvId = (conversation.conversationID ? String(conversation.conversationID).trim() : '').toLowerCase();
+  const cId = (conversation._id ? String(conversation._id).trim() : '').toLowerCase();
+  const cGenId = (conversation.id ? String(conversation.id).trim() : '').toLowerCase();
 
   if (cUuid && cUuid === tid) return true;
   if (cConvId && cConvId === tid) return true;
   if (cId && cId === tid) return true;
   if (cGenId && cGenId === tid) return true;
 
-  const sId = String(conversation.sellerID?._id || conversation.sellerID?.id || conversation.sellerID || '');
-  const bId = String(conversation.buyerID?._id || conversation.buyerID?.id || conversation.buyerID || '');
+  const sId = String(conversation.sellerID?._id || conversation.sellerID?.id || conversation.sellerID || '').toLowerCase();
+  const bId = String(conversation.buyerID?._id || conversation.buyerID?.id || conversation.buyerID || '').toLowerCase();
   if (sId && bId && (`${sId}${bId}` === tid || `${bId}${sId}` === tid)) return true;
-  if (sId === tid || bId === tid) return true;
+
+  const sUser = String(conversation.seller_username || conversation.sellerID?.username || '').toLowerCase();
+  const bUser = String(conversation.buyer_username || conversation.buyerID?.username || '').toLowerCase();
+  if (sUser && bUser && (`${sUser}${bUser}` === tid || `${bUser}${sUser}` === tid)) return true;
+  if (sUser && sUser === tid) return true;
+  if (bUser && bUser === tid) return true;
+
+  if (sId && sId === tid) return true;
+  if (bId && bId === tid) return true;
 
   return false;
 };

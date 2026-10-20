@@ -32,28 +32,32 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   const lastMsg = conv.lastMessage?.startsWith("[CUSTOM_OFFER]")
     ? "📋 Custom Offer"
     : conv.lastMessage?.startsWith("[MEETING_INVITE]")
-    ? "📹 Video Meeting Invitation"
-    : conv.lastMessage || "No messages yet";
+      ? "📹 Video Meeting Invitation"
+      : conv.lastMessage || "No messages yet";
   const canonicalId = conv._id || conv.uuid || conv.conversationID || conv.id;
   const isActive = isTargetConversation(conv, activeConversationID);
   const timeText = conv.updatedAt ? moment(conv.updatedAt).format("h:mm A") : "";
-  const unreadCountBadge = conv.unreadCount || (isUnread ? 1 : 0);
+  const unreadCountBadge = isActive
+    ? 0
+    : typeof conv.unreadCount === "number"
+      ? conv.unreadCount
+      : isUnread
+        ? 1
+        : 0;
 
   return (
     <div
-      className={`flex items-center gap-3 p-2.5 sm:p-3 rounded-[6px] cursor-pointer transition-all duration-150 ${
-        isActive ? "bg-white" : "hover:bg-slate-50"
-      }`}
+      className={`flex items-center gap-3 p-2.5 sm:p-3 rounded-[6px] cursor-pointer transition-all duration-150 ${isActive ? "bg-white" : "hover:bg-slate-50"
+        }`}
       onClick={() => onSelect(canonicalId)}
     >
       <img
         src={avatarSrc}
         alt={contactName}
-        className={`w-11 h-11 rounded-full object-cover shrink-0 transition-all ${
-          unreadCountBadge > 0
-            ? "border-2 border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs"
-            : "border border-slate-100 shadow-2xs"
-        }`}
+        className={`w-11 h-11 rounded-full object-cover shrink-0 transition-all ${unreadCountBadge > 0
+          ? "border-2 border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs"
+          : "border border-slate-100 shadow-2xs"
+          }`}
       />
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-1 mb-0.5">
@@ -63,7 +67,8 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
             </span>
             {unreadCountBadge > 0 && (
               <span className="w-4 h-4 bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shrink-0 leading-none">
-                {unreadCountBadge}
+                {/* {unreadCountBadge} */}
+                1
               </span>
             )}
           </div>

@@ -22,79 +22,58 @@ const HeaderInboxIcon: React.FC<HeaderInboxIconProps> = ({ currentUser, classNam
 
   const { data: conversations = [] } = useQuery({
     queryKey: ['conversations'],
-    queryFn: () => axiosFetch.get('/conversations').then(({ data }) => Array.isArray(data) ? data : (data?.conversations || data?.data || [])).catch(() => []),
+    queryFn: async () => {
+      try {
+        const { data } = await axiosFetch.get('/conversations');
+        const incomingList: any[] = Array.isArray(data) ? data : (data?.conversations || data?.data || []);
+        const currentCache: any[] = queryClient.getQueryData(['conversations']) || [];
+
+        return incomingList.map((conv: any) => {
+          const cached = Array.isArray(currentCache)
+            ? currentCache.find((c: any) =>
+                isTargetConversation(conv, c._id || c.uuid || c.conversationID || c.id)
+              )
+            : null;
+          const backendIsUnread = isConversationUnread(conv, currentUser);
+          const defaultUnreadCount = backendIsUnread ? 1 : 0;
+
+          if (cached) {
+            return {
+              ...conv,
+              unread: !backendIsUnread ? false : (typeof cached.unread === "boolean" ? cached.unread : true),
+              unreadCount: !backendIsUnread ? 0 : (typeof cached.unreadCount === "number" && cached.unreadCount > 0 ? cached.unreadCount : defaultUnreadCount),
+              readBySeller: typeof cached.readBySeller === "boolean" ? cached.readBySeller : conv.readBySeller,
+              readByBuyer: typeof cached.readByBuyer === "boolean" ? cached.readByBuyer : conv.readByBuyer,
+            };
+          }
+          return {
+            ...conv,
+            unread: backendIsUnread,
+            unreadCount: !backendIsUnread ? 0 : (typeof conv.unreadCount === "number" ? conv.unreadCount : defaultUnreadCount),
+          };
+        });
+      } catch {
+        return [];
+      }
+    },
     enabled: !!userId,
     staleTime: 10000,
     refetchInterval: 30000,
   });
 
-  // Listen for real-time message events to update unread badge instantly
+  // Listen for real-time message notification to trigger icon bounce animation
   useEffect(() => {
-    if (!userId) return;
-
-    const handleReceiveMessage = (newMsg: any) => {
-      if (!newMsg) return;
-
-      const senderId = String(newMsg.userID?._id || newMsg.userID?.id || (typeof newMsg.userID === 'string' ? newMsg.userID : '') || '');
-      const currentUserIdStr = String(userId);
-
-      // Do not count messages sent by current user as unread
-      if (senderId && currentUserIdStr && senderId === currentUserIdStr) return;
-
-      const incomingCid = String(newMsg?.conversationUUID || newMsg?.conversationID || newMsg?.uuid || newMsg?.id || '').trim();
-
-      // Trigger subtle bounce animation on the inbox icon
+    const handleNewMessageAnimation = () => {
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 2000);
-
-      queryClient.setQueryData(['conversations'], (oldConvs: any) => {
-        if (!Array.isArray(oldConvs) || oldConvs.length === 0) {
-          queryClient.invalidateQueries({ queryKey: ['conversations'] });
-          return oldConvs;
-        }
-
-        const matchFound = oldConvs.some((c: any) => isTargetConversation(c, incomingCid));
-        if (!matchFound) {
-          queryClient.invalidateQueries({ queryKey: ['conversations'] });
-          return oldConvs;
-        }
-
-        return oldConvs.map((c: any) => {
-          if (isTargetConversation(c, incomingCid)) {
-            const isViewing = typeof window !== 'undefined' && (
-              window.location.pathname.includes(`/message/${incomingCid}`) ||
-              (c._id && window.location.pathname.includes(`/message/${c._id}`)) ||
-              (c.id && window.location.pathname.includes(`/message/${c.id}`))
-            );
-
-            const isRecipientSeller = String(c.sellerID?._id || c.sellerID?.id || c.sellerID) === currentUserIdStr;
-
-            return {
-              ...c,
-              lastMessage: newMsg.description || c.lastMessage,
-              updatedAt: new Date().toISOString(),
-              readBySeller: isRecipientSeller ? isViewing : true,
-              readByBuyer: !isRecipientSeller ? isViewing : true,
-            };
-          }
-          return c;
-        }).sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-      });
     };
 
-    const handleCustomNewMessage = () => {
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
-    };
-
-    if (!socket.connected) socket.connect();
-    socket.on('receive_message', handleReceiveMessage);
-    window.addEventListener('new-message-received', handleCustomNewMessage);
+    window.addEventListener('new-message-received', handleNewMessageAnimation);
 
     return () => {
-      socket.off('receive_message', handleReceiveMessage);
-      window.removeEventListener('new-message-received', handleCustomNewMessage);
+      window.removeEventListener('new-message-received', handleNewMessageAnimation);
     };
-  }, [userId, queryClient]);
+  }, []);
 
   // Join all conversation rooms so we receive real-time messages globally
   useEffect(() => {

@@ -10,6 +10,7 @@ import { Conversation } from "@/types";
 
 import { Loader, Skeleton } from "@/components";
 import { PageHeader } from "@/components/ui";
+import { isConversationUnread } from "@/utils/chatHelpers";
 
 const Messages = () => {
   const user = useUserStore((state) => state.user);
@@ -114,7 +115,7 @@ const Messages = () => {
                       {
                         data.map((conv) => {
                           const targetId = conv.uuid || conv.conversationID || conv._id;
-                          const isUnread = (user?.isSeller && !conv.readBySeller) || (!user?.isSeller && !conv.readByBuyer);
+                          const isUnread = isConversationUnread(conv, user);
                           return (
                             <tr
                               key={conv._id || targetId}

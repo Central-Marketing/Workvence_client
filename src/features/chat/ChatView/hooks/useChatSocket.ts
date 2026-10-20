@@ -5,6 +5,67 @@ import { QueryClient } from "@tanstack/react-query";
 import { socket } from "@/utils";
 import { isTargetConversation, getMessageText, getAttachmentUrl } from "@/utils/chatHelpers";
 
+const getIncomingConversationId = (data: any): string => {
+  if (!data) return "";
+  const convFieldId =
+    typeof data?.conversation === "object"
+      ? data.conversation?._id || data.conversation?.id || data.conversation?.uuid
+      : data?.conversation;
+
+  return String(
+    data?.conversationUUID ||
+      data?.conversationID ||
+      data?.conversationId ||
+      convFieldId ||
+      data?.room ||
+      data?.roomId ||
+      ""
+  ).trim();
+};
+
+const isMessageSentByCurrentUser = (
+  msg: any,
+  currentUserId?: string,
+  currentUsername?: string
+): boolean => {
+  if (!msg) return false;
+  const senderId = String(
+    (typeof msg.sender === "object" && (msg.sender?._id || msg.sender?.id)) ||
+      (typeof msg.user === "object" && (msg.user?._id || msg.user?.id)) ||
+      (typeof msg.userID === "object" && (msg.userID?._id || msg.userID?.id)) ||
+      msg.sender ||
+      msg.user ||
+      msg.senderID ||
+      msg.userID ||
+      msg.from ||
+      ""
+  ).trim();
+
+  if (currentUserId && senderId && senderId === String(currentUserId).trim()) {
+    return true;
+  }
+
+  const senderUsername = String(
+    msg.username ||
+      msg.senderUsername ||
+      msg.sender_username ||
+      msg.sender?.username ||
+      msg.user?.username ||
+      msg.from?.username ||
+      ""
+  ).trim();
+
+  if (
+    currentUsername &&
+    senderUsername &&
+    senderUsername.toLowerCase() === currentUsername.toLowerCase()
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
 interface UseChatSocketOptions {
   user: any;
   conversationID: string;
@@ -74,42 +135,75 @@ export function useChatSocket({
 
     // Global listener for new messages to update the sidebar even if in a different chat
     const handleGlobalReceiveMessage = (newMsg: any) => {
-      const convFieldId =
-        typeof newMsg?.conversation === "object"
-          ? newMsg.conversation?._id || newMsg.conversation?.id || newMsg.conversation?.uuid
-          : newMsg?.conversation;
-
-      const incomingCid = String(
-        newMsg?.conversationUUID ||
-          newMsg?.conversationID ||
-          newMsg?.conversationId ||
-          newMsg?.uuid ||
-          newMsg?.id ||
-          convFieldId ||
+      if (!newMsg) return;
+      const incomingCid = getIncomingConversationId(newMsg);
+      const senderId = String(
+        (typeof newMsg.sender === "object" && (newMsg.sender?._id || newMsg.sender?.id)) ||
+          (typeof newMsg.user === "object" && (newMsg.user?._id || newMsg.user?.id)) ||
+          (typeof newMsg.userID === "object" && (newMsg.userID?._id || newMsg.userID?.id)) ||
+          newMsg.sender ||
+          newMsg.user ||
+          newMsg.senderID ||
+          newMsg.userID ||
+          newMsg.from ||
           ""
       ).trim();
-      if (!incomingCid) return;
+      const senderName = String(
+        newMsg.username ||
+          newMsg.senderUsername ||
+          newMsg.sender_username ||
+          newMsg.sender?.username ||
+          newMsg.user?.username ||
+          newMsg.from?.username ||
+          ""
+      ).trim();
+
+      const currentUid = userRef.current?._id || userRef.current?.id;
+      const currentUname = userRef.current?.username;
+      const isSentByMe = isMessageSentByCurrentUser(newMsg, currentUid, currentUname);
 
       queryClient.setQueryData(["conversations"], (oldConvs: any) => {
-        if (!Array.isArray(oldConvs)) return oldConvs;
+        if (!Array.isArray(oldConvs) || oldConvs.length === 0) return oldConvs;
+        const currentActiveId = String(convIdRef.current || conversationID || "").trim();
+        const incomingFile = getAttachmentUrl(newMsg);
+        const incomingText =
+          newMsg.description ||
+          newMsg.desc ||
+          newMsg.text ||
+          newMsg.message ||
+          (incomingFile ? "📎 Attachment" : "");
+
         return oldConvs
           .map((c: any) => {
-            if (isTargetConversation(c, incomingCid)) {
-              const isCurrentlyViewingThisChat =
-                (typeof window !== "undefined" &&
-                  window.location.pathname.includes(`/message/${incomingCid}`)) ||
-                Boolean(conversationID && isTargetConversation(c, conversationID));
+            const isMatch = Boolean(
+              (incomingCid && isTargetConversation(c, incomingCid)) ||
+              (senderId && isTargetConversation(c, senderId)) ||
+              (senderName && isTargetConversation(c, senderName))
+            );
+
+            if (isMatch) {
+              const isCurrentlyViewingThisChat = Boolean(
+                currentActiveId && isTargetConversation(c, currentActiveId)
+              );
+
+              const currentUid = String(user?._id || user?.id || "");
+              const currentUsername = String(user?.username || "").toLowerCase();
+              const sellerObj = c.sellerID || c.seller || c.sellerId || c.sellerDetails;
+              const sellerId = String(sellerObj?._id || sellerObj?.id || (typeof sellerObj === "string" ? sellerObj : ""));
+              const sellerUsername = String(c.seller_username || sellerObj?.username || "").toLowerCase();
+              const isCurrentUserSeller = (sellerId && sellerId === currentUid) || (sellerUsername && sellerUsername === currentUsername);
+
               return {
                 ...c,
-                lastMessage:
-                  newMsg.description ||
-                  newMsg.desc ||
-                  newMsg.text ||
-                  newMsg.message ||
-                  c.lastMessage,
+                lastMessage: incomingText || c.lastMessage,
+                lastMessageSender: senderId,
                 updatedAt: new Date().toISOString(),
-                readBySeller: user?.isSeller ? isCurrentlyViewingThisChat : c.readBySeller,
-                readByBuyer: !user?.isSeller ? isCurrentlyViewingThisChat : c.readByBuyer,
+                readBySeller: isSentByMe ? (isCurrentUserSeller ? true : false) : (isCurrentUserSeller ? isCurrentlyViewingThisChat : true),
+                readByBuyer: isSentByMe ? (isCurrentUserSeller ? false : true) : (isCurrentUserSeller ? true : isCurrentlyViewingThisChat),
+                unread: isSentByMe || isCurrentlyViewingThisChat ? false : true,
+                unreadCount: isSentByMe || isCurrentlyViewingThisChat
+                  ? 0
+                  : Math.max(1, (Number(c.unreadCount) || 0) + 1),
               };
             }
             return c;
@@ -119,6 +213,12 @@ export function useChatSocket({
               new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
           );
       });
+
+      // Refetch conversations API in background to sync authoritative fresh data from server
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("refresh-conversations"));
+      }
     };
 
     socket.on("online_users", handleOnlineUsers);
@@ -170,60 +270,51 @@ export function useChatSocket({
       if (!data) return false;
 
       const currentUser = userRef.current;
-      if (
-        isTypingEvent &&
-        data.username &&
-        currentUser?.username &&
-        data.username.toLowerCase() === currentUser.username.toLowerCase()
-      ) {
+      const currentUserId = currentUser?._id || currentUser?.id;
+      const currentUsername = currentUser?.username;
+
+      if (isTypingEvent && isMessageSentByCurrentUser(data, currentUserId, currentUsername)) {
         return false; // Ignore typing events from self
       }
 
-      const convFieldId =
-        typeof data?.conversation === "object"
-          ? data.conversation?._id || data.conversation?.id || data.conversation?.uuid
-          : data?.conversation;
-
-      const incomingId = String(
-        data?.conversationUUID ||
-          data?.conversationID ||
-          data?.conversationId ||
-          data?.uuid ||
-          data?.id ||
-          convFieldId ||
-          ""
-      ).trim();
-
+      const incomingId = getIncomingConversationId(data);
       if (!incomingId || incomingId === "undefined") return false;
 
+      // 1. Check against route parameter / props conversation ID
       const currentParamId = String(convIdRef.current || conversationID || "").trim();
-      if (currentParamId && incomingId === currentParamId) return true;
-
-      if (
-        typeof window !== "undefined" &&
-        window.location.pathname.includes(`/message/${incomingId}`)
-      ) {
+      if (currentParamId && incomingId.toLowerCase() === currentParamId.toLowerCase()) {
         return true;
       }
 
+      // 2. Check against active conversation document identifiers
       const convDoc = activeConvRef.current;
       if (convDoc) {
-        if (isTargetConversation(convDoc, incomingId)) return true;
-        if (currentParamId && isTargetConversation(convDoc, currentParamId)) return true;
+        const docIds = [
+          convDoc._id,
+          convDoc.id,
+          convDoc.uuid,
+          convDoc.conversationID,
+        ]
+          .filter(Boolean)
+          .map((id) => String(id).trim().toLowerCase());
 
-        if (convDoc.uuid && incomingId === String(convDoc.uuid).trim()) return true;
-        if (convDoc.conversationID && incomingId === String(convDoc.conversationID).trim())
+        if (docIds.includes(incomingId.toLowerCase())) {
           return true;
-        if (convDoc._id && incomingId === String(convDoc._id).trim()) return true;
-        if (convDoc.id && incomingId === String(convDoc.id).trim()) return true;
+        }
 
-        const sId = String(convDoc.sellerID?._id || convDoc.sellerID?.id || convDoc.sellerID || "");
-        const bId = String(convDoc.buyerID?._id || convDoc.buyerID?.id || convDoc.buyerID || "");
-        if (sId && bId && (`${sId}${bId}` === incomingId || `${bId}${sId}` === incomingId))
-          return true;
-        if (sId && incomingId === sId) return true;
-        if (bId && incomingId === bId) return true;
+        // Check composite pair of seller and buyer IDs (e.g. sellerId+buyerId or buyerId+sellerId)
+        const sId = String(convDoc.sellerID?._id || convDoc.sellerID?.id || convDoc.sellerID || "").trim();
+        const bId = String(convDoc.buyerID?._id || convDoc.buyerID?.id || convDoc.buyerID || "").trim();
+        if (sId && bId) {
+          const pair1 = `${sId}${bId}`.toLowerCase();
+          const pair2 = `${bId}${sId}`.toLowerCase();
+          const incLower = incomingId.toLowerCase();
+          if (incLower === pair1 || incLower === pair2) {
+            return true;
+          }
+        }
       }
+
       return false;
     };
 
@@ -341,44 +432,6 @@ export function useChatSocket({
           queryClient.setQueryData(["messages", activeDocId], updateCache);
         }
       }
-
-      // 2. Instantly update conversation sidebar
-      queryClient.setQueryData(["conversations"], (oldConvs: any) => {
-        if (!Array.isArray(oldConvs)) return oldConvs;
-        const convFieldId =
-          typeof newMsg?.conversation === "object"
-            ? newMsg.conversation?._id || newMsg.conversation?.id || newMsg.conversation?.uuid
-            : newMsg?.conversation;
-        const incomingCid = String(
-          newMsg?.conversationUUID ||
-            newMsg?.conversationID ||
-            newMsg?.conversationId ||
-            newMsg?.uuid ||
-            convFieldId ||
-            ""
-        ).trim();
-        if (!incomingCid) return oldConvs;
-        const incomingFile = getAttachmentUrl(newMsg);
-        const incomingText =
-          newMsg.description || newMsg.desc || newMsg.text || newMsg.message || (incomingFile ? "📎 Attachment" : "");
-        return oldConvs
-          .map((c: any) => {
-            if (isTargetConversation(c, incomingCid)) {
-              return {
-                ...c,
-                lastMessage: incomingText || c.lastMessage,
-                updatedAt: new Date().toISOString(),
-                readBySeller: user?.isSeller ? isForCurrent : c.readBySeller,
-                readByBuyer: !user?.isSeller ? isForCurrent : c.readByBuyer,
-              };
-            }
-            return c;
-          })
-          .sort(
-            (a: any, b: any) =>
-              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-          );
-      });
     };
 
     const handleUserTyping = (data: any) => {

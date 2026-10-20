@@ -33,8 +33,8 @@ export const MeetingCard: React.FC<MeetingCardProps> = ({
         <div className="flex items-center gap-2.5">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
+            width="20"
+            height="20"
             viewBox="0 0 24 24"
             fill="none"
           >
@@ -107,7 +107,7 @@ export const MeetingCard: React.FC<MeetingCardProps> = ({
             onClick={() =>
               onCopyText(
                 meeting.meetingId ||
-                  (meeting.roomUrl ? String(meeting.roomUrl).split("/").pop() : ""),
+                (meeting.roomUrl ? String(meeting.roomUrl).split("/").pop() : ""),
                 "Meeting ID copied!"
               )
             }
@@ -172,8 +172,7 @@ export const MeetingCard: React.FC<MeetingCardProps> = ({
       <div className="w-full flex flex-col gap-2">
         <h5 className="text-[16px] font-bold text-slate-900 leading-snug m-0">
           {meeting.title ||
-            `Job Discussion with @${
-              finalRecipientUser?.username || partnerUsername || "Nilson_dev"
+            `Job Discussion with @${finalRecipientUser?.username || partnerUsername || "Nilson_dev"
             }`}
         </h5>
         <p className="text-[14px] text-slate-600 leading-relaxed m-0 font-normal">

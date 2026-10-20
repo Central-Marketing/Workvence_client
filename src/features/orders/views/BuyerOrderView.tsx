@@ -566,10 +566,16 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                     </span>
 
                     <h3
-                      title={order.title || order.packageTitle}
+                      title={
+                        order.raw?.packageType === "custom" && order.raw?.packageDetails?.shortDesc
+                          ? order.raw.packageDetails.shortDesc
+                          : (order.title || order.packageTitle)
+                      }
                       className="block w-full max-w-full truncate font-bold text-sm sm:text-base text-slate-900"
                     >
-                      {order.title || order.packageTitle}
+                      {order.raw?.packageType === "custom" && order.raw?.packageDetails?.shortDesc
+                        ? order.raw.packageDetails.shortDesc
+                        : (order.title || order.packageTitle)}
                     </h3>
                   </div>
                 </div>

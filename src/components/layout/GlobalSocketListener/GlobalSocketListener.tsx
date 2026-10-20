@@ -8,6 +8,7 @@ import { socket } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { playNotificationSound } from "@/utils/soundUtil";
 import { getNotificationDescription, getNotificationPresentation } from "@/utils/notificationToast";
+import { isTargetConversation } from "@/utils/chatHelpers";
 
 const processedNotifIds = new Set<string>();
 const processedNotifMessageIds = new Set<string>();
@@ -51,12 +52,12 @@ const isChatMessageNotif = (notif: any) => {
     type === "media" ||
     Boolean(
       notif.conversationID ||
-        notif.conversationId ||
-        notif.conversationUUID ||
-        notif.conversation ||
-        notif.chatId ||
-        notif.messageId ||
-        notif.messageID
+      notif.conversationId ||
+      notif.conversationUUID ||
+      notif.conversation ||
+      notif.chatId ||
+      notif.messageId ||
+      notif.messageID
     );
 
   if (isChatType) return true;
@@ -151,12 +152,20 @@ export default function GlobalSocketListener() {
         return;
       }
 
+      const convFieldId =
+        typeof newMsg?.conversation === "object"
+          ? newMsg.conversation?._id || newMsg.conversation?.id || newMsg.conversation?.uuid
+          : newMsg?.conversation;
+
       const conversationId = String(
         newMsg.conversationID ||
-          newMsg.conversationId ||
-          newMsg.conversationUUID ||
-          newMsg.uuid ||
-          ""
+        newMsg.conversationId ||
+        newMsg.conversationUUID ||
+        convFieldId ||
+        newMsg.room ||
+        newMsg.roomId ||
+        newMsg.uuid ||
+        ""
       ).trim();
 
       const senderIdStr = String(senderId || "").trim();
@@ -204,15 +213,81 @@ export default function GlobalSocketListener() {
 
       // Check if user is currently looking at this active conversation
       const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+      const activeParamMatch = pathname.match(/\/message\/([^/?#]+)/);
+      const activeRouteId = activeParamMatch ? decodeURIComponent(activeParamMatch[1]).trim() : "";
       const isViewingThisChat = Boolean(
-        convIdStr &&
-          (pathname.includes(`/message/${convIdStr}`) ||
-            pathname.endsWith(`/message/${convIdStr}`))
+        activeRouteId &&
+        (convIdStr && activeRouteId.toLowerCase() === convIdStr.toLowerCase() ||
+          senderIdStr && activeRouteId.toLowerCase() === senderIdStr.toLowerCase() ||
+          senderName && activeRouteId.toLowerCase() === senderName.toLowerCase())
       );
 
-      // Dispatch event to update conversation badges across components
+      // Dispatch event to notify listeners (e.g. badge animation)
       if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("new-message-received"));
+        window.dispatchEvent(new CustomEvent("new-message-received", { detail: newMsg }));
+      }
+
+      // Instantly update conversation sidebar cache in React Query
+      queryClient.setQueryData(["conversations"], (oldConvs: any) => {
+        if (!Array.isArray(oldConvs) || oldConvs.length === 0) {
+          return oldConvs;
+        }
+
+        const incomingText =
+          newMsg.description?.startsWith("[CUSTOM_OFFER]")
+            ? "📋 Custom Offer"
+            : rawText || (fileAttachment ? "📎 Attachment" : "");
+
+        let matched = false;
+        const updated = oldConvs.map((c: any) => {
+          const isMatch = Boolean(
+            (convIdStr && isTargetConversation(c, convIdStr)) ||
+            (senderIdStr && isTargetConversation(c, senderIdStr)) ||
+            (senderName && isTargetConversation(c, senderName))
+          );
+
+          if (isMatch) {
+            matched = true;
+            const isCurrentlyActive = Boolean(
+              isViewingThisChat ||
+              (activeRouteId && isTargetConversation(c, activeRouteId))
+            );
+
+            const currentUid = String(user?._id || user?.id || "");
+            const currentUsername = String(user?.username || "").toLowerCase();
+            const sellerObj = c.sellerID || c.seller || c.sellerId || c.sellerDetails;
+            const sellerId = String(sellerObj?._id || sellerObj?.id || (typeof sellerObj === "string" ? sellerObj : ""));
+            const sellerUsername = String(c.seller_username || sellerObj?.username || "").toLowerCase();
+            const isCurrentUserSeller = (sellerId && sellerId === currentUid) || (sellerUsername && sellerUsername === currentUsername);
+
+            return {
+              ...c,
+              lastMessage: incomingText || c.lastMessage,
+              lastMessageSender: senderIdStr,
+              updatedAt: new Date().toISOString(),
+              readBySeller: isCurrentUserSeller ? isCurrentlyActive : true,
+              readByBuyer: isCurrentUserSeller ? true : isCurrentlyActive,
+              unread: !isCurrentlyActive,
+              unreadCount: isCurrentlyActive ? 0 : Math.max(1, (Number(c.unreadCount) || 0) + 1),
+            };
+          }
+          return c;
+        });
+
+        if (matched) {
+          return updated.sort(
+            (a: any, b: any) =>
+              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          );
+        }
+
+        return oldConvs;
+      });
+
+      // Refetch conversations API in background to sync authoritative fresh data from server
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("refresh-conversations"));
       }
 
       // If user is currently looking at this active conversation, skip toast (message renders in stream)
@@ -245,14 +320,14 @@ export default function GlobalSocketListener() {
         timestamp: "Just now",
         ...(targetConvId
           ? {
-              navigation: {
-                label: `Reply to ${displayName}`,
-                actionLabel: "Reply",
-                onClick: () => {
-                  router.push(`/message/${targetConvId}`);
-                },
+            navigation: {
+              label: `Reply to ${displayName}`,
+              actionLabel: "Reply",
+              onClick: () => {
+                router.push(`/message/${targetConvId}`);
               },
-            }
+            },
+          }
           : {}),
       });
     };
@@ -438,8 +513,8 @@ export default function GlobalSocketListener() {
 
       const notifId = String(
         newNotif._id ||
-          newNotif.id ||
-          `${newNotif.title || ""}-${newNotif.message || ""}`
+        newNotif.id ||
+        `${newNotif.title || ""}-${newNotif.message || ""}`
       ).trim();
 
       if (processedNotifIds.has(notifId)) return;
@@ -468,12 +543,12 @@ export default function GlobalSocketListener() {
         notifType === "success"
           ? toast.success
           : notifType === "warning"
-          ? toast.warning
-          : notifType === "error"
-          ? toast.error
-          : notifType === "info"
-          ? toast.info
-          : toast;
+            ? toast.warning
+            : notifType === "error"
+              ? toast.error
+              : notifType === "info"
+                ? toast.info
+                : toast;
 
       const hasAction = Boolean(
         newNotif.link || targetOrderId || targetTicketId || targetBriefId || targetProposalId
@@ -489,12 +564,12 @@ export default function GlobalSocketListener() {
         timestamp: "Just now",
         ...(hasAction
           ? {
-              navigation: {
-                label: `Open notification: ${titleText}`,
-                actionLabel: presentation.actionLabel,
-                onClick: handleOpenNotification,
-              },
-            }
+            navigation: {
+              label: `Open notification: ${titleText}`,
+              actionLabel: presentation.actionLabel,
+              onClick: handleOpenNotification,
+            },
+          }
           : {}),
       });
     };

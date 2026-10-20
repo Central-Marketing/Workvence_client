@@ -10,6 +10,7 @@ import { FiCalendar, FiArrowRight, FiCheckCircle } from "react-icons/fi";
 import { Button, Tag, AccountStandingBanner, ProgressBar } from "@/components/ui";
 import { calculateProfileCompletion } from "../utils/dashboardNormalizer";
 import { sortOrdersByPriority } from "@/features/orders";
+import { isConversationUnread } from "@/utils/chatHelpers";
 
 interface SellerDashboardProps {
   user: any;
@@ -404,7 +405,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
                 : curr.price || 0;
           return acc + (Number(net) || 0);
         }, 0);
-  const unreadMessagesCount = conversations.filter((c: any) => !c.readBySeller).length;
+  const unreadMessagesCount = conversations.filter((c: any) => isConversationUnread(c, user)).length;
 
   // Filtered orders by type tab (All, Packages, Briefs)
   const filteredOrders = sellerOrders.filter((o: any) => {

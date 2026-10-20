@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components';
 import { ButtonVariant, ButtonRadius, ButtonSize } from '@/components/ui/Button/buttonVariants';
+import { useAuthModalStore } from '@/store/authModalStore';
 
 export interface CTAButtonProps {
   text: string;
@@ -152,6 +153,7 @@ const CTA: React.FC<CTAProps> = ({
   priority = true,
   children,
 }) => {
+  const openAuthModal = useAuthModalStore((state) => state.openAuthModal);
   const isDefaultHomepage = !title && !description && !primaryButton && !buttonText && !actions;
 
   // Resolve Badge
@@ -203,7 +205,7 @@ const CTA: React.FC<CTAProps> = ({
     if (isDefaultHomepage) {
       return {
         text: "Become A Seller",
-        href: "/register?seller=true",
+        onClick: () => openAuthModal({ mode: "register", defaultIsSeller: true }),
         rightIcon: <ArrowRight size={16} strokeWidth={2} />,
         radius: "fiverr",
       };

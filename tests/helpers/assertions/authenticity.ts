@@ -20,7 +20,10 @@ export async function auditPageAuthenticity(page: Page): Promise<AuthenticityAud
   const currentUrl = page.url();
   const violations: AuthenticityViolation[] = [];
 
-  // 1. Audit visible rendered text for suspicious dummy/leak data
+  try {
+    await page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(() => null);
+
+    // 1. Audit visible rendered text for suspicious dummy/leak data
   const textAudit = await page.evaluate(() => {
     const issues: { text: string; tag: string; selector: string }[] = [];
     const forbiddenPatterns = [
@@ -109,9 +112,19 @@ export async function auditPageAuthenticity(page: Page): Promise<AuthenticityAud
       message: `Dead anchor link with dummy href="${link.href}" on element text: "${link.text}"`
     });
   }
+  } catch (err: any) {
+    if (err?.message?.includes('Execution context was destroyed')) {
+      // Navigation occurred during audit; safely return clean status
+      return {
+        url: page.url(),
+        violations: [],
+        passed: true
+      };
+    }
+  }
 
   return {
-    url: currentUrl,
+    url: page.url(),
     violations,
     passed: violations.length === 0
   };

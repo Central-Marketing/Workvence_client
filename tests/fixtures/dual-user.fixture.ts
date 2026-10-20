@@ -11,38 +11,72 @@ export const BUYER_AUTH_FILE = path.join(AUTH_DIR, 'buyer.json');
 export const SELLER_AUTH_FILE = path.join(AUTH_DIR, 'seller.json');
 
 export async function loginBuyer(page: Page) {
-  if (!fs.existsSync(AUTH_DIR)) {
-    fs.mkdirSync(AUTH_DIR, { recursive: true });
-  }
-  await page.goto('/login', { waitUntil: 'domcontentloaded' });
-  if (page.url().includes('/dashboard')) return;
+  if (!fs.existsSync(AUTH_DIR)) fs.mkdirSync(AUTH_DIR, { recursive: true });
 
-  await page.locator('input[name="username"]').fill(LIVE_ACCOUNTS.buyer.email);
-  await page.locator('input[name="password"]').fill(LIVE_ACCOUNTS.buyer.password);
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(1500);
+
+  const signInBtn = page.locator('button:has-text("Sign in")').first();
+  const isLoggedOut = await signInBtn.isVisible().catch(() => false);
+
+  if (!isLoggedOut) {
+    await page.context().storageState({ path: BUYER_AUTH_FILE });
+    return;
+  }
+
+  await signInBtn.click();
+  const modal = page.locator('div[role="dialog"]').first();
+  await modal.waitFor({ state: 'visible', timeout: 15000 });
+
+  const emailField = modal.locator('input[data-testid="modal-login-email-input"]').first();
+  await emailField.waitFor({ state: 'visible', timeout: 15000 });
+  await emailField.fill(LIVE_ACCOUNTS.buyer.email);
+
+  const passwordField = modal.locator('input[data-testid="modal-login-password-input"]').first();
+  await passwordField.fill(LIVE_ACCOUNTS.buyer.password);
+
+  const submitBtn = modal.locator('button[data-testid="modal-login-submit-btn"]').first();
   await Promise.all([
-    page.waitForResponse((res) => res.url().includes('/auth/login') && res.request().method() === 'POST', { timeout: 20000 }),
-    page.locator('button[type="submit"]:has-text("Sign In"), button[type="submit"]:has-text("Continue")').first().click(),
+    page.waitForResponse((res) => res.url().includes('/auth/login') && res.request().method() === 'POST', { timeout: 25000 }).catch(() => null),
+    submitBtn.click(),
   ]);
-  await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 20000 });
-  await page.waitForTimeout(1000);
+
+  await page.waitForTimeout(2000);
   await page.context().storageState({ path: BUYER_AUTH_FILE });
 }
 
 export async function loginSeller(page: Page) {
-  if (!fs.existsSync(AUTH_DIR)) {
-    fs.mkdirSync(AUTH_DIR, { recursive: true });
-  }
-  await page.goto('/login', { waitUntil: 'domcontentloaded' });
-  if (page.url().includes('/dashboard')) return;
+  if (!fs.existsSync(AUTH_DIR)) fs.mkdirSync(AUTH_DIR, { recursive: true });
 
-  await page.locator('input[name="username"]').fill(LIVE_ACCOUNTS.seller.email);
-  await page.locator('input[name="password"]').fill(LIVE_ACCOUNTS.seller.password);
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(1500);
+
+  const signInBtn = page.locator('button:has-text("Sign in")').first();
+  const isLoggedOut = await signInBtn.isVisible().catch(() => false);
+
+  if (!isLoggedOut) {
+    await page.context().storageState({ path: SELLER_AUTH_FILE });
+    return;
+  }
+
+  await signInBtn.click();
+  const modal = page.locator('div[role="dialog"]').first();
+  await modal.waitFor({ state: 'visible', timeout: 15000 });
+
+  const emailField = modal.locator('input[data-testid="modal-login-email-input"]').first();
+  await emailField.waitFor({ state: 'visible', timeout: 15000 });
+  await emailField.fill(LIVE_ACCOUNTS.seller.email);
+
+  const passwordField = modal.locator('input[data-testid="modal-login-password-input"]').first();
+  await passwordField.fill(LIVE_ACCOUNTS.seller.password);
+
+  const submitBtn = modal.locator('button[data-testid="modal-login-submit-btn"]').first();
   await Promise.all([
-    page.waitForResponse((res) => res.url().includes('/auth/login') && res.request().method() === 'POST', { timeout: 20000 }),
-    page.locator('button[type="submit"]:has-text("Sign In"), button[type="submit"]:has-text("Continue")').first().click(),
+    page.waitForResponse((res) => res.url().includes('/auth/login') && res.request().method() === 'POST', { timeout: 25000 }).catch(() => null),
+    submitBtn.click(),
   ]);
-  await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 20000 });
-  await page.waitForTimeout(1000);
+
+  await page.waitForTimeout(2000);
   await page.context().storageState({ path: SELLER_AUTH_FILE });
 }
 

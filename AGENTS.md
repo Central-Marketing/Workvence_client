@@ -56,11 +56,11 @@ workvence_frontend/
     │   ├── support/                  # Support ticketing system
     │   ├── globals.css               # Global CSS, SF Pro font-faces, Quill editor theme overrides
     │   ├── layout.tsx                # Root layout (Inter + Outfit variable fonts, Providers, LayoutWrapper)
-    │   └── Providers.tsx             # TanStack QueryClientProvider, Toaster, GlobalSocketListener
+    │   └── Providers.tsx             # TanStack QueryClientProvider, WorkvenceToaster (Sonner), GlobalSocketListener, GlobalAuthModal
     ├── components/                   # Reusable shared components
-    │   ├── layout/                   # Navbar, Footer, Sidebar, LayoutWrapper
-    │   ├── marketing/                # Hero, Featured, Testimonials, CategorySliders
-    │   └── ui/                       # Buttons, Modals, Loaders, Skeletons, Dropdowns, Inputs
+    │   ├── layout/                   # Navbar, Footer, Sidebar, LayoutWrapper, GlobalAuthModal, CategoryBar
+    │   ├── marketing/                # Hero, Featured, Testimonials, CategorySliders, CategoryHub
+    │   └── ui/                       # Design system primitives: Button, Input, CustomSelect, Modal, ConfirmModal, Tag, Skeletons, WorkvenceToaster, Loader, PageHeader, Breadcrumb, Pagination, BorderBeam
     ├── data/                         # Static datasets, category mocks, country lists
     ├── features/                     # Feature-sliced modules (business logic + views)
     │   ├── admin/                    # Admin moderation, category management, logs
@@ -89,10 +89,17 @@ workvence_frontend/
     └── utils/                        # Core utilities & API clients
         ├── axiosFetch.ts             # Main Axios instance with auto 401 token refresh queue
         ├── adminAxios.ts             # Dedicated admin API client (/api/admin)
+        ├── toast.ts                  # Centralized Sonner toast wrapper (standard + rich navigation toasts)
         ├── tokenRefresh.ts           # Cookie/token management & refresh handshake
         ├── socket.ts                 # Socket.io connection manager
         ├── supportService.ts         # Cloudinary / CDN upload & support utilities
         ├── generateImageURL.ts       # Fallback CDN / ImgBB uploader
+        ├── avatar.ts                 # User avatar resolution & fallbacks
+        ├── orderStatus.ts            # Order status normalization & badge styles
+        ├── userStatus.ts             # Online/offline presence helpers
+        ├── formatBytes.ts            # File size formatting utility
+        ├── getTimeRemaining.ts       # Countdown & deadline calculation
+        ├── chatHelpers.ts            # Message parsing & attachment helpers
         └── countriesFlags.ts         # Country dial codes and flags
 ```
 
@@ -115,9 +122,10 @@ AI agents must strictly respect the installed tech stack and never install compe
 - **Real-Time Communication:** `socket.io-client` (`^4.8.3`) for real-time messaging, notifications, and support tickets
 - **Payments:** `@stripe/react-stripe-js` (`^6.8.0`) & `@stripe/stripe-js` (`^9.13.0`)
 - **Rich Text Editor:** `react-quill-new` (`^3.8.3`) with custom `.quill-snow` theme overrides
-- **Icons:** `lucide-react` (`^1.28.0`) and `react-icons` (`^5.7.0`) — **Do not install other icon packs**
+- **Icons:** `lucide-react` (`^1.28.0`), `react-icons` (`^5.7.0`), `@hugeicons/react` (`^1.1.10`) & `@hugeicons/core-free-icons` (`^4.3.5`) — **Do not install other icon packs**
 - **Sliders & Media:** `swiper` (`^14.0.7`), `react-slick` (`^0.31.0`), `pure-react-carousel`
-- **Notifications:** `react-hot-toast` (`^2.6.0`) with global `ToastLimitEnforcer`, `sweetalert2` (`^11.26.25`)
+- **Notifications:** `sonner` (`^2.0.8`) with custom `WorkvenceToaster` & `@/utils/toast` wrapper, `sweetalert2` (`^11.26.25`) — **Do not use or install `react-hot-toast`**
+- **Date & Time:** `moment` (`^2.30.1`)
 - **Charts:** `recharts` (`^3.10.1`)
 - **Animation:** `gsap` (`^3.15.0`) & `@gsap/react` (`^2.1.2`)
 - **Testing:** Playwright (`@playwright/test` `^1.63.0`)
@@ -143,23 +151,46 @@ Workvence has a distinctive, polished aesthetic that must be strictly preserved 
 
 3. **Layout & Container:**
    - Notice that Tailwind's rigid container plugin is disabled (`container: false` in `tailwind.config.js`).
-   - A custom fluid `.container` component is defined with breakpoint-specific side padding:
+   - A custom fluid `.container` component is defined with breakpoint-specific side padding (`maxWidth: 1400px`):
      - Mobile: `paddingLeft/Right: 1rem`
      - `sm`: `1.5rem`
-     - `md`: `2rem`
-     - `lg`: `3rem`
-     - `xl` & `2xl`: `80px`
+     - `md`, `lg`, `xl`, `2xl`: `2rem`
    - Custom screen breakpoint: `macbook: '1440px'`.
 
-4. **Component Styling Tokens:**
-   - **Border Radii:** Rounded cards use `rounded-[6px]` or `rounded-[6px]`. Buttons and pills use `rounded-[6px]` or `rounded-full`.
-   - **Borders:** Subtle gray borders: `border border-gray-200` or `border-gray-200/80`.
+4. **Component Styling Tokens & Standardized Rounded PX Hierarchy:**
+   Workvence enforces a strict, consistent border-radius system across all components:
+   - **Default UI Cards, Containers & Skeletons:** `rounded-[6px]` (Workvence / Fiverr modern standard). All white cards, content boxes, table shells, and skeleton loaders use `rounded-[6px]`.
+   - **Buttons:** `rounded-[6px]` default (`radius="fiverr"` or `radius="md"`), `rounded-[4px]` (`radius="fiverr-classic"` for compact actions), or `rounded-full` (`radius="full"` for circular/pill buttons).
+   - **Form Inputs & Selects:** `rounded-[6px]` (`h-10`, `text-sm`).
+   - **Modals & Dialogs:** Outer animated gradient container uses `rounded-[20px]`, inner modal card uses `rounded-[16px]`.
+   - **Chat / Message Bubbles:** `rounded-[10px_10px_10px_0]` (received) and `rounded-[10px_10px_0_10px]` (sent).
+   - **Status Badges & Tags:** `rounded-[60px]` pill style.
+   - **Avatars:** `rounded-full` (or `rounded-[6px]` for square avatars in toast notifications and chat headers).
+   - **Borders:** Subtle gray borders: `border border-gray-200`, `border-gray-200/80`, or `border-[rgba(0,0,0,0.10)]`.
    - **Shadows:** Minimalist modern shadows: `shadow-2xs`, `shadow-xs`, `shadow-[0_1px_6px_rgba(0,0,0,0.02)]`.
-   - **Inputs:** `bg-[#F4F5F7] border border-transparent focus:border-gray-300 focus:bg-white rounded-[6px] px-4 py-3 text-xs sm:text-[13px]`.
-   - **Buttons:** Dark primary buttons `bg-black hover:bg-gray-900 text-white`, brand buttons `bg-[#0D6D5F] hover:bg-[#0b5c50] text-white`, outline buttons `border border-gray-200 hover:bg-gray-50`.
-   - **Icons:** Use `lucide-react` consistently with existing sizing (`w-4 h-4` or `w-3.5 h-3.5`).
+   - **Inputs:** `bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 h-10 text-sm` (standard) or `bg-white border border-gray-200 focus:border-gray-300` (white variant).
+   - **Buttons:** Dark primary buttons `bg-black hover:bg-gray-900 text-white`, brand buttons `bg-[#0D6D5F] hover:bg-[#0b5c50] text-white`, outline buttons `border border-gray-200 hover:bg-gray-50`. Use the `<Button>` component whenever possible.
+   - **Icons:** Use `lucide-react`, `react-icons`, or `@hugeicons/react` consistently with existing sizing (`w-4 h-4` or `w-3.5 h-3.5`).
 
-5. **Aesthetics & Non-Destructive Editing:**
+5. **Shared UI Component Library (`src/components/ui` / `@/components`):**
+   Always check and reuse existing UI components rather than writing custom markup:
+   - `<Button>`: Variants (`brand`, `primary`, `dark`, `black`, `outline`, `soft`, `secondary`, `emerald`, `danger`, `danger-soft`, `ghost`, `pill-tab`), sizes (`xs`, `sm`, `md`, `lg`, `xl`, `icon`), radius (`fiverr` [6px], `fiverr-classic` [4px], `full`, etc.), loading state (`isLoading`, `loadingText`), icon slots (`icon`, `leftIcon`, `rightIcon`).
+   - `<Input>`: ForwardRef input with `variant` (`standard` [#F0F0F0] | `white`), `label`, `labelRight`, `error`, `helperText`, `leftIcon`, `rightIcon`, `h-10`, `rounded-[6px]`.
+   - `<CustomSelect>`: Fully accessible custom select dropdown with `searchable` mode, options with icons, sizes (`sm`, `md`, `lg`), variants (`default` | `filled`), `rounded-[6px]`.
+   - `<Modal>` & `<ConfirmModal>`: Full-featured accessible dialog with animated gradient border shell (`rounded-[20px]`), inner card (`rounded-[16px]`), `BorderBeam`, ESC dismissal, backdrop blur, action footer.
+   - `<Tag>`: Status tags for orders, tickets, and gigs with preset color palettes (`inprogress`, `in_revision`, `delivered`, `completed`, `cancelled`, `late`, `pending`, `draft`, `neutral`, `disputed`), `rounded-[60px]`, optional status dot and icons.
+   - `<WorkvenceToaster>`: Sonner-based notification host mounted in `Providers.tsx` (configured with bottom-right positioning, custom toast icons, and light theme).
+   - `<Skeletons>`: Pre-built skeleton loaders (`Skeleton`, `OrdersTableSkeleton`, `PackageDetailSkeleton`, `SellerProfileSkeleton`, `SupportTicketSkeleton`, `OrganizeSkeleton`) all styled with `rounded-[6px]`.
+   - `<Loader>`: Workvence brand circular spinner.
+   - `<PageHeader>`: Standardized page header with breadcrumbs and action buttons.
+   - `<Breadcrumb>`: Accessible breadcrumb navigation.
+   - `<Pagination>`: Numbered pagination controls.
+   - `<BorderBeam>`: Animated border glow effect for cards and modals.
+   - `<ProgressBar>`: Progress indicator for multi-step order/kyc workflows.
+   - `<FaqAccordion>`: Accordion component for FAQ sections.
+   - `<SearchSuggestionsDropdown>`: Search suggestion dropdown with keyboard navigation.
+
+6. **Aesthetics & Non-Destructive Editing:**
    - Never redesign a page or component when asked to fix a bug or add a field.
    - Match existing component classes and spacing directly from neighboring markup.
    - Do not touch layouts, headers, footers, or sidebars unless explicitly instructed.
@@ -181,16 +212,45 @@ You are forbidden from breaking or removing existing functionality:
 
 ---
 
-## 5. Minimal-Change Principle
+## 5. Minimal-Change Principle & Utility Functions
 
 When addressing tasks:
 1. **Search Before Writing:** Search for existing implementations (`grep_search` / `Select-String`) before creating new components, utilities, or types.
 2. **Reuse Existing Utilities:**
-   - API calls: use `axiosFetch` from `@/utils` (or `adminAxios` for admin routes).
-   - Uploads: use `supportService.uploadFileToCloudinary` or `generateImageURL`.
-   - Toasts: use `toast` from `react-hot-toast`.
-   - User state: use `useUserStore` from `@/store/userStore`.
-   - Categories: use `useAdminCategories` hook.
+   - **API calls:** Use `axiosFetch` from `@/utils` (or `adminAxios` for admin routes).
+   - **Uploads:** Use `supportService.uploadFileToCloudinary` or `generateImageURL`.
+   - **Toasts & Notifications:** Use `{ toast }` from `@/utils/toast`.
+     - Standard notifications:
+       ```typescript
+       toast.success("Changes saved successfully!");
+       toast.error("Failed to update profile.");
+       toast.info("Your order is being processed.");
+       toast.warning("Deadline is approaching.");
+       toast.loading("Uploading files...");
+       toast.neutral("Draft saved.");
+       toast.dismiss(toastId);
+       ```
+     - Interactive / Navigation toasts (e.g., chat messages, real-time events):
+       ```typescript
+       toast.info("New message from Alex", {
+         description: "I've uploaded the delivery preview files for your review.",
+         navigation: { url: "/messages", label: "Reply" },
+         kind: "chat",
+         avatar: "/avatars/alex.jpg",
+         isOnline: true,
+         duration: 5000,
+       });
+       ```
+     - **CRITICAL:** **NEVER** import or use `react-hot-toast` or call raw `sonner` in feature components. Always import `{ toast }` from `@/utils/toast`.
+   - **User state:** Use `useUserStore` from `@/store/userStore`.
+   - **Categories:** Use `useAdminCategories` hook.
+   - **Core Utility Functions in `@/utils`:**
+     - `getAvatarUrl(user)`: User avatar URL resolver with graceful fallback placeholder.
+     - `getOnlineStatus(lastActive)`: Real-time online/offline presence checker.
+     - `getOrderStatusInfo(status)`: Order status normalizer, labels, and badge color mappings.
+     - `getCountryFlag(code)` / `countriesFlags`: Country flag and dial code mappings.
+     - `formatBytes(bytes)`: File size formatting (KB, MB, GB).
+     - `getTimeRemaining(deadline)`: Countdown & delivery timer calculations.
 3. **Surgical Diffs:** Change only the lines necessary. Do not reformat entire files, run automated linters over unchanged code, or rename variables unnecessarily.
 4. **No Arbitrary Architecture Changes:** Do not migrate Zustand to Redux, Axios to fetch, Tailwind to CSS Modules, or App Router to Pages Router.
 

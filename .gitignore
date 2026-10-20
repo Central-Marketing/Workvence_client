@@ -41,7 +41,9 @@ yarn-error.log*
 next-env.d.ts
 
 # playwright test artifacts
-/test-results/artifacts/
-/test-results/html-report/
-/test-results/toast/
+test-results/
+/test-results/
 /playwright-report/
+/blob-report/
+playwright/.cache/
+*.webm

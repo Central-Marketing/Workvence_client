@@ -40,47 +40,19 @@ test.describe.serial('Workvence Production-Grade Dual-Role E2E Master Suite', ()
 
     // ── 1. Buyer Login & Dashboard Audit ──
     console.log(`\n--- [1.1] Authenticating Buyer: ${buyerUser.email} (${buyerUser.username}) ---`);
-    await buyerPage.goto('/login', { waitUntil: 'domcontentloaded' });
-    await auditPage(buyerPage, 'Buyer Login Page');
-
-    if (buyerPage.url().includes('/login')) {
-      await buyerPage.locator('input[name="username"]').fill(buyerUser.email);
-      await buyerPage.locator('input[name="password"]').fill(buyerUser.password);
-
-      await Promise.all([
-        buyerPage.waitForResponse((res) => res.url().includes('/auth/login') && res.request().method() === 'POST', { timeout: 20000 }),
-        buyerPage.locator('button[type="submit"]:has-text("Sign In"), button[type="submit"]:has-text("Continue")').first().click(),
-      ]);
-
-      await buyerPage.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 20000 });
-    }
-
-    await buyerPage.waitForTimeout(2000);
+    await loginBuyer(buyerPage);
+    await buyerPage.goto('/dashboard', { waitUntil: 'domcontentloaded' }).catch(() => null);
+    await buyerPage.waitForTimeout(1500);
     await auditPage(buyerPage, 'Buyer Dashboard');
-    await buyerPage.context().storageState({ path: BUYER_AUTH_FILE });
     CleanupTracker.register({ type: 'USER', title: buyerUser.username, owner: buyerUser.email });
     console.log(`  ✅ Buyer authenticated and session saved.`);
 
     // ── 2. Seller Login & Dashboard Audit ──
     console.log(`\n--- [1.2] Authenticating Seller: ${sellerUser.email} (${sellerUser.username}) ---`);
-    await sellerPage.goto('/login', { waitUntil: 'domcontentloaded' });
-    await auditPage(sellerPage, 'Seller Login Page');
-
-    if (sellerPage.url().includes('/login')) {
-      await sellerPage.locator('input[name="username"]').fill(sellerUser.email);
-      await sellerPage.locator('input[name="password"]').fill(sellerUser.password);
-
-      await Promise.all([
-        sellerPage.waitForResponse((res) => res.url().includes('/auth/login') && res.request().method() === 'POST', { timeout: 20000 }),
-        sellerPage.locator('button[type="submit"]:has-text("Sign In"), button[type="submit"]:has-text("Continue")').first().click(),
-      ]);
-
-      await sellerPage.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 20000 });
-    }
-
-    await sellerPage.waitForTimeout(2000);
+    await loginSeller(sellerPage);
+    await sellerPage.goto('/dashboard', { waitUntil: 'domcontentloaded' }).catch(() => null);
+    await sellerPage.waitForTimeout(1500);
     await auditPage(sellerPage, 'Seller Dashboard');
-    await sellerPage.context().storageState({ path: SELLER_AUTH_FILE });
     CleanupTracker.register({ type: 'USER', title: sellerUser.username, owner: sellerUser.email });
     console.log(`  ✅ Seller authenticated and session saved.`);
 
@@ -376,12 +348,21 @@ test.describe.serial('Workvence Production-Grade Dual-Role E2E Master Suite', ()
       }
     }
 
+    // Close AI drawer if open
+    const drawerCloseBtn = buyerPage.locator('button[aria-label*="close" i], button:has-text("✕")').first();
+    if (await drawerCloseBtn.isVisible().catch(() => false)) {
+      await drawerCloseBtn.click();
+      await buyerPage.waitForTimeout(500);
+    }
+    await buyerPage.keyboard.press('Escape').catch(() => null);
+    await buyerPage.waitForTimeout(500);
+
     // Submit
     const submitBtn = buyerPage.locator('button:has-text("Publish Project"), button:has-text("Post Brief"), button:has-text("Submit")').first();
     if (await submitBtn.isVisible()) {
       const [createBriefRes] = await Promise.all([
         buyerPage.waitForResponse((res) => res.url().includes('/briefs') && res.request().method() === 'POST', { timeout: 15000 }).catch(() => null),
-        submitBtn.click(),
+        submitBtn.click({ force: true }),
       ]);
       if (createBriefRes && createBriefRes.status() < 300) {
         const bJson = await createBriefRes.json().catch(() => null);

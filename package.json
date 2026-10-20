@@ -10,7 +10,14 @@
     "test:journey": "node tests/run-full-journey.js",
     "test:dual": "node tests/comprehensive-dual-journey.js",
     "test:e2e": "playwright test",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:master": "playwright test tests/e2e/suite",
+    "test:e2e:modules": "playwright test tests/e2e/modules",
+    "test:e2e:full": "playwright test tests/e2e",
+    "test:e2e:lifecycle": "playwright test tests/e2e/suite-1-full-lifecycle-journey.spec.ts",
+    "test:e2e:payments": "playwright test tests/e2e/suite-2-payment-and-disputes.spec.ts",
+    "test:e2e:support": "playwright test tests/e2e/suite-3-support-chat-and-security.spec.ts",
+    "test:e2e:admin": "playwright test tests/e2e/modules/10-admin-portal.spec.ts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

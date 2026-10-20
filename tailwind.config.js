@@ -12,8 +12,11 @@ module.exports = {
         'macbook': '1440px',
       },
       fontFamily: {
-        sans: ["var(--font-sf-pro)", "SF Pro Display", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
-        "sf-pro": ["var(--font-sf-pro)", "SF Pro Display", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        sans: ["var(--font-inter)", "Inter", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        heading: ["var(--font-plus-jakarta-sans)", "Plus Jakarta Sans", "sans-serif"],
+        jakarta: ["var(--font-plus-jakarta-sans)", "Plus Jakarta Sans", "sans-serif"],
+        "plus-jakarta-sans": ["var(--font-plus-jakarta-sans)", "Plus Jakarta Sans", "sans-serif"],
+        "sf-pro": ["var(--font-plus-jakarta-sans)", "Plus Jakarta Sans", "sans-serif"],
         inter: ["var(--font-inter)", "Inter", "sans-serif"],
         outfit: ["var(--font-outfit)", "Outfit", "sans-serif"],
       },

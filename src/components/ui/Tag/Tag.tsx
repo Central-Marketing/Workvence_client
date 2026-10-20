@@ -199,7 +199,7 @@ export const Tag = forwardRef<HTMLElement, TagProps>(
     const Component = as as any;
 
     const baseStyle: React.CSSProperties = {
-      fontFamily: '"SF Pro", var(--font-sf-pro), -apple-system, BlinkMacSystemFont, sans-serif',
+      fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif',
       fontStyle: "normal",
       fontWeight: 510,
       lineHeight: "normal",

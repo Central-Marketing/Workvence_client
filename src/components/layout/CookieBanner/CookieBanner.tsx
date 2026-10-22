@@ -20,38 +20,42 @@ const DEFAULT_CATEGORIES: CookieCategories = {
 };
 
 export const CookieBanner: React.FC = () => {
-  const user = useUserStore((state: any) => state.user);
+  const user = useUserStore((state) => state.user);
   const [isVisible, setIsVisible] = useState(false);
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
   const [isDismissing, setIsDismissing] = useState(false);
 
   // 1. Check if user already gave consent on initial client mount
   useEffect(() => {
-    try {
-      // Check document.cookie
-      const hasCookie = document.cookie
-        .split("; ")
-        .some((item) => item.startsWith(`${COOKIE_NAME}=`));
+    const timer = setTimeout(() => {
+      try {
+        // Check document.cookie
+        const hasCookie = document.cookie
+          .split("; ")
+          .some((item) => item.startsWith(`${COOKIE_NAME}=`));
 
-      // Check localStorage
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.expiresAt && parsed.expiresAt > Date.now()) {
-          return; // Valid consent exists, keep hidden
+        // Check localStorage
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed.expiresAt && parsed.expiresAt > Date.now()) {
+            return; // Valid consent exists, keep hidden
+          }
         }
-      }
 
-      if (hasCookie) {
-        return; // Valid cookie exists, keep hidden
-      }
+        if (hasCookie) {
+          return; // Valid cookie exists, keep hidden
+        }
 
-      // No consent recorded -> display banner
-      setIsVisible(true);
-    } catch {
-      // Fallback: show banner if storage read fails
-      setIsVisible(true);
-    }
+        // No consent recorded -> display banner
+        setIsVisible(true);
+      } catch {
+        // Fallback: show banner if storage read fails
+        setIsVisible(true);
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // 2. Build full marketplace telemetry payload
@@ -112,7 +116,7 @@ export const CookieBanner: React.FC = () => {
   );
 
   // 3. Dispatch payload to backend (sendBeacon with axiosFetch 5s timeout fallback)
-  const dispatchPayloadToBackend = useCallback((payload: any) => {
+  const dispatchPayloadToBackend = useCallback((payload: Record<string, unknown>) => {
     try {
       const jsonString = JSON.stringify(payload);
 

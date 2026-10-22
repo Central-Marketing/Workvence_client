@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Navbar, Footer, KycPromptModal } from "@/components";
+import { Navbar, Footer, KycPromptModal, CookieBanner } from "@/components";
 import React from "react";
 
 const AUTH_ROUTES = [
@@ -34,6 +34,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         {children}
       </main>
       {!isMessagePage && !isAuthPage && !isOnboardingPage && !isAdminPage && <Footer />}
+      {!isAdminPage && <CookieBanner />}
     </div>
   );
 }

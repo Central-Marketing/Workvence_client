@@ -5,3 +5,4 @@ export { default as NotificationBell } from './NotificationBell/NotificationBell
 export { default as GlobalSocketListener } from './GlobalSocketListener/GlobalSocketListener';
 export { default as GlobalAuthModal } from './GlobalAuthModal/GlobalAuthModal';
 export { default as LayoutWrapper } from './LayoutWrapper/LayoutWrapper';
+export { default as CookieBanner } from './CookieBanner/CookieBanner';

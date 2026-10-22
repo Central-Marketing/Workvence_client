@@ -6,6 +6,7 @@ export { default as NotificationBell } from "./layout/NotificationBell/Notificat
 export { default as LayoutWrapper } from "./layout/LayoutWrapper/LayoutWrapper";
 export { default as GlobalSocketListener } from "./layout/GlobalSocketListener/GlobalSocketListener";
 export { default as GlobalAuthModal } from "./layout/GlobalAuthModal/GlobalAuthModal";
+export { default as CookieBanner } from "./layout/CookieBanner/CookieBanner";
 
 // UI components
 export { default as Loader } from "./ui/Loader/Loader";

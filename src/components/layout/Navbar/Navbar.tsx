@@ -371,8 +371,8 @@ const Navbar = () => {
       >
         <div className="w-full container mx-auto flex justify-between items-center px-4 sm:px-6 md:px-8 xl:px-10 py-3.5 sm:py-4 md:py-4 border-b border-white">
 
-          {/* Left Section: Logo + Fluid Responsive Search Box */}
-          <div className="flex items-center gap-[20px] flex-1 min-w-0 mr-3 sm:mr-4 lg:mr-6">
+          {/* Left Section: Logo + Fluid Responsive Search Box (Desktop only) */}
+          <div className="flex items-center gap-[20px] flex-1 lg:flex-1 min-w-0 mr-0 lg:mr-6">
             <Link href="/" className="flex items-center shrink-0">
               <Image
                 src="/Workvence-logo-Horizontal3.png"
@@ -385,7 +385,7 @@ const Navbar = () => {
               />
             </Link>
 
-            <div className={`flex items-center transition-all duration-300 ${showSearchBar ? 'opacity-100 flex-1 min-w-0 max-w-full' : 'opacity-0 max-w-0 pointer-events-none w-0 overflow-hidden'}`}>
+            <div className={`hidden lg:flex items-center transition-all duration-300 ${showSearchBar ? 'opacity-100 flex-1 min-w-0 max-w-full' : 'opacity-0 max-w-0 pointer-events-none w-0 overflow-hidden'}`}>
               <div className="relative group/search search-container w-full max-w-full lg:max-w-[240px] xl:max-w-[420px] macbook:max-w-[540px] 2xl:max-w-[620px] h-[40px] xl:h-[44px] rounded-[6px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition-all">
                 {/* Gradient Border Layer (Pink: #FF5E8E, Violet: #8B5CF6, Green: #10B981) */}
                 <div className="absolute -inset-[1.5px] rounded-[7.5px] bg-gradient-to-r from-[#FF5E8E] via-[#8B5CF6] to-[#10B981] opacity-0 group-hover/search:opacity-100 group-focus-within/search:opacity-100 transition-opacity duration-300 pointer-events-none" />
@@ -714,29 +714,15 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Hamburger Button & Pre-reserved Icons Container */}
-          <div className="flex lg:hidden items-center gap-2.5 shrink-0 min-h-[36px]">
-            {effectiveUser && !isLoading && (
-              <div className="flex items-center gap-2 mr-1 shrink-0">
-                <HeaderInboxIcon
-                  currentUser={effectiveUser}
-                  className="w-9 h-9 rounded-full bg-[#F5F5F7] flex items-center justify-center text-gray-700 relative"
-                  iconClassName="text-[17px]"
-                />
-                <NotificationBell
-                  currentUser={effectiveUser}
-                  triggerClassName="w-9 h-9 rounded-full bg-[#F5F5F7] flex items-center justify-center text-gray-700 relative"
-                  iconClassName="text-[17px]"
-                />
-              </div>
-            )}
+          {/* Mobile Hamburger Button */}
+          <div className="flex lg:hidden items-center shrink-0">
             <Button
               type="button"
               variant="ghost"
               size="icon"
               radius="lg"
               onClick={() => setIsMobileMenuOpen(true)}
-              className="text-2xl text-gray-700 hover:text-brand-green ml-1 p-1 shrink-0"
+              className="text-2xl text-gray-700 hover:text-brand-green p-1 shrink-0 cursor-pointer"
               aria-label="Open menu"
               icon={<FiMenu width={24} height={24} />}
             />
@@ -773,6 +759,34 @@ const Navbar = () => {
             aria-label="Close menu"
             icon={<FiX />}
           />
+        </div>
+
+        {/* Mobile Search Bar inside Drawer */}
+        <div className="px-5 pt-3 pb-1 border-b border-gray-100">
+          <div className="relative flex items-center w-full h-[40px] bg-[#F5F5F7] rounded-[6px] border border-gray-200/80 px-3 gap-2.5">
+            <RiSearchLine
+              className="text-gray-400 text-base shrink-0 cursor-pointer"
+              onClick={() => {
+                if (searchQuery.trim()) {
+                  setIsMobileMenuOpen(false);
+                  router.push(`/packages?search=${encodeURIComponent(searchQuery.trim())}`);
+                }
+              }}
+            />
+            <input
+              type="text"
+              placeholder="What you are looking for"
+              className="w-full flex-1 bg-transparent border-none outline-none text-xs sm:text-sm font-medium text-gray-800 placeholder-gray-400"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && searchQuery.trim()) {
+                  setIsMobileMenuOpen(false);
+                  router.push(`/packages?search=${encodeURIComponent(searchQuery.trim())}`);
+                }
+              }}
+            />
+          </div>
         </div>
 
         <div className="flex flex-col flex-1 overflow-y-auto p-6 gap-5 text-[16px] font-semibold text-gray-700">

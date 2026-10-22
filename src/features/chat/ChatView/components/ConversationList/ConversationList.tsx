@@ -2,7 +2,8 @@
 
 import React from "react";
 import { Home } from "lucide-react";
-import { Button, Loader } from "@/components";
+import { Button } from "@/components";
+import { Skeleton } from "@/components/ui";
 import { ConversationFilters } from "./ConversationFilters";
 import { ConversationItem } from "./ConversationItem";
 
@@ -28,6 +29,19 @@ interface ConversationListProps {
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
 }
+
+const ConversationItemSkeleton: React.FC = () => (
+  <div className="flex items-center gap-3 p-2.5 sm:p-3 rounded-[6px]">
+    <Skeleton className="w-11 h-11 rounded-full shrink-0" />
+    <div className="flex-1 min-w-0 space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <Skeleton className="w-24 h-3.5 rounded-[4px]" />
+        <Skeleton className="w-10 h-2.5 rounded-[4px]" />
+      </div>
+      <Skeleton className="w-36 h-3 rounded-[4px]" />
+    </div>
+  </div>
+);
 
 export const ConversationList: React.FC<ConversationListProps> = ({
   isLeftSideOpen,
@@ -109,8 +123,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
           onScroll={handleScroll}
         >
           {convsLoading ? (
-            <div className="list-loader py-10 flex justify-center">
-              <Loader size={28} />
+            <div className="flex flex-col gap-0.5">
+              {[...Array(7)].map((_, i) => (
+                <ConversationItemSkeleton key={i} />
+              ))}
             </div>
           ) : displayedConversations.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-400">
@@ -131,8 +147,8 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 />
               ))}
               {isFetchingNextPage && (
-                <div className="py-2.5 flex items-center justify-center shrink-0">
-                  <Loader size={20} />
+                <div className="pt-1 shrink-0">
+                  <ConversationItemSkeleton />
                 </div>
               )}
             </>

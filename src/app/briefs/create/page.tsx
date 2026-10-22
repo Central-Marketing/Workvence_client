@@ -415,7 +415,7 @@ const CreateBrief = () => {
   if (isPublished) {
     return (
       <div className="min-h-[85vh] bg-[#FAFAFA] flex items-center justify-center px-4 py-16">
-        <div className="bg-white border border-slate-200/80 rounded-[6px] shadow-sm p-8 sm:p-12 max-w-lg w-full text-center flex flex-col items-center">
+        <div className="bg-white border border-slate-200/80 rounded-[6px] shadow-sm p-4 sm:p-8 md:p-12 max-w-lg w-full text-center flex flex-col items-center">
           <div className="w-16 h-16 rounded-[6px] bg-[#D8F5ED] text-[#0D6B5D] border border-[#BCE8DE] flex items-center justify-center text-3xl mb-5 shadow-2xs">
             <FiCheckCircle />
           </div>

@@ -2,6 +2,8 @@
 
 import React from "react";
 import moment from "moment";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Attachment01Icon, Video01Icon, Invoice01Icon } from "@hugeicons/core-free-icons";
 import { getOtherUser, isConversationUnread, isTargetConversation } from "@/utils/chatHelpers";
 import { getAvatarUrl } from "@/utils";
 import { ConversationTagBadge } from "@/features/chat/ConversationTags";
@@ -29,11 +31,6 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   const avatarSrc = getAvatarUrl(
     contact?.image || contact?.img || contact?.avatar || "/media/noavatar.png"
   );
-  const lastMsg = conv.lastMessage?.startsWith("[CUSTOM_OFFER]")
-    ? "📋 Custom Offer"
-    : conv.lastMessage?.startsWith("[MEETING_INVITE]")
-      ? "📹 Video Meeting Invitation"
-      : conv.lastMessage || "No messages yet";
   const canonicalId = conv._id || conv.uuid || conv.conversationID || conv.id;
   const isActive = isTargetConversation(conv, activeConversationID);
   const timeText = conv.updatedAt ? moment(conv.updatedAt).format("h:mm A") : "";
@@ -44,6 +41,47 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
       : isUnread
         ? 1
         : 0;
+
+  const renderLastMessagePreview = () => {
+    const raw = conv.lastMessage;
+    if (!raw && !conv.file && !conv.attachment) {
+      return <span>No messages yet</span>;
+    }
+
+    if (raw?.startsWith("[CUSTOM_OFFER]") || raw?.includes("Custom Offer")) {
+      return (
+        <span className="inline-flex items-center gap-1.5 text-slate-600 truncate">
+          <HugeiconsIcon icon={Invoice01Icon} size={13} className="shrink-0 text-blue-600" />
+          <span className="truncate">Custom Offer</span>
+        </span>
+      );
+    }
+
+    if (raw?.startsWith("[MEETING_INVITE]") || raw?.includes("Video Meeting")) {
+      return (
+        <span className="inline-flex items-center gap-1.5 text-slate-600 truncate">
+          <HugeiconsIcon icon={Video01Icon} size={13} className="shrink-0 text-emerald-600" />
+          <span className="truncate">Video Meeting Invitation</span>
+        </span>
+      );
+    }
+
+    if (
+      raw?.startsWith("📎") ||
+      raw?.toLowerCase().includes("attachment") ||
+      Boolean(conv.file || conv.attachment)
+    ) {
+      const cleanText = raw ? raw.replace(/^📎\s*/, "").trim() : "";
+      return (
+        <span className="inline-flex items-center gap-1.5 text-slate-600 truncate">
+          <HugeiconsIcon icon={Attachment01Icon} size={13} className="shrink-0 text-slate-500" />
+          <span className="truncate">{cleanText || "Attachment"}</span>
+        </span>
+      );
+    }
+
+    return <span>{raw}</span>;
+  };
 
   return (
     <div
@@ -76,7 +114,9 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
             {timeText}
           </span>
         </div>
-        <p className="text-xs text-slate-500 truncate leading-snug">{lastMsg}</p>
+        <div className="text-xs text-slate-500 truncate leading-snug">
+          {renderLastMessagePreview()}
+        </div>
         {/* Private Tags Badges on Conversation Card */}
         {Array.isArray(conv.tags) && conv.tags.length > 0 && (
           <div className="flex items-center gap-1 mt-1 overflow-hidden flex-wrap">

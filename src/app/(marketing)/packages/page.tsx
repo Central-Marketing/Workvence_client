@@ -59,7 +59,7 @@ const EmptyGigsState: React.FC<EmptyGigsStateProps> = ({
   return (
     <div className="py-6 w-full animate-fadeIn">
       {/* Coral-900 Empty State Banner */}
-      <div className="w-full rounded-[6px] bg-[var(--coral-900,#683733)] py-16 sm:py-24 md:py-32 px-6 text-center flex flex-col items-center justify-center shadow-md mb-12">
+      <div className="w-full rounded-[6px] bg-[var(--coral-900,#683733)] py-16 sm:py-24 md:py-32 px-4 sm:px-6 text-center flex flex-col items-center justify-center shadow-md mb-12">
         {/* Breadcrumb */}
         {categoryName && (
           <Breadcrumb
@@ -813,7 +813,7 @@ const Packages = () => {
 
       {/* Main Content Area: Subcategory Hub, Subcategory Services, or General Gigs Listing */}
       {currentTaxonomy && activeCategory !== 'All services' && viewTab === 'hub' ? (
-        <div className="container mx-auto pb-[80px] min-[1400px]:pb-[100px] animate-fadeIn">
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 pb-[80px] min-[1400px]:pb-[100px] animate-fadeIn">
           {/* Subcategory Grid - only rendered if category has subcategories */}
           {currentTaxonomy.subcategories && currentTaxonomy.subcategories.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
@@ -881,7 +881,7 @@ const Packages = () => {
         </div>
       ) : (categoryAncestry.length > 1 && activeCategory !== 'All services' && viewTab === 'gigs' && resolvedSubcategoryHeaderItem) ? (
         /* Subcategory / Niche Services View */
-        <div className="container mx-auto py-6 sm:py-8 animate-fadeIn">
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 animate-fadeIn">
           {/* 1. Subcategory Header: Breadcrumbs, Title with Chevron Dropdown, Subtitle */}
           <SubcategoryHeader
             categoryName={categoryAncestry.length > 0 ? categoryAncestry[0].name : (currentTaxonomy?.name || '')}
@@ -1015,7 +1015,7 @@ const Packages = () => {
         </div>
       ) : (
         /* Main Content - Gigs Listing View */
-        <div className="container mx-auto pt-8 pb-[80px] min-[1400px]:pb-[100px]">
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 pt-8 pb-[80px] min-[1400px]:pb-[100px]">
           {/* Breadcrumb + Filter Button Row */}
           <div className="flex items-center justify-between mb-7 sm:mb-8">
             <div>
@@ -1276,7 +1276,7 @@ export default function PackagesPage() {
     <Suspense fallback={
       <div role="status" className="min-h-screen bg-[#F8F8F8]">
         <span className="sr-only">Loading packages</span>
-        <div aria-hidden="true" className="container mx-auto pt-8 pb-[80px] min-[1400px]:pb-[100px]">
+        <div aria-hidden="true" className="container mx-auto px-4 sm:px-6 md:px-8 pt-8 pb-[80px] min-[1400px]:pb-[100px]">
           <GigsGridSkeleton count={8} />
         </div>
       </div>

@@ -308,7 +308,7 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
     <div className="min-h-screen bg-white">
       {/* Category Tabs Bar */}
       <div className="w-full bg-gray-100 border-b border-gray-200 sticky top-0 z-10 select-none">
-        <div className="container mx-auto px-2 sm:px-4 md:px-6 relative flex items-center group">
+        <div className="container mx-auto px-4 sm:px-6 md:px-8 relative flex items-center group">
           {/* Scroll Left Button */}
           <Button
             type="button"
@@ -327,7 +327,7 @@ export const PackagesClient = ({ initialData }: PackagesClientProps) => {
           {/* Scrollable Container */}
           <div
             ref={categoryScrollRef}
-            className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-0 w-full scroll-smooth touch-pan-x overscroll-x-contain px-2 xl:px-0"
+            className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-0 w-full scroll-smooth touch-pan-x overscroll-x-contain"
           >
             {categories.map((cat: any) => {
               const name = typeof cat === 'string' ? cat : cat.name;

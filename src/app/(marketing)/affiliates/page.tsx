@@ -194,7 +194,7 @@ export default function AffiliatesPage() {
       <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10">
         <section
           aria-label="Workvence Affiliates Banner"
-          className="relative w-full rounded-[6px] py-12 sm:py-14 md:py-16 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#102322] bg-cover bg-center bg-no-repeat"
+          className="relative w-full rounded-[6px] py-12 sm:py-14 md:py-16 px-4 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#102322] bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('/media/BecomeASeller.png')" }}
         >
           {/* Subtle ambient overlay */}
@@ -434,7 +434,7 @@ export default function AffiliatesPage() {
       {/* 6. INTERACTIVE REVENUE CALCULATOR (Workvence Clean Card Theme) */}
       <section id="calculator" className="py-16 sm:py-20 bg-[#f8fafc] border-y border-gray-100">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-4xl mx-auto bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-8 sm:p-12 shadow-xs space-y-8">
+          <div className="max-w-4xl mx-auto bg-white border border-[rgba(0,0,0,0.10)] rounded-[6px] p-4 sm:p-8 md:p-12 shadow-xs space-y-8">
             <div className="text-center space-y-2">
               <span className="text-xs font-bold text-[#0D6D5F] uppercase tracking-wider">
                 Affiliate Revenue Calculator
@@ -568,7 +568,7 @@ export default function AffiliatesPage() {
             </p>
           </div>
 
-          <div className="w-full bg-white border border-gray-100 rounded-[6px] p-6 sm:p-8 shadow-2xs">
+          <div className="w-full bg-white border border-gray-100 rounded-[6px] p-4 sm:p-8 shadow-2xs">
             <FaqAccordion items={affiliateFaqs} defaultOpenIndex={0} />
           </div>
         </div>

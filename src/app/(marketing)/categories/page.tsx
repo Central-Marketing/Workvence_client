@@ -6,7 +6,7 @@ import { CategoryHubDirectory } from "@/components";
 export default function CategoriesPage() {
   return (
     <div className="min-h-screen bg-[#F5F5F5] text-gray-800 pt-5 sm:pt-7 pb-[80px] min-[1400px]:pb-[100px]">
-      <div className="container mx-auto">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8">
         <Suspense
           fallback={
             <div className="animate-pulse space-y-8" role="status">

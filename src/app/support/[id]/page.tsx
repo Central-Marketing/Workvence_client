@@ -642,7 +642,7 @@ export default function TicketDetailsPage() {
   if (is403 || isUnauthorized) {
     return (
       <div className="min-h-screen bg-[#f8fafc] py-16 px-4">
-        <div className="max-w-xl mx-auto bg-white p-8 rounded-[6px] border border-[#e2e8f0] text-center space-y-4 shadow-xs">
+        <div className="max-w-xl mx-auto bg-white p-4 sm:p-8 rounded-[6px] border border-[#e2e8f0] text-center space-y-4 shadow-xs">
           <ShieldAlert className="w-12 h-12 mx-auto text-rose-600" />
           <h2 className="text-lg font-bold text-[#0f172a] font-sf-pro">Access Restricted</h2>
           <p className="text-xs text-[#64748b] font-inter">
@@ -664,7 +664,7 @@ export default function TicketDetailsPage() {
   if (error || !ticket) {
     return (
       <div className="min-h-screen bg-[#f8fafc] py-16 px-4">
-        <div className="max-w-xl mx-auto bg-white p-8 rounded-[6px] border border-[#e2e8f0] text-center space-y-4 shadow-xs">
+        <div className="max-w-xl mx-auto bg-white p-4 sm:p-8 rounded-[6px] border border-[#e2e8f0] text-center space-y-4 shadow-xs">
           <AlertCircle className="w-10 h-10 mx-auto text-rose-600" />
           <h2 className="text-lg font-bold text-[#0f172a] font-sf-pro">Ticket Not Found</h2>
           <p className="text-xs text-[#64748b] font-inter">{error || "The requested support ticket could not be found."}</p>
@@ -1116,7 +1116,7 @@ export default function TicketDetailsPage() {
             </div>
 
             {/* Message Composer (ChatView Style) */}
-            <div className="p-4 sm:px-5 sm:py-4 bg-[#f0f0f0] border-t border-[#e2e8f0] relative max-md:p-3 shrink-0">
+            <div className="p-4 sm:px-5 sm:py-4 bg-[#f0f0f0] border-t border-[#e2e8f0] relative shrink-0">
 
               {/* Attachment Previews */}
               {attachments.length > 0 && (

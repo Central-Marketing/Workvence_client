@@ -155,7 +155,7 @@ const VerifyEmailContent = () => {
   return (
     <div className="min-h-screen w-full bg-[#f8f9fa] flex flex-col lg:flex-row overflow-x-hidden">
       {/* Left Pane */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-16 min-h-screen">
+      <div className="w-full lg:w-1/2 flex flex-col justify-between p-4 sm:p-10 lg:p-12 xl:p-16 min-h-screen">
         {/* Top Header Logo */}
         <div className="w-full flex justify-start">
           <Link href="/" className="inline-flex items-center">

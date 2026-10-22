@@ -27,7 +27,7 @@ const Success: React.FC = () => {
   }, [navigate, payment_intent]);
 
   return (
-    <div className="w-[90%] max-w-lg mx-auto text-center min-h-[450px] flex flex-col items-center justify-center gap-4 p-8">
+    <div className="w-full max-w-lg mx-auto text-center min-h-[450px] flex flex-col items-center justify-center gap-4 p-4 sm:p-8">
       <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2 animate-bounce">
         <CheckCircle2 size={36} />
       </div>

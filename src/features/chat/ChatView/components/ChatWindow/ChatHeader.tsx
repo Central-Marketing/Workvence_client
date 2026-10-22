@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { RiMenuLine } from "react-icons/ri";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Tag01Icon } from "@hugeicons/core-free-icons";
+import { Tag01Icon, Video01Icon, Invoice01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components";
 import { ConversationTagBadge, ConversationTagsManager } from "@/features/chat/ConversationTags";
 
@@ -236,31 +236,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               title="Start Video Meeting"
               aria-label="Start Video Meeting"
               icon={
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className=""
-                >
-                  <path
-                    d="M2 11C2 7.70017 2 6.05025 3.02513 5.02513C4.05025 4 5.70017 4 9 4H10C13.2998 4 14.9497 4 15.9749 5.02513C17 6.05025 17 7.70017 17 11V13C17 16.2998 17 17.9497 15.9749 18.9749C14.9497 20 13.2998 20 10 20H9C5.70017 20 4.05025 18.9749 3.02513 18.9749C2 17.9497 2 16.2998 2 13V11Z"
-                    stroke="#292929"
-                    strokeWidth="1.5"
-                  />
-                  <path
-                    d="M17 8.90585L17.1259 8.80196C19.2417 7.05623 20.2998 6.18336 21.1498 6.60482C22 7.02628 22 8.42355 22 11.2181V12.7819C22 15.5765 22 16.9737 21.1498 17.3952C20.2996 17.8166 19.2417 16.9438 17.1259 15.198L17 15.0941"
-                    stroke="#292929"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M11.5 11C12.3284 11 13 10.3284 13 9.5C13 8.67157 12.3284 8 11.5 8C10.6716 8 10 8.67157 10 9.5C10 10.3284 10.6716 11 11.5 11Z"
-                    stroke="#292929"
-                    strokeWidth="1.5"
-                  />
-                </svg>
+                <HugeiconsIcon icon={Video01Icon} size={20} className="text-[#292929]" />
               }
             />
 
@@ -381,22 +357,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 title={user?.isSuspended ? "Offer Restricted" : "Create Offer"}
                 aria-label="Create Offer"
                 icon={
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#292929"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                    <line x1="12" y1="18" x2="12" y2="12" />
-                    <line x1="9" y1="15" x2="15" y2="15" />
-                  </svg>
+                  <HugeiconsIcon icon={Invoice01Icon} size={20} className="text-[#292929]" />
                 }
               />
             )}

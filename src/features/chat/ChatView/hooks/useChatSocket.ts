@@ -171,7 +171,7 @@ export function useChatSocket({
           newMsg.desc ||
           newMsg.text ||
           newMsg.message ||
-          (incomingFile ? "📎 Attachment" : "");
+          (incomingFile ? "Attachment" : "");
 
         return oldConvs
           .map((c: any) => {

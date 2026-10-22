@@ -504,13 +504,13 @@ export function useChatMessages({
         const incomingFile = getAttachmentUrl(newMsg);
         const incomingText =
           newMsg?.isCustomOffer || newMsg?.customOffer
-            ? "📋 Custom Offer"
+            ? "Custom Offer"
             : (
               newMsg.description ||
               newMsg.desc ||
               newMsg.text ||
               newMsg.message ||
-              (incomingFile ? "📎 Attachment" : "")
+              (incomingFile ? "Attachment" : "")
             );
         return oldConvs
           .map((c: any) => {
@@ -805,7 +805,7 @@ export function useChatMessages({
 
             return {
               ...c,
-              lastMessage: currentText || (attachmentUrl ? "📎 Attachment" : c.lastMessage),
+              lastMessage: currentText || (attachmentUrl ? "Attachment" : c.lastMessage),
               lastMessageSender: currentUid,
               updatedAt: new Date().toISOString(),
               readBySeller: isCurrentUserSeller ? true : false,

@@ -360,7 +360,7 @@ export default function CareersClient() {
           </div>
 
           {/* General Application Callout */}
-          <div className="mt-12 bg-[#F8F9FA] border border-[rgba(0,0,0,0.10)] rounded-[6px] p-8 text-center max-w-3xl mx-auto space-y-4">
+          <div className="mt-12 bg-[#F8F9FA] border border-[rgba(0,0,0,0.10)] rounded-[6px] p-4 sm:p-8 text-center max-w-3xl mx-auto space-y-4">
             <h3 className="text-lg sm:text-xl font-bold text-[#0f172a]">Don't see your role?</h3>
             <p className="text-xs sm:text-[13px] text-gray-600 max-w-xl mx-auto leading-relaxed font-normal">
               We're always looking for exceptional engineers, designers, and operators. Send us your portfolio and tell us how you can make an impact.

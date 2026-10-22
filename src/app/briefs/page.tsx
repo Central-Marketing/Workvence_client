@@ -615,7 +615,7 @@ function BriefsContent() {
 
   return (
     <div className="min-h-screen bg-[#F5F5F5] text-gray-800 pt-5 sm:pt-7 pb-[80px] min-[1400px]:pb-[100px]">
-      <div className="container mx-auto">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8">
         {viewMode === "categories" && !isSeller ? (
           /* ============================================================ */
           /* CATEGORY HUB VIEW (Default View)                             */
@@ -1179,7 +1179,7 @@ export default function BriefsPage() {
       fallback={
         <div role="status" className="min-h-screen bg-[#F5F5F5] text-gray-800 pt-5 sm:pt-7 pb-[80px] min-[1400px]:pb-[100px]">
           <span className="sr-only">Loading briefs</span>
-          <div aria-hidden="true" className="container mx-auto">
+          <div aria-hidden="true" className="container mx-auto px-4 sm:px-6 md:px-8">
             <BriefsListSkeleton />
           </div>
         </div>

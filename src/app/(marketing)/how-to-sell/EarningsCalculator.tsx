@@ -14,7 +14,7 @@ export default function EarningsCalculator() {
   return (
     <section id="calculator" className="py-20 bg-[#0f172a] text-white">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-[6px] p-8 sm:p-12 shadow-2xl space-y-8">
+        <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-[6px] p-4 sm:p-8 md:p-12 shadow-2xl space-y-8">
           <div className="text-center space-y-2">
             <span className="text-xs font-bold text-[#10b981] uppercase tracking-wider">
               Earnings Estimator

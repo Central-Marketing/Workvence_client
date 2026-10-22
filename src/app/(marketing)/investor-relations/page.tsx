@@ -131,7 +131,7 @@ export default function InvestorRelationsPage() {
       <div className=" pt-6 sm:pt-8 md:pt-10">
         <section
           aria-label="Workvence Investor Relations Banner"
-          className="relative w-full rounded-[6px] py-12 sm:py-14 md:py-16 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
+          className="relative w-full rounded-[6px] py-12 sm:py-14 md:py-16 px-4 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('/media/BecomeASeller.png')" }}
         >
           {/* Subtle dark overlay for optimal text contrast */}

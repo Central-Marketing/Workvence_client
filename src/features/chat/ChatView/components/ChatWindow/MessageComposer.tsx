@@ -76,7 +76,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
     return () => window.removeEventListener("resize", adjustHeight);
   }, [adjustHeight]);
   return (
-    <div className="p-4 sm:px-5 sm:py-4 bg-[#f0f0f0] relative max-md:p-3 shrink-0">
+    <div className="p-4 sm:px-5 sm:py-4 bg-[#f0f0f0] relative shrink-0">
       {attachment && (
         <div className="flex items-center gap-3 mb-3 p-2.5 bg-slate-50 dark:bg-slate-900 rounded-[6px] border border-slate-200 shadow-sm max-w-sm">
           {attachment.type?.includes("image") ||

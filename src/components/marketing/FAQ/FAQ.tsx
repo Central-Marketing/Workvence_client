@@ -74,7 +74,7 @@ const FAQ = () => {
           </div>
 
           {/* Right Column - Accordion */}
-          <div className="flex-1 w-full bg-white border border-gray-100 rounded-[6px] p-6 sm:p-8 shadow-2xs">
+          <div className="flex-1 w-full bg-white border border-gray-100 rounded-[6px] p-4 sm:p-8 shadow-2xs">
             <FaqAccordion items={faqData} defaultOpenIndex={0} />
           </div>
 

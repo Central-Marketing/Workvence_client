@@ -232,7 +232,7 @@ const RegisterContent = () => {
   return (
     <div className="h-screen w-full bg-[#f8f9fa] flex flex-col lg:flex-row overflow-hidden">
       {/* Left Pane */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-between p-5 sm:p-8 lg:px-10 lg:py-4 xl:px-14 xl:py-5 h-screen overflow-y-auto lg:overflow-hidden">
+      <div className="w-full lg:w-1/2 flex flex-col justify-between p-4 sm:p-8 lg:px-10 lg:py-4 xl:px-14 xl:py-5 h-screen overflow-y-auto lg:overflow-hidden">
         {/* Top Header Logo */}
         <div className="w-full flex justify-start shrink-0">
           <Link href="/" className="inline-flex items-center">

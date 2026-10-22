@@ -416,7 +416,7 @@ export default function CreateSupportTicketPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-8">
+        <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center p-4 sm:p-8">
           <div className="flex items-center gap-2 text-xs font-semibold text-[#64748b]">
             <Loader2 className="w-4 h-4 animate-spin text-[#327C73]" />
             <span>Loading support ticket form...</span>

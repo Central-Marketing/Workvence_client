@@ -235,8 +235,8 @@ export default function GlobalSocketListener() {
 
         const incomingText =
           newMsg.description?.startsWith("[CUSTOM_OFFER]")
-            ? "📋 Custom Offer"
-            : rawText || (fileAttachment ? "📎 Attachment" : "");
+            ? "Custom Offer"
+            : rawText || (fileAttachment ? "Attachment" : "");
 
         let matched = false;
         const updated = oldConvs.map((c: any) => {

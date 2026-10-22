@@ -49,7 +49,7 @@ const PayContent: React.FC = () => {
   }, [id, navigate, packageType]);
 
   return (
-    <div className="w-[90%] min-[901px]:w-[600px] h-[400px] mx-auto flex flex-col items-center justify-center gap-5" style={{ height: '55vh' }}>
+    <div className="w-full max-w-[600px] px-4 sm:px-6 h-[400px] mx-auto flex flex-col items-center justify-center gap-5" style={{ height: '55vh' }}>
       <Loader size={45} />
       <h2 className="my-[20px] mb-[40px] text-[#1e293b] font-medium" style={{ color: '#1e293b', fontWeight: 500 }}>Redirecting to secure payment checkout...</h2>
     </div>

@@ -29,7 +29,7 @@ export default function SettingsVerificationPage() {
         </div>
 
         {user && !user.isSeller ? (
-          <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-8 text-center max-w-xl mx-auto">
+          <div className="bg-white rounded-[6px] border border-gray-200 shadow-sm p-4 sm:p-8 text-center max-w-xl mx-auto">
             <div className="w-16 h-16 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center justify-center text-brand-green mx-auto mb-4">
               <Sparkles size={32} />
             </div>

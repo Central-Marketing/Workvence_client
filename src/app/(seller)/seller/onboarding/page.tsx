@@ -109,7 +109,7 @@ export default function SellerOnboardingPage() {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#FAFAFA] font-sans selection:bg-[#0D6D5F]/20 selection:text-[#0D6D5F]">
       {/* Left Panel */}
-      <div className="w-full lg:w-[42%] xl:w-[38%] bg-white flex flex-col justify-between p-6 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-gray-100 shrink-0">
+      <div className="w-full lg:w-[42%] xl:w-[38%] bg-white flex flex-col justify-between p-4 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-gray-100 shrink-0">
         {/* Brand Logo */}
         <div>
           <Link href="/" className="inline-flex items-center gap-2 group">
@@ -147,7 +147,7 @@ export default function SellerOnboardingPage() {
       </div>
 
       {/* Right Panel / Background Glow Container */}
-      <div className="flex-1 min-h-screen p-6 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden bg-white">
+      <div className="flex-1 min-h-screen p-4 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden bg-white">
         {/* Glow circle background */}
         <div
           className="absolute pointer-events-none select-none rounded-full"

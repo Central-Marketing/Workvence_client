@@ -117,7 +117,7 @@ export default function BlogPage() {
       <div className="w-full container mx-auto px-4 md:px-6 pt-6 sm:pt-8 md:pt-10">
         <section
           aria-label="Workvence Blog Banner"
-          className="relative w-full rounded-[6px] py-12 sm:py-14 md:py-16 px-6 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
+          className="relative w-full rounded-[6px] py-12 sm:py-14 md:py-16 px-4 sm:px-10 text-center flex flex-col items-center justify-center shadow-xs overflow-hidden bg-[#013571] bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('/media/BecomeASeller.png')" }}
         >
           {/* Subtle dark overlay for optimal text contrast */}
@@ -280,7 +280,7 @@ export default function BlogPage() {
           </div>
 
           {/* Newsletter Box */}
-          <div className="mt-20 bg-[#0f172a] text-white rounded-[6px] p-8 sm:p-12 text-center max-w-3xl mx-auto space-y-5">
+          <div className="mt-20 bg-[#0f172a] text-white rounded-[6px] p-4 sm:p-8 md:p-12 text-center max-w-3xl mx-auto space-y-5">
             <h3 className="text-2xl sm:text-3xl font-bold">Stay Ahead in the Creator Economy</h3>
             <p className="text-xs sm:text-sm text-gray-300 max-w-lg mx-auto">
               Get our weekly digest of top freelance playbooks, marketplace trends, and exclusive interviews delivered to your inbox.

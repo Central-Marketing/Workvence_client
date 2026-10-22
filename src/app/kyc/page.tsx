@@ -231,7 +231,7 @@ export default function KycPage() {
           </div>
         ) : user && !user.isSeller ? (
           /* ── STATE C: BUYER ONLY PROMPT ── */
-          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-8 text-center max-w-xl mx-auto space-y-4">
+          <div className="bg-white rounded-[6px] border border-gray-200/80 shadow-[0_1px_6px_rgba(0,0,0,0.02)] p-4 sm:p-8 text-center max-w-xl mx-auto space-y-4">
             <div className="w-14 h-14 rounded-[6px] bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#0D6D5F] mx-auto">
               <Sparkles className="w-6 h-6" />
             </div>

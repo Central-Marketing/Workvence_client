@@ -680,7 +680,7 @@ const AuthModal: React.FC<AuthModalProps> = ({
           </div>
 
           {/* ── RIGHT PANE: Auth Forms & State Machine (50% Split) ── */}
-          <div className="w-full md:w-1/2 min-w-0 h-full px-6 sm:px-8 py-5 sm:py-6 flex flex-col overflow-y-auto scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div className="w-full md:w-1/2 min-w-0 h-full px-4 sm:px-8 py-5 sm:py-6 flex flex-col overflow-y-auto scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <div className="my-auto w-full flex flex-col justify-center py-2">
               {/* Mobile Brand Header */}
               <div className="flex md:hidden items-center justify-between mb-4">

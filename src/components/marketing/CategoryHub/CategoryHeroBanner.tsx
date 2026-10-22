@@ -39,7 +39,7 @@ const CategoryHeroBanner: React.FC<CategoryHeroBannerProps> = ({
   const isCustomBanner = imgSrc !== fallbackBanner;
 
   return (
-    <div className="container mx-auto my-5 sm:my-7">
+    <div className="container mx-auto px-4 sm:px-6 md:px-8 my-5 sm:my-7">
       <div className="relative w-full max-w-[1760px] mx-auto aspect-[1760/500] max-h-[500px] min-h-[160px] sm:min-h-[200px] md:min-h-[240px] rounded-[6px] overflow-hidden bg-[#3a1b08] flex items-center justify-center text-center shadow-xs select-none">
         <Image
           src={imgSrc}

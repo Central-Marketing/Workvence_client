@@ -82,7 +82,7 @@ export const getOnlineStatus = (
     isOnline: false,
     statusText: "Offline",
     lastSeenText,
-    displayText: `Offline · Last seen ${lastSeenText}`,
+    displayText: lastSeenText ? `Last seen ${lastSeenText}` : "Offline",
   };
 };
 

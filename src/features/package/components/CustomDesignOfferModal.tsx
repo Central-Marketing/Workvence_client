@@ -9,6 +9,7 @@ import { useUserStore } from "@/store/userStore";
 import { useAuthModalStore } from "@/store/authModalStore";
 import axiosFetch from "@/utils/axiosFetch";
 import { toast } from "@/utils/toast";
+import { getOnlineStatus } from "@/utils";
 
 export interface CustomDesignOfferModalProps {
   isOpen: boolean;
@@ -164,6 +165,12 @@ export const CustomDesignOfferModal: React.FC<CustomDesignOfferModalProps> = ({
   const sellerAvatar =
     seller?.image || seller?.avatar || "/media/noavatar.png";
 
+  const sellerStatus = getOnlineStatus(
+    (seller as any)?.lastActiveAt || (seller as any)?.lastSeen,
+    seller?.isOnline,
+    10
+  );
+
   const isDesignCategory =
     !categoryName ||
     categoryName.toLowerCase().includes("design") ||
@@ -229,7 +236,7 @@ export const CustomDesignOfferModal: React.FC<CustomDesignOfferModalProps> = ({
             alt={seller?.name || seller?.username || "Seller"}
             className="w-full h-full rounded-full object-cover"
           />
-          {seller?.isOnline !== false && (
+          {sellerStatus.isOnline && (
             <span
               className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full shadow-xs"
               title="Online"

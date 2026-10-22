@@ -60,11 +60,7 @@ export const SellerAboutSidebar: React.FC<SellerAboutSidebarProps> = ({
   const [internalLoading, setInternalLoading] = useState(false);
 
   const userStatus = getOnlineStatus(lastActiveAt, isOnline, 10);
-  const statusLabel = userStatus.isOnline
-    ? "Online"
-    : userStatus.lastSeenText
-      ? `Active ${userStatus.lastSeenText}`
-      : "Offline";
+  const statusLabel = userStatus.displayText;
 
   const cleanLocalTime = (localTimeText || "")
     .replace(/^(Online|Offline|Active[^•]*)\s*•\s*/i, "")

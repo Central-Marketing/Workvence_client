@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/utils/toast";
-import { axiosFetch } from "@/utils";
+import { axiosFetch, getOnlineStatus } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { useAuthModalStore } from "@/store/authModalStore";
 import {
@@ -242,6 +242,12 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
     return <SellerProfileSkeleton />;
   }
 
+  const userStatus = getOnlineStatus(
+    profileData?.lastActiveAt,
+    profileData?.isOnline,
+    10
+  );
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-gray-800 pt-4 sm:pt-6 pb-[80px] min-[1400px]:pb-[100px]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -334,7 +340,7 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
                 {(profileData.name || "U").charAt(0).toUpperCase()}
               </div>
             )}
-            {profileData.isOnline && (
+            {userStatus.isOnline && (
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full ring-2 ring-white" />
             )}
           </div>
@@ -342,8 +348,8 @@ const SellerPublicProfile: React.FC<SellerPublicProfileProps> = ({ username }) =
             <span className="text-[13px] font-bold text-slate-900 truncate block">
               {profileData.name}
             </span>
-            <span className="text-[11px] text-slate-500 block">
-              {profileData.isOnline ? "Online" : "Offline"}
+            <span className="text-[11px] text-slate-500 block truncate">
+              {userStatus.displayText}
             </span>
           </div>
         </div>

@@ -173,11 +173,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
                     : "text-[var(--Foundation-Grey-grey-500,#4A4A4A)] font-normal"
                 }
               >
-                {sellerStatus.isOnline
-                  ? "Online"
-                  : sellerStatus.lastSeenText
-                    ? sellerStatus.lastSeenText
-                    : "Offline"}
+                {sellerStatus.displayText}
               </span>
             </span>
           </div>

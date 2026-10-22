@@ -265,10 +265,8 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
               <span className="text-emerald-600 font-medium flex items-center gap-1">
                 Online
               </span>
-            ) : sellerStatus.lastSeenText ? (
-              `Offline · Last seen ${sellerStatus.lastSeenText}`
             ) : (
-              "Offline"
+              sellerStatus.displayText
             )}
           </div>
         </div>

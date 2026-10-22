@@ -1,7 +1,7 @@
 [data-sonner-toaster].workvence-toaster {
   width: 440px;
   max-width: 520px;
-  font-family: var(--font-sf-pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-family: var(--font-inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
 }
 
 .workvence-toaster [data-sonner-toast] {
@@ -16,7 +16,7 @@
   background: #ffffff;
   color: #111827;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
-  font-family: var(--font-sf-pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-family: var(--font-inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
   box-sizing: border-box;
 }
 
@@ -36,7 +36,7 @@
 .workvence-toaster [data-title],
 .workvence-toaster [data-toast-title],
 .workvence-toaster .workvence-toast-title {
-  font-family: var(--font-sf-pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-family: var(--font-plus-jakarta-sans, 'Plus Jakarta Sans', sans-serif);
   font-size: 14px;
   line-height: 20px;
   font-weight: 500;
@@ -50,7 +50,7 @@
 .workvence-toaster [data-description],
 .workvence-toaster .workvence-toast-desc {
   margin-top: 2px;
-  font-family: var(--font-sf-pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-family: var(--font-inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
   font-size: 13px;
   line-height: 18px;
   font-weight: 400;
@@ -130,7 +130,7 @@
   border-radius: 6px;
   background: #000000;
   color: #ffffff;
-  font-family: var(--font-sf-pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-family: var(--font-inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;

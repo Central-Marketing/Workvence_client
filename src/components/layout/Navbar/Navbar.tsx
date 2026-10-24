@@ -357,16 +357,24 @@ const Navbar = () => {
     <>
       <nav
         ref={navRef}
-        style={pathname === "/" && !showMenu && !isMobileMenuOpen ? { background: "#EDEDED", opacity: "0.96" } : undefined}
+        style={
+          pathname === "/" && !showMenu && !isMobileMenuOpen
+            ? { background: "#EDEDED", opacity: isCategoryDropdownOpen ? "1" : "0.96" }
+            : undefined
+        }
         className={`w-full sticky top-0 z-50 transition-all duration-300 ${isMobileMenuOpen
           ? pathname === "/" && !showMenu
             ? "bg-[#EDEDED] border-b border-gray-200/40 text-gray-800"
-            : "bg-white  shadow-sm text-gray-800"
+            : "bg-white shadow-sm text-gray-800"
           : pathname === "/"
             ? showMenu
-              ? "bg-white/75 backdrop-blur-md backdrop-saturate-150 border-b border-white/20 shadow-xs text-gray-800"
+              ? isCategoryDropdownOpen
+                ? "bg-white border-b border-gray-200 shadow-xs text-gray-800"
+                : "bg-white/75 backdrop-blur-md backdrop-saturate-150 border-b border-white/20 shadow-xs text-gray-800"
               : "bg-[#EDEDED] border-b border-gray-200/40 text-gray-800"
-            : "bg-white/70 backdrop-blur-md border-b border-gray-100 shadow-sm text-gray-800"
+            : isCategoryDropdownOpen
+              ? "bg-white border-b border-gray-100 shadow-sm text-gray-800"
+              : "bg-white/70 backdrop-blur-md border-b border-gray-100 shadow-sm text-gray-800"
           }`}
       >
         <div className="w-full container mx-auto flex justify-between items-center px-4 sm:px-6 md:px-8 xl:px-10 py-3.5 sm:py-4 md:py-4 border-b border-white">

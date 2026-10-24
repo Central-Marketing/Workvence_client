@@ -175,7 +175,7 @@ export const ExploreCategoryMegaMenu: React.FC<ExploreCategoryMegaMenuProps> = (
         aria-label="Loading Categories"
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}
-        className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[calc(100vw-32px)] max-w-[1240px] bg-white border border-gray-200/90 rounded-[10px] shadow-2xl z-[60] p-7 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150"
+        className="absolute left-1/2 -translate-x-1/2 top-full mt-0.5 w-[calc(100vw-32px)] max-w-[1240px] bg-white border border-gray-200 rounded-[10px] shadow-2xl z-[60] p-7 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150"
       >
         <div className="flex gap-6 h-[440px]">
           <div className="w-[240px] space-y-3 border-r border-gray-100 pr-4">
@@ -208,7 +208,7 @@ export const ExploreCategoryMegaMenu: React.FC<ExploreCategoryMegaMenuProps> = (
         aria-label="No Categories"
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}
-        className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[calc(100vw-32px)] max-w-[500px] bg-white border border-gray-200/90 rounded-[10px] shadow-2xl z-[60] p-8 text-center text-sm text-gray-500 animate-in fade-in duration-150"
+        className="absolute left-1/2 -translate-x-1/2 top-full mt-0.5 w-[calc(100vw-32px)] max-w-[500px] bg-white border border-gray-200 rounded-[10px] shadow-2xl z-[60] p-8 text-center text-sm text-gray-500 animate-in fade-in duration-150"
       >
         No categories found from server.
       </div>
@@ -222,7 +222,7 @@ export const ExploreCategoryMegaMenu: React.FC<ExploreCategoryMegaMenuProps> = (
       aria-label="Explore Categories Mega Menu"
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
-      className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[calc(100vw-32px)] max-w-[1240px] bg-white border border-gray-200/90 rounded-[10px] shadow-2xl z-[60] overflow-hidden p-6 animate-in fade-in slide-in-from-top-1 duration-150 motion-reduce:transition-none motion-reduce:animate-none"
+      className="absolute left-1/2 -translate-x-1/2 top-full mt-0.5 w-[calc(100vw-32px)] max-w-[1240px] bg-white border border-gray-200 rounded-[10px] shadow-2xl z-[60] overflow-hidden p-6 animate-in fade-in slide-in-from-top-1 duration-150 motion-reduce:transition-none motion-reduce:animate-none"
     >
       <div className="flex gap-6 h-[440px]">
         {/* COLUMN 1: CATEGORIES LIST (LEFT) */}
@@ -360,13 +360,10 @@ export const ExploreCategoryMegaMenu: React.FC<ExploreCategoryMegaMenuProps> = (
 
         {/* COLUMN 4: FEATURED BANNER CARD (RIGHT) */}
         <div className="w-[290px] shrink-0 flex flex-col">
-          <div className="h-full flex flex-col justify-between p-4 rounded-[12px] bg-gradient-to-b from-[#F2FBF8] via-[#EBF7F4] to-[#DFEFFB] border border-[#CCE8E0] relative overflow-hidden group/card shadow-xs">
-            {/* Subtle decorative glow */}
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#126D6B]/10 rounded-full blur-2xl pointer-events-none" />
-
+          <div className="h-full flex flex-col justify-between p-4 rounded-[12px] bg-[#F2FBF8] border border-[#CCE8E0] relative overflow-hidden group/card shadow-xs">
             {/* Top Text Content */}
             <div className="relative z-10 space-y-1.5">
-              <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#126D6B]/15 text-[#126D6B]">
+              <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#126D6B] text-white">
                 Featured Category
               </span>
               <h4 className="font-semibold text-gray-900 text-[15px] leading-snug line-clamp-2">
@@ -379,7 +376,7 @@ export const ExploreCategoryMegaMenu: React.FC<ExploreCategoryMegaMenuProps> = (
             </div>
 
             {/* Image Container with scale to ensure clean edges */}
-            <div className="relative z-10 my-2.5 w-full aspect-[4/3] rounded-[8px] overflow-hidden bg-white/60 shadow-xs border border-white/80">
+            <div className="relative z-10 my-2.5 w-full aspect-[4/3] rounded-[8px] overflow-hidden bg-white shadow-xs border border-gray-200">
               <Image
                 src={resolvedBannerImage}
                 alt={activeSubcategory?.name || activeCategory?.name || "Category Banner"}

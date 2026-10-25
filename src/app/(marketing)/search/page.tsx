@@ -233,46 +233,52 @@ function SearchPageContent() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [closeSuggestions]);
 
-  // Real categories from backend
-  const { categoryList: rawCategories } = useAdminCategories();
-  const categoryList = useMemo(() => {
-    return (rawCategories || []).map((cat: any) => {
-      if (typeof cat === "string") {
-        const slug = cat
-          .toLowerCase()
-          .trim()
-          .replace(/&/g, "and")
-          .replace(/\s+/g, "-")
-          .replace(/[^a-z0-9-]/g, "");
-        return { name: cat, slug, icon: "" };
-      }
-      return {
-        name: cat.name || cat.title || String(cat),
-        slug:
-          cat.slug ||
-          (cat.name || cat.title || "")
+  // Fetch parent categories from backend (top-level categories where parentId is null)
+  const { categoryList: rawCategories, parentCategories } = useAdminCategories();
+
+  const displayedCategories = useMemo(() => {
+    const source = parentCategories?.length
+      ? parentCategories
+      : (rawCategories || []).filter((cat: any) => typeof cat === "string" || !cat?.parentId);
+
+    return source
+      .map((cat: any) => {
+        if (typeof cat === "string") {
+          const cleanName = cat.trim();
+          const unicodeSlug = cleanName
             .toLowerCase()
-            .trim()
             .replace(/&/g, "and")
             .replace(/\s+/g, "-")
-            .replace(/[^a-z0-9-]/g, ""),
-        icon: cat.icon || "",
-      };
-    });
-  }, [rawCategories]);
+            .replace(/[^\p{L}\p{N}-]/gu, "")
+            .replace(/-+/g, "-");
+          const slug = unicodeSlug || encodeURIComponent(cleanName) || cleanName;
+          return {
+            id: slug,
+            name: cleanName,
+            slug,
+            icon: "",
+          };
+        }
 
-  // Display top categories in the bottom category item row (matching Featured)
-  const displayedCategories = useMemo(() => {
-    if (categoryList && categoryList.length >= 4) {
-      return categoryList.slice(0, 6);
-    }
-    return [
-      { name: "Ai Engineering", slug: "ai-engineering", icon: "sparkles" },
-      { name: "Website Development", slug: "website-development", icon: "code" },
-      { name: "Graphics Design", slug: "graphics-design", icon: "palette" },
-      { name: "Music Production", slug: "music-production", icon: "music" },
-    ];
-  }, [categoryList]);
+        const name = (cat?.name || "").trim();
+        const rawSlug = (cat?.slug || "").trim();
+        const unicodeFallback = name
+          .toLowerCase()
+          .replace(/&/g, "and")
+          .replace(/\s+/g, "-")
+          .replace(/[^\p{L}\p{N}-]/gu, "")
+          .replace(/-+/g, "-");
+        const slug = rawSlug || unicodeFallback || encodeURIComponent(name) || String(cat?.id || cat?._id || "");
+
+        return {
+          id: cat?.id || cat?._id || slug,
+          name: name || slug,
+          slug,
+          icon: cat?.icon || "",
+        };
+      })
+      .filter((cat) => Boolean(cat.slug));
+  }, [parentCategories, rawCategories]);
 
   const sortOptions = useMemo(
     () => [

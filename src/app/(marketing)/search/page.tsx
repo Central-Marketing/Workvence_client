@@ -69,9 +69,10 @@ const resolveRealCoverImage = (data: any): string | null => {
   return null;
 };
 
-const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
+const getCategoryIcon = (iconStr?: string, nameStr?: string, customClassName?: string) => {
   const iconKey = (iconStr || "").toLowerCase().replace(/[-_\s]/g, "");
   const nameKey = (nameStr || "").toLowerCase();
+  const iconClass = customClassName || "w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0";
 
   // If iconStr is an image URL (e.g. Cloudinary / CDN upload)
   if (iconStr && (iconStr.startsWith("http://") || iconStr.startsWith("https://"))) {
@@ -85,7 +86,7 @@ const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
     nameKey.includes("ai") ||
     nameKey.includes("artificial")
   ) {
-    return <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    return <Brain className={iconClass} strokeWidth={1.8} />;
   }
   if (
     iconKey === "code" ||
@@ -96,7 +97,7 @@ const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
     nameKey.includes("web") ||
     nameKey.includes("develop")
   ) {
-    return <Code className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    return <Code className={iconClass} strokeWidth={1.8} />;
   }
   if (
     iconKey === "palette" ||
@@ -105,7 +106,7 @@ const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
     nameKey.includes("art") ||
     nameKey.includes("graphic")
   ) {
-    return <Palette className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    return <Palette className={iconClass} strokeWidth={1.8} />;
   }
   if (
     iconKey === "bullhorn" ||
@@ -115,7 +116,7 @@ const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
     nameKey.includes("seo") ||
     nameKey.includes("social")
   ) {
-    return <Megaphone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    return <Megaphone className={iconClass} strokeWidth={1.8} />;
   }
   if (
     iconKey === "video" ||
@@ -124,7 +125,7 @@ const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
     nameKey.includes("photo") ||
     nameKey.includes("animat")
   ) {
-    return <Film className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    return <Film className={iconClass} strokeWidth={1.8} />;
   }
   if (
     iconKey === "briefcase" ||
@@ -132,7 +133,7 @@ const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
     nameKey.includes("business") ||
     nameKey.includes("consult")
   ) {
-    return <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    return <Briefcase className={iconClass} strokeWidth={1.8} />;
   }
   if (
     iconKey === "music" ||
@@ -141,7 +142,7 @@ const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
     nameKey.includes("audio") ||
     nameKey.includes("voice")
   ) {
-    return <Music className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    return <Music className={iconClass} strokeWidth={1.8} />;
   }
   if (
     iconKey === "filetext" ||
@@ -149,7 +150,7 @@ const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
     nameKey.includes("writ") ||
     nameKey.includes("translat")
   ) {
-    return <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    return <FileText className={iconClass} strokeWidth={1.8} />;
   }
   if (
     iconKey === "database" ||
@@ -158,7 +159,7 @@ const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
     nameKey.includes("data") ||
     nameKey.includes("analyt")
   ) {
-    return <Database className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    return <Database className={iconClass} strokeWidth={1.8} />;
   }
   if (
     iconKey === "shoppingcart" ||
@@ -166,14 +167,14 @@ const getCategoryIcon = (iconStr?: string, nameStr?: string) => {
     nameKey.includes("e-commerce") ||
     nameKey.includes("commerce")
   ) {
-    return <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    return <ShoppingCart className={iconClass} strokeWidth={1.8} />;
   }
   if (iconKey === "star" || nameKey.includes("other") || nameKey.includes("general")) {
-    return <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+    return <Star className={iconClass} strokeWidth={1.8} />;
   }
 
   // Fallback icon when no match is found
-  return <Layers className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" strokeWidth={1.8} />;
+  return <Layers className={iconClass} strokeWidth={1.8} />;
 };
 
 function SearchPageContent() {

@@ -252,17 +252,15 @@ export const ExploreCategoryMegaMenu: React.FC<ExploreCategoryMegaMenuProps> = (
                     onClose();
                     router.push(`/packages?category=${encodeURIComponent(cat.slug)}`);
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[8px] text-[13.5px] text-left transition-all cursor-pointer ${
-                    isCatActive
-                      ? "bg-[#F3F4F6] text-gray-900 font-semibold shadow-2xs"
-                      : "text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-normal"
-                  }`}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-[8px] text-[13.5px] text-left transition-all cursor-pointer ${isCatActive
+                    ? "bg-[#F3F4F6] text-gray-900 font-semibold shadow-2xs"
+                    : "text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-normal"
+                    }`}
                 >
                   <span className="truncate pr-2">{cat.name}</span>
                   <FiChevronRight
-                    className={`text-sm shrink-0 transition-transform ${
-                      isCatActive ? "text-gray-900 translate-x-0.5" : "text-gray-400"
-                    }`}
+                    className={`text-sm shrink-0 transition-transform ${isCatActive ? "text-gray-900 translate-x-0.5" : "text-gray-400"
+                      }`}
                   />
                 </button>
               );
@@ -291,18 +289,16 @@ export const ExploreCategoryMegaMenu: React.FC<ExploreCategoryMegaMenuProps> = (
                       onClose();
                       router.push(`/packages?category=${encodeURIComponent(sub.slug)}&view=gigs`);
                     }}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[8px] text-[13px] text-left transition-all cursor-pointer ${
-                      isSubActive
-                        ? "bg-[#F3F4F6] text-[#0D6D5F] font-semibold shadow-2xs"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-normal"
-                    }`}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[8px] text-[13px] text-left transition-all cursor-pointer ${isSubActive
+                      ? "bg-[#F3F4F6] text-[#0D6D5F] font-semibold shadow-2xs"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-normal"
+                      }`}
                   >
                     <span className="truncate pr-2">{sub.name}</span>
                     {hasNiches && (
                       <FiChevronRight
-                        className={`text-xs shrink-0 ${
-                          isSubActive ? "text-[#0D6D5F]" : "text-gray-300"
-                        }`}
+                        className={`text-xs shrink-0 ${isSubActive ? "text-[#0D6D5F]" : "text-gray-300"
+                          }`}
                       />
                     )}
                   </button>
@@ -346,7 +342,7 @@ export const ExploreCategoryMegaMenu: React.FC<ExploreCategoryMegaMenuProps> = (
                   onClick={onClose}
                   className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[#0D6D5F] hover:underline"
                 >
-                  <span>Browse all gigs</span>
+                  <span>Browse all packages</span>
                   <FiArrowRight size={13} />
                 </Link>
               </div>

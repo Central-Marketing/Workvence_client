@@ -231,9 +231,9 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
         {/* Text Content */}
         {!isIconOnly && children !== undefined && children !== null ? (
           isLoading && loadingText ? (
-            <span className="truncate">{loadingText}</span>
+            <span className="">{loadingText}</span>
           ) : typeof children === "string" || typeof children === "number" ? (
-            <span className="truncate">{children}</span>
+            <span className="">{children}</span>
           ) : (
             <span className="inline-flex items-center gap-2 max-w-full">
               {children}

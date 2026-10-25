@@ -755,7 +755,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
                   </h2>
                   <p className="text-xs sm:text-[13px] text-gray-500 mt-0.5">
                     {mode === "login" && "Welcome back! Enter your credentials to continue."}
-                    {mode === "register" && "Join Workvence to discover client projects and submit proposals."}
                     {mode === "forgot" && "Enter your email address and we'll send you a 6-digit reset code."}
                     {mode === "reset" && `Enter the 6-digit code sent to ${resetEmail || "your email"} and a new password.`}
                   </p>
@@ -919,32 +918,38 @@ const AuthModal: React.FC<AuthModalProps> = ({
               {mode === "register" && (
                 <div className="flex flex-col w-full">
                   {/* Role Toggle */}
-                  <div className="space-y-1 mb-2.5">
+                  <div className="space-y-1.5 mb-2.5">
                     <label className="text-xs font-semibold text-gray-700">I want to</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
+                    <div className="flex items-center w-full h-10 sm:h-11 bg-[#F4F4F6] p-[3px] sm:p-[4px] rounded-[6px] border border-gray-200/50">
+                      <Button
                         type="button"
                         onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: true }))}
-                        className={`flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${registerInput.isSeller
-                          ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
-                          : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
+                        variant={registerInput.isSeller ? "brand" : "ghost"}
+                        size="sm"
+                        radius="fiverr"
+                        className={`flex-1 h-full font-sf-pro font-medium text-xs sm:text-[13px] gap-1.5 transition-all cursor-pointer ${registerInput.isSeller
+                          ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                          : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                           }`}
                       >
                         <Briefcase className="w-3.5 h-3.5" />
                         <span>Work as Freelancer</span>
-                      </button>
+                      </Button>
 
-                      <button
+                      <Button
                         type="button"
                         onClick={() => setRegisterInput((prev) => ({ ...prev, isSeller: false }))}
-                        className={`flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3 rounded-[6px] text-xs font-semibold border transition-all cursor-pointer ${!registerInput.isSeller
-                          ? "bg-[#0D6D5F]/10 border-[#0D6D5F] text-[#0D6D5F]"
-                          : "bg-[#F8F9FA] border-gray-200 text-gray-600 hover:bg-gray-100"
+                        variant={!registerInput.isSeller ? "brand" : "ghost"}
+                        size="sm"
+                        radius="fiverr"
+                        className={`flex-1 h-full font-sf-pro font-medium text-xs sm:text-[13px] gap-1.5 transition-all cursor-pointer ${!registerInput.isSeller
+                          ? "bg-[#0B403F] hover:bg-[#0B403F] text-white shadow-sm"
+                          : "bg-transparent hover:bg-transparent text-[#6E6E6E] hover:text-[#222427]"
                           }`}
                       >
                         <User className="w-3.5 h-3.5" />
                         <span>Hire as Client</span>
-                      </button>
+                      </Button>
                     </div>
                   </div>
 
@@ -1362,12 +1367,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
             </div>
 
             {/* Bottom Copyright & Terms Disclaimer */}
-            <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400 shrink-0">
+            {/* <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-400 shrink-0">
               <span>© 2026 Workvence. All rights reserved.</span>
               <Link href="/trust-safety" className="hover:text-gray-600 transition-colors">
                 Privacy & Safety
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
         <BorderBeam radius={20} thickness={4} />

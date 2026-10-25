@@ -16,9 +16,7 @@ import {
   X,
   Star,
   Clock,
-  ArrowRight,
   Layers,
-  Sparkles,
   Palette,
   Code,
   Megaphone,
@@ -26,7 +24,6 @@ import {
   Briefcase,
   Music,
   FileText,
-  BarChart2,
   Database,
   Brain,
   ShoppingCart,
@@ -456,16 +453,27 @@ function SearchPageContent() {
       {/* ===================== FEATURED-STYLE SEARCH SECTION ===================== */}
       <section
         id="search-hero-section"
-        className="w-full bg-[#080C10] py-10 sm:py-14 md:py-16 px-4 flex flex-col justify-center items-center text-center select-none shadow-md border-b border-black/40"
+        className="relative w-full bg-[#fafafa] py-10 sm:py-14 md:py-16 px-4 flex flex-col justify-center items-center text-center select-none border-b border-gray-200/80 overflow-hidden"
       >
-        <div className="container mx-auto px-4 max-w-[1000px] flex flex-col items-center">
+        {/* Centered Ambient Glow (Exact ExploreCategories style) */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[808px] h-[808px] rounded-[608px] pointer-events-none"
+          style={{
+            background: "#E8F5F5",
+            filter: "blur(250px)",
+            mixBlendMode: "multiply",
+          }}
+          aria-hidden="true"
+        />
+
+        <div className="relative z-10 container mx-auto px-4 max-w-[1000px] flex flex-col items-center">
           {/* Headline */}
-          <h1 className="font-sf-pro font-[510] text-[26px] sm:text-[36px] md:text-[44px] lg:text-[48px] text-white tracking-[0px] leading-[1.15] text-center mb-3">
-            Find the right <span className="text-[#7CE7DA]">freelancer</span> and get to work in minutes.
+          <h1 className="font-sf-pro font-[510] text-[26px] sm:text-[36px] md:text-[44px] lg:text-[48px] text-[#292929] tracking-[0px] leading-[1.15] text-center mb-3">
+            Find the right <span className="text-[#0D6D5F]">freelancer</span> and get to work in minutes.
           </h1>
 
           {/* Subtitle */}
-          <p className="text-[#C7C7C7] text-xs sm:text-sm md:text-[15px] font-normal font-inter max-w-xl mx-auto leading-relaxed text-center mb-7">
+          <p className="text-[#6E6E6E] text-xs sm:text-sm md:text-[15px] font-normal font-inter max-w-xl mx-auto leading-relaxed text-center mb-7">
             Search thousands of vetted sellers, order in under a minute, and start today.
           </p>
 
@@ -535,8 +543,8 @@ function SearchPageContent() {
               type="button"
               onClick={() => handleCategorySelect("")}
               className={`flex items-center gap-[8px] pl-[12px] pr-[14px] py-[6px] rounded-[4px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer active:scale-95 ${!selectedCategory
-                ? "bg-[#0D6D5F] text-white shadow-sm ring-1 ring-emerald-400/50"
-                : "bg-white/10 hover:bg-white/20 backdrop-blur-[50px] text-white"
+                ? "bg-[#0D6D5F] text-white shadow-sm ring-1 ring-emerald-500/30"
+                : "bg-white hover:bg-gray-100 text-[#4B5563] hover:text-[#111827] border border-gray-200/90 shadow-2xs"
                 }`}
             >
               <Layers className="w-3.5 h-3.5 shrink-0" />
@@ -552,8 +560,8 @@ function SearchPageContent() {
                   type="button"
                   onClick={() => handleCategorySelect(isActive ? "" : cat.slug)}
                   className={`flex items-center gap-[10px] pl-[10px] pr-[12px] py-[6px] rounded-[4px] text-xs sm:text-[13px] font-medium transition-all cursor-pointer active:scale-95 ${isActive
-                    ? "bg-[#0D6D5F] text-white shadow-sm ring-1 ring-emerald-400/50"
-                    : "bg-white/10 hover:bg-white/20 backdrop-blur-[50px] text-white"
+                    ? "bg-[#0D6D5F] text-white shadow-sm ring-1 ring-emerald-500/30"
+                    : "bg-white hover:bg-gray-100 text-[#4B5563] hover:text-[#111827] border border-gray-200/90 shadow-2xs"
                     }`}
                 >
                   {getCategoryIcon(cat.icon, cat.name)}

@@ -47,3 +47,10 @@ test-results/
 /blob-report/
 playwright/.cache/
 *.webm
+
+# AI agent and assistant instructions
+agent.md
+AGENTS.md
+agents.md
+claude.md
+CLAUDE.md

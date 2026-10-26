@@ -94,6 +94,23 @@ export default function ProfilePage() {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [categorySearch, setCategorySearch] = useState("");
   const categoryDropdownRef = useRef<HTMLDivElement>(null);
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  // Auto-center active tab horizontally in the scrollable tab bar on mobile
+  useEffect(() => {
+    const tabEl = tabRefs.current[activeSection];
+    const container = tabsContainerRef.current;
+    if (tabEl && container) {
+      const tabLeft = tabEl.offsetLeft;
+      const tabWidth = tabEl.offsetWidth;
+      const containerWidth = container.offsetWidth;
+      container.scrollTo({
+        left: tabLeft - containerWidth / 2 + tabWidth / 2,
+        behavior: "smooth",
+      });
+    }
+  }, [activeSection]);
 
   // Available categories list
   const allCategoryNames = useMemo(() => {
@@ -708,7 +725,7 @@ export default function ProfilePage() {
   }, [isSeller]);
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-[80px] min-[1400px]:pb-[100px] font-sans">
+    <div className="min-h-screen bg-[#F8F9FA] pt-8 sm:pt-10 md:pt-12 pb-28 sm:pb-24 min-[1400px]:pb-[100px] font-sans">
       <div className="container mx-auto px-4 md:px-6 space-y-6 sm:space-y-7">
         {/* Account Standing Status Card (only renders if warning or suspended) */}
         <AccountStandingCard className="mb-6" />
@@ -725,94 +742,117 @@ export default function ProfilePage() {
           style={{
             top: `calc(var(--navbar-height, ${isSeller ? "82px" : "136px"}) + 0px)`,
           }}
-          className={`sticky z-30 py-2.5 sm:py-3.5 -my-1 bg-[#F8F9FA]/95 backdrop-blur-md transition-[top] duration-200 mb-6 flex items-center justify-between gap-2.5 sm:gap-4 ${isSeller ? "top-[74px] md:top-[88px]" : "top-[128px] md:top-[142px]"
+          className={`sticky z-30 py-2 sm:py-3.5 -my-1 bg-[#F8F9FA]/95 backdrop-blur-md transition-[top] duration-200 mb-6 flex items-center justify-between gap-3 ${isSeller ? "top-[74px] md:top-[88px]" : "top-[128px] md:top-[142px]"
             }`}
         >
-          {/* Section Pill Tabs */}
-          <div className="bg-white border border-slate-200/80 rounded-[6px] p-1 flex items-center gap-1 overflow-x-auto max-w-full scrollbar-none shadow-xs w-fit min-w-0">
-            <Button
-              type="button"
-              size="sm"
-              radius="fiverr"
-              onClick={() => {
-                setActiveSection("personal");
-                scrollToSection("section-personal");
-              }}
-              className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "personal"
-                ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
-                : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                }`}
+          {/* Section Pill Tabs Container */}
+          <div className="relative w-full md:w-auto min-w-0">
+            <div
+              ref={tabsContainerRef}
+              className="bg-white border border-slate-200/80 rounded-[8px] sm:rounded-[6px] p-1 flex items-center gap-1 sm:gap-1.5 overflow-x-auto w-full md:w-fit min-w-0 scrollbar-none shadow-xs scroll-smooth"
             >
-              Personal Info
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              radius="fiverr"
-              onClick={() => {
-                setActiveSection("professional");
-                scrollToSection("section-professional");
-              }}
-              className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "professional"
-                ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
-                : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                }`}
-            >
-              Professional Details
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              radius="fiverr"
-              onClick={() => {
-                setActiveSection("experience");
-                scrollToSection("section-experience");
-              }}
-              className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "experience"
-                ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
-                : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                }`}
-            >
-              Experience &amp; Education
-            </Button>
-            {isSeller && (
               <Button
+                ref={(el) => {
+                  tabRefs.current["personal"] = el;
+                }}
                 type="button"
                 size="sm"
                 radius="fiverr"
                 onClick={() => {
-                  setActiveSection("portfolio");
-                  scrollToSection("section-portfolio");
+                  setActiveSection("personal");
+                  scrollToSection("section-personal");
                 }}
-                className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "portfolio"
+                className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors shrink-0 ${activeSection === "personal"
                   ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
                   : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`}
               >
-                Portfolio
+                <span className="inline sm:hidden">Personal</span>
+                <span className="hidden sm:inline">Personal Info</span>
               </Button>
-            )}
-            {isSeller && (
               <Button
+                ref={(el) => {
+                  tabRefs.current["professional"] = el;
+                }}
                 type="button"
                 size="sm"
                 radius="fiverr"
                 onClick={() => {
-                  setActiveSection("verification");
-                  scrollToSection("section-verification");
+                  setActiveSection("professional");
+                  scrollToSection("section-professional");
                 }}
-                className={`px-4 py-2 font-semibold whitespace-nowrap transition-colors ${activeSection === "verification"
+                className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors shrink-0 ${activeSection === "professional"
                   ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
                   : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                   }`}
               >
-                Verification
+                <span className="inline sm:hidden">Professional</span>
+                <span className="hidden sm:inline">Professional Details</span>
               </Button>
-            )}
+              <Button
+                ref={(el) => {
+                  tabRefs.current["experience"] = el;
+                }}
+                type="button"
+                size="sm"
+                radius="fiverr"
+                onClick={() => {
+                  setActiveSection("experience");
+                  scrollToSection("section-experience");
+                }}
+                className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors shrink-0 ${activeSection === "experience"
+                  ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
+                  : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  }`}
+              >
+                <span className="inline sm:hidden">Experience</span>
+                <span className="hidden sm:inline">Experience &amp; Education</span>
+              </Button>
+              {isSeller && (
+                <Button
+                  ref={(el) => {
+                    tabRefs.current["portfolio"] = el;
+                  }}
+                  type="button"
+                  size="sm"
+                  radius="fiverr"
+                  onClick={() => {
+                    setActiveSection("portfolio");
+                    scrollToSection("section-portfolio");
+                  }}
+                  className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors shrink-0 ${activeSection === "portfolio"
+                    ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
+                    : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    }`}
+                >
+                  Portfolio
+                </Button>
+              )}
+              {isSeller && (
+                <Button
+                  ref={(el) => {
+                    tabRefs.current["verification"] = el;
+                  }}
+                  type="button"
+                  size="sm"
+                  radius="fiverr"
+                  onClick={() => {
+                    setActiveSection("verification");
+                    scrollToSection("section-verification");
+                  }}
+                  className={`px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors shrink-0 ${activeSection === "verification"
+                    ? "bg-[#0D3B34] text-white shadow-2xs hover:bg-[#0D3B34]"
+                    : "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                    }`}
+                >
+                  Verification
+                </Button>
+              )}
+            </div>
           </div>
 
-          {/* Right-aligned Save Changes Action */}
-          <div className="shrink-0 flex items-center">
+          {/* Desktop/Tablet Save Changes Action */}
+          <div className="hidden md:flex shrink-0 items-center">
             <Button
               type="button"
               variant="dark"
@@ -822,10 +862,9 @@ export default function ProfilePage() {
               isLoading={isUpdating}
               loadingText="Saving..."
               onClick={() => handleSubmit()}
-              className="px-3.5 sm:px-5 py-2 font-semibold shadow-xs whitespace-nowrap text-xs sm:text-sm"
+              className="px-5 py-2 font-semibold shadow-xs whitespace-nowrap text-sm"
             >
-              <span className="hidden min-[360px]:inline">Save Changes</span>
-              <span className="inline min-[360px]:hidden">Save</span>
+              Save Changes
             </Button>
           </div>
         </div>
@@ -913,10 +952,10 @@ export default function ProfilePage() {
               <div className="mb-1">
                 <div className="flex items-center gap-2">
                   <h2 className="font-bold text-base sm:text-lg text-slate-900 leading-tight">
-                    {user?.name || user?.username || "User"}
+                    {user?.username || "User"}
                   </h2>
                   <span className="bg-[#4C1D95] text-white text-[10px] font-bold px-2 py-0.5 rounded-[6px] tracking-wider">
-                    {user?.badge || (isSeller ? "Pro" : "Client")}
+                    {isSeller ? (user?.sellerLevel || "Level 1 Seller") : "Buyer"}
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -1997,6 +2036,23 @@ export default function ProfilePage() {
           </>
         )}
 
+      </div>
+
+      {/* Mobile Fixed Bottom Save Action Bar */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] pb-[max(12px,env(safe-area-inset-bottom))]">
+        <Button
+          type="button"
+          variant="dark"
+          size="md"
+          radius="fiverr"
+          disabled={isUpdating}
+          isLoading={isUpdating}
+          loadingText="Saving Changes..."
+          onClick={() => handleSubmit()}
+          className="w-full py-2.5 font-semibold shadow-xs text-sm flex items-center justify-center gap-2"
+        >
+          <span>Save Changes</span>
+        </Button>
       </div>
     </div>
   );

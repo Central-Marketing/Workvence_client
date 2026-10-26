@@ -23,7 +23,7 @@
   - [Building for Production](#building-for-production)
 - [Available Scripts](#available-scripts)
 - [Testing](#testing)
-- [Directory Structure](#directory-structure)
+- [Directory Structure](#project-architecture)
 - [License](#license)
 
 ---

@@ -253,7 +253,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
             <h2 className="text-2xl sm:text-[26px] font-bold text-gray-900 tracking-tight">
               Most Popular Packages
             </h2>
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <Button
                 type="button"
                 onClick={handleScrollLeft}
@@ -274,7 +274,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
                 className="w-8 h-8 min-w-[32px] min-h-[32px] bg-[#F5F5F7] hover:bg-gray-200 text-gray-700 p-0"
                 icon={<FiArrowRight className="text-sm" />}
               />
-            </div>
+            </div> */}
           </div>
 
           <div

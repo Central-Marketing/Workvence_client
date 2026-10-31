@@ -26,7 +26,6 @@ export interface PackageTierDetails {
 export interface SellerDetails {
   id: string;
   username: string;
-  name: string;
   avatar: string;
   isPro: boolean;
   role: string;
@@ -162,11 +161,11 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
       (rawUser.sellerLevel.toLowerCase().includes("top") || rawUser.sellerLevel.toLowerCase().includes("pro")))
   );
 
-  const sellerRating = Number(rawUser.starRating);
-  const reviewCount = Number(rawUser.totalReviews);
+  const sellerRating = Number(rawUser.starRating) || 0;
+  const reviewCount = Number(rawUser.totalReviews) || 0;
   const sellerBio = rawUser.description || "";
 
-  const sellerRole = rawUser.sellerLevel;
+  const sellerRole = rawUser.sellerLevel || "";
 
   const responseTime = rawUser.responseTimeHours
     ? `${rawUser.responseTimeHours} Hour${rawUser.responseTimeHours > 1 ? 's' : ''}`

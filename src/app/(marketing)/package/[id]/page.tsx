@@ -388,7 +388,7 @@ const PackageContent = () => {
             {sellerPackagesData && sellerPackagesData.length > 0 && (
               <PackagePortfolioShowcase
                 sellerPackages={sellerPackagesData}
-                sellerName={normalizedData.seller.name}
+                sellerName={normalizedData.seller.username}
               />
             )}
 
@@ -408,7 +408,7 @@ const PackageContent = () => {
               starDistribution={normalizedData.reviewsData.starDistribution}
               categoryScores={normalizedData.reviewsData.categoryScores}
               reviews={normalizedData.reviewsData.list}
-              sellerName={normalizedData.seller.name || normalizedData.seller.username}
+              sellerName={normalizedData.seller.username}
               sellerAvatar={normalizedData.seller.avatar}
               sellerId={normalizedData.seller.id}
               sellerUsername={normalizedData.seller.username}

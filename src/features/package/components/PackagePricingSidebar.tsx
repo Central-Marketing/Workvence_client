@@ -44,7 +44,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
       : [];
 
   const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-    seller.name || "Seller"
+    seller.username || "Seller"
   )}&background=0D9488&color=fff&bold=true`;
 
   const sellerStatus = getOnlineStatus(seller.lastActiveAt || seller.lastSeen, seller.isOnline, 10);
@@ -204,7 +204,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
           }
         }}
         className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2.5 sm:gap-3 bg-white hover:bg-[#FAFAFA] border border-gray-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.10)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.16)] px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-[6px] cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:scale-95 select-none animate-fadeIn"
-        title={`Message ${seller.name || seller.username || "Seller"}`}
+        title={`Message ${seller.username || "Seller"}`}
       >
         {/* Emerald Lightning Bolt */}
         <svg
@@ -221,7 +221,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
         <div className="relative shrink-0">
           <img
             src={seller.avatar || defaultAvatar}
-            alt={seller.name || "Seller"}
+            alt={seller.username || "Seller"}
             className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border border-gray-200/80 shadow-2xs"
             onError={(e) => {
               (e.target as HTMLImageElement).src = defaultAvatar;
@@ -253,7 +253,7 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
               <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z" />
               <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1" />
             </svg>
-            <span>Message {seller.name || seller.username || "Seller"}</span>
+            <span>Message {seller.username || "Seller"}</span>
           </div>
           <div className="text-[10px] sm:text-[11.5px] text-gray-500 font-normal leading-tight mt-0.5">
             {sellerStatus.isOnline ? (

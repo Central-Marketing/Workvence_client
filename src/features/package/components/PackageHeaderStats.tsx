@@ -33,7 +33,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
   onShare,
 }) => {
   const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-    seller.name || "Seller"
+    seller.username || "Seller"
   )}&background=0D9488&color=fff&bold=true`;
 
   const user = useUserStore((state: any) => state.user);
@@ -109,7 +109,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
           >
             <img
               src={seller.avatar || defaultAvatar}
-              alt={seller.name}
+              alt={seller.username}
               className="w-12 h-12 sm:w-14 sm:h-14 md:w-[64px] md:h-[64px] aspect-square rounded-full object-cover border border-gray-200 shadow-xs group-hover:opacity-90 transition-opacity"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = defaultAvatar;
@@ -121,7 +121,7 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
               <Link
                 href={`/seller/${seller.username}`}
                 className="font-[510] text-[#000] font-sf-pro text-lg not-italic leading-normal hover:text-brand-green transition-colors"
-                title={`View ${seller.name}'s profile`}
+                title={`View ${seller.username}'s profile`}
               >
                 {seller.username}
               </Link>

@@ -17,7 +17,7 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
   onContact,
 }) => {
   const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-    seller.name || "Seller"
+    seller.username || "Seller"
   )}&background=0D9488&color=fff&bold=true`;
 
   return (
@@ -37,13 +37,13 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
       {/* Seller Header Row */}
       <div className="flex items-center gap-4 mb-6">
         <Link
-          href={`/seller/${seller.username || seller.name}`}
+          href={`/seller/${seller.username}`}
           className="shrink-0 group block"
-          title={`View ${seller.name}'s profile`}
+          title={`View ${seller.username}'s profile`}
         >
           <img
             src={seller.avatar || defaultAvatar}
-            alt={seller.name}
+            alt={seller.username}
             className="w-14 h-14 rounded-full object-cover border border-gray-200 shadow-xs group-hover:opacity-90 transition-opacity"
             onError={(e) => {
               (e.target as HTMLImageElement).src = defaultAvatar;
@@ -53,12 +53,12 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-0.5">
             <Link
-              href={`/seller/${seller.username || seller.name}`}
+              href={`/seller/${seller.username}`}
               className="text-base font-bold text-gray-900 hover:text-brand-green transition-colors"
-              title={`View ${seller.name}'s profile`}
+              title={`View ${seller.username}'s profile`}
             >
               <h3 className="text-base font-bold text-gray-900 hover:text-brand-green transition-colors">
-                {seller.name}
+                {seller.username}
               </h3>
             </Link>
             {seller.isPro && (
@@ -131,7 +131,7 @@ export const PackageSellerSection: React.FC<PackageSellerSectionProps> = ({
           Contact Seller
         </Button>
         <Button
-          href={`/seller/${seller.username || seller.name}`}
+          href={`/seller/${seller.username}`}
           variant="outline"
           size="md"
           radius="fiverr"

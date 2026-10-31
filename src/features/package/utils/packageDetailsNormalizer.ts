@@ -133,7 +133,7 @@ export function formatCategoryName(slug?: string): string {
 export function normalizePackageData(raw: any): NormalizedPackageData {
   if (!raw) raw = {};
 
-  const id = raw._id || raw.id || raw.slug || 'package-details';
+  const id = raw._id || raw.id || raw.slug;
   const slug = raw.slug || '';
   const title = raw.title || raw.shortTitle || "Service Package";
 
@@ -146,18 +146,11 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
     typeof raw.userID === "object" && raw.userID !== null
       ? raw.userID
       : typeof raw.user === "object" && raw.user !== null
-      ? raw.user
-      : {};
+        ? raw.user
+        : {};
 
   const sellerId = rawUser._id || rawUser.id || (typeof raw.userID === "string" ? raw.userID : "");
   const sellerUsername = rawUser.username || "Seller";
-  const sellerName =
-    rawUser.name ||
-    rawUser.fullName ||
-    (rawUser.firstName
-      ? `${rawUser.firstName} ${rawUser.lastName || ""}`.trim()
-      : "") ||
-    sellerUsername;
   const sellerAvatar = rawUser.image || rawUser.img || rawUser.avatar || "";
   const isOnline = Boolean(rawUser.isOnline ?? raw.isOnline ?? false);
   const lastActiveAt = rawUser.lastActiveAt || raw.lastActiveAt || rawUser.lastSeen || rawUser.updatedAt || raw.updatedAt || raw.createdAt || "";
@@ -169,15 +162,11 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
       (rawUser.sellerLevel.toLowerCase().includes("top") || rawUser.sellerLevel.toLowerCase().includes("pro")))
   );
 
-  const sellerRating = Number(raw.starRating ?? rawUser.starRating ?? 0);
-  const reviewCount = Number(raw.totalReviews ?? raw.totalStars ?? rawUser.totalReviews ?? 0);
+  const sellerRating = Number(rawUser.starRating);
+  const reviewCount = Number(rawUser.totalReviews);
   const sellerBio = rawUser.description || "";
 
-  const sellerRole =
-    rawUser.headline ||
-    rawUser.role ||
-    (hasMetricsReset ? "Level 1 Seller" : rawUser.sellerLevel) ||
-    "";
+  const sellerRole = rawUser.sellerLevel;
 
   const responseTime = rawUser.responseTimeHours
     ? `${rawUser.responseTimeHours} Hour${rawUser.responseTimeHours > 1 ? 's' : ''}`
@@ -190,8 +179,8 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
   const onTimeDelivery = rawUser.metrics?.overall?.onTimeDeliveryRate
     ? `${rawUser.metrics.overall.onTimeDeliveryRate}%`
     : rawUser.onTimeDeliveryRate
-    ? `${rawUser.onTimeDeliveryRate}%`
-    : "";
+      ? `${rawUser.onTimeDeliveryRate}%`
+      : "";
 
   const memberSince = rawUser.createdAt
     ? String(new Date(rawUser.createdAt).getFullYear())
@@ -200,13 +189,12 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
   const sellerSkills = Array.isArray(rawUser.skills) && rawUser.skills.length > 0
     ? rawUser.skills
     : Array.isArray(raw.tags) && raw.tags.length > 0
-    ? raw.tags
-    : [];
+      ? raw.tags
+      : [];
 
   const seller: SellerDetails = {
     id: sellerId,
     username: sellerUsername,
-    name: sellerName,
     avatar: sellerAvatar,
     isPro,
     role: sellerRole,
@@ -385,19 +373,19 @@ export function normalizePackageData(raw: any): NormalizedPackageData {
   const tools: string[] = Array.isArray(parsedPackages.tools_use) && parsedPackages.tools_use.length > 0
     ? parsedPackages.tools_use
     : Array.isArray(parsedPackages.toolsUse) && parsedPackages.toolsUse.length > 0
-    ? parsedPackages.toolsUse
-    : Array.isArray(raw.tools_use) && raw.tools_use.length > 0
-    ? raw.tools_use
-    : Array.isArray(raw.toolsUse) && raw.toolsUse.length > 0
-    ? raw.toolsUse
-    : [];
+      ? parsedPackages.toolsUse
+      : Array.isArray(raw.tools_use) && raw.tools_use.length > 0
+        ? raw.tools_use
+        : Array.isArray(raw.toolsUse) && raw.toolsUse.length > 0
+          ? raw.toolsUse
+          : [];
 
   // Real deliverables / area covered
   const areaCovered: string[] = Array.isArray(raw.features) && raw.features.length > 0
     ? raw.features
     : Array.isArray(raw.tags) && raw.tags.length > 0
-    ? raw.tags
-    : [];
+      ? raw.tags
+      : [];
 
   // Real highlights / Why me
   const whyMe: string[] = [];

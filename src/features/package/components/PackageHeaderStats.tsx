@@ -103,9 +103,9 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4 mb-4 border-b border-gray-100">
         <div className="flex items-center gap-3 sm:gap-4">
           <Link
-            href={`/seller/${seller.username || seller.name}`}
+            href={`/seller/${seller.username}`}
             className="shrink-0 group block"
-            title={`View ${seller.name}'s profile`}
+            title={`View ${seller.username}'s profile`}
           >
             <img
               src={seller.avatar || defaultAvatar}
@@ -119,17 +119,12 @@ export const PackageHeaderStats: React.FC<PackageHeaderStatsProps> = ({
           <div className="flex items-start gap-1 flex-col">
             <div className="flex items-center gap-2">
               <Link
-                href={`/seller/${seller.username || seller.name}`}
+                href={`/seller/${seller.username}`}
                 className="font-[510] text-[#000] font-sf-pro text-lg not-italic leading-normal hover:text-brand-green transition-colors"
                 title={`View ${seller.name}'s profile`}
               >
-                {seller.name}
+                {seller.username}
               </Link>
-              {seller.isPro && (
-                <span className="inline-flex items-center justify-center px-[10px] py-[2px] gap-[10px] rounded-[4px] bg-[var(--purple-800,#360083)] text-white text-[10px] sm:text-xs font-bold uppercase tracking-wide">
-                  Pro
-                </span>
-              )}
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">

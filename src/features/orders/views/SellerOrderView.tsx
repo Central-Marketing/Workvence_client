@@ -56,9 +56,6 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
   const [isContacting, setIsContacting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Dynamic countdown
-  const [countdown, setCountdown] = useState({ days: 0, hours: 0, seconds: 0 });
-
   // Lock body scroll when ledger drawer is open
   useEffect(() => {
     if (isLedgerOpen) {
@@ -81,42 +78,6 @@ export const SellerOrderView: React.FC<SellerOrderViewProps> = ({ order, refetch
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isLedgerOpen]);
-
-  useEffect(() => {
-    let targetTime: number | null = null;
-    const deadlineStr = order.deadline || order.raw?.deadline;
-
-    if (deadlineStr) {
-      const parsed = new Date(deadlineStr).getTime();
-      if (!isNaN(parsed) && parsed > Date.now()) {
-        targetTime = parsed;
-      }
-    } else if (order.raw?.createdAt && order.raw?.deliveryTime) {
-      const created = new Date(order.raw.createdAt).getTime();
-      const days = Number(order.raw.deliveryTime);
-      if (!isNaN(created) && !isNaN(days)) {
-        const est = created + days * 86400000;
-        if (est > Date.now()) targetTime = est;
-      }
-    }
-
-    if (targetTime) {
-      const update = () => {
-        const diff = Math.max(0, targetTime! - Date.now());
-        const totalSec = Math.floor(diff / 1000);
-        const d = Math.floor(totalSec / 86400);
-        const remSec = totalSec % 86400;
-        const h = Math.floor(remSec / 3600);
-        const s = remSec % 60;
-        setCountdown({ days: d, hours: h, seconds: s });
-      };
-      update();
-      const timer = setInterval(update, 1000);
-      return () => clearInterval(timer);
-    } else {
-      setCountdown({ days: 0, hours: 0, seconds: 0 });
-    }
-  }, [order]);
 
   // Fetch reviews for completed order
   const { data: reviews = [] } = useQuery({

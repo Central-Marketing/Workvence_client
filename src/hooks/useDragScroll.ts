@@ -13,7 +13,7 @@ interface UseDragScrollOptions {
  * - Smooth drag-to-scroll left and right
  * - Distinguishing clicks from drags so child button clicks aren't triggered accidentally
  * - Cursor grab / grabbing states
- * - Global window tracking during drag to prevent abrupt release when cursor moves outside container
+ * - On-demand global window tracking strictly during active drag (zero idle mousemove listeners)
  */
 export function useDragScroll<T extends HTMLElement = HTMLDivElement>(
   options: UseDragScrollOptions = {}
@@ -28,18 +28,62 @@ export function useDragScroll<T extends HTMLElement = HTMLDivElement>(
   const startXRef = useRef(0);
   const scrollLeftRef = useRef(0);
   const hasDraggedRef = useRef(false);
+  const cleanupDragListenersRef = useRef<(() => void) | null>(null);
 
   const onMouseDown = useCallback(
     (e: React.MouseEvent<T>) => {
       // Only respond to primary (left) mouse clicks
       if (e.button !== 0 || !containerRef.current) return;
 
+      cleanupDragListenersRef.current?.();
+
       isDownRef.current = true;
       hasDraggedRef.current = false;
       startXRef.current = e.pageX - containerRef.current.offsetLeft;
       scrollLeftRef.current = containerRef.current.scrollLeft;
+
+      const handleGlobalMouseMove = (moveEvent: MouseEvent) => {
+        if (!isDownRef.current || !containerRef.current) return;
+
+        const currentX = moveEvent.pageX - containerRef.current.offsetLeft;
+        const walk = (currentX - startXRef.current) * multiplier;
+
+        if (Math.abs(walk) > dragThreshold && !hasDraggedRef.current) {
+          hasDraggedRef.current = true;
+          setIsDragging(true);
+        }
+
+        if (hasDraggedRef.current) {
+          // Prevent accidental text selection while dragging
+          moveEvent.preventDefault();
+          containerRef.current.scrollLeft = scrollLeftRef.current - walk;
+        }
+      };
+
+      const detachListeners = () => {
+        window.removeEventListener("mousemove", handleGlobalMouseMove);
+        window.removeEventListener("mouseup", handleGlobalMouseUp);
+        cleanupDragListenersRef.current = null;
+      };
+
+      const handleGlobalMouseUp = () => {
+        detachListeners();
+        if (isDownRef.current) {
+          isDownRef.current = false;
+          setIsDragging(false);
+
+          // Reset hasDragged after a tick if no click event caught it
+          setTimeout(() => {
+            hasDraggedRef.current = false;
+          }, 100);
+        }
+      };
+
+      cleanupDragListenersRef.current = detachListeners;
+      window.addEventListener("mousemove", handleGlobalMouseMove);
+      window.addEventListener("mouseup", handleGlobalMouseUp);
     },
-    []
+    [multiplier, dragThreshold]
   );
 
   const onClickCapture = useCallback((e: React.MouseEvent<T>) => {
@@ -52,46 +96,10 @@ export function useDragScroll<T extends HTMLElement = HTMLDivElement>(
   }, []);
 
   useEffect(() => {
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      if (!isDownRef.current || !containerRef.current) return;
-
-      const currentX = e.pageX - containerRef.current.offsetLeft;
-      const walk = (currentX - startXRef.current) * multiplier;
-
-      if (Math.abs(walk) > dragThreshold) {
-        if (!hasDraggedRef.current) {
-          hasDraggedRef.current = true;
-          setIsDragging(true);
-        }
-      }
-
-      if (hasDraggedRef.current) {
-        // Prevent accidental text selection while dragging
-        e.preventDefault();
-        containerRef.current.scrollLeft = scrollLeftRef.current - walk;
-      }
-    };
-
-    const handleGlobalMouseUp = () => {
-      if (isDownRef.current) {
-        isDownRef.current = false;
-        setIsDragging(false);
-
-        // Reset hasDragged after a tick if no click event caught it
-        setTimeout(() => {
-          hasDraggedRef.current = false;
-        }, 100);
-      }
-    };
-
-    window.addEventListener("mousemove", handleGlobalMouseMove);
-    window.addEventListener("mouseup", handleGlobalMouseUp);
-
     return () => {
-      window.removeEventListener("mousemove", handleGlobalMouseMove);
-      window.removeEventListener("mouseup", handleGlobalMouseUp);
+      cleanupDragListenersRef.current?.();
     };
-  }, [multiplier, dragThreshold]);
+  }, []);
 
   return {
     ref: containerRef,

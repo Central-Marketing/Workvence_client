@@ -144,14 +144,12 @@ h6,
 /* Global Consistent Slim Scrollbar with Hover-Reveal Behavior                */
 /* -------------------------------------------------------------------------- */
 
-/* Standard (Firefox) */
-* {
+/* Standard (Firefox) — scoped without universal *:hover transitions to avoid main-thread style jank */
+html,
+.overflow-y-auto,
+.overflow-x-auto,
+.overflow-auto {
   scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-  transition: scrollbar-color 0.2s ease-in-out;
-}
-
-*:hover {
   scrollbar-color: #cbd5e1 transparent;
 }
 
@@ -166,13 +164,8 @@ h6,
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: transparent;
+  background-color: rgba(203, 213, 225, 0.75); /* slate-300 */
   border-radius: 9999px;
-  transition: background-color 0.2s ease-in-out;
-}
-
-*:hover::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1; /* slate-300 */
 }
 
 *::-webkit-scrollbar-thumb:hover {

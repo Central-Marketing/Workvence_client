@@ -18,9 +18,6 @@ import {
   FiRotateCcw,
   FiFileText,
   FiHome,
-  FiShield,
-  FiInfo,
-  FiCheckCircle,
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 import { axiosFetch } from "@/utils";
@@ -31,6 +28,7 @@ import { AiGradientButton, Breadcrumb, Button, Tag } from "@/components/ui";
 import { NormalizedOrder } from "../types";
 import { OrderTimelineStepper } from "../components/OrderTimelineStepper";
 import { OrderDeliverablesList } from "../components/OrderDeliverablesList";
+import { OrderStatusBanner } from "../components/OrderStatusBanner";
 import { ArrowRight } from "lucide-react";
 import { DeliveryCountdown } from "../components/DeliveryCountdown";
 import { SellerReviewReply } from "@/features/reviews";
@@ -595,136 +593,37 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
 
             {/* Dispute Alert Banner */}
             {isDisputed && (
-              <div className="bg-[#f5f5f5] border border-[#F5B400] rounded-[6px] p-6 mb-6">
-                <div className="flex items-start gap-3.5">
-                  <div className="w-10 h-10 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] text-amber-700 flex items-center justify-center shrink-0">
-                    <FiShield className="text-xl" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-base text-[#292929]">Workvence Support is handling your dispute</h4>
-                    <p className="text-xs sm:text-sm text-amber-800 mt-1 leading-relaxed">
-                      Our Support &amp; Administration team is actively investigating the details of this order. All payment releases
-                      and work deliveries are temporarily paused while administrators review the communication history and deliverables.
-                    </p>
-                    {disputeSummary && (
-                      <div className="mt-3.5 p-3.5 bg-white/90 border border-amber-300 rounded-[6px] text-xs sm:text-[13px] text-amber-950 leading-relaxed font-sf-pro shadow-2xs">
-                        <div className="flex items-center gap-1.5 font-semibold text-amber-900 mb-1">
-                          <FiInfo className="w-4 h-4 text-amber-600 shrink-0" />
-                          <span>Dispute Summary</span>
-                        </div>
-                        <p className="text-slate-800 font-medium">{disputeSummary}</p>
-                      </div>
-                    )}
-                    <div className="flex flex-wrap gap-3 mt-4">
-                      <Link
-                        href={order.raw?.supportTicketID ? `/support/${order.raw.supportTicketID}` : `/support?orderId=${order.id}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-black border border-[rgba(0,0,0,0.10)] text-white text-[16px] font-semibold font-sf-pro transition-colors shadow-xs"
-                      >
-                        {order.raw?.supportTicketID ? "View Dispute Ticket" : "Go to Support Desk"}
-                      </Link>
-                      <a
-                        href="mailto:support@workvence.com"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] text-black text-[16px] font-semibold font-sf-pro transition-colors shadow-xs"
-                      >
-                        Email: support@workvence.com
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <OrderStatusBanner
+                variant="disputed"
+                role="buyer"
+                orderId={order.id}
+                supportTicketId={order.raw?.supportTicketID}
+                disputeSummary={disputeSummary}
+              />
             )}
 
             {/* Dispute Resolved & Completed Alert Banner */}
             {isCompleted && (disputeSummary || disputeDetailsText) && (
-              <div className="bg-[#f5f5f5] border border-emerald-300 rounded-[6px] p-6 mb-6">
-                <div className="flex items-start gap-3.5">
-                  <div className="w-10 h-10 rounded-[6px] bg-white border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0">
-                    <FiCheckCircle className="text-xl" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-base text-[#112131]">Dispute Resolved &amp; Order Completed</h4>
-                    <p className="text-xs sm:text-sm text-emerald-800 mt-1 leading-relaxed">
-                      Our Support &amp; Administration team has reviewed and finalized the dispute arbitration for this order.
-                      The order has been completed and escrow funds have been settled according to the final decision.
-                    </p>
-                    {disputeSummary && (
-                      <div className="mt-3.5 p-3.5 bg-white/95 border border-emerald-200 rounded-[6px] text-xs sm:text-[13px] text-emerald-950 leading-relaxed font-sf-pro shadow-2xs">
-                        <div className="flex items-center gap-1.5 font-semibold text-emerald-900 mb-1">
-                          <FiInfo className="w-4 h-4 text-emerald-600 shrink-0" />
-                          <span>Dispute Resolution Summary</span>
-                        </div>
-                        <p className="text-slate-800 font-medium">{disputeSummary}</p>
-                      </div>
-                    )}
-                    {disputeDetailsText && disputeDetailsText !== disputeSummary && (
-                      <div className="mt-2.5 p-3.5 bg-white/95 border border-emerald-200 rounded-[6px] text-xs sm:text-[13px] text-emerald-950 leading-relaxed font-sf-pro shadow-2xs">
-                        <div className="flex items-center gap-1.5 font-semibold text-emerald-900 mb-1">
-                          <FiFileText className="w-4 h-4 text-emerald-600 shrink-0" />
-                          <span>Resolution Details</span>
-                        </div>
-                        <p className="text-slate-700 font-normal whitespace-pre-line">{disputeDetailsText}</p>
-                      </div>
-                    )}
-                    <div className="flex flex-wrap gap-3 mt-4">
-                      <Link
-                        href={order.raw?.supportTicketID ? `/support/${order.raw.supportTicketID}` : `/support?orderId=${order.id}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-black border border-[rgba(0,0,0,0.10)] text-white text-[14px] sm:text-[15px] font-semibold font-sf-pro transition-colors shadow-xs"
-                      >
-                        {order.raw?.supportTicketID ? "View Dispute Ticket" : "Go to Support Desk"}
-                      </Link>
-                      <a
-                        href="mailto:support@workvence.com"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-white border border-[rgba(0,0,0,0.10)] text-black text-[14px] sm:text-[15px] font-semibold font-sf-pro transition-colors shadow-xs"
-                      >
-                        Email: support@workvence.com
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <OrderStatusBanner
+                variant="resolved"
+                role="buyer"
+                orderId={order.id}
+                supportTicketId={order.raw?.supportTicketID}
+                disputeSummary={disputeSummary}
+                disputeDetailsText={disputeDetailsText}
+              />
             )}
 
             {/* Cancelled Resolution Banner */}
             {isCancelled && (
-              <div className="bg-[#f5f5f5] border border-rose-200 rounded-[6px] p-6 mb-6">
-                <div className="flex items-start gap-3.5">
-                  <div className="w-10 h-10 rounded-[6px] bg-[#ffffff] border border-red-200 text-rose-700 flex items-center justify-center shrink-0">
-                    <FiAlertCircle className="text-xl" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-base text-[#292929]">This Order Has Been Cancelled</h4>
-                    <p className="text-xs sm:text-sm text-red-600 mt-1 leading-relaxed">
-                      This order was marked as cancelled. Any refunded funds have been returned to your payment balance or original payment method.
-                    </p>
-                    {disputeSummary && (
-                      <div className="mt-3.5 p-3.5 bg-white/90 border border-rose-200 rounded-[6px] text-xs sm:text-[13px] text-rose-950 leading-relaxed font-sf-pro shadow-2xs">
-                        <div className="flex items-center gap-1.5 font-semibold text-rose-900 mb-1">
-                          <FiInfo className="w-4 h-4 text-rose-600 shrink-0" />
-                          <span>Dispute Resolution Summary</span>
-                        </div>
-                        <p className="text-slate-800 font-medium">{disputeSummary}</p>
-                      </div>
-                    )}
-                    {disputeDetailsText && disputeDetailsText !== disputeSummary && (
-                      <div className="mt-2.5 p-3.5 bg-white/90 border border-rose-200 rounded-[6px] text-xs sm:text-[13px] text-rose-950 leading-relaxed font-sf-pro shadow-2xs">
-                        <div className="flex items-center gap-1.5 font-semibold text-rose-900 mb-1">
-                          <FiFileText className="w-4 h-4 text-rose-600 shrink-0" />
-                          <span>Resolution Details</span>
-                        </div>
-                        <p className="text-slate-700 font-normal whitespace-pre-line">{disputeDetailsText}</p>
-                      </div>
-                    )}
-                    <div className="flex flex-wrap gap-3 mt-4">
-                      <Link
-                        href="/support"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[#ffffff] border border-[rgba(0,0,0,0.10)] text-[#000000] text-xs sm:text-sm font-semibold transition-colors shadow-xs"
-                      >
-                        Contact Support
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <OrderStatusBanner
+                variant="cancelled"
+                role="buyer"
+                orderId={order.id}
+                supportTicketId={order.raw?.supportTicketID}
+                disputeSummary={disputeSummary}
+                disputeDetailsText={disputeDetailsText}
+              />
             )}
 
             {/* CARD 1: Deliverables from Seller */}
@@ -734,7 +633,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
                   <h3 className="text-xl font-bold text-[#292929] font-inter">Files &amp; Attachments from Seller</h3>
                 </div>
                 {isDelivered && (
-                  <span className="bg-[#CCF6F1] text-[#265F58] border border-[rgba(0, 0, 0, 0.10)] text-xs font-semibold px-3 py-1 rounded-full">
+                  <span className="bg-[#CCF6F1] text-[#265F58] border border-[rgba(0, 0, 0, 0.10)] text-xs font-semibold px-5 py-2.5 rounded-full">
                     Delivered
                   </span>
                 )}

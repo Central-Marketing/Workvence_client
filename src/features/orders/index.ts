@@ -5,5 +5,6 @@ export { OrderTimelineStepper } from './components/OrderTimelineStepper';
 export { OrderDeliverablesList } from './components/OrderDeliverablesList';
 export { OrderActivityLedgerDrawer } from './components/OrderActivityLedgerDrawer';
 export { DeclineExtensionModal } from './components/DeclineExtensionModal';
+export { OrderStatusBanner } from './components/OrderStatusBanner';
 export * from './types';
 export * from './utils/orderPrioritySort';

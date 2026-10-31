@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 // Rounded arrow cursor path (24px viewBox), rendered at 25px and rotated 15deg clockwise.
 const CURSOR_PATH =
@@ -11,16 +11,58 @@ const CURSOR_SIZE = 25;
 const HOTSPOT_X = 8;
 const HOTSPOT_Y = 3;
 
-let cachedCursorCss: string | null = null;
+const CLICK_DURATION_MS = 800;
+const BEAM_FRAME_COUNT = 22;
+
+const NON_TEXT_INPUT_TYPES = new Set([
+    "button",
+    "submit",
+    "reset",
+    "checkbox",
+    "radio",
+    "range",
+    "file",
+    "color",
+]);
+
+let cachedIdleCss: string | null = null;
+let cachedFramesCss: string | null = null;
+// Keep decoded HTMLImageElement instances pinned in memory so Blink's MemoryCache
+// never evicts or re-decodes the OS cursor frames during click playback.
+const pinnedCursorImages: HTMLImageElement[] = [];
+
+function pinImageInCache(dataUrl: string) {
+    if (!dataUrl || typeof Image === "undefined") return;
+    const img = new Image();
+    img.src = dataUrl;
+    img.decode?.().catch(() => {});
+    pinnedCursorImages.push(img);
+}
+
+function getCursorPathTotalLength(): number {
+    if (typeof document === "undefined") return 54.6;
+    try {
+        const svgPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        svgPath.setAttribute("d", CURSOR_PATH);
+        const len = svgPath.getTotalLength();
+        return len > 0 ? len : 54.6;
+    } catch {
+        return 54.6;
+    }
+}
 
 /**
- * Rasterizes the Workvence custom arrow once onto an offscreen canvas at the target
- * pixel density so the OS GPU Hardware Cursor Plane can render it with 0ms latency.
+ * Renders a single OS hardware cursor bitmap (either idle or at normalized border-beam
+ * dash offset `normDashOffset` along `CURSOR_PATH`) at `1x` or `2x` HiDPI scale.
  */
-function renderHardwareCursorDataUrl(scale: number): string {
+function renderCursorFrameDataUrl(
+    scale: number,
+    normDashOffset: number | null,
+    totalPathLen: number
+): string {
     const pxSize = Math.round(CURSOR_SIZE * scale);
 
-    // 1. Render crisp fill + white border onto an unshadowed shape buffer
+    // 1. Draw crisp black body + white border (+ optional border-beam sweep) on unshadowed buffer
     const shapeCanvas = document.createElement("canvas");
     shapeCanvas.width = pxSize;
     shapeCanvas.height = pxSize;
@@ -38,6 +80,7 @@ function renderHardwareCursorDataUrl(scale: number): string {
     shapeCtx.translate(-12, -12);
 
     const path = new Path2D(CURSOR_PATH);
+
     shapeCtx.fillStyle = "#000000";
     shapeCtx.fill(path);
 
@@ -47,7 +90,23 @@ function renderHardwareCursorDataUrl(scale: number): string {
     shapeCtx.lineJoin = "round";
     shapeCtx.stroke(path);
 
-    // 2. Composite shape buffer with a single unified drop-shadow (matching CSS drop-shadow)
+    // Overlay the exact #9AFFDA -> #82C2FD -> #F29EFF border-beam sweep on top of the white border
+    if (normDashOffset !== null) {
+        const grad = shapeCtx.createLinearGradient(3.1, 0, 20.9, 0);
+        grad.addColorStop(0, "#9AFFDA");
+        grad.addColorStop(0.5, "#82C2FD");
+        grad.addColorStop(1, "#F29EFF");
+
+        shapeCtx.strokeStyle = grad;
+        shapeCtx.lineWidth = 3;
+        shapeCtx.lineCap = "round";
+        shapeCtx.lineJoin = "round";
+        shapeCtx.setLineDash([totalPathLen, totalPathLen * 2]);
+        shapeCtx.lineDashOffset = (normDashOffset / 100) * totalPathLen;
+        shapeCtx.stroke(path);
+    }
+
+    // 2. Composite shape buffer onto output canvas with unified drop-shadow
     const outCanvas = document.createElement("canvas");
     outCanvas.width = pxSize;
     outCanvas.height = pxSize;
@@ -60,25 +119,20 @@ function renderHardwareCursorDataUrl(scale: number): string {
     outCtx.shadowOffsetY = 1 * scale;
     outCtx.drawImage(shapeCanvas, 0, 0);
 
-    return outCanvas.toDataURL("image/png");
+    const dataUrl = outCanvas.toDataURL("image/png");
+    pinImageInCache(dataUrl);
+    return dataUrl;
 }
 
-function buildHardwareCursorCss(): string {
-    if (cachedCursorCss) return cachedCursorCss;
+function formatCursorDeclarations(png1x: string, png2x: string): string {
+    return [
+        `cursor: url("${png1x}") ${HOTSPOT_X} ${HOTSPOT_Y}, auto !important;`,
+        `cursor: -webkit-image-set(url("${png1x}") 1x, url("${png2x}") 2x) ${HOTSPOT_X} ${HOTSPOT_Y}, auto !important;`,
+        `cursor: image-set(url("${png1x}") 1x, url("${png2x}") 2x) ${HOTSPOT_X} ${HOTSPOT_Y}, auto !important;`,
+    ].join("\n    ");
+}
 
-    const png1x = renderHardwareCursorDataUrl(1);
-    const png2x = renderHardwareCursorDataUrl(2);
-    if (!png1x || !png2x) return "";
-
-    cachedCursorCss = `
-@media (pointer: fine) {
-  html.has-custom-cursor,
-  html.has-custom-cursor * {
-    cursor: url("${png1x}") ${HOTSPOT_X} ${HOTSPOT_Y}, auto !important;
-    cursor: -webkit-image-set(url("${png1x}") 1x, url("${png2x}") 2x) ${HOTSPOT_X} ${HOTSPOT_Y}, auto !important;
-    cursor: image-set(url("${png1x}") 1x, url("${png2x}") 2x) ${HOTSPOT_X} ${HOTSPOT_Y}, auto !important;
-  }
-
+const SPECIALIZED_CURSOR_OVERRIDES_CSS = `
   html.has-custom-cursor input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
   html.has-custom-cursor textarea,
   html.has-custom-cursor [contenteditable="true"],
@@ -100,113 +154,208 @@ function buildHardwareCursorCss(): string {
   html.has-custom-cursor .cursor-grabbing {
     cursor: grabbing !important;
   }
+`;
+
+function buildIdleCursorCss(): string {
+    if (cachedIdleCss) return cachedIdleCss;
+
+    const totalLen = getCursorPathTotalLength();
+    const idle1x = renderCursorFrameDataUrl(1, null, totalLen);
+    const idle2x = renderCursorFrameDataUrl(2, null, totalLen);
+    if (!idle1x || !idle2x) return "";
+
+    cachedIdleCss = `
+@media (pointer: fine) {
+  html.has-custom-cursor,
+  html.has-custom-cursor * {
+    ${formatCursorDeclarations(idle1x, idle2x)}
+  }
+${SPECIALIZED_CURSOR_OVERRIDES_CSS}
 }
 `;
-    return cachedCursorCss;
+    return cachedIdleCss;
+}
+
+function buildAnimatedFramesCss(): string {
+    if (cachedFramesCss) return cachedFramesCss;
+
+    const totalLen = getCursorPathTotalLength();
+    const frameRules: string[] = [];
+
+    for (let i = 0; i < BEAM_FRAME_COUNT; i++) {
+        const t = (i + 1) / (BEAM_FRAME_COUNT + 1);
+        let normOffset: number;
+
+        // Match original keyframes: 101 -> 0 (ease-out to 50%), then 0 -> -101 (ease-in to 100%)
+        if (t <= 0.5) {
+            const u = t / 0.5;
+            const eased = 1 - (1 - u) * (1 - u);
+            normOffset = 104 * (1 - eased);
+        } else {
+            const u = (t - 0.5) / 0.5;
+            const eased = u * u;
+            normOffset = -104 * eased;
+        }
+
+        const f1x = renderCursorFrameDataUrl(1, normOffset, totalLen);
+        const f2x = renderCursorFrameDataUrl(2, normOffset, totalLen);
+        if (!f1x || !f2x) continue;
+
+        // :where() keeps specificity identical to html.has-custom-cursor * so specialized
+        // overrides (text, not-allowed, grab) always take precedence automatically.
+        frameRules.push(`
+  html.has-custom-cursor:where([data-cursor-frame="${i}"]),
+  html.has-custom-cursor:where([data-cursor-frame="${i}"]) * {
+    ${formatCursorDeclarations(f1x, f2x)}
+  }`);
+    }
+
+    cachedFramesCss = `
+@media (pointer: fine) {
+${frameRules.join("\n")}
+${SPECIALIZED_CURSOR_OVERRIDES_CSS}
+}
+`;
+    return cachedFramesCss;
+}
+
+function isArrowCursorTarget(target: Element | null): boolean {
+    let el: Element | null = target;
+    while (el) {
+        if ((el as HTMLElement).isContentEditable) return false;
+
+        const tag = el.tagName;
+        if (tag === "TEXTAREA") return false;
+        if (tag === "INPUT") {
+            const input = el as HTMLInputElement;
+            if (input.disabled) return false;
+            const type = (input.type || "text").toLowerCase();
+            if (!NON_TEXT_INPUT_TYPES.has(type)) return false;
+        }
+
+        if ((el as HTMLButtonElement).disabled || el.getAttribute("aria-disabled") === "true") {
+            return false;
+        }
+
+        const cls = el.classList;
+        if (
+            cls.length > 0 &&
+            (cls.contains("cursor-not-allowed") ||
+                cls.contains("cursor-text") ||
+                cls.contains("cursor-grab") ||
+                cls.contains("cursor-grabbing") ||
+                cls.contains("ql-editor"))
+        ) {
+            return false;
+        }
+
+        el = el.parentElement;
+    }
+    return true;
 }
 
 export const TidalWaveCursor = () => {
-    const rippleRef = useRef<HTMLDivElement | null>(null);
-
     useEffect(() => {
         if (!window.matchMedia("(pointer: fine)").matches) return;
 
-        const css = buildHardwareCursorCss();
-        if (!css) return;
+        const idleCss = buildIdleCursorCss();
+        if (!idleCss) return;
 
-        const styleEl = document.createElement("style");
-        styleEl.setAttribute("data-workvence-cursor", "hardware");
-        styleEl.textContent = css;
-        document.head.appendChild(styleEl);
+        const idleStyleEl = document.createElement("style");
+        idleStyleEl.setAttribute("data-workvence-cursor", "hardware-idle");
+        idleStyleEl.textContent = idleCss;
+        document.head.appendChild(idleStyleEl);
+
+        const framesStyleEl = document.createElement("style");
+        framesStyleEl.setAttribute("data-workvence-cursor", "hardware-frames");
+        document.head.appendChild(framesStyleEl);
 
         const root = document.documentElement;
         root.classList.add("has-custom-cursor");
 
+        let framesReady = false;
+        const ensureFramesBuilt = () => {
+            if (framesReady) return;
+            framesReady = true;
+            framesStyleEl.textContent = buildAnimatedFramesCss();
+        };
+
+        // Pre-warm the 22 OS-level border-beam cursor frames during browser idle time
+        let idleCallbackId: number | null = null;
+        let fallbackTimerId: ReturnType<typeof setTimeout> | null = null;
+        if ("requestIdleCallback" in window) {
+            idleCallbackId = window.requestIdleCallback(ensureFramesBuilt, { timeout: 500 });
+        } else {
+            fallbackTimerId = setTimeout(ensureFramesBuilt, 32);
+        }
+
         const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-        let clickAnimation: Animation | null = null;
+        let rafId = 0;
+        let lastFrameIdx = -1;
+
+        const stopAnimation = () => {
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = 0;
+            }
+            if (lastFrameIdx !== -1) {
+                lastFrameIdx = -1;
+                root.removeAttribute("data-cursor-frame");
+            }
+        };
 
         const handlePointerDown = (e: PointerEvent) => {
             if (e.button !== 0 || prefersReducedMotion.matches) return;
-            const ripple = rippleRef.current;
-            if (!ripple) return;
+            if (!isArrowCursorTarget(e.target as Element | null)) return;
 
-            const target = e.target as Element | null;
-            if (target?.closest?.(':disabled, [aria-disabled="true"], .cursor-not-allowed')) {
-                return;
-            }
+            ensureFramesBuilt();
+            stopAnimation();
 
-            clickAnimation?.cancel();
+            const startTime = performance.now();
 
-            // Pure GPU compositor-thread animation (transform + opacity only)
-            const x = e.clientX;
-            const y = e.clientY;
-            clickAnimation = ripple.animate(
-                [
-                    {
-                        transform: `translate3d(${x}px, ${y}px, 0) scale(0.35)`,
-                        opacity: 0.95,
-                    },
-                    {
-                        transform: `translate3d(${x}px, ${y}px, 0) scale(1.35)`,
-                        opacity: 0,
-                    },
-                ],
-                {
-                    duration: 420,
-                    easing: "cubic-bezier(0.16, 1, 0.3, 1)",
-                    fill: "forwards",
+            const step = (now: number) => {
+                const elapsed = now - startTime;
+                if (elapsed >= CLICK_DURATION_MS) {
+                    stopAnimation();
+                    return;
                 }
-            );
+
+                const frameIdx = Math.min(
+                    BEAM_FRAME_COUNT - 1,
+                    Math.floor((elapsed / CLICK_DURATION_MS) * BEAM_FRAME_COUNT)
+                );
+
+                if (frameIdx !== lastFrameIdx) {
+                    lastFrameIdx = frameIdx;
+                    root.setAttribute("data-cursor-frame", String(frameIdx));
+                }
+
+                rafId = requestAnimationFrame(step);
+            };
+
+            // Show frame 0 immediately on click
+            lastFrameIdx = 0;
+            root.setAttribute("data-cursor-frame", "0");
+            rafId = requestAnimationFrame(step);
         };
 
         window.addEventListener("pointerdown", handlePointerDown, { passive: true });
 
         return () => {
             window.removeEventListener("pointerdown", handlePointerDown);
-            clickAnimation?.cancel();
+            stopAnimation();
+            if (idleCallbackId !== null && "cancelIdleCallback" in window) {
+                window.cancelIdleCallback(idleCallbackId);
+            }
+            if (fallbackTimerId !== null) {
+                clearTimeout(fallbackTimerId);
+            }
             root.classList.remove("has-custom-cursor");
-            styleEl.remove();
+            idleStyleEl.remove();
+            framesStyleEl.remove();
         };
     }, []);
 
-    return (
-        <div
-            ref={rippleRef}
-            aria-hidden="true"
-            className="pointer-events-none fixed will-change-transform"
-            style={{
-                left: -14,
-                top: -14,
-                width: 28,
-                height: 28,
-                zIndex: 2147483647,
-                opacity: 0,
-                contain: "layout style paint",
-                transform: "translate3d(-100px, -100px, 0) scale(0.35)",
-            }}
-        >
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                <defs>
-                    <linearGradient
-                        id="tidal-cursor-gradient"
-                        x1="0"
-                        y1="0"
-                        x2="1"
-                        y2="1"
-                    >
-                        <stop offset="0" stopColor="#9AFFDA" />
-                        <stop offset="0.5" stopColor="#82C2FD" />
-                        <stop offset="1" stopColor="#F29EFF" />
-                    </linearGradient>
-                </defs>
-                <circle
-                    cx="14"
-                    cy="14"
-                    r="10.5"
-                    stroke="url(#tidal-cursor-gradient)"
-                    strokeWidth="2.25"
-                />
-            </svg>
-        </div>
-    );
+    // Pure OS-level hardware cursor — zero DOM follower elements!
+    return null;
 };

@@ -9,6 +9,7 @@ import { axiosFetch } from "@/utils";
 import { FiCalendar, FiArrowRight, FiCheckCircle } from "react-icons/fi";
 import { Button, Tag, AccountStandingBanner, ProgressBar } from "@/components/ui";
 import { calculateProfileCompletion } from "../utils/dashboardNormalizer";
+import { PackageCard } from "@/features/gigs";
 import { sortOrdersByPriority } from "@/features/orders";
 import { isConversationUnread } from "@/utils/chatHelpers";
 
@@ -340,10 +341,13 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
   const hasPackages = packagesList.length > 0;
   const displayName = user?.name ? user.name.split(" ")[0] : (user?.username || "User");
 
-  // Filter draft packages (isDraft === true or "true" or status === "draft")
-  const draftPackages = packagesList.filter(
-    (pkg: any) => Boolean(pkg.isDraft) === true || pkg.isDraft === "true" || pkg.status === "draft"
-  );
+  // Filter draft vs published packages (isDraft === true or "true" or status === "draft")
+  const isPackageDraft = (pkg: any) =>
+    Boolean(pkg.isDraft) === true || pkg.isDraft === "true" || pkg.status === "draft";
+
+  const draftPackages = packagesList.filter(isPackageDraft);
+  const publishedPackages = packagesList.filter((pkg: any) => !isPackageDraft(pkg));
+  const hasPublishedPackages = publishedPackages.length > 0;
 
   // Find the last uploaded / created draft gig
   const latestDraftPackage = draftPackages.length > 0
@@ -844,12 +848,13 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
           </div>
         )}
 
-        {/* 3. Section 2: Packages (List when exist, Empty state card when 0) */}
-        {hasPackages ? (
+        {/* 3. Section 2: Packages (Published list when exist, Empty state card when 0) */}
+        {hasPublishedPackages ? (
           <div className="space-y-4 pt-1">
             <div className="flex items-center justify-between">
               <h2 className="text-xl sm:text-[24px] font-bold text-[#111827] tracking-tight">
-                Packages <span className="text-sm font-normal text-slate-500">({packagesList.length})</span>
+                Packages
+                {/* <span className="text-sm font-normal text-slate-500">({publishedPackages.length})</span> */}
               </h2>
               <div className="flex items-center gap-3">
                 <Link
@@ -876,46 +881,38 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {packagesList.map((pkg: any) => (
-                <div
-                  key={pkg._id}
-                  onClick={() => {
-                    if (pkg.isDraft === true || pkg.isDraft === "true" || pkg.status === "draft") {
-                      router.push(`/organize/${pkg._id}`);
-                    } else {
-                      router.push(`/package/${pkg._id}`);
-                    }
-                  }}
-                  className="bg-white rounded-[6px] border border-slate-100 shadow-xs hover:shadow-md transition-all overflow-hidden cursor-pointer group flex flex-col"
-                >
-                  <div className="relative aspect-[16/10] w-full bg-slate-100 overflow-hidden">
-                    <img
-                      src={pkg.cover || pkg.image || "/images/mock-dashboard/rec-1.png"}
-                      alt={pkg.title || "Package"}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    {(pkg.isDraft === true || pkg.isDraft === "true" || pkg.status === "draft") && (
-                      <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-xs">
-                        Draft
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-4 flex flex-col flex-1 justify-between gap-3">
-                    <h3 className="font-semibold text-sm text-slate-800 line-clamp-2 group-hover:text-teal-700 transition-colors">
-                      {pkg.title}
-                    </h3>
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-50 text-xs">
-                      <span className="text-slate-500">
-                        Sales: <strong className="text-slate-700">{pkg.sales || 0}</strong>
-                      </span>
-                      <span className="font-bold text-sm text-slate-900">
-                        {(pkg.price || 0).toLocaleString("en-US", { style: "currency", currency: "USD" })}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+              {publishedPackages.map((pkg: any, idx: number) => {
+                const pkgUser =
+                  (typeof pkg.user === "object" && pkg.user) ||
+                  (typeof pkg.userID === "object" && pkg.userID) ||
+                  {};
+                const cardData = {
+                  ...pkg,
+                  price: pkg.price ?? pkg.startingPrice ?? 0,
+                  user: {
+                    ...pkgUser,
+                    name: pkgUser.name || user?.name,
+                    username: pkgUser.username || user?.username,
+                    image:
+                      pkgUser.image ||
+                      pkgUser.img ||
+                      pkgUser.avatar ||
+                      user?.image ||
+                      user?.img ||
+                      user?.avatar,
+                    sellerLevel: pkgUser.sellerLevel || user?.sellerLevel || "Level 1",
+                    metricsResetAt: pkgUser.metricsResetAt ?? user?.metricsResetAt,
+                  },
+                };
+                return (
+                  <PackageCard
+                    key={pkg._id || pkg.id || idx}
+                    data={cardData}
+                    priority={idx < 4}
+                  />
+                );
+              })}
             </div>
           </div>
         ) : (

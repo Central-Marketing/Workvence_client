@@ -100,19 +100,14 @@ export const PackagePricingSidebar: React.FC<PackagePricingSidebarProps> = ({
 
         {/* Short Description */}
         {activePkg.shortDesc && (
-          <p className="
-            font-inter
-            not-italic
-            text-[14px]
-            leading-[1.3]
-            text-[var(--Foundation-Grey-grey-500,#4A4A4A)]
-            mb-5
-            pb-5
-            border-b
-            border-gray-100
-          ">
-            {activePkg.shortDesc}
-          </p>
+          <div className="mb-5 pb-5 border-b border-gray-100">
+            <p
+              title={activePkg.shortDesc}
+              className="font-inter not-italic text-[14px] leading-[1.3] text-[var(--Foundation-Grey-grey-500,#4A4A4A)] line-clamp-3 break-words"
+            >
+              {activePkg.shortDesc}
+            </p>
+          </div>
         )}
 
         {/* Revisions & Delivery Meta Row */}

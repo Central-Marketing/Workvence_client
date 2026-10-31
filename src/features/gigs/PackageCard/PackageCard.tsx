@@ -49,8 +49,9 @@ const PackageCard = ({ data, priority = false }: { data: any; priority?: boolean
 
   if (!data) return null;
 
-  const userObj = data.user || data.userId || data.userID || {};
-  const userImg = userObj.image || data.pp || "/media/noavatar.png";
+  const rawUserObj = data.user || data.userId || data.userID;
+  const userObj = typeof rawUserObj === "object" && rawUserObj !== null ? rawUserObj : {};
+  const userImg = userObj.image || userObj.img || userObj.avatar || data.pp || "/media/noavatar.png";
   const username = userObj.username || data.username || "Seller";
 
   const handleImageError = () => {

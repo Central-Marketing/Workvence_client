@@ -907,6 +907,18 @@ const EditPackagePage = () => {
         toast.error("Please enter a valid price for the Basic package");
         return;
       }
+      const tierChecks: Array<{ key: TierKey; label: string; desc?: string }> = [
+        { key: "basic", label: "Basic", desc: basicTier?.shortDesc },
+        { key: "standard", label: "Silver", desc: standardTier?.shortDesc },
+        { key: "premium", label: "Platinum", desc: premiumTier?.shortDesc },
+      ];
+      for (const tier of tierChecks) {
+        if (tier.desc && tier.desc.trim().length > 100) {
+          setActiveTier(tier.key);
+          toast.error(`${tier.label} package description must not exceed 100 characters`);
+          return;
+        }
+      }
     }
 
     mutation.mutate(payload);
@@ -1472,16 +1484,42 @@ const EditPackagePage = () => {
 
             {/* Tier Description */}
             <div className="space-y-1">
-              <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
-                Package description
-              </label>
-              <textarea
-                value={currentTierData.shortDesc || ""}
-                onChange={(e) => handleTierInputChange("shortDesc", e.target.value)}
-                placeholder="write description"
-                rows={3}
-                className="w-full bg-[#F0F0F0] border border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white rounded-[6px] px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors resize-y min-h-[80px]"
-              />
+              {(() => {
+                const currentTierShortDesc = currentTierData.shortDesc || "";
+                const isDescExceeded = currentTierShortDesc.length > 100;
+                return (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs sm:text-[13px] font-medium text-gray-700 block">
+                        Package description
+                      </label>
+                      <span
+                        className={`text-[11px] font-medium transition-colors ${isDescExceeded
+                          ? "text-red-500 font-semibold"
+                          : "text-gray-400"
+                          }`}
+                      >
+                        {currentTierShortDesc.length}/100
+                      </span>
+                    </div>
+                    <textarea
+                      value={currentTierShortDesc}
+                      onChange={(e) => handleTierInputChange("shortDesc", e.target.value)}
+                      placeholder="write description"
+                      rows={3}
+                      className={`w-full bg-[#F0F0F0] border rounded-[6px] px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-[#868686] placeholder:font-normal outline-none transition-colors resize-y min-h-[80px] ${isDescExceeded
+                        ? "border-red-400 focus:border-red-500 bg-red-50/10"
+                        : "border-[rgba(0,0,0,0.10)] focus:border-gray-300 focus:bg-white"
+                        }`}
+                    />
+                    {isDescExceeded && (
+                      <p className="text-[11px] text-red-500 font-medium">
+                        Package description cannot exceed 100 characters
+                      </p>
+                    )}
+                  </>
+                );
+              })()}
             </div>
 
             {/* Add Delivery Time & Revisions in responsive 2-col grid */}

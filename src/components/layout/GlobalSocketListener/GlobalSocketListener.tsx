@@ -452,6 +452,7 @@ export default function GlobalSocketListener() {
       if (newNotif.briefID || newNotif.briefId || newNotif.proposalID || newNotif.proposalId || newNotif.link?.includes("/brief")) {
         queryClient.invalidateQueries({ queryKey: ["briefs"] });
         queryClient.invalidateQueries({ queryKey: ["my-briefs"] });
+        queryClient.invalidateQueries({ queryKey: ["brief-proposals"] });
         queryClient.invalidateQueries({ queryKey: ["proposals"] });
         queryClient.invalidateQueries({ queryKey: ["my-proposals"] });
       }

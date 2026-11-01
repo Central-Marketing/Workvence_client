@@ -35,7 +35,7 @@ function pinImageInCache(dataUrl: string) {
     if (!dataUrl || typeof Image === "undefined") return;
     const img = new Image();
     img.src = dataUrl;
-    img.decode?.().catch(() => {});
+    img.decode?.().catch(() => { });
     pinnedCursorImages.push(img);
 }
 

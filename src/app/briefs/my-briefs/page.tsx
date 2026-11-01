@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import moment from "moment";
 import { toast } from "@/utils/toast";
 import {
@@ -21,7 +22,7 @@ import {
   FiTrash2,
 } from "react-icons/fi";
 
-import { axiosFetch } from "@/utils";
+import { axiosFetch, isValidAvatarUrl, getUsernameInitial } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { Button, AiGradientButton } from "@/components";
 import { CustomSelect, CustomSelectOption, BriefsListSkeleton, ConfirmModal, PageHeader } from "@/components/ui";
@@ -29,11 +30,81 @@ import { EditBriefModal } from "@/features/buyer";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { FolderKanbanIcon } from "@hugeicons/core-free-icons";
 
-const DEFAULT_AVATARS = [
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80",
-];
+interface ProposalApplicant {
+  id: string;
+  username: string;
+  avatar: string;
+}
+
+type LooseRecord = Record<string, unknown>;
+
+const asRecord = (val: unknown): LooseRecord | null =>
+  typeof val === "object" && val !== null ? (val as LooseRecord) : null;
+
+const extractProposalApplicants = (proposals: unknown): ProposalApplicant[] => {
+  if (!Array.isArray(proposals)) return [];
+  return proposals
+    .map((raw, idx): ProposalApplicant | null => {
+      const p = asRecord(raw);
+      if (!p) return null;
+
+      const seller =
+        asRecord(p.seller) ||
+        asRecord(p.sellerID) ||
+        asRecord(p.sellerId) ||
+        asRecord(p.user);
+
+      const username = String(
+        seller?.username || p.sellerUsername || p.username || seller?.name || ""
+      ).trim();
+      const rawAvatar = String(
+        seller?.image || seller?.img || seller?.avatar || p.sellerAvatar || p.avatar || ""
+      );
+      const avatar = isValidAvatarUrl(rawAvatar) ? rawAvatar.trim() : "";
+
+      if (!seller && !username && !avatar) return null;
+
+      return {
+        id: String(seller?._id || seller?.id || p._id || p.id || `applicant-${idx}`),
+        username,
+        avatar,
+      };
+    })
+    .filter((item): item is ProposalApplicant => item !== null);
+};
+
+const ProposalApplicantAvatar = ({ applicant }: { applicant: ProposalApplicant }) => {
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+
+  const showImage = Boolean(applicant.avatar) && failedSrc !== applicant.avatar;
+  const initial = getUsernameInitial(applicant.username);
+  const label = applicant.username ? `@${applicant.username}` : undefined;
+
+  if (showImage) {
+    return (
+      <Image
+        src={applicant.avatar}
+        alt={applicant.username || "Applicant"}
+        width={28}
+        height={28}
+        unoptimized
+        title={label}
+        onError={() => setFailedSrc(applicant.avatar)}
+        className="w-7 h-7 rounded-full border-2 border-white object-cover shadow-2xs bg-white shrink-0"
+      />
+    );
+  }
+
+  return (
+    <div
+      title={label}
+      aria-label={applicant.username || "Applicant"}
+      className="w-7 h-7 rounded-full bg-teal-50 border-2 border-white text-[11px] font-bold text-teal-800 flex items-center justify-center shadow-2xs uppercase shrink-0 select-none"
+    >
+      {initial}
+    </div>
+  );
+};
 
 const BRIEF_SORT_OPTIONS: CustomSelectOption[] = [
   { value: "newest", label: "Sort: Newest" },
@@ -168,7 +239,59 @@ const MyBriefs = () => {
     },
   });
 
-  const briefsArray = Array.isArray(briefs) ? briefs : [];
+  const briefsArray = useMemo(() => (Array.isArray(briefs) ? briefs : []), [briefs]);
+
+  // Fetch real proposal applicants on demand for briefs with proposalCount > 0 when inline proposals aren't populated
+  const proposalQueries = useQueries({
+    queries: briefsArray.map((rawBrief: unknown) => {
+      const b = asRecord(rawBrief) || {};
+      const briefId = String(b?._id || b?.id || "");
+      const pCount =
+        b?.proposalCount ??
+        asRecord(b._count)?.proposals ??
+        b?.proposalsCount ??
+        (Array.isArray(b?.proposals) ? b.proposals.length : 0);
+      const hasInlineApplicants = extractProposalApplicants(b?.proposals).length > 0;
+
+      return {
+        queryKey: ["brief-proposals", briefId],
+        queryFn: () =>
+          axiosFetch
+            .get(`/briefs/${briefId}/proposals`)
+            .then(({ data }) => {
+              if (Array.isArray(data)) return data;
+              if (Array.isArray(data?.proposals)) return data.proposals;
+              if (Array.isArray(data?.data)) return data.data;
+              return [];
+            })
+            .catch(() => []),
+        enabled: Boolean(briefId && Number(pCount) > 0 && !hasInlineApplicants),
+        staleTime: 60_000,
+      };
+    }),
+  });
+
+  const proposalsByBriefId = useMemo(() => {
+    const map = new Map<string, { applicants: ProposalApplicant[]; isLoading: boolean }>();
+    briefsArray.forEach((rawBrief: unknown, idx: number) => {
+      const b = asRecord(rawBrief) || {};
+      const briefId = String(b?._id || b?.id || "");
+      if (!briefId) return;
+
+      const inlineApplicants = extractProposalApplicants(b?.proposals);
+      if (inlineApplicants.length > 0) {
+        map.set(briefId, { applicants: inlineApplicants, isLoading: false });
+        return;
+      }
+
+      const q = proposalQueries[idx];
+      map.set(briefId, {
+        applicants: extractProposalApplicants(q?.data),
+        isLoading: Boolean(q?.isLoading),
+      });
+    });
+    return map;
+  }, [briefsArray, proposalQueries]);
 
   // Count stats for filter pills
   const counts = useMemo(() => {
@@ -502,12 +625,20 @@ const MyBriefs = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filtered.map((brief: any, index: number) => {
+              const briefId = String(brief._id || brief.id || "");
               const isClosed = brief.isClosed || brief.status === "closed";
               const isNew = isProjectNew(brief);
-              const proposalCount =
+              const proposalInfo = briefId ? proposalsByBriefId.get(briefId) : undefined;
+              const applicants =
+                proposalInfo?.applicants || extractProposalApplicants(brief.proposals);
+              const isProposalsLoading = Boolean(proposalInfo?.isLoading);
+              const proposalCount = Math.max(
                 brief.proposalCount ??
-                brief.proposalsCount ??
-                (Array.isArray(brief.proposals) ? brief.proposals.length : 0);
+                  brief._count?.proposals ??
+                  brief.proposalsCount ??
+                  (Array.isArray(brief.proposals) ? brief.proposals.length : 0),
+                applicants.length
+              );
               const tags = getBriefTags(brief);
               const workType = getWorkType(brief, index);
               const rateBadge = getRateBadge(brief);
@@ -711,17 +842,30 @@ const MyBriefs = () => {
                       {proposalCount > 0 ? (
                         <>
                           <div className="flex items-center -space-x-2 mr-2.5">
-                            {DEFAULT_AVATARS.slice(0, Math.min(3, proposalCount)).map((imgSrc, aIdx) => (
-                              <img
-                                key={aIdx}
-                                src={imgSrc}
-                                alt="Applicant"
-                                className="w-7 h-7 rounded-full border-2 border-white object-cover shadow-2xs"
-                              />
-                            ))}
-                            <div className="w-7 h-7 rounded-full bg-slate-100 border-2 border-white text-[10px] font-bold text-slate-700 flex items-center justify-center shadow-2xs">
-                              {proposalCount > 3 ? `${proposalCount - 2}+` : `${proposalCount}+`}
-                            </div>
+                            {applicants.length > 0 ? (
+                              applicants.slice(0, 3).map((applicant) => (
+                                <ProposalApplicantAvatar
+                                  key={applicant.id}
+                                  applicant={applicant}
+                                />
+                              ))
+                            ) : isProposalsLoading ? (
+                              Array.from({ length: Math.min(3, proposalCount) }).map((_, sIdx) => (
+                                <div
+                                  key={sIdx}
+                                  className="w-7 h-7 rounded-full bg-slate-100 border-2 border-white shadow-2xs animate-pulse shrink-0"
+                                />
+                              ))
+                            ) : (
+                              <div className="w-7 h-7 rounded-full bg-[#E6F4F2] border-2 border-white text-[10px] font-bold text-teal-800 flex items-center justify-center shadow-2xs shrink-0">
+                                {proposalCount}
+                              </div>
+                            )}
+                            {proposalCount > 3 && (
+                              <div className="w-7 h-7 rounded-full bg-slate-100 border-2 border-white text-[10px] font-bold text-slate-700 flex items-center justify-center shadow-2xs shrink-0">
+                                {proposalCount - 3}+
+                              </div>
+                            )}
                           </div>
                           <span className="text-xs font-semibold text-slate-800">
                             {proposalCount} {proposalCount === 1 ? "proposal" : "proposals"}

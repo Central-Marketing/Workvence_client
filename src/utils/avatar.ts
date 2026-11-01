@@ -1,3 +1,19 @@
+export const isValidAvatarUrl = (imageUrl?: string | null): imageUrl is string => {
+  if (!imageUrl) return false;
+  const trimmed = imageUrl.trim();
+  return Boolean(
+    trimmed &&
+      trimmed !== '/media/noavatar.png' &&
+      trimmed !== 'noavatar.png' &&
+      !trimmed.includes('noavatar')
+  );
+};
+
+export const getUsernameInitial = (username?: string | null, fallback = 'U'): string => {
+  const cleaned = (username || '').replace(/^@+/, '').trim();
+  return cleaned ? cleaned.charAt(0).toUpperCase() : fallback;
+};
+
 /**
  * Generates an actual image URL using ui-avatars.com API for users without custom uploaded profile photos.
  * Example: https://ui-avatars.com/api/?name=Alex+Dev&background=0D9488&color=fff&bold=true
@@ -7,13 +23,8 @@ export const getAvatarUrl = (
   name?: string | null,
   options?: { size?: number; background?: string; color?: string }
 ): string => {
-  if (
-    imageUrl &&
-    imageUrl !== '/media/noavatar.png' &&
-    imageUrl !== 'noavatar.png' &&
-    !imageUrl.includes('noavatar')
-  ) {
-    return imageUrl;
+  if (isValidAvatarUrl(imageUrl)) {
+    return imageUrl.trim();
   }
 
   const cleanName = encodeURIComponent((name || 'User').trim());

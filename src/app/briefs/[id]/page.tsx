@@ -29,7 +29,7 @@ import {
 } from "react-icons/fi";
 import { HiSparkles } from "react-icons/hi2";
 
-import { axiosFetch } from "@/utils";
+import { axiosFetch, isValidAvatarUrl, getUsernameInitial } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { SubmitProposalModal, AuthModal } from "@/components";
 import { Button, Breadcrumb, BriefDetailSkeleton, ConfirmModal, AiGradientButton, PageHeader } from "@/components/ui";
@@ -54,11 +54,25 @@ function formatCategoryName(cat?: string): string {
 }
 
 const normalizeProposal = (p: any, idx: number) => {
-  const seller = p?.seller || {};
+  const seller =
+    (typeof p?.seller === "object" && p.seller) ||
+    (typeof p?.sellerID === "object" && p.sellerID) ||
+    (typeof p?.sellerId === "object" && p.sellerId) ||
+    (typeof p?.user === "object" && p.user) ||
+    {};
   const id = p?.id || p?._id || `prop-${idx}`;
-  const sellerId = seller?.id || seller?._id || p?.sellerID || "";
-  const username = seller?.username || "freelancer";
-  const avatar = seller?.image || "";
+  const sellerId =
+    seller?.id ||
+    seller?._id ||
+    (typeof p?.sellerID === "string" ? p.sellerID : "") ||
+    (typeof p?.sellerId === "string" ? p.sellerId : "") ||
+    "";
+  const username = String(
+    seller?.username || p?.sellerUsername || p?.username || seller?.name || "freelancer"
+  ).trim();
+  const rawAvatar =
+    seller?.image || seller?.img || seller?.avatar || p?.sellerAvatar || p?.avatar || "";
+  const avatar = isValidAvatarUrl(rawAvatar) ? rawAvatar.trim() : "";
   const country = seller?.country || "";
   const badge = seller?.sellerLevel || "";
   const rating = typeof seller?.starRating === "number" ? seller.starRating : null;
@@ -89,6 +103,42 @@ const normalizeProposal = (p: any, idx: number) => {
     createdAt,
     skills,
   };
+};
+
+const ProposalSellerAvatar = ({
+  avatar,
+  username,
+  size = 44,
+  imgClassName,
+  fallbackClassName,
+}: {
+  avatar?: string;
+  username?: string;
+  size?: number;
+  imgClassName: string;
+  fallbackClassName: string;
+}) => {
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+
+  if (avatar && failedSrc !== avatar) {
+    return (
+      <Image
+        src={avatar}
+        alt={username || "Freelancer"}
+        width={size}
+        height={size}
+        unoptimized
+        className={imgClassName}
+        onError={() => setFailedSrc(avatar)}
+      />
+    );
+  }
+
+  return (
+    <div className={fallbackClassName}>
+      {getUsernameInitial(username)}
+    </div>
+  );
 };
 
 const BriefDetail = () => {
@@ -754,26 +804,16 @@ const BriefDetail = () => {
               >
                 {/* Real Seller Avatars Stack */}
                 <div className="flex items-center -space-x-2">
-                  {normalizedProposals.slice(0, 3).map((item, aIdx) =>
-                    item.avatar ? (
-                      <img
-                        key={aIdx}
-                        src={item.avatar}
-                        alt={item.username}
-                        className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-2xs group-hover:scale-105 transition-transform"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLElement).style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      <div
-                        key={aIdx}
-                        className="w-8 h-8 rounded-full bg-teal-50 border-2 border-white text-[11px] font-bold text-teal-800 flex items-center justify-center shadow-2xs uppercase group-hover:scale-105 transition-transform"
-                      >
-                        {item.username.slice(0, 2)}
-                      </div>
-                    )
-                  )}
+                  {normalizedProposals.slice(0, 3).map((item, aIdx) => (
+                    <ProposalSellerAvatar
+                      key={item.id || aIdx}
+                      avatar={item.avatar}
+                      username={item.username}
+                      size={32}
+                      imgClassName="w-8 h-8 rounded-full border-2 border-white object-cover shadow-2xs bg-white group-hover:scale-105 transition-transform shrink-0"
+                      fallbackClassName="w-8 h-8 rounded-full bg-teal-50 border-2 border-white text-[11px] font-bold text-teal-800 flex items-center justify-center shadow-2xs uppercase group-hover:scale-105 transition-transform shrink-0 select-none"
+                    />
+                  ))}
                   {totalProposalsCount > 3 ? (
                     <div className="w-8 h-8 rounded-full bg-[#E6F4F2] border-2 border-white text-[11px] font-bold text-slate-700 flex items-center justify-center shadow-2xs">
                       {totalProposalsCount - 3}+
@@ -811,26 +851,16 @@ const BriefDetail = () => {
               <div className="flex items-center gap-3">
                 {/* Real Seller Avatars Stack */}
                 <div className="flex items-center -space-x-2">
-                  {normalizedProposals.slice(0, 3).map((item, aIdx) =>
-                    item.avatar ? (
-                      <img
-                        key={aIdx}
-                        src={item.avatar}
-                        alt={item.username}
-                        className="w-8 h-8 rounded-full border-2 border-white object-cover shadow-2xs"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLElement).style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      <div
-                        key={aIdx}
-                        className="w-8 h-8 rounded-full bg-teal-50 border-2 border-white text-[11px] font-bold text-teal-800 flex items-center justify-center shadow-2xs uppercase"
-                      >
-                        {item.username.slice(0, 2)}
-                      </div>
-                    )
-                  )}
+                  {normalizedProposals.slice(0, 3).map((item, aIdx) => (
+                    <ProposalSellerAvatar
+                      key={item.id || aIdx}
+                      avatar={item.avatar}
+                      username={item.username}
+                      size={32}
+                      imgClassName="w-8 h-8 rounded-full border-2 border-white object-cover shadow-2xs bg-white shrink-0"
+                      fallbackClassName="w-8 h-8 rounded-full bg-teal-50 border-2 border-white text-[11px] font-bold text-teal-800 flex items-center justify-center shadow-2xs uppercase shrink-0 select-none"
+                    />
+                  ))}
                   {totalProposalsCount > 3 ? (
                     <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white text-[11px] font-bold text-slate-700 flex items-center justify-center shadow-2xs">
                       {totalProposalsCount}+
@@ -1190,20 +1220,12 @@ const BriefDetail = () => {
                               onClick={(e) => e.stopPropagation()}
                               className="shrink-0 hover:opacity-90 transition-opacity"
                             >
-                              {item.avatar ? (
-                                <img
-                                  src={item.avatar}
-                                  alt={item.username}
-                                  className="w-11 h-11 rounded-full object-cover border border-slate-200"
-                                  onError={(e) => {
-                                    (e.currentTarget as HTMLElement).style.display = "none";
-                                  }}
-                                />
-                              ) : (
-                                <div className="w-11 h-11 rounded-full bg-teal-50 text-teal-800 font-bold text-sm flex items-center justify-center border border-teal-200 uppercase">
-                                  {item.username.slice(0, 2)}
-                                </div>
-                              )}
+                              <ProposalSellerAvatar
+                                avatar={item.avatar}
+                                username={item.username}
+                                imgClassName="w-11 h-11 rounded-full object-cover border border-slate-200 bg-white"
+                                fallbackClassName="w-11 h-11 rounded-full bg-teal-50 text-teal-800 font-bold text-sm flex items-center justify-center border border-teal-200 uppercase select-none"
+                              />
                             </Link>
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
@@ -1412,20 +1434,12 @@ const BriefDetail = () => {
                                   onClick={(e) => e.stopPropagation()}
                                   className="shrink-0 hover:opacity-90 transition-opacity"
                                 >
-                                  {displayItem.avatar ? (
-                                    <img
-                                      src={displayItem.avatar}
-                                      alt={displayItem.username}
-                                      className="w-11 h-11 rounded-full object-cover border border-slate-200"
-                                      onError={(e) => {
-                                        (e.currentTarget as HTMLElement).style.display = "none";
-                                      }}
-                                    />
-                                  ) : (
-                                    <div className="w-11 h-11 rounded-full bg-[#0D6D5F]/10 text-[#0D6D5F] font-bold text-sm flex items-center justify-center border border-[#0D6D5F]/20 uppercase">
-                                      {displayItem.username.slice(0, 2)}
-                                    </div>
-                                  )}
+                                  <ProposalSellerAvatar
+                                    avatar={displayItem.avatar}
+                                    username={displayItem.username}
+                                    imgClassName="w-11 h-11 rounded-full object-cover border border-slate-200 bg-white"
+                                    fallbackClassName="w-11 h-11 rounded-full bg-[#0D6D5F]/10 text-[#0D6D5F] font-bold text-sm flex items-center justify-center border border-[#0D6D5F]/20 uppercase select-none"
+                                  />
                                 </Link>
                                 <div className="min-w-0">
                                   <div className="flex items-center gap-2">
@@ -1598,20 +1612,13 @@ const BriefDetail = () => {
                       onClick={(e) => e.stopPropagation()}
                       className="shrink-0 hover:opacity-90 transition-opacity"
                     >
-                      {detailedProposal.avatar ? (
-                        <img
-                          src={detailedProposal.avatar}
-                          alt={detailedProposal.username}
-                          className="w-14 h-14 rounded-full object-cover border border-slate-200"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLElement).style.display = "none";
-                          }}
-                        />
-                      ) : (
-                        <div className="w-14 h-14 rounded-full bg-teal-50 text-teal-800 font-bold text-base flex items-center justify-center border border-teal-200 uppercase">
-                          {detailedProposal.username.slice(0, 2)}
-                        </div>
-                      )}
+                      <ProposalSellerAvatar
+                        avatar={detailedProposal.avatar}
+                        username={detailedProposal.username}
+                        size={56}
+                        imgClassName="w-14 h-14 rounded-full object-cover border border-slate-200 bg-white"
+                        fallbackClassName="w-14 h-14 rounded-full bg-teal-50 text-teal-800 font-bold text-base flex items-center justify-center border border-teal-200 uppercase select-none"
+                      />
                     </Link>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">

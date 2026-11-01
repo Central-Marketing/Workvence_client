@@ -42,7 +42,47 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/brief',
-        destination: '/briefs',
+        destination: '/projects',
+        permanent: true,
+      },
+      {
+        source: '/project',
+        destination: '/projects',
+        permanent: true,
+      },
+      {
+        source: '/briefs',
+        destination: '/projects',
+        permanent: true,
+      },
+      {
+        source: '/briefs/create',
+        destination: '/projects/create',
+        permanent: true,
+      },
+      {
+        source: '/briefs/my-briefs',
+        destination: '/projects/my-projects',
+        permanent: true,
+      },
+      {
+        source: '/projects/my-briefs',
+        destination: '/projects/my-projects',
+        permanent: true,
+      },
+      {
+        source: '/briefs/my-proposals',
+        destination: '/projects/my-proposals',
+        permanent: true,
+      },
+      {
+        source: '/briefs/:id',
+        destination: '/projects/:id',
+        permanent: true,
+      },
+      {
+        source: '/project/:id',
+        destination: '/projects/:id',
         permanent: true,
       },
     ];

@@ -284,22 +284,22 @@ test.describe.serial('Workvence Production-Grade Dual-Role E2E Master Suite', ()
   });
 
   // ===========================================================================
-  // PHASE 6: BUYER PROJECT BRIEF CREATION (/briefs/create)
+  // PHASE 6: BUYER PROJECT BRIEF CREATION (/projects/create)
   // ===========================================================================
-  test('Phase 6: Buyer Creates and Publishes Project Brief (/briefs/create)', async ({
+  test('Phase 6: Buyer Creates and Publishes Project Brief (/projects/create)', async ({
     buyerPage,
     auditPage,
   }) => {
     test.setTimeout(90000);
 
-    await buyerPage.goto('/briefs/create', { waitUntil: 'domcontentloaded' });
+    await buyerPage.goto('/projects/create', { waitUntil: 'domcontentloaded' });
     if (buyerPage.url().includes('/login')) {
       await loginBuyer(buyerPage);
-      await buyerPage.goto('/briefs/create', { waitUntil: 'domcontentloaded' });
+      await buyerPage.goto('/projects/create', { waitUntil: 'domcontentloaded' });
     }
     await auditPage(buyerPage, 'Create Project Brief');
 
-    // 1. Test "Create with AI" Auto-Fill on /briefs/create
+    // 1. Test "Create with AI" Auto-Fill on /projects/create
     const aiBtn = buyerPage.locator('button:has-text("Create with AI")').first();
     if (await aiBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
       const [aiRes] = await Promise.all([
@@ -374,17 +374,17 @@ test.describe.serial('Workvence Production-Grade Dual-Role E2E Master Suite', ()
       await buyerPage.waitForTimeout(3000);
     }
 
-    // Confirm listed on /briefs/my-briefs
-    await buyerPage.goto('/briefs/my-briefs', { waitUntil: 'domcontentloaded' });
+    // Confirm listed on /projects/my-projects
+    await buyerPage.goto('/projects/my-projects', { waitUntil: 'domcontentloaded' });
     await auditPage(buyerPage, 'My Briefs Dashboard');
 
     const firstBriefCard = buyerPage.locator('.grid > div').first();
     if (await firstBriefCard.isVisible({ timeout: 10000 }).catch(() => false)) {
       if (!createdBriefId) {
         await firstBriefCard.click();
-        await buyerPage.waitForURL((url) => url.pathname.includes('/briefs/'), { timeout: 15000 }).catch(() => {});
-        if (buyerPage.url().includes('/briefs/')) {
-          createdBriefId = buyerPage.url().split('/briefs/')[1]?.split('?')[0]?.split('/')[0] || null;
+        await buyerPage.waitForURL((url) => url.pathname.includes('/projects/'), { timeout: 15000 }).catch(() => {});
+        if (buyerPage.url().includes('/projects/')) {
+          createdBriefId = buyerPage.url().split('/projects/')[1]?.split('?')[0]?.split('/')[0] || null;
         }
       }
     }
@@ -404,10 +404,10 @@ test.describe.serial('Workvence Production-Grade Dual-Role E2E Master Suite', ()
     test.setTimeout(90000);
 
     // Seller searches for brief
-    await sellerPage.goto('/briefs', { waitUntil: 'domcontentloaded' });
+    await sellerPage.goto('/projects', { waitUntil: 'domcontentloaded' });
     if (sellerPage.url().includes('/login')) {
       await loginSeller(sellerPage);
-      await sellerPage.goto('/briefs', { waitUntil: 'domcontentloaded' });
+      await sellerPage.goto('/projects', { waitUntil: 'domcontentloaded' });
     }
     await auditPage(sellerPage, 'Browse Briefs Catalog');
 
@@ -416,7 +416,7 @@ test.describe.serial('Workvence Production-Grade Dual-Role E2E Master Suite', ()
       test.skip(true, 'Skipping proposal submission because createdBriefId is unknown');
       return;
     }
-    await sellerPage.goto(`/briefs/${createdBriefId}`, { waitUntil: 'domcontentloaded' });
+    await sellerPage.goto(`/projects/${createdBriefId}`, { waitUntil: 'domcontentloaded' });
 
     await auditPage(sellerPage, 'Brief Detail Page');
 
@@ -448,12 +448,12 @@ test.describe.serial('Workvence Production-Grade Dual-Role E2E Master Suite', ()
       }
     }
 
-    // Buyer checks proposals on /briefs/[id]
+    // Buyer checks proposals on /projects/[id]
     if (createdBriefId) {
-      await buyerPage.goto(`/briefs/${createdBriefId}`, { waitUntil: 'domcontentloaded' });
+      await buyerPage.goto(`/projects/${createdBriefId}`, { waitUntil: 'domcontentloaded' });
       if (buyerPage.url().includes('/login')) {
         await loginBuyer(buyerPage);
-        await buyerPage.goto(`/briefs/${createdBriefId}`, { waitUntil: 'domcontentloaded' });
+        await buyerPage.goto(`/projects/${createdBriefId}`, { waitUntil: 'domcontentloaded' });
       }
       await auditPage(buyerPage, 'Buyer Brief Proposals View');
 

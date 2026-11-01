@@ -5,7 +5,7 @@ import React, { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/userStore";
-import { axiosFetch, socket } from "@/utils";
+import { axiosFetch, socket, normalizeNotificationLink } from "@/utils";
 import { Breadcrumb, PageHeader } from "@/components/ui";
 import { toast } from "@/utils/toast";
 import moment from "moment";
@@ -150,13 +150,13 @@ const NotificationsPage = () => {
     }
 
     if (n.link) {
-      router.push(n.link);
+      router.push(normalizeNotificationLink(n.link));
     } else if (n.orderID) {
       router.push(`/orders/${n.orderID}`);
     } else if (n.briefID) {
-      router.push(`/briefs/${n.briefID}`);
+      router.push(`/projects/${n.briefID}`);
     } else if (n.proposalID) {
-      router.push("/briefs/my-proposals");
+      router.push("/projects/my-proposals");
     }
   };
 

@@ -448,7 +448,7 @@ const MyBriefs = () => {
           actions={
             !user?.isSeller ? (
               <AiGradientButton
-                href="/briefs/create?ai=true"
+                href="/projects/create?ai=true"
                 text="Post a Project with AI"
                 icon={
                   <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
@@ -601,7 +601,7 @@ const MyBriefs = () => {
             </p>
             {filter === "all" && !searchQuery && !user?.isSeller ? (
               <Link
-                href="/briefs/create"
+                href="/projects/create"
                 className="px-5 py-2.5 rounded-[6px] font-semibold text-xs sm:text-sm bg-[#0B0F19] hover:bg-black text-white transition-colors cursor-pointer shadow-xs"
               >
                 Post Your First Project
@@ -647,7 +647,7 @@ const MyBriefs = () => {
               return (
                 <div
                   key={brief._id}
-                  onClick={() => router.push(`/briefs/${brief._id}`)}
+                  onClick={() => router.push(`/projects/${brief._id}`)}
                   className={`relative bg-white rounded-[6px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-5 sm:p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer ${isMenuOpen ? "z-30 overflow-visible" : "overflow-hidden"
                     }`}
                 >
@@ -946,7 +946,7 @@ const MyProposals = () => {
             </p>
           </div>
           <Link
-            href="/briefs"
+            href="/projects"
             className="inline-flex items-center justify-center gap-2 px-4.5 py-2.5 rounded-[6px] bg-[#0B0F19] hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs shrink-0 self-start sm:self-center"
           >
             <span>Browse Open Projects</span>
@@ -966,7 +966,7 @@ const MyProposals = () => {
               You haven&apos;t submitted any proposals yet. Browse open client projects and start pitching!
             </p>
             <Link
-              href="/briefs"
+              href="/projects"
               className="px-5 py-2.5 rounded-[6px] font-semibold text-xs sm:text-sm bg-[#0B0F19] hover:bg-black text-white transition-colors cursor-pointer shadow-xs"
             >
               Browse Open Projects
@@ -981,7 +981,7 @@ const MyProposals = () => {
               return (
                 <div
                   key={proposal._id}
-                  onClick={() => router.push(`/briefs/${briefId}`)}
+                  onClick={() => router.push(`/projects/${briefId}`)}
                   className="relative overflow-hidden bg-white rounded-[6px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer"
                 >
                   {/* Ambient Purple Glow (appears on card hover) */}
@@ -1076,7 +1076,7 @@ export default function MyBriefsPage() {
 
   useEffect(() => {
     if (user?.isSeller) {
-      router.replace("/briefs/my-proposals");
+      router.replace("/projects/my-proposals");
     }
   }, [user?.isSeller, router]);
 

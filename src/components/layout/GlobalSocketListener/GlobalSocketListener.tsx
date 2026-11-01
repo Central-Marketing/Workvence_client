@@ -7,7 +7,7 @@ import { toast } from "@/utils/toast";
 import { socket } from "@/utils";
 import { useUserStore } from "@/store/userStore";
 import { playNotificationSound } from "@/utils/soundUtil";
-import { getNotificationDescription, getNotificationPresentation } from "@/utils/notificationToast";
+import { getNotificationDescription, getNotificationPresentation, normalizeNotificationLink } from "@/utils/notificationToast";
 import { isTargetConversation } from "@/utils/chatHelpers";
 
 const processedNotifIds = new Set<string>();
@@ -449,7 +449,7 @@ export default function GlobalSocketListener() {
       }
 
       // Domain-specific query invalidations based on backend notification payload
-      if (newNotif.briefID || newNotif.briefId || newNotif.proposalID || newNotif.proposalId || newNotif.link?.includes("/brief")) {
+      if (newNotif.briefID || newNotif.briefId || newNotif.proposalID || newNotif.proposalId || newNotif.link?.includes("/brief") || newNotif.link?.includes("/project")) {
         queryClient.invalidateQueries({ queryKey: ["briefs"] });
         queryClient.invalidateQueries({ queryKey: ["my-briefs"] });
         queryClient.invalidateQueries({ queryKey: ["brief-proposals"] });
@@ -526,15 +526,15 @@ export default function GlobalSocketListener() {
 
       const handleOpenNotification = () => {
         if (newNotif.link) {
-          router.push(newNotif.link);
+          router.push(normalizeNotificationLink(newNotif.link));
         } else if (targetOrderId) {
           router.push(`/orders/${targetOrderId}`);
         } else if (targetTicketId) {
           router.push(`/support/${targetTicketId}`);
         } else if (targetBriefId) {
-          router.push(`/briefs/${targetBriefId}`);
+          router.push(`/projects/${targetBriefId}`);
         } else if (targetProposalId) {
-          router.push("/briefs/my-proposals");
+          router.push("/projects/my-proposals");
         }
       };
 

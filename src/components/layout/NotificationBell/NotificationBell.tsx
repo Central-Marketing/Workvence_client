@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { axiosFetch } from "@/utils";
+import { axiosFetch, normalizeNotificationLink } from "@/utils";
 import { socket } from "@/utils/socket";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useUserStore } from "@/store/userStore";
@@ -150,13 +150,13 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ currentUser, trigge
 
     // Navigate if there's a link
     if (n.link) {
-      router.push(n.link);
+      router.push(normalizeNotificationLink(n.link));
     } else if (n.orderID) {
       router.push(`/orders/${n.orderID}`);
     } else if (n.briefID) {
-      router.push(`/briefs/${n.briefID}`);
+      router.push(`/projects/${n.briefID}`);
     } else if (n.proposalID) {
-      router.push("/briefs/my-proposals");
+      router.push("/projects/my-proposals");
     }
 
     if (n.isRead) return;

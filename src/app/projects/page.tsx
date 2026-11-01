@@ -170,14 +170,14 @@ function BriefsContent() {
     return () => window.removeEventListener("resize", checkViewport);
   }, []);
 
-  // Redirect logged-in sellers from /briefs to /briefs?view=feed
+  // Redirect logged-in sellers from /projects to /projects?view=feed
   useEffect(() => {
     if (isSeller) {
       const currentView = searchParams?.get("view");
       if (currentView !== "feed") {
         const params = new URLSearchParams(searchParams ? searchParams.toString() : "");
         params.set("view", "feed");
-        router.replace(`/briefs?${params.toString()}`, { scroll: false });
+        router.replace(`/projects?${params.toString()}`, { scroll: false });
       }
       if (viewMode !== "feed") {
         setViewMode("feed");
@@ -220,7 +220,7 @@ function BriefsContent() {
     if (isSeller || qView === "feed") params.set("view", "feed");
 
     const qs = params.toString();
-    const targetUrl = qs ? `/briefs?${qs}` : (isSeller ? "/briefs?view=feed" : "/briefs");
+    const targetUrl = qs ? `/projects?${qs}` : (isSeller ? "/projects?view=feed" : "/projects");
     router.push(targetUrl, { scroll: false });
   };
 
@@ -451,11 +451,11 @@ function BriefsContent() {
 
   const handleBackToCategories = () => {
     if (isSeller) {
-      router.push("/briefs?view=feed", { scroll: false });
+      router.push("/projects?view=feed", { scroll: false });
       setViewMode("feed");
       return;
     }
-    router.push("/briefs", { scroll: false });
+    router.push("/projects", { scroll: false });
     setViewMode("categories");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -664,7 +664,7 @@ function BriefsContent() {
 
                 {user && !user.isSeller && (
                   <Link
-                    href="/briefs/create"
+                    href="/projects/create"
                     className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-[6px] bg-[#327C73] hover:bg-[#256059] text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors shrink-0"
                   >
                     + Post a Project
@@ -939,7 +939,7 @@ function BriefsContent() {
                         return (
                           <div
                             key={briefId}
-                            onClick={() => router.push(`/briefs/${briefId}`)}
+                            onClick={() => router.push(`/projects/${briefId}`)}
                             className="relative overflow-hidden bg-white rounded-[6px] border border-gray-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] p-6 sm:p-7 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer group select-none"
                           >
                             {/* Ambient Purple Glow (appears on card hover) */}

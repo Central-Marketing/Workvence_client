@@ -252,7 +252,7 @@ export default function BuyerOrdersPage() {
                 Your freelancer is actively working on your project. High-quality delivery takes time.
               </p>
               <Link
-                href={`/briefs/${activeBrief._id}`}
+                href={`/projects/${activeBrief._id}`}
                 className="inline-flex items-center gap-1.5 text-sm font-medium text-white hover:underline mt-4 group"
               >
                 <span>See the current project</span>

@@ -9,11 +9,11 @@ test.describe('Module 05: Project Briefs & Freelancer Proposals (BRF-001 to BRF-
     // BRF-003: Permanent redirect
     await page.goto('/brief', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
-    expect(page.url()).toContain('/briefs');
-    console.log('   ✅ BRF-003 Passed: /brief permanently redirects to /briefs.');
+    expect(page.url()).toContain('/projects');
+    console.log('   ✅ BRF-003 Passed: /brief permanently redirects to /projects.');
 
     // BRF-001 & BRF-002: Catalog & Filters
-    await page.goto('/briefs', { waitUntil: 'domcontentloaded' });
+    await page.goto('/projects', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
     const filterBtn = page.locator('button:has-text("Budget"), select, input[placeholder*="budget" i]').first();
     if ((await filterBtn.count()) > 0) {
@@ -30,19 +30,19 @@ test.describe('Module 05: Project Briefs & Freelancer Proposals (BRF-001 to BRF-
     const guestContext = await page.context().browser()!.newContext();
     const guestPage = await guestContext.newPage();
     try {
-      await guestPage.goto('/briefs/create', { waitUntil: 'domcontentloaded' });
+      await guestPage.goto('/projects/create', { waitUntil: 'domcontentloaded' });
       await guestPage.waitForTimeout(2000);
       const isRedirected = guestPage.url().includes('/login') || guestPage.url().includes('redirect');
       const form = guestPage.locator('form[data-testid="brief-create-form"], input[name="title"]');
       const hasForm = (await form.count()) > 0 && (await form.first().isVisible());
       expect(isRedirected || !hasForm).toBe(true);
-      console.log('   ✅ BRF-008 Passed: Guest redirected or denied from /briefs/create.');
+      console.log('   ✅ BRF-008 Passed: Guest redirected or denied from /projects/create.');
     } finally {
       await guestContext.close();
     }
 
     // Authenticated creation form checks on main page
-    await page.goto('/briefs/create', { waitUntil: 'domcontentloaded' });
+    await page.goto('/projects/create', { waitUntil: 'domcontentloaded' });
     const titleInput = page.locator('input[placeholder*="project" i], input[name="title"]').first();
     const aiBtn = page.locator('button:has-text("Create with AI"), button:has-text("Generate with AI")').first();
     if ((await aiBtn.count()) > 0) {
@@ -55,13 +55,13 @@ test.describe('Module 05: Project Briefs & Freelancer Proposals (BRF-001 to BRF-
   // BRF-009 to BRF-015: Proposal Submission, Proposals Audit & AI Match
   // ---------------------------------------------------------------------------
   test('BRF-009 to BRF-015: Brief detail, proposal modal, buyer audit screen, and match score', async ({ page }) => {
-    await page.goto('/briefs', { waitUntil: 'domcontentloaded' });
+    await page.goto('/projects', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
 
-    const firstBrief = page.locator('a[href*="/briefs/"]').first();
+    const firstBrief = page.locator('a[href*="/projects/"]').first();
     if ((await firstBrief.count()) > 0) {
       const href = await firstBrief.getAttribute('href');
-      if (href && !href.includes('/create') && !href.includes('/my-briefs')) {
+      if (href && !href.includes('/create') && !href.includes('/my-projects')) {
         await page.goto(href, { waitUntil: 'domcontentloaded' });
         await page.waitForTimeout(2000);
 
@@ -77,7 +77,7 @@ test.describe('Module 05: Project Briefs & Freelancer Proposals (BRF-001 to BRF-
   // ---------------------------------------------------------------------------
   // BRF-016 to BRF-020: My Briefs Dashboard, Cancellation & Seller Proposals
   // ---------------------------------------------------------------------------
-  test('BRF-016 to BRF-020: Buyer /briefs/my-briefs dashboard and Seller /briefs/my-proposals', async ({ page }) => {
+  test('BRF-016 to BRF-020: Buyer /projects/my-projects dashboard and Seller /projects/my-proposals', async ({ page }) => {
     // Authenticate Buyer
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const signInBtn = page.locator('button:has-text("Sign in")').first();
@@ -94,14 +94,14 @@ test.describe('Module 05: Project Briefs & Freelancer Proposals (BRF-001 to BRF-
     }
 
     // BRF-016: Buyer My Briefs
-    const myBriefsRes = await page.goto('/briefs/my-briefs', { waitUntil: 'domcontentloaded' });
+    const myBriefsRes = await page.goto('/projects/my-projects', { waitUntil: 'domcontentloaded' });
     expect(myBriefsRes?.status()).toBeLessThan(400);
     const briefsHeading = page.locator('h1, h2, div:has-text("Briefs")').first();
     await expect(briefsHeading).toBeVisible({ timeout: 10000 });
     console.log('   ✅ BRF-016 Passed: Buyer My Briefs dashboard content accessible.');
 
     // BRF-018: Seller My Proposals
-    const myProposalsRes = await page.goto('/briefs/my-proposals', { waitUntil: 'domcontentloaded' });
+    const myProposalsRes = await page.goto('/projects/my-proposals', { waitUntil: 'domcontentloaded' });
     expect(myProposalsRes?.status()).toBeLessThan(400);
     const proposalsHeading = page.locator('h1, h2, div:has-text("Proposals")').first();
     await expect(proposalsHeading).toBeVisible({ timeout: 10000 });

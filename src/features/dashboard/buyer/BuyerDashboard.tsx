@@ -205,7 +205,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({ user, onSwitchTo
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center justify-center gap-3.5">
               <Button
-                href="/briefs"
+                href="/projects"
                 variant="soft"
                 size="md"
                 radius="fiverr"

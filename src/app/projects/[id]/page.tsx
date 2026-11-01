@@ -408,7 +408,7 @@ const BriefDetail = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-briefs"] });
       toast.success("Project deleted successfully");
-      router.push("/briefs/my-briefs");
+      router.push("/projects/my-projects");
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message || "Failed to delete project");
@@ -532,7 +532,7 @@ const BriefDetail = () => {
           <h3 className="text-xl font-bold text-slate-900 mb-2">Project not found</h3>
           <p className="text-slate-500 mb-6">This project may have been removed or the link is invalid.</p>
           <Link
-            href="/briefs"
+            href="/projects"
             className="px-5 py-2.5 rounded-[6px] bg-black text-white text-sm font-semibold"
           >
             ← Browse All Projects
@@ -573,11 +573,11 @@ const BriefDetail = () => {
             isOwner || (!isSeller && user)
               ? {
                 name: "My Projects",
-                href: "/briefs/my-briefs",
+                href: "/projects/my-projects",
               }
               : {
                 name: "Find Projects",
-                href: "/briefs",
+                href: "/projects",
               },
             {
               name: brief.title || "Project Details",

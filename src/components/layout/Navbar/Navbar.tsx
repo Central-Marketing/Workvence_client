@@ -81,9 +81,9 @@ const Navbar = () => {
   const effectiveUser = isMounted ? user : null;
   const isBuyer = Boolean(effectiveUser && !effectiveUser.isSeller);
   const isSeller = Boolean(effectiveUser?.isSeller);
-  const isBriefsRoute = Boolean(pathname && (pathname === "/briefs" || pathname.startsWith("/briefs/")));
-  const isMyBriefsRoute = Boolean(pathname && (pathname === "/briefs/my-briefs" || pathname.startsWith("/briefs/my-briefs/")));
-  const isCreateBriefRoute = Boolean(pathname && (pathname === "/briefs/create" || pathname.startsWith("/briefs/create/")));
+  const isBriefsRoute = Boolean(pathname && (pathname === "/projects" || pathname.startsWith("/projects/")));
+  const isMyBriefsRoute = Boolean(pathname && (pathname === "/projects/my-projects" || pathname.startsWith("/projects/my-projects/")));
+  const isCreateBriefRoute = Boolean(pathname && (pathname === "/projects/create" || pathname.startsWith("/projects/create/")));
   const hidePostProjectAiButton = isMyBriefsRoute || isCreateBriefRoute;
 
   // Fetch real categories from backend
@@ -243,7 +243,7 @@ const Navbar = () => {
 
     setShowSearchBar(hasCrossedFeatured);
 
-    // Suppress category bar completely for seller on all pages, /briefs routes, or /search route
+    // Suppress category bar completely for seller on all pages, /projects routes, or /search route
     if (user?.isSeller || isBriefsRoute || isSearchRoute) {
       setShowCategoryBar(false);
       return;
@@ -499,7 +499,7 @@ const Navbar = () => {
                   </div>
 
                   <Link
-                    href="/briefs"
+                    href="/projects"
                     className="px-2 xl:px-4 py-[8px] xl:py-[10px] rounded-[6px] font-sf-pro font-[510] text-[14px] xl:text-[16px] leading-normal text-black hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
                   >
                     Projects
@@ -566,7 +566,7 @@ const Navbar = () => {
 
                 {!hidePostProjectAiButton && (
                   <AiGradientButton
-                    href="/briefs/create?ai=true"
+                    href="/projects/create?ai=true"
                     text="Post a Project with AI"
                     icon={
                       <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
@@ -612,7 +612,7 @@ const Navbar = () => {
                       <Link href="/favorites" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                         My Favorites
                       </Link>
-                      <Link href="/briefs/my-briefs" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
+                      <Link href="/projects/my-projects" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                         My Projects
                       </Link>
                       <hr className="my-1 border-gray-100" />
@@ -637,7 +637,7 @@ const Navbar = () => {
                 </Link>
 
                 <Link
-                  href="/briefs?view=feed"
+                  href="/projects?view=feed"
                   className="font-sf-pro font-medium text-[14px] xl:text-[16px] leading-[100%] tracking-[0px] text-[#1E293B] hover:text-[#327C73] transition-colors whitespace-nowrap shrink-0"
                 >
                   Find Project
@@ -687,7 +687,7 @@ const Navbar = () => {
                       <Link href="/manage-orders" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                         Orders
                       </Link>
-                      <Link href="/briefs/my-proposals" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
+                      <Link href="/projects/my-proposals" onClick={() => setIsProfileDropdownOpen(false)} className="px-3.5 py-2 hover:bg-teal-50/70 hover:text-teal-800 transition-colors flex items-center gap-3">
                         My Proposals
                       </Link>
                       <hr className="my-1 border-gray-100" />
@@ -834,7 +834,7 @@ const Navbar = () => {
                 )}
               </div>
 
-              <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
+              <Link href="/projects" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
               <hr className="my-2 border-gray-100" />
               <button
                 type="button"
@@ -882,7 +882,7 @@ const Navbar = () => {
                 <div className="flex flex-col gap-4">
                   <Link href="/dashboard/seller" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname === "/dashboard/seller" ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Dashboard</Link>
                   <Link href="/manage-orders" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/manage-orders") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Manage Orders</Link>
-                  <Link href="/briefs/my-proposals" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/briefs/my-proposals") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>My Proposals</Link>
+                  <Link href="/projects/my-proposals" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/projects/my-proposals") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>My Proposals</Link>
                   <Link href="/my-packages" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/my-packages") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>My Packages</Link>
                   <Link href="/organize" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/organize") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Add New Package</Link>
                   <Link href="/earnings" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/earnings") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Earnings</Link>
@@ -896,7 +896,7 @@ const Navbar = () => {
                   </Link>
                   <Link href="/message" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/message") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Messages</Link>
                   <Link href="/packages?category=ai-services" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Browse Packages</Link>
-                  <Link href="/briefs?view=feed" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
+                  <Link href="/projects?view=feed" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Projects</Link>
                 </div>
               ) : (
                 /* Buyer Navigation Links (UX-Optimized Ordering) */
@@ -905,7 +905,7 @@ const Navbar = () => {
                   {!hidePostProjectAiButton && (
                     <div className="my-0.5">
                       <AiGradientButton
-                        href="/briefs/create?ai=true"
+                        href="/projects/create?ai=true"
                         text="Post a Project with AI"
                         icon={
                           <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
@@ -923,7 +923,7 @@ const Navbar = () => {
                     <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">My Activity</span>
                     <Link href="/dashboard/buyer" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname === "/dashboard/buyer" ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Dashboard</Link>
                     <Link href="/orders" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/orders") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Orders</Link>
-                    <Link href="/briefs/my-briefs" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/briefs/my-briefs") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>My Projects</Link>
+                    <Link href="/projects/my-projects" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/projects/my-projects") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>My Projects</Link>
                     <Link href="/message" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname.startsWith("/message") ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>Messages</Link>
                     <Link href="/favorites" onClick={() => setIsMobileMenuOpen(false)} className={`transition-colors ${pathname === "/favorites" ? "text-brand-green font-bold" : "hover:text-brand-green"}`}>My Favorites</Link>
                   </div>
@@ -967,7 +967,7 @@ const Navbar = () => {
                     </div>
 
                     <Link href="/packages?category=ai-services" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Browse Packages</Link>
-                    <Link href="/briefs" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Explore Projects</Link>
+                    <Link href="/projects" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-brand-green transition-colors">Explore Projects</Link>
                   </div>
                 </div>
               )}

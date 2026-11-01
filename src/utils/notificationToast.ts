@@ -225,3 +225,13 @@ export function getNotificationPresentation(notif?: NotificationToastPayload | n
 export function getNotificationToastType(notif?: NotificationToastPayload | null): NotificationToastType {
   return getNotificationPresentation(notif).variant;
 }
+
+export function normalizeNotificationLink(rawLink: string): string {
+  if (!rawLink || typeof rawLink !== "string") return rawLink;
+  return rawLink
+    .replace(/^\/briefs\/my-briefs(?=\/|\?|$)/, "/projects/my-projects")
+    .replace(/^\/briefs\/my-proposals(?=\/|\?|$)/, "/projects/my-proposals")
+    .replace(/^\/briefs\/create(?=\/|\?|$)/, "/projects/create")
+    .replace(/^\/briefs(?=\/|\?|$)/, "/projects")
+    .replace(/^\/brief(?=\/|\?|$)/, "/projects");
+}

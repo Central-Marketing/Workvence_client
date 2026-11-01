@@ -45,7 +45,7 @@ export interface CategoryHubDirectoryProps {
   exploreAllHref?: string;
   /** Explore all click handler (alternative to href) */
   onExploreAll?: () => void;
-  /** Subcategory card click handler (e.g. in /briefs for switching feed view) */
+  /** Subcategory card click handler (e.g. in /projects for switching feed view) */
   onSelectSubcategory?: (catSlug: string, subcatSlug: string) => void;
   /** Custom href generator for subcategory cards */
   getSubcategoryHref?: (catSlug: string, subcatSlug: string) => string;
@@ -65,7 +65,7 @@ export const CategoryHubDirectory: React.FC<CategoryHubDirectoryProps> = ({
     ? ""
     : "Popular picks, proven results. Find talent across all services and creative disciplines.",
   exploreAllLabel = mode === "projects" ? "Explore All Projects" : "Explore All Packages",
-  exploreAllHref = mode === "projects" ? "/briefs?view=feed" : "/packages?view=gigs",
+  exploreAllHref = mode === "projects" ? "/projects?view=feed" : "/packages?view=gigs",
   onExploreAll,
   onSelectSubcategory,
   getSubcategoryHref,

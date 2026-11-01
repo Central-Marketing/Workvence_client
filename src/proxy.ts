@@ -48,6 +48,9 @@ const GENERAL_PROTECTED_ROUTES = [
   "/favorites",
   "/pay",
   "/organize",
+  "/projects/create",
+  "/projects/my-projects",
+  "/projects/my-proposals",
   "/briefs/create",
   "/briefs/my-briefs",
   "/briefs/my-proposals",
@@ -309,11 +312,12 @@ export async function proxy(req: NextRequest) {
   }
 
   // -------------------------------------------------------------
-  // RULE F: Redirect Logged-In Sellers from /briefs to /briefs?view=feed
+  // RULE F: Redirect Logged-In Sellers from /projects to /projects?view=feed
   // -------------------------------------------------------------
-  if (pathname === "/briefs" && isSeller && !isAdmin) {
+  if ((pathname === "/projects" || pathname === "/briefs") && isSeller && !isAdmin) {
     if (searchParams.get("view") !== "feed") {
       const feedUrl = req.nextUrl.clone();
+      feedUrl.pathname = "/projects";
       feedUrl.searchParams.set("view", "feed");
       return applyRefreshedCookie(NextResponse.redirect(feedUrl));
     }

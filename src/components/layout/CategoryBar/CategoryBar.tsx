@@ -80,7 +80,7 @@ const CategoryBarContent: React.FC<CategoryBarProps> = ({ visible, className = "
   }, [currentCategory, rootCategories, rawCats]);
 
   const isSeller = Boolean(user?.isSeller);
-  const isBriefsRoute = Boolean(pathname && (pathname === "/briefs" || pathname.startsWith("/briefs/")));
+  const isBriefsRoute = Boolean(pathname && (pathname === "/projects" || pathname.startsWith("/projects/")));
 
   // CategoryBar is visible for buyers/guests across pages (except briefs)
   const isBarVisible = visible && !isSeller && !isBriefsRoute;

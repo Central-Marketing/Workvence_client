@@ -428,7 +428,7 @@ const CreateBrief = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
             <Button
-              href="/briefs/my-briefs"
+              href="/projects/my-projects"
               variant="dark"
               size="md"
               radius="fiverr"
@@ -437,7 +437,7 @@ const CreateBrief = () => {
               View My Projects
             </Button>
             <Button
-              href="/briefs"
+              href="/projects"
               variant="soft"
               size="md"
               radius="fiverr"
@@ -459,7 +459,7 @@ const CreateBrief = () => {
           breadcrumbs={[
             {
               name: "Find Projects",
-              href: "/briefs",
+              href: "/projects",
             },
             {
               name: "Post a Job",
@@ -682,7 +682,7 @@ const CreateBrief = () => {
           {/* Form Actions */}
           <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-100">
             <Button
-              href="/briefs"
+              href="/projects"
               variant="soft"
               size="md"
               radius="fiverr"

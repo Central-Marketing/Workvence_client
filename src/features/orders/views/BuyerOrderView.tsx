@@ -1228,7 +1228,7 @@ export const BuyerOrderView: React.FC<BuyerOrderViewProps> = ({ order, refetch }
               <div className="flex flex-col gap-3">
                 <AiGradientButton
                   fullWidth
-                  href="/briefs/create?ai=true"
+                  href="/projects/create?ai=true"
                   height="h-[40px]"
                   text="Post a project with AI"
                   icon={

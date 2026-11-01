@@ -6,7 +6,7 @@
  *   2. Real Seller Account Lifecycle (Disposable Temp-Mail -> Registration API -> OTP Retrieval -> Verify API -> Session Validation)
  *   3. Seller Service Creation (/organize -> /my-packages -> Catalog Listing)
  *   4. Real Buyer Account Lifecycle (Disposable Temp-Mail -> Registration API -> OTP Retrieval -> Verify API -> Session Validation)
- *   5. Buyer Package Inspection & Client Brief Creation (/package/:id -> /briefs/create -> /briefs/my-briefs)
+ *   5. Buyer Package Inspection & Client Brief Creation (/package/:id -> /projects/create -> /projects/my-projects)
  *   6. Cross-User Realtime Interaction (Buyer <-> Seller chat messaging)
  *   7. Seller Earnings, Clearance & Orders Center
  *   8. Buyer Support Portal & Ticket Submission
@@ -397,10 +397,10 @@ async function runWorkvenceE2EJourney() {
       await tracker.failStep(step, err, 'Package inspection failed', buyerPage);
     }
 
-    step = await tracker.startStep('Buyer: Create & Post Client Project Brief (/briefs/create)', '5. Buyer Actions');
+    step = await tracker.startStep('Buyer: Create & Post Client Project Brief (/projects/create)', '5. Buyer Actions');
     try {
-      await buyerPage.goto(`${BASE_URL}/briefs/create`, { waitUntil: 'domcontentloaded', timeout: 25000 });
-      await tracker.recordPagePerformance(buyerPage, 'Create Brief Page', `${BASE_URL}/briefs/create`);
+      await buyerPage.goto(`${BASE_URL}/projects/create`, { waitUntil: 'domcontentloaded', timeout: 25000 });
+      await tracker.recordPagePerformance(buyerPage, 'Create Brief Page', `${BASE_URL}/projects/create`);
       await buyerPage.waitForTimeout(2000);
 
       // Step 1: AI Prompt / Manual Description
@@ -436,12 +436,12 @@ async function runWorkvenceE2EJourney() {
         await buyerPage.waitForTimeout(3000);
       }
 
-      // Verify on /briefs/my-briefs
-      await buyerPage.goto(`${BASE_URL}/briefs/my-briefs`, { waitUntil: 'domcontentloaded', timeout: 20000 });
-      await tracker.recordPagePerformance(buyerPage, 'Buyer My Briefs', `${BASE_URL}/briefs/my-briefs`);
+      // Verify on /projects/my-projects
+      await buyerPage.goto(`${BASE_URL}/projects/my-projects`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+      await tracker.recordPagePerformance(buyerPage, 'Buyer My Briefs', `${BASE_URL}/projects/my-projects`);
       await buyerPage.waitForTimeout(2000);
 
-      await tracker.passStep(step, `Project brief created & verified on /briefs/my-briefs (${createdBriefTitle})`, buyerPage);
+      await tracker.passStep(step, `Project brief created & verified on /projects/my-projects (${createdBriefTitle})`, buyerPage);
     } catch (err) {
       await tracker.failStep(step, err, 'Project brief creation failed', buyerPage);
     }

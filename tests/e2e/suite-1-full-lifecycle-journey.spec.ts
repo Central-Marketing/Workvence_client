@@ -90,13 +90,13 @@ test.describe.serial('Suite 1: Marketplace End-to-End Buyer & Seller Lifecycle &
   });
 
   // ---------------------------------------------------------------------------
-  // STEP 3: Buyer Project Brief Submission (/briefs/create -> /briefs/my-briefs)
+  // STEP 3: Buyer Project Brief Submission (/projects/create -> /projects/my-projects)
   // ---------------------------------------------------------------------------
   test('3. Buyer Project Brief Submission & Management', async ({ buyerPage }) => {
     await loginBuyer(buyerPage);
 
-    console.log('\n--- [Buyer Briefs] 3. Posting Project Brief (/briefs/create) ---');
-    await buyerPage.goto('/briefs/create', { waitUntil: 'domcontentloaded' });
+    console.log('\n--- [Buyer Briefs] 3. Posting Project Brief (/projects/create) ---');
+    await buyerPage.goto('/projects/create', { waitUntil: 'domcontentloaded' });
     await buyerPage.waitForTimeout(1500);
 
     const briefTitleInput = buyerPage.locator('input[placeholder*="Build a responsive"], input[name="title"]').first();
@@ -117,10 +117,10 @@ test.describe.serial('Suite 1: Marketplace End-to-End Buyer & Seller Lifecycle &
     await submitBriefBtn.click();
     await buyerPage.waitForTimeout(3000);
 
-    // Verify on /briefs/my-briefs
-    await buyerPage.goto('/briefs/my-briefs', { waitUntil: 'domcontentloaded' });
+    // Verify on /projects/my-projects
+    await buyerPage.goto('/projects/my-projects', { waitUntil: 'domcontentloaded' });
     await buyerPage.waitForTimeout(2000);
-    console.log('   ✅ Project Brief successfully registered and inspected on /briefs/my-briefs.');
+    console.log('   ✅ Project Brief successfully registered and inspected on /projects/my-projects.');
   });
 
   // ---------------------------------------------------------------------------

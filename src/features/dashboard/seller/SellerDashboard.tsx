@@ -827,13 +827,13 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({ user }) => {
             </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
               <Link
-                href="/briefs?view=feed"
+                href="/projects?view=feed"
                 className="px-5 py-2.5 rounded-[6px] bg-[#EFEFEF] hover:bg-[#E5E5E5] text-[#1F2937] text-xs sm:text-[13px] font-semibold transition-colors"
               >
                 Explore Projects
               </Link>
               <Link
-                href="/briefs/my-proposals"
+                href="/projects/my-proposals"
                 className="px-5 py-2.5 rounded-[6px] bg-white hover:bg-[#E5E5E5] text-[#000000] border border-[rgba(0,0,0,0.10)] text-xs sm:text-[13px] font-semibold transition-colors"
               >
                 My Proposals

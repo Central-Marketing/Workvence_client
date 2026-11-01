@@ -158,7 +158,7 @@ export default function MyProposalsPage() {
           subtitle="Keep track of your bids, client responses, and proposal status for open client projects."
           actions={
             <Button
-              href="/briefs?view=feed"
+              href="/projects?view=feed"
               variant="brand"
               size="sm"
               radius="fiverr"
@@ -263,7 +263,7 @@ export default function MyProposalsPage() {
               </Button>
             ) : (
               <Link
-                href="/briefs?view=feed"
+                href="/projects?view=feed"
                 className="px-5 py-2.5 rounded-[6px] font-semibold text-xs sm:text-[13px] bg-[#0D6D5F] hover:bg-[#0B5C50] text-white transition-colors cursor-pointer shadow-2xs"
               >
                 Browse Open Projects
@@ -391,7 +391,7 @@ export default function MyProposalsPage() {
 
                       {briefId && (
                         <Link
-                          href={`/briefs/${briefId}`}
+                          href={`/projects/${briefId}`}
                           onClick={(e) => e.stopPropagation()}
                           className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] font-bold text-[#0D6D5F] hover:text-[#0B5C50] group-hover:underline transition-colors"
                         >
@@ -571,7 +571,7 @@ export default function MyProposalsPage() {
                     {briefId && (
                       <div className="pt-2">
                         <Link
-                          href={`/briefs/${briefId}`}
+                          href={`/projects/${briefId}`}
                           className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0D6D5F] hover:underline"
                         >
                           <span>Open Full Project Page</span>
@@ -608,7 +608,7 @@ export default function MyProposalsPage() {
               if (!briefId) return null;
               return (
                 <Link
-                  href={`/briefs/${briefId}`}
+                  href={`/projects/${briefId}`}
                   className="px-4 h-10 inline-flex items-center justify-center rounded-[6px] bg-[#0D6D5F] hover:bg-[#0B5C50] text-white text-xs font-semibold transition-colors"
                 >
                   View Project

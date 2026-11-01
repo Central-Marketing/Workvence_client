@@ -49,7 +49,7 @@ tests/
 - **Coverage:**
   1. Public discovery, category bar dropdowns, search auto-complete, header/footer button audits.
   2. Seller `/organize` studio package wizard (step-by-step tier inputs, gallery, tags, publish) & `/my-packages` action controls.
-  3. Buyer `/briefs/create` proposal submission & `/briefs/my-briefs` tracking.
+  3. Buyer `/projects/create` proposal submission & `/projects/my-projects` tracking.
   4. Cross-user real-time Socket.io chat messaging & file attachments (`/messages`).
   5. Seller `/earnings` dashboard, clearance timeline, and withdrawal modal trigger.
 

@@ -48,7 +48,7 @@ const PostProject = () => {
 
                             <div>
                                 <AiGradientButton
-                                    href="/briefs/create"
+                                    href="/projects/create"
                                     className=""
                                     text="Post a Project with AI"
                                     icon={

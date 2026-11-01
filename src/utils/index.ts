@@ -11,3 +11,4 @@ export * from './userStatus';
 export * from './tokenRefresh';
 export * from './revision';
 export * from './formatBytes';
+export { normalizeNotificationLink } from './notificationToast';

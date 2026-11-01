@@ -6,7 +6,7 @@
  * Features tested:
  *   1. Dual authentication & session validation
  *   2. Seller Gig Creation (/organize -> /my-packages)
- *   3. Buyer Project / Brief Creation (/briefs/create -> /briefs/my-briefs)
+ *   3. Buyer Project / Brief Creation (/projects/create -> /projects/my-projects)
  *   4. Two-way Real-time Messaging (Buyer <-> Seller chat)
  *   5. Order Lifecycle: Deliver work, Extension request, Revision/Cancel actions
  *   6. Support Ticket & Admin Chat (/support/new -> /support/[id])
@@ -193,12 +193,12 @@ async function runComprehensiveDualJourney() {
     }
 
     // =========================================================================
-    // 3. BUYER: PROJECT / BRIEF CREATION (/briefs/create)
+    // 3. BUYER: PROJECT / BRIEF CREATION (/projects/create)
     // =========================================================================
-    step = await tracker.startStep('Buyer: Create & Post Project Brief (/briefs/create)', '3. Buyer Brief Creation');
+    step = await tracker.startStep('Buyer: Create & Post Project Brief (/projects/create)', '3. Buyer Brief Creation');
     try {
-      await buyerPage.goto(`${BASE_URL}/briefs/create`, { waitUntil: 'domcontentloaded', timeout: 25000 });
-      await tracker.recordPagePerformance(buyerPage, 'Create Brief Page', `${BASE_URL}/briefs/create`);
+      await buyerPage.goto(`${BASE_URL}/projects/create`, { waitUntil: 'domcontentloaded', timeout: 25000 });
+      await tracker.recordPagePerformance(buyerPage, 'Create Brief Page', `${BASE_URL}/projects/create`);
       await buyerPage.waitForTimeout(2000);
 
       // Check if Step 1 (AI / Manual prompt) is present
@@ -234,12 +234,12 @@ async function runComprehensiveDualJourney() {
         await buyerPage.waitForTimeout(3000);
       }
 
-      // Verify on /briefs/my-briefs
-      await buyerPage.goto(`${BASE_URL}/briefs/my-briefs`, { waitUntil: 'domcontentloaded', timeout: 20000 });
-      await tracker.recordPagePerformance(buyerPage, 'Buyer My Briefs', `${BASE_URL}/briefs/my-briefs`);
+      // Verify on /projects/my-projects
+      await buyerPage.goto(`${BASE_URL}/projects/my-projects`, { waitUntil: 'domcontentloaded', timeout: 20000 });
+      await tracker.recordPagePerformance(buyerPage, 'Buyer My Briefs', `${BASE_URL}/projects/my-projects`);
       await buyerPage.waitForTimeout(2000);
 
-      await tracker.passStep(step, `Project brief created and verified on /briefs/my-briefs (${createdBriefTitle})`, buyerPage);
+      await tracker.passStep(step, `Project brief created and verified on /projects/my-projects (${createdBriefTitle})`, buyerPage);
     } catch (err) {
       await tracker.failStep(step, err, 'Project brief creation failed', buyerPage);
     }

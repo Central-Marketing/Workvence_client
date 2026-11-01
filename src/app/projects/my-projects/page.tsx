@@ -41,6 +41,38 @@ type LooseRecord = Record<string, unknown>;
 const asRecord = (val: unknown): LooseRecord | null =>
   typeof val === "object" && val !== null ? (val as LooseRecord) : null;
 
+const getProposalCount = (brief: unknown): number => {
+  const b = asRecord(brief);
+  if (!b) return 0;
+  const raw =
+    b.proposalCount ??
+    asRecord(b._count)?.proposals ??
+    b.proposalsCount ??
+    (Array.isArray(b.proposals) ? b.proposals.length : 0);
+  const num = Number(raw);
+  return Number.isFinite(num) && num > 0 ? num : 0;
+};
+
+const resolveBriefId = (brief: unknown): string => {
+  const b = asRecord(brief);
+  if (!b) return "";
+  const raw = b._id ?? b.id;
+  return typeof raw === "string" || typeof raw === "number" ? String(raw).trim() : "";
+};
+
+const resolveProposalBriefId = (proposal: unknown): string => {
+  const p = asRecord(proposal);
+  if (!p) return "";
+  const nested = asRecord(p.briefID) || asRecord(p.brief) || asRecord(p.briefId);
+  if (nested) {
+    const nestedId = resolveBriefId(nested);
+    if (nestedId) return nestedId;
+  }
+  if (typeof p.briefID === "string" && p.briefID.trim()) return p.briefID.trim();
+  if (typeof p.briefId === "string" && p.briefId.trim()) return p.briefId.trim();
+  return "";
+};
+
 const extractProposalApplicants = (proposals: unknown): ProposalApplicant[] => {
   if (!Array.isArray(proposals)) return [];
   return proposals
@@ -245,12 +277,8 @@ const MyBriefs = () => {
   const proposalQueries = useQueries({
     queries: briefsArray.map((rawBrief: unknown) => {
       const b = asRecord(rawBrief) || {};
-      const briefId = String(b?._id || b?.id || "");
-      const pCount =
-        b?.proposalCount ??
-        asRecord(b._count)?.proposals ??
-        b?.proposalsCount ??
-        (Array.isArray(b?.proposals) ? b.proposals.length : 0);
+      const briefId = resolveBriefId(b);
+      const pCount = getProposalCount(b);
       const hasInlineApplicants = extractProposalApplicants(b?.proposals).length > 0;
 
       return {
@@ -302,10 +330,7 @@ const MyBriefs = () => {
 
     briefsArray.forEach((b: any) => {
       const isClosed = b.isClosed || b.status === "closed";
-      const pCount =
-        b.proposalCount ??
-        b.proposalsCount ??
-        (Array.isArray(b.proposals) ? b.proposals.length : 0);
+      const pCount = getProposalCount(b);
 
       if (pCount > 0 && !isClosed) newProposalsCount++;
       if (isProjectNew(b) && !isClosed) newProjectsCount++;
@@ -333,11 +358,7 @@ const MyBriefs = () => {
     } else if (filter === "new_proposals") {
       list = list.filter((b) => {
         const isClosed = b.isClosed || b.status === "closed";
-        const pCount =
-          b.proposalCount ??
-          b.proposalsCount ??
-          (Array.isArray(b.proposals) ? b.proposals.length : 0);
-        return pCount > 0 && !isClosed;
+        return getProposalCount(b) > 0 && !isClosed;
       });
     } else if (filter === "new_projects") {
       list = list.filter((b) => isProjectNew(b) && !b.isClosed && b.status !== "closed");
@@ -367,9 +388,7 @@ const MyBriefs = () => {
     // 3. Sorting
     list.sort((a, b) => {
       if (sortBy === "proposals") {
-        const pA = a.proposalCount ?? a.proposalsCount ?? (Array.isArray(a.proposals) ? a.proposals.length : 0);
-        const pB = b.proposalCount ?? b.proposalsCount ?? (Array.isArray(b.proposals) ? b.proposals.length : 0);
-        return pB - pA;
+        return getProposalCount(b) - getProposalCount(a);
       }
       if (sortBy === "budget") {
         const bA = typeof a.budget === "number" ? a.budget : parseFloat(a.budget) || 0;
@@ -625,29 +644,25 @@ const MyBriefs = () => {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filtered.map((brief: any, index: number) => {
-              const briefId = String(brief._id || brief.id || "");
+              const briefId = resolveBriefId(brief);
               const isClosed = brief.isClosed || brief.status === "closed";
               const isNew = isProjectNew(brief);
               const proposalInfo = briefId ? proposalsByBriefId.get(briefId) : undefined;
               const applicants =
                 proposalInfo?.applicants || extractProposalApplicants(brief.proposals);
               const isProposalsLoading = Boolean(proposalInfo?.isLoading);
-              const proposalCount = Math.max(
-                brief.proposalCount ??
-                  brief._count?.proposals ??
-                  brief.proposalsCount ??
-                  (Array.isArray(brief.proposals) ? brief.proposals.length : 0),
-                applicants.length
-              );
+              const proposalCount = Math.max(getProposalCount(brief), applicants.length);
               const tags = getBriefTags(brief);
               const workType = getWorkType(brief, index);
               const rateBadge = getRateBadge(brief);
-              const isMenuOpen = openMenuId === brief._id;
+              const isMenuOpen = Boolean(briefId) && openMenuId === briefId;
 
               return (
                 <div
-                  key={brief._id}
-                  onClick={() => router.push(`/projects/${brief._id}`)}
+                  key={briefId || index}
+                  onClick={() => {
+                    if (briefId) router.push(`/projects/${briefId}`);
+                  }}
                   className={`relative bg-white rounded-[6px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-5 sm:p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer ${isMenuOpen ? "z-30 overflow-visible" : "overflow-hidden"
                     }`}
                 >
@@ -720,7 +735,8 @@ const MyBriefs = () => {
                           className={`relative ${isMenuOpen ? "z-50" : ""}`}
                           onClick={(e) => {
                             e.stopPropagation();
-                            setOpenMenuId(isMenuOpen ? null : brief._id);
+                            if (!briefId) return;
+                            setOpenMenuId(isMenuOpen ? null : briefId);
                           }}
                         >
                           <Button
@@ -769,7 +785,7 @@ const MyBriefs = () => {
                                   fullWidth
                                   onClick={() => {
                                     setOpenMenuId(null);
-                                    closeMutation.mutate(brief._id || brief.id);
+                                    if (briefId) closeMutation.mutate(briefId);
                                   }}
                                   leftIcon={<FiXCircle className="text-[#292929]" />}
                                   className="!justify-start text-left px-3.5 py-2 text-xs font-medium text-[#292929] hover:bg-amber-50 border-none shadow-none h-auto min-h-0 transition-colors"
@@ -787,7 +803,7 @@ const MyBriefs = () => {
                                   fullWidth
                                   onClick={() => {
                                     setOpenMenuId(null);
-                                    reopenMutation.mutate(brief._id || brief.id);
+                                    if (briefId) reopenMutation.mutate(briefId);
                                   }}
                                   leftIcon={<FiRotateCcw className="text-teal-600" />}
                                   className="!justify-start text-left px-3.5 py-2 text-xs font-medium text-teal-700 hover:bg-teal-50 border-none shadow-none h-auto min-h-0 transition-colors"
@@ -804,7 +820,7 @@ const MyBriefs = () => {
                                 fullWidth
                                 onClick={() => {
                                   setOpenMenuId(null);
-                                  setDeletingBriefId(brief._id || brief.id);
+                                  if (briefId) setDeletingBriefId(briefId);
                                 }}
                                 leftIcon={<FiTrash2 className="text-rose-500" />}
                                 className="!justify-start text-left px-3.5 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 border-none shadow-none h-auto min-h-0 transition-colors"
@@ -974,14 +990,17 @@ const MyProposals = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {proposalsArray.map((proposal: any) => {
-              const brief = proposal.briefID || {};
-              const briefId = brief._id || proposal.briefID;
+            {proposalsArray.map((proposal: any, index: number) => {
+              const brief = asRecord(proposal.briefID) || asRecord(proposal.brief) || {};
+              const briefId = resolveProposalBriefId(proposal);
+              const proposalKey = String(proposal._id || proposal.id || index);
 
               return (
                 <div
-                  key={proposal._id}
-                  onClick={() => router.push(`/projects/${briefId}`)}
+                  key={proposalKey}
+                  onClick={() => {
+                    if (briefId) router.push(`/projects/${briefId}`);
+                  }}
                   className="relative overflow-hidden bg-white rounded-[6px] border border-slate-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] shadow-[0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-md p-6 sm:p-7 flex flex-col justify-between transition-all duration-300 group cursor-pointer"
                 >
                   {/* Ambient Purple Glow (appears on card hover) */}
@@ -1005,7 +1024,7 @@ const MyProposals = () => {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0 flex-1">
                         <h2 className="text-lg sm:text-[19px] font-bold text-slate-900 tracking-tight group-hover:text-slate-950 truncate">
-                          {brief.title || "Project Proposal"}
+                          {typeof brief.title === "string" && brief.title ? brief.title : "Project Proposal"}
                         </h2>
                         <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
                           <span>Submitted {moment(proposal.createdAt).fromNow()}</span>

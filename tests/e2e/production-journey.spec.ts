@@ -378,13 +378,27 @@ test.describe.serial('Workvence Production-Grade Dual-Role E2E Master Suite', ()
     await buyerPage.goto('/projects/my-projects', { waitUntil: 'domcontentloaded' });
     await auditPage(buyerPage, 'My Briefs Dashboard');
 
+    const extractProjectDetailId = (pathname: string): string | null => {
+      const match = pathname.match(/^\/projects\/([^/?#]+)\/?$/);
+      if (!match) return null;
+      const seg = match[1];
+      if (!seg || ['create', 'my-projects', 'my-proposals', 'my-briefs'].includes(seg.toLowerCase())) {
+        return null;
+      }
+      return seg;
+    };
+
     const firstBriefCard = buyerPage.locator('.grid > div').first();
     if (await firstBriefCard.isVisible({ timeout: 10000 }).catch(() => false)) {
       if (!createdBriefId) {
         await firstBriefCard.click();
-        await buyerPage.waitForURL((url) => url.pathname.includes('/projects/'), { timeout: 15000 }).catch(() => {});
-        if (buyerPage.url().includes('/projects/')) {
-          createdBriefId = buyerPage.url().split('/projects/')[1]?.split('?')[0]?.split('/')[0] || null;
+        await buyerPage
+          .waitForURL((url) => extractProjectDetailId(url.pathname) !== null, { timeout: 15000 })
+          .catch(() => {});
+        try {
+          createdBriefId = extractProjectDetailId(new URL(buyerPage.url()).pathname);
+        } catch {
+          createdBriefId = null;
         }
       }
     }

@@ -540,11 +540,17 @@ export default function MyProposalsPage() {
               const brief =
                 typeof selectedProposal?.briefID === "object" && selectedProposal?.briefID !== null
                   ? selectedProposal.briefID
-                  : {};
+                  : typeof selectedProposal?.brief === "object" && selectedProposal?.brief !== null
+                    ? selectedProposal.brief
+                    : {};
               const briefId =
                 brief._id ||
                 brief.id ||
-                (typeof selectedProposal?.briefID === "string" ? selectedProposal.briefID : null);
+                (typeof selectedProposal?.briefID === "string"
+                  ? selectedProposal.briefID
+                  : typeof selectedProposal?.briefId === "string"
+                    ? selectedProposal.briefId
+                    : null);
 
               if (!brief.title && !brief.description) return null;
 
@@ -600,11 +606,17 @@ export default function MyProposalsPage() {
               const brief =
                 typeof selectedProposal?.briefID === "object" && selectedProposal?.briefID !== null
                   ? selectedProposal.briefID
-                  : {};
+                  : typeof selectedProposal?.brief === "object" && selectedProposal?.brief !== null
+                    ? selectedProposal.brief
+                    : {};
               const briefId =
                 brief._id ||
                 brief.id ||
-                (typeof selectedProposal?.briefID === "string" ? selectedProposal.briefID : null);
+                (typeof selectedProposal?.briefID === "string"
+                  ? selectedProposal.briefID
+                  : typeof selectedProposal?.briefId === "string"
+                    ? selectedProposal.briefId
+                    : null);
               if (!briefId) return null;
               return (
                 <Link

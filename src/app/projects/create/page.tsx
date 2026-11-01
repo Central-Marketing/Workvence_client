@@ -192,7 +192,20 @@ const CreateBrief = () => {
             ? String(draft.deliveryTime)
             : form.deliveryTime,
         requiredSkills: Array.isArray(draft?.requiredSkills)
-          ? draft.requiredSkills
+          ? (() => {
+              const seen = new Set<string>();
+              const cleaned: string[] = [];
+              for (const item of draft.requiredSkills) {
+                if (typeof item !== "string") continue;
+                const trimmed = item.trim();
+                if (!trimmed) continue;
+                const lower = trimmed.toLowerCase();
+                if (seen.has(lower)) continue;
+                seen.add(lower);
+                cleaned.push(trimmed);
+              }
+              return cleaned;
+            })()
           : form.requiredSkills,
       });
 

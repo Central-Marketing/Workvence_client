@@ -248,7 +248,7 @@ function BriefsContent() {
     const qView = searchParams?.get("view") || "";
     const qExplore = searchParams?.get("explore") || "";
 
-    if (qSearch !== search) setSearch(qSearch);
+    if (qSearch !== search.trim()) setSearch(qSearch);
     if (qCat) setActivePill(qCat.toLowerCase().replace(/&/g, "and").replace(/\s+/g, "-"));
     else if (!qCat && activePill !== "all") setActivePill("all");
 
@@ -937,10 +937,10 @@ function BriefsContent() {
                         const isFav = favoritedIds.has(briefId);
 
                         return (
-                          <div
+                          <Link
                             key={briefId}
-                            onClick={() => router.push(`/projects/${briefId}`)}
-                            className="relative overflow-hidden bg-white rounded-[6px] border border-gray-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] p-6 sm:p-7 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer group select-none"
+                            href={briefId ? `/projects/${briefId}` : "/projects"}
+                            className="relative overflow-hidden bg-white rounded-[6px] border border-gray-200/90 hover:border-[var(--purple-200,#B78AF7)] hover:rounded-[6px] p-6 sm:p-7 shadow-2xs hover:shadow-md transition-all duration-300 flex flex-col justify-between cursor-pointer group select-none no-underline text-inherit"
                           >
                             {/* Ambient Purple Glow (appears on card hover) */}
                             <div
@@ -1060,7 +1060,7 @@ function BriefsContent() {
                                 ) : null}
                               </div>
                             </div>
-                          </div>
+                          </Link>
                         );
                       })}
                     </div>

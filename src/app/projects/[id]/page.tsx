@@ -148,15 +148,37 @@ const BriefDetail = () => {
   const user = useUserStore((state) => state.user);
   const queryClient = useQueryClient();
 
+  const currentUserScopeId = String(user?._id || user?.id || user?.username || "").trim();
+  const proposedStorageKey =
+    currentUserScopeId && briefId ? `proposed_${currentUserScopeId}_${briefId}` : "";
+
   // Modals state
-  const [proposalSent, setProposalSent] = useState(false);
+  const [sentProposalKey, setSentProposalKey] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showMyProposalModal, setShowMyProposalModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<"login" | "register">("register");
-  const [submittedProposalData, setSubmittedProposalData] = useState<any>(null);
+  const [submittedProposalEntry, setSubmittedProposalEntry] = useState<{ key: string; data: any } | null>(null);
+
+  const submittedProposalData =
+    proposedStorageKey && submittedProposalEntry?.key === proposedStorageKey
+      ? submittedProposalEntry.data
+      : null;
+
+  const proposalSent = useMemo(() => {
+    if (!proposedStorageKey) return false;
+    if (sentProposalKey === proposedStorageKey) return true;
+    if (typeof window !== "undefined") {
+      try {
+        return Boolean(localStorage.getItem(proposedStorageKey));
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  }, [proposedStorageKey, sentProposalKey]);
 
   // Proposals modal states
   const [showProposalsModal, setShowProposalsModal] = useState(false);
@@ -176,9 +198,6 @@ const BriefDetail = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (typeof window !== "undefined" && localStorage.getItem(`proposed_${briefId}`)) {
-      setProposalSent(true);
-    }
   }, [briefId]);
 
   // Lock scroll when proposals drawer or seller proposal drawer is open
@@ -296,11 +315,19 @@ const BriefDetail = () => {
     });
   }, [modalView, normalizedProposals, aiRecommendedIds]);
 
-  const totalProposalsCount = brief?.proposalCount ?? 0;
+  const totalProposalsCount = Math.max(
+    Number(
+      brief?.proposalCount ??
+        brief?._count?.proposals ??
+        brief?.proposalsCount ??
+        (Array.isArray(brief?.proposals) ? brief.proposals.length : 0)
+    ) || 0,
+    normalizedProposals.length
+  );
 
   // Check if seller already submitted a proposal
   const { data: myProposals = [] } = useQuery({
-    queryKey: ["my-proposals-for-brief", briefId],
+    queryKey: ["my-proposals-for-brief", briefId, currentUserScopeId],
     queryFn: () =>
       axiosFetch
         .get(`/briefs/my-proposals`)
@@ -315,8 +342,13 @@ const BriefDetail = () => {
               p.briefID === briefId ||
               p.briefID?._id === briefId ||
               p.briefID?.id === briefId ||
+              p.briefId === briefId ||
+              p.brief?._id === briefId ||
+              p.brief?.id === briefId ||
               p.briefID === brief?._id ||
-              p.briefID === brief?.id
+              p.briefID === brief?.id ||
+              p.briefId === brief?._id ||
+              p.briefId === brief?.id
           );
         })
         .catch(() => []),
@@ -415,11 +447,15 @@ const BriefDetail = () => {
     },
   });
 
-  const handleProposalSuccess = (data?: any, isAlreadySubmitted?: boolean) => {
-    setProposalSent(true);
-    setSubmittedProposalData(data);
-    if (typeof window !== "undefined") {
-      localStorage.setItem(`proposed_${briefId}`, "true");
+  const handleProposalSuccess = (data?: any, _isAlreadySubmitted?: boolean) => {
+    if (proposedStorageKey) {
+      setSentProposalKey(proposedStorageKey);
+      setSubmittedProposalEntry({ key: proposedStorageKey, data });
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem(proposedStorageKey, "true");
+        } catch {}
+      }
     }
     queryClient.invalidateQueries({ queryKey: ["brief", briefId] });
     queryClient.invalidateQueries({ queryKey: ["brief-proposals", briefId] });
@@ -840,6 +876,7 @@ const BriefDetail = () => {
                   View {totalProposalsCount} {totalProposalsCount === 1 ? "proposal" : "proposals"}
                 </Button>
               </div>
+
             </div>
           ) : (
             /* FREELANCER / GUEST VIEW */
@@ -888,81 +925,9 @@ const BriefDetail = () => {
                 </div>
               </div>
 
-              {/* Action Button: Guest ("Join Now") vs Logged-in Seller ("Send Proposal" / "Proposal Submitted") vs Owner Controls */}
+              {/* Action Button: Guest ("Join Now") vs Logged-in Seller ("Send Proposal" / "Proposal Submitted") */}
               <div className="mt-4">
-                {isOwner ? (
-                  <div className="space-y-2.5 pt-2 border-t border-slate-100">
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="font-bold text-slate-500 uppercase tracking-wider text-[11px]">
-                        Project Status
-                      </span>
-                      <span
-                        className={`font-bold px-2 py-0.5 rounded-full text-[11px] ${isClosed
-                          ? "bg-rose-50 text-rose-600 border border-rose-200/80"
-                          : "bg-emerald-50 text-emerald-700 border border-emerald-200/80"
-                          }`}
-                      >
-                        {isClosed ? "Closed" : "Active / Open"}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {!isClosed && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          radius="md"
-                          onClick={() => setShowEditModal(true)}
-                          leftIcon={<FiEdit3 className="text-slate-600" />}
-                          className="w-full text-xs font-semibold border-slate-200 hover:bg-slate-50"
-                        >
-                          Edit Project
-                        </Button>
-                      )}
-
-                      {!isClosed ? (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          radius="md"
-                          onClick={() => closeMutation.mutate()}
-                          isLoading={closeMutation.isPending}
-                          leftIcon={<FiXCircle className="text-amber-500" />}
-                          className="w-full text-xs font-semibold text-amber-700 border-amber-200 hover:bg-amber-50"
-                        >
-                          Close Project
-                        </Button>
-                      ) : (
-                        <Button
-                          type="button"
-                          variant="brand"
-                          size="sm"
-                          radius="md"
-                          onClick={() => reopenMutation.mutate()}
-                          isLoading={reopenMutation.isPending}
-                          leftIcon={<FiRotateCcw className="text-white" />}
-                          className="w-full text-xs font-semibold bg-[#0D6D5F] hover:bg-[#0b5c50] text-white"
-                        >
-                          Reopen Project
-                        </Button>
-                      )}
-                    </div>
-
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      radius="md"
-                      onClick={() => setShowDeleteModal(true)}
-                      leftIcon={<FiTrash2 className="text-rose-500" />}
-                      className="w-full text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-100/80"
-                    >
-                      Delete Project
-                    </Button>
-                  </div>
-                ) : !user ? (
+                {!user ? (
                   <Button
                     type="button"
                     variant="dark"
@@ -1861,7 +1826,16 @@ const BriefDetail = () => {
         initialMode={authModalMode}
         defaultIsSeller={true}
         onSuccess={(loggedInUser) => {
-          if (loggedInUser?.isSeller && !showSubmittedUI && !isClosed) {
+          const loggedInScope = String(
+            loggedInUser?._id || loggedInUser?.id || loggedInUser?.username || ""
+          ).trim();
+          let alreadySent = false;
+          if (loggedInScope && briefId && typeof window !== "undefined") {
+            try {
+              alreadySent = Boolean(localStorage.getItem(`proposed_${loggedInScope}_${briefId}`));
+            } catch {}
+          }
+          if (loggedInUser?.isSeller && !alreadySent && !isClosed) {
             setShowModal(true);
           }
         }}

@@ -111,12 +111,12 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   const severity = String(msg.moderation?.severity || "high").toLowerCase();
   const severityBubbleClass =
     severity === "low"
-      ? "!border-amber-300 !bg-amber-50/80 dark:!bg-amber-950/30 dark:!border-amber-700/60"
+      ? "!border-amber-300 !bg-amber-50/80 "
       : severity === "medium"
-        ? "!border-orange-300 !bg-orange-50/80 dark:!bg-orange-950/30 dark:!border-orange-700/60"
+        ? "!border-orange-300 !bg-orange-50/80 "
         : severity === "critical"
-          ? "!border-red-500 !bg-red-100/90 dark:!bg-red-950/50 dark:!border-red-600"
-          : "!border-rose-400 !bg-rose-50/80 dark:!bg-rose-950/30 dark:!border-rose-700/60";
+          ? "!border-red-500 !bg-red-100/90 "
+          : "!border-rose-400 !bg-rose-50/80 ";
 
   const severityIconColor =
     severity === "low"
@@ -227,8 +227,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
           <>
             <div
               className={`relative px-2.5 pt-2 pb-1.5 min-w-[85px] max-w-full shadow-2xs [overflow-wrap:anywhere] [word-break:break-word] ${bubbleModerationClass} ${isOwner
-                  ? "rounded-[10px_10px_10px_0] border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-300,#F5F5F5)]"
-                  : "rounded-[10px_10px_10px_0] bg-[#FFF] border-0"
+                ? "rounded-[10px_10px_10px_0] border border-[rgba(0,0,0,0.10)] bg-[var(--Foundation-White-white-300,#F5F5F5)]"
+                : "rounded-[10px_10px_10px_0] bg-[#FFF] border-0"
                 }`}
             >
               <div className="clear-both">
